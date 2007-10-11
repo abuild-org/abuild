@@ -1,0 +1,9 @@
+declare INCLUDES list filename prepend
+declare LIBS list string prepend
+declare LIBDIRS list string prepend
+
+declare PLATFORM string
+declare TARGET-TYPE string
+
+declare OTHER_LIST list string append
+OTHER_LIST = a

@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+foreach my $o (".release", ".debug", "")
+{
+    print "platform os.cpu.toolset.echo$o -type echo\n";
+}

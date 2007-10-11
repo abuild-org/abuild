@@ -1,0 +1,112 @@
+abuild: e.lib (abuild-os.cpu.toolset.echo): bin-bin1
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src1.c bin1-src1.o bin1-src1.dep
+Compiling ../bin1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags-
+make-obj src: ../bin1-src1.c
+make-obj obj: bin1-src1.o
+contents of bin1-src1.o:
+** file: bin1-src1.c **
+end contents of bin1-src1.o
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src2.cc bin1-src2.o bin1-src2.dep
+Compiling ../bin1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../bin1-src2.cc
+make-obj obj: bin1-src2.o
+contents of bin1-src2.o:
+** file: bin1-src2.cc **
+end contents of bin1-src2.o
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src3.cpp bin1-src3.o bin1-src3.dep
+Compiling ../bin1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../bin1-src3.cpp
+make-obj obj: bin1-src3.o
+contents of bin1-src3.o:
+** file: bin1-src3.cpp **
+end contents of bin1-src3.o
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
+Compiling ../lib1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags- -xcppflags- -lib1-src1-xcppflags- -xcflags- -lib1-src1-xcflags-
+make-obj src: ../lib1-src1.c
+make-obj obj: lib1-src1.lo
+contents of lib1-src1.lo:
+** file: lib1-src1.c **
+end contents of lib1-src1.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -lib1-src2-oflags- -wflags-  -xcppflags-  ../lib1-src2.cc lib1-src2.lo lib1-src2.dep
+Compiling ../lib1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -lib1-src2-oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib1-src2.cc
+make-obj obj: lib1-src2.lo
+contents of lib1-src2.lo:
+** file: lib1-src2.cc **
+end contents of lib1-src2.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -lib1-src3-wflags-  -xcppflags-  ../lib1-src3.cpp lib1-src3.lo lib1-src3.dep
+Compiling ../lib1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -lib1-src3-wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib1-src3.cpp
+make-obj obj: lib1-src3.lo
+contents of lib1-src3.lo:
+** file: lib1-src3.cpp **
+end contents of lib1-src3.lo
+Creating lib1 library
+make-lib objects: lib1-src1.lo lib1-src2.lo lib1-src3.lo
+make-lib lib: lib-lib1
+contents of lib-lib1:
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+end contents of lib-lib1
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../lib2.cc lib2.lo lib2.dep
+Compiling ../lib2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib2.cc
+make-obj obj: lib2.lo
+contents of lib2.lo:
+** file: lib2.cc **
+end contents of lib2.lo
+Creating lib2 library
+make-lib objects: lib2.lo
+make-lib lib: lib-lib2
+contents of lib-lib2:
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+end contents of lib-lib2
+Creating bin1 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin1-src1.o bin1-src2.o bin1-src3.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin1
+contents of bin-bin1:
+** bin bin1 **
+** file: bin1-src1.c **
+** file: bin1-src2.cc **
+** file: bin1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin1 **
+end contents of bin-bin1

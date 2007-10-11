@@ -1,0 +1,54 @@
+Our figures are created with the diagramming tool called "dia".  This
+is basically a free Visio clone.  We have adopted certain conventions
+in the figures.  Some of these are for visual consistency, and others
+are to work around limitations of the tool.
+
+Visual Consistency
+==================
+
+ * Build items are UML objects, line width 0.10
+
+ * Directories are folders, line width 0.10
+
+ * Labels for build items and directories use the default font and
+   size information
+
+ * Scope and arrow labels use sans italic with font size 0.6.
+
+ * Never use linewidth 0.  Use 0.05 for the thinnest line width.
+
+ * For backing areas, a linewidth of 0.10 and a hollow triangle arrow
+   head
+
+ * For externals, use a linewidth of 0.10 and a filled in spear head
+   as the arrow head
+
+ * For dependencies, use a linewidth of 0.05 and a simple arrow head
+   (like a V).
+
+ * For annotations, use a labelled oval and a simple undirected
+   connecting line at 0.05.  Use font size 0.6, sans, normal as the
+   label font.  Use 0.05 as the line width for the oval as well.
+
+ * Lines to backing areas and externals
+
+ * When shading for scopes, be consistent with conventions used in
+   build-item-scopes.dia
+
+ * When shading for build tree membership, use #F0F0F0.
+
+ * When shading build items that are inherited from backing areas or
+   externals, use #A0A0A0 as the line/text color and #E0E0E0 as the
+   background color.
+
+ * For Abuild.interface or Abuild.conf code, use monospace at 0.7
+
+Tool Workarounds
+================
+
+This list is as of dia 0.96.1.
+
+ * Dia computes incorrect bounding boxes for italicized text.  In
+   order to avoid clipping at the beginnings and ends of italicized
+   labels, make sure each line of each italicized label starts and
+   ends with a space.

@@ -1,0 +1,38 @@
+abuild: java-library (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/classes
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/dist
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/basic/java-library/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/basic/java-library/abuild-java/dist/java-library.jar
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: java-program (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/classes
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/dist
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/basic/java-program/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/basic/java-program/abuild-java/dist/java-program.jar
+
+BUILD SUCCESSFUL
+Total time: <time>

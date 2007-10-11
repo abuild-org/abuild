@@ -1,0 +1,10 @@
+abuild: util (abuild-<native>): all
+make: Entering directory `--topdir--/util/abuild-<native>'
+Compiling ../File1.cpp as C++
+Creating utility library
+make: Leaving directory `--topdir--/util/abuild-<native>'
+abuild: main (abuild-<native>): all
+make: Entering directory `--topdir--/main/abuild-<native>'
+Compiling ../main.cpp as C++
+Creating main executable
+make: Leaving directory `--topdir--/main/abuild-<native>'

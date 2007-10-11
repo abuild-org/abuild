@@ -1,0 +1,34 @@
+abuild: common-lib1.src (abuild-<native>): check
+abuild: common-lib3.src (abuild-<native>): check
+abuild: common-lib2.src (abuild-<native>): check
+abuild: project-lib.src (abuild-<native>): check
+make: Entering directory `--topdir--/stable/project/lib/src/abuild-<native>'
+Compiling ../ProjectLib.cpp as C++
+Creating project-lib library
+make: Leaving directory `--topdir--/stable/project/lib/src/abuild-<native>'
+abuild: project-main.src (abuild-<native>): check
+make: Entering directory `--topdir--/stable/project/main/src/abuild-<native>'
+Compiling ../main.cpp as C++
+Creating main executable
+
+*********************************
+STARTING TESTS on ---timestamp---
+*********************************
+
+
+Running ../qtest/main.test
+main  1 (testing project-main)                                 ... PASSED
+
+Overall test suite                                             ... PASSED
+
+TESTS COMPLETE.  Summary:
+
+Total tests: 1
+Passes: 1
+Failures: 0
+Unexpected Passes: 0
+Expected Failures: 0
+Missing Tests: 0
+Extra Tests: 0
+
+make: Leaving directory `--topdir--/stable/project/main/src/abuild-<native>'

@@ -1,0 +1,55 @@
+target-type object-code
+
+after-build something.interface
+
+declare a string
+declare b list string append
+declare c boolean
+declare d filename
+declare e list filename prepend
+
+a = b
+if (x(asdfoimqwer \
+   asdflasdf))
+ c=d
+ e = f \
+    g
+elseif ($(qwer))
+  q = $(w)
+  if (xyz(,\ \,\$\\))
+    potato = spackle
+  endif
+  if ($(xyz))
+    fallback potato = spackle
+  else
+    override spackle = potato
+  endif
+  if (x(y(z, z), z(w())))
+    moo = quack
+  endif
+else
+  moo = oink\ baaa quack
+endif
+oink = moo
+
+c = true
+if ($(c))
+  # seen
+  bad1 = x
+else
+  # not seen
+  bad2 = x
+endif
+
+target-type $(a)
+override a=
+target-type $(a)
+
+d = a
+after-build $(d)
+
+override a = $(ENV:NO_SUCH_VARIABLE)
+
+reset UNKNOWN
+no-reset UNKNOWN
+flag unknown-flag override a = x

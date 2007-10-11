@@ -1,0 +1,3 @@
+abuild: common (abuild-<native>): no-op
+abuild: b (abuild-<native>): no-op
+abuild: a (abuild-<native>): no-op

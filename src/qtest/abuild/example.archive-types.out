@@ -1,0 +1,147 @@
+abuild: har-example (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/har/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/har/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/har/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/har/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/har/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/har/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/archive-types/har/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/archive-types/har/abuild-java/dist/har-example.har
+     [copy] Copying 1 file to --topdir--/archive-types/har/abuild-java/dist
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: jar-example (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/archive-types/jar/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/archive-types/jar/abuild-java/dist/jar-example.jar
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: client-war-example (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/archive-types/client-war/abuild-java/classes
+
+-copy-classpath:
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/classpath
+     [copy] Copying 2 files to --topdir--/archive-types/client-war/abuild-java/classpath
+
+war:
+      [war] Building war: --topdir--/archive-types/client-war/abuild-java/dist/client-war-example.war
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: ear-example.local-jar (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/archive-types/ear/local-jar/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/archive-types/ear/local-jar/abuild-java/dist/ear-code.jar
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: war-example (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/archive-types/war/abuild-java/classes
+
+-copy-classpath:
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/classpath
+     [copy] Copying 2 files to --topdir--/archive-types/war/abuild-java/classpath
+
+war:
+      [war] Building war: --topdir--/archive-types/war/abuild-java/dist/war-example.war
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: ear-example (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/src/conf
+
+-copy-classpath:
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/classpath
+     [copy] Copying 4 files to --topdir--/archive-types/ear/abuild-java/classpath
+
+ear:
+      [ear] Building ear: --topdir--/archive-types/ear/abuild-java/dist/ear-example.ear
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: other-ear-example (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/src/conf
+
+-copy-classpath:
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/classpath
+     [copy] Copying 3 files to --topdir--/archive-types/other-ear/abuild-java/classpath
+
+-pre-package:
+   [delete] Deleting: --topdir--/archive-types/other-ear/abuild-java/classpath/jar-example.jar
+
+ear:
+      [ear] Building ear: --topdir--/archive-types/other-ear/abuild-java/dist/other-ear-example.ear
+
+BUILD SUCCESSFUL
+Total time: <time>

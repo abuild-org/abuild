@@ -1,0 +1,161 @@
+#!/usr/bin/env perl
+#
+# This script provides the os, cpu, toolset triple for the native platform.
+#
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Spec;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my $devnull = File::Spec->devnull();
+
+my $windows = 0;
+if ((@ARGV == 1) && ($ARGV[0] eq '--windows') &&
+    (($^O eq 'cygwin') || ($^O eq 'MSWin32')))
+{
+    # We're running in cygwin but supporting a native Windows version
+    # of abuild.
+    $windows = 1;
+}
+
+my ($os, $cpu, $toolset) = (get_platform_components());
+print "$os $cpu $toolset\n";
+
+sub get_platform_components
+{
+    # For now, assume Windows or Unix
+    if ($windows)
+    {
+	get_platform_components_windows();
+    }
+    else
+    {
+	get_platform_components_unix();
+    }
+}
+
+sub get_platform_components_windows
+{
+    my $os = 'windows';
+    my $cpu = safe_run("uname -m");
+    $cpu =~ s/-pc$//;		# GNUWin32 uname
+    $cpu =~ s/^i.86$/ix86/;
+    my $toolset = 'nt5-cygwin';
+    ($os, $cpu, $toolset);
+}
+
+sub get_platform_components_unix
+{
+    # Returns (os, cpu, toolset)
+
+    my $os = $^O;
+    my $toolset = 'unknown';
+    my $cpu = 'unknown';
+
+    if ($os eq 'linux')
+    {
+	$cpu = safe_run("uname -m");
+	# Don't distinguish for now between different flavors of ix86.
+	$cpu =~ s/^i.86$/ix86/;
+
+	my $release = "";
+        if (read_dist_file("/etc/mandrake-release", \$release) &&
+	    ($release =~ m/release (\S+) /))
+        {
+            $toolset = "mdk$1";
+        }
+        elsif (read_dist_file("/etc/fedora-release", \$release) &&
+	       ($release =~ m/ release (\S+) /))
+        {
+	    my $release = $1;
+	    if (($release =~ m/^\d+/) && ($release >= 7))
+	    {
+		$toolset = "fedora$release";
+	    }
+	    else
+	    {
+		$toolset = "fc$release";
+	    }
+        }
+        elsif (read_dist_file("/etc/redhat-release", \$release) &&
+	       ($release =~ m/Red Hat Enterprise.*release (\S+) /))
+        {
+            $toolset = "rhel$1";
+        }
+        elsif (read_dist_file("/etc/redhat-release", \$release) &&
+		 ($release =~ m/CentOS release (\S+) /))
+        {
+            $toolset = "centos$1";
+        }
+        elsif (read_dist_file("/etc/debian_version", \$release))
+        {
+	    $toolset = "deb$release";
+	}
+	else
+	{
+	    # unknown toolset
+	}
+    }
+    elsif ($os eq 'solaris')
+    {
+        $cpu = safe_run("uname -p");
+        $toolset = safe_run("uname -r");
+    }
+    elsif ($os eq 'cygwin')
+    {
+	# Note: Cygwin is not Windows; it is more like a UNIX flavor.
+	# If Cygwin is being used as a toolset for Windows, this
+	# program is invoked with the --windows flag and this code is
+	# not seen.
+	$os = 'cygwin';
+	$toolset = 'cygwin-nt5';
+    }
+
+    clean_component(\$os);
+    clean_component(\$cpu);
+    clean_component(\$toolset);
+
+    ($os, $cpu, $toolset);
+}
+
+sub clean_component
+{
+    my $strp = shift;
+    $$strp =~ tr/A-Z/a-z/;
+    $$strp =~ s,[^a-z0-9_-],_,g;
+}
+
+sub read_dist_file
+{
+    # Reads a file specific to a Linux distribution.  If successful,
+    # returns true and initializes $$resultp to the first line.
+
+    my ($filename, $resultp) = @_;
+
+    my $success = 0;
+    if (open(F, "<$filename"))
+    {
+	my $firstline = <F>;
+	close(F);
+	if (defined $firstline)
+	{
+	    chomp($firstline);
+	    $$resultp = $firstline;
+	    $success = 1;
+	}
+    }
+
+    $success;
+}
+
+sub safe_run
+{
+    my $cmd = shift;
+    chop (my $result = `$cmd 2>$devnull`);
+    die "$whoami: $cmd failed\n" if $? != 0;
+    $result;
+}

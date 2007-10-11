@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+print "what is this?\n";
+print "platform a.b.c.d.e -type native\n";
+print "platform a.b.c.d.e -type native\n";
+print "native-compiler xyz\n";
+print "native-compiler xyz\n";

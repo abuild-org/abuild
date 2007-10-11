@@ -1,0 +1,40 @@
+working directory: --top--/run-program
+args:
+  run-program
+  3
+  env = new
+  one "two three
+  four
+env:
+  MOO=quack
+  OINK=spackle
+  VAR=potato
+done
+status: 0
+
+working directory: --top--
+args:
+  run-program
+  0
+  env = both
+  one "two three
+  four
+env:
+  MOO=quack
+  OINK=spackle
+  VAR=potato
+  <other vars>
+done
+status: 1
+
+working directory: /
+args:
+  run-program
+  0
+  env = none
+  one "two three
+  four
+env:
+done
+status: 1
+

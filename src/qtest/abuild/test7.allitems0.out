@@ -1,0 +1,7 @@
+abuild: a (abuild-<native>): all
+abuild: b (abuild-<native>): all
+abuild: prog (abuild-<native>): all
+make: Entering directory `--topdir--/good/prog/abuild-<native>'
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/good/prog/abuild-<native>'

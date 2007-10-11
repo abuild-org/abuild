@@ -1,0 +1,236 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Find;
+use File::Basename;
+
+$| = 1;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my @abuild_conf = ();
+
+my @paths = @ARGV;
+if (@paths == 0)
+{
+    @paths = ('.');
+}
+
+finddepth({wanted => \&wanted, no_chdir => 1}, @paths);
+
+@abuild_conf = sort @abuild_conf;
+
+foreach my $ac (@abuild_conf)
+{
+    my $this = fix_abuild_conf($ac);
+    my $interface_mk = dirname($ac) . "/Interface.mk";
+    if (-f $interface_mk)
+    {
+	if (defined $this)
+	{
+	    fix_interface_mk($interface_mk, $this);
+	}
+	else
+	{
+	    print "$interface_mk belongs to unnamed item\n";
+	}
+	rename $interface_mk, "$interface_mk.off" or die;
+    }
+    my $private_mk = dirname($ac) . "/Private.mk";
+    if (-f $private_mk)
+    {
+	print "$private_mk must be manually converted\n";
+    }
+}
+
+sub fix_abuild_conf
+{
+    my $in = shift;
+    my $dir = dirname($in);
+    my $this = undef;
+    my @out = ();
+    open(IN, "<$in") or die "$whoami: can't open $in: $!";
+    my $found_platform_types = 0;
+    while (<IN>)
+    {
+	if (m/^\s*this\s*:\s*(\S+)/)
+	{
+	    $this = $1;
+	}
+	s/^(\s*)arch(\s*:)/${1}platform-types${2}/;
+	if (m/platform-types\s*:/)
+	{
+	    $found_platform_types = 1;
+	}
+	push(@out, $_);
+    }
+    close(IN);
+    my $out = "$in.new";
+    open(OUT, ">$out") or die "$whoami: can't create $out: $!";
+    for (@out)
+    {
+	if (m/^\s*platform-types\s*:/)
+	{
+	    if (! ((-f "$dir/Abuild.mk") ||
+		   (-f "$dir/Abuild-ant.properties") ||
+		   (-f "$dir/Abuild.interface") ||
+		   (-f "$dir/Interface.mk")))
+	    {
+		next;
+	    }
+	}
+	print OUT;
+	if ((! $found_platform_types) && m/^\s*this\s*:/)
+	{
+	    if ((-f "$dir/Abuild.mk") ||
+		(-f "$dir/Abuild.interface") ||
+		(-f "$dir/Interface.mk"))
+	    {
+		print OUT "platform-types: native\n";
+	    }
+	}
+    }
+    close(OUT);
+    if (system("cmp -s $in $out >/dev/null 2>&1") == 0)
+    {
+	unlink $out;
+    }
+
+    $this;
+}
+
+sub fix_interface_mk
+{
+    my ($in, $this) = @_;
+    open(IN, "<$in") or die "$whoami: can't open $in: $!";
+    my @in = ();
+    while (<IN>)
+    {
+	s/arch-/abuild-/g;
+	s/abuild-\$\(abTARGET_ARCH\)/\$(ABUILD_OUTPUT_DIR)/;
+	s/abCOMPDIR/abDIR/g;
+	push(@in, $_);
+    }
+    close(IN);
+
+    my $known_vars = 'INCLUDES|LIBS|LIBDIRS|X(?:CPP|C|CXX|LINK)FLAGS';
+
+    my $dir_var = '$(abDIR_' . $this . ')';
+
+    my $last_was_continuation = 0;
+    my $in_known_var = 0;
+    my $in_path_var = 0;
+    my @out = ();
+    my $error = 0;
+    foreach my $line (@in)
+    {
+	if (($line =~ m/^\s*#/) || ($line =~ m/^\s*$/))
+	{
+	    push(@out, $line);
+	    next;
+	}
+
+	if (! $last_was_continuation)
+	{
+	    $in_known_var = 0;
+	    $in_path_var = 0;
+	    if ($line =~ m/^\s*($known_vars)\s*\+=/)
+	    {
+		$in_known_var = 1;
+		if ($line =~ m/INCLUDES|LIBDIRS/)
+		{
+		    $in_path_var = 1;
+		}
+	    }
+	}
+
+	if ($in_known_var)
+	{
+	    my $outline = "";
+	    my @words = (split(/(\s+)/, $line));
+	    foreach my $word (@words)
+	    {
+		if (($word =~ m/^\s*$/) ||
+		    ($word eq '\\') ||
+		    ($word =~ m/($known_vars)/))
+		{
+		    $outline .= $word;
+		}
+		elsif ($word eq '+=')
+		{
+		    $outline .= '=';
+		}
+		else
+		{
+		    if ($in_path_var)
+		    {
+			if ($word eq $dir_var)
+			{
+			    $outline .= ".";
+			}
+			elsif ($word =~ s,\Q$dir_var\E/,,)
+			{
+			    $outline .= $word;
+			}
+			else
+			{
+			    $error = 1;
+			    $outline .= '$(ERROR)' . $word;
+			}
+		    }
+		    else
+		    {
+			$outline .= $word;
+		    }
+		}
+	    }
+	    push(@out, $outline);
+	}
+	elsif ($line =~ m/^\s*(WHOLE_lib_\S+)\s*:?=\s*1\s*$/)
+	{
+	    push(@out, "declare $1 boolean\n");
+	    $line =~ s/:=/=/;
+	    push(@out, $line);
+	}
+	elsif ($line =~ m/^\s*endif\s*$/)
+	{
+	    push(@out, $line);
+	}
+	else
+	{
+	    $error = 1;
+	    push(@out, 'ERROR: ' . $line);
+	}
+
+	if ($line =~ m/\\$/)
+	{
+	    $last_was_continuation = 1;
+	}
+	else
+	{
+	    $last_was_continuation = 0;
+	}
+    }
+
+    my $out = dirname($in) . "/Abuild.interface";
+    open(OUT, ">$out") or die "$whoami: can't create $out: $!\n";
+    for (@out)
+    {
+	print OUT $_;
+    }
+    close(OUT);
+
+    if ($error)
+    {
+	print "$out requires manual edits (marked with ERROR)\n";
+    }
+}
+
+sub wanted
+{
+    my $lastcomp = basename($_);
+    push(@abuild_conf, $_) if $lastcomp eq 'Abuild.conf';
+}

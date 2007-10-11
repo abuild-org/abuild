@@ -1,0 +1,6 @@
+lib:<native> -> <none>
+calculate:<native> -> lib:<native>
+lib:<native>.release -> <none>
+calculate:<native>.release -> lib:<native>.release
+codegen:indep -> calculate:<native>.release lib:<native>.release
+prog:<native> -> codegen:indep calculate:<native>.release lib:<native>.release

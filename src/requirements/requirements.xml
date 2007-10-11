@@ -1,0 +1,788 @@
+<?xml version="1.0"?>
+<!DOCTYPE requirements SYSTEM "requirements.dtd" [
+
+<!ENTITY nbsp "&#xa0;">
+<!ENTITY ldquo "&#x201c;">
+<!ENTITY rdquo "&#x201d;">
+
+<!-- Entities defined here help us reduce typos and ensure consistency. -->
+
+<!-- Common requirements sources -->
+<!ENTITY productline "Product Line">
+<!ENTITY searchlight "SearchLight">
+<!ENTITY lh3 "LightHouse&nbsp;3">
+<!ENTITY wcsi "World-class Software">
+
+<!-- Values for the impl element -->
+<!ENTITY inuse "Operational">
+<!ENTITY tested "Test Suite">
+<!ENTITY todo "To-do List">
+<!ENTITY planned "Planned">
+<!ENTITY partial "Partial">
+
+]>
+<requirements>
+ <title>Abuild Requirements Document (2007-03-30 15:00:00)</title>
+ <intro>
+  <p>
+   This document describes abuild's requirements as gathered through
+   observations of various build systems within Argon ST's Fair Lakes
+   facility and discussions with people who use those systems.  Many
+   requirements come from conversations from other people, while many
+   other requirements are motivated by a desire to have our tools help
+   support widely recognized sound software development practices.
+   Many of the contributed requirements were provided in the context
+   of what any new build system should do.  They are included in this
+   documented as <emph>abuild</emph> requirements.  There are some
+   requirements on the overall build environment that are not specific
+   to abuild.  Such requirements are not listed here but may be
+   discussed in documentation for related tools.
+  </p>
+  <p>
+   In the table below, the <emph>source</emph> column indicates the
+   source of the requirement.  The source <emph>&productline;</emph>
+   indicates that the requirement is a fundamental requirement that
+   must be satisfied for abuild to be able to build product lines for
+   which it is intended.  The source <emph>&searchlight;</emph>
+   indicates that this requirement was added by the SearchLight
+   development team during abuild's initial planning and
+   implementation.  The source <emph>&lh3;</emph> indicates that the
+   requirement originated from discussions with the LightHouse&nbsp;3
+   team (J. Schwarzwalder, T. Lee, J. Moore, others).  The
+   source <emph>&wcsi;</emph> indicates that this requirement
+   originates from discussions surrounding the the World Class
+   Software initiative.
+  </p>
+  <p>
+   The <emph>implementation</emph> column indicates how the
+   requirement is met in the implementation.  The
+   value <emph>&tested;</emph> indicates that the feature is
+   implemented in the currently released version of abuild and that
+   the functionality is verified in abuild's automated test suite.
+   The value <emph>&inuse;</emph> indicates that the requirement is
+   met as demonstrated by abuild's existing operational use.  The
+   value <emph>&todo;</emph> indicates that the item is mentioned in
+   the <emph>Future Enhancements</emph> section of the abuild
+   documentation.  The value <emph>&planned;</emph> indicates that the
+   requirement has not yet been implemented but is acknowledged as
+   needed and planned for a future release.  The
+   value <emph>&partial;</emph> indicates that the feature is
+   partially implemented but is not working at the desired level in
+   all cases.
+  </p>
+ </intro>
+
+ <glossary>
+  <term>
+   <strong>backing area</strong>: a build area from the local build
+   area resolves any build items that are not present locally; usually
+   contains a superset of the items contained in the local build area
+  </term>
+  <term>
+   <strong>build area</strong>: a hierarchical collection of
+   directories that are built; a build tree
+  </term>
+  <term>
+   <strong>build item</strong>: a single directory that is built;
+   build items are uniquely named (within the scope of all build items
+   visible in a particular build tree) and are referred to by other
+   build items by name rather than by path
+  </term>
+  <term>
+   <strong>build tree</strong>: see build area
+  </term>
+  <term>
+   <strong>direct dependency</strong>: if build item <emph>A</emph>
+   makes direct use of build item <emph>B</emph>, then <emph>B</emph>
+   is a direct dependency of <emph>A</emph>
+  </term>
+  <term>
+   <strong>distributed build</strong>: a build that is distributed
+   across multiple build hosts rather than run completely from one
+   machine
+  </term>
+  <term>
+   <strong>host operating system</strong>: an operating system on
+   which abuild itself runs; contains abuild and any compiler or
+   development tools that abuild invokes to create its targets
+  </term>
+  <term>
+   <strong>indirect dependency</strong>: if build item <emph>A</emph>
+   depends upon build item <emph>B</emph> but not build
+   item <emph>C</emph>, and if build item <emph>B</emph> depends upon
+   build item <emph>C</emph>, then build item <emph>C</emph> is an
+   indirect dependency of build item <emph>A</emph>
+  </term>
+  <term>
+   <strong>metalibrary</strong>: one library constructed by merging
+   the contents of other libraries
+  </term>
+  <term>
+   <strong>parallel build</strong>: a build in which more than one
+   build item may be built at the same time by a single invocation of
+   the top-level build command; the implication is that two build
+   items may be built in parallel if one does not depend upon the
+   other
+  </term>
+  <term>
+   <strong>private interface</strong>: modifications to the build
+   environment, such as additions to the include path, provided by a
+   build item in order to give access to private interfaces in that
+   build item's code
+  </term>
+  <term>
+   <strong>public interface</strong>: modifications to the build
+   environment, such as additions to include or library paths and
+   additions of libraries to the link command, that provide access to
+   a build item's code.
+  </term>
+  <term>
+   <strong>target operating system</strong>: the operating system
+   environment on which the code is actually run; may or may not be
+   the same as the host operating system
+  </term>
+  <term>
+   <strong>target</strong>: a product built by the build system such
+   as a library or executable; alternatively, a keyword indicating a
+   general operation or category, such
+   as <emph>all</emph>, <emph>check</emph>, or <emph>clean</emph> that
+   is passed as an argument to the build command
+  </term>
+ </glossary>
+
+ <reqtable>
+
+  <req><id>1</id><category>Basic Functionality</category></req>
+
+  <req><id>1.1</id><category>Language Support</category></req>
+
+  <req>
+   <id>1.1.1</id>
+   <text>Abuild shall support C.</text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.1.2</id>
+   <text>Abuild shall support C++.</text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.1.3</id>
+   <text>Abuild shall support Java.</text>
+   <source>&productline;</source>
+   <impl>&todo;</impl>
+  </req>
+
+  <req><id>1.2</id><category>Operating System Support</category></req>
+
+  <req><id>1.2.1</id><category>Host Operating System Support</category></req>
+
+  <req>
+   <id>1.2.1.1</id>
+   <text>
+    Abuild shall support UNIX-like host operating systems.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.2.1.1.1</id>
+   <text>
+    Abuild shall support Linux as a host operating systems.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.2.1.1.2</id>
+   <text>
+    Abuild shall support Solaris as a host operating systems.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.2.1.2</id>
+   <text>
+    Abuild shall support Solaris as a host operating system.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.2.1.3</id>
+   <text>
+    Abuild shall support Windows as a host operating system.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req><id>1.2.2</id><category>Target Operating System Support</category></req>
+
+  <req>
+   <id>1.2.2.1</id>
+   <text>
+    Abuild shall be able to support targets that are not supported as
+    hosts through the use of cross compilers.
+   </text>
+   <source>&productline;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.2.2.2</id>
+   <text>
+    Abuild shall not require that every target be supported from every
+    host.
+   </text>
+   <source>&productline;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.2.2.3</id>
+   <text>
+    Abuild shall be able to generate code for UNIX-like operating systems.
+   </text>
+   <source>&lh3;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.2.2.3.1</id>
+   <text>
+    Abuild shall be able to generate code for Linux.
+   </text>
+   <source>&lh3;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.2.2.3.2</id>
+   <text>
+    Abuild shall be able to generate code for Solaris.
+   </text>
+   <source>&wcsi;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.2.2.4</id>
+   <text>
+    Abuild shall be able to generate code for VxWorks.
+   </text>
+   <source>&lh3;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.2.2.5</id>
+   <text>
+    Abuild shall be able to generate code for Windows.
+   </text>
+   <source>&searchlight;</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.3</id>
+   <text>
+    Abuild shall be independent of the user's environment and shell.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.3.1</id>
+   <text>
+    Abuild's behavior shall be independent of environment variable
+    values.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>1.4</id>
+   <text>
+    Abuild shall not be tied to a specific product line or project.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.4.1</id>
+   <text>
+    Abuild shall provide hooks for product lines or projects to
+    implement support for compiler tool chains and target
+    architectures without having to modify abuild itself.
+   </text>
+   <source>&lh3;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.5</id>
+   <text>
+    Abuild shall provide a mechanism for individual build items to
+    create custom rules.  (These can be used to implement code
+    generators, custom scripts, etc.)
+   </text>
+   <source>&lh3;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.6</id>
+   <text>
+    As a goal, abuild will require minimal end-user configuration in
+    order to be run.  (For example, no/minimal user-defined
+    configuration files, environment variables, etc. have to be set
+    up.)
+   </text>
+   <source>&searchlight;</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.7</id>
+   <text>
+    As a goal, abuild will require minimal effort to add a new
+    component to a build area.
+   </text>
+   <source>Review</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.8</id>
+   <text>
+    Abuild shall be thoroughly documented with documentation geared
+    toward users, administrators, and maintainers.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.9</id>
+   <text>
+    Abuild shall support integration of software build trees at
+    varying levels of classification.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.10</id>
+   <text>
+    Abuild shall support use of autoconf for performing runtime
+    determination of platform functionality.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&productline;</impl>
+  </req>
+
+  <req>
+   <id>1.11</id>
+   <text>
+    Abuild shall support backing areas such that users can build with
+    a partially checked out build tree and resolve missing items from
+    a prebuilt area.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.12</id>
+   <text>
+    Abuild shall not be tied to a particular software configuration
+    management system.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.13</id>
+   <text>
+    Abuild shall support creation of multiple targets (e.g., both
+    library and executable) in a build item directory.
+   </text>
+   <source>&searchlight;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>1.14</id>
+   <text>
+    Abuild shall support generation of libraries.
+   </text>
+   <source>Review</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.14.1</id>
+   <text>
+    Abuild shall support generation of static libraries.
+   </text>
+   <source>Review</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.14.2</id>
+   <text>
+    Abuild shall support generation of shared libraries.
+   </text>
+   <source>J. Schwarzwalder</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>1.14.3</id>
+   <text>
+    Abuild shall support generation of metalibraries.
+   </text>
+   <source>V. Hopkins</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>1.15</id>
+   <text>
+    Abuild shall support generation of executables.
+   </text>
+   <source>Review</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>1.16</id>
+   <text>
+    Abuild shall allow a single item to be built on multiple architectures.
+   </text>
+   <source>&productline;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req><id>2</id><category>Integrity Guarantees</category></req>
+
+  <req><id>2.1</id><category>Dependency Management</category></req>
+
+  <req>
+   <id>2.1.1</id>
+   <text>
+    Abuild shall require all direct dependencies to be explicitly declared.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.1.2</id>
+   <text>
+    Abuild shall automatically compute indirect dependencies
+    (<emph>i.e.</emph>, you only have to declare direct dependencies,
+    not indirect dependencies).
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.1.3</id>
+   <text>
+    Abuild shall enforce that the dependency graph of build items
+    contain no cycles.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.1.4</id>
+   <text>
+    Abuild shall implement this basic integrity guarantee: when
+    item <emph>A</emph> depends upon item <emph>B</emph> and
+    item <emph>B</emph> depends upon item <emph>C</emph>,
+    item <emph>A</emph> and item <emph>B</emph> will see the same copy
+    of item <emph>C</emph>.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.1.5</id>
+   <text>
+    Abuild shall support one-way dependency gates such
+    that <emph>A</emph> can see <emph>B</emph> but <emph>B</emph>
+    cannot see <emph>A</emph>.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.1.6</id>
+   <text>
+    Abuild shall allow complete dependency checking separate from
+    performing a build.
+   </text>
+   <source>C. Pell</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.2</id>
+   <text>
+    Abuild shall provide a mechanism that allows knowledge about how
+    to build with a specific item to be encapsulated in that item.
+    (Remark: a core intention of abuild is that this mechanism be used
+    exclusively rather than having this knowledge spread throughout
+    the system.)
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.3</id>
+   <text>
+    Having another build item as a direct or indirect dependency shall
+    be both necessary and sufficient for using it at compile time.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.4</id>
+   <text>
+    Build items shall refer to each other by name rather than by path.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>2.5</id>
+   <text>
+    Abuild shall allow items to export both public and private interfaces.
+   </text>
+   <source>V. Lee-Shue</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req><id>3</id><category>Performance</category></req>
+
+  <req>
+   <id>3.1</id>
+   <text>
+    Abuild's shall not invoke itself or cause its backends to invoke
+    themselves recursively.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>3.2</id>
+   <text>
+    Abuild shall not preclude implementation of parallel or distributed
+    builds.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>3.3</id>
+   <text>
+    Abuild shall implement <emph>clean</emph> rules that do not
+    require invocation of a backend and that can be run in an order
+    not influenced by dependencies among build items.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>3.4</id>
+   <text>
+    Abuild's Java support shall be implemented such that a JVM is not
+    invoked for every source file.
+   </text>
+   <source>R. Silton</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req><id>4</id><category>Miscellaneous Features</category></req>
+
+  <req>
+   <id>4.1</id>
+   <text>
+    Abuild shall provide help and debugging support to users and
+    maintainers.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&partial;</impl>
+  </req>
+
+  <req>
+   <id>4.2</id>
+   <text>
+    Error messages shall be easily separable from informational
+    diagnostic messages.
+   </text>
+   <source>C. Dalton</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.3</id>
+   <text>
+    Abuild shall support use of analyzers.  Examples of analyzers that
+    abuild could support including Purify, Klocwork, Valgrind,
+    Electric Fence, and njamd.
+   </text>
+   <source>J. Shields</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.3.1</id>
+   <text>
+    Abuild shall support use of Purify.
+   </text>
+   <source>Review</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.3.2</id>
+   <text>
+    Abuild shall support use of Klocwork.
+   </text>
+   <source>Review</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.3.3</id>
+   <text>
+    Abuild shall support use of Valgrind.
+   </text>
+   <source>J. Schwarzwalder</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.4</id>
+   <text>
+    Abuild shall support multiple build profiles (e.g., release,
+    debug, profile) in a manner that is not compiler- or
+    platform-specific.
+   </text>
+   <source>J. Davidson</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.5</id>
+   <text>
+    Abuild shall not support multiple configurations based on
+    preprocessor symbols to be selected at build time.
+   </text>
+   <source>&lh3;</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>4.6</id>
+   <text>
+    Abuild shall support integration with automated test frameworks
+    such that test suites can be run by invoking a specific build
+    target.
+   </text>
+   <source>&wcsi;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>4.6.1</id>
+   <text>
+    Abuild shall support integration with qtest.  (qtest is the
+    automated test framework used to implement abuild's own test
+    suite.)
+   </text>
+   <source>&wcsi;</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>4.7</id>
+   <text>
+    Abuild shall support automatic documentation generation with
+    Javadoc and Doxygen.
+   </text>
+   <source>R. Silton</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.8</id>
+   <text>
+    Abuild shall have an automated test suite.
+   </text>
+   <source>J. Berkenbilt</source>
+   <impl>&tested;</impl>
+  </req>
+
+  <req>
+   <id>4.9</id>
+   <text>
+    Abuild shall be able co-exist with other build systems in a
+    product line.
+   </text>
+   <source>J. Schwarzwalder</source>
+   <impl>&inuse;</impl>
+  </req>
+
+  <req>
+   <id>4.10</id>
+   <text>
+    Abuild shall detect and remove stray build targets when a build is
+    run.
+   </text>
+   <source>Review</source>
+   <impl>&planned;</impl>
+  </req>
+
+  <req>
+   <id>4.11</id>
+   <text>
+    Abuild shall support specification of additional compiler flags on
+    a per-file and/or per-compiler basis.
+   </text>
+   <source>Review</source>
+   <impl>&planned;</impl>
+  </req>
+
+ </reqtable>
+</requirements>

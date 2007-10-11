@@ -1,0 +1,10 @@
+abuild: targets (abuild-<native>): all
+Extra object files found: removing libraries and binaries
+make: Entering directory `--topdir--/extra-targets/abuild-<native>'
+Creating lib1 library
+Creating lib2 library
+Creating shlib1 shared library
+Creating shlib2 shared library
+Creating bin1 executable
+Creating bin2 executable
+make: Leaving directory `--topdir--/extra-targets/abuild-<native>'

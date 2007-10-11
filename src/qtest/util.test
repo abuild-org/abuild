@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("util") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('Util');
+
+$td->runtest("general tests",
+	     {$td->COMMAND => "test_util"},
+	     {$td->FILE => "util.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

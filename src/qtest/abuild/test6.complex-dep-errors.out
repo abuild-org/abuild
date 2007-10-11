@@ -1,0 +1,7 @@
+--topdir--/bad/6/main/product/c/Abuild.conf: ERROR: build item c conflicts with an item in an external
+--topdir--/bad/6/backing/common/c/Abuild.conf: ERROR: here is another location
+--topdir--/bad/6/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "common-lib1", which is shadowed
+--topdir--/bad/6/main/common/libs/lib1/Abuild.conf: ERROR: here is the location of "common-lib1"
+--topdir--/bad/6/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "product-common", which is shadowed
+--topdir--/bad/6/main/product/common/Abuild.conf: ERROR: here is the location of "product-common"
+abuild: ERROR: errors detected; exiting

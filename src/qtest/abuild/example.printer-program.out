@@ -1,0 +1,30 @@
+
+------ ==> ../../lib/abuild-zzprinter.any.test-suite.abc/lib-lib <== ------
+
+
+------ ../lib.cc ------
+
+1: #include "lib.hh"
+2: 
+3: #include <iostream>
+4: 
+5: void f()
+6: {
+7:     std::cout << "I am a function named f." << std::endl;
+8: }
+
+------ main.obj ------
+
+
+------ ../main.cc ------
+
+1: #include <iostream>
+2: #include "lib.hh"
+3: 
+4: int main()
+5: {
+6:     f();
+7:     std::cout << "I, this program, am aware of myself." << std::endl;
+8:     std::cout << "Does that mean I'm alive?" << std::endl;
+9:     return 0;
+10: }

@@ -1,0 +1,7 @@
+<project name="plugin.echoer-hooks">
+
+ <target name="-post-compile">
+  <echo message="This is a post-compile hook from the echoer plugin."/>
+ </target>
+
+</project>

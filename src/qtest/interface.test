@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+
+chdir("interface") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('Interface');
+
+my $cwd = getcwd();
+$td->runtest("Interface class",
+	     {$td->COMMAND => "test_interface $cwd",
+	      $td->FILTER => "perl filter-pwd.pl $cwd"},
+	     {$td->FILE => "interface.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

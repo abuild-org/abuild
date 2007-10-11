@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<project default="all">
+
+ <property file=".ab-dynamic-ant.properties"/>
+
+ <property name="jar-name" location="dist/alternative.jar"/>
+
+ <path id="classpath">
+  <pathelement path="${abuild.classpath}"/>
+  <pathelement path="${jar-name}"/>
+ </path>
+
+ <!--  Abuild expects the all target to build everything required  -->
+ <!--  by items that depend upon this item.                        -->
+ <target name="all">
+  <mkdir dir="classes"/>
+  <mkdir dir="dist"/>
+  <javac source="1.5"
+         target="1.5"
+         destdir="classes"
+         classpathref="classpath"
+         includeantruntime="no">
+   <src path="../src/java"/>
+   <compilerarg value="-Xlint"/>
+   <compilerarg value="-Xlint:-path"/>
+  </javac>
+  <jar destfile="${jar-name}">
+   <fileset dir="classes">
+    <include name="**/*.class"/>
+   </fileset>
+  </jar>
+ </target>
+
+ <!--  Abuild expects all build items to support these targets as  -->
+ <!--  well.                                                       -->
+ <target name="check"/>
+ <target name="test"/>
+ <target name="doc"/>
+
+ <target name="run" depends="all">
+  <java classname="com.example.alternative.Alternative"
+        fork="true"
+        classpathref="classpath"/>
+ </target>
+
+</project>

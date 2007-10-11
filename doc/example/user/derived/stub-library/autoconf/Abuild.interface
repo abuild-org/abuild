@@ -1,0 +1,5 @@
+
+# $(ABUILD_OUTPUT_DIR) contains the autoconf-generated header.
+INCLUDES = $(ABUILD_OUTPUT_DIR)
+
+after-build $(ABUILD_OUTPUT_DIR)/autoconf.interface

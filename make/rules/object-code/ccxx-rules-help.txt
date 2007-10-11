@@ -1,0 +1,118 @@
+
+** Help for users of RULES=ccxx **
+
+Variables to be set in Abuild.mk:
+
+  TARGETS_lib := lib1 lib2 ...
+  TARGETS_bin := bin1 bin2 ...
+  SRCS_lib_lib1 := lib1-src1.cpp lib1-src2.c ...
+  SRCS_lib_lib2 := lib2-src1.cpp lib2-src2.c ...
+  SRCS_bin_bin1 := bin1-src1.cpp bin1-src2.c ...
+  SRCS_bin_bin2 := bin2-src1.cpp bin2-src2.c ...
+
+Note that no file should be listed as belonging to more than one
+target.  Doing so will result in a cryptic make message about
+redefinition of a rule.  If the same source file is needed by more
+than one target, put it in a library target.  All bin targets
+automatically link with (and depend upon) all lib targets defined in a
+given Abuild.mk
+
+Note that the targets are just base names.  For example, the library
+target "moo" might generate libmoo.a on a UNIX system and moo.lib on a
+Windows system.
+
+Each library and executable target gets its own corresponding list of
+sources.  Sources may consist of C or C++ files ending in .c, .cc, or
+.cpp.  Files ending with .c are compiled as C sources.  Files ending
+with .cc or .cpp are compiled as C++ sources.
+
+The following additional variables may also be set or
+appended to:
+
+  XCPPFLAGS - additional flags passed to the preprocessor, C compiler,
+  and C++ compiler (but not the linker)
+
+  XCFLAGS - additional flags passed to the C compiler, C++ compiler,
+  and linker
+
+  XCXXFLAGS - additional flags passed to the C++ compiler and linker
+
+  XLINKFLAGS - additional flags passed to the linker
+
+  DFLAGS - debug flags passed to the processor, compilers, and linker
+
+  OFLAGS - optimization flags passed to the processor, compilers, and
+  linker
+
+  WFLAGS - warning flags passed to the processor, compilers, and
+  linker
+
+Each of the above variables also has a file-specific version.  For the
+X*FLAGS variables, the file-specific values are added to the general
+values.  For DFLAGS, OFLAGS, and WFLAGS, the file-specific values
+replace the general vales.  For example, setting XCPPFLAGS_File.cc
+will cause the value of that variable to be added to the preprocessor,
+C compiler and C++ compiler invocations for File.cc.  File-specific
+versions of XCPPFLAGS, XCFLAGS, and XCXXFLAGS are used only for
+compilation and, if appropriate, preprocessing of those specific
+files.  They are not used at link time.  The file-specific versions of
+DFLAGS, OFLAGS, and WFLAGS *override* the default values rather than
+supplementing them.  This makes it possible to completely change
+debugging flags, optimization flags, or warning flags for specific
+source files.  For example, if Hardware.cc absolutely cannot be
+compiled with any optimization, you could set OFLAGS_Hardware.cc to
+the empty string to suppress optimization on that file regardless of
+the value of OFLAGS.
+
+By default, library code is compiled as position independent code if
+supported by the compiler.  This enables it to be included in static
+or shared libraries.  If the variable NOPIC_File.cc is set, then
+File.cc will not be compiled as position independent code.  Use of
+this option would be appropriate only in extreme cases where the
+negligible performance hit of using PIC would be a problem.
+
+To create a shared library instead of a static library for a given
+library target, define the variable
+
+  SHLIB_libname := major minor revision
+
+where major, minor, and revision are the major version number, minor
+version number, and revision number of the shared library version.  If
+your intention is to build a versionless shared library object file
+(such as one to be used as a dynamically loadable module), set
+SHLIB_libname to the empty string.
+
+By default, abuild will not link shared libraries with static
+libraries.  To enable this, set LINK_SHLIBS to a non-empty value.
+This applies to all shared libraries declared in the Abuild.mk file.
+
+By default, all shared libaries and executable targets will be linked
+using the C++ compiler.  To force a program or shared library to be
+linked as a C program, set the variable LINK_AS_C to a non-empty
+value.  This applies to all shared libraries and executables declared
+in the Abuild.mk file.
+
+If the variable LINKWRAPPER is set, it should contain a command that
+will be prepended to each link step.  This is useful for running
+programs such as purify and quantify which wrap the link step in this
+fashion.
+
+Any source file ending with .ll.cc or .ll.cpp is generated from the
+corresponding .ll using flex to generate C++ code.  Any source file
+ending with .l.c is generated from the corresponding .l file using lex
+to generate C code.  Using .fl.cc, .fl.cpp, or .fl.c will force the
+use of flex rather than lex.
+
+Any source file of the form FlexLexer.something.cc will be generated
+with flex from something.fl using the -+ option to a C++ parser class.
+
+Any source file of the form something.tab.cc will be generated with
+bison from something.yy.
+
+Any source file ending of the form base_rpc_xdr.c, base_rpc_svc.c, or
+base_rpc_clnt.c is automatically generated along with base_rpc.h from
+base.x using rpcgen.
+
+The special target ccxx_debug can be used to print the values of the
+INCLUDES, LIBDIRS, and LIBS and can be useful for debugging.
+

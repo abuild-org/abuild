@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+
+chdir("keyval") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('KeyVal');
+
+my $n = 9;
+for (my $i = 1; $i <= $n; ++$i)
+{
+    $td->runtest("KeyVal $i",
+		 {$td->COMMAND => "test_keyval test$i.in"},
+		 {$td->FILE => "test$i.out", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report($n);

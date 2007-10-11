@@ -1,0 +1,4 @@
+no defaults
+test6.in: ERROR: no values for the following keys: duck
+defaults
+test6.in: ERROR: no values for the following keys: duck

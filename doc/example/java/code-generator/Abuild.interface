@@ -1,0 +1,8 @@
+# Provide a variable that names our code generator so we can use it in
+# taskdef.  There's no reason for most build items to provide this
+# information, but it is needed for cases in which there is a reason
+# to refer to a specific output product individually.  Since this jar
+# just creates an ant task, we don't need to add it to the classpath.
+
+declare code-generator.classpath filename
+code-generator.classpath = $(ABUILD_OUTPUT_DIR)/dist/CodeGenerator.jar

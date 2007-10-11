@@ -1,0 +1,232 @@
+abuild: e.lib (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags-  -xcppflags- -bin2-xcppflags- ../bin2.cc bin2.o bin2.dep
+Compiling ../bin2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags- -xcppflags- -bin2-xcppflags- -xcflags- -bin2-xcflags- -xcxxflags- -bin2-xcxxflags-
+make-obj src: ../bin2.cc
+make-obj obj: bin2.o
+contents of bin2.o:
+** file: bin2.cc **
+end contents of bin2.o
+Creating bin2 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin2.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin2
+contents of bin-bin2:
+** bin bin2 **
+** file: bin2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin2 **
+end contents of bin-bin2
+make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
+abuild: e.shlib (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
+Creating shlib1 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib1.1.2.3
+contents of shlib-shlib1.1.2.3:
+** shlib shlib1 **
+** file: shlib1-src1.c **
+** file: shlib1-src2.cc **
+** file: shlib1-src3.cpp **
+** end of shlib shlib1 **
+end contents of shlib-shlib1.1.2.3
+Creating shlib2 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib2.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib2.4.5
+contents of shlib-shlib2.4.5:
+** shlib shlib2 **
+** file: shlib2.cc **
+** end of shlib shlib2 **
+end contents of shlib-shlib2.4.5
+Creating shlib3 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib3.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib3.6
+contents of shlib-shlib3.6:
+** shlib shlib3 **
+** file: shlib3.cc **
+** end of shlib shlib3 **
+end contents of shlib-shlib3.6
+Creating shlib4 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib4.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib4
+contents of shlib-shlib4:
+** shlib shlib4 **
+** file: shlib4.cc **
+** end of shlib shlib4 **
+end contents of shlib-shlib4
+make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
+abuild: e.bin (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -lib-xlinkflags-
+make-bin: objects: bin.o
+make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo ../../lib/abuild-os.cpu.toolset.echo
+make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+** file: bin.cc **
+** shlib shlib1 **
+** file: shlib1-src1.c **
+** file: shlib1-src2.cc **
+** file: shlib1-src3.cpp **
+** end of shlib shlib1 **
+** shlib shlib2 **
+** file: shlib2.cc **
+** end of shlib shlib2 **
+** shlib shlib3 **
+** file: shlib3.cc **
+** end of shlib shlib3 **
+** shlib shlib4 **
+** file: shlib4.cc **
+** end of shlib shlib4 **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
+Creating shlib1 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib1.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs: static lib1 lib2
+make-shlib: shlib: shlib-shlib1.0.0.0
+contents of shlib-shlib1.0.0.0:
+** shlib shlib1 **
+** file: shlib1.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib1 **
+end contents of shlib-shlib1.0.0.0
+Creating shlib2 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib2.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs: static lib1 lib2
+make-shlib: shlib: shlib-shlib2.0.0.0
+contents of shlib-shlib2.0.0.0:
+** shlib shlib2 **
+** file: shlib2.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib2 **
+end contents of shlib-shlib2.0.0.0
+Creating bin executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -lib-xlinkflags-
+make-bin: objects: bin.o
+make-bin: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-bin: libs: static shlib1 shlib2 lib1 lib2
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+** file: bin.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** shlib shlib1 **
+** file: shlib1.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib1 **
+** shlib shlib2 **
+** file: shlib2.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib2 **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'

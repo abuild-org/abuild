@@ -1,0 +1,26 @@
+abuild: lib (abuild-<native>): all
+abuild: lib (abuild-<native>.debug): all
+make: Entering directory `--topdir--/native-compiler/lib/abuild-<native>.debug'
+Compiling ../lib.cc as C++
+Creating lib library
+make: Leaving directory `--topdir--/native-compiler/lib/abuild-<native>.debug'
+abuild: lib (abuild-<native>.release): all
+make: Entering directory `--topdir--/native-compiler/lib/abuild-<native>.release'
+Compiling ../lib.cc as C++
+Creating lib library
+make: Leaving directory `--topdir--/native-compiler/lib/abuild-<native>.release'
+abuild: lib (abuild-<native-os-data>.qcc): all
+abuild: lib (abuild-<native-os-data>.qcc.debug): all
+make: Entering directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc.debug'
+Compiling ../lib.cc as C++
+make-obj lib.o
+Creating lib library
+make-lib lib-lib
+make: Leaving directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc.debug'
+abuild: lib (abuild-<native-os-data>.qcc.release): all
+make: Entering directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc.release'
+Compiling ../lib.cc as C++
+make-obj lib.o
+Creating lib library
+make-lib lib-lib
+make: Leaving directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc.release'

@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--/native-compiler"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native-os-data>.qcc" selected="1"/>
+     <platform name="<native-os-data>.qcc.debug" selected="0"/>
+     <platform name="<native-os-data>.qcc.release" selected="0"/>
+     <platform name="<native>" selected="0"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <plugins>
+    <plugin name="plugin.compiler"/>
+   </plugins>
+   <build-item
+    name="lib"
+    home-tree="bt-1"
+    absolute-path="--topdir--/native-compiler/lib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+     <platform name="<native-os-data>.qcc"/>
+     <platform name="<native-os-data>.qcc.debug"/>
+     <platform name="<native-os-data>.qcc.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="plugin.compiler"
+    home-tree="bt-1"
+    absolute-path="--topdir--/native-compiler/compiler"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-2"
+   absolute-path="--topdir--/native-compiler/outside"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-1"/>
+   <build-item
+    name="lib"
+    home-tree="bt-1"
+    absolute-path="--topdir--/native-compiler/lib"
+    backing-depth="0"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+     <platform name="<native-os-data>.qcc"/>
+     <platform name="<native-os-data>.qcc.debug"/>
+     <platform name="<native-os-data>.qcc.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="outside"
+    home-tree="bt-2"
+    absolute-path="--topdir--/native-compiler/outside"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="plugin.compiler"
+    home-tree="bt-1"
+    absolute-path="--topdir--/native-compiler/compiler"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+ </build-trees>
+</abuild-data>

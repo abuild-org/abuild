@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="echo" target-type="object-code">
+     <platform name="os.cpu.toolset.echo" selected="1"/>
+     <platform name="os.cpu.toolset.echo.debug" selected="0"/>
+     <platform name="os.cpu.toolset.echo.release" selected="0"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <plugins>
+    <plugin name="plugin.qrwx"/>
+    <plugin name="plugin.echo"/>
+   </plugins>
+   <build-item
+    name="bb"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b/bb"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ca"
+    home-tree="bt-1"
+    absolute-path="--topdir--/c/ca"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="aa"
+    description="Here&apos;s a &lt;nice&gt; &quot;description&quot; for you &amp; you!"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/aa"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="bb"/>
+     <dependency name="ca"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="bb"/>
+     <dependency name="ca"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="aaa"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/aa/aaa"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="d.a.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/a/a"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.b.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/b/a"
+    backing-depth="0"
+    external-depth="0"
+    visible-to="d.*"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/a"
+    backing-depth="0"
+    external-depth="0"
+    visible-to="*"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="d.a.a"/>
+     <dependency name="d.b.a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="d.a.a"/>
+     <dependency name="d.b.a"/>
+    </expanded-dependencies>
+   </build-item>
+   <build-item
+    name="ab"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ab"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="d.a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="d.a.a"/>
+     <dependency name="d.b.a"/>
+     <dependency name="d.a"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ac"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ac"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ad"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ad"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="b"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ba"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b/ba"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="bc"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b/bc"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="cb"
+    home-tree="bt-1"
+    absolute-path="--topdir--/c/cb"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="ca"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="ca"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="cc"
+    home-tree="bt-1"
+    absolute-path="--topdir--/c/cc"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="d"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.b.a.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/b/a/a"
+    backing-depth="0"
+    external-depth="0"
+    visible-to="d.b.*"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.b"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/b"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="d"/>
+     <dependency name="d.b.a.a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="d"/>
+     <dependency name="d.b.a.a"/>
+    </expanded-dependencies>
+   </build-item>
+   <build-item
+    name="e.lib"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/lib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="e.shlib"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/shlib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="e.lib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="e.lib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="e.bin"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/bin"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="e.lib"/>
+     <dependency name="e.shlib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="e.lib"/>
+     <dependency name="e.shlib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="e.shlib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/shlib2"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="e.lib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="e.lib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="plugin.echo"
+    home-tree="bt-1"
+    absolute-path="--topdir--/plugins/echo"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+   <build-item
+    name="plugin.qrwx"
+    home-tree="bt-1"
+    absolute-path="--topdir--/plugins/qrwx"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+   <build-item
+    name="root"
+    home-tree="bt-1"
+    absolute-path="--topdir--"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+ </build-trees>
+</abuild-data>

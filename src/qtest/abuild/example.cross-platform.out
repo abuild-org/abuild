@@ -1,0 +1,26 @@
+abuild: lib (abuild-<native>): all
+make: Entering directory `--topdir--/cross-platform/lib/abuild-<native>'
+Compiling ../lib.cc as C++
+Creating lib library
+make: Leaving directory `--topdir--/cross-platform/lib/abuild-<native>'
+abuild: calculate (abuild-<native>): all
+make: Entering directory `--topdir--/cross-platform/calculate/abuild-<native>'
+Compiling ../calculate.cc as C++
+Creating calculate executable
+make: Leaving directory `--topdir--/cross-platform/calculate/abuild-<native>'
+abuild: lib (abuild-<native>.release): all
+make: Entering directory `--topdir--/cross-platform/lib/abuild-<native>.release'
+Compiling ../lib.cc as C++
+Creating lib library
+make: Leaving directory `--topdir--/cross-platform/lib/abuild-<native>.release'
+abuild: calculate (abuild-<native>.release): all
+make: Entering directory `--topdir--/cross-platform/calculate/abuild-<native>.release'
+Compiling ../calculate.cc as C++
+Creating calculate executable
+make: Leaving directory `--topdir--/cross-platform/calculate/abuild-<native>.release'
+abuild: prog (abuild-<native>): all
+make: Entering directory `--topdir--/cross-platform/prog/abuild-<native>'
+Compiling generate.cc as C++
+Compiling ../main.cc as C++
+Creating prog executable
+make: Leaving directory `--topdir--/cross-platform/prog/abuild-<native>'

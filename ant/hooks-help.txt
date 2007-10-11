@@ -1,0 +1,104 @@
+#
+# PLEASE KEEP LINES NO LONGER THAN 60 COLUMNS.
+# PLEASE KEEP EXACTLY ONE BLANK LINE AFTER THIS COMMENT
+# BLOCK.
+#
+
+Abuild's main ant build file invokes various hooks at
+various times during the build process.  This facility
+allows build items that provide some service to other build
+items to make that service available as part of the normal
+build process.
+
+Since hooks are called in separate projects from the main
+build, it is not useful to set properties from hook targets
+and expect them to be available to later targets not invoked
+directly by the hook.
+
+Note that the pre- and post- hooks are run even when the
+target itself is not being run.  For example, the
+-post-package hook may be run even if the package target is
+not run.  This makes it possible to implement packaging or
+compilation strategies, for example, that would be beyond
+abuild's ant code's ordinary purview.  An example may be the
+implementation of a wrapper post-package hook that can
+create a wrapper around things in an item's classpath even
+if that item itself doesn't generate any new packages.
+
+The following hooks are defined:
+
+ * init -- called from the "init" target after any internal
+   initialization has been completed.  Use this to perform
+   any additional initialization.
+
+ * generate -- called from the "generate" target, which is a
+   dependency of the "compile" target.  Use this hook to
+   automatically generate code to be compiled as part of the
+   calling build item.
+
+ * pre-compile -- called right before compilation.  Use this
+   hook to perform any compilation tasks that should precede
+   invocation of the Java compiler but follow automatic
+   generation of any source files.
+
+ * post-compile -- called right after compilation.  Use this
+   hook to perform any operations that should follow
+   invocation of the Java compiler and should be performed
+   whether or not packaging is being done.
+
+ * pre-package -- called right before packaging.  Use this
+   hook to perform any operations that should be performed
+   before packaging is performed but after all compilation
+   steps have been completed.
+
+ * post-package -- called right after packaging.  Use this
+   hook to perform any operations that must follow
+   packaging.
+
+ * pre-test -- called before any test suites are executed.
+   Use this to perform any unconditional setup required for
+   automated testing.
+
+ * test -- called after any internally supported test suites
+   are run but after pre-test and before post-test.  Use
+   this hook to provide support for additional automated
+   test frameworks beyond those supported directly by
+   abuild.
+
+ * post-test -- called after any internally supported or
+   externally provided test suites have been run.
+
+ * deploy -- called from the "deploy" target.
+
+ * doc -- called from the "doc" target.
+
+ * other -- called from the "other" target.  This hook is
+   provided as a mechanism for allowing build-item-specific
+   or local targets to be defined that don't fit into the
+   build in any other way.  The expected mode of operation
+   is that your "-other" target would depend upon various
+   other targets that would be invoked conditionally upon
+   the value of some user-provided property.
+
+ * properties-help -- called from the "properties-help"
+   target.  Use this hook to provide help to your users
+   about any properties that may need to set to make use of
+   the services provided by your hooks.
+
+ * interface-help -- called from the "interface-help"
+   target.  Use this hook to provide help to your users
+   about any variables that may need to set to set in their
+   Abuild.interface files.
+
+Any file that provides hooks must create an ant-hooks.xml
+file.  For each hook that it wants to provide, it should
+create a target called "-hook" where "hook" is replaced by
+the hook name above.  For example, a hook file that provides
+a "generate" hook would define a target called "-generate".
+
+For examples, see the abuild manual.
+
+#
+# PLEASE KEEP EXACTLY ONE BLANK LINE BEFORE THIS COMMENT
+# BLOCK AND PLACE NO TEXT AFTER IT.
+#

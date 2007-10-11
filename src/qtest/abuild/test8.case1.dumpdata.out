@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--/rules"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/rules"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-2"
+   absolute-path="--topdir--/case1"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-1"/>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/rules"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="03-object-code"
+    home-tree="bt-2"
+    absolute-path="--topdir--/case1/03-object-code"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="rules"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="rules"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="02-indep"
+    home-tree="bt-2"
+    absolute-path="--topdir--/case1/02-indep"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="rules"/>
+     <dependency name="03-object-code" platform-type="native"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="rules"/>
+     <dependency name="03-object-code"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="01-object-code"
+    home-tree="bt-2"
+    absolute-path="--topdir--/case1/01-object-code"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="rules"/>
+     <dependency name="02-indep"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="rules"/>
+     <dependency name="03-object-code"/>
+     <dependency name="02-indep"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+ </build-trees>
+</abuild-data>

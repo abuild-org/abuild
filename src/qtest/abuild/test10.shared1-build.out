@@ -1,0 +1,5 @@
+abuild: shared1 (abuild-<native>): all
+make: Entering directory `--topdir--/shared1/abuild-<native>'
+Compiling ../Shared1.cc as C++
+Creating shared1 shared library
+make: Leaving directory `--topdir--/shared1/abuild-<native>'

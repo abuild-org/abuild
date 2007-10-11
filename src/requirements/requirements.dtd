@@ -1,0 +1,16 @@
+<!ENTITY % text "(#PCDATA|emph|strong)*">
+<!ELEMENT requirements (title, intro, glossary, reqtable)>
+<!ELEMENT title %text;>
+<!ELEMENT intro (p+)>
+<!ELEMENT p %text;>
+<!ELEMENT glossary (term*)>
+<!ELEMENT term %text;>
+<!ELEMENT reqtable (req+)>
+<!ELEMENT req (id, (category | (text, source, impl)))>
+<!ELEMENT id %text;>
+<!ELEMENT text %text;>
+<!ELEMENT category %text;>
+<!ELEMENT source %text;>
+<!ELEMENT impl %text;>
+<!ELEMENT emph %text;>
+<!ELEMENT strong %text;>

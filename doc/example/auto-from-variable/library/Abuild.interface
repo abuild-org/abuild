@@ -1,0 +1,10 @@
+# Add $(ABUILD_OUTPUT_DIR) to includes since that's where the
+# generated header is located.
+INCLUDES = . $(ABUILD_OUTPUT_DIR)
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+LIBS = file-provider
+
+# Provide a variable for the location of the file that we are
+# providing
+declare file-provider-filename filename
+file-provider-filename = interesting-file

@@ -1,0 +1,14 @@
+META-INF/
+META-INF/MANIFEST.MF
+WEB-INF/
+WEB-INF/classes/
+WEB-INF/classes/com/
+WEB-INF/classes/com/example/
+WEB-INF/classes/com/example/war_example/
+WEB-INF/classes/com/example/war_example/WarExample.class
+WEB-INF/jboss-web.xml
+WEB-INF/lib/
+WEB-INF/lib/har-example.har.jar
+WEB-INF/lib/jar-example.jar
+WEB-INF/web.xml
+index.txt

@@ -1,0 +1,4 @@
+abuild: bb (abuild-indep): all
+abuild: ca (abuild-<native>): all
+abuild: aa (abuild-<native>): check
+abuild: cb (abuild-<native>): check

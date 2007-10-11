@@ -1,0 +1,119 @@
+abuild-monitor: begin-dump-data
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--/a/af"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="af-dep"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/af/dep"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="af"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/af"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="af-dep"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="af-dep"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="af-rdep"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/af/rdep"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="af"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="af-dep"/>
+     <dependency name="af"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+ </build-trees>
+</abuild-data>
+abuild-monitor: end-dump-data
+abuild-monitor: state-change af-dep indep ready
+abuild-monitor: state-change af-rdep indep waiting
+abuild-monitor: state-change af indep waiting
+abuild-monitor: state-change af-dep indep running
+abuild-monitor: targets af-dep indep all
+abuild: af-dep (abuild-indep): all
+abuild-monitor: state-change af-dep indep completed
+abuild-monitor: state-change af indep ready
+abuild-monitor: state-change af indep running
+abuild-monitor: targets af indep all
+abuild: af (abuild-indep): all
+--topdir--/a/af/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
+abuild-monitor: error --topdir--/a/af/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
+--topdir--/a/af/Abuild.interface: ERROR: after-build file 2.interface does not exist
+abuild-monitor: error --topdir--/a/af/Abuild.interface: ERROR: after-build file 2.interface does not exist
+abuild-monitor: state-change af indep failed
+abuild-monitor: state-change af-rdep indep dependency-failed

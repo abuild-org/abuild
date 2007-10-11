@@ -1,0 +1,14 @@
+abuild-monitor: begin-dump-data
+abuild-monitor: end-dump-data
+abuild-monitor: state-change prog1 <native> waiting
+abuild-monitor: state-change shared1 <native> waiting
+abuild-monitor: state-change static <native> ready
+abuild-monitor: state-change static <native> running
+abuild-monitor: state-change static <native> completed
+abuild-monitor: state-change shared1 <native> ready
+abuild-monitor: state-change shared1 <native> running
+abuild-monitor: state-change shared1 <native> completed
+abuild-monitor: state-change prog1 <native> ready
+abuild-monitor: state-change prog1 <native> running
+abuild-monitor: targets prog1 <native> all
+abuild-monitor: state-change prog1 <native> failed

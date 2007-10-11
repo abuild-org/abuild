@@ -1,0 +1,38 @@
+conditional1:4:3: ERROR: assigning to unknown variable seen1
+conditional1:15:3: ERROR: assigning to unknown variable seen2
+conditional1:19:3: ERROR: assigning to unknown variable seen3
+conditional1:25:3: ERROR: assigning to unknown variable seen4
+conditional1:29:3: ERROR: assigning to unknown variable seen5
+conditional1:34:5: ERROR: unknown function seen6
+conditional1:44:3: ERROR: assigning to unknown variable seen7
+conditional1:48:3: ERROR: assigning to unknown variable seen8
+conditional1:51:21: ERROR: invalid regular expression seen9**
+conditional1:59:3: ERROR: assigning to unknown variable seen10
+conditional1:63:3: ERROR: assigning to unknown variable seen11
+conditional1:67:3: ERROR: assigning to unknown variable seen12
+conditional1:71:3: ERROR: assigning to unknown variable seen13
+conditional1:75:3: ERROR: assigning to unknown variable seen14
+conditional1:81:11: ERROR: unknown function seen15
+conditional1:89:18: ERROR: invalid regular expression 
+conditional1:105:21: ERROR: this argument must be a string
+conditional1:109:14: ERROR: this argument may not be a function
+conditional1:109:18: ERROR: variable str is not a boolean scalar
+conditional1:109:28: ERROR: variable l1 is not a string scalar
+conditional1:109:27: ERROR: this argument must be a string
+conditional1:113:5: ERROR: variable str is not a boolean scalar
+conditional1:118:5: ERROR: variable q is not initialized
+conditional1:122:5: ERROR: function "not" takes 1 argument
+conditional1:122:12: ERROR: function "and" takes 2 arguments
+conditional1:128:15: ERROR: variable str is not a filename scalar
+conditional1:128:15: ERROR: this argument must be a filename
+conditional1:137:9: ERROR: this argument must be a function call or a boolean variable
+parse(conditional1): failure
+dumping interface conditional1
+  a: boolean scalar, target type all = 1
+  b: boolean scalar, target type all = 0
+  l1: string appendlist, target type all = one two three
+  q: boolean scalar, target type all: uninitialized
+  str: string scalar, target type all = asdf
+  after-build files:
+    --CWD--/seen17
+end of interface conditional1

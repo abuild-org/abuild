@@ -1,0 +1,6 @@
+no defaults
+test2.in:1: ERROR: syntax error
+test2.in: ERROR: no values for the following keys: chicken duck pig qoww
+defaults
+test2.in:1: ERROR: syntax error
+test2.in: ERROR: no values for the following keys: chicken duck pig qoww

@@ -1,0 +1,794 @@
+<?xml version="1.0"?>
+
+<!--
+
+ These comments describe implementation details for this file.  For
+ user-oriented help, please see properties-help.txt,
+ interface-help.txt, and hooks-help.txt.  These can be viewed by
+ invoking the rules-help, interface-help, and hooks-help targets.
+ When editing the help files, please keep lines no wider than 60
+ columns so that the files display cleanly on an 80-column display
+ when prefixed by ant's [concat] prefix.
+
+ When modifying this file to create new user-defined properties, new
+ interface properties, or new hooks, please update the appropriate
+ help files as needed.
+
+ This is the top-level build file used by abuild when it invokes ant.
+ It defines several targets and also handles loading additional
+ targets from external files.
+
+ The basic design of abuild's use of ant is based on the following
+ principles:
+
+  * Abuild's ant builds are property-driven.  That is, we use a
+    generic ant framework that does things based on the values of a
+    minimal set of user-defined properties and some additional
+    properties set through Abuild.interface files or set internally by
+    abuild.
+
+  * This top-level entry point defines targets to perform the standard
+    targets required for generating code, compiling code, creating
+    packages (jars, etc.), deploying, analyzing, and testing.  (Other
+    functions may be supported as well; see comments throughout the
+    file and the list of supported targets for an authoritative list.)
+    Hooks are provided to allow users or build items to register
+    additional targets to be run before or after predefined targets.
+    The mechanism for supporting this is described below and in
+    hooks-help.txt.
+
+  * Abuild's standard ant targets make use of standard, documented,
+    directory structures.  In this case, we favor uniformity over
+    flexibility.
+
+  * Very little, if any, behavior is enabled by default so that an
+    abuild-driven ant-based build that sets no properties should
+    produce no results.  This makes it possible for the default
+    behavior to be overridden to a large extent in those rare
+    instances where doing so is appropriate.
+
+ Since ant is not a scripting language and was not really designed for
+ creation of generic targets, abuild's ant configuration files make
+ use of antcontrib.  Even so, there are a few somewhat convoluted
+ things happening here that require some additional information.
+ Foremost among these is the mechanism that abuild's ant configuration
+ files use to implement hooks.
+
+ Ant offers no way for a build file to supply a target and "register"
+ that target as a dependency of something else, and it offers no way
+ to ask a build file whether it provides a target or, for that matter,
+ to run a target conditionally upon its being defined.  In order to
+ avoid the situation of every build file that provides hooks to
+ provide a long list of empty targets and, furthermore, to create a
+ situation in which adding a new hook to this file causes a ripple
+ effect throughout existing build files, we have provided a custom
+ task that can set a property if a specific build file contains a
+ given target.  When we want to invoke a hook named "hook" from a
+ specific file, we simply ask that file if it has a target called
+ "-hook", and if it does, we execute it.
+
+ A note about antcall and running hooks: use of antcall should be
+ avoided in favor of dependencies whenever possible.  The reason is
+ that if A depends upon B and C and C antcalls something that also
+ depends upon B, then B will be invoked twice when A is invoked.
+ However, if C depends upon something that depends upon B instead of
+ antcalling it, then B will be invoked only once.  In general, using
+ antcall to call something with dependencies that are otherwise part
+ of the dependency set should be avoided.  We aim to use antcall only
+ for calling hooks.  Note that when splitting a target into
+ dependencies, the dependencies are run even if the if/unless
+ attributes of the main target are not satisfied.  As a matter of
+ policy, we run pre- and post- hooks even if the main target is not
+ being run.  This is discussed in hooks-help.txt.
+
+ In addition, the special target "all" is defined.  The "all" target
+ performs all steps required to make a build item usable by things
+ that depend upon it.  The "all" target is an empty target that
+ depends on "init,package".  There are no hooks for the "all" target.
+
+ By convention, properties used by abuild start with "abuild.".
+ Properties used by abuild that are not intended to be set by users in
+ interface or properties files start with "abuild.private.".
+
+-->
+
+<project name="abuild" default="all">
+
+ <!--  Load antcontrib                                             -->
+ <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+ <!--
+
+  Set private properties to support various directory layout
+  convetions.  Since abuild invokes ant with basedir set to its output
+  directory.  Relative paths therefore are treated as relative to that
+  directory.
+
+  Note: if changing this, please ensure that the abuild manual is
+  updated accordingly.
+
+ -->
+
+ <!--  build item directory: where Abuild.conf, etc. reside        -->
+ <property name="abuild.private.dir.item" location=".."/>
+ <!--  location of source files                                    -->
+ <property name="abuild.private.dir.jsrc"
+           location="${abuild.private.dir.item}/src/java"/>
+ <!--  location of generated source files                          -->
+ <property name="abuild.private.dir.generated-jsrc" location="src/java"/>
+ <!--  location of other static resources to be included in the    -->
+ <!--  jar file                                                    -->
+ <property name="abuild.private.dir.resources"
+           location="${abuild.private.dir.item}/src/resources"/>
+ <!--  location of other static files to be included in the war    -->
+ <!--  file                                                        -->
+ <property name="abuild.private.dir.web"
+           location="${abuild.private.dir.item}/src/web"/>
+ <!--  location of other generated resources to be included in     -->
+ <!--  the jar file                                                -->
+ <property name="abuild.private.dir.generated-resources"
+           location="src/resources"/>
+ <!--  location of other generated resources to be included in     -->
+ <!--  the war file                                                -->
+ <property name="abuild.private.dir.generated-web"
+           location="src/web"/>
+ <!--  location of other static files to be included in the        -->
+ <!--  META-INF directory                                          -->
+ <property name="abuild.private.dir.conf"
+           location="${abuild.private.dir.item}/src/conf"/>
+ <!--  location of other generated resources to be included in     -->
+ <!--  the META-INFO directory                                     -->
+ <property name="abuild.private.dir.generated-conf"
+           location="src/conf"/>
+ <!--  location of compiled class files                            -->
+ <property name="abuild.private.dir.classes" location="classes"/>
+ <!--  location of exported files                                  -->
+ <property name="abuild.private.dir.dist" location="dist"/>
+ <!--  location of copied classpath files for ear and war          -->
+ <!--  generation                                                  -->
+ <property name="abuild.private.dir.classpath" location="classpath"/>
+
+ <!--  There appears to be no clean way of adding something to a   -->
+ <!--  fileset conditionally upon its existence, so we use a       -->
+ <!--  level of indirection to control which fileset to use.  We   -->
+ <!--  create an empty fileset and a fileset for each optional     -->
+ <!--  directory.  Then we set the a property to one or the other  -->
+ <!--  depending on the optional directory's existence.            -->
+
+ <fileset id="abuild.private.fileset-id.empty" dir="." excludes="**"/>
+ <fileset id="abuild.private.fileset-id.jsrc"
+          dir="${abuild.private.dir.jsrc}"/>
+ <fileset id="abuild.private.fileset-id.resources"
+          dir="${abuild.private.dir.resources}"/>
+ <fileset id="abuild.private.fileset-id.web"
+          dir="${abuild.private.dir.web}"/>
+ <fileset id="abuild.private.fileset-id.conf"
+          dir="${abuild.private.dir.conf}"/>
+ <fileset id="abuild.private.fileset-id.classpath"
+          dir="${abuild.private.dir.classpath}"/>
+
+ <condition property="abuild.private.path.jsrc"
+            value="${abuild.private.dir.jsrc}"
+            else="">
+  <available type="dir" file="${abuild.private.dir.jsrc}"/>
+ </condition>
+ <condition property="abuild.private.fileset.jsrc"
+            value="abuild.private.fileset-id.jsrc"
+            else="abuild.private.fileset-id.empty">
+  <available type="dir" file="${abuild.private.dir.jsrc}"/>
+ </condition>
+ <condition property="abuild.private.fileset.resources"
+            value="abuild.private.fileset-id.resources"
+            else="abuild.private.fileset-id.empty">
+  <available type="dir" file="${abuild.private.dir.resources}"/>
+ </condition>
+ <condition property="abuild.private.fileset.web"
+            value="abuild.private.fileset-id.web"
+            else="abuild.private.fileset-id.empty">
+  <available type="dir" file="${abuild.private.dir.web}"/>
+ </condition>
+ <condition property="abuild.private.fileset.conf"
+            value="abuild.private.fileset-id.conf"
+            else="abuild.private.fileset-id.empty">
+  <available type="dir" file="${abuild.private.dir.conf}"/>
+ </condition>
+
+ <!--  Load dynamic Abuild information file                        -->
+ <property file=".ab-dynamic-ant.properties"/>
+
+ <!--  Load Abuild build files                                     -->
+ <property file="${abuild.private.dir.item}/Abuild-ant.properties"/>
+ <if>
+  <isset property="abuild.local-buildfile"/>
+  <then>
+   <import file="${abuild.private.dir.item}/${abuild.local-buildfile}"/>
+  </then>
+ </if>
+
+ <condition property="ant.build.javac.source"
+            value="${abuild.java-source-version}">
+  <isset property="abuild.java-source-version"/>
+ </condition>
+ <condition property="ant.build.javac.target"
+            value="${abuild.java-target-version}">
+  <isset property="abuild.java-target-version"/>
+ </condition>
+
+ <!--  Assume we should only compile if a jar or war file name is  -->
+ <!--  defined.                                                    -->
+ <condition property="abuild.private.need-compile">
+  <or>
+   <isset property="abuild.jar-name"/>
+   <isset property="abuild.war-name"/>
+  </or>
+ </condition>
+
+ <condition property="abuild.private.jar-name-has-suffix">
+  <and>
+   <isset property="abuild.jar-name"/>
+   <matches string="${abuild.jar-name}" pattern="\."/>
+  </and>
+ </condition>
+
+ <if>
+  <not>
+   <isset property="abuild.private.bootstrapping"/>
+  </not>
+  <then>
+  <!--  Load our own checkfortarget task                           -->
+   <taskdef name="checkfortarget"
+            classname="org.abuild.ant.CheckForTarget"/>
+  </then>
+ </if>
+
+ <!--
+
+  Provide utility targets.  The user may set abuild.hook-build-items
+  to a comma-separated list of build items from which hooks will be
+  loaded.  The user may also set abuild.use-local-hooks to any value
+  and abuild.local-buildfile to the name of a local file that contains
+  build hooks.
+
+ -->
+
+ <macrodef name="run-hooks">
+  <attribute name="name"/>
+  <sequential>
+   <antcall target="-run-hooks">
+    <param name="abuild.private.hook-name" value="@{name}"/>
+   </antcall>
+  </sequential>
+ </macrodef>
+
+ <!--  Requires abuild.private.hook-name be set (typically by      -->
+ <!--  <run-hooks> macro).  Since -run-hooks is always called      -->
+ <!--  by antcall, any properties set by it or its children        -->
+ <!--  disappear when it returns.                                  -->
+ <target name="-run-hooks"
+         depends="-run-plugin-hooks,-run-build-item-hooks,-run-local-hooks"/>
+
+ <target name="-run-plugin-hooks">
+  <foreach list="${abuild.plugins}"
+           target="-query-plugin-hooks"
+           param="abuild.private.plugin-dir"
+           inheritall="true"/>
+ </target>
+
+ <target name="-query-plugin-hooks">
+  <property name="abuild.private.hook-file"
+            location="${abuild.private.plugin-dir}/plugin-ant.xml"/>
+  <antcall target="-run-external-hook"/>
+ </target>
+
+ <target name="-run-build-item-hooks" if="abuild.hook-build-items">
+  <foreach list="${abuild.hook-build-items}"
+           target="-query-build-item-hooks"
+           param="abuild.private.hook-item"
+           inheritall="true"/>
+ </target>
+
+ <target name="-query-build-item-hooks">
+  <propertycopy name="abuild.private.item-dir"
+                from="abuild.dir.${abuild.private.hook-item}"/>
+  <property name="abuild.private.hook-file"
+            location="${abuild.private.item-dir}/ant-hooks.xml"/>
+  <antcall target="-run-external-hook"/>
+ </target>
+
+ <target name="-run-local-hooks" if="abuild.use-local-hooks">
+  <property name="abuild.private.hook-file"
+            location="${abuild.private.dir.item}/${abuild.local-buildfile}"/>
+  <antcall target="-run-external-hook"/>
+ </target>
+
+ <!--  Must set abuild.private.hook-name and                       -->
+ <!--  abuild.private.hook-file                                    -->
+ <target name="-run-external-hook" unless="abuild.private.bootstrapping">
+  <if>
+   <available file="${abuild.private.hook-file}"/>
+   <then>
+    <checkfortarget property="has-hook"
+                    antfile="${abuild.private.hook-file}"
+                    target="-${abuild.private.hook-name}"/>
+   </then>
+  </if>
+  <if>
+   <isset property="has-hook"/>
+   <then>
+    <ant antfile="${abuild.private.hook-file}"
+         target="-${abuild.private.hook-name}"/>
+   </then>
+  </if>
+ </target>
+
+ <!--  Define special "all" target                                 -->
+ <target name="all" depends="package"
+         description="Build anything needed by items that depend on this item"/>
+
+ <!--  For compatibility with make-based backends                  -->
+ <target name="check" depends="test"/>
+
+ <!--  Help targets                                                -->
+
+ <filterchain id="help-filter">
+  <linecontainsregexp negate="true">
+   <regexp pattern="^#"/>
+  </linecontainsregexp>
+ </filterchain>
+
+ <!--  Define rules-help for compatibility with make-based build   -->
+ <!--  items.                                                      -->
+ <target name="rules-help" depends="properties-help"/>
+
+ <target name="properties-help"
+    description="Show abuild-specific help for Abuild-ant.properties files">
+  <concat>
+   <fileset dir="${abuild.top}/ant" includes="properties-help.txt"/>
+   <filterchain refid="help-filter"/>
+  </concat>
+  <run-hooks name="properties-help"/>
+ </target>
+
+ <target name="interface-help"
+         description="Show abuild-specific help for Abuild.interface files">
+  <concat>
+   <fileset dir="${abuild.top}/ant" includes="interface-help.txt"/>
+   <filterchain refid="help-filter"/>
+  </concat>
+  <run-hooks name="interface-help"/>
+ </target>
+
+ <target name="hooks-help"
+         description="Show abuild-specific help for ant-hooks.xml files">
+  <concat>
+   <fileset dir="${abuild.top}/ant" includes="hooks-help.txt"/>
+   <filterchain refid="help-filter"/>
+  </concat>
+ </target>
+
+ <!--  If users' Abuild.interface files have been created          -->
+ <!--  correctly, this path includes all items that were built in  -->
+ <!--  this build tree or one of its backing areas or externals.   -->
+ <!--  The only place built-classpath should be used is in the     -->
+ <!--  construction of ear files.  For anything that needs to      -->
+ <!--  know about the actual compile-time or run-time classpath,   -->
+ <!--  use complete-classpath instead.                             -->
+ <path id="built-classpath">
+  <pathelement path="${abuild.classpath}"/>
+ </path>
+ <!--  This path class includes all external jar files as well.    -->
+ <path id="complete-classpath">
+  <pathelement path="${abuild.classpath}"/>
+  <pathelement path="${abuild.classpath.external}"/>
+ </path>
+ <!--  The abuild.private.complete-classpath-jar property and      -->
+ <!--  complete-classpath-jar path contains each element of the    -->
+ <!--  complete classpath except that any element that does end    -->
+ <!--  with .jar has .jar appended to it.  This enables us to      -->
+ <!--  have har, sar, and other archive types in our classpath     -->
+ <!--  even though some versions of javac ignore them if           -->
+ <!--  specified in the compile classpath.  This code precludes    -->
+ <!--  our adding directories to abuild.classpath.  This is        -->
+ <!--  documented.                                                 -->
+ <pathconvert property="abuild.private.complete-classpath-jar"
+              refid="complete-classpath">
+  <chainedmapper>
+   <globmapper from="*" to="*.jar"/>
+   <regexpmapper from="^(.*?)(\.jar(?:\.jar)?)$" to="\1.jar"/>
+  </chainedmapper>
+ </pathconvert>
+ <path id="complete-classpath-jar">
+  <pathelement path="${abuild.private.complete-classpath-jar}"/>
+ </path>
+ <!--  This is the same transformation but only for the built      -->
+ <!--  classpath, not the complete classpath.                      -->
+ <pathconvert property="abuild.private.built-classpath-jar"
+              refid="built-classpath">
+  <chainedmapper>
+   <globmapper from="*" to="*.jar"/>
+   <regexpmapper from="^(.*?)(\.jar(?:\.jar)?)$" to="\1.jar"/>
+  </chainedmapper>
+ </pathconvert>
+ <path id="built-classpath-jar">
+  <pathelement path="${abuild.private.built-classpath-jar}"/>
+ </path>
+
+ <!--  Perform some additional validations.                        -->
+
+ <condition property="multiple-archive-types">
+  <!--  It would be nice if there were a better way of testing     -->
+  <!--  whether at most one of these properties is set.            -->
+  <or>
+   <and>
+    <isset property="abuild.jar-name"/>
+    <isset property="abuild.war-name"/>
+   </and>
+   <and>
+    <isset property="abuild.jar-name"/>
+    <isset property="abuild.ear-name"/>
+   </and>
+   <and>
+    <isset property="abuild.war-name"/>
+    <isset property="abuild.ear-name"/>
+   </and>
+  </or>
+ </condition>
+
+ <!--  Define standard targets.  Each calls hooks as needed        -->
+
+ <target name="init">
+  <fail message="at most one of abuild.jar-name, abuild-war-name, and abuild.ear-name may be set"
+        if="multiple-archive-types"/>
+  <!--  Create directories that are potentially needed by          -->
+  <!--  numerous targets and hooks.                                -->
+  <mkdir dir="${abuild.private.dir.classes}"/>
+  <mkdir dir="${abuild.private.dir.dist}"/>
+  <mkdir dir="${abuild.private.dir.generated-jsrc}"/>
+  <mkdir dir="${abuild.private.dir.generated-resources}"/>
+  <mkdir dir="${abuild.private.dir.generated-web}"/>
+  <mkdir dir="${abuild.private.dir.generated-conf}"/>
+  <run-hooks name="init"/>
+ </target>
+
+ <target name="generate" depends="init"
+         description="Create automatically generated sources">
+  <run-hooks name="generate"/>
+ </target>
+
+ <!--  XXX Need configurable way of setting debug, etc.  Get list  -->
+ <!--  of things that are like this.                               -->
+ <target name="compile" depends="generate,-pre-compile,-do-compile,-copy-classpath,-post-compile"
+         description="Compile sources"/>
+
+ <target name="-pre-compile">
+  <run-hooks name="pre-compile"/>
+ </target>
+
+ <target name="-post-compile">
+  <run-hooks name="post-compile"/>
+ </target>
+
+ <target name="-do-compile" if="abuild.private.need-compile">
+  <property name="debug" value="true"/>
+  <property name="deprecation" value="on"/>
+  <condition property="abuild.private.includeantruntime" value="yes" else="no">
+   <isset property="abuild.include-ant-runtime"/>
+  </condition>
+  <!--  Source and target may be overridden by setting properties  -->
+  <!--  in Abuild-ant.properties.  See properties-help.txt for     -->
+  <!--  details.                                                   -->
+  <javac debug="${debug}"
+         deprecation="${deprecation}"
+         destdir="${abuild.private.dir.classes}"
+         includeantruntime="${abuild.private.includeantruntime}"
+         classpathref="complete-classpath-jar">
+   <src path="${abuild.private.path.jsrc}"/>
+   <src path="${abuild.private.dir.generated-jsrc}"/>
+   <compilerarg value="-Xlint"/>
+   <compilerarg value="-Xlint:-path"/>
+  </javac>
+ </target>
+
+ <condition property="abuild.private.classpath-to-copy"
+            value="built-classpath">
+  <isset property="abuild.ear-name"/>
+ </condition>
+ <condition property="abuild.private.classpath-to-copy"
+            value="built-classpath-jar">
+  <isset property="abuild.war-name"/>
+ </condition>
+
+ <target name="-copy-classpath" if="abuild.private.classpath-to-copy">
+  <delete dir="${abuild.private.dir.classpath}"/>
+  <mkdir dir="${abuild.private.dir.classpath}"/>
+  <copy flatten="true" todir="${abuild.private.dir.classpath}">
+   <path refid="${abuild.private.classpath-to-copy}"/>
+  </copy>
+ </target>
+
+ <condition property="abuild.private.need-ear">
+  <and>
+   <isset property="abuild.ear-name"/>
+   <isset property="abuild.application-xml"/>
+  </and>
+ </condition>
+
+ <condition property="abuild.private.ear-name-has-suffix">
+  <and>
+   <isset property="abuild.ear-name"/>
+   <matches string="${abuild.ear-name}" pattern="\."/>
+  </and>
+ </condition>
+
+ <condition property="abuild.private.need-package">
+  <or>
+   <isset property="abuild.private.need-compile"/>
+   <isset property="abuild.private.need-ear"/>
+  </or>
+ </condition>
+
+ <target name="package"
+         depends="compile,-pre-package,-do-package,-post-package"
+         if="abuild.private.need-package"
+         description="Create jar, ear, or other package files"/>
+
+ <target name="-pre-package">
+  <run-hooks name="pre-package"/>
+ </target>
+
+ <target name="-do-package" depends="jar,war,ear,wrapper"
+         if="abuild.private.need-package"/>
+
+ <target name="-post-package">
+  <run-hooks name="post-package"/>
+ </target>
+
+ <target name="jar" depends="compile" if="abuild.jar-name">
+  <pathconvert refid="complete-classpath-jar" dirsep="/" pathsep=" "
+               property="manifest-classpath">
+   <mapper type="flatten"/>
+  </pathconvert>
+  <fail message="abuild.jar-name must have a filename extension"
+        unless="abuild.private.jar-name-has-suffix"/>
+  <jar destfile="${abuild.private.dir.dist}/${abuild.jar-name}">
+   <fileset dir="${abuild.private.dir.classes}">
+    <include name="**/*.class"/>
+   </fileset>
+   <fileset refid="${abuild.private.fileset.resources}"/>
+   <fileset dir="${abuild.private.dir.generated-resources}"/>
+   <metainf refid="${abuild.private.fileset.conf}"/>
+   <metainf dir="${abuild.private.dir.generated-conf}"/>
+   <manifest>
+    <attribute name="Class-Path" value="${manifest-classpath}"/>
+   </manifest>
+  </jar>
+  <if>
+   <not>
+    <matches string="${abuild.jar-name}" pattern="\.jar$"/>
+   </not>
+   <then>
+    <copy file="${abuild.private.dir.dist}/${abuild.jar-name}"
+          tofile="${abuild.private.dir.dist}/${abuild.jar-name}.jar"/>
+   </then>
+  </if>
+ </target>
+
+ <condition property="abuild.private.need-war">
+  <and>
+   <isset property="abuild.war-name"/>
+   <isset property="abuild.web-xml"/>
+  </and>
+ </condition>
+
+ <condition property="abuild.private.war-name-has-suffix">
+  <and>
+   <isset property="abuild.war-name"/>
+   <matches string="${abuild.war-name}" pattern="\."/>
+  </and>
+ </condition>
+
+ <!--  The following convoluted ant logic achieves this simple     -->
+ <!--  goal: if abuild.war-type is client, copy the classpath to   -->
+ <!--  the root of the war file.  If it is server, copy it to      -->
+ <!--  WEB-INF/lib.                                                -->
+ <condition property="abuild.private.war-classpath-lib"
+            value="abuild.private.fileset-id.classpath"
+            else="abuild.private.fileset-id.empty">
+  <and>
+   <isset property="abuild.war-type"/>
+   <equals arg1="${abuild.war-type}" arg2="server"/>
+  </and>
+ </condition>
+ <condition property="abuild.private.war-classpath-root"
+            value="abuild.private.fileset-id.classpath"
+            else="abuild.private.fileset-id.empty">
+  <and>
+   <isset property="abuild.war-type"/>
+   <equals arg1="${abuild.war-type}" arg2="client"/>
+  </and>
+ </condition>
+ <condition property="abuild.private.valid-war-type">
+  <or>
+   <equals arg1="${abuild.war-type}" arg2="client"/>
+   <equals arg1="${abuild.war-type}" arg2="server"/>
+  </or>
+ </condition>
+
+ <target name="war" depends="compile" if="abuild.private.need-war">
+  <fail message="abuild.war-name must have a filename extension"
+        unless="abuild.private.war-name-has-suffix"/>
+  <fail message="abuild.war-type must have the value &quot;client&quot; or &quot;server&quot;"
+        unless="abuild.private.valid-war-type"/>
+  <war destfile="${abuild.private.dir.dist}/${abuild.war-name}"
+       webxml="${abuild.private.dir.item}/${abuild.web-xml}">
+   <webinf refid="${abuild.private.fileset.conf}"/>
+   <webinf dir="${abuild.private.dir.generated-conf}"/>
+   <classes dir="${abuild.private.dir.classes}">
+    <include name="**/*.class"/>
+   </classes>
+   <lib refid="${abuild.private.war-classpath-lib}"/>
+   <fileset refid="${abuild.private.war-classpath-root}"/>
+   <fileset refid="${abuild.private.fileset.web}"/>
+   <fileset dir="${abuild.private.dir.generated-web}"/>
+  </war>
+ </target>
+
+ <target name="ear" depends="jar" if="abuild.private.need-ear">
+  <fail message="abuild.ear-name must have a filename extension"
+        unless="abuild.private.ear-name-has-suffix"/>
+  <!--  Include all jars in the abuild.classpath property but not  -->
+  <!--  those in the abuild.classpath.external property.  This     -->
+  <!--  does not include any jars we built locally unless they     -->
+  <!--  are also in the abuild.classpath variable.                 -->
+  <ear destfile="${abuild.private.dir.dist}/${abuild.ear-name}"
+       appxml="${abuild.private.dir.item}/${abuild.application-xml}">
+   <fileset dir="${abuild.private.dir.classpath}"/>
+   <fileset refid="${abuild.private.fileset.resources}"/>
+   <fileset dir="${abuild.private.dir.generated-resources}"/>
+   <metainf refid="${abuild.private.fileset.conf}"/>
+   <metainf dir="${abuild.private.dir.generated-conf}"/>
+  </ear>
+ </target>
+
+ <condition property="abuild.private.need-wrapper">
+  <and>
+   <isset property="abuild.main-class"/>
+   <isset property="abuild.wrapper-name"/>
+  </and>
+ </condition>
+
+ <target name="wrapper" description="create executable wrapper"
+         if="abuild.private.need-wrapper">
+  <pathconvert property="wrapper.classpath">
+   <!--  XXX This is going to create command lines that are too    -->
+   <!--  long because of the absolute path.                        -->
+   <path refid="complete-classpath-jar"/>
+   <fileset dir="${abuild.private.dir.dist}" includes="*.jar"/>
+  </pathconvert>
+  <if>
+   <os family="windows"/>
+   <then>
+    <echo file="${abuild.wrapper-name}.bat">@echo off
+java -classpath ${wrapper.classpath} ${abuild.main-class} %1 %2 %3 %4 %5 %6 %7 %8 %9
+</echo>
+    <!-- in case we're in cygwin... -->
+    <echo file="${abuild.wrapper-name}">#!/bin/sh
+exec `dirname $0`/`basename $0`.bat ${1+"$@"}
+</echo>
+    <chmod file="${abuild.wrapper-name}" perm="a+x"/>
+   </then>
+   <else>
+    <echo file="${abuild.wrapper-name}">#!/bin/sh
+exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
+</echo>
+    <chmod file="${abuild.wrapper-name}" perm="a+x"/>
+   </else>
+  </if>
+ </target>
+
+ <!--  The qtest test framework tries to colorize its              -->
+ <!--  PASSED/FAILED output and tries to right-justify its         -->
+ <!--  output.  If we are running qtest-driver from ant and are    -->
+ <!--  not in emacs mode, it will generate incorrect results       -->
+ <!--  because ant adds extra margin on its own from the exec      -->
+ <!--  task.  If ant is invoked from abuild with the -e or emacs   -->
+ <!--  flag, then it passes the -e option to ant and also sets     -->
+ <!--  the property abuild.private.emacs-mode.  Unless this is     -->
+ <!--  set, we add 12 characters to qtest-driver's margin.  This   -->
+ <!--  is an unfortunate workaround.                               -->
+ <condition property="abuild.private.qtest_extra_margin"
+            value="12" else="0">
+  <not>
+   <isset property="abuild.private.emacs-mode"/>
+  </not>
+ </condition>
+
+ <target name="test" depends="all,-pre-test,-do-test,-post-test"
+         description="Run test suites"/>
+
+ <target name="-pre-test">
+  <run-hooks name="pre-test"/>
+ </target>
+
+ <target name="-post-test">
+  <run-hooks name="post-test"/>
+ </target>
+
+ <target name="-do-test" depends="-test-junit,-test-qtest">
+  <run-hooks name="test"/>
+ </target>
+
+ <condition property="abuild.private.need-junit">
+  <isset property="abuild.junit.testsuite"/>
+ </condition>
+
+ <!--  XXX The build doesn't fail if the test suite fails.  Why    -->
+ <!--  not?                                                        -->
+ <!--  XXX Requires something in the classpath or in ant's lib     -->
+ <!--  directory that provides junit test cases.  By what          -->
+ <!--  mechanism do we guarantee that this is always there?        -->
+ <!--  Maybe we treat it like antcontrib?                          -->
+ <target name="-test-junit" depends="package"
+         if="abuild.private.need-junit">
+  <mkdir dir="junit"/>
+  <junit printsummary="yes" haltonfailure="yes" fork="true">
+   <classpath>
+    <path refid="complete-classpath-jar"/>
+    <fileset dir="${abuild.private.dir.dist}" includes="*.jar"/>
+   </classpath>
+   <test name="${abuild.junit.testsuite}"
+         haltonfailure="no" todir="${abuild.private.dir.dist}">
+    <formatter type="xml"/>
+   </test>
+  </junit>
+  <junitreport todir="junit">
+   <fileset dir="${abuild.private.dir.dist}">
+    <include name="TEST-*.xml"/>
+   </fileset>
+   <report format="frames" todir="junit/html"/>
+  </junitreport>
+ </target>
+
+ <available property="abuild.private.need-qtest"
+            file="${abuild.private.dir.item}/qtest"/>
+
+ <target name="-test-qtest" if="abuild.private.need-qtest">
+  <!--  Note: in order to make it possible to run qtest-driver     -->
+  <!--  with the cygwin perl from a native Windows environment,    -->
+  <!--  pass explicitly relative paths for -datadir, -bindirs,     -->
+  <!--  and -covdir rather than using properties.                  -->
+  <exec executable="perl" dir=".">
+   <env key="QTEST_EXTRA_MARGIN" value="${abuild.private.qtest_extra_margin}"/>
+   <arg value="-S"/>
+   <arg value="qtest-driver"/>
+   <arg value="-stdout-tty=${ABUILD_STDOUT_IS_TTY}"/>
+   <arg value="-datadir"/>
+   <arg value="../qtest"/>
+   <arg value="-bindirs"/>
+   <arg value="..:."/>
+   <arg value="-covdir"/>
+   <arg value=".."/>
+  </exec>
+ </target>
+
+ <target name="deploy" depends="all" description="Deploy packages">
+  <run-hooks name="deploy"/>
+ </target>
+
+ <target name="doc" depends="all,-doc"/>
+
+ <target name="-doc">
+  <run-hooks name="doc"/>
+ </target>
+
+ <target name="other"
+    description="Catch-all used to invoke local or build-item hooks">
+  <run-hooks name="other"/>
+ </target>
+
+ <target name="clean">
+  <delete dir="${abuild.private.dir.classes}"/>
+  <delete dir="${abuild.private.dir.dist}"/>
+ </target>
+
+</project>

@@ -1,0 +1,7 @@
+# Declare this "mutex" variable to prevent multiple implementations of
+# the interface from being in a build item's dependency chain at the
+# same time.
+declare shared_MUTEX boolean
+
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+LIBS = shared

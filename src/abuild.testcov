@@ -1,0 +1,213 @@
+Interface repeat declaration 0
+Interface ERR conflicting declaration 0
+Interface ERR bad boolean value 0
+Interface ERR bad list assignment type 0
+Interface ERR variable already assigned 0
+Interface update list 0
+Interface update scalar 2
+Interface ERR empty filename 0
+Interface ERR get unknown variable 0
+Interface ERR assign unknown variable 0
+Interface repeat assignment 0
+Interface uninitialized variable 2
+Interface scalar value 0
+Interface appendlist value 0
+Interface prependlist value 0
+InterfaceParser ERR invalid target_type 0
+InterfaceParser ERR unknown variable 0
+InterfaceParser ERR uninitialized var 0
+InterfaceParser found invalid clause 0
+InterfaceParser erroneous conditional 0
+InterfaceParser ERR non-boolean variable 0
+InterfaceParser ERR invalid function 0
+InterfaceParser ERR wrong number of arguments 0
+InterfaceParser ERR invalid boolean argument 0
+InterfaceParser check nested function 0
+InterfaceParser checking target_type variable 0
+InterfaceParser not checking target_type var 0
+InterfaceParser empty target_type value 0
+InterfaceParser ERR non-string/filename variable 1
+InterfaceParser ERR function for str/filename arg 0
+InterfaceParser expand string/filename 3
+InterfaceParser ERR function as words arg 0
+InterfaceParser ERR bad regular expression 0
+Util::canonicalizePath ignore empty 0
+Util::canonicalizePath ignore . 0
+Util::canonicalizePath handle .. 0
+Util::canonicalizePath ignore .. 0
+Util::canoncalizePath absolute link 0
+Util::canoncalizePath relative link 0
+Util::canonicalizePath loop detected 0
+KeyVal ERR syntax error 0
+KeyVal ignore comment 0
+KeyVal ERR end with continuation line 0
+KeyVal ERR duplicate key 0
+KeyVal using default 0
+KeyVal ERR invalid key 0
+KeyVal ERR missing keys 0
+KeyVal ignore blank line 0
+Abuild with_deps 0
+Abuild ERR cycle reading Abuild.conf 0
+ItemConfig ERR build item invalid name 0
+ItemConfig ERR deps without this 0
+ItemConfig ERR external on non-root 0
+ItemConfig ERR absolute parent 0
+Abuild ERR missing parent 0
+ItemConfig ERR absolute child 0
+Abuild ERR not child of parent 0
+ItemConfig ERR absolute external 0
+Abuild ERR unknown platform type 0
+Abuild ERR incompatible platform types 0
+Abuild ERR inaccessible dep 0
+Abuild multiple target types 1
+Abuild empty build set 0
+Abuild integrity errors in buildset 0
+Abuild ERR backing cycle 0
+Abuild ERR build tree root with parent 0
+Abuild ERR invalid backing file 0
+Abuild ERR no build tree top config 0
+Abuild Abuild.backing without Abuild.conf 0
+Abuild external in backing area 0
+Abuild ERR can't resolve external 0
+Abuild ERR item multiple locations 0
+Abuild ERR child no parent 0
+Abuild ERR wrong parent 0
+Abuild ERR no child config 0
+Abuild child in backing area 0
+Abuild ERR can't resolve child 0
+Abuild build item multiple paths 0
+Abuild ERR in local and external 0
+Abuild override build item 0
+Abuild ERR unknown dependency 0
+Abuild ERR circular dependency 0
+Abuild ERR dep inconsistency 0
+Abuild buildset all 1
+Abuild buildset local 1
+Abuild buildset desc 1
+Abuild buildset deps 1
+Abuild buildset current 1
+Abuild empty buildset 0
+Abuild clean 0
+Abuild no local build 0
+Abuild not building read-only build item 0
+Abuild not building with no build file 1
+Abuild no-op 0
+ccxx.mk ccxx_compile 0
+ccxx.mk ccxx_make_static_lib 0
+ccxx.mk ccxx_make_shared_lib 0
+ccxx.mk ccxx_make_bin 0
+ccxx.mk ccxx_debug 0
+ccxx.mk undefined variables 0
+ccxx.mk no targets 0
+abuild.mk BUILD_ITEM_RULES 0
+abuild.mk LOCAL_RULES 0
+abuild.mk platform-specific clean 0
+Abuild ERR no abuild.conf 0
+Abuild ERR item traversal loop 0
+Abuild ERR missing after-build 0
+Abuild good after-build 0
+Interface skip empty string 0
+ItemConfig ERR multiple build files 0
+ItemConfig ERR platform-types without this 0
+Abuild ERR after-build with no build file 0
+ItemConfig ERR config files without this 0
+ItemConfig ERR no platform types 0
+ItemConfig ERR platforms without build files 0
+InterfaceParser ERR invalid environment variable 0
+InterfaceParser environment variable 0
+ItemConfig ERR invalid visible-to 0
+ItemConfig ERR visible-to for public item 0
+ItemConfig ERR visible-to not ancestor 0
+Abuild globally visible item 0
+Abuild accessor sees ancestor 1
+Abuild accessor sees child 0
+Abuild set scope from visibility 0
+ItemConfig ERR visible-to too long 0
+Interface ERR reset unknown variable 0
+InterfaceParser no-reset 0
+InterfaceParser ERR no-reset invalid 0
+InterfaceParser reset all 0
+InterfaceParser reset variable 0
+ItemConfig ERR supported-flags without this 0
+ItemConfig ERR invalid flag 0
+ItemConfig ERR bad dep 0
+ItemConfig ERR flag without dep 0
+Abuild ERR unsupported flag 0
+Abuild skipping flag for unknown dep 0
+Abuild flag made variable uninitialized 0
+InterfaceParser ERR bad flag 0
+ItemConfig ERR traits without this 0
+ItemConfig ERR supported-traits on non-root 0
+ItemConfig ERR invalid trait 0
+ItemConfig ERR duplicate trait 0
+ItemConfig ERR duplicate flag 0
+ItemConfig ERR bad trait 0
+ItemConfig ERR item without trait 0
+Abuild inherit traits from backing area 0
+Abuild ERR unsupported trait 0
+Abuild ERR inaccessible trait referent 0
+Abuild listTraits with no traits 0
+Abuild listTraits 0
+Abuild expand by trait 1
+Abuild category et_traits 1
+Abuild ERR unknown trait 0
+ItemConfig ERR duplicate platform type 0
+ItemConfig ERR deleted on non-root 0
+ItemConfig ERR duplicate deleted item 0
+Abuild ERR deleting non-existent item 0
+Abuild ERR deleting unqualified item 0
+Abuild deleting item 0
+ItemConfig ERR duplicate plugins item 0
+ItemConfig ERR plugins on non-root 0
+Abuild ERR invalid plugin 0
+Abuild ERR plugin with dependencies 0
+Abuild ERR item depends on plugin 0
+Abuild ERR plugin with target type !all 0
+Abuild ERR plugin integrity 0
+Abuild ERR import of plugin interface 0
+Abuild ERR import of dependent interface 0
+Abuild ERR error loading plugin interface 0
+InterfaceParser ERR disallowed after-build 0
+Abuild ERR bad platform type specification 0
+Abuild ERR addPlatformType error 0
+Abuild ERR addPlatform error 0
+Abuild ERR bad platform specification 0
+Abuild ERR add compiler error 0
+Abuild non-trivial update platform types 0
+Abuild platform type difference 0
+Abuild inherit platform types 0
+Abuild ERR unmatched platform 0
+ItemConfig ERR ptype without dep 0
+ItemConfig ERR duplicate dep ptype 0
+Abuild ERR dep doesn't have dep ptype 0
+Abuild ERR all with ptype deps 0
+Abuild ERR dep ptype indep 0
+Abuild ERR no override platform 0
+Abuild ignoring all's dep without platform 0
+Abuild item -> indep 1
+Abuild override platform 0
+Abuild A:p -> B:p 1
+Abuild ABUILD_PLATFORM_SELECTORS 0
+Abuild ERR invalid platform selector 0
+PlatformSelector option 0
+PlatformSelector skip 0
+PlatformSelector all 0
+PlatformSelector platform 4 0
+PlatformSelector platform 5 0
+PlatformSelector compiler 2 0
+PlatformSelector compiler 1 0
+PlatformData skipping platform type 0
+ItemConfig ptype is selector 0
+ItemConfig bad ptype selector 0
+BuildItem used selector for type 0
+BuildItem used first for type 0
+Abuild not copying deleted in external 0
+Abuild buildset names 1
+Abuild ERR unknown items in set 0
+Abuild ERR bad buildset pattern 0
+Abuild buildset pattern 1
+Abuild add selected to explicit targets 0
+Abuild add all to explicit targets 1
+ccxx.mk remove extra deps 0
+ccxx.mk found extra objs 0
+ccxx.mk found extra other 0

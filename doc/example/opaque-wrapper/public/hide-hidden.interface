@@ -1,0 +1,4 @@
+# Prevent those that depend upon us from seeing the INCLUDES that we saw
+reset INCLUDES
+# Re-insert our own include directory into the public interface
+INCLUDES = .

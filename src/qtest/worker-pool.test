@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver("WorkerPool");
+chdir("worker-pool") or die;
+
+for (my $i = 0; $i < 3; ++$i)
+{
+    cleanup();
+
+    $td->runtest("WorkerPool",
+		 {$td->COMMAND => "test_worker_pool > tmp.out"},
+		 {$td->STRING => "", $td->EXIT_STATUS => 0});
+
+    my @lines = ();
+    open(F, "<tmp.out") or die;
+    @lines = (<F>);
+    close(F);
+    my $sequence = "";
+    my @words = ();
+    foreach my $line (@lines)
+    {
+	$line =~ s/\r?\n//;
+	$line =~ s/^result: //;
+	my @fields = ($line =~ m/^(\d+) (.+)$/);
+	$sequence .= " " . $fields[0];
+	push(@words, $fields[1]);
+    }
+    $sequence =~ s/^ //;
+    $sequence .= "\n";
+
+    $td->runtest("check sequence",
+		 {$td->STRING => $sequence},
+		 {$td->STRING => "1 1 1 1 2 2 2 2 3 3 3\n"});
+
+    @words = sort(@words);
+    my $words = join("\n", @words) . "\n";
+    $td->runtest("check words",
+		 {$td->STRING => $words},
+		 {$td->STRING =>
+		      "eight 7\nelephant 10\nfive 6\nfour 6\nnine 6\n" .
+		      "one 5\nseven 7\nsix 5\nten 5\nthree 7\ntwo 5\n"});
+}
+
+cleanup();
+
+$td->report(9);
+
+sub cleanup
+{
+    unlink "tmp.out";
+}

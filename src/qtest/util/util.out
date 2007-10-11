@@ -1,0 +1,33 @@
+5 -12
+/
+.
+a/b
+a\b
+/
+C:/
+../../three
+../four/five
+..
+four
+.
+.
+../../../D/E/F
+Q:/w/w/w
+-one-
+-two-
+-three-
+-four-
+-five-
+split empty
+test getProgramOutput
+one
+two
+three
+one'two"three&amp;&lt;four&gt;
+five!
+one&apos;two&quot;three&amp;&lt;four&gt; five!
+Asdf cmp asdF = 0
+qwer cmp QWERTY = -1
+123x cmp 123X = 0
+ORANGE cmp apple = 1
+APPLE cmp orange = -1

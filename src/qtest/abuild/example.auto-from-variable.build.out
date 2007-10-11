@@ -1,0 +1,10 @@
+abuild: file-provider (abuild-<native>): all
+make: Entering directory `--topdir--/auto-from-variable/library/abuild-<native>'
+Compiling ../FileProvider.cc as C++
+Creating file-provider library
+make: Leaving directory `--topdir--/auto-from-variable/library/abuild-<native>'
+abuild: program (abuild-<native>): all
+make: Entering directory `--topdir--/auto-from-variable/program/abuild-<native>'
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/auto-from-variable/program/abuild-<native>'

@@ -1,0 +1,5 @@
+abuild: 04-java (abuild-java): no-op
+abuild: 04-indep (abuild-indep): no-op
+abuild: 01-java (abuild-java): no-op
+abuild: 04-object-code (abuild-<native>): no-op
+abuild: 01-object-code (abuild-<native>): no-op

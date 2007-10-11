@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+#
+# This script provides the default native platform for bootstrapping.
+# It is not used by abuild itself, but only by Makefile.bootstrap and
+# make-release.  This logic is duplicated in Abuild.cc, though not
+# exactly in this form.
+#
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my $winflag = '';
+# For now, assume Cygwin means Windows.
+if ($^O =~ m/^(cygwin|MSWin32)$/)
+{
+    $winflag = '--windows';
+}
+
+chop(my $native_data = `$dirname/get_native_platform_data $winflag`);
+if ($? != 0)
+{
+    die "$whoami: get_native_platform_data failed\n";
+}
+my @fields = split(/\s+/, $native_data);
+die "$whoami: invalid get_native_platform_data output ($native_data)\n"
+    unless @fields == 3;
+my ($os, $cpu, $toolset) = @fields;
+
+my $compiler = undef;
+open(P, "$dirname/../list_platforms $winflag|") or
+    die "$whoami: can't run list_platforms: $!\n";
+while (<P>)
+{
+    # Keep the last native compiler we see.
+    if (m/^native-compiler (\S+)/)
+    {
+	$compiler = $1;
+    }
+}
+close(P);
+
+if (! defined $compiler)
+{
+    die "$whoami: unable to determine native compiler\n";
+}
+
+my $result = "$os.$cpu.$toolset.$compiler";
+
+if ((exists $ENV{'ABUILD_BOOTSTRAP_RELEASE'}) &&
+    ($ENV{'ABUILD_BOOTSTRAP_RELEASE'} eq '1'))
+{
+    $result .= ".release";
+}
+
+print "$result\n";

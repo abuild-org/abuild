@@ -1,0 +1,82 @@
+/* -*- text -*- */
+
+/* Note: we automatically generate a flex file from this list of
+ * tokens by generating rules for the tokens defined below.
+ */
+
+%{
+#include <nt_all.hh>
+#include <interface.tab.hh>
+#include <Token.hh>
+#include <InterfaceLexer.hh>
+#include <InterfaceParser.hh>
+%}
+
+%option yyclass="InterfaceLexer"
+%option prefix="yy_interface"
+
+/*
+ * Identifiers may contain alphanumerics, dash, underscore, and
+ * period.  We repeat [_[:alnum:]\.-]+ below for this purpose as
+ * needed.  Note that we put _ first to avoid having two consecutive
+ * "[" characters, which is rejected by m4 which flex uses starting at
+ * version 2.5.30.
+ *
+ * Note that the C++ code that receives tokens recognized here shares
+ * knowledge with this file about the nature of the tokens.  Finer
+ * parsing is done there using regular expressions.
+ *
+ * Whitespace handling is tricky in our grammar.  It's significant in
+ * some places but not in others, more or less like how make variables
+ * are assigned.  We deal with this by allowing keyword and operator
+ * tokens to suck in ignorable whitespace around them.
+ */
+
+/* comments, as a special case, are consumed by the lexer */
+tok_comment	^[ \t]*#.*\n
+
+/* be flexible about line terminators */
+tok_newline	[ \t]*\r?\n
+
+/* Trailing backslash followed by a newline is a line continuation
+ * character and is embedded in the tok_spaces token.  Any other
+ * character preceded by a backslash will be treated as that
+ * character.  That catches all use of backslash except a trailing
+ * backslash as the last character in the file, which will be
+ * recognized as tok_other. */
+
+tok_quotedchar	\\.
+
+/* operators */
+tok_equal	[ \t]*=[ \t]*
+tok_comma	[ \t]*,[ \t]*
+tok_clope	[ \t]*\)[ \t]*
+
+/* keywords */
+tok_if		[ \t]*if[ \t]*[ \t]*+\(
+tok_elseif	[ \t]*elseif[ \t]*[ \t]*+\(
+tok_else	[ \t]*else[ \t]*
+tok_endif	[ \t]*endif[ \t]*
+tok_reset	[ \t]*reset[ \t]*
+tok_reset_all	[ \t]*reset-all[ \t]*
+tok_no_reset	[ \t]*no-reset[ \t]*
+tok_override	[ \t]*override[ \t]*
+tok_fallback	[ \t]*fallback[ \t]*
+tok_flag	[ \t]*flag[ \t]*
+tok_declare	[ \t]*declare[ \t]*
+tok_boolean	[ \t]*boolean[ \t]*
+tok_string	[ \t]*string[ \t]*
+tok_filename	[ \t]*filename[ \t]*
+tok_list	[ \t]*list[ \t]*
+tok_append	[ \t]*append[ \t]*
+tok_prepend	[ \t]*prepend[ \t]*
+tok_afterbuild	[ \t]*after-build[ \t]*
+tok_targettype	[ \t]*target-type[ \t]*
+
+/* remaining syntax */
+tok_function	[_[:alnum:]\.-]+[ \t]*+\(
+tok_identifier	[_[:alnum:]\.-]+
+tok_variable	\$\([_[:alnum:]\.-]+\)
+tok_environment	\$\(ENV:[_[:alnum:]]+\)
+tok_spaces	([ \t]|\\\r?\n)([ \t]*|(\\\r?\n))*
+tok_other	.

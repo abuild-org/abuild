@@ -1,0 +1,8 @@
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+LIBS = lib1 lib2
+
+# Overall flags visible to reverse dependencies but not item itself
+XCPPFLAGS = -lib-xcppflags-
+XCFLAGS = -lib-xcflags-
+XCXXFLAGS = -lib-xcxxflags-
+XLINKFLAGS = -lib-xlinkflags-

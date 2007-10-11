@@ -1,0 +1,7 @@
+work/.now
+work/multi/a/Abuild.mk
+work/multi/b/Abuild.mk
+work/multi/common/Abuild.mk
+work/multi/product/Abuild.mk
+work/read-only/product/bin/Abuild.mk
+work/shared/product/new/Abuild.mk

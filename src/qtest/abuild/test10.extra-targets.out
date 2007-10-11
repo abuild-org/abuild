@@ -1,0 +1,21 @@
+abuild: targets (abuild-<native>): all
+make: Entering directory `--topdir--/extra-targets/abuild-<native>'
+Compiling ../lib1_1.cc as C++
+Compiling ../lib1_2.cc as C++
+Creating lib1 library
+Compiling ../lib2_1.cc as C++
+Compiling ../lib2_2.cc as C++
+Creating lib2 library
+Compiling ../shlib1_1.cc as C++
+Compiling ../shlib1_2.cc as C++
+Creating shlib1 shared library
+Compiling ../shlib2_1.cc as C++
+Compiling ../shlib2_2.cc as C++
+Creating shlib2 shared library
+Compiling ../bin1_1.cc as C++
+Compiling ../bin1_2.cc as C++
+Creating bin1 executable
+Compiling ../bin2_1.cc as C++
+Compiling ../bin2_2.cc as C++
+Creating bin2 executable
+make: Leaving directory `--topdir--/extra-targets/abuild-<native>'

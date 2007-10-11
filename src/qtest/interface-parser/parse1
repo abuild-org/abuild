@@ -1,0 +1,22 @@
+# -*- require-final-newline: nil -*-
+target-type
+a ==
+
+after-build x y z
+
+something
+
+if ($(asdfasdf)
+  x
+endif
+
+if (x())
+  x=y
+endif
+
+if (x(x y() z))
+  x=y
+endif
+
+# no newline at end of file
+asdf\

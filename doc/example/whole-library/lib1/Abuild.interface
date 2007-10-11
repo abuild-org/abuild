@@ -1,0 +1,5 @@
+INCLUDES = .
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+declare WHOLE_lib_thing1 boolean
+WHOLE_lib_thing1 = 1
+LIBS = thing1

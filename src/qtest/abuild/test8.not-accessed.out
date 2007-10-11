@@ -1,0 +1,11 @@
+work/.now
+work/bad1/indep/Abuild.mk
+work/bad1/object-code/Abuild.mk
+work/bad2/indep/Abuild.mk
+work/bad2/object-code/Abuild.mk
+work/bad2/other/Abuild.mk
+work/case2/01-java/Abuild-ant.properties
+work/case2/01-object-code/Abuild.mk
+work/case2/04-indep/Abuild.mk
+work/case2/04-java/Abuild-ant.properties
+work/case2/04-object-code/Abuild.mk

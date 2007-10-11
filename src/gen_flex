@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Basename;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+die "Usage: $whoami x.qfl x.fl\n" unless @ARGV == 2;
+
+my ($qfl, $fl) = @ARGV;
+my $base = basename($qfl, '.qfl');
+
+my $lineno = 1;
+open(IN, "<$qfl") or die "$whoami: can't open $qfl: $!\n";
+open(OUT, ">$fl") or die "$whoami: can't create $fl: $!\n";
+
+output("#line $lineno \"$qfl\"\n");
+
+my @tokens = ();
+while (<IN>)
+{
+    if (m/^tok_(\S+)\t/)
+    {
+	push(@tokens, $1);
+    }
+    output($_);
+}
+
+output("#line $lineno \"$fl\"\n");
+output("\n%%\n");
+
+foreach my $token (@tokens)
+{
+    output("\n");
+    output("{tok_$token} {\n");
+    if ($token eq 'comment')
+    {
+	# special case: don't return comments to the parser
+	output("    parser->createToken(yytext);\n");
+    }
+    else
+    {
+	output("    parser->setToken(parser->createToken(yytext));\n");
+	output("    return tok_$token;\n");
+    }
+    output("}\n");
+}
+
+output("\n%%\n");
+
+close(OUT) or die "$whoami: can't close $fl: $!\n";
+close(IN);
+
+sub output
+{
+    my $line = shift;
+    print OUT $line;
+    while ($line =~ m,\n,gs)
+    {
+	++$lineno;
+    }
+}

@@ -1,0 +1,258 @@
+#ifndef __ABUILD_HH__
+#define __ABUILD_HH__
+
+#include <string>
+#include <list>
+#include <set>
+#include <map>
+#include <boost/shared_ptr.hpp>
+#include <boost/function.hpp>
+#include <boost/regex.hpp>
+#include <Error.hh>
+#include <QEXC.hh>
+#include <BuildTree.hh>
+#include <DependencyGraph.hh>
+#include <DependencyEvaluator.hh>
+#include <Interface.hh>
+#include <PlatformData.hh>
+#include <PlatformSelector.hh>
+
+class Logger;
+class ItemConfig;
+class InterfaceParser;
+
+class Abuild
+{
+  public:
+    Abuild(int argc, char* argv[], char* envp[]);
+    ~Abuild();
+    bool run();
+
+  private:
+    Abuild(Abuild const&);
+    Abuild& operator=(Abuild const&);
+
+    typedef boost::shared_ptr<BuildTree> BuildTree_ptr;
+    typedef std::map<std::string, BuildTree_ptr> BuildTree_map;
+
+    static bool initializeStatics();
+
+    typedef BuildTree::BuildItem_ptr BuildItem_ptr;
+    typedef BuildTree::BuildItem_map BuildItem_map;
+
+    bool runInternal();
+    void getThisPlatform();
+    void parseArgv();
+    void checkBuildsetName(std::string const& kind, std::string const& name);
+    void initializePlatforms();
+    void initializeJavaPlatforms();
+    void loadPlatformData(PlatformData&, std::string const& dir);
+    bool readConfigs();
+    ItemConfig* readConfig(std::string const& dir);
+    std::string findTop();
+    void traverse(BuildTree_map&, std::string const& top_path,
+		  std::set<std::string>& visiting,
+		  FileLocation const& referrer,
+		  std::string const& description);
+    void traverseItems(BuildTree_map& buildtrees,
+		       std::string const& top_path);
+    void resolveItems(BuildTree_map& buildtrees,
+		      std::string const& top_path);
+    void resolveTraits(BuildTree_map& buildtrees,
+		       std::string const& top_path);
+    void checkPlugins(BuildTree& tree_data,
+		      BuildItem_map& builditems,
+		      std::string const& top_path);
+    void checkPlatformTypes(BuildTree& tree_data,
+			    BuildItem_map& builditems,
+			    std::string const& top_path);
+    void checkItemNames(BuildItem_map& builditems,
+			std::string const& top_path);
+    bool accessibleFrom(BuildItem_map& builditems,
+			std::string const& accessor,
+			std::string const& accessee);
+    void checkDependencies(BuildTree& tree_data,
+			   BuildItem_map& builditems,
+			   std::string const& top_path);
+    void updatePlatformTypes(BuildTree& tree_data,
+			     BuildItem_map& builditems,
+			     std::string const& top_path);
+    void checkDependencyPlatformTypes(BuildItem_map& builditems);
+    void checkFlags(BuildItem_map& builditems);
+    void checkTraits(BuildTree& tree_data,
+		     BuildItem_map& builditems,
+		     std::string const& top_path);
+    void checkIntegrity(BuildTree_map& buildtrees,
+			std::string const& top_path);
+    void reportIntegrityErrors(BuildTree_map& buildtrees,
+			       BuildItem_map& builditems,
+			       std::string const& top_path);
+    void computeBuildablePlatforms(BuildTree& tree_data,
+				   BuildItem_map& builditems,
+				   std::string const& top_path);
+    void readBacking(std::string const& dir,
+		     std::string& backing_area);
+    bool haveExternal(BuildTree_map&, std::string const& backing_area,
+		      std::string const& external,
+		      std::string& external_dir);
+    bool checkBuilditemPath(BuildTree_map& buildtrees,
+			    std::string const& backing_area,
+			    std::string const& child_tree_relative);
+    void computeValidTraits(BuildTree_map& buildtrees);
+    void listTraits();
+    void listPlatforms(BuildTree_map& buildtrees);
+    void dumpData(BuildTree_map& buildtrees);
+    void dumpPlatformData(PlatformData const&, std::string const& indent);
+    void dumpBuildItem(BuildItem& item, std::string const& item_name,
+		       std::map<std::string, int>& tree_numbers);
+    void computeBuildset(BuildItem_map& builditems);
+    void populateBuildset(BuildItem_map& builditems,
+			  boost::function<bool(BuildItem const*)> pred);
+    bool buildBuildset();
+    bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);
+    void findGnuMakeInPath();
+    void findAnt();
+    bool isThisItemThisPlatform(std::string const& name,
+				std::string const& platform);
+    bool isThisItem(std::string const& name, std::string const& platform);
+    bool isAnyItem(std::string const& name, std::string const& platform);
+    bool itemBuilder(
+	std::string builder_string,
+	boost::function<bool(std::string const&, std::string const&)> filter);
+    bool buildItem(std::string const& item_name,
+		   std::string const& item_platform,
+		   BuildItem& build_item);
+    void stateChangeCallback(std::string const& builder_string,
+			     DependencyEvaluator::ItemState state);
+    bool createItemInterface(std::string const& builder_string,
+			     std::string const& item_name,
+			     std::string const& item_platform,
+			     BuildItem& build_item,
+			     InterfaceParser& parser);
+    bool createPluginInterface(std::string const& plugin_name,
+			       BuildItem& build_item);
+    void assignInterfaceVariable(Interface&, FileLocation const&,
+				 std::string const& variable_name,
+				 std::string const& value,
+				 Interface::assign_e assignment_type,
+				 bool& status);
+    bool readAfterBuilds(std::string const& item_name,
+			 std::string const& item_platform,
+			 BuildItem& build_item,
+			 InterfaceParser& parser);
+    bool invoke_gmake(std::string const& item_name,
+		      std::string const& item_platform,
+		      BuildItem& build_item,
+		      std::string const& dir,
+		      std::list<std::string> const& targets);
+    bool invoke_ant(std::string const& item_name,
+		    std::string const& item_platform,
+		    BuildItem& build_item,
+		    std::string const& dir,
+		    std::list<std::string> const& targets);
+    bool invokeBackend(std::string const& progname,
+		       std::vector<std::string> const& args,
+		       std::map<std::string, std::string> const& environment,
+		       char* old_env[],
+		       std::string const& dir);
+    void cleanBuildset();
+    void cleanPath(std::string const& item_name, std::string const& dir);
+    void help();
+    void usage(std::string const& msg);
+    void exitIfErrors();
+    void info(std::string const& msg);
+    void verbose(std::string const& msg);
+    void monitorOutput(std::string const& msg);
+    void monitorErrorCallback(std::string const& msg);
+    void error(std::string const& msg);
+    void error(FileLocation const&, std::string const& msg);
+    void fatal(std::string const& msg);
+
+    static std::string const ABUILD_VERSION;
+    static std::string const OUTPUT_DIR_PREFIX;
+    static std::string const FILE_BACKING;
+    static std::string const FILE_DYNAMIC_MK;
+    static std::string const FILE_DYNAMIC_ANT;
+    static std::string const b_ALL;
+    static std::string const b_LOCAL;
+    static std::string const b_DESC;
+    static std::string const b_DEPS;
+    static std::string const b_CURRENT;
+    static std::set<std::string> valid_buildsets;
+    static std::string const s_CLEAN;
+    static std::string const s_NO_OP;
+    static std::string const PLUGIN_PLATFORM;
+    static std::string const FILE_PLUGIN_INTERFACE;
+    static boost::regex BUILDER_RE;
+    static std::set<std::string> special_targets;
+    static std::list<std::string> default_targets;
+
+    static bool statics_initialized;
+
+    int argc;
+    char** argv;
+    char** envp;
+
+    // Parameters determined from the command line or at startup
+    std::string whoami;
+    bool stdout_is_tty;
+    unsigned int max_workers;
+    std::list<std::string> make_args;
+    std::list<std::string> ant_args;
+    bool keep_going;
+    std::string buildset_name;
+    std::set<std::string> buildset_named_items;
+    std::string buildset_pattern;
+    std::string cleanset_name;
+    bool full_integrity;
+    bool list_traits;
+    bool list_platforms;
+    bool dump_data;
+    bool dump_build_graph;
+    bool verbose_mode;
+    bool silent;
+    bool monitored;
+    bool use_abuild_logger;
+    std::string special_target;
+    std::list<std::string> targets;
+    bool apply_targets_to_deps;
+    std::set<std::string> explicit_target_items;
+    std::list<std::string> only_with_traits;
+    std::list<std::string> related_by_traits;
+    std::map<std::string, PlatformSelector> platform_selectors;
+    bool local_build;
+
+    // Other data
+    Error error_handler;
+    std::string current_directory;
+    std::string program_fullpath;
+    std::string abuild_top;
+    std::string native_os;
+    std::string native_cpu;
+    std::string native_toolset;
+    std::string this_platform;
+    std::string this_config_dir;
+    ItemConfig* this_config;
+    PlatformData internal_platform_data;
+    std::set<std::string> valid_traits;
+    BuildItem_map buildset;
+#ifdef _WIN32
+    bool have_perl;
+#endif
+    std::string gmake;
+    std::string ant;
+    std::string ant_library;
+    DependencyGraph build_graph;
+    boost::shared_ptr<Interface> base_interface;
+    std::vector<std::string> buildset_reverse_order;
+
+    // (tree, other_tree) -> [plugin, ...]
+    typedef std::map<std::string,
+		     std::vector<std::string> > map_string_vec_string;
+    typedef std::map<std::string, map_string_vec_string> shadowed_plugin_map;
+    shadowed_plugin_map shadowed_plugins;
+
+    Logger& logger;
+};
+
+#endif // __ABUILD_HH__

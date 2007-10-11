@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<project default="other-ear-example">
+
+ <!--  Prevent jar-example.jar from being included in the ear.     -->
+ <target name="-pre-package">
+  <delete file="classpath/jar-example.jar"/>
+ </target>
+
+</project>

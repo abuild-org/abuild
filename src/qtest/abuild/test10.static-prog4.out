@@ -1,0 +1,7 @@
+abuild: static (abuild-<native>): all
+make: Entering directory `--topdir--/static/abuild-<native>'
+Compiling ../Static.cc as C++
+Generating auto.cc with value prog4
+Compiling auto.cc as C++
+Creating static library
+make: Leaving directory `--topdir--/static/abuild-<native>'

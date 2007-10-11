@@ -1,0 +1,13 @@
+tree --topdir--/native-compiler
+  platform type native
+    platform <native-os-data>.qcc; built by default: yes
+    platform <native-os-data>.qcc.debug; built by default: no
+    platform <native-os-data>.qcc.release; built by default: no
+    platform <native>; built by default: no
+    platform <native>.debug; built by default: no
+    platform <native>.release; built by default: no
+tree --topdir--/native-compiler/outside
+  platform type native
+    platform <native>; built by default: yes
+    platform <native>.debug; built by default: no
+    platform <native>.release; built by default: no

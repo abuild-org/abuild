@@ -1,0 +1,7 @@
+META-INF/
+META-INF/MANIFEST.MF
+META-INF/application.xml
+ear-code.jar
+har-example.har
+jar-example.jar
+war-example.war

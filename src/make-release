@@ -1,0 +1,436 @@
+#!/usr/bin/env perl
+#
+# This script is used to create a binary distribution for abuild.  It
+# extracts a source distribution, builds it, runs its test suite, and
+# packages it.  It can optionally create doc and java distribution
+# files.  These are not for external distribution but are rather to be
+# used to supplement the source distribution for creation of binary
+# distribution files.
+#
+# The usual process for doing a release would to first create a source
+# distribution.  Then, on a system that can build everything, create a
+# binary distribution by running this script with the --make-java-dist
+# and --make-doc-dist flags.  Then copy the make-release script, the
+# source distribution, and whichever of the doc and java distributions
+# are required to the other platform build systems and run this script
+# on each one.
+#
+# Note that qtest-driver must be in your path to run the test suites.
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Find;
+use File::Basename;
+use Cwd;
+use Cwd 'abs_path';
+use File::Copy;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my $tmpdir = undef;
+my $cwd = getcwd();
+
+END
+{
+    chdir $cwd;
+    rmrf($tmpdir) if defined $tmpdir;
+}
+
+usage() unless @ARGV >= 1;
+my $src_dist = shift(@ARGV);
+usage() unless $src_dist =~ m/^abuild-(\d+\.\d+(?:\.[ab]\d+)?)\.tar.bz2$/;
+my $version = $1;
+
+my $java_dist = undef;
+my $make_java_dist = 0;
+my $doc_dist = undef;
+my $make_doc_dist = 0;
+my $make_static = 0;
+my $save_auto = 0;
+foreach my $arg (@ARGV)
+{
+    if ($arg eq '--make-java-dist')
+    {
+	$make_java_dist = 1;
+    }
+    elsif ($arg eq '--make-doc-dist')
+    {
+	$make_doc_dist = 1;
+    }
+    elsif ($arg eq "abuild-$version-java.tar.bz2")
+    {
+	$java_dist = $arg;
+    }
+    elsif ($arg eq "abuild-$version-doc.tar.bz2")
+    {
+	$doc_dist = $arg;
+    }
+    elsif ($arg eq '--make-static')
+    {
+	$make_static = 1;
+    }
+    elsif ($arg eq '--save-auto')
+    {
+	$save_auto = 1;
+    }
+    else
+    {
+	usage();
+    }
+}
+
+run("qtest-driver --version > /dev/null");
+
+$src_dist = normalize_path($src_dist);
+$java_dist = normalize_path($java_dist);
+$doc_dist = normalize_path($doc_dist);
+
+my $build_java = 1;
+my $build_doc = 1;
+
+if (defined $java_dist)
+{
+    $ENV{'ABUILD_NO_JAVA'} = '1';
+    $build_java = 0;
+}
+if (defined $doc_dist)
+{
+    $build_doc = 0;
+}
+
+if ($make_doc_dist && (! $build_doc))
+{
+    die "$whoami: can't create documentation distribution file" .
+	" if not building documentation\n";
+}
+if ($make_java_dist && (! $build_java))
+{
+    die "$whoami: can't create java distribution file" .
+	" if not building java support\n";
+}
+
+my $build_all = ($build_doc && $build_java);
+
+my $windows = 0;
+
+# This should pretty much work with native Win32 perl, but there are
+# incorrect assumptions about what to do for windows bootstrap build
+# and binary distribution creation.  Don't remove this without
+# thorough testing.
+die "MSWin32 not yet supported" if $^O eq 'MSWin32';
+
+if ($^O eq 'cygwin')
+{
+    # For now, assume cygwin means windows
+    $windows = 1;
+    # We need objdump to determine which DLLs are required.
+    run("objdump --version > /dev/null");
+    if (! -d "auto-srcs")
+    {
+	die "$whoami: auto-srcs must exist\n";
+    }
+}
+
+if ($windows && $make_static)
+{
+    die "$whoami: --static not supported in Windows\n";
+}
+
+my $now = time;
+$tmpdir = ".abuild-release-$$-$now";
+
+mkdir $tmpdir, 0777 or die "$whoami: can't create $tmpdir\n";
+$tmpdir = abs_path($tmpdir);
+
+chdir $tmpdir or die "$whoami: can't cd $tmpdir\n";
+
+run("tar xjf $src_dist");
+safe_chdir("abuild-$version");
+
+# Determination of bin_platform is duplicated in Makefile.bootstrap.
+$ENV{'ABUILD_BOOTSTRAP_RELEASE'} = 1;
+$ENV{'ABUILD_PLATFORM_SELECTORS'} = 'native:option=release';
+chop(my $bin_platform = `private/bin/bootstrap_native_platform`);
+
+if ($bin_platform !~ m/^([^\.]+)\.([^\.]+)\.([^\.]+)\.([^\.]+)/)
+{
+    die "$whoami: can't parse platform $bin_platform\n";
+}
+my ($os, $cpu, $dist, $compiler) = ($1, $2, $3, $4);
+my $bin_dist = "abuild-$version-$dist-$cpu-bin";
+
+print $bin_dist, "\n";
+
+safe_chdir("src");
+
+if ($windows)
+{
+    mkdir "abuild-$bin_platform", 0777 or
+	die "$whoami: can't create abuild-$bin_platform: $!\n";
+    run("cp $cwd/auto-srcs/* abuild-$bin_platform");
+}
+
+run("make -f Makefile.bootstrap");
+my $abuild = getcwd() . "/abuild-$bin_platform/abuild";
+my $actual_version = `$abuild --version`;
+if ($? != 0)
+{
+    die "$whoami: abuild --version failed\n";
+}
+if ($actual_version !~ m/\b$version\b/)
+{
+    die "$whoami: abuild --version reported the wrong version" .
+	" ($actual_version)\n";
+}
+my $static_dist = undef;
+if ($make_static)
+{
+    safe_rename($abuild, "$abuild.real");
+    run("make -f Makefile.bootstrap ABUILD_STATIC=1");
+    safe_rename($abuild, "$tmpdir/abuild.static");
+    $static_dist = "abuild-$version-${os}_static-$cpu-bin";
+    safe_rename("$abuild.real", $abuild);
+}
+if ($save_auto)
+{
+    run("$abuild save-auto");
+    if (-d "$cwd/auto-srcs")
+    {
+	rmrf("$cwd/auto-srcs");
+    }
+}
+
+if ($build_all)
+{
+    run("$abuild --build=all");
+}
+else
+{
+    if ($build_java)
+    {
+	run("(cd ant-library; $abuild)");
+    }
+    if ($build_doc)
+    {
+	run("(cd manual; $abuild)");
+    }
+}
+run("$abuild check");
+
+safe_chdir($tmpdir);
+safe_chdir("abuild-$version");
+
+# Copy static files to installation directory
+safe_copy("src/abuild_data.dtd", "doc/abuild_data.dtd");
+
+print "\n";
+
+# Copy autogenerated files to installation directory
+if ($build_doc)
+{
+    safe_copy("src/manual/abuild-indep/manual.pdf", "doc/abuild-manual.pdf");
+    safe_copy("src/manual/abuild-indep/manual.html", "doc/abuild-manual.html");
+    safe_copy("src/manual/abuild-indep/stylesheet.css", "doc/stylesheet.css");
+    my @png = sort grep { m/\.png$/ } (<src/manual/abuild-indep/*>);
+    @png = map { basename $_ } @png;
+    foreach my $p (@png)
+    {
+	safe_copy("src/manual/abuild-indep/$p", "doc/$p");
+    }
+    my $docpng = join(' ', map { "doc/$_" } @png);
+    if ($make_doc_dist)
+    {
+	run("tar cjf $cwd/abuild-$version-doc.tar.bz2" .
+	    " doc/abuild-manual.pdf doc/abuild-manual.html doc/stylesheet.css" .
+	    " $docpng");
+	print "$whoami: created abuild-$version-doc.tar.bz2\n";
+    }
+}
+else
+{
+    run("tar xjf $doc_dist");
+}
+if ($build_java)
+{
+    mkdir "lib", 0777 or die "$whoami: can't create lib: $!\n";
+    safe_copy("src/ant-library/abuild-java/dist/abuild-ant-library.jar",
+	      "lib/abuild-ant-library.jar");
+    if ($make_java_dist)
+    {
+	run("tar cjf $cwd/abuild-$version-java.tar.bz2" .
+	    " lib/abuild-ant-library.jar");
+	print "$whoami: created abuild-$version-java.tar.bz2\n";
+    }
+}
+else
+{
+    run("tar xjf $java_dist");
+}
+
+mkdir "bin", 0777 or die "$whoami: can't create bin: $!\n";
+if ($windows)
+{
+    safe_copy("$abuild.exe", "bin/abuild.exe");
+
+    # XXX Attempt to copy Windows DLLs required by this program.  This
+    # is not really a good solution, but it should work okay on a
+    # default installation of MSVC .NET 2003.  For .NET 2005,
+    # something other than copying the DLL files into the bin
+    # directory is required.  For mingw, no external DLLs should be
+    # needed.
+
+    # We check for objdump at the start of this program.
+    my @dlls = ();
+    open(O, "objdump -p bin/abuild.exe|") or die "$whoami: can't run objdump\n";
+    while (<O>)
+    {
+	if (m/^\s+DLL Name:\s+(.+\.dll)/i)
+	{
+	    my $dll = $1;
+	    next unless $dll =~ m/MSVC/i;
+	    $dll =~ tr/A-Z/a-z/;
+	    push(@dlls, $dll);
+	}
+    }
+    close(O);
+    my $sysroot = $ENV{'SYSTEMROOT'} or die "$whoami: can't get \$SYSTEMROOT\n";
+    $sysroot =~ s,\\,/,g;
+    chop($sysroot = `cygpath $sysroot`);
+    die "$whoami: can't get system root" unless $? == 0;
+    foreach my $dll (@dlls)
+    {
+	safe_copy("$sysroot/System32/$dll", "bin/$dll");
+    }
+}
+else
+{
+    safe_copy($abuild, "bin/abuild");
+    system("chmod -R g-w .");
+    system("chmod +x bin/abuild");
+}
+
+if ($save_auto)
+{
+    safe_rename("src/auto-srcs", "$cwd/auto-srcs");
+    print "$whoami: created auto-srcs\n";
+}
+
+rmrf("src");
+safe_chdir($tmpdir);
+
+if ($windows)
+{
+    run("zip -r ../$bin_dist.zip abuild-$version");
+    print "$whoami: created $bin_dist.zip\n";
+}
+else
+{
+    run("tar cjf ../$bin_dist.tar.bz2 abuild-$version");
+    print "$whoami: created $bin_dist.tar.bz2\n";
+}
+
+if (defined $static_dist)
+{
+    safe_unlink("abuild-$version/bin/abuild");
+    safe_copy("abuild.static", "abuild-$version/bin/abuild");
+    system("chmod +x abuild-$version/bin/abuild");
+    run("tar cjf ../$static_dist.tar.bz2 abuild-$version");
+    print "$whoami: created $static_dist.tar.bz2\n";
+}
+
+sub safe_rename
+{
+    my ($src, $dest) = @_;
+    rename $src, $dest or die "$whoami: rename $src $dest failed: $!\n";
+}
+
+sub safe_copy
+{
+    my ($src, $dest) = @_;
+    copy($src, $dest) or die "$whoami: copy $src $dest failed: $!\n";
+}
+
+sub safe_unlink
+{
+    my $file = shift;
+    unlink $file or die "unlink $file failed: $!\n";
+}
+
+sub run
+{
+    my $cmd = shift;
+    system($cmd) == 0 or die "$whoami: $cmd failed\n";
+}
+
+sub normalize_path
+{
+    my $path = shift;
+    return undef unless defined $path;
+    die "$whoami: $path not found\n" unless -f $path;
+    abs_path($path);
+}
+
+sub safe_chdir
+{
+    my $dir = shift;
+    chdir($dir) or die "$whoami: chdir $dir failed: $!\n";
+}
+
+sub rmrf
+{
+    my $path = shift;
+    return unless -e $path;
+    my $wanted = sub
+    {
+	if (-d $_)
+	{
+	    rmdir $_ or die "rmdir $_ failed: $!\n";
+	}
+	else
+	{
+	    safe_unlink($_);
+	}
+    };
+    finddepth({wanted => $wanted, no_chdir => 1}, $path);
+}
+
+sub usage
+{
+    die "
+Usage: $whoami src-dist [ java-dist | --make-java-dist ]
+               [ doc-dist | --make-doc-dist ]
+               [ --make-static ]
+
+src-dist must be of the form abuild-version.tar.bz2
+java-dist, if present, must be of the form abuild-version-java.tar.bz2
+doc-dist, if present, must be of the form abuild-version-doc.tar.bz2
+
+This program creates a binary distribution of abuild from the given
+source distribution.  The version number of the distribution is
+determined from the name of the source distribuion file.  This program
+creates a binary distribution file called
+abuild-version-bin-platform-bin.tar.bz2.
+
+If java-dist is specified, its contents are added to the binary
+distribution, and no attempt is made to build or test the Java
+portions of abuild.  This makes it possible to create complete binary
+distributions of abuild on systems that do not have a Java development
+environment.
+
+If doc-dist is specified, its contents are added to the binary
+distribution, and no attempt is made to build the documentation.  This
+makes it possible to create complete binary distributions of abuild on
+systems that can't compile texinfo documentation.
+
+If --make-java-dist or --make-doc-dist are specified, this program
+creates java-dist or doc-dist files usable for invocations of this
+program on other platforms.
+
+If --make-static is specified, also create a static version.  This
+will be called abuild-os_static-cpu.bin.tar.bz2.  The static version
+will be in addition to, not instead of, the regular dynamic version.
+
+";
+}

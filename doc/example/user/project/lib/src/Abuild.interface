@@ -1,0 +1,4 @@
+INCLUDES = ../include
+flag private INCLUDES = ../private-include
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+LIBS = project-lib

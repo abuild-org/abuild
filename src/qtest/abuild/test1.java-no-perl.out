@@ -1,0 +1,19 @@
+abuild: java (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/java/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java/abuild-java/dist
+    [mkdir] Created dir: --topdir--/java/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/java/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/java/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/java/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/java/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/java/abuild-java/dist/test.jar
+
+BUILD SUCCESSFUL
+Total time: <time>

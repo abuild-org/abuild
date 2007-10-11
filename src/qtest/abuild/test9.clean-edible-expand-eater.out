@@ -1,0 +1,5 @@
+abuild: cleaning A in A
+abuild: cleaning A-eater-painter in others/A-eater-painter
+abuild: cleaning AB-eater in others/AB-eater
+abuild: cleaning B in others/B
+abuild: cleaning B-eater in others/B-eater

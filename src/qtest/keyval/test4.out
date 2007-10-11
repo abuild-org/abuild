@@ -1,0 +1,7 @@
+no defaults
+test4.in:3: ERROR: invalid key potato (ignored)
+test4.in:4: ERROR: invalid key one (ignored)
+test4.in: ERROR: no values for the following keys: chicken duck pig qoww
+defaults
+test4.in:4: ERROR: invalid key one (ignored)
+test4.in: ERROR: no values for the following keys: chicken duck pig qoww

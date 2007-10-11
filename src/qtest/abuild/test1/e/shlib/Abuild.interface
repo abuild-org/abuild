@@ -1,0 +1,2 @@
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+LIBS = shlib1 shlib2 shlib3 shlib4

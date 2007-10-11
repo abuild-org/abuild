@@ -1,0 +1,26 @@
+semantic1:12:5: ERROR: unknown function x
+semantic1:17:9: ERROR: unknown variable qwer
+semantic1:19:7: ERROR: unknown function xyz
+semantic1:27:7: ERROR: unknown function x
+semantic1:27:9: ERROR: unknown function y
+semantic1:27:18: ERROR: unknown function z
+semantic1:27:20: ERROR: unknown function w
+semantic1:33:1: ERROR: assigning to unknown variable oink
+semantic1:38:3: ERROR: assigning to unknown variable bad1
+semantic1:44:13: ERROR: b is not a valid target type
+semantic1:46:13: ERROR: the empty string is not a valid target type
+semantic1:51:14: ERROR: unknown environment variable NO_SUCH_VARIABLE
+semantic1:53:7: ERROR: resetting unknown variable UNKNOWN
+semantic1:54:10: ERROR: unknown variable UNKNOWN
+semantic1:55:6: ERROR: unknown flag unknown-flag
+parse(semantic1): failure
+dumping interface semantic1
+  a: string scalar, target type object-code = 
+  b: string appendlist, target type object-code: uninitialized
+  c: boolean scalar, target type object-code = 1
+  d: filename scalar, target type object-code = --CWD--/a
+  e: filename prependlist, target type object-code: uninitialized
+  after-build files:
+    --CWD--/something.interface
+    --CWD--/a
+end of interface semantic1

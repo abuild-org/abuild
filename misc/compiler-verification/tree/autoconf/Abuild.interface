@@ -1,0 +1,2 @@
+INCLUDES = $(ABUILD_OUTPUT_DIR)
+after-build $(ABUILD_OUTPUT_DIR)/autoconf.interface

@@ -1,0 +1,11 @@
+TARGETS_lib := lib1 lib2 shlib1 shlib2
+TARGETS_bin := bin1 bin2
+SHLIB_shlib1 :=
+SHLIB_shlib2 := 1 2 3
+SRCS_lib_lib1 := lib1_1.cc lib1_2.cc
+SRCS_lib_lib2 := lib2_1.cc lib2_2.cc
+SRCS_lib_shlib1 := shlib1_1.cc shlib1_2.cc
+SRCS_lib_shlib2 := shlib2_1.cc shlib2_2.cc
+SRCS_bin_bin1 := bin1_1.cc bin1_2.cc
+SRCS_bin_bin2 := bin2_1.cc bin2_2.cc
+RULES := ccxx

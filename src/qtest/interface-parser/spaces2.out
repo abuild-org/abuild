@@ -1,0 +1,5 @@
+parse(spaces2): success
+dumping interface spaces2
+  A: string appendlist, target type all = B C D E F
+  no after-build files
+end of interface spaces2

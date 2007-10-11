@@ -1,0 +1,252 @@
+<!--  This DTD describes the format of abuild's dump-data output.  -->
+<!--  Inline comments explain the details.  The file is called     -->
+<!--  abuild_data.dtd instead of abuild-data.dtd so we don't       -->
+<!--  accidentally ignore it because it matches the pattern        -->
+<!--  abuild-* (like abuild output directories).                   -->
+
+<!--  By convention, we use "0" or "1" for boolean values.  Some   -->
+<!--  boolean values are optional.  In this case, omitted always   -->
+<!--  means "0".                                                   -->
+<!ENTITY % boolean "(0|1)">
+
+<!--  Whenever the target-type attribute appears, it may only      -->
+<!--  have one of these values.                                    -->
+<!ENTITY % target-type "(all|platform-independent|object-code|java)">
+
+
+<!--  The version attribute is always "1".  We will only           -->
+<!--  increment this if there is a change to the output such that  -->
+<!--  previously valid data is either no longer valid or is valid  -->
+<!--  but has different semantics.  Adding new attributes with     -->
+<!--  default values, optional attributes, or optional elements    -->
+<!--  will not cause the version number to be increased.  Code     -->
+<!--  that reads this output should be prepared to accept and      -->
+<!--  ignore unknown attributes or elements.  The errors           -->
+<!--  attribute is present and has the value "1" whenever abuild   -->
+<!--  has detected errors.  In this case, normal guarantees about  -->
+<!--  output consistency do not apply, and the output may contain  -->
+<!--  references to unknown build items, platform types, flags,    -->
+<!--  traits, etc.  Abuild will still make every effort to         -->
+<!--  produce useful and coherent data and will also always        -->
+<!--  produce XML output that parses against this DTD.             -->
+<!ELEMENT abuild-data (platform-data, supported-traits?, build-trees)>
+<!ATTLIST abuild-data
+  version       CDATA     #REQUIRED
+  errors        %boolean; #IMPLIED
+>
+
+<!--  The platform-data element provides information about all     -->
+<!--  platform types known and any platforms they contain.  When   -->
+<!--  it appears directly under abuild-data, it refers to the      -->
+<!--  built-in platforms and platform types.  When it appears      -->
+<!--  under build-tree, it refers to the platforms known to that   -->
+<!--  tree.  This would include built-in platform information as   -->
+<!--  well as any platform information added by a plugin in that   -->
+<!--  tree.                                                        -->
+<!ELEMENT platform-data (platform-type+)>
+
+<!--  The platform-type element describes a platform type.  When   -->
+<!--  used inside of platform-data, it gives the name of the       -->
+<!--  platform type, its target type, and the list of platforms    -->
+<!--  it contains.  When used inside a build item, it just lists   -->
+<!--  a platform type on which that build item could be built.     -->
+<!ELEMENT platform-type (platform*)>
+<!ATTLIST platform-type
+  name           CDATA          #REQUIRED
+  target-type    %target-type;  #IMPLIED
+>
+<!--  The selected attribute is present only when platform         -->
+<!--  appears inside of platform-type.  In this case, it has the   -->
+<!--  value "1" when items in that platform type would always be   -->
+<!--  built on that platform (based on platform selection          -->
+<!--  criteria) and "0" otherwise.                                 -->
+<!ELEMENT platform EMPTY>
+<!ATTLIST platform
+  name           CDATA      #REQUIRED
+  selected       %boolean;  #IMPLIED
+>
+
+<!--  Every build tree includes a list of traits that are allowed  -->
+<!--  on any items that appear natively to that build tree.        -->
+<!--  There is also an overall list of supported traits that are   -->
+<!--  available from the command line.  This element lists all     -->
+<!--  traits when it appears under abuild-data and the traits      -->
+<!--  defined by any of the build tree or its externals when it    -->
+<!--  appears under build-tree.                                    -->
+<!ELEMENT supported-traits (supported-trait+)>
+<!ELEMENT supported-trait EMPTY>
+<!ATTLIST supported-trait
+  name           CDATA   #REQUIRED
+>
+
+<!ELEMENT build-trees (build-tree+)>
+
+<!--  build-trees are given IDs so that they may be referred to    -->
+<!--  by other build trees and by build items.  build-trees are    -->
+<!--  always output in an order such that no build tree refers to  -->
+<!--  a later build tree.  Although not enforced by the DTD,       -->
+<!--  readers may rely on this if it is helpful.  This constraint  -->
+<!--  is satisfied even with the errors attribute of the           -->
+<!--  top-level element is set.                                    -->
+<!ELEMENT build-tree (platform-data, supported-traits?, backing-area?,
+                      external*, deleted-items?, plugins?, build-item+)>
+<!ATTLIST build-tree
+  id             ID      #REQUIRED
+  absolute-path  CDATA   #REQUIRED
+>
+
+<!--  The backing-area element contains a reference to the         -->
+<!--  backing area.  It is omitted if there is no backing area.    -->
+<!ELEMENT backing-area EMPTY>
+<!ATTLIST backing-area
+  build-tree     IDREF     #REQUIRED
+>
+
+<!--  One external element appears for each external.  It          -->
+<!--  contains a reference to the external build tree.  Externals  -->
+<!--  that don't explicitly exist but are resolved through a       -->
+<!--  backing area appear with the backed="1" attribute.           -->
+<!ELEMENT external EMPTY>
+<!ATTLIST external
+  build-tree     IDREF     #REQUIRED
+  backed         %boolean; #IMPLIED
+>
+
+<!--  The deleted-items element contains a list of build items     -->
+<!--  that were deleted in this build tree.  These item names      -->
+<!--  will appear in the direct backing chain of this tree but     -->
+<!--  not in this tree.                                            -->
+<!ELEMENT deleted-items (deleted-item+)>
+<!ELEMENT deleted-item EMPTY>
+<!ATTLIST deleted-item
+  name           CDATA   #REQUIRED
+>
+
+<!--  The plugins element contains a list of build items that are  -->
+<!--  plugins.                                                     -->
+<!ELEMENT plugins (plugin+)>
+<!ELEMENT plugin EMPTY>
+<!ATTLIST plugin
+  name           CDATA   #REQUIRED
+>
+
+<!--  One build-item element appears for each build-item.          -->
+<!--  build-items are output in dependency order such that no      -->
+<!--  build item will refer to another build item that has not     -->
+<!--  already been output.  Readers may rely on this behavior if   -->
+<!--  it is helpful, unless the errors attribute of the top level  -->
+<!--  element is set.                                              -->
+
+<!--  The attributes have the following meanings:                  -->
+
+<!--  name: the name of the build item                             -->
+
+<!--  description: an optional description of the build item for   -->
+<!--  informational purposes only                                  -->
+
+<!--  home-tree: a reference to the tree from which the build      -->
+<!--  item is resolved                                             -->
+
+<!--  absolute-path: the absolute path of the build item           -->
+
+<!--  backing-depth: the number of backing areas that have to be   -->
+<!--  crossed to reach this build item                             -->
+
+<!--  external-depth: the number of externals that have to be      -->
+<!--  crossed to reach this build item                             -->
+
+<!--  has-shadowed-references: "1" if this build item uses any     -->
+<!--  plugins or dependencies that are shadowed by a tree that     -->
+<!--  backs to this item's tree.  Items with shadowed references   -->
+<!--  are not able to be built.                                    -->
+
+<!--  visible-to: the scope at which this item is visible;         -->
+<!--  corresponds to the visible-to key in the Abuild.conf.  If    -->
+<!--  absent, default visibility applies.                          -->
+
+<!--  target-type: the target type of this build item              -->
+
+<!--  is-plugin: true if the item is a plugin in this tree         -->
+
+<!--  is-plugin-anywhere: true if the item is a plugin in this     -->
+<!--  tree or any tree known to this tree                          -->
+
+<!ELEMENT build-item (declared-dependencies?, expanded-dependencies?,
+                      platform-types?, buildable-platforms?,
+                      supported-flags?, traits?)>
+<!ATTLIST build-item
+  name                    CDATA     #REQUIRED
+  description             CDATA     #IMPLIED
+  home-tree               IDREF     #REQUIRED
+  absolute-path           CDATA     #REQUIRED
+  backing-depth           CDATA     #REQUIRED
+  external-depth          CDATA     #REQUIRED
+  has-shadowed-references %boolean; "0"
+  visible-to              CDATA     #IMPLIED
+  target-type             %target-type;  #REQUIRED
+  is-plugin               %boolean; #REQUIRED
+  is-plugin-anywhere      %boolean; #REQUIRED
+>
+
+<!--  declared-dependencies contains the list of direct            -->
+<!--  dependencies in the order in which they were declared in     -->
+<!--  the Abuild.conf file.  Any flags associated with direct      -->
+<!--  dependencies appear in a nested flag element.                -->
+<!ELEMENT declared-dependencies (dependency+)>
+
+<!--  expanded-dependencies contains the list of recursively       -->
+<!--  expanded dependencies in sorted order from least to most     -->
+<!--  dependent.  In other words, if A depends on B and B depends  -->
+<!--  on C, A's expanded-dependencies contains C, and then B.      -->
+<!--  Note that flags appear only with direct dependencies, so     -->
+<!--  nested dependencies here will never have flag attributes.    -->
+<!ELEMENT expanded-dependencies (dependency+)>
+
+<!--  The dependency element represents a single dependency.  For  -->
+<!--  direct dependencies declared with flags, the dependency      -->
+<!--  element will contain nested flag elements.  Dependencies     -->
+<!--  that appear inside of expanded-dependencies never contain    -->
+<!--  flags elements since flags apply only to direct              -->
+<!--  dependencies.  If a dependency is declared with a specific   -->
+<!--  platform type, the platform type appears in the              -->
+<!--  "platform-type" attribute.                                   -->
+<!ELEMENT dependency (flag*)>
+<!ATTLIST dependency
+  name                 CDATA    #REQUIRED
+  platform-type        CDATA    #IMPLIED
+>
+
+<!--  The flag element represents a single dependency flag.        -->
+<!ELEMENT flag EMPTY>
+<!ATTLIST flag
+  name                 CDATA    #REQUIRED
+>
+
+<!--  platform-types contains the list of platform types in the    -->
+<!--  order in which they appeared in the Abuild.conf.             -->
+<!ELEMENT platform-types (platform-type+)>
+
+<!--  buildable-platforms contains the list of platforms on which  -->
+<!--  this item could be built.                                    -->
+<!ELEMENT buildable-platforms (platform+)>
+
+<!--  supported-flags contains a list of flags that are supported  -->
+<!--  by this build item.                                          -->
+<!ELEMENT supported-flags (supported-flag+)>
+<!ELEMENT supported-flag EMPTY>
+<!ATTLIST supported-flag
+  name                 CDATA    #REQUIRED
+>
+
+<!--  The traits element contains a list of traits that this       -->
+<!--  build item has.  Any referent build items appear in nested   -->
+<!--  trait-referent elements.                                     -->
+<!ELEMENT traits (trait+)>
+<!ELEMENT trait (trait-referent*)>
+<!ATTLIST trait
+  name                 CDATA    #REQUIRED
+>
+<!ELEMENT trait-referent EMPTY>
+<!ATTLIST trait-referent
+  name                 CDATA    #REQUIRED
+>

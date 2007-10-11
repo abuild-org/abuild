@@ -1,0 +1,42 @@
+# This is the base interface file for abuild.
+
+# Declare variables that abuild sets locally for each build item
+
+target-type all
+
+# Global information
+
+declare ABUILD_STDOUT_IS_TTY boolean
+
+declare ABUILD_THIS string
+declare ABUILD_TARGET_TYPE string
+declare ABUILD_PLATFORM_TYPE string
+declare ABUILD_OUTPUT_DIR filename
+declare ABUILD_PLATFORM string
+
+# For object-code build items, declare variables used primarily by
+# ccxx.mk.
+
+target-type object-code
+
+# Variables set by abuild
+declare ABUILD_PLATFORM_OS string
+declare ABUILD_PLATFORM_CPU string
+declare ABUILD_PLATFORM_TOOLSET string
+declare ABUILD_PLATFORM_COMPILER string
+declare ABUILD_PLATFORM_OPTION string
+
+# Variables set by the user
+declare INCLUDES list filename prepend
+declare LIBS list string prepend
+declare LIBDIRS list filename prepend
+declare XCPPFLAGS list string append
+declare XCFLAGS list string append
+declare XCXXFLAGS list string append
+declare XLINKFLAGS list string prepend
+
+target-type java
+
+# Variables set by the user
+declare abuild.classpath.external list filename prepend
+declare abuild.classpath list filename prepend

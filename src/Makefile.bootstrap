@@ -1,0 +1,32 @@
+# -*- makefile-gmake -*-
+# This is a makefile for gnu make.  In order to manage bootstrapping
+# issues, we are not building abuild with abuild, but we can still use
+# all of abuild's existing make support.  See README.build.
+
+ABUILD_TOP := $(shell dirname `pwd`)
+
+PLATFORM := $(shell $(ABUILD_TOP)/private/bin/bootstrap_native_platform)
+
+ABUILD_OUTPUT_DIR := abuild-$(PLATFORM)
+ABDYNAMIC := $(ABUILD_OUTPUT_DIR)/.ab-dynamic.mk
+
+# Set needed ABUILD_PLATFORM fields from PLATFORM
+OS := $(word 1,$(subst ., ,$(PLATFORM)))
+COMPILER := $(word 4,$(subst ., ,$(PLATFORM)))
+OPTION := $(word 5,$(subst ., ,$(PLATFORM)))
+
+abuild:
+	-mkdir $(ABUILD_OUTPUT_DIR)
+	touch $(ABUILD_OUTPUT_DIR)/.abuild
+	-$(RM) $(ABDYNAMIC)
+	touch $(ABDYNAMIC)
+	@echo 'ABUILD_PLATFORM := $(PLATFORM)' >> $(ABDYNAMIC)
+	@echo 'ABUILD_PLATFORM_OS := $(OS)' >> $(ABDYNAMIC)
+	@echo 'ABUILD_PLATFORM_COMPILER := $(COMPILER)' >> $(ABDYNAMIC)
+	@echo 'ABUILD_PLATFORM_OPTION := $(OPTION)' >> $(ABDYNAMIC)
+	@echo 'ABUILD_TARGET_TYPE := object-code' >> $(ABDYNAMIC)
+	@echo 'LIBDIRS := .' >> $(ABDYNAMIC)
+	@echo 'INCLUDES := .' >> $(ABDYNAMIC)
+	@echo 'LIBS := abuild' >> $(ABDYNAMIC)
+	make -C $(ABUILD_OUTPUT_DIR) ABUILD_TOP=$(ABUILD_TOP) \
+		-f $(ABUILD_TOP)/make/abuild.mk all

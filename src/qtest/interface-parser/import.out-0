@@ -1,0 +1,35 @@
+parse(a/good1): success
+dumping interface a/good1
+  INCLUDES: filename prependlist, target type all: uninitialized
+  LIBDIRS: string prependlist, target type all: uninitialized
+  LIBS: string prependlist, target type all: uninitialized
+  OTHER_LIST: string appendlist, target type all = a
+  PLATFORM: string scalar, target type all: uninitialized
+  TARGET-TYPE: string scalar, target type all: uninitialized
+  no after-build files
+end of interface a/good1
+parse(b/good2): success
+dumping interface b/good2
+  HAVE_good2: boolean scalar, target type platform-independent = 1
+  INCLUDES: filename prependlist, target type all = --CWD--/b/i1-1 --CWD--/b/i1-2
+  LIBDIRS: string prependlist, target type all = d1-1 d1-2
+  LIBS: string prependlist, target type all = l1-1 l1-2
+  OTHER_LIST: string appendlist, target type all = c
+  PLATFORM: string scalar, target type all = arch1
+  TARGET-TYPE: string scalar, target type all = platform-independent
+  after-build files:
+    --CWD--/b/other-file
+end of interface b/good2
+parse(c/good3): success
+dumping interface c/good3
+  HAVE_good2: boolean scalar, target type platform-independent = 1
+  INCLUDES: filename prependlist, target type all = --CWD--/c/i2-1 --CWD--/c/i2-2 --CWD--/b/i1-1 --CWD--/b/i1-2
+  LIBDIRS: string prependlist, target type all = d2-1 d2-2 d1-1 d1-2
+  LIBS: string prependlist, target type all = l2-1 l2-2 l1-1 l1-2
+  OTHER_LIST: string appendlist, target type all = c
+  PLATFORM: string scalar, target type all = arch2
+  TARGET-TYPE: string scalar, target type all = object-code
+  XFLAGS: string appendlist, target type object-code = -DHAVE_good3=1 -DHAVE_good2=1
+  after-build files:
+    --CWD--/c/other-file
+end of interface c/good3

@@ -1,0 +1,18 @@
+abuild: util.src2 (abuild-<native>): all
+make: Entering directory `--topdir--/util/src2/abuild-<native>'
+Compiling ../src2.cpp as C++
+Creating src2 library
+make: Leaving directory `--topdir--/util/src2/abuild-<native>'
+abuild: util.src (abuild-<native>): all
+make: Entering directory `--topdir--/util/src/abuild-<native>'
+Compiling ../CUPublic.cpp as C++
+Compiling ../CUPrivate.cpp as C++
+Creating utility library
+Compiling ../src2-test.cpp as C++
+Creating src2-test executable
+make: Leaving directory `--topdir--/util/src/abuild-<native>'
+abuild: main (abuild-<native>): all
+make: Entering directory `--topdir--/main/abuild-<native>'
+Compiling ../main.cpp as C++
+Creating main executable
+make: Leaving directory `--topdir--/main/abuild-<native>'

@@ -1,0 +1,6 @@
+abuild: cleaning aa in ../a/aa
+abuild: cleaning ab in ../a/ab
+abuild: cleaning ac in ../a/ac
+abuild: cleaning ad in ../a/ad
+abuild: cleaning bb in ../b/bb
+abuild: cleaning ca in ../c/ca

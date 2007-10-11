@@ -1,0 +1,9 @@
+TARGETS_lib := Y Z
+TARGETS_bin := main
+SHLIB_Z := 1 2 3
+SRCS_lib_Y := Y.cc
+SRCS_lib_Z := Z.cc
+SRCS_bin_main := main.cc other.cc
+LINK_SHLIBS := 1
+XCPPFLAGS_main.cc := -DD1\=$(HAVE_PRINTF) -DD2\=$(HAVE_EXCEPTION)
+RULES := ccxx

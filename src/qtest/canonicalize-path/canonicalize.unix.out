@@ -1,0 +1,11 @@
+/ -> /
+etc/passwd/asdf -> /etc/passwd/asdf
+root/etc/passwd/asdf -> /etc/passwd/asdf
+up/canonicalize-path -> --CWD--
+up/canonicalize-path/work/up/canonicalize-path/work/x/y/z -> --CWD--/work/up/canonicalize-path/work/x/y/z
+x/y/z -> --CWD--/work/x/y/z
+. -> --CWD--/work
+.. -> --CWD--
+over/asdf -> --CWD--/work/dir/asdf
+dangling/asdf -> --CWD--/work/other/asdf
+root/../../etc -> /etc

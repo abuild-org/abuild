@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+use File::Find;
+use File::Basename;
+
+chdir("get-program-fullpath") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('get program full name');
+
+mkdir "work", 0777;
+
+my $cwd = getcwd();
+
+chdir "work" or die;
+
+my $in_windows = ($^O =~ m/^(cygwin|MSWin32)$/);
+
+my $ntests = 0;
+
+if ($in_windows)
+{
+    # Here we run all commands with cmd /c to get cygwin out of the
+    # way.
+
+    $ntests = 6;
+
+    my $grandparent = windir(dirname(dirname($cwd)));
+
+    $td->runtest("in path",
+		 {$td->COMMAND => "cmd /c test_get_program_fullpath"},
+		 {$td->REGEXP => "^test_get_program_fullpath -> " .
+		      "$grandparent/abuild-.*/test_get_program_fullpath\n\$",
+		      $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    my $t = `test_get_program_fullpath`;
+    $t =~ s/\r?\n$//s;
+    my $real_prog = (split(/ /, $t))[2];
+
+    my $wreal_prog = $real_prog;
+    $wreal_prog =~ s,/,\\,g;
+    my $qwreal_prog = $wreal_prog;
+    $qwreal_prog =~ s,\\,\\\\,g;
+
+    $td->runtest("real prog",
+		 {$td->STRING => $real_prog},
+		 {$td->REGEXP => "/test_get_program_fullpath\$"});
+
+    $td->runtest("full path",
+		 {$td->COMMAND => "cmd /c $qwreal_prog"},
+		 {$td->STRING => "$wreal_prog -> $real_prog\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    my $relpath = "../../.." . substr($real_prog, length($grandparent));
+    $relpath =~ s,/,\\,g;
+    my $qrelpath = $relpath;
+    $qrelpath =~ s,\\,\\\\,g;
+    $td->runtest("relative path",
+		 {$td->COMMAND => "cmd /c $qrelpath"},
+		 {$td->STRING => "$relpath -> $real_prog\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("full path with exe",
+		 {$td->COMMAND => "cmd /c $qwreal_prog.exe"},
+		 {$td->STRING => "$wreal_prog.exe -> $real_prog\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("in path with exe",
+		 {$td->COMMAND => "cmd /c test_get_program_fullpath.exe"},
+		 {$td->STRING => "test_get_program_fullpath.exe -> " .
+		      "$real_prog\n",
+		      $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+}
+else
+{
+    $ntests = 4;
+
+    my $grandparent = dirname(dirname($cwd));
+    chop(my $real_prog = `which test_get_program_fullpath`);
+    $td->runtest("full path",
+		 {$td->STRING => $real_prog},
+		 {$td->REGEXP =>
+		      "^$grandparent/abuild-.*/test_get_program_fullpath\$"});
+
+    $td->runtest("in path",
+		 {$td->COMMAND => ["test_get_program_fullpath"]},
+		 {$td->STRING => "test_get_program_fullpath -> $real_prog\n",
+		  $td->EXIT_STATUS => 0});
+
+    my $relpath = "../../.." . substr($real_prog, length($grandparent));
+    $td->runtest("relative path",
+		 {$td->COMMAND => $relpath},
+		 {$td->STRING => "$relpath -> $real_prog\n",
+		  $td->EXIT_STATUS => 0});
+
+
+    $td->runtest("not found",
+		 {$td->COMMAND =>
+		      "perl -e 'exec {\"$real_prog\"}".
+		      " \"something-that-doesnt-exist\"'"},
+		 {$td->STRING => "something-that-doesnt-exist not found\n",
+		  $td->EXIT_STATUS => 0});
+}
+
+chdir $cwd or die;
+
+cleanup();
+
+$td->report($ntests);
+
+sub cleanup
+{
+    rmrf("work");
+}
+
+sub rmrf
+{
+    my $path = shift;
+    return unless -e $path;
+    my $wanted = sub
+    {
+	if ((-d $_) && (! -l $_))
+	{
+	    rmdir $_ or die "rmdir $_ failed: $!\n";
+	}
+	else
+	{
+	    unlink $_ or die "unlink $_ failed: $!\n";
+	}
+    };
+    finddepth({wanted => $wanted, no_chdir => 1}, $path);
+}
+
+sub windir
+{
+    my $dir = shift;
+    my $windir = $dir;
+    if ($^O eq 'cygwin')
+    {
+	chop($windir = `cygpath -w $dir`);
+	$windir =~ s,\\,/,g;
+    }
+    $windir;
+}

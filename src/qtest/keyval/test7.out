@@ -1,0 +1,8 @@
+no defaults
+test7.in:8: ERROR: invalid key potato (ignored)
+defaults
+chicken: quack \# quack # quack
+duck: meow
+pig: oink
+potato: mashed
+qoww: moo

@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+use File::Basename;
+
+my $top = windir(getcwd());
+
+chdir("run-program") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('run program');
+
+my $in_windows = ($^O =~ m/^(cygwin|MSWin32)$/);
+
+$td->runtest("run program",
+	     {$td->COMMAND => "test_run_program",
+	      $td->FILTER => "perl filter.pl $top"},
+	     {$td->FILE => "run_program.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+if ($in_windows)
+{
+    $td->runtest("batch file",
+		 {$td->COMMAND => "test_run_program -win32"},
+		 {$td->FILE => "win32.out", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report(1 + ($in_windows ? 1 : 0));
+
+sub windir
+{
+    my $dir = shift;
+    my $windir = $dir;
+    if ($^O eq 'cygwin')
+    {
+	chop($windir = `cygpath -w $dir`);
+	$windir =~ s,\\,/,g;
+    }
+    $windir;
+}

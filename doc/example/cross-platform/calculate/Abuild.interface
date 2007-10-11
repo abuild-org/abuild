@@ -1,0 +1,3 @@
+declare CALCULATE filename
+CALCULATE = $(ABUILD_OUTPUT_DIR)/calculate
+after-build after.interface

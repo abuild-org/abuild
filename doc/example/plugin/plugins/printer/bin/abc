@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Copy;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my ($src, $obj);
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '-c')
+    {
+	die "$whoami: -c requires an argument\n" unless @ARGV;
+	$src = shift(@ARGV);
+    }
+    elsif ($arg eq '-o')
+    {
+	die "$whoami: -o requires an argument\n" unless @ARGV;
+	$obj = shift(@ARGV);
+    }
+}
+die "$whoami: -c and -o are required\n"
+    unless ((defined $src) && (defined $obj));
+
+open(O, ">$obj") or die "$whoami: can't write to $obj: $!\n";
+open(S, "<$src") or die "$whoami: can't open $src: $!\n";
+
+print O "\n------ $src ------\n\n";
+
+my $tabwidth = 8;
+my $lineno = 0;
+while (<S>)
+{
+    ++$lineno;
+    my $new = "";
+    while (m/\t/g)
+    {
+	$new .= $`;
+	$new .= (' ') x ($tabwidth - (length($new) % $tabwidth));
+	$_ = $'; #'
+    }
+    $new .= $_;
+    print O "${lineno}: $new";
+}
+close(S);
+close(O);

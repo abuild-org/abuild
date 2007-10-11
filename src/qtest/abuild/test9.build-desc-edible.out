@@ -1,0 +1,3 @@
+abuild: common (abuild-indep): all
+abuild: A-dep (abuild-indep): all
+abuild: A (abuild-indep): hello

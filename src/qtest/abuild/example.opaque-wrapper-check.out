@@ -1,0 +1,36 @@
+abuild: opaque-hidden (abuild-<native>): check
+make: Entering directory `--topdir--/opaque-wrapper/hidden/abuild-<native>'
+Compiling ../Hidden.cc as C++
+Creating opaque-hidden library
+make: Leaving directory `--topdir--/opaque-wrapper/hidden/abuild-<native>'
+abuild: opaque-public (abuild-<native>): check
+make: Entering directory `--topdir--/opaque-wrapper/public/abuild-<native>'
+Compiling ../Public.cc as C++
+Creating opaque-public library
+make: Leaving directory `--topdir--/opaque-wrapper/public/abuild-<native>'
+abuild: opaque-client (abuild-<native>): check
+make: Entering directory `--topdir--/opaque-wrapper/client/abuild-<native>'
+Compiling ../main.cc as C++
+Creating opaque-client executable
+
+*********************************
+STARTING TESTS on ---timestamp---
+*********************************
+
+
+Running ../qtest/client.test
+opaque client  1 (opaque client)                               ... PASSED
+
+Overall test suite                                             ... PASSED
+
+TESTS COMPLETE.  Summary:
+
+Total tests: 1
+Passes: 1
+Failures: 0
+Unexpected Passes: 0
+Expected Failures: 0
+Missing Tests: 0
+Extra Tests: 0
+
+make: Leaving directory `--topdir--/opaque-wrapper/client/abuild-<native>'

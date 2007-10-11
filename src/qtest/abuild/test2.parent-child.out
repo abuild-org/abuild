@@ -1,0 +1,5 @@
+--topdir--/a/aa/aac/Abuild.conf: ERROR: child-dirs entries must be relative paths
+--topdir--/a/aa/aac/Abuild.conf: ERROR: child ../aaca/Abuild.conf has parent-dir that doesn't point to this directory
+--topdir--/a/aa/aac/Abuild.conf: ERROR: child ../aacb/Abuild.conf has parent-dir that doesn't point to this directory
+--topdir--/a/aa/aac/Abuild.conf: ERROR: unable to find child does-not-exist
+abuild: ERROR: errors detected; exiting

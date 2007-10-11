@@ -1,0 +1,5 @@
+--topdir--/a/ae/aeb/Abuild.conf: ERROR: more than one build file exists
+--topdir--/a/ae/aec/Abuild.conf: ERROR: "platform-types" is mandatory if build or interfaces files are present
+--topdir--/a/ae/aea/Abuild.conf: ERROR: child Abuild.conf has no parent-dir
+--topdir--/a/ae/Abuild.conf: ERROR: loop detected while reading Abuild.conf files: build item ae reached by multiple paths
+abuild: ERROR: errors detected; exiting

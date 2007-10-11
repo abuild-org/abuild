@@ -1,0 +1,5 @@
+abuild: ERROR: trait one is unknown
+abuild: ERROR: trait two is unknown
+abuild: ERROR: trait three is unknown
+abuild: ERROR: trait four is unknown
+abuild: ERROR: errors detected; exiting

@@ -1,0 +1,3 @@
+INCLUDES = include
+LIBDIRS = lib
+LIBS = aa

@@ -1,0 +1,17 @@
+abuild: cleaning aa in ../../a/aa
+abuild: cleaning aaa in ../../a/aa/aaa
+abuild: cleaning ab in ../../a/ab
+abuild: cleaning ac in ../../a/ac
+abuild: cleaning ad in ../../a/ad
+abuild: cleaning b in ../../b
+abuild: cleaning ba in ../../b/ba
+abuild: cleaning bb in ../../b/bb
+abuild: cleaning bc in ../../b/bc
+abuild: cleaning ca in ../ca
+abuild: cleaning cb in .
+abuild: cleaning cc in ../cc
+abuild: cleaning e.bin in ../../e/bin
+abuild: cleaning e.lib in ../../e/lib
+abuild: cleaning e.shlib in ../../e/shlib
+abuild: cleaning e.shlib2 in ../../e/shlib2
+abuild: cleaning root in ../..

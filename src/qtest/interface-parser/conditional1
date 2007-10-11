@@ -1,0 +1,139 @@
+declare a boolean
+a = true
+if ($(a))
+  seen1 = x
+else
+  # not seen
+  notseen = x
+endif
+
+declare b boolean
+b = false
+if (and($(a), $(b)))
+  notseen = 1
+elseif (or($(a), $(b)))
+  seen2 = x
+endif
+
+if (and($(a), $(a)))
+  seen3 = x
+endif
+
+if (and($(a), $(b)))
+  notseen = 1
+else
+  seen4 = x
+endif
+
+if (not($(b)))
+  seen5 = x
+else
+  notseen = 1
+endif
+
+if (seen6())
+  notseen = 1
+else
+  notseen = 1
+endif
+
+declare str string
+str = asdf
+
+if (equals($(str), asdf))
+  seen7 = x
+endif
+
+if (matches($(str), .*d.*))
+  seen8 = x
+endif
+
+if (matches($(str), seen9**))
+  notseen = x
+endif
+
+declare l1 list string append
+l1 = one two three
+
+if (contains($(l1), one))
+  seen10 = 1
+endif
+
+if (equals(qw$(str)er, qwasdfer))
+  seen11 = x
+endif
+
+if (contains(a b c, a))
+  seen12 = x
+endif
+
+if (containsmatch(asdf 123 qwer, \\d+))
+  seen13 = x
+endif
+
+if ($(a))
+  seen14 = x
+else
+  if ($(a))
+    notseen = x
+  elseif ($(notchecked))
+    notseen = x
+  elseif (seen15($(notchecked)))
+    notseen = x
+  else
+    notseen = x
+  endif
+endif
+
+# seen16
+if (matches(asdf,))
+  notseen = x
+endif
+
+# empty ifblock
+if ($(a))
+else
+  notseen = x
+endif
+
+if ($(a))
+  after-build seen17
+else
+  after-build $(notseen)
+endif
+
+if (contains($(l1), not($(a))))
+  notseen = x
+endif
+
+if (contains(not($(str)), x$(l1)z))
+  notseen = x
+endif
+
+if ($(str))
+  notseen = x
+endif
+
+declare q boolean
+if ($(q))
+  notseen = x
+endif
+
+if (not(x, and(y)))
+  notseen = x
+endif
+
+if ($(a))
+  # checked
+  after-build $(str)
+elseif ($(a))
+  # not checked
+  after-build $(l1)
+else
+  # not checked
+  target-type $(l1)
+endif
+
+if (not(x))
+  notseen = x
+endif

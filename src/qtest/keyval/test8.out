@@ -1,0 +1,11 @@
+no defaults
+chicken: quack
+duck: meow
+pig: oink
+qoww: moo
+defaults
+chicken: quack
+duck: meow
+pig: oink
+potato: salad
+qoww: moo

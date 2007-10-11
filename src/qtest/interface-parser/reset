@@ -1,0 +1,13 @@
+declare A string
+A = quack
+
+declare B string
+B = moo
+
+declare C string
+C = oink
+
+no-reset B
+reset-all
+
+C = cluq

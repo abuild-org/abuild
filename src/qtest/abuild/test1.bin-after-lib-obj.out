@@ -1,0 +1,36 @@
+abuild: e.lib (abuild-os.cpu.toolset.echo): bin-bin1
+Creating lib1 library
+make-lib objects: lib1-src1.lo lib1-src2.lo lib1-src3.lo
+make-lib lib: lib-lib1
+contents of lib-lib1:
+** lib lib1 **
+** file: lib1-src1.c **
+--append-to-lib1-src1--
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+end contents of lib-lib1
+Creating bin1 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin1-src1.o bin1-src2.o bin1-src3.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin1
+contents of bin-bin1:
+** bin bin1 **
+** file: bin1-src1.c **
+** file: bin1-src2.cc **
+** file: bin1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+--append-to-lib1-src1--
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin1 **
+end contents of bin-bin1

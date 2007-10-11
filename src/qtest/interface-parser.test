@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+
+chdir("interface-parser") or die "chdir testdir failed: $!\n";
+my $top = getcwd();
+if ($^O eq 'cygwin')
+{
+    chop($top = `cygpath -w $top`);
+    $top =~ s,\\,/,g;
+}
+
+require TestDriver;
+
+my $td = new TestDriver('InterfaceParser');
+
+test_interfaces("parse errors", "parse1.out", ["parse1"]);
+test_interfaces("semantic errors", "semantic1.out", ["semantic1"]);
+test_interfaces("conditional", "conditional1.out", ["conditional1"]);
+$ENV{'QTEST_ARCH1'} = "arch1";
+test_interfaces("importing", "import.out",
+		["a/good1", "b/good2", "c/good3"],
+		["test-interface-parser", "other-flag"]);
+test_interfaces("reset", "reset.out", ["reset"]);
+test_interfaces("space parsing 1", "spaces1.out", ["spaces1"]);
+test_interfaces("space parsing 2", "spaces2.out", ["spaces2"]);
+
+
+$td->report(8);
+
+sub test_interfaces
+{
+    my ($description, $output, $files, $flags) = @_;
+    my @methods = (0, 1);
+    if (@$files == 1)
+    {
+	@methods = (0);
+    }
+    my @flag_args = ();
+    if (defined $flags)
+    {
+	@flag_args = ('-allow-flags', @$flags);
+    }
+
+    foreach my $method (@methods)
+    {
+	my $out = (-f "$output-$method") ? "$output-$method" : $output;
+	$td->runtest($description . " (method $method)",
+		     {$td->COMMAND => ['test_interface_parser', @flag_args,
+				       '-method', $method, @$files],
+		      $td->FILTER => "perl filter-interface.pl $top"},
+		     {$td->FILE => $out, $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+}

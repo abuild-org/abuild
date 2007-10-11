@@ -1,0 +1,2 @@
+--topdir--/e/other/plugin/plugin.interface:2:1: ERROR: assigning to unknown variable Y
+abuild: ERROR: errors detected in plugin interface files

@@ -1,0 +1,9 @@
+To run the automated test suite, you must have 'qtest-driver' in your
+path.  Then run "abuild check" from this directory.
+
+For details about things tested in the test suite, please see comments
+in abuild.test.
+
+To do performance testing, run the script "perftest-buildtree.pl",
+which is located in the tests directory.  See comments in that script
+for details on how to run it and use it.

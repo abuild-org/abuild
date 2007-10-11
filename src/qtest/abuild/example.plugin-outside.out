@@ -1,0 +1,13 @@
+abuild: lib (abuild-<native>): all
+make: Entering directory `--topdir--/plugin/other/lib/abuild-<native>'
+This is message from the echoer plugin.
+make: Leaving directory `--topdir--/plugin/other/lib/abuild-<native>'
+abuild: lib (abuild-zzprinter.any.test-suite.abc): all
+make: Entering directory `--topdir--/plugin/other/lib/abuild-zzprinter.any.test-suite.abc'
+This is message from the echoer plugin.
+make: Leaving directory `--topdir--/plugin/other/lib/abuild-zzprinter.any.test-suite.abc'
+abuild: prog2 (abuild-<native>): all
+make: Entering directory `--topdir--/plugin/outside/prog2/abuild-<native>'
+Compiling ../main.cc as C++
+Creating prog2 executable
+make: Leaving directory `--topdir--/plugin/outside/prog2/abuild-<native>'

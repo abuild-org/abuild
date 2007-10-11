@@ -1,0 +1,245 @@
+
+1.0.b2
+======
+
+General
+-------
+
+ * Look at all XXX comments.
+
+
+Documentation
+-------------
+
+ * Do something more useful with docbook so the make code doesn't have
+   to be duplicated between qtest and abuild.
+
+ * Acknowledgments
+
+    - Andrew Hayden - doc and sounding board
+    - Chris Costa - sounding board
+    - Joe Davidson
+    - Gavin Mulligan - bug reporting
+    - Argon ST
+
+Code
+----
+
+ * Move javadoc to a plugin.  Have a test suite for the plugin that
+   lives under the plugins/javadoc directory and lists ../../.. as an
+   external and plugin.javadoc as a plugin.  XXX Why can't plugin code
+   see abuild properties?  Make sure this is exercised in the test
+   suite.
+
+ * Test on Solaris
+
+ * Klocwork support
+
+ * Doxygen
+
+    - Doxygen support provided by plugin
+
+    - Basic model: user and plugin can provide overrides to variables
+      from doxygen config
+
+    - Abuild.mk file DOXYGEN_CONFIG points to local config override
+
+    - Script runs doxygen -g and makes substitutions based on plugin
+      config, user config; warn if override variable isn't found in
+      doxygen -g output
+
+    - Tags files are generated in the name of a file as specified by
+      some Abuild.mk variable
+
+    - Abuild.interface has two variables: one "normal" one for just
+      listing the of your tag file; plugin generates
+      path/file.tag=path/html for doxygen; the other one is to add
+      special case options that fall outside this pattern
+
+
+Bugs
+====
+
+ * There are some Windows path issues.  Find out the real story behind
+   Windows paths.  See whether using absolute paths is better than
+   relative paths for Windows.  If so, this has implications as there
+   is a mixture of Windows native and cygwin tools in use.
+
+ * Wade Taylor reports: I just noticed a quirk in
+   Abuild-ant.properties: whitespace is not "trimmed" after an
+   abuild.hook-build-item.
+
+ * Spencer Allain reports: I'm not quite sure what is going on, but
+   doing a Ctrl-C on abuild under Windows results in my console
+   session being totally hosed permanently.
+
+ * Ant seems to not complain when populating an ear file from a
+   classpath that contains non-existent items.  In general, there may
+   be an issue with not getting any notification of non-existent
+   classpath items.
+
+ * Test suites that create output in the tests hierarchy will not be
+   able to be run simultaneously on more than one platform.  Need to
+   add a method to TestDriver that returns the directory from which
+   the test driver was invoked.  For abuild, this would be the abuild
+   output directory.  Test suites can be written to create temporary
+   output directories there.
+
+ * Orphan target detection won't find orphan targets in
+   subdirectories.  This is very hard to fix in general.  We could
+   search directories represented in the source lists, but that
+   wouldn't help if we removed the last file from a subdirectory.  For
+   now, we'll just not handle this case.
+
+Java Problems
+=============
+
+We probably need a different approach to Java.  Ant was not designed
+to be used as a framework, and it doesn't work very well when used in
+this way.
+
+ * In order to get wars in ear files, we need to add them to
+   abuild.classpath.  Although this is harmless, it's sort of an abuse
+   of abuild.classpath.
+
+ * We don't detect when inaccessible build items are referenced in
+   abuild.hook-build-items
+
+ * Abuild has no real way to support a difference between compile-time
+   classpaths and run-time classpaths.
+
+ * NOTE: It was necessary to create /usr/{share,lib}/java-1.6.0 in
+   order for build-classpath from jpackage to do the right thing when
+   launching ant 1.7.0 in fedora core 5.  Not sure how general of a
+   problem this is.
+
+ * make sure --silent and --verbose do something sensible
+
+ * Reconsider using depends task for compile in abuild.xml.
+
+ * Signed jar support will eventually be required.
+
+ * Our default java compile rule doesn't notice if a .java file was
+   removed.  Maybe we want to force full recompilation if the list of
+   files changed, or maybe we want to delete class files that appear
+   to have come from non-existent java files.  I'm not sure what
+   happens with nested/inner classes that disappeared....does javac
+   automatically remove the corresponding class files?  This would be
+   an easy experiment to try.
+
+ * Consider supporting creation of multiple jar files with different
+   contents analogous to different libraries being created from a
+   single C++ build item.
+
+
+Other
+=====
+
+See also "Known Limitations" in the documentation.
+
+ * gen_deps: rewrite so that it doesn't force a runtime dependency on
+   perl.  It should be a fallback for cases when compilers can't
+   generate dependency information.  With gcc, use -MD -MF -MP to
+   generate proper .dep files.  xlc: "-M -MF a.dep" works, but there
+   is no equivalent to -MP, so we'll need to postprocess.  VC:
+   nothing.
+
+ * Test qtest coverage from abuild test suite
+
+ * Think about implementing a dependency analyzer that would look at
+   first-level includes to figure out what the correct list of direct
+   dependencies should be.
+
+ * Consider having --silent invoke make with --no-print-directory.  If
+   we do this, we should follow build item failure with a message that
+   contains the name, path, and platform of whatever failed.
+
+ * Consider whether to support mingw directly instead of through
+   cygwin's gcc.
+
+ * Consider having an abuild template generator that can run if no
+   Abuild.conf or other files are present.  This would spit out
+   commented template files.  Alternatively, could be a command-line
+   wizard or something.
+
+ * Need a way to get a list of build items that will be skipped
+   because they have no platforms.  There are times when it would be
+   nicer if it were an error to have no platforms available for an
+   item in your local area rather than to just have it be skipped.
+
+ * Consider testing junit in the test suite; for this to work, we need
+   to figure out how abuild is going to know about junit.
+   Alternatively, consider moving junit support to a plugin.
+
+ * Piping ANSI color stuff through ant on Windows doesn't work.  When
+   running qtest from ant on Windows, qtest correctly generates the
+   ansi color codes, but they don't get displayed right through ant,
+   at least in cygwin.
+
+ * To check for all Abuild.mk files that define local targets:
+   pcregrep '^\s*\S+\s*:(\Z|[^=])' **/Abuild.mk
+
+ * Consider having an option for abuild to look upward until it finds
+   an Abuild.conf.  This must not be the default behavior.
+
+ * It might be useful to have the ability to find all references to a
+   particular interface variable and/or to find the origin and
+   variable history for a specific variable.  This comes back to the
+   interface tracing mode or dump mode.  Examples: I see some
+   interface variable in a build item's Abuild.interface file and want
+   to know who uses it, or I see some variable in someone's
+   Abuild-ant.properties or Abuild.mk and want to know who defines it.
+
+ * Use re-entrant scanners instead of C++ scanners.  This requires
+   flex >= 2.5.33.  Have abuild's own build process detect whether or
+   not a new enough version of flex is available.  If so, it should
+   generate the parsers and attempt to update a cached copy of the
+   automatically generated files if they have changed.  Otherwise, it
+   should use the cached files by adding them to SRCS in place of the
+   automatically generated ones.  We also need to disable warnings for
+   the flex-generated code.  Use %option nounistd.
+
+ * Test, at least informally, backing areas on different drive letters
+   on Windows.  Not sure whether it's worth putting this in the test
+   suite.
+
+ * It would be nice if there were a mechanism for providing
+   documentation on traits so that --list-traits could tell the user
+   how each trait was intended to be used.
+
+ * doc target not tested in test suite for java
+
+ * Consider capturing the output of the backend so that we can
+   de-interleave output when running parallel builds, separate error
+   from informational output, etc.
+
+ * Clean up ~/source/examples/java/native/abuild and use as JNI
+   example
+
+ * Think about the idea of having some kind of extended plugin
+   interface to allow additional policy validations to be made on a
+   per-project basis.  Examples would be things like tier-based
+   dependency rules, facade class interfaces not being violated, not
+   having nested build items under directories that have items that
+   build stuff, etc.  If this is done, update the documentation on
+   custom access rules.
+
+ * ccxx: Consider enforcing that .. may not appear as a path component
+   in any source file.
+
+ * ccxx: Consider enforcing that no object file may appear both as a
+   program and a library object file and that no object file may be
+   generated from more than one source file (with different suffixes)
+
+ * Consider converting abuild_data.dtd to a schema for tighter
+   validation (which attributes are allowed in which contexts).
+   Search for DTD in the documentation and test suite.
+
+ * It would be nice if we could use higher resolution figures for the
+   PDF than for the HTML.  There is plenty of material in the
+   sagehill.net DocBook XSL guide about this.
+
+ * We really need a way to be able to use autoconf to find out
+   information about a specific compiler.  This would be especially
+   useful for figuring out what flags to use for PIC when building
+   shared libraries.

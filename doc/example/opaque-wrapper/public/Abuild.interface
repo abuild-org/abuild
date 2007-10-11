@@ -1,0 +1,5 @@
+INCLUDES = .
+LIBDIRS = $(ABUILD_OUTPUT_DIR)
+LIBS = opaque-public
+
+after-build hide-hidden.interface

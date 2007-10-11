@@ -1,0 +1,3 @@
+abuild: lib (abuild-<native-os-data>.qcc): all
+abuild: lib (abuild-<native-os-data>.qcc.debug): all
+abuild: lib (abuild-<native-os-data>.qcc.release): all

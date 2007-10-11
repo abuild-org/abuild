@@ -1,0 +1,18 @@
+abuild: 03-object-code (abuild-<native>): all
+make: Entering directory `--topdir--/case1/03-object-code/abuild-<native>'
+
+*** 03-object-code ***
+
+make: Leaving directory `--topdir--/case1/03-object-code/abuild-<native>'
+abuild: 02-indep (abuild-indep): all
+make: Entering directory `--topdir--/case1/02-indep/abuild-indep'
+
+*** 02-indep ***
+
+make: Leaving directory `--topdir--/case1/02-indep/abuild-indep'
+abuild: 01-object-code (abuild-<native>): all
+make: Entering directory `--topdir--/case1/01-object-code/abuild-<native>'
+
+*** 01-object-code ***
+
+make: Leaving directory `--topdir--/case1/01-object-code/abuild-<native>'

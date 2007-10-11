@@ -1,0 +1,7 @@
+abuild: util.src2 (abuild-<native>): all
+abuild: util.src (abuild-<native>): all
+abuild: bad1 (abuild-<native>): all
+abuild: bad2 (abuild-<native>): all
+make: Entering directory `--topdir--/bad/2/abuild-<native>'
+--abuild-dir--/make/abuild.mk:nn: *** These build items from BUILD_ITEM_RULES inaccessible: util.src.  Stop.
+make: Leaving directory `--topdir--/bad/2/abuild-<native>'

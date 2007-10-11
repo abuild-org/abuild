@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("lib3") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('lib3');
+
+$td->runtest("test lib3 class",
+	     {$td->COMMAND => "lib3_test"},
+	     {$td->FILE => "lib3.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

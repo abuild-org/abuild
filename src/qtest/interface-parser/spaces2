@@ -1,0 +1,14 @@
+# -*- require-final-newline: nil -*-
+declare A list string append
+
+# no spaces at beginning of line after continuation character
+A = B \
+C
+
+# no spaces before or after continuation character
+A = D\
+E
+
+# trailng spaces and no newline at end of file
+
+A = F             

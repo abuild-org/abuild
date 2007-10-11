@@ -1,0 +1,557 @@
+#!/usr/bin/env perl
+
+# See README.txt for details about this verification.
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+use File::Find;
+use File::Basename;
+use File::Copy;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my $tmpdir = undef;
+my $cwd = getcwd();
+my $save_tree = 0;
+
+$SIG{'INT'} = sub { exit 2 };
+
+END
+{
+    chdir $cwd;
+    if (defined $tmpdir)
+    {
+	if ($save_tree)
+	{
+	    print "\nBuild tree saved at $tmpdir\n";
+	}
+	else
+	{
+	    rmrf($tmpdir);
+	}
+    }
+}
+
+# See if we're in Windows.  For now, assume Cygwin means Windows.
+my $in_windows = 0;
+if ($^O =~ m/^(cygwin|MSWin32)$/)
+{
+    $in_windows = 1;
+}
+my $shlib_runtime_variable = $in_windows ? 'PATH' : 'LD_LIBRARY_PATH';
+
+my $platform_type = 'native';
+my $plugin_tree_location = "";
+my $plugin_name = "";
+my $compiler = "";
+my $verbose = "";
+
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '--plugin-tree')
+    {
+	usage() unless @ARGV;
+	$plugin_tree_location = shift(@ARGV);
+    }
+    elsif ($arg eq '--plugin-name')
+    {
+	usage() unless @ARGV;
+	$plugin_name = shift(@ARGV);
+    }
+    elsif ($arg eq '--platform-type')
+    {
+	usage() unless @ARGV;
+	$platform_type = shift(@ARGV);
+    }
+    elsif ($arg eq '--compiler')
+    {
+	usage() unless @ARGV;
+	$compiler = shift(@ARGV);
+    }
+    elsif ($arg eq '--verbose')
+    {
+	$verbose = " --verbose";
+    }
+    elsif ($arg eq '--save-tree')
+    {
+	$save_tree = 1;
+    }
+    else
+    {
+	usage();
+    }
+}
+
+my $failures = 0;
+
+my $color_reset = "";
+my $color_emph = "";
+my $color_pass = "";
+my $color_fail = "";
+my $color_ask = "";
+if (-t STDOUT)
+{
+    eval
+    {
+	require Term::ANSIColor;
+	$color_reset = Term::ANSIColor::RESET();
+	$color_emph = Term::ANSIColor::color('bold blue on_black');
+	$color_pass = Term::ANSIColor::color('bold green on_black');
+	$color_fail = Term::ANSIColor::color('bold red on_black');
+	$color_ask = Term::ANSIColor::color('bold yellow on_black');
+    };
+}
+
+my $old_pathval = $ENV{$shlib_runtime_variable} || "";
+
+if ($compiler)
+{
+    $ENV{'ABUILD_PLATFORM_SELECTORS'} = "$platform_type:compiler=$compiler";
+}
+else
+{
+    $ENV{'ABUILD_PLATFORM_SELECTORS'} = "";
+    delete $ENV{'ABUILD_PLATFORM_SELECTORS'};
+}
+
+my $now = time;
+$tmpdir = ".verify-$$-$now";
+if (exists $ENV{'IN_TESTSUITE'})
+{
+    $tmpdir = ".verify-tmp";
+}
+mkdir $tmpdir, 0777 or die "$whoami: can't create $tmpdir\n";
+
+my @files = ();
+sub find_files
+{
+    if (basename($_) =~ m/^(\.svn|CVS)$/)
+    {
+	$File::Find::prune = 1;
+    }
+    elsif (! m/~$/)
+    {
+	push(@files, $_);
+    }
+}
+my $orig_tree = "$dirname/tree";
+find({wanted => \&find_files, no_chdir => 1}, $orig_tree);
+shift(@files);
+
+notice("CREATING BUILD TREE");
+foreach my $src (@files)
+{
+    my $relpath = $src;
+    $relpath =~ s,^\Q$orig_tree\E/,,;
+    my $dest = "$tmpdir/$relpath";
+    if (-d $src)
+    {
+	mkdir $dest, 0777 or die "$whoami: mkdir $dest failed: $!\n";
+    }
+    elsif (basename($src) eq 'Abuild.conf')
+    {
+	open(IN, "<$src") or die "$whoami: can't open $src: $!\n";
+	open(OUT, ">$dest") or die "$whoami: can't create $dest: $!\n";
+	if ($relpath eq 'Abuild.conf')
+	{
+	    # Root Abuild.conf
+	    while (<IN>)
+	    {
+		print OUT;
+	    }
+	    if ($plugin_tree_location)
+	    {
+		mkdir "$tmpdir/plugin-tree", 0777;
+		my $backing = "$tmpdir/plugin-tree/Abuild.backing";
+		open(B, ">$backing") or
+		    die "$whoami: can't create $backing: $!\n";
+		print B "$plugin_tree_location\n";
+		close(B);
+		print OUT "external-dirs: plugin-tree\n";
+		if ($plugin_name)
+		{
+		    print OUT "plugins: $plugin_name\n";
+		}
+	    }
+	}
+	else
+	{
+	    # Lower Abuild.conf
+	    while (<IN>)
+	    {
+		if (m/^platform-types:/)
+		{
+		    s/native/$platform_type/;
+		}
+		print OUT;
+	    }
+	}
+	close(IN);
+	close(OUT) or die "$whoami: close $dest failed: $!\n";
+    }
+    elsif (-f $src)
+    {
+	safe_copy($src, $dest);
+    }
+}
+
+chdir "$tmpdir/src" or die "$whoami: chdir $tmpdir/src failed: $!\n";
+
+my $abuild_out = undef;
+{ # private scope
+    open(P, "abuild --list-platforms|") or
+	die "$whoami: can't run abuild --list-platformns: $!\n";
+    my $in_platform_type = 0;
+    while (<P>)
+    {
+	if (m/platform type (\S+)/)
+	{
+	    $in_platform_type = ($1 eq $platform_type);
+	}
+	elsif ($in_platform_type)
+	{
+	    if (m/platform (\S+);.*: yes/)
+	    {
+		$abuild_out = "abuild-$1";
+		last;
+	    }
+	}
+    }
+    close(P);
+    if (! defined $abuild_out)
+    {
+	die "$whoami: can't determine output platform\n";
+    }
+    if ($compiler)
+    {
+	if ($abuild_out !~ m/\.\Q$compiler\E$/)
+	{
+	    die "$whoami: requested compiler is not available\n";
+	}
+    }
+}
+
+if ($platform_type ne 'native')
+{
+    ask("NON-NATIVE COMPILER");
+    print "You will be asked to run programs at various times during this test.
+In each case, the executable target is \"main\" and is located in
+$tmpdir/src/$abuild_out.
+
+The program requires two shared libraries: \"Z\", which can be found in the
+same directory as \"main\", and \"B\", which is located in
+$tmpdir/b/$abuild_out.
+
+The program itself should contain the symbols A::hello() and
+X::hello().  If Other::Other() is in the expected output, it should
+also contain the symbol Other::Other().  The B shared library should
+contain the symbol B::hello().  The Z shared library should contain
+the symbols Y::hello() and Z::hello().
+
+When this program asks you to run the program, it will display the expected
+output and prompt you to continue.
+";
+    prompt();
+}
+
+my $expected2 = "have printf: 1
+have exception: 1
+Hello from A
+Hello from B
+Hello from X
+Hello from Y
+Hello from Z
+";
+
+my $expected1 = "Other::Other()
+$expected2";
+
+
+# The first build should build everything.
+safe_copy("Abuild.mk-1", "Abuild.mk");
+notice("RUNNING INITIAL BUILD");
+check_build("abuild -d",
+	    [],
+	    [qw(A.cc B.cc X.cc Y.cc Z.cc main.cc other.cc)],
+	    [qw(A B X Y Z main)],
+	    ["printf yes", "exception yes"]);
+check_prog($expected1);
+
+# When up to date, the build should build nothing.
+notice("REBUILD WHEN UP TO DATE");
+check_build("abuild -d", [], [], [], []);
+
+# If we remove a source file, everything should relink
+safe_copy("Abuild.mk-2", "Abuild.mk");
+notice("RUNNING BUILD AFTER REMOVING SOURCE");
+check_build("abuild -d", ["object files"], [], [qw(Y Z main)], []);
+check_prog($expected2);
+
+# After moving X.hh, anything that uses X.hh should recompile and
+# anythnig that links with X, including the shared library Z, should
+# relink.
+safe_rename("../incl1/X.hh", "../incl2/X.hh");
+notice("RUNNING BUILD AFTER MOVING HEADER");
+check_build("abuild -d", [], [qw(X.cc main.cc)], [qw(X Z main)], []);
+check_prog($expected2);
+
+notice("REBUILD WHEN UP TO DATE");
+check_build("abuild -d", [], [], [], []);
+
+if ($failures)
+{
+    print "${color_fail}FAILURES: $failures$color_reset\n";
+}
+else
+{
+    print "${color_pass}ALL CASES PASSED$color_reset\n";
+}
+
+
+sub check_build
+{
+    my ($cmd, $remove, $compile, $create, $autoconf) = @_;
+    sleep 1;
+    open(B, "$cmd$verbose 2>&1|") or die "$whoami: can't run $cmd: $!\n";
+    my %to_remove = ();
+    map { $to_remove{$_} = 1 } @$remove;
+    my %to_compile = ();
+    map { $to_compile{$_} = 1 } @$compile;
+    my %to_create = ();
+    map { $to_create{$_} = 1 } @$create;
+    my %checking = ();
+    map { $checking{$_} = 1 } @$autoconf;
+    my @errors = ();
+    while (<B>)
+    {
+	print;
+	if (m/^Extra (.*) found: removing/)
+	{
+	    my $t = $1;
+	    if (exists $to_remove{$t})
+	    {
+		delete $to_remove{$t};
+	    }
+	    else
+	    {
+		push(@errors, "extraneous removal of $t");
+	    }
+	}
+	elsif (m,^Compiling ../(\S+) as,)
+	{
+	    my $t = $1;
+	    if (exists $to_compile{$t})
+	    {
+		delete $to_compile{$t};
+	    }
+	    else
+	    {
+		push(@errors, "extraneous compilation of $t");
+	    }
+	}
+	elsif (m/^Creating (\S+) /)
+	{
+	    my $t = $1;
+	    if (exists $to_create{$t})
+	    {
+		delete $to_create{$t};
+	    }
+	    else
+	    {
+		push(@errors, "extraneous creation of $t");
+	    }
+	}
+	elsif (m/^checking for (\S+)\.\.\.\s*(\S+)/)
+	{
+	    my $check_for = "$1 $2";
+	    if (exists $checking{$check_for})
+	    {
+		delete $checking{$check_for};
+	    }
+	    # else no error -- we can't predict autoconf output.
+	}
+    }
+    close(B);
+    die "$whoami: $cmd failed\n" if $? != 0;
+    foreach my $k (sort keys %to_remove)
+    {
+	push(@errors, "missing removal of $k");
+    }
+    foreach my $k (sort keys %to_compile)
+    {
+	push(@errors, "missing compilation of $k");
+    }
+    foreach my $k (sort keys %to_create)
+    {
+	push(@errors, "missing creation of $k");
+    }
+    foreach my $k (sort keys %checking)
+    {
+	push(@errors, "missing autoconf check result \"$k\"");
+    }
+    if (@errors)
+    {
+	fail("BUILD");
+	for (@errors) { print $_, "\n" };
+	print "\n";
+    }
+    else
+    {
+	pass("BUILD");
+    }
+}
+
+sub check_prog
+{
+    my $expected = shift;
+    if ($platform_type eq 'native')
+    {
+	my $cmd = prepend_pathvar($shlib_runtime_variable, $old_pathval,
+				  ["../b/$abuild_out", $abuild_out]);
+	$cmd .= " $abuild_out/main";
+	open(CMD, "$cmd|") or die "$whoami: can't run $cmd: $!\n";
+	my $actual = "";
+	while (<CMD>)
+	{
+	    s/\r//g;
+	    $actual .= $_;
+	}
+	close(CMD);
+	die "$whoami: $cmd terminated abnormally\n" unless $? == 0;
+	check("PROGRAM OUTPUT", $actual, $expected);
+    }
+    else
+    {
+	ask("CHECK PROGRAM OUTPUT");
+	print "Execpted output:\n$expected\n";
+	prompt();
+    }
+}
+
+sub check
+{
+    my ($what, $actual, $expected) = @_;
+    if ($actual eq $expected)
+    {
+	pass($what);
+    }
+    else
+    {
+	fail($what);
+	print "\nActual:\n\n";
+	print $actual;
+	print "\nExpected:\n\n";
+	print $expected;
+	print "\n";
+    }
+}
+
+sub pass
+{
+    my $what = shift;
+    print "\n$color_pass===> $what OKAY <===$color_reset\n\n";
+}
+
+sub fail
+{
+    my $what = shift;
+    print "\n$color_fail===> $what INCORRECT <===$color_reset\n\n";
+    ++$failures;
+}
+
+sub notice
+{
+    my $msg = shift;
+    print "\n$color_emph===> $msg <===$color_reset\n\n";
+}
+
+sub ask
+{
+    my $msg = shift;
+    print "\n$color_ask===> $msg <===$color_reset\n\n";
+}
+
+sub rmrf
+{
+    my $path = shift;
+    return unless -e $path;
+    my $wanted = sub
+    {
+	if (-d $_)
+	{
+	    rmdir $_ or die "rmdir $_ failed: $!\n";
+	}
+	else
+	{
+	    safe_unlink($_);
+	}
+    };
+    finddepth({wanted => $wanted, no_chdir => 1}, $path);
+}
+
+sub safe_rename
+{
+    my ($src, $dest) = @_;
+    rename $src, $dest or die "$whoami: rename $src $dest failed: $!\n";
+}
+
+sub safe_copy
+{
+    my ($src, $dest) = @_;
+    copy($src, $dest) or die "$whoami: copy $src $dest failed: $!\n";
+}
+
+sub safe_unlink
+{
+    my $file = shift;
+    unlink $file or die "unlink $file failed: $!\n";
+}
+
+sub prepend_pathvar
+{
+    my ($var, $old_value, $dirs) = @_;
+    my $cwd = getcwd();
+    my $result = join(':', map { "$cwd/$_" } @$dirs);
+    if ($old_value ne '')
+    {
+	$result .= ":" . $old_value;
+    }
+    "$var=\"$result\" ";
+}
+
+sub prompt
+{
+    print "${color_emph}Hit return to continue.$color_reset\n";
+    scalar(<STDIN>);
+}
+
+sub usage
+{
+    die "
+Usage: $whoami options
+  --plugin-tree path                 absolute path of tree with compiler plugin
+  --plugin-name plugin-name          name of compiler plugin
+  --platform-type platform-type      platform type to test
+  --compiler compiler[.option]       compiler to test
+  --verbose                          pass --verbose to abuild
+  --save-tree                        save build tree used for testing
+
+Runs a series of tests to verify that a compiler support plugin is
+properly supports all functionality expected by abuild.  With no
+arguments, this will just verify proper operation of the default
+built-in native compiler.  If --platform-type is specified and is
+other than native, this verification program will not attempt to run
+the program but will instead prompt you to run the program.  For
+native compilers, the program can run without interaction.
+
+$whoami creates a temporary directory in the directory from which it
+is invoked.  By default, it deletes the directory when it is finished.
+If you wish to run abuild manually in the directory, invoke this
+program with the --save-tree option.
+
+";
+}

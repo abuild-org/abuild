@@ -1,0 +1,22 @@
+INCLUDES = i2-1 i2-2
+LIBS = l2-1 l2-2
+LIBDIRS = d2-1 d2-2
+
+flag test-interface-parser override PLATFORM = arch2
+flag other-flag override PLATFORM = not-seen
+override TARGET-TYPE = object-code
+
+target-type $(TARGET-TYPE)
+
+declare XFLAGS list string append
+
+fallback HAVE_good2 = 0
+
+XFLAGS = -DHAVE_good3\=1
+if ($(HAVE_good2))
+  XFLAGS = -DHAVE_good2\=1
+else
+  XFLAGS = -DHAVE_good2\=0
+endif
+
+after-build other-file

@@ -1,0 +1,6 @@
+abuild: common (abuild-indep): all
+abuild: A-dep (abuild-indep): all
+abuild: A (abuild-indep): all
+abuild: eater (abuild-indep): all
+abuild: painter (abuild-indep): all
+abuild: A-eater-painter (abuild-indep): eat paint

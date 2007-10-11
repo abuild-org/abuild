@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("dependency-runner") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('DependencyRunner');
+
+$td->runtest("full test",
+	     {$td->COMMAND => "test_dependency_runner",
+	      $td->FILTER => "perl filter-runner.pl"},
+	     {$td->FILE => "dependency-runner.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

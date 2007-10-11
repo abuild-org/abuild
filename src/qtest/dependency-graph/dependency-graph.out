@@ -1,0 +1,123 @@
+Graph:
+d:
+p:
+r:
+q: r
+e: p q
+f: q
+b: d e f
+g:
+h:
+c: g h
+a: b c
+n:
+o: q
+k: n o
+l:
+m:
+j: k l m
+i: c j
+No errors found.
+Lexical: a b c d e f g h i j k l m n o p q r
+Dependency order: d p r q e f b g h c a n o k l m j i
+sort(d) = d
+sort(p) = p
+sort(r) = r
+sort(q) = r q
+sort(e) = p r q e
+sort(f) = r q f
+sort(b) = d p r q e f b
+sort(g) = g
+sort(h) = h
+sort(c) = g h c
+sort(a) = d p r q e f b g h c a
+sort(n) = n
+sort(o) = r q o
+sort(k) = n r q o k
+sort(l) = l
+sort(m) = m
+sort(j) = n r q o k l m j
+sort(i) = g h c n r q o k l m j i
+rdeps(d) = b
+rdeps(p) = e
+rdeps(r) = q
+rdeps(q) = e f o
+rdeps(e) = b
+rdeps(f) = b
+rdeps(b) = a
+rdeps(g) = c
+rdeps(h) = c
+rdeps(c) = a i
+rdeps(a) =
+rdeps(n) = k
+rdeps(o) = k
+rdeps(k) = j
+rdeps(l) = j
+rdeps(m) = j
+rdeps(j) = i
+rdeps(i) =
+
+Graph:
+d: w x
+p:
+r:
+n:
+o: q
+k: n o
+l:
+m:
+j: k l m
+q: r b j
+e: p q
+f: q b
+b: d e f
+g: w
+h:
+c: g h
+a: b c
+i: c j
+Errors found:
+  Unknowns:
+    d -> w x
+    g -> w
+  Cycles:
+    b -> e -> q -> b
+    j -> k -> o -> q -> j
+    b -> f -> b
+    b -> f -> q -> b
+sort(d) = d
+sort(p) = p
+sort(r) = r
+sort(n) = n
+sort(o) = r d p e f b n k l m j q o
+sort(k) = n r d p e f b l m j q o k
+sort(l) = l
+sort(m) = m
+sort(j) = n r d p e f b q o k l m j
+sort(q) = r d p e f b n o k l m j q
+sort(e) = p r d f b n o k l m j q e
+sort(f) = r d p e b n o k l m j q f
+sort(b) = d p r n o k l m j q e f b
+sort(g) = g
+sort(h) = h
+sort(c) = g h c
+sort(a) = d p r n o k l m j q e f b g h c a
+sort(i) = g h c n r d p e f b q o k l m j i
+rdeps(d) = b
+rdeps(p) = e
+rdeps(r) = q
+rdeps(n) = k
+rdeps(o) = k
+rdeps(k) = j
+rdeps(l) = j
+rdeps(m) = j
+rdeps(j) = i q
+rdeps(q) = e f o
+rdeps(e) = b
+rdeps(f) = b
+rdeps(b) = a f q
+rdeps(g) = c
+rdeps(h) = c
+rdeps(c) = a i
+rdeps(a) =
+rdeps(i) =

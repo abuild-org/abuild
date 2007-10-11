@@ -1,0 +1,22 @@
+abuild: java-main (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/classes
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/dist
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/plugin/java/code/abuild-java/classes
+
+-post-compile:
+     [echo] This is a post-compile hook from the echoer plugin.
+
+jar:
+      [jar] Building jar: --topdir--/plugin/java/code/abuild-java/dist/code.jar
+
+BUILD SUCCESSFUL
+Total time: <time>

@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('sensitive');
+
+$td->runtest("normal case",
+	     {$td->COMMAND => "executable 3"},
+	     {$td->FILE => "sensitive.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

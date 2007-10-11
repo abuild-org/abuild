@@ -1,0 +1,4 @@
+abuild: a (abuild-indep): all
+abuild: b (abuild-indep): all
+--topdir--/e/backing/b/Abuild.interface:1:9: ERROR: variable X has already been declared
+--topdir--/e/backing/a/Abuild.interface:1:9: ERROR: here is the previous declaration

@@ -1,0 +1,15 @@
+abuild: common-lib3 (abuild-<native>): all
+make: Entering directory `--topdir--/other/2/common/libs/lib3/abuild-<native>'
+Compiling ../lib3.cc as C++
+Creating lib3 library
+make: Leaving directory `--topdir--/other/2/common/libs/lib3/abuild-<native>'
+abuild: product-common (abuild-<native>): all
+make: Entering directory `--topdir--/other/2/product/common/abuild-<native>'
+Compiling ../pcommon.cc as C++
+Creating pcommon library
+make: Leaving directory `--topdir--/other/2/product/common/abuild-<native>'
+abuild: product-lib (abuild-<native>): all
+make: Entering directory `--topdir--/other/2/product/lib/abuild-<native>'
+Compiling ../plib.cc as C++
+Creating plib library
+make: Leaving directory `--topdir--/other/2/product/lib/abuild-<native>'

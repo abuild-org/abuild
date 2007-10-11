@@ -1,0 +1,120 @@
+abuild: code-generator (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/dist
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/java/code-generator/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/java/code-generator/abuild-java/dist/CodeGenerator.jar
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: library (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/dist
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/src/conf
+
+codegen:
+  [codegen] created --topdir--/java/library/abuild-java/src/java/com/example/library/generated/Negator.java
+
+-do-compile:
+    [javac] Compiling 2 source files to --topdir--/java/library/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/java/library/abuild-java/dist/example-library.jar
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: executable (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/dist
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 2 source files to --topdir--/java/executable/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/java/executable/abuild-java/dist/example-executable.jar
+
+-test-qtest:
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running ../qtest/executable.test
+     [exec] executable  1 (normal case)                        ... PASSED
+     [exec] executable  2 (error case)                         ... PASSED
+     [exec] 
+     [exec] Overall test suite                                 ... PASSED
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 2
+     [exec] Passes: 2
+     [exec] Failures: 0
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: other-executable (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/dist
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/src/conf
+
+-test-qtest:
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running ../qtest/other.test
+     [exec] other  1 (normal case)                             ... PASSED
+     [exec] 
+     [exec] Overall test suite                                 ... PASSED
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 1
+     [exec] Passes: 1
+     [exec] Failures: 0
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 
+
+BUILD SUCCESSFUL
+Total time: <time>

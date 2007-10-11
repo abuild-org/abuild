@@ -1,0 +1,2 @@
+--topdir--/a/aa/aad/aada/Abuild.conf: ERROR: this directory is not listed as a child of its parent
+abuild: ERROR: errors detected; exiting

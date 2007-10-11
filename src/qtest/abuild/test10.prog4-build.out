@@ -1,0 +1,5 @@
+abuild: prog4 (abuild-<native>): all
+make: Entering directory `--topdir--/prog4/abuild-<native>'
+Compiling ../prog4.cc as C++
+Creating prog4 executable
+make: Leaving directory `--topdir--/prog4/abuild-<native>'

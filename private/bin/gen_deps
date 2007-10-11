@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+&usage if (@ARGV != 4);
+
+my $cleanup = undef;
+END { defined($cleanup) && &$cleanup(); }
+$SIG{'INT'} = $SIG{'HUP'} = $SIG{'TERM'} = sub { exit 0; };
+
+my ($compiler, $src, $obj, $dep) = (@ARGV);
+unlink($dep);
+
+my @tmpfiles = ("$dep.tmp1", "$dep.tmp2");
+$cleanup = sub { unlink @tmpfiles; };
+
+open(COMPILE, "$compiler $src 2>$dep.tmp2 |") || die "Can't run $compiler\n";
+open(TMP1, ">$dep.tmp1") || die "Can't open $dep.tmp1\n";
+
+my @deps = ();
+while (<COMPILE>)
+{
+    chop;
+    next if m/^\#pragma/;
+    m/^\#/ || next;
+    m/\"([^\"]+)\"/ || next;
+    push(@deps, clean_path($1));
+}
+close(COMPILE);
+my $comp_failed = ($? != 0);
+
+my @tmpdeps = sort(@deps);
+@deps = ();
+my $last = "";
+for (@tmpdeps) {
+    push(@deps, $_) unless ($_ eq $last);
+    $last = $_;
+}
+
+my $ndeps = 0;
+for (@deps)
+{
+    if (-r $_)
+    {
+	++$ndeps;
+	s, ,\\ ,g;
+	print TMP1 "$obj: $_\n";
+	# Generate a rule with no dependencies or actions for each
+	# prerequisite.  This causes make to consider the target out
+	# of date, rather than to give an error, if the dependency
+	# doesn't exist.  Note that this is incompatible with
+	# .SECONDARY: with no dependencies secondary targets are not
+	# considered out of date when they don't exist.
+	print TMP1 "$_:\n";
+    }
+}
+
+if ($ndeps == 0)
+{
+    print TMP1 "$obj: FORCE\n";
+}
+
+close(TMP1);
+
+system("cat $dep.tmp2 1>&2") if (-s "$dep.tmp2");
+unlink("$dep.tmp2");
+
+if ($comp_failed)
+{
+    unlink("$dep.tmp1");
+}
+else
+{
+    rename("$dep.tmp1", $dep);
+}
+
+exit((-f $dep) ? 0 : 2);
+
+sub clean_path
+{
+    my $path = shift;
+    if ($path =~ m/^[a-z]:[\\\/]/i)
+    {
+	# We must be in Windows.
+	$path =~ s,\\\\,/,g;
+	$path =~ s,^([a-z]):,/cygdrive/$1,i;
+    }
+    $path;
+}
+
+sub usage
+{
+    print STDERR "Usage: $whoami compile src obj dep\n";
+    print STDERR "  Write dependencies for converting src to obj into dep\n";
+    exit 1;
+}

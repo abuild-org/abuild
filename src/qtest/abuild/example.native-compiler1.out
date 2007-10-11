@@ -1,0 +1,7 @@
+abuild: lib (abuild-<native-os-data>.qcc): all
+make: Entering directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc'
+Compiling ../lib.cc as C++
+make-obj lib.o
+Creating lib library
+make-lib lib-lib
+make: Leaving directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc'

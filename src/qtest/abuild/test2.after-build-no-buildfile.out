@@ -1,0 +1,1 @@
+--topdir--/a/aa/aai/aaib/Abuild.interface: ERROR: interfaces for items with no build files may not load after-build files

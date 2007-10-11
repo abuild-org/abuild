@@ -1,0 +1,1080 @@
+abuild-monitor: begin-dump-data
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="echo" target-type="object-code">
+     <platform name="os.cpu.toolset.echo" selected="1"/>
+     <platform name="os.cpu.toolset.echo.debug" selected="0"/>
+     <platform name="os.cpu.toolset.echo.release" selected="0"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <plugins>
+    <plugin name="plugin.qrwx"/>
+    <plugin name="plugin.echo"/>
+   </plugins>
+   <build-item
+    name="bb"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b/bb"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ca"
+    home-tree="bt-1"
+    absolute-path="--topdir--/c/ca"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="aa"
+    description="Here&apos;s a &lt;nice&gt; &quot;description&quot; for you &amp; you!"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/aa"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="bb"/>
+     <dependency name="ca"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="bb"/>
+     <dependency name="ca"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="aaa"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/aa/aaa"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="d.a.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/a/a"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.b.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/b/a"
+    backing-depth="0"
+    external-depth="0"
+    visible-to="d.*"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/a"
+    backing-depth="0"
+    external-depth="0"
+    visible-to="*"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="d.a.a"/>
+     <dependency name="d.b.a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="d.a.a"/>
+     <dependency name="d.b.a"/>
+    </expanded-dependencies>
+   </build-item>
+   <build-item
+    name="ab"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ab"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="d.a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="d.a.a"/>
+     <dependency name="d.b.a"/>
+     <dependency name="d.a"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ac"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ac"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ad"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ad"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="b"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="ba"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b/ba"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="bc"
+    home-tree="bt-1"
+    absolute-path="--topdir--/b/bc"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="cb"
+    home-tree="bt-1"
+    absolute-path="--topdir--/c/cb"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="ca"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="ca"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="cc"
+    home-tree="bt-1"
+    absolute-path="--topdir--/c/cc"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="d"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.b.a.a"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/b/a/a"
+    backing-depth="0"
+    external-depth="0"
+    visible-to="d.b.*"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="d.b"
+    home-tree="bt-1"
+    absolute-path="--topdir--/d/b"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="d"/>
+     <dependency name="d.b.a.a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="d"/>
+     <dependency name="d.b.a.a"/>
+    </expanded-dependencies>
+   </build-item>
+   <build-item
+    name="e.lib"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/lib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="e.shlib"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/shlib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="e.lib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="e.lib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="e.bin"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/bin"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="e.lib"/>
+     <dependency name="e.shlib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="e.lib"/>
+     <dependency name="e.shlib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="e.shlib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/shlib2"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="e.lib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="e.lib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="echo"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="plugin.echo"
+    home-tree="bt-1"
+    absolute-path="--topdir--/plugins/echo"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+   <build-item
+    name="plugin.qrwx"
+    home-tree="bt-1"
+    absolute-path="--topdir--/plugins/qrwx"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+   <build-item
+    name="root"
+    home-tree="bt-1"
+    absolute-path="--topdir--"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+ </build-trees>
+</abuild-data>
+abuild-monitor: end-dump-data
+abuild-monitor: state-change aa <native> waiting
+abuild-monitor: state-change aaa indep ready
+abuild-monitor: state-change ab indep waiting
+abuild-monitor: state-change ac indep ready
+abuild-monitor: state-change ad indep ready
+abuild-monitor: state-change b indep ready
+abuild-monitor: state-change ba indep ready
+abuild-monitor: state-change bb indep ready
+abuild-monitor: state-change bc indep ready
+abuild-monitor: state-change ca <native> ready
+abuild-monitor: state-change cb <native> waiting
+abuild-monitor: state-change cc indep ready
+abuild-monitor: state-change d.a.a indep ready
+abuild-monitor: state-change d.a indep waiting
+abuild-monitor: state-change d.b.a indep ready
+abuild-monitor: state-change e.bin os.cpu.toolset.echo waiting
+abuild-monitor: state-change e.lib os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo waiting
+abuild-monitor: state-change e.shlib os.cpu.toolset.echo waiting
+abuild-monitor: state-change root indep ready
+abuild-monitor: state-change bb indep running
+abuild-monitor: targets bb indep all
+abuild: bb (abuild-indep): all
+abuild-monitor: state-change bb indep completed
+abuild-monitor: state-change ca <native> running
+abuild-monitor: targets ca <native> all
+abuild: ca (abuild-<native>): all
+make: Entering directory `--topdir--/c/ca/abuild-<native>'
+Compiling ../C1.cpp as C++
+Creating ca library
+Compiling ../C2.cpp as C++
+Compiling ../main.cpp as C++
+Creating ca executable
+make: Leaving directory `--topdir--/c/ca/abuild-<native>'
+abuild-monitor: state-change ca <native> completed
+abuild-monitor: state-change aa <native> ready
+abuild-monitor: state-change cb <native> ready
+abuild-monitor: state-change aa <native> running
+abuild-monitor: targets aa <native> all
+abuild: aa (abuild-<native>): all
+make: Entering directory `--topdir--/a/aa/abuild-<native>'
+Pretending to compile ../a.q as Q
+Pretending to compile ../b.q as Q
+Pretending to compile ../d1/c.q as Q
+Prentending to link moo
+make: Leaving directory `--topdir--/a/aa/abuild-<native>'
+abuild-monitor: state-change aa <native> completed
+abuild-monitor: state-change aaa indep running
+abuild-monitor: targets aaa indep all
+abuild: aaa (abuild-indep): all
+abuild-monitor: state-change aaa indep completed
+abuild-monitor: state-change d.a.a indep running
+abuild-monitor: state-change d.a.a indep completed
+abuild-monitor: state-change d.b.a indep running
+abuild-monitor: state-change d.b.a indep completed
+abuild-monitor: state-change d.a indep ready
+abuild-monitor: state-change d.a indep running
+abuild-monitor: state-change d.a indep completed
+abuild-monitor: state-change ab indep ready
+abuild-monitor: state-change ab indep running
+abuild-monitor: targets ab indep all
+abuild: ab (abuild-indep): all
+abuild-monitor: state-change ab indep completed
+abuild-monitor: state-change ac indep running
+abuild-monitor: targets ac indep all
+abuild: ac (abuild-indep): all
+abuild-monitor: state-change ac indep completed
+abuild-monitor: state-change ad indep running
+abuild-monitor: targets ad indep all
+abuild: ad (abuild-indep): all
+make: Entering directory `--topdir--/a/ad/abuild-indep'
+Pretending to compile ../a.w as W
+make: Leaving directory `--topdir--/a/ad/abuild-indep'
+abuild-monitor: state-change ad indep completed
+abuild-monitor: state-change b indep running
+abuild-monitor: targets b indep all
+abuild: b (abuild-indep): all
+abuild-monitor: state-change b indep completed
+abuild-monitor: state-change ba indep running
+abuild-monitor: targets ba indep all
+abuild: ba (abuild-indep): all
+abuild-monitor: state-change ba indep completed
+abuild-monitor: state-change bc indep running
+abuild-monitor: targets bc indep all
+abuild: bc (abuild-indep): all
+abuild-monitor: state-change bc indep completed
+abuild-monitor: state-change cb <native> running
+abuild-monitor: targets cb <native> all
+abuild: cb (abuild-<native>): all
+make: Entering directory `--topdir--/c/cb/abuild-<native>'
+Compiling ../CB1.cc as C++
+Creating cb1 executable
+Compiling ../CB2.cpp as C++
+Creating cb2 executable
+Compiling ../CB3.c as C
+Creating cb3 executable
+Creating moo.quack
+make: Leaving directory `--topdir--/c/cb/abuild-<native>'
+abuild-monitor: state-change cb <native> completed
+abuild-monitor: state-change cc indep running
+abuild-monitor: targets cc indep all
+abuild: cc (abuild-indep): all
+make: Entering directory `--topdir--/c/cc/abuild-indep'
+Making potato salad
+make: Leaving directory `--topdir--/c/cc/abuild-indep'
+abuild-monitor: state-change cc indep completed
+abuild-monitor: state-change e.lib os.cpu.toolset.echo running
+abuild-monitor: targets e.lib os.cpu.toolset.echo all
+abuild: e.lib (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
+Compiling ../lib1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags- -xcppflags- -lib1-src1-xcppflags- -xcflags- -lib1-src1-xcflags-
+make-obj src: ../lib1-src1.c
+make-obj obj: lib1-src1.lo
+contents of lib1-src1.lo:
+** file: lib1-src1.c **
+end contents of lib1-src1.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -lib1-src2-oflags- -wflags-  -xcppflags-  ../lib1-src2.cc lib1-src2.lo lib1-src2.dep
+Compiling ../lib1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -lib1-src2-oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib1-src2.cc
+make-obj obj: lib1-src2.lo
+contents of lib1-src2.lo:
+** file: lib1-src2.cc **
+end contents of lib1-src2.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -lib1-src3-wflags-  -xcppflags-  ../lib1-src3.cpp lib1-src3.lo lib1-src3.dep
+Compiling ../lib1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -lib1-src3-wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib1-src3.cpp
+make-obj obj: lib1-src3.lo
+contents of lib1-src3.lo:
+** file: lib1-src3.cpp **
+end contents of lib1-src3.lo
+Creating lib1 library
+make-lib objects: lib1-src1.lo lib1-src2.lo lib1-src3.lo
+make-lib lib: lib-lib1
+contents of lib-lib1:
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+end contents of lib-lib1
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../lib2.cc lib2.lo lib2.dep
+Compiling ../lib2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib2.cc
+make-obj obj: lib2.lo
+contents of lib2.lo:
+** file: lib2.cc **
+end contents of lib2.lo
+Creating lib2 library
+make-lib objects: lib2.lo
+make-lib lib: lib-lib2
+contents of lib-lib2:
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+end contents of lib-lib2
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src1.c bin1-src1.o bin1-src1.dep
+Compiling ../bin1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags-
+make-obj src: ../bin1-src1.c
+make-obj obj: bin1-src1.o
+contents of bin1-src1.o:
+** file: bin1-src1.c **
+end contents of bin1-src1.o
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src2.cc bin1-src2.o bin1-src2.dep
+Compiling ../bin1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../bin1-src2.cc
+make-obj obj: bin1-src2.o
+contents of bin1-src2.o:
+** file: bin1-src2.cc **
+end contents of bin1-src2.o
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src3.cpp bin1-src3.o bin1-src3.dep
+Compiling ../bin1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../bin1-src3.cpp
+make-obj obj: bin1-src3.o
+contents of bin1-src3.o:
+** file: bin1-src3.cpp **
+end contents of bin1-src3.o
+Creating bin1 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin1-src1.o bin1-src2.o bin1-src3.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin1
+contents of bin-bin1:
+** bin bin1 **
+** file: bin1-src1.c **
+** file: bin1-src2.cc **
+** file: bin1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin1 **
+end contents of bin-bin1
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags-  -xcppflags- -bin2-xcppflags- ../bin2.cc bin2.o bin2.dep
+Compiling ../bin2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags- -xcppflags- -bin2-xcppflags- -xcflags- -bin2-xcflags- -xcxxflags- -bin2-xcxxflags-
+make-obj src: ../bin2.cc
+make-obj obj: bin2.o
+contents of bin2.o:
+** file: bin2.cc **
+end contents of bin2.o
+Creating bin2 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin2.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin2
+contents of bin-bin2:
+** bin bin2 **
+** file: bin2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin2 **
+end contents of bin-bin2
+make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.lib os.cpu.toolset.echo completed
+abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib os.cpu.toolset.echo running
+abuild-monitor: targets e.shlib os.cpu.toolset.echo all
+abuild: e.shlib (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src1.c shlib1-src1.lo shlib1-src1.dep
+Compiling ../shlib1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags-
+make-obj src: ../shlib1-src1.c
+make-obj obj: shlib1-src1.lo
+contents of shlib1-src1.lo:
+** file: shlib1-src1.c **
+end contents of shlib1-src1.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src2.cc shlib1-src2.lo shlib1-src2.dep
+Compiling ../shlib1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib1-src2.cc
+make-obj obj: shlib1-src2.lo
+contents of shlib1-src2.lo:
+** file: shlib1-src2.cc **
+end contents of shlib1-src2.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src3.cpp shlib1-src3.lo shlib1-src3.dep
+Compiling ../shlib1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib1-src3.cpp
+make-obj obj: shlib1-src3.lo
+contents of shlib1-src3.lo:
+** file: shlib1-src3.cpp **
+end contents of shlib1-src3.lo
+Creating shlib1 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib1.1.2.3
+contents of shlib-shlib1.1.2.3:
+** shlib shlib1 **
+** file: shlib1-src1.c **
+** file: shlib1-src2.cc **
+** file: shlib1-src3.cpp **
+** end of shlib shlib1 **
+end contents of shlib-shlib1.1.2.3
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib2.cc shlib2.lo shlib2.dep
+Compiling ../shlib2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib2.cc
+make-obj obj: shlib2.lo
+contents of shlib2.lo:
+** file: shlib2.cc **
+end contents of shlib2.lo
+Creating shlib2 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib2.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib2.4.5
+contents of shlib-shlib2.4.5:
+** shlib shlib2 **
+** file: shlib2.cc **
+** end of shlib shlib2 **
+end contents of shlib-shlib2.4.5
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib3.cc shlib3.lo shlib3.dep
+Compiling ../shlib3.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib3.cc
+make-obj obj: shlib3.lo
+contents of shlib3.lo:
+** file: shlib3.cc **
+end contents of shlib3.lo
+Creating shlib3 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib3.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib3.6
+contents of shlib-shlib3.6:
+** shlib shlib3 **
+** file: shlib3.cc **
+** end of shlib shlib3 **
+end contents of shlib-shlib3.6
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib4.cc shlib4.lo shlib4.dep
+Compiling ../shlib4.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib4.cc
+make-obj obj: shlib4.lo
+contents of shlib4.lo:
+** file: shlib4.cc **
+end contents of shlib4.lo
+Creating shlib4 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib4.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib4
+contents of shlib-shlib4:
+** shlib shlib4 **
+** file: shlib4.cc **
+** end of shlib shlib4 **
+end contents of shlib-shlib4
+make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.shlib os.cpu.toolset.echo completed
+abuild-monitor: state-change e.bin os.cpu.toolset.echo ready
+abuild-monitor: state-change e.bin os.cpu.toolset.echo running
+abuild-monitor: targets e.bin os.cpu.toolset.echo all
+abuild: e.bin (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../bin.cc bin.o bin.dep
+Compiling ../bin.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../bin.cc
+make-obj obj: bin.o
+contents of bin.o:
+** file: bin.cc **
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -lib-xlinkflags-
+make-bin: objects: bin.o
+make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo ../../lib/abuild-os.cpu.toolset.echo
+make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+** file: bin.cc **
+** shlib shlib1 **
+** file: shlib1-src1.c **
+** file: shlib1-src2.cc **
+** file: shlib1-src3.cpp **
+** end of shlib shlib1 **
+** shlib shlib2 **
+** file: shlib2.cc **
+** end of shlib shlib2 **
+** shlib shlib3 **
+** file: shlib3.cc **
+** end of shlib shlib3 **
+** shlib shlib4 **
+** file: shlib4.cc **
+** end of shlib shlib4 **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.bin os.cpu.toolset.echo completed
+abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo running
+abuild-monitor: targets e.shlib2 os.cpu.toolset.echo all
+abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../static.c static.lo static.dep
+Compiling ../static.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -oflags- -wflags- -lib-xcppflags- -lib-xcflags-
+make-obj src: ../static.c
+make-obj obj: static.lo
+contents of static.lo:
+** file: static.c **
+end contents of static.lo
+Creating static library
+make-lib objects: static.lo
+make-lib lib: lib-static
+contents of lib-static:
+** lib static **
+** file: static.c **
+** end of lib static **
+end contents of lib-static
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags-  -wflags- -lib-xcppflags-  ../shlib1.c shlib1.lo shlib1.dep
+Compiling ../shlib1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -wflags- -lib-xcppflags- -lib-xcflags-
+make-obj src: ../shlib1.c
+make-obj obj: shlib1.lo
+contents of shlib1.lo:
+** file: shlib1.c **
+end contents of shlib1.lo
+Creating shlib1 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib1.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs: static lib1 lib2
+make-shlib: shlib: shlib-shlib1.0.0.0
+contents of shlib-shlib1.0.0.0:
+** shlib shlib1 **
+** file: shlib1.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib1 **
+end contents of shlib-shlib1.0.0.0
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags-  -lib-xcppflags-  ../shlib2.c shlib2.lo shlib2.dep
+Compiling ../shlib2.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -lib-xcppflags- -lib-xcflags-
+make-obj src: ../shlib2.c
+make-obj obj: shlib2.lo
+contents of shlib2.lo:
+** file: shlib2.c **
+end contents of shlib2.lo
+Creating shlib2 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib2.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: libs: static lib1 lib2
+make-shlib: shlib: shlib-shlib2.0.0.0
+contents of shlib-shlib2.0.0.0:
+** shlib shlib2 **
+** file: shlib2.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib2 **
+end contents of shlib-shlib2.0.0.0
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../bin.c bin.o bin.dep
+Compiling ../bin.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags-
+make-obj src: ../bin.c
+make-obj obj: bin.o
+contents of bin.o:
+** file: bin.c **
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -lib-xlinkflags-
+make-bin: objects: bin.o
+make-bin: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-bin: libs: static shlib1 shlib2 lib1 lib2
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+** file: bin.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** shlib shlib1 **
+** file: shlib1.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib1 **
+** shlib shlib2 **
+** file: shlib2.c **
+** lib static **
+** file: static.c **
+** end of lib static **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of shlib shlib2 **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo completed
+abuild-monitor: state-change root indep running
+abuild-monitor: targets root indep all
+abuild: root (abuild-indep): all
+abuild-monitor: state-change root indep completed

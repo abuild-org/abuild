@@ -1,0 +1,17 @@
+abuild: bb (abuild-indep): all
+abuild: ca (abuild-<native>): all
+make: Entering directory `--topdir--/c/ca/abuild-<native>'
+Compiling ../C1.cpp as C++
+Creating ca library
+Compiling ../C2.cpp as C++
+Compiling ../main.cpp as C++
+Creating ca executable
+make: Leaving directory `--topdir--/c/ca/abuild-<native>'
+abuild: aa (abuild-<native>): all
+make: Entering directory `--topdir--/a/aa/abuild-<native>'
+Pretending to compile ../a.q as Q
+Pretending to compile ../b.q as Q
+Pretending to compile ../d1/c.q as Q
+Prentending to link moo
+make: Leaving directory `--topdir--/a/aa/abuild-<native>'
+abuild: aaa (abuild-indep): all

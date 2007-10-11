@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+print "platform zzprinter.any.test-suite.abc -type printer\n"

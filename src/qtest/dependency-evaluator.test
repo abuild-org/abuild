@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("dependency-evaluator") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('DependencyEvaluator');
+
+$td->runtest("full test",
+	     {$td->COMMAND => "test_dependency_evaluator"},
+	     {$td->FILE => "dependency-evaluator.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

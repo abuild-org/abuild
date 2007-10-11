@@ -1,0 +1,1 @@
+abuild: ERROR: backing area/externals cycle detected for --topdir--/bad/1/common (backing area of --topdir--/bad/1/common)

@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Find;
+use File::Basename;
+
+$| = 1;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my @abuild_conf = ();
+
+my @paths = @ARGV;
+if (@paths == 0)
+{
+    @paths = ('.');
+}
+
+finddepth({wanted => \&wanted, no_chdir => 1}, @paths);
+
+@abuild_conf = sort @abuild_conf;
+
+foreach my $ac (@abuild_conf)
+{
+    fix_item_names($ac);
+    fix_item_names(dirname($ac) . "/Private.mk");
+    fix_item_names(dirname($ac) . "/Rules.mk");
+    fix_item_names(dirname($ac) . "/Abuild.mk");
+    fix_item_names(dirname($ac) . "/Abuild-ant.properties");
+}
+
+sub fix_item_names
+{
+    my $in = shift;
+    return unless -f $in;
+    my @out = ();
+    my $replace = 0;
+    open(IN, "<$in") or die "$whoami: can't open $in: $!";
+    while (<IN>)
+    {
+	if (s/([a-zA-Z0-9_-]+)--([a-zA-Z0-9_-]+)/$1.$2/g)
+	{
+	    $replace = 1;
+	}
+	push(@out, $_);
+    }
+    close(IN);
+    if ($replace)
+    {
+	open(OUT, ">$in") or die "$whoami: can't overwrite $in: $!";
+	for (@out)
+	{
+	    print OUT;
+	}
+	close(OUT);
+    }
+}
+
+sub wanted
+{
+    my $lastcomp = basename($_);
+    push(@abuild_conf, $_) if $lastcomp eq 'Abuild.conf';
+}

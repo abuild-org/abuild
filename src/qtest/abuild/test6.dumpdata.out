@@ -1,0 +1,891 @@
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <supported-traits>
+  <supported-trait name="other-2-common"/>
+  <supported-trait name="other-2-product"/>
+  <supported-trait name="ro1-product"/>
+  <supported-trait name="shared-common"/>
+  <supported-trait name="shared-product"/>
+ </supported-traits>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--/shared/common"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="shared-common"/>
+   </supported-traits>
+   <build-item
+    name="common"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="common-lib1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib1"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib2"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib3"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib3"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   id="bt-2"
+   absolute-path="--topdir--/other/2/common"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="other-2-common"/>
+   </supported-traits>
+   <backing-area build-tree="bt-1"/>
+   <plugins>
+    <plugin name="common-plugin"/>
+   </plugins>
+   <build-item
+    name="common"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="common-lib1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib1"
+    backing-depth="1"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib2"
+    backing-depth="1"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib3"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/libs/lib3"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-plugin"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/plugin"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-3"
+   absolute-path="--topdir--/shared/product"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="shared-common"/>
+    <supported-trait name="shared-product"/>
+   </supported-traits>
+   <external build-tree="bt-1"/>
+   <build-item
+    name="common"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="common-lib1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib1"
+    backing-depth="0"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib2"
+    backing-depth="0"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib3"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib3"
+    backing-depth="0"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="new-item"
+    home-tree="bt-3"
+    absolute-path="--topdir--/shared/product/new"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product"
+    home-tree="bt-3"
+    absolute-path="--topdir--/shared/product"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="product-common"
+    home-tree="bt-3"
+    absolute-path="--topdir--/shared/product/common"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product-lib"
+    home-tree="bt-3"
+    absolute-path="--topdir--/shared/product/lib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product-bin"
+    home-tree="bt-3"
+    absolute-path="--topdir--/shared/product/bin"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="product-lib"/>
+     <dependency name="common-lib2"/>
+     <dependency name="common-lib3"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+     <dependency name="product-lib"/>
+     <dependency name="common-lib2"/>
+     <dependency name="common-lib3"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   id="bt-4"
+   absolute-path="--topdir--/other/2/product"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="other-2-common"/>
+    <supported-trait name="other-2-product"/>
+   </supported-traits>
+   <backing-area build-tree="bt-3"/>
+   <external build-tree="bt-2"/>
+   <deleted-items>
+    <deleted-item name="new-item"/>
+   </deleted-items>
+   <plugins>
+    <plugin name="common-plugin"/>
+   </plugins>
+   <build-item
+    name="common"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="common-lib1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib1"
+    backing-depth="1"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib2"
+    backing-depth="1"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib3"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/libs/lib3"
+    backing-depth="0"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-plugin"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/plugin"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+   <build-item
+    name="product"
+    home-tree="bt-4"
+    absolute-path="--topdir--/other/2/product"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="product-common"
+    home-tree="bt-4"
+    absolute-path="--topdir--/other/2/product/common"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product-lib"
+    home-tree="bt-4"
+    absolute-path="--topdir--/other/2/product/lib"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product-bin"
+    home-tree="bt-3"
+    absolute-path="--topdir--/shared/product/bin"
+    backing-depth="1"
+    external-depth="0"
+    has-shadowed-references="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="product-lib"/>
+     <dependency name="common-lib2"/>
+     <dependency name="common-lib3"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+     <dependency name="product-lib"/>
+     <dependency name="common-lib2"/>
+     <dependency name="common-lib3"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   id="bt-5"
+   absolute-path="--topdir--/read-only/common"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="other-2-common"/>
+   </supported-traits>
+   <backing-area build-tree="bt-2"/>
+   <build-item
+    name="common"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common"
+    backing-depth="1"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="common-lib1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib1"
+    backing-depth="2"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib2"
+    backing-depth="2"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib3"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/libs/lib3"
+    backing-depth="1"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-plugin"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/plugin"
+    backing-depth="1"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-6"
+   absolute-path="--topdir--/read-only/product"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="other-2-common"/>
+    <supported-trait name="ro1-product"/>
+   </supported-traits>
+   <backing-area build-tree="bt-4"/>
+   <external build-tree="bt-5"/>
+   <build-item
+    name="common"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common"
+    backing-depth="1"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="common-lib1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib1"
+    backing-depth="2"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/shared/common/libs/lib2"
+    backing-depth="2"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-lib3"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/libs/lib3"
+    backing-depth="1"
+    external-depth="1"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="common-plugin"
+    home-tree="bt-2"
+    absolute-path="--topdir--/other/2/common/plugin"
+    backing-depth="1"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+   <build-item
+    name="product"
+    home-tree="bt-6"
+    absolute-path="--topdir--/read-only/product"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
+    name="product-common"
+    home-tree="bt-4"
+    absolute-path="--topdir--/other/2/product/common"
+    backing-depth="1"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product-lib"
+    home-tree="bt-4"
+    absolute-path="--topdir--/other/2/product/lib"
+    backing-depth="1"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product-bin"
+    home-tree="bt-6"
+    absolute-path="--topdir--/read-only/product/bin"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="product-lib"/>
+     <dependency name="common-lib2"/>
+     <dependency name="common-lib3"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="product-common"/>
+     <dependency name="common-lib1"/>
+     <dependency name="product-lib"/>
+     <dependency name="common-lib2"/>
+     <dependency name="common-lib3"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+ </build-trees>
+</abuild-data>

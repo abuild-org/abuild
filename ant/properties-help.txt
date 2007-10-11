@@ -1,0 +1,87 @@
+#
+# PLEASE KEEP LINES NO LONGER THAN 60 COLUMNS.
+# PLEASE KEEP EXACTLY ONE BLANK LINE AFTER THIS COMMENT
+# BLOCK.
+#
+# Note: these properties are also documented in the Abuild
+# manual.  Please keep that in synch with this.
+#
+
+The following standard properties may be set for any
+Java-based build item:
+
+ * abuild.java-source-version: if specified, the value of
+   this property will be used for the source attribute of
+   the javac task.
+
+ * abuild.java-target-version: if specified, the value of
+   this property will be used for the target attribute of
+   the javac task.
+
+ * abuild.use-ant-runtime: if set, ant runtime libraries
+   will be included in the compilation classpath.  This can
+   be useful for compiling custom ant tasks.
+
+ * abuild.jar-name: the name (including extension) of the
+   jar file.  The "compile" target is only run if this is
+   set.  The resulting jar file will be created in the
+   "dist" directory of the abuild output directory.
+
+ * abuild.main-class: the name of a class, if any, that
+   implements main.  Used when abuild.wrapper-name is set.
+
+ * abuild.wrapper-name: if this property and
+   abuild.main-class are both set, a script by this name
+   will be generated that will invoke the Java runtime
+   environment using this jar file to invoke this main.  The
+   script will include the classpath as determined by
+   abuild.  On Windows, the script is usable to invoke the
+   application from a Cygwin environment, and a stand-alone
+   batch file is generated in addition to the script.
+
+ * abuild.ear-name: the name (including extension) of an ear
+   file to be generated.
+
+ * abuild.application-xml: the name of an application.xml
+   file to be included in the ear file.
+
+ * abuild.war-name: the name (including extension) of a war
+   file to be generated.
+
+ * abuild.war-type: required if building a war file; must
+   have the value "client" or "server".  This property
+   determines where files in your classpath are copied into
+   the war file.
+
+ * abuild.web-xml: the name of a web.xml file to be included
+   in the war file.
+
+ * abuild.hook-build-items: a comma-separated list of build
+   items from which hooks will be called.
+
+ * abuild.local-buildfile: the name of a file, specified
+   relative to the build item's directory, that will be
+   imported from the main entry point.  This file can be
+   used to define properties that can't be expressed in a
+   properties file, to define resource collections, or to
+   create local targets.  If the variable
+   abuild.use-local-hooks is set, abuild will also attempt
+   to find hooks in this file.
+
+ * abuild.use-local-hooks: if set, abuild.local-buildfile
+   must also be set.  In this case, abuild will attempt to
+   resolve hooks from the local build file in addition to
+   importing it.  Please run abuild hooks-help for
+   information on what hooks are available.
+
+ * abuild.junit.testsuite: the class name of the class
+   containing junit test suites.  If this is set, the "test"
+   target will run junit test suites defined here.
+
+Note that at most one of abuild.jar-name, abuild.war-name,
+or abuild.ear-name may be set for any given build item.
+
+#
+# PLEASE KEEP EXACTLY ONE BLANK LINE BEFORE THIS COMMENT
+# BLOCK AND PLACE NO TEXT AFTER IT.
+#

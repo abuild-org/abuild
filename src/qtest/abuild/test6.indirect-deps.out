@@ -1,0 +1,3 @@
+--topdir--/bad/4/backing/product/1/Abuild.conf: ERROR: 1 depends on unknown build item c
+--topdir--/bad/4/backing/product/Abuild.conf: ERROR: product depends on unknown build item c
+abuild: ERROR: errors detected; exiting

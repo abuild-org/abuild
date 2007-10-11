@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use Cwd;
+use File::Find;
+
+chdir("canonicalize-path") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('canonicalize');
+
+mkdir "work", 0777;
+
+my $cwd = getcwd();
+
+chdir "work" or die;
+
+my $ntests = 0;
+
+if ($^O =~ m/^(cygwin|MSWin32)$/)
+{
+    $ntests = 5;
+
+    my $dir = getcwd();
+    my $windir = windir($dir);
+    $td->runtest("current directory",
+		 {$td->COMMAND => "test_canonicalize_path ."},
+		 {$td->STRING => ". -> $windir\n", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    my $win_sys_root = $ENV{'SYSTEMROOT'};
+    my $sys_root = realdir($win_sys_root);
+    chdir $sys_root or die;
+    $win_sys_root =~ s/^(.)/\L$1\E/;
+    $win_sys_root =~ s,\\,/,g;
+
+    $td->runtest("system root",
+		 {$td->COMMAND => "test_canonicalize_path ."},
+		 {$td->STRING => ". -> $win_sys_root\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    my $drive = substr($win_sys_root, 0, 2);
+
+    $td->runtest("ignore .",
+		 {$td->COMMAND => ["test_canonicalize_path",
+				   $win_sys_root . "\\."]},
+		 {$td->STRING => "$win_sys_root\\. -> $win_sys_root\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("handle and ignore empty and ..",
+		 {$td->COMMAND => ["test_canonicalize_path",
+				   $win_sys_root . "\\..\\/..\\.."]},
+		 {$td->STRING => "$win_sys_root\\..\\/..\\.. -> $drive/\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    my $nodrive = substr($win_sys_root, 2);
+
+    $td->runtest("no drive letter",
+		 {$td->COMMAND => "test_canonicalize_path $nodrive"},
+		 {$td->STRING => "$nodrive -> $nodrive\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    chdir $dir or die;
+}
+else
+{
+    $ntests = 1;
+
+    mkdir "dir", 0777;
+    symlink "/", "root" or die;
+    symlink "/etc", "etc" or die;
+    symlink "../..", "up" or die;
+    symlink "dir", "over" or die;
+    symlink "other", "dangling" or die;
+
+    my @paths = ("/",
+		 "etc/passwd/asdf",
+		 "root/etc/passwd/asdf",
+		 "up/canonicalize-path",
+		 "up/canonicalize-path/work/up/canonicalize-path/work/x/y/z",
+		 "x/y/z",
+		 ".",
+		 "..",
+		 "over/asdf",
+		 "dangling/asdf",
+		 "root/../../etc");
+
+    $td->runtest("canonicalize path",
+		 {$td->COMMAND => ["test_canonicalize_path",
+				   @paths],
+		  $td->FILTER => "sed -e s,$cwd,--CWD--,g"},
+		 {$td->FILE => "../canonicalize.unix.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+chdir $cwd or die;
+
+cleanup();
+
+$td->report($ntests);
+
+sub cleanup
+{
+    rmrf("work");
+}
+
+sub rmrf
+{
+    my $path = shift;
+    return unless -e $path;
+    my $wanted = sub
+    {
+	if ((-d $_) && (! -l $_))
+	{
+	    rmdir $_ or die "rmdir $_ failed: $!\n";
+	}
+	else
+	{
+	    unlink $_ or die "unlink $_ failed: $!\n";
+	}
+    };
+    finddepth({wanted => $wanted, no_chdir => 1}, $path);
+}
+
+sub windir
+{
+    my $dir = shift;
+    my $windir = $dir;
+    if ($^O eq 'cygwin')
+    {
+	chop($windir = `cygpath -w $dir`);
+	$windir =~ s,\\,/,g;
+    }
+    $windir;
+}
+
+sub realdir
+{
+    my $dir = shift;
+    my $realdir = $dir;
+    if ($^O eq 'cygwin')
+    {
+	chop($realdir = `cygpath "$dir"`);
+    }
+    $realdir;
+}

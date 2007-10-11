@@ -1,0 +1,6 @@
+--topdir--/a/aa/aaf/aafa/aafaa/Abuild.conf: ERROR: this build item sets parent-dir but is referenced as a build tree root (backing area of --topdir--/a/aa/aaf)
+--topdir--/a/aa/aaf/Abuild.backing: ERROR: here is the referring build item
+--topdir--/a/aa/aaf/aafa/aafaa/Abuild.conf: ERROR: this build item sets parent-dir but is referenced as a build tree root (external of --topdir--/a/aa/aaf)
+--topdir--/a/aa/aaf/Abuild.conf: ERROR: here is the referring build item
+--topdir--/a/aa/aaf/Abuild.conf: ERROR: unable to find external oops
+abuild: ERROR: errors detected; exiting

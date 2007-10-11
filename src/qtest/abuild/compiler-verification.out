@@ -1,0 +1,108 @@
+
+===> CREATING BUILD TREE <===
+
+
+===> RUNNING INITIAL BUILD <===
+
+abuild: a (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/a/abuild-<native>'
+Compiling ../A.cc as C++
+Creating A library
+make: Leaving directory `--topdir--/.verify-tmp/a/abuild-<native>'
+abuild: auto (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/autoconf/abuild-<native>'
+[autoconf output suppressed]
+make: Leaving directory `--topdir--/.verify-tmp/autoconf/abuild-<native>'
+abuild: b (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/b/abuild-<native>'
+Compiling ../B.cc as C++
+Creating B shared library
+make: Leaving directory `--topdir--/.verify-tmp/b/abuild-<native>'
+abuild: x (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/x/abuild-<native>'
+Compiling ../X.cc as C++
+Creating X library
+make: Leaving directory `--topdir--/.verify-tmp/x/abuild-<native>'
+abuild: src (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native>'
+Compiling ../Y.cc as C++
+Creating Y library
+Compiling ../Z.cc as C++
+Creating Z shared library
+Compiling ../main.cc as C++
+Compiling ../other.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native>'
+
+===> BUILD OKAY <===
+
+
+===> PROGRAM OUTPUT OKAY <===
+
+
+===> REBUILD WHEN UP TO DATE <===
+
+abuild: a (abuild-<native>): all
+abuild: auto (abuild-<native>): all
+abuild: b (abuild-<native>): all
+abuild: x (abuild-<native>): all
+abuild: src (abuild-<native>): all
+
+===> BUILD OKAY <===
+
+
+===> RUNNING BUILD AFTER REMOVING SOURCE <===
+
+abuild: a (abuild-<native>): all
+abuild: auto (abuild-<native>): all
+abuild: b (abuild-<native>): all
+abuild: x (abuild-<native>): all
+abuild: src (abuild-<native>): all
+Removing extraneous dep files
+Extra object files found: removing libraries and binaries
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native>'
+Creating Y library
+Creating Z shared library
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native>'
+
+===> BUILD OKAY <===
+
+
+===> PROGRAM OUTPUT OKAY <===
+
+
+===> RUNNING BUILD AFTER MOVING HEADER <===
+
+abuild: a (abuild-<native>): all
+abuild: auto (abuild-<native>): all
+abuild: b (abuild-<native>): all
+abuild: x (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/x/abuild-<native>'
+Compiling ../X.cc as C++
+Creating X library
+make: Leaving directory `--topdir--/.verify-tmp/x/abuild-<native>'
+abuild: src (abuild-<native>): all
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native>'
+Creating Z shared library
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native>'
+
+===> BUILD OKAY <===
+
+
+===> PROGRAM OUTPUT OKAY <===
+
+
+===> REBUILD WHEN UP TO DATE <===
+
+abuild: a (abuild-<native>): all
+abuild: auto (abuild-<native>): all
+abuild: b (abuild-<native>): all
+abuild: x (abuild-<native>): all
+abuild: src (abuild-<native>): all
+
+===> BUILD OKAY <===
+
+ALL CASES PASSED

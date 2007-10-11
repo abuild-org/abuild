@@ -1,0 +1,1 @@
+abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/har-example.har

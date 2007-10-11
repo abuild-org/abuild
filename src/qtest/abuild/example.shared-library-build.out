@@ -1,0 +1,20 @@
+abuild: shared.impl1 (abuild-<native>): all
+make: Entering directory `--topdir--/shared-library/shared/impl1/abuild-<native>'
+Compiling ../Shared.cc as C++
+Creating shared shared library
+make: Leaving directory `--topdir--/shared-library/shared/impl1/abuild-<native>'
+abuild: prog (abuild-<native>): all
+make: Entering directory `--topdir--/shared-library/prog/abuild-<native>'
+Compiling ../prog.cc as C++
+Creating prog executable
+make: Leaving directory `--topdir--/shared-library/prog/abuild-<native>'
+abuild: shared.impl2.static (abuild-<native>): all
+make: Entering directory `--topdir--/shared-library/shared/impl2/static/abuild-<native>'
+Compiling ../Static.cc as C++
+Creating static library
+make: Leaving directory `--topdir--/shared-library/shared/impl2/static/abuild-<native>'
+abuild: shared.impl2 (abuild-<native>): all
+make: Entering directory `--topdir--/shared-library/shared/impl2/abuild-<native>'
+Compiling ../Shared.cc as C++
+Creating shared shared library
+make: Leaving directory `--topdir--/shared-library/shared/impl2/abuild-<native>'

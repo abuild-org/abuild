@@ -1,0 +1,6 @@
+abuild: cb (abuild-<native>): all
+make: Entering directory `--topdir--/c/cb/abuild-<native>'
+Creating cb1 executable
+Creating cb2 executable
+Creating cb3 executable
+make: Leaving directory `--topdir--/c/cb/abuild-<native>'

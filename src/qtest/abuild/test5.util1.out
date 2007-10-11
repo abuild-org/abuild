@@ -1,0 +1,4 @@
+abuild: util (abuild-<native>): all
+make: Entering directory `--topdir--/util/abuild-<native>'
+--abuild-dir--/make/rules/object-code/ccxx.mk:nn: *** The following variables are undefined: SRCS_lib_utility.  Stop.
+make: Leaving directory `--topdir--/util/abuild-<native>'

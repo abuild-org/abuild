@@ -1,0 +1,54 @@
+--topdir--/a/Abuild.conf:4: ERROR: duplicate value for child-dirs (using new value)
+--topdir--/c/Abuild.conf: ERROR: build and interface files are not permitted for unnamed build items
+--topdir--/a/ab/Abuild.conf: ERROR: "external-dirs" may only appear in a root build item
+--topdir--/a/ab/Abuild.conf: ERROR: flag -flag=moo is not preceded by a build item name
+--topdir--/a/ab/Abuild.conf: ERROR: platform declaration -platform=oink is not preceded by a build item name
+--topdir--/a/ab/Abuild.conf: ERROR: a platform has already been declared for dependency b.private
+--topdir--/a/ab/Abuild.conf: ERROR: invalid platform selector other:skip
+--topdir--/a/ab/Abuild.conf: ERROR: invalid dependency !heh!
+--topdir--/a/ab/Abuild.conf: ERROR: visible-to not permitted for public build items
+--topdir--/a/ab/Abuild.conf: ERROR: flag names may contain only alphanumeric characters, underscores, periods, and dashes
+--topdir--/a/ac/Abuild.conf:1: ERROR: invalid key that (ignored)
+--topdir--/a/ac/Abuild.conf:2: ERROR: syntax error
+--topdir--/a/ac/Abuild.conf: ERROR: file ended with continuation line
+--topdir--/a/ac/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
+--topdir--/a/Abuild.conf: ERROR: child a/ac/Abuild.conf has no parent-dir
+--topdir--/a/ad/Abuild.conf: ERROR: "platform-types" is not permitted for unnamed build items
+--topdir--/a/ad/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
+--topdir--/a/ag/Abuild.conf: ERROR: "supported-flags" is not permitted for unnamed build items
+--topdir--/a/ag/Abuild.conf: ERROR: "traits" is not permitted for unnamed build items
+--topdir--/a/ag/Abuild.conf: ERROR: "supported-traits" may only appear in a root build item
+--topdir--/a/ag/Abuild.conf: ERROR: "deleted" may only appear in a root build item
+--topdir--/a/ag/Abuild.conf: ERROR: "plugins" may only appear in a root build item
+--topdir--/a/ag/Abuild.conf: ERROR: flag "moo" listed more than once
+--topdir--/a/ag/Abuild.conf: ERROR: trait "oink" listed more than once
+--topdir--/a/ag/Abuild.conf: ERROR: trait names may contain only alphanumeric characters, underscores, periods, and dashes
+--topdir--/a/ag/Abuild.conf: ERROR: item -item=asdf is not preceded by a trait name
+--topdir--/a/ag/Abuild.conf: ERROR: invalid trait !wrong!
+--topdir--/a/ag/Abuild.conf: ERROR: deleted item "quack" listed more than once
+--topdir--/a/ag/Abuild.conf: ERROR: plugin "oink" listed more than once
+--topdir--/c/cd/Abuild.conf: ERROR: build item names may contain only alphanumeric characters, underscores, periods, and dashes
+--topdir--/c/cd/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
+--topdir--/d/a/Abuild.conf: ERROR: visible-to value must be * or end with .*
+--topdir--/d/a/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
+--topdir--/d/a/Abuild.conf: ERROR: platform type "native" listed more than once
+--topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
+--topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
+--topdir--/a/ab/aba/Abuild.conf: ERROR: external-dirs entries must be relative paths
+--topdir--/a/ab/Abuild.conf: ERROR: child a/ab/aba/Abuild.conf has no parent-dir
+--topdir--/a/ab/Abuild.conf: ERROR: child a/ab/abb/Abuild.conf has parent-dir that doesn't point to this directory
+--topdir--/b/bc/Abuild.conf: ERROR: build item bb appears in multiple locations
+--topdir--/b/bb/Abuild.conf: ERROR: here is another location
+--topdir--/d/b/a/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
+--topdir--/d/b/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
+--topdir--/c/cd/Abuild.conf: ERROR: unknown platform type "potato"
+--topdir--/d/a/Abuild.conf: ERROR: platforms in different target types may not be mixed
+--topdir--/a/ab/Abuild.conf: ERROR: ab may not depend on b.private because it is private to another scope
+--topdir--/d/a/Abuild.conf: ERROR: d.a may not depend on d.b.a because it is private to another scope
+--topdir--/a/ab/Abuild.conf: ERROR: ab depends on unknown build item b.private
+--topdir--/c/ca/Abuild.conf: ERROR: ca depends on unknown build item cc
+--topdir--/c/cc/Abuild.conf: ERROR: cc.private depends on unknown build item cc
+--topdir--/d/a/Abuild.conf: ERROR: d.a may not specify flag oink for dependency d.a.a because d.a.a does not support that flag
+--topdir--/a/ab/Abuild.conf: ERROR: trait trait1 refers to item b.private which is private to another scope
+--topdir--/a/ab/Abuild.conf: ERROR: trait trait3 is not supported in this item's build tree
+abuild: ERROR: errors detected; exiting

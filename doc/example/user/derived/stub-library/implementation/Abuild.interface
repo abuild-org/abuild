@@ -1,0 +1,5 @@
+INCLUDES = .
+if (not($(HAVE_CREATE_WORLD_PEACE)))
+   LIBS = stub-library
+   LIBDIRS = $(ABUILD_OUTPUT_DIR)
+endif
