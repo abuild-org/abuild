@@ -2,6 +2,7 @@ abuild: java-main (abuild-java): all
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/empty
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/classes
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/dist
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/src/java

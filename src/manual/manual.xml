@@ -24,10 +24,10 @@ Possible fop/stylesheet bugs:
 
 Possible stylesheet considerations:
 
- * Consider putting <?example?> and maybe <?qtest?> in a formal
-   listing/example element if we can get it to have a title of
-   "Listing" instead of "Example".  See also Program listings chapter
-   in DocBook XSL.
+ * Consider putting "example" and maybe "qtest" processing
+   instructions in a formal listing/example element if we can get it
+   to have a title of "Listing" instead of "Example".  See also
+   Program listings chapter in DocBook XSL.
 
 BEFORE EACH RELEASE
 
@@ -6682,6 +6682,26 @@ endif
         This directory contains the HTML summary of junit test output.
         Loading <filename>index.html</filename> from this directory
         into a browser will allow you to view the test results.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <!-- keep this directory last -->
+      <term><filename>abuild-java/empty</filename></term>
+      <listitem>
+       <para>
+        This is an empty directory used to substitute in &abuild;'s
+        <application>ant</application> code for optional directories
+        that don't exist.  You should never put any files here.  If
+        you do, they will show up in generated archives in mysterious
+        places.
+        <footnote>
+         <para>
+          If you really want to know why we do it this way, read the
+          comments in <filename>ant/abuild.xml</filename> in your
+          &abuild; distribution.
+         </para>
+        </footnote>
        </para>
       </listitem>
      </varlistentry>

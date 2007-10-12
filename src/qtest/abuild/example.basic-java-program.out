@@ -2,6 +2,7 @@ abuild: java-library (abuild-java): all
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/empty
     [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/classes
     [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/dist
     [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/src/java
@@ -21,6 +22,7 @@ abuild: java-program (abuild-java): all
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/empty
     [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/classes
     [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/dist
     [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/src/java

@@ -19,13 +19,16 @@ XLINKFLAGS += -static
 endif
 
 ifeq ($(CCXX_TOOLCHAIN), gcc)
-XCPPFLAGS += -Werror
+WFLAGS += -Werror
 endif
 
 ifeq ($(CCXX_TOOLCHAIN), msvc)
 # Disable a warning in InterfaceParser about using "this" in a constructor
 WFLAGS_InterfaceParser.cc = -wd4355
 endif
+
+WFLAGS_interface.tab.cc :=
+WFLAGS_FlexLexer.interface.cc :=
 
 TEST_PROGS := \
 	test_util \

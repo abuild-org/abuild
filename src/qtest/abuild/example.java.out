@@ -2,6 +2,7 @@ abuild: code-generator (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/empty
     [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/classes
     [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/dist
     [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/src/java
@@ -21,6 +22,7 @@ abuild: library (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/java/library/abuild-java/empty
     [mkdir] Created dir: --topdir--/java/library/abuild-java/classes
     [mkdir] Created dir: --topdir--/java/library/abuild-java/dist
     [mkdir] Created dir: --topdir--/java/library/abuild-java/src/java
@@ -43,6 +45,7 @@ abuild: executable (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/java/executable/abuild-java/empty
     [mkdir] Created dir: --topdir--/java/executable/abuild-java/classes
     [mkdir] Created dir: --topdir--/java/executable/abuild-java/dist
     [mkdir] Created dir: --topdir--/java/executable/abuild-java/src/java
@@ -86,6 +89,7 @@ abuild: other-executable (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/empty
     [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/classes
     [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/dist
     [mkdir] Created dir: --topdir--/java/other-executable/abuild-java/src/java

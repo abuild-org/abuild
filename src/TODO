@@ -11,9 +11,6 @@ General
 Documentation
 -------------
 
- * Do something more useful with docbook so the make code doesn't have
-   to be duplicated between qtest and abuild.
-
  * Acknowledgments
 
     - Andrew Hayden - doc and sounding board
@@ -25,36 +22,12 @@ Documentation
 Code
 ----
 
- * Move javadoc to a plugin.  Have a test suite for the plugin that
-   lives under the plugins/javadoc directory and lists ../../.. as an
-   external and plugin.javadoc as a plugin.  XXX Why can't plugin code
-   see abuild properties?  Make sure this is exercised in the test
-   suite.
-
- * Test on Solaris
-
  * Klocwork support
 
- * Doxygen
+ * Consider adding an option to native-compiler for low-priority
+   instead of high-priority compilers.
 
-    - Doxygen support provided by plugin
-
-    - Basic model: user and plugin can provide overrides to variables
-      from doxygen config
-
-    - Abuild.mk file DOXYGEN_CONFIG points to local config override
-
-    - Script runs doxygen -g and makes substitutions based on plugin
-      config, user config; warn if override variable isn't found in
-      doxygen -g output
-
-    - Tags files are generated in the name of a file as specified by
-      some Abuild.mk variable
-
-    - Abuild.interface has two variables: one "normal" one for just
-      listing the of your tag file; plugin generates
-      path/file.tag=path/html for doxygen; the other one is to add
-      special case options that fall outside this pattern
+ * Consider adding a -C option to chdir...
 
 
 Bugs
@@ -78,13 +51,6 @@ Bugs
    be an issue with not getting any notification of non-existent
    classpath items.
 
- * Test suites that create output in the tests hierarchy will not be
-   able to be run simultaneously on more than one platform.  Need to
-   add a method to TestDriver that returns the directory from which
-   the test driver was invoked.  For abuild, this would be the abuild
-   output directory.  Test suites can be written to create temporary
-   output directories there.
-
  * Orphan target detection won't find orphan targets in
    subdirectories.  This is very hard to fix in general.  We could
    search directories represented in the source lists, but that
@@ -97,6 +63,13 @@ Java Problems
 We probably need a different approach to Java.  Ant was not designed
 to be used as a framework, and it doesn't work very well when used in
 this way.
+
+ * We should add the Main-Class attribute to the manifest of a jar
+   when the abuild.main-class property is set:
+
+     <attribute name="Main-Class" value="${abuild.main-class}"/>
+
+   How do we do this conditionally upon the existence of that property?
 
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse
@@ -112,8 +85,6 @@ this way.
    order for build-classpath from jpackage to do the right thing when
    launching ant 1.7.0 in fedora core 5.  Not sure how general of a
    problem this is.
-
- * make sure --silent and --verbose do something sensible
 
  * Reconsider using depends task for compile in abuild.xml.
 
@@ -153,9 +124,6 @@ See also "Known Limitations" in the documentation.
  * Consider having --silent invoke make with --no-print-directory.  If
    we do this, we should follow build item failure with a message that
    contains the name, path, and platform of whatever failed.
-
- * Consider whether to support mingw directly instead of through
-   cygwin's gcc.
 
  * Consider having an abuild template generator that can run if no
    Abuild.conf or other files are present.  This would spit out
@@ -206,8 +174,6 @@ See also "Known Limitations" in the documentation.
  * It would be nice if there were a mechanism for providing
    documentation on traits so that --list-traits could tell the user
    how each trait was intended to be used.
-
- * doc target not tested in test suite for java
 
  * Consider capturing the output of the backend so that we can
    de-interleave output when running parallel builds, separate error

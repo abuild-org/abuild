@@ -2,6 +2,7 @@ abuild: handlers.interface (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/interface/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/interface/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/interface/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/interface/abuild-java/src/java
@@ -21,6 +22,7 @@ abuild: handlers.h1 (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h1/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h1/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h1/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h1/abuild-java/src/java
@@ -40,6 +42,7 @@ abuild: handlers.h2 (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h2/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h2/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h2/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/public/handlers/h2/abuild-java/src/java
@@ -59,6 +62,7 @@ abuild: executable.entry (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/public/executable/entry/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/entry/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/entry/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/entry/abuild-java/src/java
@@ -78,6 +82,7 @@ abuild: handlers.h3 (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h3/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h3/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h3/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h3/abuild-java/src/java
@@ -97,6 +102,7 @@ abuild: handlers.h4 (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h4/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h4/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h4/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/handlers/h4/abuild-java/src/java
@@ -116,6 +122,7 @@ abuild: helper.sensitive (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/helper/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/helper/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/helper/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/helper/abuild-java/src/java
@@ -135,6 +142,7 @@ abuild: executable.sensitive (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/src/java
@@ -177,6 +185,7 @@ abuild: helper (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/public/helper/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/public/helper/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/helper/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/public/helper/abuild-java/src/java
@@ -196,6 +205,7 @@ abuild: executable (abuild-java): test
 Buildfile: --abuild.xml--
 
 init:
+    [mkdir] Created dir: --topdir--/mixed-classification/public/executable/abuild-java/empty
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/abuild-java/dist
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/abuild-java/src/java

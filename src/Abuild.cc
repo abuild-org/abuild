@@ -784,6 +784,18 @@ Abuild::readConfigs()
     this->this_config = readConfig(this->this_config_dir);
 
     std::string local_top = findTop();
+
+    // We explicitly make buildtrees local to readConfigs.  By not
+    // holding onto it after readConfigs exits, we ensure that we
+    // don't have any way to get any information about items not in
+    // the build set.  This policy has helped to prevent a number of
+    // potential logic errors in which we might try, for one reason or
+    // another, to access something we shouldn't be accessing.  Before
+    // deciding to change this policy, keep in mind that the build set
+    // is closed with respect to dependency relationships, and
+    // dependency relationships are subject to the integrity
+    // guarantee.  See comments in BuildItem::getReferences for
+    // additional discussion.
     BuildTree_map buildtrees;
     std::set<std::string> visiting;
     traverse(buildtrees, local_top, visiting, FileLocation(),
@@ -1130,8 +1142,8 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
     // effects of other operations having been completed.
     verbose("build tree " + top_path + ": validating");
     resolveTraits(buildtrees, top_path);
-    checkPlugins(tree_data, builditems, top_path);
     checkPlatformTypes(tree_data, builditems, top_path);
+    checkPlugins(tree_data, builditems, top_path);
     checkItemNames(builditems, top_path);
     checkDependencies(tree_data, builditems, top_path);
     updatePlatformTypes(tree_data, builditems, top_path);

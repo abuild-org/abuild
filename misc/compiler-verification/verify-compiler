@@ -6,6 +6,7 @@ require 5.008;
 BEGIN { $^W = 1; }
 use strict;
 use Cwd;
+use Cwd 'abs_path';
 use File::Find;
 use File::Basename;
 use File::Copy;
@@ -55,7 +56,7 @@ while (@ARGV)
     if ($arg eq '--plugin-tree')
     {
 	usage() unless @ARGV;
-	$plugin_tree_location = shift(@ARGV);
+	$plugin_tree_location = abs_path(shift(@ARGV));
     }
     elsif ($arg eq '--plugin-name')
     {

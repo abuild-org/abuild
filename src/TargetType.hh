@@ -9,6 +9,7 @@ class TargetType
   public:
     enum target_type_e
     {
+	tt_unknown,
 	tt_all,
 	tt_platform_independent,
 	tt_object_code,

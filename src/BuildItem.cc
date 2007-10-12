@@ -15,7 +15,7 @@ BuildItem::BuildItem(std::string const& item_name,
     tree_top(tree_top),
     backing_depth(0),
     external_depth(0),
-    target_type(TargetType::tt_all),
+    target_type(TargetType::tt_unknown),
     plugin(false),
     plugin_anywhere(false)
 {
@@ -189,6 +189,11 @@ BuildItem::getShadowedDependencies() const
 TargetType::target_type_e
 BuildItem::getTargetType() const
 {
+    if (this->target_type == TargetType::tt_unknown)
+    {
+	throw QEXC::Internal(
+	    "attempt to retrieve build item target type before it was set");
+    }
     return this->target_type;
 }
 
@@ -365,6 +370,20 @@ BuildItem::getPlugins() const
 std::set<std::string>
 BuildItem::getReferences() const
 {
+    // We only include dependencies and plugins here, not items we
+    // refer to with a trait.  If we were to add trait referent items
+    // here, we'd also have to add them to the build set so that we
+    // could get information about them.  That would have to be done
+    // recursively.  Then we might want to extend the integrity
+    // guarantee to cover trait referent items, and this could get out
+    // of hand.  If we really wanted to be able to include traits here
+    // so that we could get the location of any item we referred to
+    // through a trait, we could let go of the policy of throwing away
+    // all build item data about items not in the build set so that we
+    // could still look up the paths to these items.  That would be
+    // unfortunate though since a number of potential errors have been
+    // caught because of that policy.  Bottom line: if you want the
+    // location of something, you have to depend on it.
     std::set<std::string> references;
     references.insert(this->expanded_dependencies.begin(),
 		      this->expanded_dependencies.end());

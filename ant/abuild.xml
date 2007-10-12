@@ -107,23 +107,76 @@
   Note: if changing this, please ensure that the abuild manual is
   updated accordingly.
 
+  There appears to be no clean way of adding something to a fileset
+  conditionally upon its existence.  In order to avoid forcing the
+  user to create empty directories, we create an empty directory and
+  assign the property that names each optional directory to the empty
+  directory if the real one doesn't exist.  An earlier implementation
+  created an empty fileset and used refid to point to it.  Although
+  this alleviated the need to create the empty directory, filesets and
+  paths don't inherit through calls to ant and antcall which prevents
+  their use from hooks.  The "empty" directory is created by the init
+  task.
+
+  By convention, the "dir" properties always point to the path we are
+  actually using.  The "optional" properties point to the real
+  location of the optional directories.  Only this initialization code
+  should ever refer to the "optional" properties.  We use this level
+  of indirection so that we can use the "location" attribute to set
+  the absolute path.
+
  -->
 
  <!--  build item directory: where Abuild.conf, etc. reside        -->
  <property name="abuild.private.dir.item" location=".."/>
+
+ <property name="abuild.private.dir.empty" location="empty"/>
+
+ <!--  Create properties for the optional directories as           -->
+ <!--  described above.                                            -->
+
  <!--  location of source files                                    -->
- <property name="abuild.private.dir.jsrc"
+ <property name="abuild.private.optional.jsrc"
            location="${abuild.private.dir.item}/src/java"/>
- <!--  location of generated source files                          -->
- <property name="abuild.private.dir.generated-jsrc" location="src/java"/>
+ <condition property="abuild.private.dir.jsrc"
+            value="${abuild.private.optional.jsrc}"
+            else="${abuild.private.dir.empty}">
+  <available type="dir" file="${abuild.private.optional.jsrc}"/>
+ </condition>
  <!--  location of other static resources to be included in the    -->
  <!--  jar file                                                    -->
- <property name="abuild.private.dir.resources"
+ <property name="abuild.private.optional.resources"
            location="${abuild.private.dir.item}/src/resources"/>
+ <condition property="abuild.private.dir.resources"
+            value="${abuild.private.optional.resources}"
+            else="${abuild.private.dir.empty}">
+  <available type="dir" file="${abuild.private.optional.resources}"/>
+ </condition>
  <!--  location of other static files to be included in the war    -->
  <!--  file                                                        -->
- <property name="abuild.private.dir.web"
+ <property name="abuild.private.optional.web"
            location="${abuild.private.dir.item}/src/web"/>
+ <condition property="abuild.private.dir.web"
+            value="${abuild.private.optional.web}"
+            else="${abuild.private.dir.empty}">
+  <available type="dir" file="${abuild.private.optional.web}"/>
+ </condition>
+ <!--  location of other static files to be included in the        -->
+ <!--  META-INF directory                                          -->
+ <property name="abuild.private.optional.conf"
+           location="${abuild.private.dir.item}/src/conf"/>
+ <condition property="abuild.private.dir.conf"
+            value="${abuild.private.optional.conf}"
+            else="${abuild.private.dir.empty}">
+  <available type="dir" file="${abuild.private.optional.conf}"/>
+ </condition>
+
+ <!--  Create properties for generated files.  We create these     -->
+ <!--  directories, so we know they will exist and can avoid the   -->
+ <!--  extra level of indirection.                                 -->
+
+ <!--  location of generated source files                          -->
+ <property name="abuild.private.dir.generated-jsrc" location="src/java"/>
  <!--  location of other generated resources to be included in     -->
  <!--  the jar file                                                -->
  <property name="abuild.private.dir.generated-resources"
@@ -132,10 +185,6 @@
  <!--  the war file                                                -->
  <property name="abuild.private.dir.generated-web"
            location="src/web"/>
- <!--  location of other static files to be included in the        -->
- <!--  META-INF directory                                          -->
- <property name="abuild.private.dir.conf"
-           location="${abuild.private.dir.item}/src/conf"/>
  <!--  location of other generated resources to be included in     -->
  <!--  the META-INFO directory                                     -->
  <property name="abuild.private.dir.generated-conf"
@@ -147,51 +196,6 @@
  <!--  location of copied classpath files for ear and war          -->
  <!--  generation                                                  -->
  <property name="abuild.private.dir.classpath" location="classpath"/>
-
- <!--  There appears to be no clean way of adding something to a   -->
- <!--  fileset conditionally upon its existence, so we use a       -->
- <!--  level of indirection to control which fileset to use.  We   -->
- <!--  create an empty fileset and a fileset for each optional     -->
- <!--  directory.  Then we set the a property to one or the other  -->
- <!--  depending on the optional directory's existence.            -->
-
- <fileset id="abuild.private.fileset-id.empty" dir="." excludes="**"/>
- <fileset id="abuild.private.fileset-id.jsrc"
-          dir="${abuild.private.dir.jsrc}"/>
- <fileset id="abuild.private.fileset-id.resources"
-          dir="${abuild.private.dir.resources}"/>
- <fileset id="abuild.private.fileset-id.web"
-          dir="${abuild.private.dir.web}"/>
- <fileset id="abuild.private.fileset-id.conf"
-          dir="${abuild.private.dir.conf}"/>
- <fileset id="abuild.private.fileset-id.classpath"
-          dir="${abuild.private.dir.classpath}"/>
-
- <condition property="abuild.private.path.jsrc"
-            value="${abuild.private.dir.jsrc}"
-            else="">
-  <available type="dir" file="${abuild.private.dir.jsrc}"/>
- </condition>
- <condition property="abuild.private.fileset.jsrc"
-            value="abuild.private.fileset-id.jsrc"
-            else="abuild.private.fileset-id.empty">
-  <available type="dir" file="${abuild.private.dir.jsrc}"/>
- </condition>
- <condition property="abuild.private.fileset.resources"
-            value="abuild.private.fileset-id.resources"
-            else="abuild.private.fileset-id.empty">
-  <available type="dir" file="${abuild.private.dir.resources}"/>
- </condition>
- <condition property="abuild.private.fileset.web"
-            value="abuild.private.fileset-id.web"
-            else="abuild.private.fileset-id.empty">
-  <available type="dir" file="${abuild.private.dir.web}"/>
- </condition>
- <condition property="abuild.private.fileset.conf"
-            value="abuild.private.fileset-id.conf"
-            else="abuild.private.fileset-id.empty">
-  <available type="dir" file="${abuild.private.dir.conf}"/>
- </condition>
 
  <!--  Load dynamic Abuild information file                        -->
  <property file=".ab-dynamic-ant.properties"/>
@@ -441,6 +445,7 @@
         if="multiple-archive-types"/>
   <!--  Create directories that are potentially needed by          -->
   <!--  numerous targets and hooks.                                -->
+  <mkdir dir="${abuild.private.dir.empty}"/>
   <mkdir dir="${abuild.private.dir.classes}"/>
   <mkdir dir="${abuild.private.dir.dist}"/>
   <mkdir dir="${abuild.private.dir.generated-jsrc}"/>
@@ -482,7 +487,7 @@
          destdir="${abuild.private.dir.classes}"
          includeantruntime="${abuild.private.includeantruntime}"
          classpathref="complete-classpath-jar">
-   <src path="${abuild.private.path.jsrc}"/>
+   <src path="${abuild.private.dir.jsrc}"/>
    <src path="${abuild.private.dir.generated-jsrc}"/>
    <compilerarg value="-Xlint"/>
    <compilerarg value="-Xlint:-path"/>
@@ -554,9 +559,9 @@
    <fileset dir="${abuild.private.dir.classes}">
     <include name="**/*.class"/>
    </fileset>
-   <fileset refid="${abuild.private.fileset.resources}"/>
+   <fileset dir="${abuild.private.dir.resources}"/>
    <fileset dir="${abuild.private.dir.generated-resources}"/>
-   <metainf refid="${abuild.private.fileset.conf}"/>
+   <metainf dir="${abuild.private.dir.conf}"/>
    <metainf dir="${abuild.private.dir.generated-conf}"/>
    <manifest>
     <attribute name="Class-Path" value="${manifest-classpath}"/>
@@ -587,21 +592,27 @@
   </and>
  </condition>
 
- <!--  The following convoluted ant logic achieves this simple     -->
- <!--  goal: if abuild.war-type is client, copy the classpath to   -->
- <!--  the root of the war file.  If it is server, copy it to      -->
- <!--  WEB-INF/lib.                                                -->
+ <!--  The achieves this simple goal: if abuild.war-type is        -->
+ <!--  client, copy the classpath to the root of the war file.     -->
+ <!--  If it is server, copy it to WEB-INF/lib.                    -->
  <condition property="abuild.private.war-classpath-lib"
-            value="abuild.private.fileset-id.classpath"
-            else="abuild.private.fileset-id.empty">
+            value="${abuild.private.dir.classpath}"
+            else="${abuild.private.dir.empty}">
+  <and>
+   <isset property="abuild.war-type"/>
+   <equals arg1="${abuild.war-type}" arg2="server"/>
+  </and>
+ </condition>
+ <condition property="abuild.private.war-classpath-lib-exclude"
+            value="" else="**">
   <and>
    <isset property="abuild.war-type"/>
    <equals arg1="${abuild.war-type}" arg2="server"/>
   </and>
  </condition>
  <condition property="abuild.private.war-classpath-root"
-            value="abuild.private.fileset-id.classpath"
-            else="abuild.private.fileset-id.empty">
+            value="${abuild.private.dir.classpath}"
+            else="${abuild.private.dir.empty}">
   <and>
    <isset property="abuild.war-type"/>
    <equals arg1="${abuild.war-type}" arg2="client"/>
@@ -621,14 +632,15 @@
         unless="abuild.private.valid-war-type"/>
   <war destfile="${abuild.private.dir.dist}/${abuild.war-name}"
        webxml="${abuild.private.dir.item}/${abuild.web-xml}">
-   <webinf refid="${abuild.private.fileset.conf}"/>
+   <webinf dir="${abuild.private.dir.conf}"/>
    <webinf dir="${abuild.private.dir.generated-conf}"/>
    <classes dir="${abuild.private.dir.classes}">
     <include name="**/*.class"/>
    </classes>
-   <lib refid="${abuild.private.war-classpath-lib}"/>
-   <fileset refid="${abuild.private.war-classpath-root}"/>
-   <fileset refid="${abuild.private.fileset.web}"/>
+   <lib dir="${abuild.private.war-classpath-lib}"
+        excludes="${abuild.private.war-classpath-lib-exclude}"/>
+   <fileset dir="${abuild.private.war-classpath-root}"/>
+   <fileset dir="${abuild.private.dir.web}"/>
    <fileset dir="${abuild.private.dir.generated-web}"/>
   </war>
  </target>
@@ -643,9 +655,9 @@
   <ear destfile="${abuild.private.dir.dist}/${abuild.ear-name}"
        appxml="${abuild.private.dir.item}/${abuild.application-xml}">
    <fileset dir="${abuild.private.dir.classpath}"/>
-   <fileset refid="${abuild.private.fileset.resources}"/>
+   <fileset dir="${abuild.private.dir.resources}"/>
    <fileset dir="${abuild.private.dir.generated-resources}"/>
-   <metainf refid="${abuild.private.fileset.conf}"/>
+   <metainf dir="${abuild.private.dir.conf}"/>
    <metainf dir="${abuild.private.dir.generated-conf}"/>
   </ear>
  </target>

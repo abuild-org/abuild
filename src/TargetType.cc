@@ -15,6 +15,7 @@ TargetType::initializeStatics()
 	return true;
     }
 
+    target_type_names[tt_unknown] = "unknown";
     target_type_names[tt_all] = "all";
     target_type_names[tt_platform_independent] = "platform-independent";
     target_type_names[tt_object_code] = "object-code";
@@ -47,5 +48,6 @@ TargetType::getID(std::string const& target_type)
 bool
 TargetType::isValid(std::string const& target_type)
 {
-    return (target_type_ids.count(target_type) > 0);
+    return ((target_type_ids.count(target_type) > 0) &&
+	    (target_type_ids[target_type] != tt_unknown));
 }
