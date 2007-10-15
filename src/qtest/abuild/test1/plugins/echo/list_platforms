@@ -8,3 +8,4 @@ foreach my $o (".release", ".debug", "")
 {
     print "platform os.cpu.toolset.echo$o -type echo\n";
 }
+print "platform -lowpri os.cpu.toolset.echo.lowpri -type echo\n";

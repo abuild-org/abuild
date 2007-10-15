@@ -27,6 +27,7 @@ abuild-monitor: begin-dump-data
      <platform name="os.cpu.toolset.echo" selected="1"/>
      <platform name="os.cpu.toolset.echo.debug" selected="0"/>
      <platform name="os.cpu.toolset.echo.release" selected="0"/>
+     <platform name="os.cpu.toolset.echo.lowpri" selected="0"/>
     </platform-type>
     <platform-type name="native" target-type="object-code">
      <platform name="<native>" selected="1"/>
@@ -371,6 +372,7 @@ abuild-monitor: begin-dump-data
     <buildable-platforms>
      <platform name="os.cpu.toolset.echo"/>
      <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.lowpri"/>
      <platform name="os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
@@ -396,6 +398,7 @@ abuild-monitor: begin-dump-data
     <buildable-platforms>
      <platform name="os.cpu.toolset.echo"/>
      <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.lowpri"/>
      <platform name="os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
@@ -423,6 +426,7 @@ abuild-monitor: begin-dump-data
     <buildable-platforms>
      <platform name="os.cpu.toolset.echo"/>
      <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.lowpri"/>
      <platform name="os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
@@ -448,6 +452,7 @@ abuild-monitor: begin-dump-data
     <buildable-platforms>
      <platform name="os.cpu.toolset.echo"/>
      <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.lowpri"/>
      <platform name="os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>

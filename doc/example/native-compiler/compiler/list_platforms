@@ -2,9 +2,14 @@
 BEGIN { $^W = 1; }
 use strict;
 
+my $lowpri = '';
+if ((exists $ENV{'QCC_LOWPRI'}) && ($ENV{'QCC_LOWPRI'} eq '1'))
+{
+    $lowpri = ' -lowpri';
+}
 if (! ((exists $ENV{'NO_QCC'}) && ($ENV{'NO_QCC'} eq '1')))
 {
-    print "native-compiler qcc.release\n";
-    print "native-compiler qcc.debug\n";
-    print "native-compiler qcc\n";
+    print "native-compiler$lowpri qcc.release\n";
+    print "native-compiler$lowpri qcc.debug\n";
+    print "native-compiler$lowpri qcc\n";
 }

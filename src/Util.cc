@@ -239,6 +239,19 @@ Util::getCurrentDirectory()
     return result;
 }
 
+void
+Util::setCurrentDirectory(std::string const& dir)
+{
+#ifdef _WIN32
+    if (! ::SetCurrentDirectory(dir.c_str()))
+    {
+	throw QEXC::General("unable to change directories to " + dir);
+    }
+#else
+    QEXC::errno_wrapper("change directories to " + dir, chdir(dir.c_str()));
+#endif
+}
+
 bool
 Util::isAbsolutePath(std::string const& path)
 {

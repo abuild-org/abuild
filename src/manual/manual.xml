@@ -3418,6 +3418,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>-C start-directory</term>
+      <listitem>
+       <para>
+        Change directories to the given directory before building.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>--print-abuild-top</term>
       <listitem>
        <para>
@@ -8487,15 +8495,22 @@ endif
       that means that platforms declared in later plugins can override
       earlier ones as well as &abuild;'s internal platform list with
       respect to determining which platforms will be built by default.
-      The user can further refine the choice of which platforms are
-      built by using platform selectors (see <xref
-      linkend="ref.platform-selection"/>).
+      When specifying a new platform or local compiler, the
+      <command>list_platforms</command> program may include the option
+      <option>-lowpri</option> to indicate that this is a low priority
+      platform or native compiler.  This will cause the new platform
+      to be added with lower priority than previously declared
+      compilers including the built-in ones.  Such compilers will only
+      be chosen if explicitly selected.  The user can further refine
+      the choice of which platforms are built, including selecting low
+      priority compilers and platforms, by using platform selectors
+      (see <xref linkend="ref.platform-selection"/>).
      </para>
      <para>
       Each line of output of <command>list_platforms</command> may
       take one of the following forms:
-      <programlisting>platform <replaceable>new-platform</replaceable> -type <replaceable>platform-type</replaceable>
-native-compiler <replaceable>compiler[.option]</replaceable>
+      <programlisting>platform [-lowpri] <replaceable>new-platform</replaceable> -type <replaceable>platform-type</replaceable>
+native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
 </programlisting>
      </para>
      <para>
@@ -8916,17 +8931,22 @@ native-compiler qcc
       fifth component.  Since new platforms take precedence over old
       platforms by default when &abuild; chooses which platform to use
       for a given platform type, our <command>list_platforms</command>
-      script offers the user a way of suppressing this platform.  In
-      this case, our <command>list_platforms</command> program doesn't
-      generate any output if the <envar>NO_QCC</envar> environment
-      variable is set.  Setting that environment variable would make
-      that platform completely unavailable, regardless of any compiler
-      preferences expressed by the user.  (We could also prevent the
-      platform using this compiler from being built by default without
-      making it disappear entirely by using platform selectors as
-      discussed in <xref linkend="ref.platform-selection"/>).  Note
-      that we generate output for the <type>qcc</type> compiler with
-      the <type>release</type> and <type>debug</type> flags as per our
+      script offers the user a way of suppressing this platform and
+      also of making these low priority compilers.  In this case, our
+      <command>list_platforms</command> program doesn't generate any
+      output if the <envar>NO_QCC</envar> environment variable is set,
+      and if the QCC_LOWPRI environment variable is set, it declares
+      these as low priority compilers which makes them available but
+      prevents them from being selected by default over built-in
+      compilers or compilers declared by earlier plugins.  Setting
+      that environment variable would make that platform completely
+      unavailable, regardless of any compiler preferences expressed by
+      the user.  (We could also prevent the platform using this
+      compiler from being built by default without making it disappear
+      entirely by using platform selectors as discussed in <xref
+      linkend="ref.platform-selection"/>).  Note that we generate
+      output for the <type>qcc</type> compiler with the
+      <type>release</type> and <type>debug</type> flags as per our
       usual convention.  By placing the compiler with no options last,
       we make &abuild; select it by default over the other two.  It
       will also be selected over any built-in platforms or platforms
@@ -10355,6 +10375,21 @@ Y = $(X)
      <term>1.0.b2: XXX</term>
      <listitem>
       <itemizedlist>
+       <listitem>
+        <para>
+         Added <option>-C</option> option to change directories to the
+         given directory before doing anything.  Similar to
+         <application>make</application>'s <option>-C</option> option.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Accept the <option>-lowpri</option> option to
+         <command>platform</command> and
+         <command>native-compiler</command> when adding new platforms
+         and native compilers from plugins.
+        </para>
+       </listitem>
        <listitem>
         <para>
          The <option>-ansi</option> flag is no longer passed to

@@ -211,3 +211,5 @@ Abuild add all to explicit targets 1
 ccxx.mk remove extra deps 0
 ccxx.mk found extra objs 0
 ccxx.mk found extra other 0
+Abuild add platform 1
+Abuild add native compiler 1

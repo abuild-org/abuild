@@ -88,10 +88,6 @@ endef
 
 #                        1      2              3          4       5       6    7
 # Usage: $(call make_bin,linker,compiler-flags,link-flags,objects,libdirs,libs,binary-base)
-# Presently uses $(CXX) unconditionally, which is probably okay since
-# it's hard to tell when something is pure C.  We may need to add a
-# make_cbin in case we need to link with a C compiler for some
-# platform or in some instance.
 define make_bin
 	$(LINKWRAPPER) $(1) -o $(call binname,$(7)) $(2) $(4) \
 		$(foreach L,$(5),-L$(L)) \

@@ -755,6 +755,13 @@ $td->runtest("disable native compiler",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("make native compiler low priority",
+	     {$td->COMMAND => "QCC_LOWPRI=1 abuild --list-platforms",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.native-compiler3.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("all compilers",
 	     {$td->COMMAND => "abuild -p native:compiler='*'",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
@@ -1179,6 +1186,20 @@ $td->runtest("check moo nonexistence",
 
 cd("work/a/aa");
 
+$td->runtest("clean in platform directory with -C",
+	     {$td->COMMAND => "abuild -C $native_out clean",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.clean-backend.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build set in platform directory with -C",
+	     {$td->COMMAND => "abuild -C $native_out -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.buildset-platform-directory.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("check .abuild existence",
 	     {$td->STRING => (-f "$native_out/.abuild" ? "yes" : "no"),},
 	     {$td->STRING => "yes"});
@@ -1211,6 +1232,16 @@ $td->runtest("clean dependencies",
 $td->runtest("clean current with dependencies",
 	     {$td->COMMAND => "abuild --apply-targets-to-deps --clean=current",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.depclean2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/..");
+
+$td->runtest("again with -C",
+	     {$td->COMMAND => "abuild --apply-targets-to-deps --clean=current" .
+		  " -C work/a/aa",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test1.depclean2.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -2469,7 +2500,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(249 + ($in_windows ? 1 : 7) + ($test_java ? 16 : 0));
+$td->report(253 + ($in_windows ? 1 : 7) + ($test_java ? 16 : 0));
 
 sub cleanup
 {

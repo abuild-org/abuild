@@ -24,7 +24,8 @@ class PlatformData
     void addPlatformType(std::string const& platform_type,
 			 TargetType::target_type_e target_type);
     void addPlatform(std::string const& platform,
-		     std::string const& platform_type);
+		     std::string const& platform_type,
+		     bool lowpri);
     // check() must be called after adding platforms and platform
     // types and before calling any of the querying methods.
     void check(std::map<std::string, PlatformSelector> const&);

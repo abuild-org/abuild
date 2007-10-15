@@ -22,12 +22,9 @@ Documentation
 Code
 ----
 
- * Klocwork support
+ * Finish documenting doxygen plugin
 
- * Consider adding an option to native-compiler for low-priority
-   instead of high-priority compilers.
-
- * Consider adding a -C option to chdir...
+ * pkg-config stuff
 
 
 Bugs

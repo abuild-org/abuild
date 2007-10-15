@@ -199,6 +199,7 @@ class Abuild
     unsigned int max_workers;
     std::list<std::string> make_args;
     std::list<std::string> ant_args;
+    std::string start_dir;
     bool keep_going;
     std::string buildset_name;
     std::set<std::string> buildset_named_items;

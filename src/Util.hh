@@ -73,6 +73,7 @@ namespace Util
     std::list<std::string> readLinesFromFile(std::istream& in);
 
     std::string getCurrentDirectory();
+    void setCurrentDirectory(std::string const&);
 
     bool isAbsolutePath(std::string const& path);
 

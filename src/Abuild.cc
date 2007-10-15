@@ -108,8 +108,6 @@ Abuild::run()
 bool
 Abuild::runInternal()
 {
-    this->current_directory = Util::getCurrentDirectory();
-
     // Handle a few arguments that short-circuit normal operation.
     if (this->argc == 2)
     {
@@ -160,13 +158,10 @@ Abuild::runInternal()
 	}
     }
 
-    getThisPlatform();
     parseArgv();
-
     exitIfErrors();
 
     initializePlatforms();
-
     exitIfErrors();
 
     if (readConfigs())
@@ -272,6 +267,14 @@ Abuild::parseArgv()
 	else if (arg == "--no-abuild-logger")
 	{
 	    this->use_abuild_logger = false;
+	}
+	else if (arg == "-C")
+	{
+	    if (! *argp)
+	    {
+		usage("-C requires an argument");
+	    }
+	    this->start_dir = *argp++;
 	}
 	else if (arg == "--make")
 	{
@@ -412,6 +415,17 @@ Abuild::parseArgv()
 	    this->targets.push_back(arg);
 	}
     }
+
+    // If an alternative start directory was specified, chdir to it
+    // before we ever access any of the user's files.
+    if (! this->start_dir.empty())
+    {
+	// Throws an exception on failure
+	Util::setCurrentDirectory(this->start_dir);
+    }
+    this->current_directory = Util::getCurrentDirectory();
+
+    getThisPlatform();
 
     if (with_deps)
     {
@@ -633,9 +647,10 @@ Abuild::loadPlatformData(PlatformData& platform_data,
     static boost::regex ignore_re("\\s*(?:#.*)?");
     static boost::regex platform_type_re("platform-type (" + component + ")");
     static boost::regex platform_re(
-	"platform (" + component4or5 + ") -type (" + component + ")");
+	"platform (-lowpri )?(" + component4or5 +
+	") -type (" + component + ")");
     static boost::regex native_compiler_re(
-	"native-compiler (" + component1or2 + ")");
+	"native-compiler (-lowpri )?(" + component1or2 + ")");
 
     boost::smatch match;
 
@@ -713,11 +728,14 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	    }
 	    else if (boost::regex_match(line, match, platform_re))
 	    {
-		std::string platform = match[1].str();
-		std::string type = match[2].str();
+		bool lowpri = ! match[1].str().empty();
+		std::string platform = match[2].str();
+		std::string type = match[3].str();
 		try
 		{
-		    platform_data.addPlatform(platform, type);
+		    platform_data.addPlatform(platform, type, lowpri);
+		    QTC::TC("abuild", "Abuild add platform",
+			    lowpri ? 0 : 1);
 		}
 		catch (QEXC::General& e)
 		{
@@ -727,7 +745,8 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	    }
 	    else if (boost::regex_match(line, match, native_compiler_re))
 	    {
-		std::string compiler = match[1].str();
+		bool lowpri = ! match[1].str().empty();
+		std::string compiler = match[2].str();
 		std::string platform =
 		    this->native_os + "." +
 		    this->native_cpu + "." +
@@ -735,7 +754,10 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 		    compiler;
 		try
 		{
-		    platform_data.addPlatform(platform, PlatformData::pt_NATIVE);
+		    platform_data.addPlatform(
+			platform, PlatformData::pt_NATIVE, lowpri);
+		    QTC::TC("abuild", "Abuild add native compiler",
+			    lowpri ? 0 : 1);
 		}
 		catch (QEXC::General& e)
 		{
@@ -4500,6 +4522,7 @@ Abuild::help()
     h("");
     h("  -H | --help       print help message and exit");
     h("  -V | --version    print abuild's version number and exit");
+    h("  -C start-dir      change directories to start-dir before running");
     h("  --print-abuild-top  print the path to the top of the abuild installation");
     h("  --make            pass all remaining arguments (up to --ant) to make");
     h("  --ant             pass all remaining arguments (up to --make) to ant");

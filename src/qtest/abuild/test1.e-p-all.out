@@ -311,6 +311,316 @@ contents of bin-bin:
 ** end of bin bin **
 end contents of bin-bin
 make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.debug'
+abuild: e.lib (abuild-os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.lowpri'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
+Compiling ../lib1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags- -xcppflags- -lib1-src1-xcppflags- -xcflags- -lib1-src1-xcflags-
+make-obj src: ../lib1-src1.c
+make-obj obj: lib1-src1.lo
+contents of lib1-src1.lo:
+** file: lib1-src1.c **
+end contents of lib1-src1.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -lib1-src2-oflags- -wflags-  -xcppflags-  ../lib1-src2.cc lib1-src2.lo lib1-src2.dep
+Compiling ../lib1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -lib1-src2-oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib1-src2.cc
+make-obj obj: lib1-src2.lo
+contents of lib1-src2.lo:
+** file: lib1-src2.cc **
+end contents of lib1-src2.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -lib1-src3-wflags-  -xcppflags-  ../lib1-src3.cpp lib1-src3.lo lib1-src3.dep
+Compiling ../lib1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -lib1-src3-wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib1-src3.cpp
+make-obj obj: lib1-src3.lo
+contents of lib1-src3.lo:
+** file: lib1-src3.cpp **
+end contents of lib1-src3.lo
+Creating lib1 library
+make-lib objects: lib1-src1.lo lib1-src2.lo lib1-src3.lo
+make-lib lib: lib-lib1
+contents of lib-lib1:
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+end contents of lib-lib1
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../lib2.cc lib2.lo lib2.dep
+Compiling ../lib2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../lib2.cc
+make-obj obj: lib2.lo
+contents of lib2.lo:
+** file: lib2.cc **
+end contents of lib2.lo
+Creating lib2 library
+make-lib objects: lib2.lo
+make-lib lib: lib-lib2
+contents of lib-lib2:
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+end contents of lib-lib2
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src1.c bin1-src1.o bin1-src1.dep
+Compiling ../bin1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags-
+make-obj src: ../bin1-src1.c
+make-obj obj: bin1-src1.o
+contents of bin1-src1.o:
+** file: bin1-src1.c **
+end contents of bin1-src1.o
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src2.cc bin1-src2.o bin1-src2.dep
+Compiling ../bin1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../bin1-src2.cc
+make-obj obj: bin1-src2.o
+contents of bin1-src2.o:
+** file: bin1-src2.cc **
+end contents of bin1-src2.o
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src3.cpp bin1-src3.o bin1-src3.dep
+Compiling ../bin1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -xcppflags- -xcflags- -xcxxflags-
+make-obj src: ../bin1-src3.cpp
+make-obj obj: bin1-src3.o
+contents of bin1-src3.o:
+** file: bin1-src3.cpp **
+end contents of bin1-src3.o
+Creating bin1 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin1-src1.o bin1-src2.o bin1-src3.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin1
+contents of bin-bin1:
+** bin bin1 **
+** file: bin1-src1.c **
+** file: bin1-src2.cc **
+** file: bin1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin1 **
+end contents of bin-bin1
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags-  -xcppflags- -bin2-xcppflags- ../bin2.cc bin2.o bin2.dep
+Compiling ../bin2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags- -xcppflags- -bin2-xcppflags- -xcflags- -bin2-xcflags- -xcxxflags- -bin2-xcxxflags-
+make-obj src: ../bin2.cc
+make-obj obj: bin2.o
+contents of bin2.o:
+** file: bin2.cc **
+end contents of bin2.o
+Creating bin2 executable
+make-bin: linker: echo LINK_cxx
+make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -xlinkflags-
+make-bin: objects: bin2.o
+make-bin: lib-dirs: .
+make-bin: libs: lib1 lib2
+make-bin: bin: bin-bin2
+contents of bin-bin2:
+** bin bin2 **
+** file: bin2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin2 **
+end contents of bin-bin2
+make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.lowpri'
+abuild: e.shlib (abuild-os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.lowpri'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src1.c shlib1-src1.lo shlib1-src1.dep
+Compiling ../shlib1-src1.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags-
+make-obj src: ../shlib1-src1.c
+make-obj obj: shlib1-src1.lo
+contents of shlib1-src1.lo:
+** file: shlib1-src1.c **
+end contents of shlib1-src1.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src2.cc shlib1-src2.lo shlib1-src2.dep
+Compiling ../shlib1-src2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib1-src2.cc
+make-obj obj: shlib1-src2.lo
+contents of shlib1-src2.lo:
+** file: shlib1-src2.cc **
+end contents of shlib1-src2.lo
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src3.cpp shlib1-src3.lo shlib1-src3.dep
+Compiling ../shlib1-src3.cpp as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib1-src3.cpp
+make-obj obj: shlib1-src3.lo
+contents of shlib1-src3.lo:
+** file: shlib1-src3.cpp **
+end contents of shlib1-src3.lo
+Creating shlib1 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib1.1.2.3
+contents of shlib-shlib1.1.2.3:
+** shlib shlib1 **
+** file: shlib1-src1.c **
+** file: shlib1-src2.cc **
+** file: shlib1-src3.cpp **
+** end of shlib shlib1 **
+end contents of shlib-shlib1.1.2.3
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib2.cc shlib2.lo shlib2.dep
+Compiling ../shlib2.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib2.cc
+make-obj obj: shlib2.lo
+contents of shlib2.lo:
+** file: shlib2.cc **
+end contents of shlib2.lo
+Creating shlib2 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib2.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib2.4.5
+contents of shlib-shlib2.4.5:
+** shlib shlib2 **
+** file: shlib2.cc **
+** end of shlib shlib2 **
+end contents of shlib-shlib2.4.5
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib3.cc shlib3.lo shlib3.dep
+Compiling ../shlib3.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib3.cc
+make-obj obj: shlib3.lo
+contents of shlib3.lo:
+** file: shlib3.cc **
+end contents of shlib3.lo
+Creating shlib3 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib3.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib3.6
+contents of shlib-shlib3.6:
+** shlib shlib3 **
+** file: shlib3.cc **
+** end of shlib shlib3 **
+end contents of shlib-shlib3.6
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib4.cc shlib4.lo shlib4.dep
+Compiling ../shlib4.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic: 1
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../shlib4.cc
+make-obj obj: shlib4.lo
+contents of shlib4.lo:
+** file: shlib4.cc **
+end contents of shlib4.lo
+Creating shlib4 shared library
+make-shlib: linker: echo LINK_cxx
+make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-shlib: link-flags: -lib-xlinkflags-
+make-shlib: objects: shlib4.lo
+make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: libs:
+make-shlib: shlib: shlib-shlib4
+contents of shlib-shlib4:
+** shlib shlib4 **
+** file: shlib4.cc **
+** end of shlib shlib4 **
+end contents of shlib-shlib4
+make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.lowpri'
+abuild: e.bin (abuild-os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.lowpri'
+CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../bin.cc bin.o bin.dep
+Compiling ../bin.cc as C++
+make-obj compiler: echo COMPILE_cxx
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags- -lib-xcflags- -lib-xcxxflags-
+make-obj src: ../bin.cc
+make-obj obj: bin.o
+contents of bin.o:
+** file: bin.cc **
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
+make-bin: link-flags: -lib-xlinkflags-
+make-bin: objects: bin.o
+make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo.lowpri ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+** file: bin.cc **
+** shlib shlib1 **
+** file: shlib1-src1.c **
+** file: shlib1-src2.cc **
+** file: shlib1-src3.cpp **
+** end of shlib shlib1 **
+** shlib shlib2 **
+** file: shlib2.cc **
+** end of shlib shlib2 **
+** shlib shlib3 **
+** file: shlib3.cc **
+** end of shlib shlib3 **
+** shlib shlib4 **
+** file: shlib4.cc **
+** end of shlib shlib4 **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.lowpri'
 abuild: e.lib (abuild-os.cpu.toolset.echo.release): all
 make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.release'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep

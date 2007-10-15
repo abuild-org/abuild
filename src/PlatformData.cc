@@ -24,8 +24,8 @@ PlatformData::PlatformData() :
     addPlatformType(pt_INDEP, TargetType::tt_platform_independent);
     addPlatformType(pt_NATIVE, TargetType::tt_object_code);
     addPlatformType(pt_JAVA, TargetType::tt_java);
-    addPlatform(PLATFORM_INDEP, pt_INDEP);
-    addPlatform(PLATFORM_JAVA, pt_JAVA);
+    addPlatform(PLATFORM_INDEP, pt_INDEP, false);
+    addPlatform(PLATFORM_JAVA, pt_JAVA, false);
     this->initializing = false;
 }
 
@@ -56,7 +56,8 @@ PlatformData::addPlatformType(std::string const& platform_type,
 
 void
 PlatformData::addPlatform(std::string const& platform,
-			  std::string const& platform_type)
+			  std::string const& platform_type,
+			  bool lowpri)
 {
     this->checked = false;
 
@@ -70,8 +71,11 @@ PlatformData::addPlatform(std::string const& platform,
     // care whether size() is evaluated before or after the key is
     // inserted as long as we get monotonically increasing platform
     // priority numbers.  Later additions take precedence over earlier
-    // additions, so higher numbers are higher priority.
-    this->platform_declaration[platform] = this->platform_declaration.size();
+    // additions, so higher numbers are higher priority.  If the
+    // platform was declared as low priority, make it a more engative
+    // number than any previous declaration.
+    int n = this->platform_declaration.size();
+    this->platform_declaration[platform] = (lowpri ? -n : n);
 
     std::string p_item = PLATFORM_PREFIX + platform;
     this->platform_graph.addItem(p_item);
@@ -223,7 +227,6 @@ bool
 PlatformData::declarationOrder(selected_platform_t const& p1,
 			       selected_platform_t const& p2) const
 {
-    // Otherwise, the item that was declared last has higher priority.
     assert(this->platform_declaration.count(p1.first) != 0);
     assert(this->platform_declaration.count(p2.first) != 0);
     return ((*(this->platform_declaration.find(p1.first))).second >
