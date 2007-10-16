@@ -2024,22 +2024,52 @@ C:\cygwin\cygwin.bat
      <filename>Abuild.conf</filename>.  The
      <property>external-dirs</property> key, like the
      <property>child-dirs</property> key, contains a space-separated
-     list of relative paths, though in this case, there is no
-     reciprocation; <emphasis>i.e.</emphasis>, nothing in the external
-     tree points back to the referring tree.  Note that the external
-     tree must be referred to using a <emphasis>relative
-     path</emphasis>.  The reason for this has to do with &abuild;'s
-     support for backing areas, which we describe later (see <xref
-     linkend="ref.backing-areas.resolving"/>).  Once you set up another
-     tree as an external to your tree, all build items defined in the
-     external tree are available to you (subject to normal access
-     control rules) as if they were in your local tree.  This means
-     that none of the build items in your tree may have the same name
-     as any build item in the external tree.  Note that the external
-     tree is not affected in any way by being referred to as an
-     external.  In order to avoid build item name clashes, it's a good
-     idea to pick a naming convention for your build items that
-     includes some kind of tree-based prefix.
+     list of paths, though in this case, there is no reciprocation;
+     <emphasis>i.e.</emphasis>, nothing in the external tree points
+     back to the referring tree.  External trees can be specified as
+     either relative paths or as absolute paths.  If an external tree
+     is specified by a relative path, then &abuild; will attempt to
+     resolve it in a backing area (see <xref
+     linkend="ref.backing-areas.resolving"/>) if it is not found.
+     Once you set up another tree as an external to your tree, all
+     build items defined in the external tree are available to you
+     (subject to normal access control rules) as if they were in your
+     local tree.  This means that none of the build items in your tree
+     may have the same name as any build item in the external tree.
+     Note that the external tree is not affected in any way by being
+     referred to as an external.  In order to avoid build item name
+     clashes, it's a good idea to pick a naming convention for your
+     build items that includes some kind of tree-based prefix.
+    </para>
+    <para>
+     When declaring an external, you must give some thought as to
+     whether you wish to use a relative path or an absolute path.  In
+     general, if your intention is to use an external tree to contain
+     code that is parallel to your development environment, such as
+     having a collection of shared code used by many related projects
+     that live together in a version control system, you will probably
+     want to use relative paths to external trees.  On the other hand,
+     if your externals contain libraries of build items that are
+     required to be installed in a certain location on your
+     development systems, an absolute path may be more appropriate.
+     Just keep in mind that using absolute paths for your externals
+     creates a dependency from inside your build tree to files located
+     in a specific place outside of your build tree.  This may be
+     appropriate in some cases, but it may not always be what you
+     want.
+     <footnote>
+      <para>
+       For example, if your backing area declares an external using an
+       absolute path and your root <filename>Abuild.conf</filename> is
+       a copy of your backing area's root
+       <filename>Abuild.conf</filename>, you can't shadow the external
+       locally without modifying your root
+       <filename>Abuild.conf</filename>.  If your external were
+       specified as a relative path, you would be able to shadow it by
+       simply creating it in the correct location, thus preventing it
+       from being resolved in the backing area.
+      </para>
+     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.example.external-build-tree">
@@ -2965,17 +2995,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
     <para>
      In addition to being able to resolve build items to backing
-     areas, it is also possible to resolve externals in backing areas.
-     In this case, &abuild; does use the path of the external relative
-     to the root of the build tree.  This is not an inconsistency:
-     build items are always accessed by name, and externals are always
-     accessed by relative path.  If you have a build tree that has an
-     external and you wish to shadow just the build tree without
-     shadowing its external, just create a new build tree that backs
-     to the original one, and don't worry about the externals.  More
-     likely than not, your new build tree's root
-     <filename>Abuild.conf</filename> will be a copy of the original
-     build tree's root <filename>Abuild.conf</filename>,
+     areas, it is also possible to resolve externals in backing areas
+     as long as they are specified as relative paths.  In this case,
+     &abuild; does use the path of the external relative to the root
+     of the build tree.  This is not an inconsistency: build items are
+     always accessed by name, and externals are always accessed by
+     path.  If you have a build tree that has an external and you wish
+     to shadow just the build tree without shadowing its external,
+     just create a new build tree that backs to the original one, and
+     don't worry about the externals.  More likely than not, your new
+     build tree's root <filename>Abuild.conf</filename> will be a copy
+     of the original build tree's root
+     <filename>Abuild.conf</filename>,
      <property>external-dirs</property> key and all.  When &abuild;
      looks for the external in your local tree and fails to find it,
      it will check to see whether that external can be resolved in
@@ -3047,12 +3078,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </figure>
      This is the only case in which &abuild; will allow a build tree
      to not contain an <filename>Abuild.conf</filename> file at its
-     root.  It is possible to use this &ldquo;trick&rdquo; to make
-     &abuild; effectively resolve an external using an absolute path
-     since backing areas can be addressed with absolute rather than
-     relative paths.  If you are relying on this behavior for that
-     purpose, however, there is probably something wrong with your
-     setup.
+     root.
     </para>
    </sect1>
    <sect1 id="ref.example.task-branch">
@@ -4106,9 +4132,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <term><property>external-dirs</property></term>
        <listitem>
         <para>
-         This key contains a list of whitespace-separated relative paths
-         to the root directories of external build trees.  It may appear
-         in the <filename>Abuild.conf</filename> of a root build item
+         This key contains a list of whitespace-separated paths to the
+         root directories of external build trees.  It may appear in
+         the <filename>Abuild.conf</filename> of a root build item
          only.  For a discussion of using externals, please see <xref
          linkend="ref.externals"/>.
         </para>
@@ -9655,7 +9681,7 @@ native-compiler qcc
      name.  It also has a mapping of relative paths to either build
      item names or to the empty string in the case of unnamed build
      items.  It stores the path to the root of its backing area and a
-     map from external relative paths to external build tree root
+     map from declared external paths to external build tree root
      absolute paths.
     </para>
     <para>
@@ -10375,6 +10401,14 @@ Y = $(X)
      <term>1.0.b2: XXX</term>
      <listitem>
       <itemizedlist>
+       <listitem>
+        <para>
+         External trees may now be specified as absolute paths.  This
+         makes it easier to support external trees that contain things
+         like libraries of build items that may be maintained
+         separately from the projects that use them.
+        </para>
+       </listitem>
        <listitem>
         <para>
          Added <option>-C</option> option to change directories to the

@@ -1,2 +1,2 @@
---topdir--/a/ab/aba/Abuild.conf: ERROR: external-dirs entries must be relative paths
+--topdir--/a/ab/aba/Abuild.conf: ERROR: unable to find external /does/not/exist
 abuild: ERROR: errors detected; exiting

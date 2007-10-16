@@ -1090,8 +1090,15 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 	    // actual build tree here.  This can only happen in an
 	    // error condition in which other error messages have been
 	    // issued.
-	    std::string ext_dir =
-		Util::canonicalizePath(top_path + "/" + *iter);
+	    std::string ext_dir = *iter;
+	    if (Util::isAbsolutePath(ext_dir))
+	    {
+		QTC::TC("abuild", "Abuild absolute external");
+	    }
+	    else
+	    {
+		ext_dir = Util::canonicalizePath(top_path + "/" + ext_dir);
+	    }
             if (Util::isDirectory(ext_dir))
             {
 		verbose("build tree " + top_path + " has external " + ext_dir);
@@ -2392,6 +2399,12 @@ Abuild::haveExternal(BuildTree_map& buildtrees,
 		     std::string& external_dir)
 {
     if (backing_top.empty())
+    {
+	return false;
+    }
+
+    // Don't attempt to resolve absolute path externals.
+    if (Util::isAbsolutePath(external))
     {
 	return false;
     }

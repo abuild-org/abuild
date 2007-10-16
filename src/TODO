@@ -19,12 +19,12 @@ Documentation
     - Gavin Mulligan - bug reporting
     - Argon ST
 
-Code
-----
+ * Incorporate Andrew Hayden's comments
 
- * Finish documenting doxygen plugin
+ * Clean up release notes
 
- * pkg-config stuff
+ * Make sure documentation for integration with third party packages
+   is sufficient.
 
 
 Bugs

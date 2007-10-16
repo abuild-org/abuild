@@ -418,10 +418,6 @@ void
 ItemConfig::checkExternals()
 {
     this->externals = Util::splitBySpace(this->kv.getVal(k_EXTERNAL));
-    if (checkRelativePaths(this->externals, k_EXTERNAL + " entries"))
-    {
-	QTC::TC("abuild", "ItemConfig ERR absolute external");
-    }
 }
 
 void

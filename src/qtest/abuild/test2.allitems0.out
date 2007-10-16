@@ -34,7 +34,6 @@
 --topdir--/d/a/Abuild.conf: ERROR: platform type "native" listed more than once
 --topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
---topdir--/a/ab/aba/Abuild.conf: ERROR: external-dirs entries must be relative paths
 --topdir--/a/ab/Abuild.conf: ERROR: child a/ab/aba/Abuild.conf has no parent-dir
 --topdir--/a/ab/Abuild.conf: ERROR: child a/ab/abb/Abuild.conf has parent-dir that doesn't point to this directory
 --topdir--/b/bc/Abuild.conf: ERROR: build item bb appears in multiple locations

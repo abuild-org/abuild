@@ -1,8 +1,6 @@
 # Flags that cause gcc to do what gen_deps does
 GDFLAGS = -MD -MF $(value *).$(DEP) -MP
 
-# XXX Add -Werror; must first disable warnings on flex, bison, and
-# rpcgen files
 DFLAGS = -g
 OFLAGS = -O2
 WFLAGS = -Wall
