@@ -158,9 +158,7 @@ _shared_lib_TARGETS := $(foreach T,$(_TARGETS_shared_lib),$(call ccxx_shlibname,
 _lib_TARGETS := $(_static_lib_TARGETS) $(_shared_lib_TARGETS)
 _bin_TARGETS := $(foreach T,$(TARGETS_bin),$(call binname,$(T)))
 
-all:: generate $(_lib_TARGETS) $(_bin_TARGETS)
-
-generate:: ;
+all:: $(_lib_TARGETS) $(_bin_TARGETS)
 
 # Add all local libraries to LIBS and all local library directories to
 # LIBDIRS.
@@ -321,6 +319,7 @@ $(foreach T,$(TARGETS_bin),\
 
 _lib_SRCS := $(sort $(foreach T,$(TARGETS_lib),$(SRCS_lib_$(T))))
 _bin_SRCS := $(sort $(foreach T,$(TARGETS_bin),$(SRCS_bin_$(T))))
+_all_SRCS := $(sort $(_lib_SRCS) $(_bin_SRCS))
 _lib_COBJS := $(call x_to_y,c,$(LOBJ),_lib_SRCS)
 _lib_CCOBJS := $(call x_to_y,cc,$(LOBJ),_lib_SRCS)
 _lib_CPPOBJS :=	$(call x_to_y,cpp,$(LOBJ),_lib_SRCS)
@@ -330,6 +329,12 @@ _bin_CPPOBJS :=	$(call x_to_y,cpp,$(OBJ),_bin_SRCS)
 _Cpproc := $(call x_to_y,c,i,_lib_SRCS) $(call x_to_y,c,i,_bin_SRCS)
 _CCpproc := $(call x_to_y,cc,i,_lib_SRCS) $(call x_to_y,cc,i,_bin_SRCS)
 _CPPpproc :=	$(call x_to_y,cpp,i,_lib_SRCS) $(call x_to_y,cpp,i,_bin_SRCS)
+
+# Make sure ".." doesn't appear in any source file names.
+ifneq ($(words $(findstring /../,$(_all_SRCS)) $(filter ../%,$(_all_SRCS))), 0)
+_qtx_dummy := $(call QTC.TC,abuild,ccxx.mk ERR .. in srcs,0)
+$(error The path component ".." may not appear in any source file names)
+endif
 
 # Include dependency files for each source file
 _lib_OBJS := $(_lib_COBJS) $(_lib_CCOBJS) $(_lib_CPPOBJS)

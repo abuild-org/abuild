@@ -1,12 +1,8 @@
 
-1.0.b2
-======
-
-General
--------
+1.0.b3 or 1.0
+=============
 
  * Look at all XXX comments.
-
 
 Documentation
 -------------
@@ -20,8 +16,6 @@ Documentation
     - Argon ST
 
  * Incorporate Andrew Hayden's comments
-
- * Clean up release notes
 
  * Make sure documentation for integration with third party packages
    is sufficient.
@@ -53,6 +47,7 @@ Bugs
    search directories represented in the source lists, but that
    wouldn't help if we removed the last file from a subdirectory.  For
    now, we'll just not handle this case.
+
 
 Java Problems
 =============
@@ -186,9 +181,6 @@ See also "Known Limitations" in the documentation.
    having nested build items under directories that have items that
    build stuff, etc.  If this is done, update the documentation on
    custom access rules.
-
- * ccxx: Consider enforcing that .. may not appear as a path component
-   in any source file.
 
  * ccxx: Consider enforcing that no object file may appear both as a
    program and a library object file and that no object file may be

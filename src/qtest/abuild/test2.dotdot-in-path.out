@@ -1,0 +1,8 @@
+abuild: fa (abuild-<native>): all
+make: Entering directory `--topdir--/f/a/abuild-<native>'
+--abuild-dir--/make/rules/object-code/ccxx.mk:nn: *** The path component ".." may not appear in any source file names.  Stop.
+make: Leaving directory `--topdir--/f/a/abuild-<native>'
+abuild: fb (abuild-<native>): all
+make: Entering directory `--topdir--/f/b/abuild-<native>'
+--abuild-dir--/make/rules/object-code/ccxx.mk:nn: *** The path component ".." may not appear in any source file names.  Stop.
+make: Leaving directory `--topdir--/f/b/abuild-<native>'

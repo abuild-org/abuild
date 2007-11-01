@@ -5,8 +5,8 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.b2-prerelease">
-<!ENTITY lastreleased "September 28, 2007">
+<!ENTITY swversion "1.0.b2">
+<!ENTITY lastreleased "November 2, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 ]>
@@ -2331,6 +2331,16 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          removes all output directories for the current build item
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><command>abuild --clean=current --apply-targets-to-deps</command></term>
+       <listitem>
+        <para>
+         removes all output directories for the current build item and
+         everything it depends on; useful when you want to try a
+         completely clean build of a particular item
         </para>
        </listitem>
       </varlistentry>
@@ -5337,13 +5347,7 @@ endif
       <command>ccxx_debug</command>.  This target prints the current
       include and library path as well as the list of libraries that
       we are linking against.  This can be a useful debugging tool for
-      solving dependency declaration problems.  We also provide a
-      <command>generate</command> target which is a dependency of
-      <command>all</command>.  This can be useful for cases in which
-      it is necessary to generate files that are used later in the
-      compilation as it provides an easy way for you to force them to
-      be generated before compilation begins.  (For an example, see
-      <xref linkend="ref.example.auto-from-variable"/>.)
+      solving dependency declaration problems.
      </para>
      <para>
       It is also possible to add additional preprocessor, compiler, or
@@ -5504,6 +5508,47 @@ endif
       <varname>LINK_AS_C</varname> to some non-empty value in your
       <filename>Abuild.mk</filename>.  This applies to all shared
       libraries and executables in the build item.
+     </para>
+     <para>
+      Most of the time, &abuild; manages all the dependencies of the
+      source and object files automatically, but there are some rare
+      instances in which you may have to create dependencies on your
+      own, such as when an object file depends on an automatically
+      generate header file that is generated in the same build item.
+      (For an example of this, see <xref
+      linkend="ref.example.auto-from-variable"/>.)  To make it
+      possible to express such dependencies in a portable fashion, the
+      <filename>ccxx</filename> rules provide the variables
+      <varname>LOBJ</varname> and <varname>OBJ</varname> which are set
+      to the object file suffixes for library object files and
+      non-library object files respectively.  For example, if you have
+      a source file called <filename>File.cc</filename> that is part
+      of a library, the name of the object file will be
+      <filename>File.<varname>$(LOBJ)</varname></filename>, and the
+      file will be created inside the &abuild; output directory.  If
+      <filename>File.cc</filename> were part of an executable instead,
+      the object file would be
+      <filename>File.<varname>$(OBJ)</varname></filename> instead.
+      <footnote>
+       <para>
+        <varname>LOBJ</varname> and <varname>OBJ</varname> usually
+        have the same value as each other, and the value is usually
+        &ldquo;<literal>o</literal>&rdquo; on UNIX systems and
+        &ldquo;<literal>obj</literal>&rdquo; on Windows systems.
+        However, there are some circumstances under which either of
+        these conditions may not be true, so it is best to use
+        <varname>LOBJ</varname> or <varname>OBJ</varname> explicitly
+        as required.
+       </para>
+      </footnote>
+     </para>
+     <para>
+      There is a lot more to &abuild;'s C and C++ generation than is
+      discussed here.  For a complete understanding of how it works,
+      you are encouraged to read <filename>make/ccxx.mk</filename> in
+      the &abuild; distribution.  There you will find copious comments
+      and a lot of pretty hair <application>GNU Make</application>
+      code.
      </para>
     </sect2>
     <sect2 id="ref.autoconf">
@@ -6288,8 +6333,51 @@ endif
      the variable, so we can just use the variable's value directly.
      Finally, we want to make sure that
      <filename>FileProvider_file.hh</filename> exists before we start
-     compiling, so we make it a dependency of the special
-     <command>generate</command> target which exists for this purpose.
+     compiling any of the files that reference it.  We have a little
+     bit of a bootstrapping problem here: although &abuild; ordinarily
+     generates dependency information of object files on header files
+     automatically, this generation step is performed during the
+     compilation itself.  In order to force the header file to be
+     generated before the compile starts, we have to create an
+     explicit dependency.  We do this by creating an explicit
+     dependency from the object file to the header file.  Notice that
+     we use the make variable <varname>LOBJ</varname> to get the
+     object file suffix rather than hard-coding it.  All compiler
+     support files are required to set the variable
+     <varname>LOBJ</varname> to the suffix of object files that are
+     going into libraries and <varname>OBJ</varname> for object files
+     that are not going into libraries.  Although they are often the
+     same, they don't have to be.
+     <footnote>
+      <para>
+       It would be nice to be able to avoid this issue entirely.  One
+       way to avoid it would be generate a source file instead of a
+       header file.  In that case, <application>make</application>
+       would definitely try to generate the source file before
+       building, so no explicit dependency would be required.  This
+       approach would certainly work for this example.  One option
+       that would definitely <emphasis>not</emphasis> work would be to
+       create a <command>generate</command> target analogous to the
+       <command>generate</command> hook in &abuild;'s
+       <application>ant</application> support and making it a
+       prerequisite for the <command>all</command> target.  Although
+       this would work for strictly serial builds, it wouldn't
+       necessarily work for parallel builds as
+       <application>make</application> is free to build all the
+       prerequisites for a given target in any order as long as they
+       don't have dependencies on each other.  In fact, the reason
+       this trick works in <application>ant</application> is that
+       <application>ant</application> only runs tasks in parallel when
+       you explicitly tell it that it can.  So the bottom line is that
+       whatever we are automatically generating must appear as a
+       dependency somewhere.  Source files automatically appear as
+       dependencies of their object files, but header files don't
+       appear as dependencies anywhere until the compile has already
+       been run at least one time.  Therefore, a solution that works
+       for parallel builds and generates header files has to create an
+       explicit dependency such as in this example.
+      </para>
+     </footnote>
     </para>
     <para>
      We have two files that use the header file.  One is the library
@@ -10398,163 +10486,195 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0.b2: XXX</term>
+     <term>1.0.b2: November 2, 2007</term>
      <listitem>
       <itemizedlist>
        <listitem>
-        <para>
-         External trees may now be specified as absolute paths.  This
-         makes it easier to support external trees that contain things
-         like libraries of build items that may be maintained
-         separately from the projects that use them.
-        </para>
+        <para>Removal of Deprecated Functionality</para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; no longer automatically removes stray
+           automatically generated files created by versions older
+           than 1.0.a14.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; no longer accepts <varname>BI_RULES</varname> as a
+           synonym for <varname>BUILD_ITEM_RULES</varname>.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
        <listitem>
-        <para>
-         Added <option>-C</option> option to change directories to the
-         given directory before doing anything.  Similar to
-         <application>make</application>'s <option>-C</option> option.
-        </para>
+        <para>Movement of Functionality to External Plugins</para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           VxWorks and XLC support have been removed from &abuild; and
+           are now available as plugins in a build tree maintained
+           separately from &abuild;.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Javadoc support is no longer provided by the default ant
+           rules but is instead provided by a <command>doc</command>
+           hook, which is provided separately.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
        <listitem>
-        <para>
-         Accept the <option>-lowpri</option> option to
-         <command>platform</command> and
-         <command>native-compiler</command> when adding new platforms
-         and native compilers from plugins.
-        </para>
+        <para>New Features</para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           External trees may now be specified as absolute paths.
+           This makes it easier to support external trees that contain
+           things like libraries of build items that may be maintained
+           separately from the projects that use them.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>-C
+           <replaceable>directory</replaceable></option> option to the
+           &abuild; command tells &abuild; to change directories to
+           the given directory before doing anything.  Similar to
+           <application>make</application>'s <option>-C</option>
+           option.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>-lowpri</option> option to
+           <command>platform</command> and
+           <command>native-compiler</command> commands output from
+           <command>list_platforms</command> scripts may now be
+           specified when adding new platforms and native compilers
+           from plugins.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; interface variable
+           <varname>ABUILD_PLATFORM_TYPE</varname> is now defined.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           A program is now provided to verify proper operation of
+           compiler plugins.  (See <xref
+           linkend="ref.adding-toolchains"/>.)
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           C/C++ rules will, in most cases, recognize orphan targets
+           are deal with them properly.  (Stray object files in
+           subdirectories of the output directory will not currently
+           be detected.)
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The new make variable <varname>LINKWRAPPER</varname> can be
+           set on the command line or in the
+           <filename>Abuild.mk</filename> file to specify the name of
+           a command to wrap the link step.  This is intended to be
+           used to support tools such as
+           <application>Purify</application> which wrap the link
+           command in this fashion.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The new variable <varname>LINK_AS_C</varname> may be set in
+           an <filename>Abuild.mk</filename> file to cause all shared
+           libraries and executables in that build item to be linked
+           as straight C code instead of C++ code.  This avoids a
+           dependency on the C++ runtime libraries for straight C
+           code.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           A new example has been created to illustrate how to pass
+           information safely from a <application>make</application>
+           variable to your source code.  See <xref
+           linkend="ref.example.auto-from-variable"/>.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
        <listitem>
-        <para>
-         The <option>-ansi</option> flag is no longer passed to
-         <command>g++</command> by default for the
-         <filename>gcc</filename> and <filename>mingw</filename>
-         compilers.  If you want it, create a plugin that adds it to
-         <varname>XCXXFLAGS</varname> (or <varname>XCFLAGS</varname>)
-         in <filename>plugin.mk</filename> conditionally upon the
-         compiler.  In older versions, <option>-ansi</option> was
-         passed to <command>g++</command> but not
-         <command>gcc</command>.
-        </para>
+        <para>Functionality Changes</para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <option>-ansi</option> flag is no longer passed to
+           <command>g++</command> by default for the
+           <filename>gcc</filename> and <filename>mingw</filename>
+           compilers.  If you want it, create a plugin that adds it to
+           <varname>XCXXFLAGS</varname> (or
+           <varname>XCFLAGS</varname>) in
+           <filename>plugin.mk</filename> conditionally upon the
+           compiler.  In older versions, <option>-ansi</option> was
+           passed to <command>g++</command> but not
+           <command>gcc</command>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <command>doc</command> target for Java builds no longer
+           runs <command>javadoc</command>.  Instead, this capability
+           must be provided by a plugin.  The reason for this change
+           is that there is too much site-specific policy in how the
+           <command>javadoc</command> task would be invoked.  In light
+           of this, the <command>pre-doc</command> and
+           <command>post-doc</command> hooks have been replaced by a
+           <command>doc</command> hook.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           A few error messages have been cleaned up so that, whenever
+           possible, all &abuild; error messages are of a form that is
+           parseable by the error-handling code in Emacs and Eclipse.
+           (Most error messages already conformed, but a small number
+           did not.)
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
        <listitem>
-        <para>
-         The <filename>autoconf</filename> rules have been fixed so
-         that they do not generate warnings about undefined variables
-         and to work better by default for cross compiles.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The <command>doc</command> target for Java builds no longer
-         runs <command>javadoc</command>.  Instead, this capability
-         must be provided by a plugin.  The reason for this change is
-         that there is too much site-specific policy in how the
-         <command>javac</command> task would be invoked.  In light of
-         this, the <command>pre-doc</command> and
-         <command>post-doc</command> hooks have been replaced by a
-         <command>doc</command> hook.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         &Abuild; interface variable
-         <varname>ABUILD_PLATFORM_TYPE</varname> is now defined
-         automatically.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The new <command>generate</command> target is supported from
-         <filename>ccxx</filename> rules.  This can be used to force
-         generated code to appear before compilation starts.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         A new example has been created to illustrate how to pass
-         information safely from a <application>make</application>
-         variable to your source code.  See <xref
-         linkend="ref.example.auto-from-variable"/>.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         A program is now provided to verify proper operation of
-         compiler plugins.  (See <xref
-         linkend="ref.adding-toolchains"/>.)
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         VxWorks and XLC support have been removed from &abuild; and
-         are now available as plugins in a build tree maintained
-         separately from &abuild;.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         A few error messages have been cleaned up so that, whenever
-         possible, all &abuild; error messages are of a form that is
-         parseable by the error-handling code in Emacs and Eclipse.
-         (Most error messages already conformed, but a small number
-         did not.)
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         C/C++ rules will, in most cases, recognize orphan targets are
-         deal with them properly.  (Stray object files in
-         subdirectories of the output directory will not currently be
-         detected.)
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Removed backward compatibility code: &abuild; no longer
-         automatically removes stray automatically generated files
-         created by versions older than 1.0.a14.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Removed backward compatibility code: &abuild; no longer
-         accepts <varname>BI_RULES</varname> as a synonym for
-         <varname>BUILD_ITEM_RULES</varname>.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The new make variable <varname>LINKWRAPPER</varname> can be
-         set on the command line or in the
-         <filename>Abuild.mk</filename> file to specify the name of a
-         command to wrap the link step.  This is intended to be used
-         to support tools such as <application>Purify</application>
-         which wrap the link command in this fashion.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The new variable <varname>LINK_AS_C</varname> may be set in
-         an <filename>Abuild.mk</filename> file to cause all shared
-         libraries and executables in that build item to be linked as
-         straight C code instead of C++ code.  This avoids a
-         dependency on the C++ runtime libraries for straight C code.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Bug fix: file-specific <varname>OFLAGS</varname>,
-         <varname>DFLAGS</varname>, and <varname>WFLAGS</varname>
-         variables now work properly when set to the empty string.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Bug fix: on Windows, don't attempt to run perl if Cygwin perl
-         is not the first perl in the path.  In verbose mode, a
-         message to this effect is printed when perl is not found.
-        </para>
+        <para>Bug Fixes</para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <filename>autoconf</filename> rules have been fixed so
+           that they do not generate warnings about undefined
+           variables and work better by default for cross compiles.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           File-specific <varname>OFLAGS</varname>,
+           <varname>DFLAGS</varname>, and <varname>WFLAGS</varname>
+           variables now work properly when set to the empty string.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           On Windows, &abuild; no longer attempts to run perl if
+           Cygwin perl is not the first perl in the path.  In verbose
+           mode, a message to this effect is printed when perl is not
+           found.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
       </itemizedlist>
      </listitem>

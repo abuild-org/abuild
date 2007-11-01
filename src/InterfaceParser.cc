@@ -510,7 +510,7 @@ InterfaceParser::evaluateAssignment(
 	{
 	    QTC::TC("abuild", "InterfaceParser ERR bad flag");
 	    error(flag_token->getLocation(),
-		  "unknown flag " + flag);
+		  "flag " + flag + " is not supported by this build item");
 	}
     }
 

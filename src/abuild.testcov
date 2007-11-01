@@ -213,3 +213,4 @@ ccxx.mk found extra other 0
 Abuild add platform 1
 Abuild add native compiler 1
 Abuild absolute external 0
+ccxx.mk ERR .. in srcs 0

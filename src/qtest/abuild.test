@@ -1535,6 +1535,16 @@ $td->runtest("plugin platform errors",
 	     {$td->FILE => "$top/test2.bad-plugin-platforms.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+
+cd("work/f");
+
+$td->runtest(".. in source files",
+	     {$td->COMMAND => "abuild -k -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test2.dotdot-in-path.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 setup("test3", "test2.not-accessed.out");
 
 $td->runtest("abuild dependency errors",
@@ -2517,7 +2527,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(253 + ($in_windows ? 1 : 7) + ($test_java ? 16 : 0));
+$td->report(254 + ($in_windows ? 1 : 7) + ($test_java ? 16 : 0));
 
 sub cleanup
 {

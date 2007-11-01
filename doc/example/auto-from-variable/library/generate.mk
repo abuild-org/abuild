@@ -23,5 +23,11 @@ FileProvider_file.hh: variable-value
 	echo '#endif' >> $@
 
 # Make sure our automatically generated file gets generated before we
-# compile
-generate:: FileProvider_file.hh ;
+# compile FileProvider.cc.  Unfortunately, the only way to do this
+# that will work reliably in a parallel build is to create an explicit
+# dependency.  We use the LOBJ variable to get the object file suffix
+# because FileProvider.cc is part of a library.  One way to avoid this
+# issue entirely would be to automatically generate a source file
+# instead of a header file, but as it is often more convenient to
+# generate a header file, we illustrate how to do so in this example.
+FileProvider.$(LOBJ): FileProvider_file.hh

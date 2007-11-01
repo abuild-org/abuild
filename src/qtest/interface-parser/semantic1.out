@@ -12,7 +12,7 @@ semantic1:46:13: ERROR: the empty string is not a valid target type
 semantic1:51:14: ERROR: unknown environment variable NO_SUCH_VARIABLE
 semantic1:53:7: ERROR: resetting unknown variable UNKNOWN
 semantic1:54:10: ERROR: unknown variable UNKNOWN
-semantic1:55:6: ERROR: unknown flag unknown-flag
+semantic1:55:6: ERROR: flag unknown-flag is not supported by this build item
 parse(semantic1): failure
 dumping interface semantic1
   a: string scalar, target type object-code = 
