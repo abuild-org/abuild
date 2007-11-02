@@ -1700,7 +1700,7 @@ cd("work/multi/product");
     close(IN);
     open(OUT, ">Abuild.conf") or die;
     my $cwd = getcwd();
-    my $newpath = dirname($cwd) . "/b";
+    my $newpath = windir(dirname($cwd) . "/b");
     for (@lines)
     {
 	s,(external-dirs:.*?)(\Q../b\E),$1$newpath,;

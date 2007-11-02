@@ -20,6 +20,13 @@ Documentation
  * Make sure documentation for integration with third party packages
    is sufficient.
 
+Abuild Contrib
+--------------
+
+ * Include pieces of the abuild library including at least doxygen and
+   javadoc plugins.  Mention this in the installation part of the
+   documentation.
+
 
 Bugs
 ====

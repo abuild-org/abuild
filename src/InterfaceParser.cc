@@ -303,7 +303,10 @@ InterfaceParser::getAfterBuilds() const
 void
 InterfaceParser::evaluateParseTree()
 {
-    evaluateBlocks(this->parse_tree, true);
+    if (this->parse_tree)
+    {
+	evaluateBlocks(this->parse_tree, true);
+    }
 }
 
 void
