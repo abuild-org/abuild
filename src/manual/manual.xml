@@ -264,7 +264,7 @@ following checks:
      <firstterm>build item</firstterm>.  A build item is essentially a
      single collection of code, usually contained within one
      directory, that is built as a unit.  A build item may produce one
-     or more products (libraries, executables, jar files, etc.) that
+     or more products (libraries, executables, JAR files, etc.) that
      other build items may want to use.  It is the responsibility of
      each build item to provide information about its products that
      may be used by other items that depend on it.  This information
@@ -574,53 +574,61 @@ following checks:
     <itemizedlist>
      <listitem>
       <para>
-       <application>GNU Make</application> version 3.81 or higher is
-       required if you are building any build items that use make as a
-       backend.  This would include platform-independent code and C/C++
-       code, but not Java code.
+       <ulink url="http://www.gnu.org/software/make/"><application>GNU
+       Make</application></ulink> version 3.81 or higher is required
+       if you are building any build items that use make as a backend.
+       This would include platform-independent code and C/C++ code,
+       but not Java code.
       </para>
      </listitem>
      <listitem>
       <para>
-       <application>Apache Ant</application> version 1.7.0 or newer
-       with <application>ant-contrib</application> version 1.0.b3 or
-       later installed in ant's lib directory is required if you are
-       building any Java code.
+       <ulink url="http://ant.apache.org/"><application>Apache
+       Ant</application></ulink> version 1.7.0 or newer with <ulink
+       url="http://ant-contrib.sourceforge.net/"><application>ant-contrib</application></ulink>
+       version 1.0.b3 or later installed in ant's lib directory is
+       required if you are building any Java code.  &Abuild;'s Java
+       code requires a Java 5 Java SDK, but could likely be ported
+       fairly easily to any Java SDK that can build Apache Ant.
       </para>
      </listitem>
      <listitem>
       <para>
-       Perl version 5.8 or newer is required if you are performing any
-       GNU Make-based builds.
+       <ulink url="http://www.perl.com/">Perl</ulink> version 5.8 or
+       newer is required if you are performing any GNU Make-based
+       builds.
       </para>
      </listitem>
      <listitem>
       <para>
-       Perl version 5.8 or newer and qtest version 1.0 or newer are
-       required if you are using the qtest automated test framework.
-       &Abuild;'s own test suite uses qtest.
+       Perl version 5.8 or newer and <ulink
+       url="http://qtest.qbilt.org/">qtest</ulink> version 1.0 or
+       newer are required if you are using the qtest automated test
+       framework.  &Abuild;'s own test suite uses qtest.
       </para>
      </listitem>
      <listitem>
       <para>
        If you are planning on building any GNU Make-based build items
-       on Windows, Cygwin is required.  For a Java-only &abuild;
-       installation on Windows, Cygwin and Perl are not required.  It
-       is hoped that a future version of &abuild; will not require
-       Cygwin.  For details on using Cygwin with &abuild;, please see
-       <xref linkend="ref.cygwin-requirements"/>.
+       on Windows, <ulink url="http://www.cygwin.com/">Cygwin</ulink>
+       is required.  For a Java-only &abuild; installation on Windows,
+       Cygwin and Perl are not required.  It is hoped that a future
+       version of &abuild; will not require Cygwin.  For details on
+       using Cygwin with &abuild;, please see <xref
+       linkend="ref.cygwin-requirements"/>.
       </para>
      </listitem>
     </itemizedlist>
     <para>
      To build &abuild;, you must also have version 1.33.1 or newer of
-     the boost regex and thread libraries.  (&Abuild; is known to work
-     with the boost 1.32 in Red Hat Enterprise Linux 4, but it may not
-     work with that version of boost on other systems.)  &abuild; is
-     known to build with gcc, xlc, Microsoft Visual C++ (7.1 or
-     newer), and mingw.  &Abuild; itself contains C++ code and Java
-     code, so all the runtime requirements for both systems are
-     required to build &abuild;.
+     the <ulink url="http://www.boost.org/">boost</ulink> regex and
+     thread libraries.  (&Abuild; is known to work with the boost 1.32
+     in Red Hat Enterprise Linux 4, but it may not work with that
+     version of boost on other systems.)  &abuild; is known to build
+     with gcc, xlc, Microsoft Visual C++ (7.1 or newer), and <ulink
+     url="http://www.mingw.org/">mingw</ulink>.  &Abuild; itself
+     contains C++ code and Java code, so all the runtime requirements
+     for both systems are required to build &abuild;.
     </para>
     <para>
      &Abuild; figures out where it is being run from when it is
@@ -649,7 +657,9 @@ following checks:
      &Abuild; is self-hosting: it can be built with itself, or for
      bootstrapping, it can be built with a special GNU Makefile that
      uses &abuild;'s internal <application>GNU Make</application>
-     support.  Please see the file
+     support.  To build &abuild;'s Java code, you also need
+     <application>Apache Ant</application> and a Java development
+     environment.  Please see the file
      <filename>src/README.build</filename> in the source distribution
      for instructions on building abuild.
     </para>
@@ -659,15 +669,18 @@ following checks:
     <para>
      If you are creating a binary distribution or installing from
      source, please see the file <filename>src/README.build</filename>
-     from the source directory.  If you are installing from a pre-built
-     binary distribution, simply extract the binary distribution in any
-     directory.  &Abuild; imposes no requirements on where the
-     directory should be or what it should be called as long as its
-     contents remain in the correct relative locations.  You may make a
-     symbolic link to the actual <filename>bin/abuild</filename>
-     executable from a directory in your path.  &Abuild; will follow
-     this link when attempting to discover the path of its installation
-     directory.
+     from the source directory.  If you are installing from a
+     pre-built binary distribution, simply extract the binary
+     distribution in any directory.  &Abuild; imposes no requirements
+     on where the directory should be or what it should be called as
+     long as its contents remain in the correct relative locations.
+     You may make a symbolic link to the actual
+     <filename>bin/abuild</filename> executable from a directory in
+     your path.  &Abuild; will follow this link when attempting to
+     discover the path of its installation directory.  You may also
+     add the &abuild; distribution's <filename>bin</filename>
+     directory to your path, or invoke &abuild; by the full path to
+     its executable.
     </para>
    </sect1>
    <sect1 id="ref.cygwin-requirements">
@@ -675,14 +688,19 @@ following checks:
     <para>
      To build &abuild; and use it in a Windows environment for
      <application>make</application>-based builds, certain pieces of
-     the Cygwin environment are required.  This may cease to be true
-     in a future version of &abuild;.  Note that &abuild; is able to
-     build using Visual C++ on Windows.  It uses Cygwin only for its
-     development tools.  Cygwin is not required to run executables
-     built by &abuild; in a Windows environment, including &abuild;
-     itself.  However, Cygwin is required to supply
-     <command>make</command> and <command>perl</command> to &abuild;.
-     The following parts of Cygwin are required:
+     the Cygwin environment are required.
+     <footnote>
+      <para>
+       This may cease to be true in a future version of &abuild;.
+      </para>
+     </footnote>
+     Note that &abuild; is able to build using Visual C++ on Windows.
+     It uses Cygwin only for its development tools.  Cygwin is not
+     required to run executables built by &abuild; in a Windows
+     environment, including &abuild; itself.  However, Cygwin is
+     required to supply <command>make</command> and
+     <command>perl</command> to &abuild;.  The following parts of
+     Cygwin are required:
      <variablelist>
       <varlistentry>
        <term>Devel</term>
@@ -818,9 +836,8 @@ C:\cygwin\cygwin.bat
         spaces in path names and is known to handle many cases
         correctly, <application>make</application> is notoriously bad
         at it.  If you try to use spaces in path names, it is very
-        likely that you will eventually run into problems.  Anyway,
-        they're more trouble than they're worth in a command-line
-        environment.
+        likely that you will eventually run into problems as they
+        generally cause trouble in a command-line environment.
        </para>
       </listitem>
       <listitem>
@@ -1079,21 +1096,20 @@ C:\cygwin\cygwin.bat
      don't explicitly list the source files.  Instead &abuild;
      automatically finds sources in the <filename>src/java</filename>
      directory.  There are more properties that can be set, and there
-     are other ways to get files into the jar file.  We provide
+     are other ways to get files into the JAR file.  We provide
      detailed information about the directory structure for
      property-driven Java builds in <xref
      linkend="ref.directory-structure-for-java-builds"/>.  Finally,
      look at the <filename>Abuild.interface</filename> file.  This
      file provides information to other build items about what they
-     should add to their classpaths in order to make use of the jar
+     should add to their classpaths in order to make use of the JAR
      file created by this build item:
      <?example basic/java-library/Abuild.interface?>
      As with the C++ library, it is possible to build this item by
      running <command>abuild</command> from the
      <filename>java</filename> directory.  Notice that &abuild; puts
-     the <filename>jar</filename> file in the
-     <filename>dist</filename> subdirectory of the &abuild; output
-     directory.
+     the JAR file in the <filename>dist</filename> subdirectory of the
+     &abuild; output directory.
     </para>
    </sect1>
    <sect1 id="ref.example.basic.java-program">
@@ -1101,9 +1117,24 @@ C:\cygwin\cygwin.bat
     <para>
      In Java, there is really no distinction between a
      &ldquo;library&rdquo; and a &ldquo;program&rdquo; except that a
-     jar file that provides a program must have a
-     <function>main</function> method.  Here are the relevant files
-     for the program example:
+     JAR file that provides a program must have a
+     <function>main</function> method.
+     <footnote>
+      <para>
+       More accurately, if a JAR file contains a main method, it can
+       be executed, though it can also be used as a library.  A JAR
+       file can also contain a <firstterm>manifest file</firstterm>
+       that identifies a class that contains a
+       <function>main</function> method.  Although &abuild; allows
+       specification of the class containing <function>main</function>
+       in the <varname>abuild.main-class</varname> property of
+       <filename>Abuild-ant.properties</filename>, this does not
+       presently influence the manifest file.  For a discussion, read
+       the comments in <filename>ant/abuild.xml</filename> in the
+       &abuild; distribution.
+      </para>
+     </footnote>
+     Here are the relevant files for the program example:
      <?example basic/java-program/src/java/com/example/basic/BasicProgram.java?>
      <?example basic/java-program/Abuild.conf?>
      <?example basic/java-program/Abuild-ant.properties?>
@@ -3958,9 +3989,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         <listitem>
          <para>
           This target will generate an executable wrapper script
-          around a jar file if certain properties are defined.  The
+          around a JAR file if certain properties are defined.  The
           resulting script or batch file will invoke the Java runtime
-          environment on the jar file with the specified main class
+          environment on the JAR file with the specified main class
           and with the proper classpath.
          </para>
         </listitem>
@@ -5202,19 +5233,19 @@ endif
       <term>abuild.classpath</term>
       <listitem>
        <para>
-        Generated jar files to add to the classpath.  This is the
+        Generated JAR files to add to the classpath.  This is the
         variable that the vast majority of build items will assign to.
         Its value will typically be
         <filename>$(ABUILD_DIR_OUTPUT)/dist/<replaceable>JarFile.jar</replaceable></filename>,
         where <replaceable>JarFile.jar</replaceable> is the name of
-        the jar file you placed in the
+        the JAR file you placed in the
         <varname>abuild.jar-name</varname> property in your
         <filename>Abuild-ant.properties</filename> file.  Note that
-        although Java allows both files (<filename>jar</filename> or
-        <filename>zip</filename>) and directories to be added to your
-        classpath, adding directories to the
-        <varname>abuild.classpath</varname> variable will not work in
-        some cases and should therefore be avoided.
+        although Java allows both files (whose names end with
+        <filename>.jar</filename> or <filename>.zip</filename>) and
+        directories to be added to your classpath, adding directories
+        to the <varname>abuild.classpath</varname> variable will not
+        work in some cases and should therefore be avoided.
        </para>
       </listitem>
      </varlistentry>
@@ -5222,12 +5253,11 @@ endif
       <term>abuild.classpath.external</term>
       <listitem>
        <para>
-        Externally supplied jar files to add to the classpath.  This
-        variable is intended to be used for third-party jar files.
+        Externally supplied JAR files to add to the classpath.  This
+        variable is intended to be used for third-party JAR files.
         The difference between it and
-        <varname>abuild.classpath</varname> is that jar files listed
-        here are not added to <filename>ear</filename> and
-        <filename>war</filename> files while those in
+        <varname>abuild.classpath</varname> is that JAR files listed
+        here are not added to EAR and WAR files while those in
         <varname>abuild.classpath</varname> are.
        </para>
       </listitem>
@@ -5891,7 +5921,7 @@ endif
       <term>abuild.jar-name</term>
       <listitem>
        <para>
-        The name of the jar file, including the
+        The name of the JAR file, including the
         <filename>.jar</filename> or other archive suffix, to be
         created by this build item.  This must be set in order for
         compilation or packaging to take place.
@@ -5913,7 +5943,7 @@ endif
        <para>
         If this property and <varname>abuild.main-class</varname> are
         both set, a script by this name will be generated that will
-        invoke the Java runtime environment using this jar file to
+        invoke the Java runtime environment using this JAR file to
         invoke this main.  The script will include the classpath as
         determined by &abuild;.  On Windows, the script is usable to
         invoke the application from a Cygwin environment, and a
@@ -5925,12 +5955,12 @@ endif
       <term>abuild.ear-name</term>
       <listitem>
        <para>
-        The name of the ear file, including the
+        The name of the EAR file, including the
         <filename>.ear</filename> suffix, to be generated.  This must
-        be set for an ear file to be generated.  Ear files contain any
+        be set for an EAR file to be generated.  EAR files contain any
         archive files in the <varname>abuild.classpath</varname>
-        property and any locally generated jar files.  They do not
-        contain jar files in the
+        property and any locally generated JAR files.  They do not
+        contain JAR files in the
         <varname>abuild.classpath.external</varname> property.
        </para>
       </listitem>
@@ -5940,8 +5970,8 @@ endif
       <listitem>
        <para>
         The name of the <filename>application.xml</filename> to put
-        into an ear file.  This must be set (along with
-        <varname>abuild.ear-name</varname>) for an ear file to be
+        into an EAR file.  This must be set (along with
+        <varname>abuild.ear-name</varname>) for an EAR file to be
         generated.
        </para>
       </listitem>
@@ -5950,11 +5980,11 @@ endif
       <term>abuild.war-name</term>
       <listitem>
        <para>
-        The name of the war file, including the
+        The name of the WAR file, including the
         <filename>.war</filename> suffix, to be generated.  This must
-        be set for a war file to be generated.  War files contain any
-        jar files in the <varname>abuild.classpath</varname> property.
-        They do not contain jar files in the
+        be set for a WAR file to be generated.  WAR files contain any
+        JAR files in the <varname>abuild.classpath</varname> property.
+        They do not contain JAR files in the
         <varname>abuild.classpath.external</varname> property.
        </para>
       </listitem>
@@ -5963,15 +5993,15 @@ endif
       <term>abuild.war-type</term>
       <listitem>
        <para>
-        The type of the war file, which must be either
+        The type of the WAR file, which must be either
         <varname>client</varname> or <varname>server</varname>.  This
         property determines where items in
         <varname>abuild.classpath</varname> are copied.  For
-        <varname>client</varname> war files, classpath jar files are
-        copied into the root of the <varname>war</varname> file where
-        the are accessible to clients' browsers.  For
-        <varname>server</varname> war files, they are copied into the
-        <filename>WEB-INF/lib</filename> directory of the war file.
+        <varname>client</varname> WAR files, classpath JAR files are
+        copied into the root of the WAR file where the are accessible
+        to clients' browsers.  For <varname>server</varname> WAR
+        files, they are copied into the
+        <filename>WEB-INF/lib</filename> directory of the WAR file.
        </para>
       </listitem>
      </varlistentry>
@@ -5979,9 +6009,9 @@ endif
       <term>abuild.web-xml</term>
       <listitem>
        <para>
-        The name of the <filename>web.xml</filename> to put into a war
+        The name of the <filename>web.xml</filename> to put into a WAR
         file.  This must be set (along with
-        <varname>abuild.war-name</varname>) for a war file to be
+        <varname>abuild.war-name</varname>) for a WAR file to be
         generated.
        </para>
       </listitem>
@@ -6062,7 +6092,7 @@ endif
        <para>
         This directory contains java source code.  Any files it
         contains will be compiled into class files and included in the
-        jar or war file.
+        JAR or WAR file.
        </para>
       </listitem>
      </varlistentry>
@@ -6070,8 +6100,8 @@ endif
       <term><filename>src/resources</filename></term>
       <listitem>
        <para>
-        Any files contained here will be copied to the jar file named
-        in the <varname>abuild.jar-name</varname> property or the ear
+        Any files contained here will be copied to the JAR file named
+        in the <varname>abuild.jar-name</varname> property or the EAR
         file named in the <varname>abuild.ear-name</varname> property.
         Standard ant exclusions (for CM directories, editor backup
         files, etc.) are in effect.
@@ -6082,7 +6112,7 @@ endif
       <term><filename>src/web</filename></term>
       <listitem>
        <para>
-        Any files contained here will be copied to the war file named
+        Any files contained here will be copied to the WAR file named
         in the <varname>abuild.war-name</varname> property.  Standard
         ant exclusions (for CM directories, editor backup files, etc.)
         are in effect.
@@ -6094,10 +6124,10 @@ endif
       <listitem>
        <para>
         Any files contained here will be added to the
-        <filename>META-INF</filename> directory in the jar or ear file
+        <filename>META-INF</filename> directory in the JAR or EAR file
         named in the <varname>abuild.jar-name</varname> property or
         <varname>abuild.ear-name</varname> property or the
-        <filename>WEB-INF</filename> directory in the war file named in
+        <filename>WEB-INF</filename> directory in the WAR file named in
         the <varname>abuild.war-name</varname> property.
        </para>
       </listitem>
@@ -6129,7 +6159,7 @@ endif
        <para>
         This directory is created automatically by &abuild;'s ant rules.
         It should be populated with any automatically generated files
-        that are to be added to the jar.
+        that are to be added to the JAR.
        </para>
       </listitem>
      </varlistentry>
@@ -6137,17 +6167,17 @@ endif
       <term><filename>abuild-java/classpath</filename></term>
       <listitem>
        <para>
-        This directory is created automatically if an ear or war file
-        is being generated.  If an ear file is generated, it is
+        This directory is created automatically if an EAR or WAR file
+        is being generated.  If an EAR file is generated, it is
         populated automatically with all files in the
-        <varname>abuild.classpath</varname> property.  If a war file is
+        <varname>abuild.classpath</varname> property.  If a WAR file is
         being generated, it is populated with the jar-file versions of
         all the files in the <varname>abuild.classpath</varname>
         property.  No action is required with this directory, but if
         necessary, a build item may create a
         <command>pre-package</command> hook to modify or rearrange the
-        contents of that directory.  This can be useful for certain ear
-        and war file construction cases.  This mechanism may change in
+        contents of that directory.  This can be useful for certain EAR
+        and WAR file construction cases.  This mechanism may change in
         the future.
        </para>
       </listitem>
@@ -6932,7 +6962,7 @@ endif
     <title>Java Code Generator Example</title>
     <para>
      In this example, we create a simple Java &ldquo;executable&rdquo;
-     (jar file with a <function>main</function> method) that depends
+     (JAR file with a <function>main</function> method) that depends
      on a simple &ldquo;library&rdquo;.  The library contains some
      automatically generated code which is generated by a code
      generator that we also supply.  Our code generator defines a
@@ -6971,15 +7001,15 @@ endif
      <filename>Executable.java</filename> located in directory
      structure based on its package, as always.  The
      <filename>resources</filename> directory contains the file
-     <filename>file.text</filename> which is to be included in the jar
+     <filename>file.text</filename> which is to be included in the JAR
      file.  Our example executable reads the contents of this file
-     from the jar file as an example of how to make use of the
+     from the JAR file as an example of how to make use of the
      <filename>resources</filename> directory.
     </para>
     <para>
      Next, we'll turn our attention to the <classname>library</classname>
      build item.  Our <classname>library</classname> build item creates a
-     jar file called <filename>example-library.jar</filename> as you
+     JAR file called <filename>example-library.jar</filename> as you
      can see from looking at the value of
      <varname>abuild.jar-name</varname> in its
      <filename>Abuild-ant.properties</filename> file:
@@ -7006,7 +7036,7 @@ endif
     <para>
      The <classname>code-generator</classname> build item is in the
      <filename>code-generator</filename> directory.  This build item
-     creates a jar file called
+     creates a JAR file called
      <filename>CodeGenerator.jar</filename>.  It also sets the
      &abuild; property <varname>abuild.include-ant-runtime</varname>
      so that the <application>ant</application> runtime library will
@@ -7048,15 +7078,15 @@ endif
      The <classname>code-generator</classname> build item's
      <filename>Abuild.interface</filename> does something that most
      build items don't have to do: it declares a custom variable that
-     holds the name of the jar file that it generates, and it does not
-     add this jar file to the classpath:
+     holds the name of the JAR file that it generates, and it does not
+     add this JAR file to the classpath:
      <?example java/code-generator/Abuild.interface?>
      The reason for this is that
      <classname>code-generator</classname>'s users don't need to call
-     anything from its jar file in their code, but its
+     anything from its JAR file in their code, but its
      <filename>ant-hooks.xml</filename> file, which will be invoked
      with <varname>basedir</varname> set to the calling build item's
-     output directory, needs to know the location of the jar file.
+     output directory, needs to know the location of the JAR file.
     </para>
     <para>
      The <classname>code-generator</classname>'s
@@ -7077,7 +7107,7 @@ endif
      item.  This build item actually contains no source code.  All it
      does is define the properties required to generate a wrapper
      script, but this time, it uses a different main class in the
-     executable jar file.  This build item serves primarily as an
+     executable JAR file.  This build item serves primarily as an
      example of using the wrapper target, which is a post-package
      hook, from a build item that doesn't actually package anything:
      <?example java/other-executable/Abuild.conf?>
@@ -7861,7 +7891,7 @@ endif
      sensitive handlers.  If this were C++, the inclusion of the
      sensitive handlers would be achieved through linking with
      additional libraries.  In Java, it is achieved by adding
-     additional jar files to the classpath.  In either case, with
+     additional JAR files to the classpath.  In either case, with
      &abuild;, it is achieved by simply adding additional dependencies
      to the build item.  We will see this in more depth when we look
      at the sensitive version of the code.
@@ -7928,7 +7958,7 @@ endif
      are using the public main routine even though we have sensitive
      handlers.  This provides an example of how to implement the case
      that people might be inclined to implement by having conditional
-     inclusion of sensitive jar files or conditional linking of
+     inclusion of sensitive JAR files or conditional linking of
      sensitive libraries.  Since &abuild; doesn't support doing
      anything conditionally upon the existence of a build item or even
      testing for the existence of a build item, this provides an
@@ -8026,76 +8056,67 @@ endif
     different archive types in a fairly general way.
    </para>
    <sect1 id="ref.example.jar-like-archives">
-    <title>Jar-like Archives</title>
+    <title>JAR-like Archives</title>
     <para>
      In the <filename>doc/example/archive-types</filename> directory,
      you will find subdirectories for each of several archive types.
-     &Abuild; knows how to create <filename>jar</filename> files,
-     <filename>war</filename> files, and <filename>ear</filename>
-     files.  The names of the archives that &abuild; creates do not
-     have to end with the suffix corresponding to the type.  In
-     particular, &abuild; is able to create jar files that are not
-     called <filename>*.jar</filename> as is necessary in some
-     instances.  When it does, it will also create a copy of that file
-     whose name does end in <filename>.jar</filename> for compilation
-     purposes as some versions of <command>javac</command> ignore
-     classpath elements that are not either directories or files whose
-     names end with <filename>.zip</filename> or
-     <filename>.jar</filename>, a behavior that is consistent with the
-     documentation.
+     &Abuild; knows how to create JAR files, WAR files, and EAR files.
+     The names of the archives that &abuild; creates do not have to
+     end with the suffix corresponding to the type.  In particular,
+     &abuild; is able to create JAR files that are not called
+     <filename>*.jar</filename> as is necessary in some instances.
+     When it does, it will also create a copy of that file whose name
+     does end in <filename>.jar</filename> for compilation purposes as
+     some versions of <command>javac</command> ignore classpath
+     elements that are not either directories or files whose names end
+     with <filename>.zip</filename> or <filename>.jar</filename>, a
+     behavior that is consistent with the documentation.
     </para>
     <para>
-     Start by looking at the <filename>har</filename> example.  If you
-     study its <filename>Abuild-ant.properties</filename> file and its
+     Start by looking at the HAR example.  If you study its
+     <filename>Abuild-ant.properties</filename> file and its
      <filename>Abuild.interface</filename> file, you will observe that
-     we are creating a <filename>har</filename> file here exactly the
-     way we would create a <filename>jar</filename> file except that we
-     are using the <filename>.har</filename> suffix:
+     we are creating a HAR file here exactly the way we would create a
+     JAR file except that we are using the <filename>.har</filename>
+     suffix:
      <?example archive-types/har/Abuild-ant.properties?>
      <?example archive-types/har/Abuild.interface?>
-     Note that the <filename>har</filename> file created here probably
-     wouldn't work as a <filename>har</filename> file.  We're just
-     naming it this way for purposes of illustration.  If you needed
-     to add other things to the <filename>har</filename> file, you
-     would do so in the same way as you would for any other
-     <filename>jar</filename> file (adding to
-     <filename>src/conf</filename>,
+     Note that the HAR file created here probably wouldn't work as a
+     HAR file.  We're just naming it this way for purposes of
+     illustration.  If you needed to add other things to the HAR file,
+     you would do so in the same way as you would for any other JAR
+     file (adding to <filename>src/conf</filename>,
      <filename>src/resources</filename>, or their automatically
      generated counterparts as appropriate).  Here are the contents of
-     the <filename>har</filename> file:
+     the HAR file:
      <?qtest example.har-contents.out?>
-     Next, look at the <filename>jar</filename> example.  It is
-     essentially identical to the <filename>har</filename> example
-     except that this build item depends on
+     Next, look at the JAR example.  It is essentially identical to
+     the HAR example except that this build item depends on
      <classname>har-example</classname>:
      <?example archive-types/jar/Abuild-ant.properties?>
      <?example archive-types/jar/Abuild.interface?>
      The <filename>JarExample.java</filename> class imports a class
-     defined in the <filename>har</filename> file to illustrate that
-     it works in &abuild; to add a <filename>har</filename> file to
-     the <varname>abuild.classpath</varname> variable even if it
-     wouldn't work in straight ant.  Here are the contents of the
-     <filename>jar</filename> file:
+     defined in the HAR file to illustrate that it works in &abuild;
+     to add a HAR file to the <varname>abuild.classpath</varname>
+     variable even if it wouldn't work in straight ant.  Here are the
+     contents of the JAR file:
      <?qtest example.jar-contents.out?>
     </para>
    </sect1>
    <sect1 id="ref.example.war-files">
-    <title>War Files</title>
+    <title>WAR Files</title>
     <para>
-     Next, look at the <filename>war</filename> example.  The
-     structure of <filename>war</filename> files is slightly different
-     from the structure of ordinary <filename>jar</filename> files.
-     In particular, when constructing a <filename>war</filename> file,
-     the <filename>src/resources</filename> directory is ignored and
-     the <filename>src/web</filename> directory is used instead.
-     Anything in <filename>src/web</filename> is added to the
-     <filename>war</filename> file at its root, just as with
-     <filename>src/resources</filename> for a <filename>jar</filename>
+     Next, look at the WAR example.  The structure of WAR files is
+     slightly different from the structure of ordinary JAR files.  In
+     particular, when constructing a WAR file, the
+     <filename>src/resources</filename> directory is ignored and the
+     <filename>src/web</filename> directory is used instead.  Anything
+     in <filename>src/web</filename> is added to the WAR file at its
+     root, just as with <filename>src/resources</filename> for a JAR
      file.  Other than the name, there is no difference between how
      these directories are used.  Additionally, the
      <filename>src/conf</filename> directory is used to populate the
-     <filename>WEB-INF</filename> directory in the
-     <filename>war</filename> rather than the
+     <filename>WEB-INF</filename> directory in the WAR rather than the
      <filename>META-INF</filename>.  At present, there is no way to
      add files to <filename>META-INF</filename> other than manually
      creating a <filename>META-INF</filename> directory under
@@ -8103,114 +8124,104 @@ endif
      <filename>MANIFEST.MF</filename> file is created automatically by
      the <command>jar</command> task.)  Another difference is that
      compiled classes go in <filename>WEB-INF/classes</filename>
-     instead of at the root as with a normal <filename>jar</filename>
-     file.
+     instead of at the root as with a normal JAR file.
     </para>
     <para>
      If <varname>abuild.war-type</varname> has the value
-     <varname>server</varname>, we copy all <filename>jar</filename>
-     files in the <varname>abuild.classpath</varname> variable into
-     the <filename>WEB-INF/lib</filename> directory.  If
+     <varname>server</varname>, we copy all JAR files in the
+     <varname>abuild.classpath</varname> variable into the
+     <filename>WEB-INF/lib</filename> directory.  If
      <varname>abuild.war-type</varname> has the value
      <varname>client</varname>, they are copied into the root of the
-     war file.  Before copying the <filename>jar</filename> files from
-     the classpath into the war file, &abuild; places them in the
+     WAR file.  Before copying the JAR files from the classpath into
+     the WAR file, &abuild; places them in the
      <filename>abuild-java/classpath</filename> directory.  If you
-     need to create a war file that includes files from
+     need to create a WAR file that includes files from
      <varname>abuild.classpath</varname> both at the root and in the
      <filename>WEB-INF/lib</filename> directory, create a
-     <varname>client</varname> war file and use a
+     <varname>client</varname> WAR file and use a
      <command>pre-package</command> hook to move some of the files
      from <filename>classpath</filename> into
      <filename>src/conf/lib</filename> (remember that both of these
      paths are relative to the output directory, which is directory
      from which <application>ant</application> is run) so that they
-     will end up in <filename>WEB-INF/lib</filename>.  The
-     <filename>ear</filename> example includes a demonstration of
-     using a <command>pre-package</command> hook for manipulating the
-     contents of the <filename>classpath</filename> directory:
+     will end up in <filename>WEB-INF/lib</filename>.  The EAR example
+     includes a demonstration of using a
+     <command>pre-package</command> hook for manipulating the contents
+     of the <filename>classpath</filename> directory:
      <?example archive-types/war/Abuild-ant.properties?>
      <?example archive-types/war/Abuild.interface?>
-     Here are the contents of this server
-     <filename>war</filename> file:
+     Here are the contents of this server WAR file:
      <?qtest example.war-contents.out?>
      The <classname>client-war</classname> example is identical except
-     it creates a client war instead:
+     it creates a client WAR instead:
      <?example archive-types/client-war/Abuild-ant.properties?>
      <?example archive-types/client-war/Abuild.interface?>
      Here are its contents:
      <?qtest example.client-war-contents.out?>
      In this example, the <classname>war-example</classname> build
-     item depends on the <classname>jar-example</classname> build
-     item which in turn depends on
-     <classname>har-example</classname>.  Notice that &abuild; has
-     added <filename>har-example.har.jar</filename> to the
-     <filename>war</filename> file instead of adding
-     <filename>har-example.har</filename>.  This behavior may change
-     if it turns out to be incorrect.  Note that this example is
-     somewhat contrived anyway though.  Generally speaking,
-     <filename>war</filename> files will not have a lot of
-     dependencies, and the idea of a <filename>war</filename> file
-     depending on something that's not a <filename>jar</filename> file
-     is a bit contrived.  Another thing to observe about the
-     <filename>war</filename> example is that it adds its
-     <filename>war</filename> file to the
+     item depends on the <classname>jar-example</classname> build item
+     which in turn depends on <classname>har-example</classname>.
+     Notice that &abuild; has added
+     <filename>har-example.har.jar</filename> to the WAR file instead
+     of adding <filename>har-example.har</filename>.  This behavior
+     may change if it turns out to be incorrect.  Note that this
+     example is somewhat contrived anyway though.  Generally speaking,
+     WAR files will not have a lot of dependencies, and the idea of a
+     WAR file depending on something that's not a JAR file is a bit
+     contrived.  Another thing to observe about the WAR example is
+     that it adds its WAR file to the
      <varname>abuild.classpath</varname> variable.  This is another
      thing that may change in the future.  It's not really accurate to
-     say that the <filename>war</filename> file is in the classpath,
-     but for the time being at least, this is the mechanism used for
-     population of <filename>ear</filename> files.  &Abuild; will
-     attempt to add <filename>example-war.war.jar</filename> to the
-     classpath of build items that depend on
-     <filename>example-war</filename>, but since this file won't
-     exist, it turns out to be harmless.  It's possible that an error
-     might result if a <filename>war</filename> file depends on
-     another <filename>war</filename> file, but there's no reason for
-     this to ever happen.  Additionally, observe that the
-     <varname>abuild.web-xml</varname> property has to be set in the
+     say that the WAR file is in the classpath, but for the time being
+     at least, this is the mechanism used for population of EAR files.
+     &Abuild; will attempt to add
+     <filename>example-war.war.jar</filename> to the classpath of
+     build items that depend on <filename>example-war</filename>, but
+     since this file won't exist, it turns out to be harmless.  It's
+     possible that an error might result if a WAR file depends on
+     another WAR file, but there's no reason for this to ever happen.
+     Additionally, observe that the <varname>abuild.web-xml</varname>
+     property has to be set in the
      <filename>Abuild-ant.properties</filename> file in addition to
      the <filename>abuild.war-name</filename> property when creating
-     <filename>war</filename> files.
+     WAR files.
     </para>
    </sect1>
    <sect1 id="ref.example.ear-files">
-    <title>Ear Files</title>
+    <title>EAR Files</title>
     <para>
-     Next, look at the <filename>ear</filename> example.  The
+     Next, look at the EAR example.  The
      <classname>ear-example</classname> build item directly or
      indirectly depends on many the other build items we've seen so
      far.  It also depends on a private build item,
-     <filename>ear-example.local-jar</filename> that builds a jar file
-     for inclusion in the ear file.  There's nothing special about
+     <filename>ear-example.local-jar</filename> that builds a JAR file
+     for inclusion in the EAR file.  There's nothing special about
      this, but making it a private build item inside of
      <classname>ear-example</classname> makes it clear that it is
-     private to the <filename>ear</filename> file:
+     private to the EAR file:
      <?example archive-types/ear/Abuild.conf?>
      <?example archive-types/ear/Abuild-ant.properties?>
-     Unlike with <filename>war</filename> files,
-     <filename>ear</filename> files actually contain the direct
-     products produced by other build items, not their
-     <filename>jar</filename> counterparts.  Observe the contents of
-     the <filename>ear</filename> file:
+     Unlike with WAR files, EAR files actually contain the direct
+     products produced by other build items, not their JAR
+     counterparts.  Observe the contents of the EAR file:
      <?qtest example.ear-contents.out?>
-     Notice that the <filename>har</filename> and
-     <filename>war</filename> files are directly contained in the
-     <filename>ear</filename> file.  This is different from how
-     <filename>war</filename> files are constructed.  Note also that
-     the <filename>ear</filename> file contains the
-     <filename>war</filename> file and it also directly contains its
-     contents.  This behavior may change in the future.  Also, observe
-     that the <varname>abuild.application-xml</varname> property has to
-     be set in <filename>Abuild-ant.properties</filename> in addition
-     to the <varname>abuild.ear-name</varname> property in order for an
-     <filename>ear</filename> to be created.
+     Notice that the HAR and WAR files are directly contained in the
+     EAR file.  This is different from how WAR files are constructed.
+     Note also that the EAR file contains the WAR file and it also
+     directly contains its contents.  This behavior may change in the
+     future.  Also, observe that the
+     <varname>abuild.application-xml</varname> property has to be set
+     in <filename>Abuild-ant.properties</filename> in addition to the
+     <varname>abuild.ear-name</varname> property in order for an EAR
+     to be created.
     </para>
     <para>
      Suppose you wanted to avoid inclusion of just the
-     <filename>jar-example.jar</filename> file from the ear file.  You
+     <filename>jar-example.jar</filename> file from the EAR file.  You
      can do this by creating a local <command>pre-package</command>
      hook that removes it from the <filename>classpath</filename>
-     directory.  To illustrate this, we have a second ear example in
+     directory.  To illustrate this, we have a second EAR example in
      the <filename>other-ear</filename> directory.  It defines a local
      build file and enables local hooks.  Here is its
      <filename>Abuild-ant.properties</filename> file:
@@ -8219,7 +8230,7 @@ endif
      <filename>local.xml</filename>:
      <?example archive-types/other-ear/local.xml?>
      This same mechanism can be used to create hybrid client/server
-     <filename>war</filename> files.  The main problem with this
+     WAR files.  The main problem with this
      approach is that it requires you to know the name of the archives
      you want to move or remove, though this is not as bad as knowing
      their locations.  If necessary, you could define custom interface
@@ -8229,11 +8240,10 @@ endif
      file.
     </para>
     <para>
-     As with a <filename>jar</filename> file, anything in the
-     <filename>src/conf</filename> directory will appear under
-     <filename>src/META-INF</filename>, and anything in
-     <filename>src/resources</filename> will appear in the
-     <filename>ear</filename> file relative to its location in
+     As with a JAR file, anything in the <filename>src/conf</filename>
+     directory will appear under <filename>src/META-INF</filename>,
+     and anything in <filename>src/resources</filename> will appear in
+     the EAR file relative to its location in
      <filename>src/resources</filename>.
     </para>
     <para>
@@ -8244,26 +8254,24 @@ endif
      <itemizedlist>
       <listitem>
        <para>
-        <filename>war</filename> and <filename>ear</filename> files
-        are currently populated from the contents of the
-        <varname>abuild.classpath</varname> interface variable.  It
-        may be necessary to have some other mechanism for specifying
-        the contents of these types of archive files should it be
-        necessary to have a build item create and &ldquo;export&rdquo;
-        something without wanting it to be deployed.  This problem
-        will be addressed again as the need arises.
+        EAR and WAR files are currently populated from the contents of
+        the <varname>abuild.classpath</varname> interface variable.
+        It may be necessary to have some other mechanism for
+        specifying the contents of these types of archive files should
+        it be necessary to have a build item create and
+        &ldquo;export&rdquo; something without wanting it to be
+        deployed.  This problem will be addressed again as the need
+        arises.
        </para>
       </listitem>
       <listitem>
        <para>
-        <filename>ear</filename> and <filename>war</filename> files
-        both contain items that are copied from
+        EAR and WAR files both contain items that are copied from
         <varname>abuild.classpath</varname>.  There is no general
         facility for allowing this functionality.  If we were to have
-        to support some other archive type such as a
-        <filename>rar</filename> file that also contains items from
-        other build items, there would be no convenient way to handle
-        this using &abuild;'s <filename>jar</filename> creation
+        to support some other archive type such as a RAR file that
+        also contains items from other build items, there would be no
+        convenient way to handle this using &abuild;'s JAR creation
         abilities.  It would be possible to implement it by defining a
         <varname>generate</varname> hook that copied files into the
         generated <filename>src/resources</filename> directory.  The
@@ -11269,15 +11277,15 @@ Y = $(X)
          <listitem>
           <para>
            <emphasis>Non-compatible change</emphasis>: It is no longer
-           possible to create a local jar file in the same build item
-           as an ear file.  The ear example in the Java Archive Types
+           possible to create a local JAR file in the same build item
+           as an EAR file.  The EAR example in the Java Archive Types
            example has been updated to illustrate a different way to do
            this.
           </para>
          </listitem>
          <listitem>
           <para>
-           <emphasis>Non-compatible change</emphasis>: For war build
+           <emphasis>Non-compatible change</emphasis>: For WAR build
            items, the property <varname>abuild.war-type</varname> must
            now be set to either <varname>client</varname> or
            <varname>server</varname>.
@@ -11285,8 +11293,8 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           It is now possible to add arbitrary files to an ear file and
-           to populate an ear file's <filename>META-INF</filename>
+           It is now possible to add arbitrary files to an EAR file and
+           to populate an EAR file's <filename>META-INF</filename>
            directory.
           </para>
          </listitem>
@@ -11435,14 +11443,14 @@ Y = $(X)
        </listitem>
        <listitem>
         <para>
-         Support added for war files.
+         Support added for WAR files.
         </para>
        </listitem>
        <listitem>
         <para>
          The <filename>src/java</filename> directory is now optional.
-         It makes sense to omit it for some war files as well as for
-         jar files that consist entirely of resources or automatically
+         It makes sense to omit it for some WAR files as well as for
+         JAR files that consist entirely of resources or automatically
          generated code.
         </para>
        </listitem>
