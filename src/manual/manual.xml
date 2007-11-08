@@ -1039,7 +1039,7 @@ C:\cygwin\cygwin.bat
      items.  Next, we'll look at the
      <filename>Abuild-ant.properties</filename> file.  Property-driven
      Java build items have this file instead of
-     <filename>Abuild.mk</filename>.
+     <filename>Abuild.mk</filename>:
      <?example basic/java-library/Abuild-ant.properties?>
      The only thing we have to set here is the property
      <varname>abuild.jar-name</varname>.  For Java build items, we
@@ -1053,7 +1053,7 @@ C:\cygwin\cygwin.bat
      look at the <filename>Abuild.interface</filename> file.  This
      file provides information to other build items about what they
      should add to their classpaths in order to make use of the jar
-     file created by this build item.
+     file created by this build item:
      <?example basic/java-library/Abuild.interface?>
      As with the C++ library, it is possible to build this item by
      running <command>abuild</command> from the
@@ -2129,10 +2129,11 @@ C:\cygwin\cygwin.bat
      This build tree declares <filename>../project</filename> as an
      external.  It contains a <classname>derived-main</classname> build
      item structure identically to the C++ program build items we've
-     seen earlier.  Looking at the main program's
+     seen earlier.  Here at the main program's
      <filename>Abuild.conf</filename>:
      <?example stable/derived/main/src/Abuild.conf?>
-     you can that <classname>derived-main.src</classname> depends on
+     In this file, you can see that
+     <classname>derived-main.src</classname> depends on
      <classname>project-lib</classname> from the
      <filename>../project</filename> build tree and also
      <classname>common-lib2</classname> which is found in
@@ -3103,7 +3104,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>doc/example/task/project</filename>.  We have set this
      build tree's backing area to
      <filename>../../stable/project</filename> so that it would resolve
-     any missing build items or externals to that location.
+     any missing build items or externals to that location:
      <?example task/project/Abuild.backing?>
      Note that, although we used a relative path for our backing area
      in this example, we would ordinarily set our backing area to an
@@ -3113,11 +3114,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      modifications to any build items in <filename>common</filename>,
      we don't have to create a build tree at
      <filename>task/common</filename>, even though our root
-     <filename>Abuild.conf</filename>:
+     <filename>Abuild.conf</filename> lists
+     <filename>../common</filename> as an external:
      <?example task/project/Abuild.conf?>
-     lists <filename>../common</filename> as an external.  Since that
-     relative path exists as a valid build tree relative to our
-     backing area, &abuild; will just use
+     Since that relative path exists as a valid build tree relative to
+     our backing area, &abuild; will just use
      <filename>../common</filename> relative to the backing area
      (<filename>../../stable/project/../common</filename>, which is
      <filename>../../stable/common</filename>) to resolve the
@@ -3146,9 +3147,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      build item we added: <classname>project-lib.extra</classname>.  To
      add the new build item, we created
      <filename>task/project/lib/extra/Abuild.conf</filename>:
-     <?example task/project/lib/extra/Abuild.conf?>
      and also added the <filename>extra</filename> directory in
      <filename>task/project/lib/Abuild.conf</filename>:
+     <?example task/project/lib/extra/Abuild.conf?>
      <?example task/project/lib/Abuild.conf?>
      We didn't modify anything under
      <filename>task/project/main</filename> at all, but we included it
@@ -3295,13 +3296,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <property>child-dirs</property> key in
      <filename>project/lib/Abuild.conf</filename>:
      <?example user/project/lib/Abuild.conf?>
-     but that in itself was not sufficient since, even though the
+     That in itself was not sufficient since, even though the
      <filename>extra</filename> directory is no longer present in the
      <property>child-dirs</property> key of
      <classname>project-lib</classname>'s
      <filename>Abuild.conf</filename>, we would just inherit
      <classname>project-lib.extra</classname> from our backing area.
-     To really delete the build item, we had to add a
+     To really delete the build item, we also had to add a
      <property>deleted</property> key in
      <filename>user/project</filename>'s
      <filename>Abuild.conf</filename>:
@@ -3319,12 +3320,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      interfaces.  If you look at the <filename>Abuild.conf</filename>
      in the <filename>src</filename> directory, you will see that it
      lists <property>private</property> in its
-     <property>supported-flags</property> key.
+     <property>supported-flags</property> key:
      <?example user/project/lib/src/Abuild.conf?>
      In its <filename>Abuild.interface</filename> file, it adds
      <filename>../private-include</filename> to
      <varname>INCLUDES</varname> only when the
-     <property>private</property> flag is set.
+     <property>private</property> flag is set:
      <?example user/project/lib/src/Abuild.interface?>
      This makes the headers in the
      <filename>private-include</filename> directory visible to it and
@@ -3346,11 +3347,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      interface flags set for itself.  Another thing we've done in this
      build item is to put the new source file
      <filename>ProjectLib_private.cpp</filename> in a
-     <filename>private</filename> subdirectory.  The only reason we
-     did this was to demonstrate that &abuild; allows multicomponent
-     paths in your source files.  Just avoid putting
-     &ldquo;<filename>..</filename>&rdquo; anywhere in the path.
+     <filename>private</filename> subdirectory:
      <?example user/project/lib/src/Abuild.mk?>
+     The only reason we did this was to demonstrate that &abuild;
+     allows multicomponent paths in your source files.  Just avoid
+     putting &ldquo;<filename>..</filename>&rdquo; anywhere in the
+     path.
     </para>
     <para>
      If you study <filename>ProjectLib.cpp</filename> in
@@ -3358,7 +3360,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      we have included the file
      <filename>ProjectLib_private.hpp</filename> and called a function
      in that file to get the value with which we initialize
-     <varname>cl1</varname>.
+     <varname>cl1</varname>:
      <?example user/project/lib/src/private/ProjectLib_private.cpp?>
      This isn't a particularly useful example of how one would use a
      private interface, but it will suffice to illustrate how they
@@ -3377,7 +3379,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>Abuild.conf</filename> file in the
      <filename>test</filename> directory mentions
      <classname>project-lib.src</classname> explicitly in its dependency
-     list, and that it is followed by <option>-flag=private</option>.
+     list, and that it is followed by <option>-flag=private</option>:
      <?example user/project/lib/test/Abuild.conf?>
      This means that when <classname>project-lib.test</classname>
      reads <classname>project-lib.src</classname>'s
@@ -5629,30 +5631,30 @@ endif
      Notice that the <filename>Abuild.conf</filename> in the
      <filename>stub-library</filename> directory itself defines a
      pass-through build item that depends on the
-     <classname>stub-library.implementation</classname> build item.
+     <classname>stub-library.implementation</classname> build item:
      <?example user/derived/stub-library/Abuild.conf?>
      The <classname>stub-library.implementation</classname> build
      item, in turn, depends on the
-     <classname>stub-library.autoconf</classname> build item.
+     <classname>stub-library.autoconf</classname> build item:
      <?example user/derived/stub-library/implementation/Abuild.conf?>
     </para>
     <para>
      The <classname>stub-library.autoconf</classname> build item's
-     <filename>Abuild.interface</filename> file:
+     <filename>Abuild.interface</filename> file adds its output
+     directory to the <varname>INCLUDES</varname> variable since this
+     where the autoconf-generated header file will go.  Then it
+     declares <filename>autoconf.interface</filename> in its output
+     directory as an after-build file using the
+     <function>after-build</function> statement:
      <?example user/derived/stub-library/autoconf/Abuild.interface?>
-     adds its output directory to the <varname>INCLUDES</varname>
-     variable since this where the autoconf-generated header file will
-     go.  Then it declares <filename>autoconf.interface</filename> in
-     its output directory as an after-build file using the
-     <function>after-build</function> statement.  This means that the
-     <filename>autoconf.interface</filename> file won't be included
-     when this build item is built but will be included when other
-     build items that depend on this one are built.  This is important
-     since the file won't actually exist yet when this build item is
-     being built from a clean state.
+     This means that the <filename>autoconf.interface</filename> file
+     won't be included when this build item is built but will be
+     included when other build items that depend on this one are
+     built.  This is important since the file won't actually exist yet
+     when this build item is being built from a clean state.
     </para>
     <para>
-     Next, look at the <filename>autoconf/Abuild.mk</filename> file.
+     Next, look at the <filename>autoconf/Abuild.mk</filename> file:
      <?example user/derived/stub-library/autoconf/Abuild.mk?>
      Here, we set the variables that the <varname>autoconf</varname>
      rules require.  You can learn more about these variables by run
@@ -5668,7 +5670,7 @@ endif
      <filename>autoconf/configure.ac</filename>.
     </para>
     <para>
-     Here is the <filename>autoconf/configure.ac</filename> file.
+     Here is the <filename>autoconf/configure.ac</filename> file:
      <?example user/derived/stub-library/autoconf/configure.ac?>
      This contains normal autoconf macros.  The main things to note
      here are the <varname>AC_CONFIG_FILES</varname> macro which
@@ -5685,7 +5687,7 @@ endif
     </para>
     <para>
      Next, we examine the <filename>autoconf.interface.in</filename>
-     file.
+     file:
      <?example user/derived/stub-library/autoconf/autoconf.interface.in?>
      This is just like any other file generated by autoconf: it
      contains substitution tokens surrounded by @ signs.  Since it is
@@ -5717,14 +5719,14 @@ endif
      function with the <constant>HAVE_CREATE_WORLD_PEACE</constant>
      preprocessor symbol as generated by autoconf.  It also makes use
      of printf and checks to make sure it's there, just to demonstrate
-     how you might do such a thing.
+     how you might do such a thing:
      <?example user/derived/stub-library/implementation/stub.cc?>
      The implementation provides a header file called
      <filename>world_peace.hh</filename>, which is presumably the same
      as the name of the header provided by the real implementation and
      which would have been made available by the
      <filename>stub-library.autoconf</filename> build item if the
-     library were found.
+     library were found:
      <?example user/derived/stub-library/implementation/world_peace.hh?>
      The <filename>Abuild.interface</filename> file in the
      <filename>implementation</filename> directory actually adds
@@ -5733,7 +5735,7 @@ endif
      provided by <filename>stub-library.autoconf</filename>'s
      <filename>autoconf.interface</filename> file, is false.  So if we
      had a real <function>create_world_peace</function> function, we
-     wouldn't have to use our stub library.
+     wouldn't have to use our stub library:
      <?example user/derived/stub-library/implementation/Abuild.interface?>
     </para>
     <para>
@@ -5957,7 +5959,7 @@ endif
      <filename>Shared.cc</filename>.  Here is the header file
      <filename>Shared.hh</filename>:
      <?example shared-library/shared/include/Shared.hh?>
-     and this implementation of the interface:
+     This is the implementation of the interface:
      <?example shared-library/shared/impl1/Shared.cc?>
      Notice the <literal>__declspec(dllexport)</literal> line that is
      there for Windows only.  This is necessary to make Windows export
@@ -5983,34 +5985,33 @@ endif
     </para>
     <para>
      Our second implementation is not in the dependency chain of our
-     program.  It resides in the <filename>impl2</filename>
-     directory.  Here is its <filename>Abuild.conf</filename>:
+     program.  It resides in the <filename>impl2</filename> directory.
+     Here are its <filename>Abuild.conf</filename> and
+     <filename>Abuild.mk</filename>:
      <?example shared-library/shared/impl2/Abuild.conf?>
-     and its <filename>Abuild.mk</filename>:
      <?example shared-library/shared/impl2/Abuild.mk?>
      You will notice in this case that this build item depends on a
-     static library that its private to its own build item name
-     scope.  This static library provides additional functions that
-     are used <emphasis>within</emphasis> the shared library.  In
-     order to tell &abuild; to link that static library into the
-     shared library, we set the variable
-     <varname>LINK_SHLIBS</varname>.  Also, we want to avoid having
-     the static library appear on the link statement for executables
-     that link with this shared library.  To do that, we have to do
-     some extra work in our <filename>Abuild.interface</filename>
-     file.  Here is that file:
-     <?example shared-library/shared/impl2/Abuild.interface?>
+     static library that its private to its own build item name scope.
+     This static library provides additional functions that are used
+     <emphasis>within</emphasis> the shared library.  In order to tell
+     &abuild; to link that static library into the shared library, we
+     set the variable <varname>LINK_SHLIBS</varname>.  Also, we want
+     to avoid having the static library appear on the link statement
+     for executables that link with this shared library.  To do that,
+     we have to do some extra work in our
+     <filename>Abuild.interface</filename> file.  Here are that file
      and the <function>after-build</function> file that it loads:
+     <?example shared-library/shared/impl2/Abuild.interface?>
      <?example shared-library/shared/impl2/after.interface?>
      Notice that we reset the <varname>LIBS</varname> variable and add
      our own library to it after the build has completed.  This makes
      the static library added in
      <classname>shared.impl2.static</classname>'s
-     <filename>Abuild.interface</filename>:
+     <filename>Abuild.interface</filename> available to
+     <classname>shared.impl2</classname> during its linking but not
+     available to those who depend on
+     <classname>shared.impl2</classname>:
      <?example shared-library/shared/impl2/static/Abuild.interface?>
-     available to <classname>shared.impl2</classname> during its
-     linking but not available to those who depend on
-     <classname>shared.impl2</classname>.
     </para>
     <para>
      Finally, we can run our program.  Remember that in order to run
@@ -6239,7 +6240,7 @@ endif
      <classname>derived-main.src</classname>:
      <?example user/derived/main/src/Abuild.conf?>
      <?example user/derived/main/src/Abuild.mk?>
-     Here is the modified <filename>main.cpp</filename> file.
+     Here is the modified <filename>main.cpp</filename> file:
      <?example user/derived/main/src/main.cpp?>
     </para>
    </sect1>
@@ -6285,12 +6286,12 @@ endif
      <filename>Abuild.interface</filename> file's directory.  Note
      that we use the build item name in the variable name to reduce
      the likelihood of clashing with other interface variables.  In
-     the <filename>Abuild.mk</filename> file:
+     the <filename>Abuild.mk</filename> file we use the
+     <varname>LOCAL_RULES</varname> variable to declare the local
+     rules file <filename>generate.mk</filename>.  This is where we
+     will actually generate the header file.  Otherwise, this is an
+     ordinary <filename>Abuild.mk</filename>:
      <?example auto-from-variable/library/Abuild.mk?>
-     we use the <varname>LOCAL_RULES</varname> variable to declare the
-     local rules file <filename>generate.mk</filename>.  This is where
-     we will actually generate the header file.  Otherwise, this is an
-     ordinary <filename>Abuild.mk</filename>.
     </para>
     <para>
      Here is <filename>generate.mk</filename>:
@@ -6380,10 +6381,10 @@ endif
      </footnote>
     </para>
     <para>
-     We have two files that use the header file.  One is the library
-     implementation itself:
+     We have two files that use the header file.  The first one is the
+     library implementation itself:
      <?example auto-from-variable/library/FileProvider.cc?>
-     and the other is the main program from the other build item:
+     The other is the main program from the other build item:
      <?example auto-from-variable/program/main.cc?>
     </para>
     <para>
@@ -6917,13 +6918,13 @@ endif
      We'll start off with the <classname>executable</classname> build
      item in the <filename>executable</filename> directory.  If you
      look at its <filename>Abuild.conf</filename> file, you will see
-     that it depends on <classname>library</classname>.
+     that it depends on <classname>library</classname>:
      <?example java/executable/Abuild.conf?>
      From <classname>executable</classname>'s
      <filename>Abuild-ant.properties</filename> file, you can see that
      this build item is generating the file
      <filename>example-executable.jar</filename>, and that it is
-     generating a wrapper script.
+     generating a wrapper script:
      <?example java/executable/Abuild-ant.properties?>
     </para>
     <para>
@@ -6947,7 +6948,7 @@ endif
      jar file called <filename>example-library.jar</filename> as you
      can see from looking at the value of
      <varname>abuild.jar-name</varname> in its
-     <filename>Abuild-ant.properties</filename> file.
+     <filename>Abuild-ant.properties</filename> file:
      <?example java/library/Abuild-ant.properties?>
      In addition, this build item makes use of hooks in the
      <classname>code-generator</classname> build item.  Specifically,
@@ -6975,13 +6976,13 @@ endif
      <filename>CodeGenerator.jar</filename>.  It also sets the
      &abuild; property <varname>abuild.include-ant-runtime</varname>
      so that the <application>ant</application> runtime library will
-     be included in the compile-time classpath.
+     be included in the compile-time classpath:
      <?example java/code-generator/Abuild-ant.properties?>
     </para>
     <para>
      This build item also has a file called
      <filename>ant-hooks.xml</filename>.  This file contains the build
-     hooks that are provided by this build item.
+     hooks that are provided by this build item:
      <?example java/code-generator/ant-hooks.xml?>
      For more details on hooks, run <command>abuild
      hooks-help</command> from any java build item.  This particular
@@ -7014,14 +7015,14 @@ endif
      <filename>Abuild.interface</filename> does something that most
      build items don't have to do: it declares a custom variable that
      holds the name of the jar file that it generates, and it does not
-     add this jar file to the classpath.
+     add this jar file to the classpath:
+     <?example java/code-generator/Abuild.interface?>
      The reason for this is that
      <classname>code-generator</classname>'s users don't need to call
      anything from its jar file in their code, but its
      <filename>ant-hooks.xml</filename> file, which will be invoked
      with <varname>basedir</varname> set to the calling build item's
      output directory, needs to know the location of the jar file.
-     <?example java/code-generator/Abuild.interface?>
     </para>
     <para>
      The <classname>code-generator</classname>'s
@@ -7044,7 +7045,7 @@ endif
      script, but this time, it uses a different main class in the
      executable jar file.  This build item serves primarily as an
      example of using the wrapper target, which is a post-package
-     hook, from a build item that doesn't actually package anything.
+     hook, from a build item that doesn't actually package anything:
      <?example java/other-executable/Abuild.conf?>
     </para>
    </sect1>
@@ -7069,7 +7070,7 @@ endif
      ant on this build file from inside the
      <filename>abuild-java</filename> output directory, all references
      to source paths must be prefixed by
-     &ldquo;<filename>../</filename>&rdquo;.
+     &ldquo;<filename>../</filename>&rdquo;:
      <?example java/alternative/Abuild-ant.xml?>
      Also observe that this build file loads the
      <filename>.ab-dynamic-ant.properties</filename> so that it can
@@ -7529,7 +7530,7 @@ endif
      <varname>CALCULATE</varname> interface variable, to do its job,
      and it uses the file named in the <varname>NUMBERS</varname>
      variable to get the arguments to pass to
-     <varname>$(CALCULATE)</varname>.
+     <varname>$(CALCULATE)</varname>:
      <?example cross-platform/codegen/Rules.mk?>
      In order for this to work, the <classname>codegen</classname>
      build item must depend on the <classname>calculate</classname>
@@ -7540,7 +7541,7 @@ endif
      get around this, <classname>codegen</classname>'s
      <filename>Abuild.conf</filename> specifies a
      <option>-platform</option> argument to its declaration of its
-     dependency on <classname>calculate</classname>.
+     dependency on <classname>calculate</classname>:
      <?example cross-platform/codegen/Abuild.conf?>
      The argument <option>-platform=native:option=release</option>
      tells &abuild; to make <classname>codegen</classname> depend on
@@ -7805,7 +7806,7 @@ endif
      of the handlers (as that would create a circular dependency),
      thus allowing it to remain completely separate from the handler
      implementations.  The handlers themselves accept a
-     <classname>HelperInterface</classname> instance as a parameter.
+     <classname>HelperInterface</classname> instance as a parameter:
      <?example mixed-classification/public/helper/Abuild.conf?>
      <?example mixed-classification/public/handlers/Abuild.conf?>
     </para>
@@ -7813,12 +7814,12 @@ endif
      Next we will study the executable.  If you look at the
      <classname>executable</classname> build item, you will observe that
      it depends on <classname>helper</classname> and
-     <classname>executable.entry</classname>.
+     <classname>executable.entry</classname>:
      <?example mixed-classification/public/executable/Abuild.conf?>
      Its <filename>Main.java</filename> is very minimal: it just
      invokes <varname>Entry.runExecutable</varname> passing to it an
      instantiated <classname>Helper</classname> object and whatever
-     arguments were passed to <varname>main</varname>.
+     arguments were passed to <varname>main</varname>:
      <?example mixed-classification/public/executable/src/java/com/example/executable/Main.java?>
      It is important to keep this main routine minimal because we will
      have to have a separate main in the sensitive area as that is the
@@ -7836,7 +7837,7 @@ endif
      <classname>executable.entry</classname> build item, we can see
      that our <filename>Entry.java</filename> file has a static
      initializer that registers our two handlers,
-     <varname>H1</varname> and <varname>H2</varname>.
+     <varname>H1</varname> and <varname>H2</varname>:
      <?example mixed-classification/public/executable/entry/src/java/com/example/executable/entry/Entry.java?>
      If this were a C++ program and portability to Windows were not
      required, we could omit this static initializer block entirely
@@ -7875,7 +7876,7 @@ endif
      simultaneously in the same executable.  Also observe that the
      name of the build item is actually
      <classname>helper.sensitive</classname> and that the build item
-     sets its visibility to <varname>*</varname>.
+     sets its visibility to <varname>*</varname>:
      <?example mixed-classification/sensitive/helper/Abuild.conf?>
      In this particular example, there's no reason that we couldn't
      have given the build item a public name as there are no
@@ -7916,13 +7917,13 @@ endif
      <?example mixed-classification/sensitive/handlers/Abuild.conf?>
      Also observe that <classname>executable.sensitive</classname>
      depends on <classname>executable.entry</classname> just like the
-     public version of the executable did.
+     public version of the executable did:
      <?example mixed-classification/sensitive/executable/Abuild.conf?>
      Looking at the sensitive executable's
      <filename>Main.java</filename>, we can see that it is essentially
      identical to the public version except that it registers some
      additional handlers that were not available in the public
-     version.
+     version:
      <?example mixed-classification/sensitive/executable/src/java/com/example/executable/Main.java?>
     </para>
     <para>
@@ -8015,7 +8016,7 @@ endif
      <filename>Abuild.interface</filename> file, you will observe that
      we are creating a <filename>har</filename> file here exactly the
      way we would create a <filename>jar</filename> file except that we
-     are using the <filename>.har</filename> suffix.
+     are using the <filename>.har</filename> suffix:
      <?example archive-types/har/Abuild-ant.properties?>
      <?example archive-types/har/Abuild.interface?>
      Note that the <filename>har</filename> file created here probably
@@ -8032,7 +8033,7 @@ endif
      Next, look at the <filename>jar</filename> example.  It is
      essentially identical to the <filename>har</filename> example
      except that this build item depends on
-     <classname>har-example</classname>.
+     <classname>har-example</classname>:
      <?example archive-types/jar/Abuild-ant.properties?>
      <?example archive-types/jar/Abuild.interface?>
      The <filename>JarExample.java</filename> class imports a class
@@ -8093,14 +8094,14 @@ endif
      will end up in <filename>WEB-INF/lib</filename>.  The
      <filename>ear</filename> example includes a demonstration of
      using a <command>pre-package</command> hook for manipulating the
-     contents of the <filename>classpath</filename> directory.
+     contents of the <filename>classpath</filename> directory:
      <?example archive-types/war/Abuild-ant.properties?>
      <?example archive-types/war/Abuild.interface?>
      Here are the contents of this server
      <filename>war</filename> file:
      <?qtest example.war-contents.out?>
      The <classname>client-war</classname> example is identical except
-     it creates a client war instead.
+     it creates a client war instead:
      <?example archive-types/client-war/Abuild-ant.properties?>
      <?example archive-types/client-war/Abuild.interface?>
      Here are its contents:
@@ -8149,7 +8150,7 @@ endif
      for inclusion in the ear file.  There's nothing special about
      this, but making it a private build item inside of
      <classname>ear-example</classname> makes it clear that it is
-     private to the <filename>ear</filename> file.
+     private to the <filename>ear</filename> file:
      <?example archive-types/ear/Abuild.conf?>
      <?example archive-types/ear/Abuild-ant.properties?>
      Unlike with <filename>war</filename> files,
@@ -8272,29 +8273,29 @@ endif
      contains an example of doing this.  The <filename>lib1</filename>
      and <filename>lib2</filename> directories both contain
      self-contained classes and have static variables that call those
-     classes' constructors.
+     classes' constructors:
      <?example whole-library/lib1/thing1.cc?>
      <?example whole-library/lib2/thing2.cc?>
-     Since neither library is referenced by
-     <filename>main.cc</filename> (in <filename>bin</filename>):
+     Neither library is referenced by <filename>main.cc</filename> (in
+     <filename>bin</filename>):
      <?example whole-library/bin/Abuild.conf?>
      <?example whole-library/bin/main.cc?>
-     the linker would not ordinarily link them in in spite of the
-     dependency on both library build items.
+     Therefore, the linker would not ordinarily link them in in spite
+     of the dependency on both library build items.
     </para>
     <para>
      In this example, we force <filename>lib1</filename> to be linked
      in but not <filename>lib2</filename>.  This is done by adding the
      variable <varname>WHOLE_lib_thing1</varname> to
      <filename>lib1</filename>'s
-     <filename>Abuild.interface</filename>.
+     <filename>Abuild.interface</filename>:
      <?example whole-library/lib1/Abuild.interface?>
-     (<filename>thing1</filename> is the name of the library provided
-     by <filename>lib1</filename>.)  On systems that support this,
-     defining this variable causes the corresponding library to be
-     linked in its entirety into any executables that use the library.
-     This facility may not be supported by all compilers.  In
-     particular, it is not supported for Microsoft Visual C++ in
+     Note that <filename>thing1</filename> is the name of the library
+     provided by <filename>lib1</filename>.  On systems that support
+     this, defining this variable causes the corresponding library to
+     be linked in its entirety into any executables that use the
+     library.  This facility may not be supported by all compilers.
+     In particular, it is not supported for Microsoft Visual C++ in
      versions at least through .NET 2005.  For cases in which some
      users of a library may want to link in the whole library and
      others may not, it is also possible to set the
@@ -8310,7 +8311,7 @@ endif
     <para>
      We do not set this variable for <filename>lib2</filename>:
      <?example whole-library/lib2/Abuild.interface?>
-     which means that its static initializer will not be linked in on
+     This means that its static initializer will not be linked in on
      any system.  On a system that supports whole-library linking, the
      main program generates this output:
      <?qtest example.whole-library.out?>
@@ -8349,7 +8350,7 @@ endif
      The <filename>public</filename> item implements a wrapper around
      <filename>hidden</filename>'s interface, but uses
      <filename>hidden</filename> privately: only its source files, not
-     its header files, access files from <filename>hidden</filename>.
+     its header files, access files from <filename>hidden</filename>:
      <?example opaque-wrapper/public/Public.hh?>
      <?example opaque-wrapper/public/Public.cc?>
      The intention is that users of <filename>public</filename> should
@@ -8363,7 +8364,7 @@ endif
      <filename>hidden</filename> library.  The
      <filename>public</filename> build item achieves this by resetting
      the <varname>INCLUDES</varname> interface variable in an
-     after-build file.
+     after-build file:
      <?example opaque-wrapper/public/Abuild.interface?>
      <?example opaque-wrapper/public/hide-hidden.interface?>
      This way, items that depend on <filename>public</filename> will
@@ -8790,14 +8791,14 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <?example plugin/plugins/counter/Abuild.conf?>
       The <filename>plugin.interface</filename> file declares a new
       interface variable called <varname>TO_COUNT</varname> which
-      contains a list of file names.
+      contains a list of file names:
       <?example plugin/plugins/counter/plugin.interface?>
       This file gets loaded automatically before any regular build
       items' <filename>Abuild.interface</filename> files.  The file
       <filename>count.mk</filename> in the
       <filename>rules/platform-independent</filename> directory is the
       file that a build item may include in its
-      <varname>RULES</varname> file.
+      <varname>RULES</varname> file:
       <?example plugin/plugins/counter/rules/platform-independent/count.mk?>
       If it does, then any files listed in <varname>TO_COUNT</varname>
       will have their lines counted with <command>wc -l</command> when
@@ -8848,7 +8849,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <filename>Abuild.interface</filename>, and a build item in
       <filename>b</filename> that uses the <filename>count</filename>
       rule in its <varname>RULES</varname> variable in its
-      <filename>Abuild.mk</filename> file.
+      <filename>Abuild.mk</filename> file:
       <?example plugin/other/indep/a/Abuild.interface?>
       <?example plugin/other/indep/b/Abuild.mk?>
       Here is the output of running <command>abuild count</command>
@@ -8871,7 +8872,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       automatically without having to take any explicit action.  This
       would be preferable to declaring this as a dependency for every
       item and modifying <varname>BUILD_ITEM_RULES</varname> or
-      <varname>abuild.hook-build-items</varname> for every build item.
+      <varname>abuild.hook-build-items</varname> for every build item:
       <?example plugin/plugins/echoer/plugin.mk?>
       <?example plugin/plugins/echoer/plugin-ant.xml?>
      </para>
@@ -8910,7 +8911,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
      <para>
       Here we define a new platform type called <type>printer</type>.
       This is done by creating a <filename>platform-types</filename>
-      file and declaring the platform type in it.
+      file and declaring the platform type in it:
       <?example plugin/plugins/printer/platform-types?>
      </para>
      <para>
@@ -8928,7 +8929,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
        </para>
       </footnote>
       To add this platform, we print its name from the
-      <command>list_platforms</command> command.
+      <command>list_platforms</command> command:
       <?example plugin/plugins/printer/list_platforms?>
       In this case, the program is trivial, but in a real
       implementation, the <command>list_platforms</command> command
@@ -8943,7 +8944,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       always the name of the compiler, so this implies that we have an
       <type>abc</type> compiler defined somewhere.  This plugin also
       provides the rules for using the <type>abc</type> compiler in
-      <filename>toolchains/abc.mk</filename>.
+      <filename>toolchains/abc.mk</filename>:
       <?example plugin/plugins/printer/toolchains/abc.mk?>
       To understand this file, you should read through the comments in
       <filename>make/rules/object-code/ccxx.mk</filename> in the
@@ -8980,7 +8981,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       and the <classname>lib</classname> build item on which it
       depends include the <filename>printer</filename> platform type
       in their <property>platform-types</property> keys in their
-      <filename>Abuild.conf</filename> files.
+      <filename>Abuild.conf</filename> files:
       <?example plugin/other/lib/Abuild.conf?>
       <?example plugin/other/bin/Abuild.conf?>
       Here is the build output:
@@ -9031,9 +9032,10 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       don't have to add any new platform types since we are just adding
       this platform to the native platform type.  Since this is a
       relatively common operation, &abuild; provides a short syntax for
-      doing it.  The <command>list_platforms</command> program:
+      doing it.  Here is the <command>list_platforms</command> program:
       <?example native-compiler/compiler/list_platforms?>
-       generates the output <programlisting>native-compiler qcc.release
+      It generates this output:
+      <programlisting>native-compiler qcc.release
 native-compiler qcc.debug
 native-compiler qcc
 </programlisting>
@@ -9069,19 +9071,20 @@ native-compiler qcc
      <para>
       In addition to listing the compiler in
       <command>list_platforms</command>, we have to provide a support
-      file for it in <filename>toolchains/qcc.mk</filename>.  This
-      file illustrates a degenerate compiler implementation, providing
-      minimal implementations of all the variables and functions that
-      <filename>ccxx.mk</filename> requires.  For details, please read
-      the comments in <filename>make/toolchains/ccxx.mk</filename> in
-      the &abuild; distribution.
+      file for it in <filename>toolchains/qcc.mk</filename>:
       <?example native-compiler/compiler/toolchains/qcc.mk?>
+      This file illustrates a degenerate compiler implementation,
+      providing minimal implementations of all the variables and
+      functions that <filename>ccxx.mk</filename> requires.  For
+      details, please read the comments in
+      <filename>make/toolchains/ccxx.mk</filename> in the &abuild;
+      distribution.
      </para>
      <para>
       In the <filename>native-compiler/outside</filename> directory,
       there is another build tree that lists
       &ldquo;<filename>..</filename>&rdquo; in its
-      <property>external-dirs</property> key.
+      <property>external-dirs</property> key:
       <?example native-compiler/outside/Abuild.conf?>
       This tree doesn't know about the <filename>qcc</filename>
       compiler, so when we build the <classname>outside</classname>
