@@ -158,9 +158,10 @@ following checks:
    software baseline that uses &abuild;.  In Part I, you will learn
    about what &abuild; is and the types of problems it was designed to
    solve, be introduced to some basic terminology, and see a few
-   examples of how to some simple build operations.  This part of the
-   manual is very short and is designed to be readable in one sitting.
-   Casual users of &abuild; may have no need to read past Part I.
+   examples of how to perform some simple build operations.  This part
+   of the manual is very short and is designed to be readable in one
+   sitting.  Casual users of &abuild; may have no need to read past
+   Part I.
   </para>
   <para>
    In <xref linkend="ref.part2"/>, we introduce the most common
@@ -171,9 +172,8 @@ following checks:
   <para>
    In <xref linkend="ref.part3"/>, we introduce advanced topics.  Part
    III opens with complete reference guides to &abuild;'s command-line
-   options and all the files used by &abuild;.  We also cover more
-   advanced topics.  By the end of Part III, you will have been
-   exposed to every feature of &abuild;.
+   options and all the files used by &abuild;.  By the end of Part
+   III, you will have been exposed to every feature of &abuild;.
   </para>
   <para>
    <xref linkend="ref.part4"/> consists of a small handful of
@@ -233,7 +233,10 @@ following checks:
     The material contained in this part is geared toward new and
     casual users of &abuild;.  Without going into excessive detail,
     this part gives you a quick tour of &abuild;'s functionality and
-    presents a few examples of routine build operations.
+    presents a few examples of routine build operations.  By the end
+    of this chapter, you should be able to use &abuild; for simple
+    build operations, and you should have begun to get a feel for the
+    basic configuration files.
    </para>
   </partintro>
   <chapter id="ref.introduction">
@@ -248,11 +251,11 @@ following checks:
      that may span multiple languages and platforms.  The basic idea
      behind &abuild; is simple: when building a single component
      (module, unit, etc.) of a software package, the developer should
-     be able to be focused just on that component.  &Abuild; requires
-     each component developer to declare, by name, the list of other
-     components on which his or her component depends.  Then it is
-     &abuild;'s responsibility to provide whatever is needed to the
-     build environment to make the other components visible.
+     be able to focus on that component exclusively.  &Abuild;
+     requires each component developer to declare, by name, the list
+     of other components on which his or her component depends.  It is
+     then &abuild;'s responsibility to provide whatever is needed to
+     the build environment to make the other components visible.
     </para>
     <para>
      You might want to think of &abuild; as an
@@ -261,11 +264,11 @@ following checks:
      <firstterm>build item</firstterm>.  A build item is essentially a
      single collection of code, usually contained within one
      directory, that is built as a unit.  A build item may produce one
-     or more products, such as libraries, executables, jar files,
-     etc., that other build items may want to use.  It is the
-     responsibility of each build item to provide information about
-     its products that may be used by other items that depend on it.
-     This information is provided by a build item in its &abuild;
+     or more products (libraries, executables, jar files, etc.) that
+     other build items may want to use.  It is the responsibility of
+     each build item to provide information about its products that
+     may be used by other items that depend on it.  This information
+     is provided by a build item in its &abuild;
      <firstterm>interface</firstterm>.  In this way, knowledge about
      how to use a build item is encapsulated within that build item
      rather than being spread around throughout the other components
@@ -274,22 +277,23 @@ following checks:
     <para>
      To implement this core functionality, &abuild; provides its own
      system for managing build items and the dependencies and
-     relationships among them.  It also provides build frameworks
-     implemented with <application>GNU Make</application> and
-     <application>Apache Ant</application> to perform the actual build
-     steps themselves.  We refer to the underlying tools used to
-     perform the actual builds as <firstterm>backends</firstterm>.
-     Although the bulk of the functionality and sophistication of
-     &abuild; comes from its own core capabilities rather than the
-     actual build code, &abuild; is intended to <emphasis>be</emphasis>
-     your build system.  It is not intended, as some other tools are,
-     to wrap around your existing build system.  &Abuild; can, however,
-     interoperate with other build systems as needed.
+     relationships among them.  It also provides various build rules
+     implemented with underlying tools, specifically <application>GNU
+     Make</application> and <application>Apache Ant</application>, to
+     perform the actual build steps.  We refer to these underlying
+     tools as <firstterm>backends</firstterm>.  Although the bulk of
+     the functionality and sophistication of &abuild; comes from its
+     own core capabilities rather than the build rules, the rules have
+     rich functionality as well.  &Abuild; is intended to
+     <emphasis>be</emphasis> your build system.  It is not intended,
+     as some other tools are, to wrap around your existing build
+     system.  &Abuild; can, however, interoperate with other build
+     systems as needed.
     </para>
     <para>
      Support for compilation in multiple programming languages and on
-     multiple platforms, including embedded platforms, is fundamental
-     to &abuild;'s design and has been built into &abuild; from the
+     multiple platforms, including embedded platforms, is central to
+     &abuild;'s design and has been built into &abuild; from the
      beginning.  &Abuild; is designed to allow build items to be built
      on multiple platforms simultaneously within a single build tree.
      An important way in which &abuild; achieves this functionality is
@@ -297,14 +301,16 @@ following checks:
      directory</firstterm>.  When &abuild; does an actual build, it
      always creates an output directory named
      <filename>abuild-<replaceable>platform</replaceable></filename>
-     and invokes the backend from that directory.  By actually invoking
-     the backend from that directory, &abuild; avoids the situation of
-     temporary files conflicting with each other on multiple
-     simultaneous builds of a single build item on multiple platforms.
-     &Abuild; is designed to never create or remove any output files
-     outside of its output directories.  This enables &abuild;'s
-     special <command>clean</command> target to simply remove all
-     output directories created by any instance of &abuild;.
+     and invokes the backend from that directory.  By actually
+     invoking the backend from that directory, &abuild; avoids the
+     situation of temporary files conflicting with each other on
+     multiple simultaneous builds of a single build item on multiple
+     platforms.  &Abuild; is designed to never create or remove any
+     output files outside of its output directories.  This enables
+     &abuild;'s special <command>clean</command> target to simply
+     remove all output directories created by any instance of
+     &abuild;, and also reduces the likelihood of unintentionally
+     mixing generated products with version-controlled sources.
     </para>
    </sect1>
    <sect1 id="ref.typographic-conventions">
@@ -313,25 +319,42 @@ following checks:
      The following list shows the font conventions used throughout
      this document for the names of different kinds of items.
      <simplelist>
-      <member><property>Abuild.conf keys</property></member>
-      <member><function>Abuild.interface keywords</function></member>
-      <member><varname>Abuild.interface variables</varname></member>
-      <member><command>abuild/make/ant targets and hooks</command></member>
-      <member><classname>build item scope names</classname></member>
-      <member><classname>build items</classname></member>
-      <member><option>build sets</option></member>
-      <member><option>command line options</option></member>
-      <member><command>commands</command></member>
-      <member><envar>environment variables</envar></member>
-      <member><filename>file names</filename></member>
-      <member><property>flags</property></member>
-      <member><varname>java properties</varname></member>
       <member><literal>literal text</literal></member>
-      <member><filename>make rule sets</filename></member>
-      <member><varname>make variables</varname></member>
-      <member><type>platforms, platform types, and target types</type></member>
       <member><replaceable>replaceable text</replaceable></member>
-      <member><property>traits</property></member>
+      <member>
+       <classname>build items</classname> and <classname>build item
+       scope names</classname>
+      </member>
+      <member>
+       <property>Abuild.conf keys</property>,
+       <property>flags</property>, and <property>traits</property>
+      </member>
+      <member>
+       <varname>Abuild.interface variables</varname>, <varname>java
+       properties</varname>, and <varname>make variables</varname>
+      </member>
+      <member>
+       <function>Abuild.interface keywords</function>
+      </member>
+      <member>
+       <command>commands</command>, <command>build targets</command>,
+       and <command>ant hooks</command>
+      </member>
+      <member>
+       <option>command line options</option> and <option>build
+       sets</option>
+      </member>
+      <member>
+       <envar>environment variables</envar>
+      </member>
+      <member>
+       <filename>file names</filename> and <filename>make rule
+       sets</filename>
+      </member>
+      <member>
+       <type>platforms</type>, <type>platform types</type>, and
+       <type>target types</type>
+      </member>
      </simplelist>
     </para>
    </sect1>
@@ -390,13 +413,14 @@ following checks:
       <term>Directory Structure Neutrality</term>
       <listitem>
        <para>
-        Build items refer to each other only by name and never by path.
-        &Abuild; resolves build item names to paths internally and
-        provides path information at runtime as needed.  This makes any
-        specific &abuild; installation agnostic about directory
-        structure and makes it possible to move things around without
-        changing any build rules.  In this way, &abuild; stays out of
-        the way when it's time to refactor your project.
+        Build items refer to each other only by name and never by
+        path.  &Abuild; resolves build item names to paths internally
+        and provides path information at runtime as needed.  This
+        makes any specific &abuild; installation agnostic about
+        directory structure and makes it possible to move things
+        around without changing any build rules.  In this way,
+        &abuild; stays out of the way when it's time to reorganize
+        your project.
        </para>
       </listitem>
      </varlistentry>
@@ -406,19 +430,19 @@ following checks:
        <para>
         &Abuild; does not require you to have any project-specific or
         source tree-specific environment variables set or to be using
-        any particular shell, and the &abuild; software itself doesn't
-        have to be installed in any particular location.  &Abuild; is
-        designed so that having the <command>abuild</command> command
-        in your path should be sufficient for doing a build.  This
-        keeps &abuild; independent from any specific source tree or
-        project.  &Abuild; can be used to build a single-source-file
-        stand-alone program or an elaborate product line consisting of
-        hundreds or thousands of components, and it can be used for
-        multiple projects on the same system at the same time.  No
-        special path settings or environment variable settings are
-        required to use &abuild;, other than ensuring that the
-        external tools it invokes (GNU Make, compilers, etc.)  are
-        available and in your path.
+        any particular shell or operating system, and the &abuild;
+        software itself doesn't have to be installed in any particular
+        location.  &Abuild; is designed so that having the
+        <command>abuild</command> command in your path should be
+        sufficient for doing a build.  This keeps &abuild; independent
+        from any specific source tree or project.  &Abuild; can be
+        used to build a single-source-file stand-alone program or an
+        elaborate product line consisting of hundreds or thousands of
+        components, and it can be used for multiple projects on the
+        same system at the same time.  No special path settings or
+        environment variable settings are required to use &abuild;,
+        other than ensuring that the external tools it invokes (GNU
+        Make, compilers, etc.)  are available and in your path.
        </para>
       </listitem>
      </varlistentry>
@@ -459,7 +483,7 @@ following checks:
         concerns.  &Abuild; includes a number of integrity and
         consistency checks throughout its implementation in order to
         ensure that the principles upon which it is designed are
-        maintained.
+        maintained and rigorously enforced.
        </para>
       </listitem>
      </varlistentry>
@@ -467,10 +491,10 @@ following checks:
       <term>Efficiency</term>
       <listitem>
        <para>
-        &Abuild; aims to be as efficient as possible when efficiency
-        does not compromise build integrity.  &Abuild; calculates as
-        much as possible up front when it is first invoked, and it
-        passes that information to backend build programs through
+        &Abuild; aims to be as efficient as possible without
+        compromising build integrity.  &Abuild; calculates as much as
+        possible up front when it is first invoked, and it passes that
+        information to backend build programs through
         automatically-generated files created inside its own output
         directories.  By computing the information one time, &abuild;
         significantly reduces the degree to which its backend build
@@ -478,8 +502,8 @@ following checks:
         compute information they need.  &Abuild;'s configuration files
         and build tree traversal steps are designed in such a way that
         &abuild; never has to perform unbounded searches of a build
-        tree.  This enables startup to be fast even on large build
-        trees.
+        tree.  This enables startup to be fast even on build trees
+        containing thousands of build items.
        </para>
       </listitem>
      </varlistentry>
@@ -490,10 +514,10 @@ following checks:
         Build items encapsulate knowledge about what is required by
         their users in order to make use of them at build time.  Build
         items may also implement themselves in terms of nested private
-        build items that cannot be declared as direct dependencies of
+        build items that cannot be declared as direct dependencies by
         &ldquo;outside&rdquo; build items.  This makes it possible to
         refactor or reorganize individual components of a system
-        without impacting the build files of other build items that
+        without affecting the build files of other build items that
         depend on them.
        </para>
       </listitem>
@@ -529,7 +553,10 @@ following checks:
         require relatively minor and localized code changes.  In
         addition, &abuild; requires only the backends that a
         particular build tree uses to be present on your system when
-        you are performing a build.
+        you are performing a build.  That is, if you are building only
+        Java code, you don't need <application>GNU Make</application>,
+        and if you're building only C and C++ code, you don't need
+        <application>Apache Ant</application>.
        </para>
       </listitem>
      </varlistentry>
