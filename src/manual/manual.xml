@@ -234,9 +234,9 @@ following checks:
     casual users of &abuild;.  Without going into excessive detail,
     this part gives you a quick tour of &abuild;'s functionality and
     presents a few examples of routine build operations.  By the end
-    of this chapter, you should be able to use &abuild; for simple
-    build operations, and you should have begun to get a feel for the
-    basic configuration files.
+    of this part, you should be able to use &abuild; for simple build
+    operations, and you should have begun to get a feel for the basic
+    configuration files.
    </para>
   </partintro>
   <chapter id="ref.introduction">
@@ -1166,7 +1166,11 @@ C:\cygwin\cygwin.bat
     provide all the information you will need.  A few advanced topics
     are presented here.  Where appropriate, they include cross
     references to later parts of the document where functionality is
-    covered in more depth.
+    covered in more depth.  By the end of this part, you should have a
+    reasonably complete understanding of the structure of &abuild;'s
+    build trees, and a fairly complete picture of &abuild;'s overall
+    functionality.  You will know enough about &abuild; to be able to
+    use it for tasks of moderate complexity.
    </para>
   </partintro>
   <chapter id="ref.build-items-and-trees">
@@ -1194,8 +1198,8 @@ C:\cygwin\cygwin.bat
      Java archive.  Build items may provide other kinds of services as
      well.  For example, a build item may implement a code generator,
      support for a new compiler, or the ability to make use of a
-     third-party software library.  In addition, a build item has
-     certain attributes.  Among these are a list of
+     third-party software library.  In addition, a build item may have
+     certain attributes including a list of
      <firstterm>dependencies</firstterm>, a list of
      <firstterm>supported flags</firstterm>, information about what
      types of platforms the build item may be built on, a list of
@@ -1208,10 +1212,9 @@ C:\cygwin\cygwin.bat
      name.  Build item names must be unique within their build tree
      and all other build trees accessible to their build tree since
      the build item name is the only way &abuild; has to address a
-     build item.  Build item names consist of period-separated
-     components.  Each component may contain mixed case alphanumeric
-     characters, underscores, and dashes.  Build item names are
-     case-sensitive.
+     build item.  Build item names consist of period-separated pieces.
+     Each piece may contain mixed case alphanumeric characters,
+     underscores, and dashes.  Build item names are case-sensitive.
     </para>
     <para>
      The primary mechanism for describing build items is the
@@ -1249,13 +1252,14 @@ C:\cygwin\cygwin.bat
       <term><filename>Abuild-ant.xml</filename></term>
       <listitem>
        <para>
-        These are the files that direct &abuild; what to actually build
-        in a given build item.  Exactly one of these files must be
-        present in order for &abuild; to attempt to build a build item.
-        As such, these files are known as <firstterm>build
+        These are the files that direct &abuild; what to actually
+        build in a given build item.  Each build file is associated
+        with a specific backend.  Exactly one of these files must be
+        present in order for &abuild; to attempt to build a build
+        item.  As such, these files are known as <firstterm>build
         files</firstterm>.  When we say that a build item has or does
-        not have a build file, we are specifically talking about one of
-        these files.  In particular, it is important to note that
+        not have a build file, we are specifically talking about one
+        of these files.  In particular, it is important to note that
         <filename>Abuild.conf</filename> and
         <filename>Abuild.interface</filename> are not considered build
         files.
@@ -1295,8 +1299,8 @@ C:\cygwin\cygwin.bat
      <property>child-dirs</property> keys of the items'
      <filename>Abuild.conf</filename> files.  Ordinarily, the value of
      the <property>parent-dir</property> key is
-     &ldquo;&ldquo;<filename>..</filename>&rdquo;&rdquo;, but it
-     doesn't have to be.  It is also customary to have the value of
+     &ldquo;<filename>..</filename>&rdquo;, but it doesn't have to be.
+     It is also customary to have the value of
      <property>child-dirs</property> contain single path components,
      but this is also not a hard restriction.  When &abuild; starts
      up, it looks for an <filename>Abuild.conf</filename> in the
@@ -1307,19 +1311,23 @@ C:\cygwin\cygwin.bat
      process is repeated until &abuild; discovers a build item that
      does not have a <property>parent-dir</property> key.  This build
      item is known as the <firstterm>root build item</firstterm> of
-     the build tree.  Please note that the hierarchy defined by the
-     layout of build items in the file system is a file system
-     hierarchy and nothing more.  It doesn't have to have any bearing
-     at all on the dependency relationships among the build items.
-     That said, it is sensible to organize build items in a manner
-     that relates to the architecture of the system, and this in turn
-     usually has implications about dependencies.  Still, it is
-     important to keep in mind that &abuild; is not file-system driven
-     but rather is dependency driven.  In fact, &abuild; doesn't even
-     maintain the information about the parents and children of build
-     items in the file system.  This information is used only at
-     startup to locate the root of the build tree and to find the
-     locations of all of the build items in the tree.
+     the build tree.
+    </para>
+    <para>
+     Please note that the hierarchy defined by the layout of build
+     items in the file system is a file system hierarchy and nothing
+     more.  It doesn't have to have any bearing at all on the
+     dependency relationships among the build items.  That said, it is
+     sensible to organize build items in a manner that relates to the
+     architecture of the system, and this in turn usually has
+     implications about dependencies.  Still, it is important to keep
+     in mind that &abuild; is not file-system driven but rather is
+     dependency driven.  In fact, &abuild; doesn't even maintain the
+     information about the parents and children of build items in the
+     file system.  This information is used only at startup to locate
+     the root of the build tree and to find the locations of all of
+     the build items in the tree so that they may be later referred to
+     only by name.
     </para>
     <para>
      In addition to containing build items, build trees contain other
@@ -1348,9 +1356,12 @@ C:\cygwin\cygwin.bat
           <primary>build item</primary>
           <secondary>unnamed</secondary>
          </indexterm>
-         &Abuild; requires that every named build item in a build tree
-         be named uniquely within that tree.  Names are given to build
-         items by setting the <property>this</property> key.
+         In order to refer to one build item from another, both build
+         items must have names.  &Abuild; requires that every named
+         build item in a build tree be named uniquely within that
+         tree.  A name is given to build item by setting the
+         <property>this</property> key in its
+         <filename>Abuild.conf</filename>.
          <footnote>
           <para>
            Perhaps <property>name</property> would have been a better
@@ -1361,14 +1372,16 @@ C:\cygwin\cygwin.bat
          </footnote>
          Sometimes, a build item exists for the sole purpose of
          bridging its parent with its children in the file system.
-         Such a build item's <filename>Abuild.conf</filename> contains
-         only the <property>parent-dir</property> and
-         <property>child-dirs</property> keys.  Since they do not have
-         names, unnamed build items may not be referenced by other
-         build items, and they may also not reference other build
-         items by name.  &Abuild; doesn't maintain any information
-         about these build items.  It simply traverses through them
-         when locating build items at startup time.
+         Such items do not need to be referenced by other build items,
+         so they do not need names.  The only use of an unnamed build
+         item is to serve as an intermediary during traversal of the
+         file system.  Such a build item's
+         <filename>Abuild.conf</filename> contains only the
+         <property>parent-dir</property> and
+         <property>child-dirs</property> keys.  &Abuild; doesn't
+         maintain any information about these build items.  It simply
+         traverses through them when locating build items at startup
+         time.
         </para>
        </listitem>
       </varlistentry>
@@ -1449,12 +1462,12 @@ C:\cygwin\cygwin.bat
        <term>plugin</term>
        <listitem>
         <para>
-         Plugins are a special type of build item that is capable of
+         A plugins is a special type of build item that is capable of
          extending the functionality of &abuild; beyond what can be
-         accomplished in regular build items.  They must be named, but
-         they may not have any dependencies, and no other build item
-         may depend on them.  Plugins are a topic in their own right.
-         They are discussed in depth in <xref linkend="ref.plugins"/>.
+         accomplished in regular build items.  Plugins must be named
+         and not have any dependencies.  Other build items may depend
+         on them.  Plugins are a topic in their own right.  They are
+         discussed in depth in <xref linkend="ref.plugins"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -1472,29 +1485,33 @@ C:\cygwin\cygwin.bat
       <primary>access control</primary>
      </indexterm>
      As mentioned above, build item names consist of period-separated
-     components.  The period separator in a build item's name is a
+     pieces.  The period separator in a build item's name is a
      namespace scope delimiter that is used to determine which build
      items may directly refer to which other build items in their
-     <filename>Abuild.conf</filename> files.  This mechanism should not
-     be viewed as strong access control as there are ways to get around
-     it, but it is a useful mechanism for allowing a build item to hide
-     the fact that it is composed of lower-level build items by
-     blocking others from accessing those lower-level items directly.
+     <filename>Abuild.conf</filename> files.  This mechanism should
+     not be viewed as strong access control as there are ways to get
+     around it, but it is a useful mechanism for allowing a build item
+     to hide the fact that it is composed of lower-level build items
+     by blocking others from accessing those lower-level items
+     directly.
     </para>
     <para>
      Each build item belongs to a namespace scope equal to the name of
      the build item after removing the last period and everything
      following it.  For example, the build item
-     <classname>A.B.C.D</classname> is in the scope called
-     <classname>A.B.C</classname>.  We would consider
-     <classname>A.B</classname> and <classname>A</classname> to be
-     ancestor scopes.  The build item name itself also defines a
-     scope.  In this case, the scope <classname>A.B.C.D</classname>
-     would contain <classname>A.B.C.D.E</classname>.  Any build item
-     name scope that starts with <classname>A.B.C.D.</classname> would
-     be a descendant scope to <classname>A.B.C.D</classname>.  Any
-     build item whose name does not contain a periods is considered to
-     belong to the global scope and is accessible by all build items.
+     &ldquo;<classname>A.B.C.D</classname>&rdquo; is in the scope
+     called &ldquo;<classname>A.B.C</classname>&rdquo;.  We would
+     consider &ldquo;<classname>A.B</classname>&rdquo; and
+     &ldquo;<classname>A</classname>&rdquo; to be ancestor scopes.
+     The build item name itself also defines a scope.  In this case,
+     the scope &ldquo;<classname>A.B.C.D</classname>&rdquo; would
+     contain &ldquo;<classname>A.B.C.D.E</classname>&rdquo;.  Any
+     build item name scope that starts with
+     &ldquo;<classname>A.B.C.D.</classname>&rdquo; (including the
+     period) would be a descendant scope to
+     &ldquo;<classname>A.B.C.D</classname>&rdquo;.  Any build item
+     whose name does not contain a periods is considered to belong to
+     the global scope and is accessible by all build items.
     </para>
     <para>
      A build item is allowed to access any other build item by name if
@@ -1599,12 +1616,13 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      There is nothing that a build item can do to allow itself to see
-     items that are private to it: the only way to gain access to a
-     build item is to be its ancestor or to be descendant of its
-     parent.  There are times, however, when it is desirable for a
-     build item to allow itself to <emphasis>be seen</emphasis> by
-     build items who would ordinarily not have access to it.  This is
-     accomplished by using the <property>visible-to</property> key in
+     items that are private to other scopes: the only way to gain
+     access to a build item is to be its ancestor or to be a
+     descendant of its parent.  There are times, however, when it is
+     desirable for a build item to allow itself to <emphasis>be
+     seen</emphasis> by build items who would ordinarily not have
+     access to it.  This is accomplished by using the
+     <property>visible-to</property> key in
      <filename>Abuild.conf</filename>.  We defer discussion of this
      feature until later; see <xref
      linkend="ref.build-item-visibility"/>.
@@ -1681,8 +1699,8 @@ C:\cygwin\cygwin.bat
      The first thing to notice is this build item's name.  It contains
      a period and is therefore private to the
      <classname>common-lib1</classname> scope.  That means that it is
-     not accessible to build items whose names not also are also under
-     that scope.  In particularly, a build item called
+     not accessible to build items whose names not also under that
+     scope.  In particular, a build item called
      <classname>common-lib2</classname> would not be able to depend
      directly on <classname>common-lib1.src</classname>.  It would
      instead depend on <classname>common-lib1</classname> and would
@@ -1702,8 +1720,8 @@ C:\cygwin\cygwin.bat
      <?example stable/common/lib1/src/Abuild.mk?>
      and an <filename>Abuild.interface</filename> file:
      <?example stable/common/lib1/src/Abuild.interface?>
-     There is nothing in these files that is any different from the
-     basic C++ library example shown in <xref
+     There is nothing in these files that is fundamentally different
+     from the basic C++ library example shown in <xref
      linkend="ref.example.basic.cxx-library"/>.  We can observe,
      however, that the <varname>INCLUDES</varname> variable in
      <filename>Abuild.interface</filename> actually points to
@@ -1754,8 +1772,8 @@ C:\cygwin\cygwin.bat
      each of the <filename>test</filename> directories contains a
      <application>qtest</application>-based test suite.
      <application>Qtest</application> is the test framework used to
-     implement &abuild;'s own test suite, and support for using it is
-     integrated into &abuild;.
+     implement &abuild;'s own test suite.  It is one of the test
+     frameworks for which support is integrated into &abuild;.
     </para>
     <para>
      We will return to this build tree later to study build sets,
@@ -1885,13 +1903,13 @@ C:\cygwin\cygwin.bat
    <sect1 id="ref.platforms.object-code">
     <title>Object-Code Platforms</title>
     <para>
-     For target type <type>object-code</type>, platform identifiers are
-     of the form
+     For target type <type>object-code</type>, platform identifiers
+     are of the form
      <type>os</type>.<type>cpu</type>.<type>toolset</type>.<type>compiler</type>[.<type>option</type>],
-     described below.  In all cases, each component of the platform
-     identifier must consist only of lower-case letters, numbers, dash,
-     or underscore.  The fields of the platform identifier are as
-     follows:
+     described below.  In all cases, each field of the platform
+     identifier must consist only of lower-case letters, numbers,
+     dash, or underscore.  The fields of the platform identifier are
+     as follows:
     </para>
     <variablelist>
      <varlistentry>
@@ -1949,20 +1967,21 @@ C:\cygwin\cygwin.bat
       <term>option</term>
       <listitem>
        <para>
-        An optional component that is used to pass additional
-        information to the compiler toolchain support file.  Typical
-        uses for flags would be to define different debugging,
-        profiling, or optimization levels.
+        An optional field that is used to pass additional information
+        to the compiler toolchain support file.  Typical uses for
+        flags would be to define different debugging, profiling, or
+        optimization levels.
        </para>
       </listitem>
      </varlistentry>
     </variablelist>
     <para>
-     All of the components of the platform identifier are made available
+     All of the fields of the platform identifier are made available
      in separate variables within the interface parsing system.  In
      addition, for <type>object-code</type> build items, the make
      variable <varname>$(CCXX_TOOLCHAIN)</varname> is set to the value
-     of the compiler field.  Here are some example platform identifiers:
+     of the compiler field.  Here are some example platform
+     identifiers:
      <simplelist>
       <member>linux.ppc64.proj1default.gcc</member>
       <member>linux.ppc64.proj1default.gcc.release</member>
@@ -4084,13 +4103,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <listitem>
         <para>
          This key is used to set the name of the build item.  Build
-         item names consist of period-delimited components.  Each
-         component consists of one or more alphanumeric characters,
-         dashes, or underscores.  Some
-         <filename>Abuild.conf</filename> files exist just to connect
-         parent directories with child directories in the file system,
-         as shown in examples below.  In those cases, the
-         <property>this</property> key may be omitted.
+         item names consist of period-delimited pieces.  Each piece
+         consists of one or more alphanumeric characters, dashes, or
+         underscores.  Some <filename>Abuild.conf</filename> files
+         exist just to connect parent directories with child
+         directories in the file system, as shown in examples below.
+         In those cases, the <property>this</property> key may be
+         omitted.
         </para>
        </listitem>
       </varlistentry>
@@ -5043,8 +5062,8 @@ endif
       <term>ABUILD_PLATFORM_OS</term>
       <listitem>
        <para>
-        For <type>object-code</type> items, this variable
-        contains the <varname>OS</varname> component of the platform.
+        For <type>object-code</type> items, this variable contains the
+        <varname>OS</varname> field of the platform.
        </para>
       </listitem>
      </varlistentry>
@@ -5052,8 +5071,8 @@ endif
       <term>ABUILD_PLATFORM_CPU</term>
       <listitem>
        <para>
-        For <type>object-code</type> items, this variable
-        contains the <varname>CPU</varname> component of the platform.
+        For <type>object-code</type> items, this variable contains the
+        <varname>CPU</varname> field of the platform.
        </para>
       </listitem>
      </varlistentry>
@@ -5061,9 +5080,8 @@ endif
       <term>ABUILD_PLATFORM_TOOLSET</term>
       <listitem>
        <para>
-        For <type>object-code</type> items, this variable
-        contains the <varname>TOOLSET</varname> component of the
-        platform.
+        For <type>object-code</type> items, this variable contains the
+        <varname>TOOLSET</varname> field of the platform.
        </para>
       </listitem>
      </varlistentry>
@@ -5071,9 +5089,8 @@ endif
       <term>ABUILD_PLATFORM_COMPILER</term>
       <listitem>
        <para>
-        For <type>object-code</type> items, this variable
-        contains the <varname>COMPILER</varname> component of the
-        platform.
+        For <type>object-code</type> items, this variable contains the
+        <varname>COMPILER</varname> field of the platform.
        </para>
       </listitem>
      </varlistentry>
@@ -5081,9 +5098,8 @@ endif
       <term>ABUILD_PLATFORM_OPTION</term>
       <listitem>
        <para>
-        For <type>object-code</type> items, this variable
-        contains the <varname>OPTION</varname> component of the
-        platform, if any.
+        For <type>object-code</type> items, this variable contains the
+        <varname>OPTION</varname> field of the platform, if any.
        </para>
       </listitem>
      </varlistentry>
@@ -5500,7 +5516,7 @@ endif
       often compiler-specific.  It may often make sense to set certain
       flags conditionally upon the value of the
       <varname>$(ABUILD_PLATFORM_COMPILER)</varname> variable or other
-      platform component variables.  This can be done using regular
+      platform field variables.  This can be done using regular
       <application>GNU Make</application> conditional syntax.
      </para>
      <para>
@@ -7245,26 +7261,26 @@ endif
     <para>
      The other selectors are translated into an (<type>os</type>,
      <type>cpu</type>, <type>toolset</type>, <type>compiler</type>,
-     <type>option</type>) tuple.  Each component may be
-     <literal>*</literal> or a platform component.  The empty string
-     may not be explicitly specified, but omitted components are
-     mapped to the empty string.  For example, <type>compiler=x</type>
-     is equivalent to (<type>""</type>, <type>""</type>,
-     <type>""</type>, <type>"x"</type>, <type>""</type>).  Any empty
-     string component except for <type>option</type> matches the
-     corresponding component of the highest priority platform (the
-     last one declared) in the list of platforms for the given type.
-     This is the always the first platform listed for the platform
-     type by <command>abuild --list-platforms</command>.  An empty
-     <type>option</type> component means that the <type>option</type>
-     field of the platform must be empty.
+     <type>option</type>) tuple.  Each field may be
+     <literal>*</literal> or a platform field.  The empty string may
+     not be explicitly specified, but omitted fields are mapped to the
+     empty string.  For example, <type>compiler=x</type> is equivalent
+     to (<type>""</type>, <type>""</type>, <type>""</type>,
+     <type>"x"</type>, <type>""</type>).  Any empty string field
+     except for <type>option</type> matches the corresponding field of
+     the highest priority platform (the last one declared) in the list
+     of platforms for the given type.  This is the always the first
+     platform listed for the platform type by <command>abuild
+     --list-platforms</command>.  An empty <type>option</type> field
+     means that the <type>option</type> field of the platform must be
+     empty.
     </para>
     <para>
      When picking platforms on which to build by default, &abuild;
      will always pick the first platform that matches the criteria.
      If there are no matches, it will pick the first platform of the
-     platform type.  If any of the components of the selector are
-     equal to <literal>*</literal>, then &abuild; will select
+     platform type.  If any of the fields of the selector are equal to
+     <literal>*</literal>, then &abuild; will select
      <emphasis>all</emphasis> platforms that match the criteria, again
      falling back to only the first platform in the type if there are
      no matches.
@@ -7401,7 +7417,7 @@ endif
        <listitem>
         <para>
          For all otherwise unspecified platform types, build for all
-         platforms that have an empty <type>option</type> component.
+         platforms that have an empty <type>option</type> field.
         </para>
        </listitem>
       </varlistentry>
@@ -8982,7 +8998,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       host from which it is run.
      </para>
      <para>
-      The fourth component of any <type>object-code</type> platform is
+      The fourth field of any <type>object-code</type> platform is
       always the name of the compiler, so this implies that we have an
       <type>abc</type> compiler defined somewhere.  This plugin also
       provides the rules for using the <type>abc</type> compiler in
@@ -9082,11 +9098,11 @@ native-compiler qcc.debug
 native-compiler qcc
 </programlisting>
       which automatically creates platforms with the same first three
-      components (<type>os</type>, <type>cpu</type>, and
+      fields (<type>os</type>, <type>cpu</type>, and
       <type>toolset</type>) as other native platforms, with the
-      <type>qcc</type> compiler as the fourth component, and with
+      <type>qcc</type> compiler as the fourth field, and with
       <type>release</type>, <type>debug</type>, or nothing as the
-      fifth component.  Since new platforms take precedence over old
+      fifth field.  Since new platforms take precedence over old
       platforms by default when &abuild; chooses which platform to use
       for a given platform type, our <command>list_platforms</command>
       script offers the user a way of suppressing this platform and
