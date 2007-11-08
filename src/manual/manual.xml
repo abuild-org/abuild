@@ -12,6 +12,12 @@
 ]>
 <!--
 
+ahayden comment to-do list
+
+
+
+______________________________________________________________________
+
 Possible fop/stylesheet bugs:
 
  * A line break can occur before either of the +'s in "C++" and
@@ -146,15 +152,15 @@ following checks:
    contain forward cross references where appropriate.
   </para>
   <para>
-   <xref linkend="ref.part1"/> contains basic information that should
-   help you come up to speed on using &abuild; for day-to-day work.
-   It is geared toward people who are working on an existing software
-   baseline that uses &abuild;.  In Part I, you will learn about what
-   &abuild; is and the types of problems it was designed to solve, be
-   introduced to some basic terminology, and see a few examples of how
-   to some simple build operations.  This part of the manual is very
-   short and is designed to be readable in one sitting.  Casual users
-   of &abuild; may have no need to read past Part I.
+   In <xref linkend="ref.part1"/>, we cover basic information that
+   should help you come up to speed on using &abuild; for day-to-day
+   work.  It is geared toward people who are working on an existing
+   software baseline that uses &abuild;.  In Part I, you will learn
+   about what &abuild; is and the types of problems it was designed to
+   solve, be introduced to some basic terminology, and see a few
+   examples of how to some simple build operations.  This part of the
+   manual is very short and is designed to be readable in one sitting.
+   Casual users of &abuild; may have no need to read past Part I.
   </para>
   <para>
    In <xref linkend="ref.part2"/>, we introduce the most common
@@ -3408,23 +3414,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
    </sect1>
   </chapter>
- </part>
- <part id="ref.part3" label="III">
-  <title>Advanced Functionality</title>
-  <partintro id="ref.part3.intro">
-   <para>
-    In this part of the manual, we cover the remaining information
-    about &abuild;'s features in complete detail.  In these chapters,
-    we include complete reference guides the &abuild;'s command-line
-    options and configuration files as well as numerous examples to
-    illustrate how to solve specific build problems with &abuild;.
-   </para>
-  </partintro>
   <chapter id="ref.command-line">
    <title>Command-Line Reference</title>
    <para>
     This chapter presents full detail about how to invoke &abuild;
-    from the command line.
+    from the command line.  Some of functionality described here is
+    explained in the chapters of <xref linkend="ref.part3"/>.
    </para>
    <sect1 id="ref.command-line-arguments">
     <title>Command-line Arguments</title>
@@ -3978,6 +3973,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
    </sect1>
   </chapter>
+ </part>
+ <part id="ref.part3" label="III">
+  <title>Advanced Functionality</title>
+  <partintro id="ref.part3.intro">
+   <para>
+    In this part of the manual, we cover the remaining information
+    about &abuild;'s features in complete detail.  In these chapters,
+    we include complete reference guides the &abuild;'s command-line
+    options and configuration files as well as numerous examples to
+    illustrate how to solve specific build problems with &abuild;.
+   </para>
+  </partintro>
   <chapter id="ref.abuild.conf">
    <title>The <filename>Abuild.conf</filename> File</title>
    <indexterm>
@@ -5208,8 +5215,8 @@ endif
     </para>
    </sect1>
   </chapter>
-  <chapter id="ref.make-build-files">
-   <title>The GNU Make Build File: <filename>Abuild.mk</filename></title>
+  <chapter id="ref.abuild.mk">
+   <title>The <filename>Abuild.mk</filename> File</title>
    <indexterm>
     <primary>Abuild.mk</primary>
    </indexterm>
@@ -5762,656 +5769,8 @@ endif
     </para>
    </sect1>
   </chapter>
-  <chapter id="ref.shared-libraries">
-   <title>Shared Libraries</title>
-   <para>
-    In most cases, development efforts consisting of large amounts of
-    dynamic and evolving code will be best served by sticking with
-    static libraries.  Sometimes, however, it may be desirable or
-    necessary to create shared library object files.  &Abuild;
-    provides limited support for working with shared libraries on
-    UNIX-based systems and DLLs on Windows systems.  Note that there
-    are many ancillary concerns one must keep in mind when using
-    shared libraries such as binary interface compatibility.  We touch
-    lightly on these topics here, but a full discussion is out of
-    scope for this document.
-   </para>
-   <sect1 id="ref.building-shared-libraries">
-    <title>Building Shared Libraries</title>
-    <para>
-     Building shared libraries with &abuild; is essentially identical
-     to building static libraries.  You still set up your shared
-     library targets using <varname>TARGETS_lib</varname> in
-     <filename>Abuild.mk</filename> just as you would for static
-     libraries.  In order to tell &abuild; that a library should be
-     created as a shared library, you must set the additional variable
-     <varname>SHLIB_<replaceable>libname</replaceable></varname> where
-     <replaceable>libname</replaceable> is the name of the library
-     target.  The value of this variable consists of up to three
-     numbers: <varname>major version</varname>, <varname>minor
-     version</varname>, and <varname>revision</varname>.  These values
-     tell potential users of your library when the library has
-     changed.  In general, you should only modify these values when
-     you are releasing versions of your library.  During development,
-     it's best to just leave them alone or else your version numbers
-     will get very large and you will lose all the advantages of using
-     shared libraries because of the need to relink everything all the
-     time.  Before a release, the major version number should be
-     incremented if the shared library has had interfaces removed or
-     modified since the last release as those operations would make
-     old binaries that linked with the shared library fail to work
-     with the new version.  The minor version should be incremented if
-     no interfaces were changed or removed but new interfaces were
-     added.  This indicates that old binaries would work with new
-     libraries but new binaries may not work with old libraries.  The
-     revision number should be incremented if any changes were made to
-     the shared library code that did not impact the interfaces.  This
-     just tells the user that the library has changed relative to
-     another version that may be installed.  On UNIX platforms,
-     &abuild; will build executables that link against shared
-     libraries in such a way that they will fail to locate shared
-     libraries whose major version numbers do not match what they
-     linked against.  The unversioned <filename>.so</filename> file
-     and the <filename>.so</filename> file with only the major version
-     will be symbolic links to the fully versioned file name.  (For
-     example, if the actual shared library file were
-     <filename>libmoo.so.1.2.3</filename>, both
-     <filename>libmoo.so</filename> and
-     <filename>libmoo.so.1</filename> would be symbolic links to it.)
-     On Windows systems, the version number parameters are ignored.
-    </para>
-    <para>
-     Note that all the version number parameters are optional.
-     Although they should always be used when creating actual shared
-     libraries that you intend to link programs against, they may be
-     omitted in some other cases.  For example, if you are building a
-     shared library object file that will be loaded at runtime or used
-     as a plugin (such as with Java native code), then it may be
-     appropriate to omit the version numbers altogether.  Even if the
-     <varname>SHLIB_<replaceable>libname</replaceable></varname>
-     variable is set to an empty string, &abuild; will still make a
-     shared library instead of a static library.  There is no way to
-     create both a shared and a static version of the same library at
-     the same time, but it is possible to create a shared library that
-     links against a static library, which achieves the same effect.
-    </para>
-    <para>
-     By default, when a shared library depends on a static library,
-     &abuild; will not link the static library into the shared
-     library.  On some systems, you <emphasis>must</emphasis> link
-     static libraries into shared libraries in order for the build to
-     succeed, and on other systems, it is optional.  When mixing
-     shared libraries and static libraries, you should make sure that
-     you don't include two copies of the same symbols in more than one
-     place (two shared libraries or a shared library and an
-     executable).  Some systems handle this case acceptably, and
-     others don't.  Even in the best case, doing this is wasteful and
-     potentially confusing.  In order to tell &abuild; to link a
-     static library into a shared library, set the variable
-     <varname>LINK_SHLIBS</varname> to a non-empty value (usually
-     <literal>1</literal>) in your <filename>Abuild.mk</filename>.
-     This applies to all shared libraries built in a build item.
-    </para>
-    <para>
-     &Abuild; allows you to mix executables, shared libraries, and
-     static libraries in the same build item.  If you do this, all
-     executable targets will link with all shared and all static
-     library targets.  If <varname>LINK_SHLIBS</varname> is set, then
-     all shared libraries will also link with all static libraries.
-    </para>
-    <para>
-     In order to allow static libraries to be linked into shared
-     libraries, &abuild; compiles all library object files as
-     position-independent code.  In some extremely rare cases, you may
-     wish to avoid doing this as there is a very minor performance
-     cost to do it.  If you wish to prevent a specific source file
-     from being compiled as position-independent code, set the
-     variable
-     <varname>NOPIC_<replaceable>filename</replaceable></varname> to
-     some non-empty value where <replaceable>filename</replaceable> is
-     the name of the source file.  For example, the code
-     <literal>NOPIC_File.cc := 1</literal> in your
-     <filename>Abuild.mk</filename> file would prevent
-     <filename>File.cc</filename> from being compiled as
-     position-independent code.  Note that &abuild; does not check to
-     make sure that code compiled in this way is not eventually linked
-     into a shared library.  If you try to link
-     non-position-independent code into a shared library, it may not
-     link at all, or it may cause undefined and hard to trace
-     behavior.  Use of this feature is not recommended unless
-     absolutely needed to fix some specific problem.
-    </para>
-    <para>
-     In order to run a program that is linked with shared libraries,
-     the operating system will have to know where to find the shared
-     library.  &Abuild; does not include library run path information
-     in the executables as doing so is inherently dangerous and
-     non-portable.  Even if &abuild; were to ignore this danger and
-     include run path information, doing so would potentially preclude
-     the ability to swap out shared libraries at runtime, which is
-     often the main reason for wanting to use them in the first place.
-     Instead, you will need to make sure that, one way or another, the
-     shared libraries you need are located in a directory that is in
-     your shared library path.  On most UNIX systems, you can set the
-     <envar>LD_LIBRARY_PATH</envar> environment variable or install
-     the shared libraries into certain system-defined locations.  On
-     some systems (like Linux), you can also add directories to
-     <filename>/etc/ld.so.conf</filename>.  On Windows, you can
-     colocate the DLL files with the executables, or you can add the
-     directories containing the DLL files to your path.
-    </para>
-   </sect1>
-   <sect1 id="ref.example.shared-library">
-    <title>Shared Library Example</title>
-    <para>
-     In <filename>doc/example/shared-library</filename>, you will find
-     an example of using shared libraries.  This example contains an
-     executable program and two implementations of the same interface,
-     both provided in shared libraries.  In the
-     <filename>shared-library/prog</filename> directory, you will find
-     a simple program.  Here is its <filename>Abuild.conf</filename>
-     file:
-     <?example shared-library/prog/Abuild.conf?>
-     All it does is depend on the build item
-     <classname>shared</classname>.  This program doesn't have to do
-     anything special in order to link against the shared library.
-     Here is the <classname>shared</classname> build item's
-     <filename>Abuild.conf</filename>:
-     <?example shared-library/shared/Abuild.conf?>
-     This is a pass-through build item that depends upon
-     <classname>shared.impl1</classname>.  Here is that build item's
-     <filename>Abuild.conf</filename>:
-     <?example shared-library/shared/impl1/Abuild.conf?>
-     This build item depends on an item called
-     <classname>shared.include</classname>.  Although, in general,
-     putting your header files in a separate build item is risky (see
-     <xref linkend="ref.best-practices"/> for a discussion), in this
-     case, we want to do this so that we can have two separate
-     implementations of this interface that reside in two different
-     shared libraries.  By making this build item private to the
-     <classname>shared</classname> build item name scope (see <xref
-     linkend="ref.build-item-access-control"/>), we effectively
-     prevent outside build items from depending on it directly.
-    </para>
-    <para>
-     Here is the first implementation's <filename>Abuild.mk</filename>
-     file:
-     <?example shared-library/shared/impl1/Abuild.mk?>
-     What we have here is a normal library
-     <filename>Abuild.mk</filename> file except that we have set the
-     variable <varname>SHLIB_shared</varname> to the value <literal>1
-     2 3</literal>.  This tells &abuild; to build the
-     <filename>shared</filename> library target as a shared library
-     instead of a static library using the version information
-     provided.  On Windows, &abuild; will create
-     <filename>shared.dll</filename> along with
-     <filename>shared.lib</filename> and
-     <filename>shared.exp</filename>.  On UNIX, it will create
-     <filename>libshared.so.1.2.3</filename> and will make
-     <filename>libshared.so</filename> and
-     <filename>libshared.so.1</filename> symbolic links to it.
-     Executables that link with <filename>-lshared</filename> will
-     need to find <filename>libshared.so.1</filename> in their library
-     paths at runtime.
-    </para>
-    <para>
-     This shared library consists of a single file called
-     <filename>Shared.cc</filename>.  Here is the header file
-     <filename>Shared.hh</filename>:
-     <?example shared-library/shared/include/Shared.hh?>
-     This is the implementation of the interface:
-     <?example shared-library/shared/impl1/Shared.cc?>
-     Notice the <literal>__declspec(dllexport)</literal> line that is
-     there for Windows only.  This is necessary to make Windows export
-     the function to a DLL.  No such mechanism is required in a UNIX
-     environment.  Our <filename>Abuild.interface</filename> file
-     looks like a normal <filename>Abuild.interface</filename> file
-     for libraries except that it omits an <varname>INCLUDES</varname>
-     variable and declares a special <firstterm>mutex</firstterm>
-     variable:
-     <?example shared-library/shared/impl1/Abuild.interface?>
-     The <varname>INCLUDES</varname> variable is set in the
-     <classname>shared.include</classname> build item's
-     <filename>Abuild.interface</filename> instead:
-     <?example shared-library/shared/include/Abuild.interface?>
-     The mutex variable is a normal interface variable.  We declare
-     the same variable in the <filename>Abuild.interface</filename>
-     file for <classname>shared.impl2</classname>.  Since &abuild;
-     won't allow any interface variable to declared in more than one
-     place, this effectively prevents any one build item from
-     simultaneously depending on both
-     <classname>shared.impl1</classname> and
-     <classname>shared.impl2</classname>.
-    </para>
-    <para>
-     Our second implementation is not in the dependency chain of our
-     program.  It resides in the <filename>impl2</filename> directory.
-     Here are its <filename>Abuild.conf</filename> and
-     <filename>Abuild.mk</filename>:
-     <?example shared-library/shared/impl2/Abuild.conf?>
-     <?example shared-library/shared/impl2/Abuild.mk?>
-     You will notice in this case that this build item depends on a
-     static library that its private to its own build item name scope.
-     This static library provides additional functions that are used
-     <emphasis>within</emphasis> the shared library.  In order to tell
-     &abuild; to link that static library into the shared library, we
-     set the variable <varname>LINK_SHLIBS</varname>.  Also, we want
-     to avoid having the static library appear on the link statement
-     for executables that link with this shared library.  To do that,
-     we have to do some extra work in our
-     <filename>Abuild.interface</filename> file.  Here are that file
-     and the <function>after-build</function> file that it loads:
-     <?example shared-library/shared/impl2/Abuild.interface?>
-     <?example shared-library/shared/impl2/after.interface?>
-     Notice that we reset the <varname>LIBS</varname> variable and add
-     our own library to it after the build has completed.  This makes
-     the static library added in
-     <classname>shared.impl2.static</classname>'s
-     <filename>Abuild.interface</filename> available to
-     <classname>shared.impl2</classname> during its linking but not
-     available to those who depend on
-     <classname>shared.impl2</classname>:
-     <?example shared-library/shared/impl2/static/Abuild.interface?>
-    </para>
-    <para>
-     Finally, we can run our program.  Remember that in order to run
-     the program, you must explicitly add the directory containing the
-     shared library whose implementation you want to use to your
-     <envar>LD_LIBRARY_PATH</envar> on UNIX or your
-     <envar>PATH</envar> on Windows.  If you set this variable to
-     include the output directory for
-     <classname>shared.impl1</classname>, you will see this output:
-     <?qtest example.shared-library-prog-impl1.out?>
-     If you set it to the <classname>shared.impl2</classname> build
-     item's directory, you will see this instead:
-     <?qtest example.shared-library-prog-impl2.out?>
-     Note that we could have made <classname>shared</classname> depend
-     on <classname>shared.impl2</classname> instead of
-     <classname>shared.impl1</classname> and gotten the same results.
-     Hiding the actual shared library implementation behind a
-     pass-through build item provides a useful device for allowing you
-     to reconfigure the system later on, including replacing
-     place-holder shared library-based stub implementations with
-     static library implementations later in the development process.
-     With careful planning, this type of technique could be used to
-     provide a shared-library based stub system that could be swapped
-     out later with very little impact on the overall build system.
-    </para>
-   </sect1>
-  </chapter>
-  <chapter id="ref.code-generators">
-   <title>Automatically Generated Code</title>
-   <para>
-    In this chapter, we show how to use &abuild; with automatically
-    generated code.  The examples in this chapter use the
-    <application>GNU Make</application> backend, but the principles
-    are the same if you are using <application>ant</application>.
-    Examples of using code generators with Java appear later in the
-    document (<xref linkend="ref.example.java-code-generator"/>).
-   </para>
-   <sect1 id="ref.build-item-rules">
-    <title>Build Item Rules</title>
-    <para>
-     The most important thing to realize about code generators in
-     &abuild; is that code generation can be viewed as a just another
-     service that a build item can offer, just like libraries or
-     header files.  In many build systems, code generators are
-     problematic because you need to take special steps to make sure
-     generated code appears before compilation or dependency
-     generation begin.  With &abuild;, code generators get run at the
-     correct stage by virtue of appearing in the correct place in the
-     dependency tree.
-    </para>
-    <para>
-     In order for a <application>make</application>-based build item
-     to provide code generation, it must have a
-     <filename>Rules.mk</filename> file.  The
-     <filename>Rules.mk</filename> file is a GNU Make fragment that is
-     included by &abuild; only when explicitly requested.  In order to
-     use the rules implemented in one build item's
-     <filename>Rules.mk</filename> file, you must depend on that build
-     item and also list its name in the
-     <varname>BUILD_ITEM_RULES</varname> variable in your
-     <filename>Abuild.mk</filename> file.  Any rules defined in
-     <filename>Rules.mk</filename> are run from the &abuild; output
-     directory of the build item that is using the rules.  That means
-     that if the rules need to refer to files inside the build item
-     that <emphasis>provides</emphasis> the rules, they must do so by
-     either accessing interface variables defined in that build item's
-     <filename>Abuild.interface</filename>, or prefixing the files
-     with a variable that &abuild; provides.  Specifically, for a
-     build item named
-     <classname><replaceable>build-item</replaceable></classname>,
-     &abuild; provides variable called
-     <varname>abDIR_<replaceable>build-item</replaceable></varname>
-     that can be accessed from a <filename>Rules.mk</filename> file.
-     Note that &abuild; only provides these variables for build items
-     in your dependency chain.  Also, use of these variables from
-     <filename>Abuild.mk</filename> files is strongly discouraged as
-     it can cause your build tree to contain path-based dependencies
-     instead of name-based dependencies which would defeat one of the
-     most compelling advantages by &abuild;.  The best practice is to
-     refer to files in your own build item from your own files by
-     using the abuild-provided variable name to find your own path,
-     and to define interface variables for files that you intend for
-     other build items to access.  Either way, there are certain
-     things that it are important to keep in mind when writing
-     <application>GNU Make</application> rules for use inside of
-     &abuild;.  For a discussion of this topic, please see <xref
-     linkend="ref.guidelines-for-make-rule-authors"/>.
-    </para>
-   </sect1>
-   <sect1 id="ref.example.code-generator">
-    <title>Code Generator Example</title>
-    <para>
-     The <classname>derived-code-generator</classname> build item in
-     <filename>doc/example/user/derived/code-generator</filename>
-     contains a trivial code generator.  All it does is generate a
-     source and header file that define a function that returns a
-     constant, which is read from a file.  We have modified
-     <classname>derived-main</classname> to use the code generator.
-     The code generator itself is implemented in the
-     <classname>derived-codegen</classname> build item and is made
-     available through that build item's <filename>Rules.mk</filename>
-     file.
-    </para>
-    <para>
-     First, we'll look at the code generator itself.  Notice that the
-     only &abuild; files contained in the
-     <classname>derived-code-generator</classname> build item
-     directory at <filename>user/derived/code-generator</filename> are
-     <filename>Abuild.conf</filename> and
-     <filename>Rules.mk</filename>.  There is no
-     <filename>Abuild.interface</filename> or
-     <filename>Abuild.mk</filename>, though these files could exist if
-     they were needed.
-    </para>
-    <para>
-     The important part of this is <filename>Rules.mk</filename>, so
-     we'll study it carefully.  Here is the
-     <filename>Rules.mk</filename> file:
-     <?example user/derived/code-generator/Rules.mk?>
-     The first thing we do here is to define a
-     <command>rules-help</command> target that prints some help
-     information about using the rules.  By placing the name of this
-     build item (<classname>derived-code-generator</classname>) in
-     your <varname>BUILD_ITEM_RULES</varname> variable, you will see
-     this output when you run <command>abuild rules-help</command>.
-     When writing rules help, please remember that the strings you are
-     echoing are subject to <application>make</application>'s ordinary
-     variable interpolation rules.  It's best to actually test by
-     running <command>abuild rules-help</command> to make sure that it
-     echoes properly.  Alternatively, you can have your
-     <command>rules-help</command> target display the contents of a
-     file in your build item.
-    </para>
-    <para>
-     The next thing that happens is that we have some code that checks
-     for undefined variables.  This isn't strictly necessary, but it
-     can save your users a lot of trouble if you detect when variables
-     they are supposed to provide are not there.  We use the function
-     <function>undefined_vars</function> to do this check.  This
-     function is provided by &abuild; and appears in the file
-     <filename>make/global.mk</filename> relative to the top of the
-     &abuild; installation.  If you expect to write a lot of make
-     rules, it will be in your best interest to familiarize yourself
-     with the functions offered by this file.  Even if we hadn't done
-     this, &abuild; invokes GNU Make in a manner that causes it to
-     warn about any undefined variables.  This is useful because
-     undefined variables are a common cause of makefile errors.
-    </para>
-    <para>
-     Then we add our source file to the <command>all::</command>
-     target to make sure it gets built.  Note that we use
-     <command>all::</command>, not <command>all:</command>, since
-     there are multiple <command>all::</command> targets throughout
-     various rules files.  Adding our source files to the
-     <command>all::</command> target is not strictly necessary in this
-     case since, by listing the source file as a source file for one
-     of our targets (in the build item that uses this code generator),
-     it will be built in the proper sequence.  It's still good
-     practice to do this though, but remember that in a parallel
-     build, dependencies of the <command>all::</command> target may
-     not necessarily be built in the order in which they are listed.
-    </para>
-    <para>
-     Next, we have the actual <application>make</application> rules
-     that create the automatically generated files.  In this case, we
-     make the output files depend on both the input file and the
-     code generator.  Although &abuild; is running the rules from the
-     depending build item's output directory, we don't need to put any
-     prefix in front of the name of the input file: &abuild; sets
-     <application>make</application>'s <varname>VPATH</varname>
-     variable so that the file can be found.  By creating a dependency
-     on the code generator as well, we can be sure that if the code
-     generator itself is modified, any code that it generates will
-     also be updated.
-    </para>
-    <para>
-     In the commands for generating our files, notice that we don't
-     need an <literal>@</literal> sign before the generation command
-     to prevent it from echoing since &abuild; doesn't echo its output
-     by default.  Not putting an <literal>@</literal> sign there means
-     that the user will see the command if he/she runs &abuild; with
-     the <option>--verbose</option> option.  So that the user knows
-     something is happening, we generate a useful output message using
-     <varname>@$(PRINT)</varname>.  The use of
-     <varname>@$(PRINT)</varname> ensures that we don't see the actual
-     echo command even when running with <option>--verbose</option>,
-     and that we don't see the output at all when we're running with
-     <option>--silent</option>.  All informational messages should be
-     generated this way.  (For the <command>rules-help</command>
-     target, we use <command>@echo</command> directly since it doesn't
-     make sense to suppress that output even when running with
-     <option>--silent</option>.)  Note also that we invoke the code
-     generator with <command>perl</command> rather than assuming that
-     it is executable (since some version control systems or file
-     systems make it hard to preserve execute permissions) and that we
-     specify the path to the code generator in terms of
-     <varname>$(abDIR_derived-code-generator)</varname>.  Also notice
-     that we have to prefix the name of the input file with
-     <varname>$(SRCDIR)</varname> when we pass it to the code
-     generator since we are running from the &abuild; output
-     directory.  (The <varname>VPATH</varname> variable tells
-     <application>make</application> where to look, but it doesn't
-     tell our code generator anything!)  Finally, we add a
-     <command>clean</command> rule that removes our automatically
-     generated files.  Note that the <command>clean</command> rule is
-     only run when the user invokes &abuild; from the output
-     directory.  For this reason, adding a <command>clean</command>
-     target is optional.  For more detail on this, please see <xref
-     linkend="ref.output-directories"/>.
-    </para>
-    <para>
-     To use this code generator from
-     <classname>derived-main.src</classname>, all we have to do is
-     define the required variables in <filename>Abuild.mk</filename>,
-     and add <classname>derived-code-generator</classname> as a
-     dependency in <filename>Abuild.conf</filename> and to the
-     <varname>BUILD_ITEM_RULES</varname> variable in
-     <filename>Abuild.mk</filename>.  Note that we have modified
-     <filename>main.cpp</filename> to include
-     <filename>auto.h</filename> and to call
-     <varname>getNumber()</varname>, thus testing the use of the code
-     generator.  Since this application effectively contains the only
-     test suite for the code generator, we declare it as a tester of
-     the code generator in <filename>Abuild.conf</filename> using
-     traits.  Here are the relevant files from
-     <classname>derived-main.src</classname>:
-     <?example user/derived/main/src/Abuild.conf?>
-     <?example user/derived/main/src/Abuild.mk?>
-     Here is the modified <filename>main.cpp</filename> file:
-     <?example user/derived/main/src/main.cpp?>
-    </para>
-   </sect1>
-   <sect1 id="ref.example.auto-from-variable">
-    <title>Dependency on a Make Variable</title>
-    <para>
-     In the previous example, we showed how to create a code generator
-     that generates code from a file.  This works nicely because
-     <application>make</application>'s dependency system is based on
-     file modification times.  Sometimes, you may want to generate
-     code based on the value of a <application>make</application>
-     variable whose origin may be either
-     <filename>Abuild.mk</filename> or, more likely,
-     <filename>Abuild.interface</filename>.  Doing this is more
-     difficult because it requires some obscure make coding, but it is
-     common enough to warrant an example.
-    </para>
-    <para>
-     The &ldquo;obvious&rdquo; way to pass information from a
-     <application>make</application> variable into your code would be
-     to use a preprocessor symbol based on the variable and to pass
-     this symbol to the code with <varname>XCPPFLAGS</varname> or
-     <varname>XCPPFLAGS_<replaceable>Filename</replaceable></varname>.
-     The problem with this is that there is no dependency tracking on
-     variable values, so if you change the variable value, there is
-     nothing that will trigger recompilation of the files that use the
-     preprocessor symbol.  To get around this problem, we use local
-     rules to generate a file with the value of the variable.  This
-     example can be found in
-     <filename>doc/example/auto-from-variable</filename>.
-    </para>
-    <para>
-     First, look at the <classname>file-provider</classname> build
-     item in <filename>library</filename>.  This build item
-     automatically generates a header file based on the value of a
-     make variable.  The variable itself is defined in the
-     <filename>Abuild.interface</filename> file:
-     <?example auto-from-variable/library/Abuild.interface?>
-     We define the variable <varname>file-provider-filename</varname>
-     to point to a local file.  By making this a <type>filename</type>
-     variable, we tell &abuild; to translate its location to the path
-     to this file as resolved relative to the
-     <filename>Abuild.interface</filename> file's directory.  Note
-     that we use the build item name in the variable name to reduce
-     the likelihood of clashing with other interface variables.  In
-     the <filename>Abuild.mk</filename> file we use the
-     <varname>LOCAL_RULES</varname> variable to declare the local
-     rules file <filename>generate.mk</filename>.  This is where we
-     will actually generate the header file.  Otherwise, this is an
-     ordinary <filename>Abuild.mk</filename>:
-     <?example auto-from-variable/library/Abuild.mk?>
-    </para>
-    <para>
-     Here is <filename>generate.mk</filename>:
-     <?example auto-from-variable/library/generate.mk?>
-     There is a lot going on here, so we'll go through line by line.
-     <application>GNU Make</application> is essentially a functional
-     programming environment.  Makefiles are not executed
-     sequentially; they are evaluated based on dependencies instead.
-     Sometimes you need to force <application>make</application> to
-     run steps sequentially.  You can trick
-     <application>make</application> into doing this by making the
-     operations side effects of a variable assignment using the
-     <literal>:=</literal> operator since these are evaluated when
-     they are read.  Our goal here is to translate a variable value,
-     which can't be tracked by the dependency system, into a file
-     modification time, which can.  To do this, we create a file whose
-     value and modification time get updated whenever the variable
-     value changes.  We do this in two steps: first, we write the
-     value of the variable to a temporary file (the first
-     <varname>DUMMY</varname> assignment), and then we overwrite
-     another file with the temporary file if the other file either
-     doesn't exist or has a different value (the second assignment).
-     In this way, whenever the variable changes, the file called
-     <filename>variable-value</filename> gets updated.  Although the
-     <filename>variable-value.tmp</filename> file gets updated every
-     time when run &abuild;, we don't care since that file is not used
-     as a dependency.  Next, we provide the rules to actually generate
-     the header file.  The header file depends on the file
-     <filename>variable-value</filename> so it will get regenerated
-     whenever the variable changes.  Here we just use
-     <command>echo</command> to write the header file.  Note that we
-     have to call <application>make</application>'s
-     <function>abspath</function> function to translate the value of
-     <varname>file-provider-filename</varname> to an absolute path.
-     This is because &abuild; writes <type>filename</type> variables
-     as relative paths when it passes them to
-     <application>make</application>.  Note also that didn't actually
-     have to use the value of the <filename>variable-value</filename>
-     file.  We know that its contents are identical to the value of
-     the variable, so we can just use the variable's value directly.
-     Finally, we want to make sure that
-     <filename>FileProvider_file.hh</filename> exists before we start
-     compiling any of the files that reference it.  We have a little
-     bit of a bootstrapping problem here: although &abuild; ordinarily
-     generates dependency information of object files on header files
-     automatically, this generation step is performed during the
-     compilation itself.  In order to force the header file to be
-     generated before the compile starts, we have to create an
-     explicit dependency.  We do this by creating an explicit
-     dependency from the object file to the header file.  Notice that
-     we use the make variable <varname>LOBJ</varname> to get the
-     object file suffix rather than hard-coding it.  All compiler
-     support files are required to set the variable
-     <varname>LOBJ</varname> to the suffix of object files that are
-     going into libraries and <varname>OBJ</varname> for object files
-     that are not going into libraries.  Although they are often the
-     same, they don't have to be.
-     <footnote>
-      <para>
-       It would be nice to be able to avoid this issue entirely.  One
-       way to avoid it would be generate a source file instead of a
-       header file.  In that case, <application>make</application>
-       would definitely try to generate the source file before
-       building, so no explicit dependency would be required.  This
-       approach would certainly work for this example.  One option
-       that would definitely <emphasis>not</emphasis> work would be to
-       create a <command>generate</command> target analogous to the
-       <command>generate</command> hook in &abuild;'s
-       <application>ant</application> support and making it a
-       prerequisite for the <command>all</command> target.  Although
-       this would work for strictly serial builds, it wouldn't
-       necessarily work for parallel builds as
-       <application>make</application> is free to build all the
-       prerequisites for a given target in any order as long as they
-       don't have dependencies on each other.  In fact, the reason
-       this trick works in <application>ant</application> is that
-       <application>ant</application> only runs tasks in parallel when
-       you explicitly tell it that it can.  So the bottom line is that
-       whatever we are automatically generating must appear as a
-       dependency somewhere.  Source files automatically appear as
-       dependencies of their object files, but header files don't
-       appear as dependencies anywhere until the compile has already
-       been run at least one time.  Therefore, a solution that works
-       for parallel builds and generates header files has to create an
-       explicit dependency such as in this example.
-      </para>
-     </footnote>
-    </para>
-    <para>
-     We have two files that use the header file.  The first one is the
-     library implementation itself:
-     <?example auto-from-variable/library/FileProvider.cc?>
-     The other is the main program from the other build item:
-     <?example auto-from-variable/program/main.cc?>
-    </para>
-    <para>
-     There are a few additional points to be made about this example.
-     We have taken an approach here that can be tailored for a wide
-     variety of situations.  In this example, the interface variable
-     is accessible to other build items.  If we didn't want this to be
-     the case, we could have used an <filename>Abuild.mk</filename>
-     variable instead or we could have made this variable visible
-     conditionally upon an interface flag.  We have also made the
-     header file available to other build items by adding the output
-     directory to <varname>INCLUDES</varname> in
-     <filename>Abuild.interface</filename>.  If you didn't want these
-     to have such high visibility, you could protect them just as you
-     would protect any private interfaces.  In other words, this
-     example is a little bit of an overkill for the exact case that it
-     implements, but it shows a pattern that can be used when this
-     type of functionality is required.  The main thing to take away
-     here is the use of a <application>make</application> trick to
-     translate a variable value into a file modification time, thus
-     making it trackable with <application>make</application>'s
-     ordinarily dependency tracking mechanism.
-    </para>
-   </sect1>
-  </chapter>
   <chapter id="ref.ant-build-files">
-   <title>The Ant Build Files</title>
+   <title>The Apache Ant Build Files</title>
    <para>
     There are two different Java build files:
     <filename>Abuild-ant.properties</filename> for property-driven
@@ -6883,6 +6242,654 @@ endif
      item build in this way that interoperates with &abuild;'s default
      ant support, see <xref
      linkend="ref.example.build-driven-java"/>.
+    </para>
+   </sect1>
+  </chapter>
+  <chapter id="ref.shared-libraries">
+   <title>Shared Libraries</title>
+   <para>
+    In most cases, development efforts consisting of large amounts of
+    dynamic and evolving code will be best served by sticking with
+    static libraries.  Sometimes, however, it may be desirable or
+    necessary to create shared library object files.  &Abuild;
+    provides limited support for working with shared libraries on
+    UNIX-based systems and DLLs on Windows systems.  Note that there
+    are many ancillary concerns one must keep in mind when using
+    shared libraries such as binary interface compatibility.  We touch
+    lightly on these topics here, but a full discussion is out of
+    scope for this document.
+   </para>
+   <sect1 id="ref.building-shared-libraries">
+    <title>Building Shared Libraries</title>
+    <para>
+     Building shared libraries with &abuild; is essentially identical
+     to building static libraries.  You still set up your shared
+     library targets using <varname>TARGETS_lib</varname> in
+     <filename>Abuild.mk</filename> just as you would for static
+     libraries.  In order to tell &abuild; that a library should be
+     created as a shared library, you must set the additional variable
+     <varname>SHLIB_<replaceable>libname</replaceable></varname> where
+     <replaceable>libname</replaceable> is the name of the library
+     target.  The value of this variable consists of up to three
+     numbers: <varname>major version</varname>, <varname>minor
+     version</varname>, and <varname>revision</varname>.  These values
+     tell potential users of your library when the library has
+     changed.  In general, you should only modify these values when
+     you are releasing versions of your library.  During development,
+     it's best to just leave them alone or else your version numbers
+     will get very large and you will lose all the advantages of using
+     shared libraries because of the need to relink everything all the
+     time.  Before a release, the major version number should be
+     incremented if the shared library has had interfaces removed or
+     modified since the last release as those operations would make
+     old binaries that linked with the shared library fail to work
+     with the new version.  The minor version should be incremented if
+     no interfaces were changed or removed but new interfaces were
+     added.  This indicates that old binaries would work with new
+     libraries but new binaries may not work with old libraries.  The
+     revision number should be incremented if any changes were made to
+     the shared library code that did not impact the interfaces.  This
+     just tells the user that the library has changed relative to
+     another version that may be installed.  On UNIX platforms,
+     &abuild; will build executables that link against shared
+     libraries in such a way that they will fail to locate shared
+     libraries whose major version numbers do not match what they
+     linked against.  The unversioned <filename>.so</filename> file
+     and the <filename>.so</filename> file with only the major version
+     will be symbolic links to the fully versioned file name.  (For
+     example, if the actual shared library file were
+     <filename>libmoo.so.1.2.3</filename>, both
+     <filename>libmoo.so</filename> and
+     <filename>libmoo.so.1</filename> would be symbolic links to it.)
+     On Windows systems, the version number parameters are ignored.
+    </para>
+    <para>
+     Note that all the version number parameters are optional.
+     Although they should always be used when creating actual shared
+     libraries that you intend to link programs against, they may be
+     omitted in some other cases.  For example, if you are building a
+     shared library object file that will be loaded at runtime or used
+     as a plugin (such as with Java native code), then it may be
+     appropriate to omit the version numbers altogether.  Even if the
+     <varname>SHLIB_<replaceable>libname</replaceable></varname>
+     variable is set to an empty string, &abuild; will still make a
+     shared library instead of a static library.  There is no way to
+     create both a shared and a static version of the same library at
+     the same time, but it is possible to create a shared library that
+     links against a static library, which achieves the same effect.
+    </para>
+    <para>
+     By default, when a shared library depends on a static library,
+     &abuild; will not link the static library into the shared
+     library.  On some systems, you <emphasis>must</emphasis> link
+     static libraries into shared libraries in order for the build to
+     succeed, and on other systems, it is optional.  When mixing
+     shared libraries and static libraries, you should make sure that
+     you don't include two copies of the same symbols in more than one
+     place (two shared libraries or a shared library and an
+     executable).  Some systems handle this case acceptably, and
+     others don't.  Even in the best case, doing this is wasteful and
+     potentially confusing.  In order to tell &abuild; to link a
+     static library into a shared library, set the variable
+     <varname>LINK_SHLIBS</varname> to a non-empty value (usually
+     <literal>1</literal>) in your <filename>Abuild.mk</filename>.
+     This applies to all shared libraries built in a build item.
+    </para>
+    <para>
+     &Abuild; allows you to mix executables, shared libraries, and
+     static libraries in the same build item.  If you do this, all
+     executable targets will link with all shared and all static
+     library targets.  If <varname>LINK_SHLIBS</varname> is set, then
+     all shared libraries will also link with all static libraries.
+    </para>
+    <para>
+     In order to allow static libraries to be linked into shared
+     libraries, &abuild; compiles all library object files as
+     position-independent code.  In some extremely rare cases, you may
+     wish to avoid doing this as there is a very minor performance
+     cost to do it.  If you wish to prevent a specific source file
+     from being compiled as position-independent code, set the
+     variable
+     <varname>NOPIC_<replaceable>filename</replaceable></varname> to
+     some non-empty value where <replaceable>filename</replaceable> is
+     the name of the source file.  For example, the code
+     <literal>NOPIC_File.cc := 1</literal> in your
+     <filename>Abuild.mk</filename> file would prevent
+     <filename>File.cc</filename> from being compiled as
+     position-independent code.  Note that &abuild; does not check to
+     make sure that code compiled in this way is not eventually linked
+     into a shared library.  If you try to link
+     non-position-independent code into a shared library, it may not
+     link at all, or it may cause undefined and hard to trace
+     behavior.  Use of this feature is not recommended unless
+     absolutely needed to fix some specific problem.
+    </para>
+    <para>
+     In order to run a program that is linked with shared libraries,
+     the operating system will have to know where to find the shared
+     library.  &Abuild; does not include library run path information
+     in the executables as doing so is inherently dangerous and
+     non-portable.  Even if &abuild; were to ignore this danger and
+     include run path information, doing so would potentially preclude
+     the ability to swap out shared libraries at runtime, which is
+     often the main reason for wanting to use them in the first place.
+     Instead, you will need to make sure that, one way or another, the
+     shared libraries you need are located in a directory that is in
+     your shared library path.  On most UNIX systems, you can set the
+     <envar>LD_LIBRARY_PATH</envar> environment variable or install
+     the shared libraries into certain system-defined locations.  On
+     some systems (like Linux), you can also add directories to
+     <filename>/etc/ld.so.conf</filename>.  On Windows, you can
+     colocate the DLL files with the executables, or you can add the
+     directories containing the DLL files to your path.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.shared-library">
+    <title>Shared Library Example</title>
+    <para>
+     In <filename>doc/example/shared-library</filename>, you will find
+     an example of using shared libraries.  This example contains an
+     executable program and two implementations of the same interface,
+     both provided in shared libraries.  In the
+     <filename>shared-library/prog</filename> directory, you will find
+     a simple program.  Here is its <filename>Abuild.conf</filename>
+     file:
+     <?example shared-library/prog/Abuild.conf?>
+     All it does is depend on the build item
+     <classname>shared</classname>.  This program doesn't have to do
+     anything special in order to link against the shared library.
+     Here is the <classname>shared</classname> build item's
+     <filename>Abuild.conf</filename>:
+     <?example shared-library/shared/Abuild.conf?>
+     This is a pass-through build item that depends upon
+     <classname>shared.impl1</classname>.  Here is that build item's
+     <filename>Abuild.conf</filename>:
+     <?example shared-library/shared/impl1/Abuild.conf?>
+     This build item depends on an item called
+     <classname>shared.include</classname>.  Although, in general,
+     putting your header files in a separate build item is risky (see
+     <xref linkend="ref.best-practices"/> for a discussion), in this
+     case, we want to do this so that we can have two separate
+     implementations of this interface that reside in two different
+     shared libraries.  By making this build item private to the
+     <classname>shared</classname> build item name scope (see <xref
+     linkend="ref.build-item-access-control"/>), we effectively
+     prevent outside build items from depending on it directly.
+    </para>
+    <para>
+     Here is the first implementation's <filename>Abuild.mk</filename>
+     file:
+     <?example shared-library/shared/impl1/Abuild.mk?>
+     What we have here is a normal library
+     <filename>Abuild.mk</filename> file except that we have set the
+     variable <varname>SHLIB_shared</varname> to the value <literal>1
+     2 3</literal>.  This tells &abuild; to build the
+     <filename>shared</filename> library target as a shared library
+     instead of a static library using the version information
+     provided.  On Windows, &abuild; will create
+     <filename>shared.dll</filename> along with
+     <filename>shared.lib</filename> and
+     <filename>shared.exp</filename>.  On UNIX, it will create
+     <filename>libshared.so.1.2.3</filename> and will make
+     <filename>libshared.so</filename> and
+     <filename>libshared.so.1</filename> symbolic links to it.
+     Executables that link with <filename>-lshared</filename> will
+     need to find <filename>libshared.so.1</filename> in their library
+     paths at runtime.
+    </para>
+    <para>
+     This shared library consists of a single file called
+     <filename>Shared.cc</filename>.  Here is the header file
+     <filename>Shared.hh</filename>:
+     <?example shared-library/shared/include/Shared.hh?>
+     This is the implementation of the interface:
+     <?example shared-library/shared/impl1/Shared.cc?>
+     Notice the <literal>__declspec(dllexport)</literal> line that is
+     there for Windows only.  This is necessary to make Windows export
+     the function to a DLL.  No such mechanism is required in a UNIX
+     environment.  Our <filename>Abuild.interface</filename> file
+     looks like a normal <filename>Abuild.interface</filename> file
+     for libraries except that it omits an <varname>INCLUDES</varname>
+     variable and declares a special <firstterm>mutex</firstterm>
+     variable:
+     <?example shared-library/shared/impl1/Abuild.interface?>
+     The <varname>INCLUDES</varname> variable is set in the
+     <classname>shared.include</classname> build item's
+     <filename>Abuild.interface</filename> instead:
+     <?example shared-library/shared/include/Abuild.interface?>
+     The mutex variable is a normal interface variable.  We declare
+     the same variable in the <filename>Abuild.interface</filename>
+     file for <classname>shared.impl2</classname>.  Since &abuild;
+     won't allow any interface variable to declared in more than one
+     place, this effectively prevents any one build item from
+     simultaneously depending on both
+     <classname>shared.impl1</classname> and
+     <classname>shared.impl2</classname>.
+    </para>
+    <para>
+     Our second implementation is not in the dependency chain of our
+     program.  It resides in the <filename>impl2</filename> directory.
+     Here are its <filename>Abuild.conf</filename> and
+     <filename>Abuild.mk</filename>:
+     <?example shared-library/shared/impl2/Abuild.conf?>
+     <?example shared-library/shared/impl2/Abuild.mk?>
+     You will notice in this case that this build item depends on a
+     static library that its private to its own build item name scope.
+     This static library provides additional functions that are used
+     <emphasis>within</emphasis> the shared library.  In order to tell
+     &abuild; to link that static library into the shared library, we
+     set the variable <varname>LINK_SHLIBS</varname>.  Also, we want
+     to avoid having the static library appear on the link statement
+     for executables that link with this shared library.  To do that,
+     we have to do some extra work in our
+     <filename>Abuild.interface</filename> file.  Here are that file
+     and the <function>after-build</function> file that it loads:
+     <?example shared-library/shared/impl2/Abuild.interface?>
+     <?example shared-library/shared/impl2/after.interface?>
+     Notice that we reset the <varname>LIBS</varname> variable and add
+     our own library to it after the build has completed.  This makes
+     the static library added in
+     <classname>shared.impl2.static</classname>'s
+     <filename>Abuild.interface</filename> available to
+     <classname>shared.impl2</classname> during its linking but not
+     available to those who depend on
+     <classname>shared.impl2</classname>:
+     <?example shared-library/shared/impl2/static/Abuild.interface?>
+    </para>
+    <para>
+     Finally, we can run our program.  Remember that in order to run
+     the program, you must explicitly add the directory containing the
+     shared library whose implementation you want to use to your
+     <envar>LD_LIBRARY_PATH</envar> on UNIX or your
+     <envar>PATH</envar> on Windows.  If you set this variable to
+     include the output directory for
+     <classname>shared.impl1</classname>, you will see this output:
+     <?qtest example.shared-library-prog-impl1.out?>
+     If you set it to the <classname>shared.impl2</classname> build
+     item's directory, you will see this instead:
+     <?qtest example.shared-library-prog-impl2.out?>
+     Note that we could have made <classname>shared</classname> depend
+     on <classname>shared.impl2</classname> instead of
+     <classname>shared.impl1</classname> and gotten the same results.
+     Hiding the actual shared library implementation behind a
+     pass-through build item provides a useful device for allowing you
+     to reconfigure the system later on, including replacing
+     place-holder shared library-based stub implementations with
+     static library implementations later in the development process.
+     With careful planning, this type of technique could be used to
+     provide a shared-library based stub system that could be swapped
+     out later with very little impact on the overall build system.
+    </para>
+   </sect1>
+  </chapter>
+  <chapter id="ref.code-generators">
+   <title>Automatically Generated Code for GNU Make-based Builds</title>
+   <para>
+    In this chapter, we show how to use &abuild; with automatically
+    generated code.  The examples in this chapter use the
+    <application>GNU Make</application> backend, but the principles
+    are the same if you are using <application>ant</application>.
+    Examples of using code generators with Java appear later in the
+    document (<xref linkend="ref.example.java-code-generator"/>).
+   </para>
+   <sect1 id="ref.build-item-rules">
+    <title>Build Item Rules</title>
+    <para>
+     The most important thing to realize about code generators in
+     &abuild; is that code generation can be viewed as a just another
+     service that a build item can offer, just like libraries or
+     header files.  In many build systems, code generators are
+     problematic because you need to take special steps to make sure
+     generated code appears before compilation or dependency
+     generation begin.  With &abuild;, code generators get run at the
+     correct stage by virtue of appearing in the correct place in the
+     dependency tree.
+    </para>
+    <para>
+     In order for a <application>make</application>-based build item
+     to provide code generation, it must have a
+     <filename>Rules.mk</filename> file.  The
+     <filename>Rules.mk</filename> file is a GNU Make fragment that is
+     included by &abuild; only when explicitly requested.  In order to
+     use the rules implemented in one build item's
+     <filename>Rules.mk</filename> file, you must depend on that build
+     item and also list its name in the
+     <varname>BUILD_ITEM_RULES</varname> variable in your
+     <filename>Abuild.mk</filename> file.  Any rules defined in
+     <filename>Rules.mk</filename> are run from the &abuild; output
+     directory of the build item that is using the rules.  That means
+     that if the rules need to refer to files inside the build item
+     that <emphasis>provides</emphasis> the rules, they must do so by
+     either accessing interface variables defined in that build item's
+     <filename>Abuild.interface</filename>, or prefixing the files
+     with a variable that &abuild; provides.  Specifically, for a
+     build item named
+     <classname><replaceable>build-item</replaceable></classname>,
+     &abuild; provides variable called
+     <varname>abDIR_<replaceable>build-item</replaceable></varname>
+     that can be accessed from a <filename>Rules.mk</filename> file.
+     Note that &abuild; only provides these variables for build items
+     in your dependency chain.  Also, use of these variables from
+     <filename>Abuild.mk</filename> files is strongly discouraged as
+     it can cause your build tree to contain path-based dependencies
+     instead of name-based dependencies which would defeat one of the
+     most compelling advantages by &abuild;.  The best practice is to
+     refer to files in your own build item from your own files by
+     using the abuild-provided variable name to find your own path,
+     and to define interface variables for files that you intend for
+     other build items to access.  Either way, there are certain
+     things that it are important to keep in mind when writing
+     <application>GNU Make</application> rules for use inside of
+     &abuild;.  For a discussion of this topic, please see <xref
+     linkend="ref.guidelines-for-make-rule-authors"/>.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.code-generator">
+    <title>Code Generator Example</title>
+    <para>
+     The <classname>derived-code-generator</classname> build item in
+     <filename>doc/example/user/derived/code-generator</filename>
+     contains a trivial code generator.  All it does is generate a
+     source and header file that define a function that returns a
+     constant, which is read from a file.  We have modified
+     <classname>derived-main</classname> to use the code generator.
+     The code generator itself is implemented in the
+     <classname>derived-codegen</classname> build item and is made
+     available through that build item's <filename>Rules.mk</filename>
+     file.
+    </para>
+    <para>
+     First, we'll look at the code generator itself.  Notice that the
+     only &abuild; files contained in the
+     <classname>derived-code-generator</classname> build item
+     directory at <filename>user/derived/code-generator</filename> are
+     <filename>Abuild.conf</filename> and
+     <filename>Rules.mk</filename>.  There is no
+     <filename>Abuild.interface</filename> or
+     <filename>Abuild.mk</filename>, though these files could exist if
+     they were needed.
+    </para>
+    <para>
+     The important part of this is <filename>Rules.mk</filename>, so
+     we'll study it carefully.  Here is the
+     <filename>Rules.mk</filename> file:
+     <?example user/derived/code-generator/Rules.mk?>
+     The first thing we do here is to define a
+     <command>rules-help</command> target that prints some help
+     information about using the rules.  By placing the name of this
+     build item (<classname>derived-code-generator</classname>) in
+     your <varname>BUILD_ITEM_RULES</varname> variable, you will see
+     this output when you run <command>abuild rules-help</command>.
+     When writing rules help, please remember that the strings you are
+     echoing are subject to <application>make</application>'s ordinary
+     variable interpolation rules.  It's best to actually test by
+     running <command>abuild rules-help</command> to make sure that it
+     echoes properly.  Alternatively, you can have your
+     <command>rules-help</command> target display the contents of a
+     file in your build item.
+    </para>
+    <para>
+     The next thing that happens is that we have some code that checks
+     for undefined variables.  This isn't strictly necessary, but it
+     can save your users a lot of trouble if you detect when variables
+     they are supposed to provide are not there.  We use the function
+     <function>undefined_vars</function> to do this check.  This
+     function is provided by &abuild; and appears in the file
+     <filename>make/global.mk</filename> relative to the top of the
+     &abuild; installation.  If you expect to write a lot of make
+     rules, it will be in your best interest to familiarize yourself
+     with the functions offered by this file.  Even if we hadn't done
+     this, &abuild; invokes GNU Make in a manner that causes it to
+     warn about any undefined variables.  This is useful because
+     undefined variables are a common cause of makefile errors.
+    </para>
+    <para>
+     Then we add our source file to the <command>all::</command>
+     target to make sure it gets built.  Note that we use
+     <command>all::</command>, not <command>all:</command>, since
+     there are multiple <command>all::</command> targets throughout
+     various rules files.  Adding our source files to the
+     <command>all::</command> target is not strictly necessary in this
+     case since, by listing the source file as a source file for one
+     of our targets (in the build item that uses this code generator),
+     it will be built in the proper sequence.  It's still good
+     practice to do this though, but remember that in a parallel
+     build, dependencies of the <command>all::</command> target may
+     not necessarily be built in the order in which they are listed.
+    </para>
+    <para>
+     Next, we have the actual <application>make</application> rules
+     that create the automatically generated files.  In this case, we
+     make the output files depend on both the input file and the
+     code generator.  Although &abuild; is running the rules from the
+     depending build item's output directory, we don't need to put any
+     prefix in front of the name of the input file: &abuild; sets
+     <application>make</application>'s <varname>VPATH</varname>
+     variable so that the file can be found.  By creating a dependency
+     on the code generator as well, we can be sure that if the code
+     generator itself is modified, any code that it generates will
+     also be updated.
+    </para>
+    <para>
+     In the commands for generating our files, notice that we don't
+     need an <literal>@</literal> sign before the generation command
+     to prevent it from echoing since &abuild; doesn't echo its output
+     by default.  Not putting an <literal>@</literal> sign there means
+     that the user will see the command if he/she runs &abuild; with
+     the <option>--verbose</option> option.  So that the user knows
+     something is happening, we generate a useful output message using
+     <varname>@$(PRINT)</varname>.  The use of
+     <varname>@$(PRINT)</varname> ensures that we don't see the actual
+     echo command even when running with <option>--verbose</option>,
+     and that we don't see the output at all when we're running with
+     <option>--silent</option>.  All informational messages should be
+     generated this way.  (For the <command>rules-help</command>
+     target, we use <command>@echo</command> directly since it doesn't
+     make sense to suppress that output even when running with
+     <option>--silent</option>.)  Note also that we invoke the code
+     generator with <command>perl</command> rather than assuming that
+     it is executable (since some version control systems or file
+     systems make it hard to preserve execute permissions) and that we
+     specify the path to the code generator in terms of
+     <varname>$(abDIR_derived-code-generator)</varname>.  Also notice
+     that we have to prefix the name of the input file with
+     <varname>$(SRCDIR)</varname> when we pass it to the code
+     generator since we are running from the &abuild; output
+     directory.  (The <varname>VPATH</varname> variable tells
+     <application>make</application> where to look, but it doesn't
+     tell our code generator anything!)  Finally, we add a
+     <command>clean</command> rule that removes our automatically
+     generated files.  Note that the <command>clean</command> rule is
+     only run when the user invokes &abuild; from the output
+     directory.  For this reason, adding a <command>clean</command>
+     target is optional.  For more detail on this, please see <xref
+     linkend="ref.output-directories"/>.
+    </para>
+    <para>
+     To use this code generator from
+     <classname>derived-main.src</classname>, all we have to do is
+     define the required variables in <filename>Abuild.mk</filename>,
+     and add <classname>derived-code-generator</classname> as a
+     dependency in <filename>Abuild.conf</filename> and to the
+     <varname>BUILD_ITEM_RULES</varname> variable in
+     <filename>Abuild.mk</filename>.  Note that we have modified
+     <filename>main.cpp</filename> to include
+     <filename>auto.h</filename> and to call
+     <varname>getNumber()</varname>, thus testing the use of the code
+     generator.  Since this application effectively contains the only
+     test suite for the code generator, we declare it as a tester of
+     the code generator in <filename>Abuild.conf</filename> using
+     traits.  Here are the relevant files from
+     <classname>derived-main.src</classname>:
+     <?example user/derived/main/src/Abuild.conf?>
+     <?example user/derived/main/src/Abuild.mk?>
+     Here is the modified <filename>main.cpp</filename> file:
+     <?example user/derived/main/src/main.cpp?>
+    </para>
+   </sect1>
+   <sect1 id="ref.example.auto-from-variable">
+    <title>Dependency on a Make Variable</title>
+    <para>
+     In the previous example, we showed how to create a code generator
+     that generates code from a file.  This works nicely because
+     <application>make</application>'s dependency system is based on
+     file modification times.  Sometimes, you may want to generate
+     code based on the value of a <application>make</application>
+     variable whose origin may be either
+     <filename>Abuild.mk</filename> or, more likely,
+     <filename>Abuild.interface</filename>.  Doing this is more
+     difficult because it requires some obscure make coding, but it is
+     common enough to warrant an example.
+    </para>
+    <para>
+     The &ldquo;obvious&rdquo; way to pass information from a
+     <application>make</application> variable into your code would be
+     to use a preprocessor symbol based on the variable and to pass
+     this symbol to the code with <varname>XCPPFLAGS</varname> or
+     <varname>XCPPFLAGS_<replaceable>Filename</replaceable></varname>.
+     The problem with this is that there is no dependency tracking on
+     variable values, so if you change the variable value, there is
+     nothing that will trigger recompilation of the files that use the
+     preprocessor symbol.  To get around this problem, we use local
+     rules to generate a file with the value of the variable.  This
+     example can be found in
+     <filename>doc/example/auto-from-variable</filename>.
+    </para>
+    <para>
+     First, look at the <classname>file-provider</classname> build
+     item in <filename>library</filename>.  This build item
+     automatically generates a header file based on the value of a
+     make variable.  The variable itself is defined in the
+     <filename>Abuild.interface</filename> file:
+     <?example auto-from-variable/library/Abuild.interface?>
+     We define the variable <varname>file-provider-filename</varname>
+     to point to a local file.  By making this a <type>filename</type>
+     variable, we tell &abuild; to translate its location to the path
+     to this file as resolved relative to the
+     <filename>Abuild.interface</filename> file's directory.  Note
+     that we use the build item name in the variable name to reduce
+     the likelihood of clashing with other interface variables.  In
+     the <filename>Abuild.mk</filename> file we use the
+     <varname>LOCAL_RULES</varname> variable to declare the local
+     rules file <filename>generate.mk</filename>.  This is where we
+     will actually generate the header file.  Otherwise, this is an
+     ordinary <filename>Abuild.mk</filename>:
+     <?example auto-from-variable/library/Abuild.mk?>
+    </para>
+    <para>
+     Here is <filename>generate.mk</filename>:
+     <?example auto-from-variable/library/generate.mk?>
+     There is a lot going on here, so we'll go through line by line.
+     <application>GNU Make</application> is essentially a functional
+     programming environment.  Makefiles are not executed
+     sequentially; they are evaluated based on dependencies instead.
+     Sometimes you need to force <application>make</application> to
+     run steps sequentially.  You can trick
+     <application>make</application> into doing this by making the
+     operations side effects of a variable assignment using the
+     <literal>:=</literal> operator since these are evaluated when
+     they are read.  Our goal here is to translate a variable value,
+     which can't be tracked by the dependency system, into a file
+     modification time, which can.  To do this, we create a file whose
+     value and modification time get updated whenever the variable
+     value changes.  We do this in two steps: first, we write the
+     value of the variable to a temporary file (the first
+     <varname>DUMMY</varname> assignment), and then we overwrite
+     another file with the temporary file if the other file either
+     doesn't exist or has a different value (the second assignment).
+     In this way, whenever the variable changes, the file called
+     <filename>variable-value</filename> gets updated.  Although the
+     <filename>variable-value.tmp</filename> file gets updated every
+     time when run &abuild;, we don't care since that file is not used
+     as a dependency.  Next, we provide the rules to actually generate
+     the header file.  The header file depends on the file
+     <filename>variable-value</filename> so it will get regenerated
+     whenever the variable changes.  Here we just use
+     <command>echo</command> to write the header file.  Note that we
+     have to call <application>make</application>'s
+     <function>abspath</function> function to translate the value of
+     <varname>file-provider-filename</varname> to an absolute path.
+     This is because &abuild; writes <type>filename</type> variables
+     as relative paths when it passes them to
+     <application>make</application>.  Note also that didn't actually
+     have to use the value of the <filename>variable-value</filename>
+     file.  We know that its contents are identical to the value of
+     the variable, so we can just use the variable's value directly.
+     Finally, we want to make sure that
+     <filename>FileProvider_file.hh</filename> exists before we start
+     compiling any of the files that reference it.  We have a little
+     bit of a bootstrapping problem here: although &abuild; ordinarily
+     generates dependency information of object files on header files
+     automatically, this generation step is performed during the
+     compilation itself.  In order to force the header file to be
+     generated before the compile starts, we have to create an
+     explicit dependency.  We do this by creating an explicit
+     dependency from the object file to the header file.  Notice that
+     we use the make variable <varname>LOBJ</varname> to get the
+     object file suffix rather than hard-coding it.  All compiler
+     support files are required to set the variable
+     <varname>LOBJ</varname> to the suffix of object files that are
+     going into libraries and <varname>OBJ</varname> for object files
+     that are not going into libraries.  Although they are often the
+     same, they don't have to be.
+     <footnote>
+      <para>
+       It would be nice to be able to avoid this issue entirely.  One
+       way to avoid it would be generate a source file instead of a
+       header file.  In that case, <application>make</application>
+       would definitely try to generate the source file before
+       building, so no explicit dependency would be required.  This
+       approach would certainly work for this example.  One option
+       that would definitely <emphasis>not</emphasis> work would be to
+       create a <command>generate</command> target analogous to the
+       <command>generate</command> hook in &abuild;'s
+       <application>ant</application> support and making it a
+       prerequisite for the <command>all</command> target.  Although
+       this would work for strictly serial builds, it wouldn't
+       necessarily work for parallel builds as
+       <application>make</application> is free to build all the
+       prerequisites for a given target in any order as long as they
+       don't have dependencies on each other.  In fact, the reason
+       this trick works in <application>ant</application> is that
+       <application>ant</application> only runs tasks in parallel when
+       you explicitly tell it that it can.  So the bottom line is that
+       whatever we are automatically generating must appear as a
+       dependency somewhere.  Source files automatically appear as
+       dependencies of their object files, but header files don't
+       appear as dependencies anywhere until the compile has already
+       been run at least one time.  Therefore, a solution that works
+       for parallel builds and generates header files has to create an
+       explicit dependency such as in this example.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     We have two files that use the header file.  The first one is the
+     library implementation itself:
+     <?example auto-from-variable/library/FileProvider.cc?>
+     The other is the main program from the other build item:
+     <?example auto-from-variable/program/main.cc?>
+    </para>
+    <para>
+     There are a few additional points to be made about this example.
+     We have taken an approach here that can be tailored for a wide
+     variety of situations.  In this example, the interface variable
+     is accessible to other build items.  If we didn't want this to be
+     the case, we could have used an <filename>Abuild.mk</filename>
+     variable instead or we could have made this variable visible
+     conditionally upon an interface flag.  We have also made the
+     header file available to other build items by adding the output
+     directory to <varname>INCLUDES</varname> in
+     <filename>Abuild.interface</filename>.  If you didn't want these
+     to have such high visibility, you could protect them just as you
+     would protect any private interfaces.  In other words, this
+     example is a little bit of an overkill for the exact case that it
+     implements, but it shows a pattern that can be used when this
+     type of functionality is required.  The main thing to take away
+     here is the use of a <application>make</application> trick to
+     translate a variable value into a file modification time, thus
+     making it trackable with <application>make</application>'s
+     ordinarily dependency tracking mechanism.
     </para>
    </sect1>
   </chapter>
@@ -7982,7 +7989,7 @@ endif
    </sect1>
   </chapter>
   <chapter id="ref.java-archive-types">
-   <title>Java Archive Types</title>
+   <title>JARs and Other Archives</title>
    <para>
     In this example, we demonstrate how to create different types of
     archive types in Java.  The actual contents of these archives are
