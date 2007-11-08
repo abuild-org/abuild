@@ -411,7 +411,7 @@ following checks:
         multiple projects on the same system at the same time.  No
         special path settings or environment variable settings are
         required to use &abuild;, other than ensuring that the
-        external tools it invokes (gnu make, compilers, etc.)  are
+        external tools it invokes (GNU Make, compilers, etc.)  are
         available and in your path.
        </para>
       </listitem>
@@ -3745,7 +3745,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </variablelist>
     <para>
      The following additional argument is recognized and is passed
-     along to gnu make:
+     along to GNU Make:
     </para>
     <variablelist>
      <varlistentry>
@@ -4386,7 +4386,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      embed spaces in string variables by quoting them with a
      backslash, but keep in mind that not all backends handle spaces
      in single-word variable values cleanly.  For example, dealing
-     with embedded spaces in variable names in gnu make is impractical
+     with embedded spaces in variable names in GNU Make is impractical
      since it uses space as a word delimiter and offers no specific
      quoting mechanisms.  The values of filename variables are
      interpreted to be path names.  Path names may be specified with
@@ -5223,8 +5223,8 @@ endif
    <sect1 id="ref.abuild.mk.general">
     <title>General <filename>Abuild.mk</filename> Syntax</title>
     <para>
-     The <filename>Abuild.mk</filename> file is read by gnu make and is
-     a gnu make fragment.  It therefore has gnu make syntax.  The
+     The <filename>Abuild.mk</filename> file is read by GNU Make and is
+     a GNU Make fragment.  It therefore has GNU Make syntax.  The
      <filename>Abuild.mk</filename> file is intended to contain only
      variable settings.  It contains no make rules or include
      directives.  &Abuild; automatically includes your
@@ -6066,7 +6066,7 @@ endif
      In order for a <application>make</application>-based build item
      to provide code generation, it must have a
      <filename>Rules.mk</filename> file.  The
-     <filename>Rules.mk</filename> file is a gnu make fragment that is
+     <filename>Rules.mk</filename> file is a GNU Make fragment that is
      included by &abuild; only when explicitly requested.  In order to
      use the rules implemented in one build item's
      <filename>Rules.mk</filename> file, you must depend on that build
@@ -6156,7 +6156,7 @@ endif
      &abuild; installation.  If you expect to write a lot of make
      rules, it will be in your best interest to familiarize yourself
      with the functions offered by this file.  Even if we hadn't done
-     this, &abuild; invokes gnu make in a manner that causes it to
+     this, &abuild; invokes GNU Make in a manner that causes it to
      warn about any undefined variables.  This is useful because
      undefined variables are a common cause of makefile errors.
     </para>
@@ -9283,7 +9283,7 @@ native-compiler qcc
       <listitem>
        <para>
         There are some convenience functions provided by &abuild;'s
-        gnu make code.  The best way to learn is to read existing
+        GNU Make code.  The best way to learn is to read existing
         rules.  If you are going to be writing a lot of
         <application>make</application> code for &abuild;, it will be
         in your interest to familiarize yourself with the code in
@@ -11686,8 +11686,8 @@ Y = $(X)
          Implementation of completely new interface system.  Interfaces
          now use <filename>Abuild.interface</filename> instead of
          <filename>Interface.mk</filename>.  The new interface files
-         are loaded internally by &abuild; and are no longer tied to gnu
-         make.
+         are loaded internally by &abuild; and are no longer tied to GNU
+         Make.
         </para>
        </listitem>
        <listitem>
@@ -11778,16 +11778,16 @@ Y = $(X)
        </listitem>
        <listitem>
         <para>
-         When looking for gnu make, &abuild; now checks all occurrences
+         When looking for GNU Make, &abuild; now checks all occurrences
          of gmake and then of make in the path, stopping with the first
-         one that appears to be gnu make version 3.81 or newer.  It
+         one that appears to be GNU Make version 3.81 or newer.  It
          previously checked only the first occurrence of make or gmake
-         and required that occurrence to be gnu make 3.81 or newer.
+         and required that occurrence to be GNU Make 3.81 or newer.
         </para>
        </listitem>
        <listitem>
         <para>
-         &Abuild; now only checks for gnu make if at least one build item
+         &Abuild; now only checks for GNU Make if at least one build item
          requires it.
         </para>
        </listitem>
@@ -11875,8 +11875,8 @@ Y = $(X)
          directories in which builds will be run and invokes the
          backend directly in each directory.  &Abuild; now manages all of
          its build order computations and parallelism computations
-         itself rather than relying on gnu make.  This means that
-         &abuild; now uses gnu make only for performing the actual
+         itself rather than relying on GNU Make.  This means that
+         &abuild; now uses GNU Make only for performing the actual
          compiles, which greatly simplifies &abuild;'s make code and
          makes it much more able to support alternative backends.  A
          pleasant side effect of this change is that &abuild; runs much
@@ -12219,13 +12219,13 @@ Y = $(X)
        On Windows, using &abuild; to build Java code works fine and
        should be comparable in performance to building Java code with
        &abuild; on a UNIX platform.  For C/C++ builds, &abuild; uses Cygwin
-       for gnu make and perl.  It can use Visual Studio for compilation
+       for GNU Make and perl.  It can use Visual Studio for compilation
        and can produce targets that don't depend on Cygwin, but
        &abuild; itself uses Cygwin.  The overhead of running things in
        Cygwin is very high, and the result is that &abuild; for C/C++ is
        slow on Windows even though the Windows compilers are actually
        quite fast.  We need to get &abuild; working properly with a
-       native gnu make and remove the last uses of perl from &abuild;,
+       native GNU Make and remove the last uses of perl from &abuild;,
        which means rewriting <command>gen_deps</command> in C++ or
        otherwise folding it into the &abuild; sources.  The automated
        test system that is integrated in &abuild; is likely to stay in
