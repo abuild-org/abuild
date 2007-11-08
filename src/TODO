@@ -20,6 +20,12 @@ Documentation
  * Make sure documentation for integration with third party packages
    is sufficient.
 
+ * Consider adding a trouble shooting section
+
+    - example: library name inconsistency between Abuild.mk and
+      Abuild.interface
+
+
 Abuild Contrib
 --------------
 
