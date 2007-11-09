@@ -4,6 +4,21 @@
 
  * Look at all XXX comments.
 
+ * Absolute externals may be wrong:
+
+    - They are read write just like regular externals which makes them
+      unsuitable for use for build item libraries
+
+    - They break build tree platform independence, at least where
+      Windows is concerned
+
+   We may need some concept of read-only externals explicitly to
+   support build item libraries.  One possibility would be to have any
+   absolute path externals automatically be read only with the
+   rationale that they are prone to being accessed by multiple people
+   just like backing areas.  Another would be to have a new key in
+   Abuild.conf for build item libraries.
+
 Documentation
 -------------
 
