@@ -2531,11 +2531,15 @@ C:\cygwin\cygwin.bat
      </para>
      <para>
       Traits listed in the <property>traits</property> key can be made
-      referent to other build items by listing the other build items in
-      an <option>-item</option> option.  For example, the following
-      <filename>Abuild.conf</filename> fragment:
-      <programlisting>this: potato.test
-traits: deployable tester -item=potato.lib -item=potato.bin unclassified
+      referent to other build items by listing the other build items
+      in an <option>-item</option> option.  Any trait listed in a
+      build item's <property>traits</property> key must be listed in
+      the <property>supported-traits</property> key of the root
+      <filename>Abuild.conf</filename> file of the local build tree or
+      one of its externals.  For example, the following
+      <filename>Abuild.conf</filename> fragment: <programlisting>this:
+      potato.test traits: deployable tester -item=potato.lib
+      -item=potato.bin unclassified
 </programlisting>
       declares that the <classname>potato.test</classname> build item
       is deployable, unclassified, and a tester for the
@@ -3013,17 +3017,22 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <sect1 id="ref.backing-areas.setup">
     <title>Setting Up Backing Areas</title>
     <para>
-     Any build tree can be a backing area.  &Abuild; uses backing
-     areas to resolve build items that it can't find in the local
-     build tree or its externals.  Since &abuild; never attempts to
-     build or otherwise modify an item in a backing area, backing
-     areas should always be fully built on all platforms for which
-     they will be used as backing areas.  (For additional details on
-     platforms, please see <xref linkend="ref.platforms"/>.)  To
-     designate another tree as your backing area, create a file called
+     Any build tree can be a backing area.  If &abuild; needs to
+     reference a build item that it is found in the local build tree
+     or its externals, it will use that copy of the build item.  If
+     &abuild; can't find an item in the local tree or its externals,
+     it will use the backing area to resolve that build item.  Since
+     &abuild; never attempts to build or otherwise modify an item in a
+     backing area, backing areas should always be fully built on all
+     platforms for which they will be used as backing areas.  (For
+     additional details on platforms, please see <xref
+     linkend="ref.platforms"/>.)  To designate another tree as your
+     backing area, create a file called
      <filename>Abuild.backing</filename> in the root directory of your
      build tree and place the path (which may be absolute or relative)
-     to the backing area in that file on a line by itself.  Creation
+     to the backing area in that file on a line by itself.  When one
+     tree declares another tree as a backing area, we say that the
+     tree <firstterm>backs to</firstterm> its backing area.  Creation
      and maintenance of backing areas is generally a function
      performed by the people who are in charge of maintaining the
      overall software baselines.  Most developers will just set up
@@ -3057,12 +3066,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      In this section, we will discuss backing areas from a
      functionality standpoint.  This section presents a somewhat
-     simplified view of how backing areas actually work, but it is good
-     enough for the vast majority of normal cases.  To understand the
-     exact mechanism that &abuild; uses to handle backing areas and
-     externals with enough detail to fully understand the subtleties of
-     how they work, please see <xref linkend="ref.traversal-details"/>.
-     To get started, the explanations provided here should suffice.
+     simplified view of how backing areas actually work, but it is
+     good enough to cover the normal cases.  To understand the exact
+     mechanism that &abuild; uses to handle backing areas and
+     externals with enough detail to fully understand the subtleties
+     of how they work, please see <xref
+     linkend="ref.traversal-details"/>.  To get started, the
+     explanations provided here should suffice.
     </para>
     <para>
      The purpose of a backing area is to enable a developer to create
@@ -3136,7 +3146,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      it will check to see whether that external can be resolved in
      your backing area chain.  If it can, then &abuild; will be
      satisfied and will allow those build items to be inherited
-     through your backing area chain.
+     through your backing area chain.  This makes it possible for you
+     to override build items in one tree without having to create a
+     tree for each of that tree's externals.
     </para>
     <para>
      There is one corner case with backing areas and externals.  It
@@ -3152,7 +3164,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>/backing/1/../ext</filename>) exists.  If
      <filename>/tree/ext</filename> does not exist, then
      <filename>/tree/1</filename> will resolve this external through
-     the backing area, as described above.  (See <xref
+     the backing area, as described above.  This is the normal case of
+     resolving externals with backing areas.  (See <xref
      linkend="fig.backed-external"/>.)
      <figure id="fig.backed-external">
       <title>External Resolved in a Backing Area</title>
@@ -3269,10 +3282,20 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      in our task branch so we could run its test suite.  Remember that
      &abuild; won't try to build the copy of
      <classname>project-main</classname> there, and even if it did,
-     that copy of <classname>project-main</classname> would not see our
-     local copy of <classname>project-lib</classname>.  This is the
-     output we see when running <command>abuild --build=all
-     check</command> from <filename>task/project</filename>:
+     that copy of <classname>project-main</classname> would not see
+     our local copy of <classname>project-lib</classname>: it would
+     see the copy in its own local build tree, which we have shadowed.
+     <footnote>
+      <para>
+       We would say that <classname>project-main</classname> has
+       shadowed dependencies.  This is an advanced topic and is
+       discussed in more detail in <xref
+       linkend="ref.integrity-checks"/>.
+      </para>
+     </footnote>
+     This is the output we see when running <command>abuild
+     --build=all check</command> from
+     <filename>task/project</filename>:
      <?qtest example.task-project-check.out?>
      As with the <command>no-op</command> build, we only see output
      relating to local build items, not to build items in our backing
@@ -3303,17 +3326,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      There are three parts to interface flags.  The first part is that
      a build item declares what flags it supports by listing them in
      the <property>supported-flags</property> key of its
-     <filename>Abuild.conf</filename>.  The second part is that a build
-     item specifies which flags it wants set for its direct
+     <filename>Abuild.conf</filename>.  The second part is that a
+     build item specifies which flags it wants set for its direct
      dependencies, if any, by specifying them in the
      <property>deps</property> key of its
      <filename>Abuild.conf</filename> file.  When one build item
      indicates that it should depend on other build item with a
      particular flag set, &abuild; checks to make sure that the
-     dependent build item supports that flag.  The third part is that a
-     build item may associate a variable assignment (and only a
-     variable assignment) in its <filename>Abuild.interface</filename>
-     file with a particular flag.
+     dependent build item supports that flag, reporting an error if it
+     does not.  The third part is that a build item may associate a
+     variable assignment (and only a variable assignment) in its
+     <filename>Abuild.interface</filename> file with a particular
+     flag.
     </para>
     <para>
      When an <filename>Abuild.interface</filename> file is read by
@@ -3363,8 +3387,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </caption>
       </mediaobject>
      </figure>
-     For additional clarification, see the example below,
-     <xref linkend="ref.example.private-interface"/>.
+     This is a bit tricky to understand.  For additional
+     clarification, see the example below, <xref
+     linkend="ref.example.private-interface"/>.
     </para>
    </sect1>
    <sect1 id="ref.example.deleted-item">
@@ -3372,8 +3397,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      Here we present a new series of build trees located under
      <filename>doc/example/user</filename>.  These build trees back to
-     our task branch and stable build tree from earlier examples.  We
-     will use these build trees to illustrate the use of the
+     our task branch and stable build tree from earlier examples.
+     (That is, they declare them as their backing areas.)  We will use
+     these build trees to illustrate the use of the
      <property>deleted</property> key in a build tree's root build
      item's <filename>Abuild.conf</filename>, and we also present a
      concrete example of using interface flags to implement private
@@ -3394,7 +3420,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      to a source file in <classname>common-lib1.src</classname> just as
      another example of shadowing a build item from our backing area.
      Since our task branch didn't contain <filename>common</filename>,
-     the <filename>common</filename> in our user branch as to back to
+     the <filename>common</filename> in our user branch has to back to
      stable.  Here is <filename>user/common/Abuild.backing</filename>:
      <?example user/common/Abuild.backing?>
     </para>
@@ -3402,9 +3428,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      In <filename>project</filename>, we have made changes to
      <filename>project-lib</filename> to make use of private
      interfaces, which we discuss in the next section.  We have also
-     delete the new build item <classname>project-lib.extra</classname>
-     that we added in the task branch.  To delete the build item, we
-     removed the <filename>extra</filename> directory from
+     deleted the new build item
+     <classname>project-lib.extra</classname> that we added in the
+     task branch.  To delete the build item, we removed the
+     <filename>extra</filename> directory from
      <filename>project/lib</filename> and from the
      <property>child-dirs</property> key in
      <filename>project/lib/Abuild.conf</filename>:
@@ -3420,6 +3447,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>user/project</filename>'s
      <filename>Abuild.conf</filename>:
      <?example user/project/Abuild.conf?>
+     This has effectively prevented &abuild; from looking for
+     <classname>project-lib.extra</classname> in the backing area
+     chain.  If any build item in the local tree references
+     <classname>project-lib.extra</classname>, an error will be
+     reported because &abuild; now considers that to be an unknown
+     build item.
     </para>
    </sect1>
    <sect1 id="ref.example.private-interface">
@@ -3463,9 +3496,21 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>private</filename> subdirectory:
      <?example user/project/lib/src/Abuild.mk?>
      The only reason we did this was to demonstrate that &abuild;
-     allows multicomponent paths in your source files.  Just avoid
-     putting &ldquo;<filename>..</filename>&rdquo; anywhere in the
-     path.
+     allows multicomponent paths (<emphasis>i.e.</emphasis>, paths
+     with subdirectories in them) in your source variables.  Just
+     avoid putting &ldquo;<filename>..</filename>&rdquo; anywhere in
+     the path.
+     <footnote>
+      <para>
+       Such constructs, if permitted, would potentially cause &abuild;
+       to write files outside the output directory.  For example, if
+       you had <filename>../A.cc</filename> as a source file, &abuild;
+       would construct
+       <filename>abuild-<replaceable>platform</replaceable>/../A.o</filename>
+       as the object file name.  Fortunately, &abuild; actually
+       detects this case and reports an error.
+      </para>
+     </footnote>
     </para>
     <para>
      If you study <filename>ProjectLib.cpp</filename> in
@@ -3483,7 +3528,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      header files.  This type of construct is most useful in straight
      C code rather than C++ code since C doesn't provide any
      encapsulation capability other than use of opaque types defined
-     in private header files.
+     in private header files.  It is somewhat akin to using the
+     <function>friend</function> keyword in C++.
     </para>
     <para>
      The test code in <filename>main.cpp</filename> in
