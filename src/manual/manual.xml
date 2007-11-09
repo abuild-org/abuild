@@ -1792,7 +1792,7 @@ C:\cygwin\cygwin.bat
     in detail.
    </para>
    <sect1 id="ref.platform-structure">
-    <title>Platform structure</title>
+    <title>Platform Structure</title>
     <para>
      &Abuild; classifies platforms into a three-level hierarchy.  The
      three levels are described by the following terms:
@@ -1836,10 +1836,13 @@ C:\cygwin\cygwin.bat
         has only one platform type: <type>java</type>.
         <footnote>
          <para>
-          At one time, it was planned for &abuild; to support different
-          platform types for different versions of Java byte code, but
-          the implications of doing this were deemed too complex, so
-          this plan was abandoned, at least for the foreseeable future.
+          At one time, it was planned for &abuild; to support
+          different platform types for different versions of Java byte
+          code.  Although this would have been useful for build trees
+          that had complex requirements for mixing JDKs of different
+          versions, this capability would have added a lot of
+          complexity to support a practice that is unusually and
+          largely undesirable.
          </para>
         </footnote>
         Platform types are most useful in the <type>object-code</type>
@@ -1969,7 +1972,7 @@ C:\cygwin\cygwin.bat
        <para>
         An optional field that is used to pass additional information
         to the compiler toolchain support file.  Typical uses for
-        flags would be to define different debugging, profiling, or
+        options would be to define different debugging, profiling, or
         optimization levels.
        </para>
       </listitem>
@@ -2035,8 +2038,9 @@ C:\cygwin\cygwin.bat
      <command>clean</command> target to the backend.  The main use for
      this feature would be in testing rules, but it could also be
      useful in helping to track down some hard-to-trace build problem
-     that impacts only one of several platforms that are being built
-     for a specific build item.
+     that apply to only one of several platforms that are being built
+     for a specific build item.  Most users will never use this
+     functionality.
     </para>
    </sect1>
   </chapter>
@@ -2122,7 +2126,8 @@ C:\cygwin\cygwin.bat
      Note that the external tree is not affected in any way by being
      referred to as an external.  In order to avoid build item name
      clashes, it's a good idea to pick a naming convention for your
-     build items that includes some kind of tree-based prefix.
+     build items that includes some kind of tree-based prefix, as we
+     have done with names like <classname>common-lib1</classname>.
     </para>
     <para>
      When declaring an external, you must give some thought as to
@@ -2158,9 +2163,9 @@ C:\cygwin\cygwin.bat
    <sect1 id="ref.example.external-build-tree">
     <title>External Build Tree Example</title>
     <para>
-     We will examine a build tree that makes use of our previous build
-     tree (see <xref linkend="ref.example.simple-build-tree"/>) as an
-     external.  This tree can be found at
+     We will examine a new build tree that makes use of our previous
+     build tree (see <xref linkend="ref.example.simple-build-tree"/>)
+     as an external.  This new tree can be found at
      <filename>doc/example/stable/project</filename>.  The first file
      to look at is the root build item's
      <filename>Abuild.conf</filename>:
@@ -2247,12 +2252,45 @@ C:\cygwin\cygwin.bat
      try to build all the items on which the current item depends.
      Now we generalize on this concept by introducing <firstterm>build
      sets</firstterm>.  A build set is a collection of build items
-     defined by certain criteria.  To instruct &abuild; to build all
-     the items in a specific build set, run <command>abuild
+     defined by certain criteria.  Build sets can be used both to tell
+     &abuild; which items to build and also to tell it which items to
+     clean.
+     <footnote>
+      <para>
+       In retrospect, the term <firstterm>build item set</firstterm>
+       would probably have been a better name for this.  Just keep in
+       mind that build sets can be used for both building and
+       cleaning, and that when we use build sets for cleaning, we
+       sometimes call them <firstterm>clean sets</firstterm> instead.
+      </para>
+     </footnote>
+     To instruct &abuild; to build all the items in a specific
+     build set, run <command>abuild
      --build=<replaceable>set-name</replaceable></command> (or
-     <command>abuild -b <replaceable>set-name</replaceable></command>)
-     where <replaceable>set-name</replaceable> is one of the items in
-     this list:
+     <command>abuild -b
+     <replaceable>set-name</replaceable></command>).  To instruct
+     &abuild; to clean all the items in a specific build set, run
+     <command>abuild
+     --clean=<replaceable>set-name</replaceable></command> (or
+     <command>abuild -c
+     <replaceable>set-name</replaceable></command>).  When building a
+     build set, &abuild; will also automatically build any items that
+     are direct or indirect dependencies of any items in the build
+     set.  However, if you specify any explicit targets on the command
+     line, &abuild; will not, by default, apply those targets to items
+     that it only added to the build set to satisfy dependencies; it
+     will build those items with the <command>all</command> target
+     instead.  If you want &abuild; to build those items with
+     explicitly named targets as well, use the
+     <option>--apply-targets-to-deps</option> option.  When cleaning
+     with a build set, &abuild; does not ordinarily also clean the
+     dependencies of the items in the set.  To apply the
+     <command>clean</command> target to all the dependencies as well,
+     we also use the <option>--apply-targets-to-deps</option> option.
+     This is a bit subtle, so we present several examples below.
+    </para>
+    <para>
+     The following build sets are defined:
      <variablelist>
       <varlistentry>
        <term><option>current</option></term>
@@ -2322,30 +2360,6 @@ C:\cygwin\cygwin.bat
       </varlistentry>
      </variablelist>
     </para>
-    <para>
-     When building a build set, &abuild; will also automatically build
-     any items that are direct or indirect dependencies of any items
-     in the build set.  However, if you specify any explicit targets
-     on the command line, &abuild; will not, by default, apply those
-     targets to items that it only added to the build set to satisfy
-     dependencies.  If you want &abuild; to build those items with
-     explicit targets as well, use the
-     <option>--apply-targets-to-deps</option> option.
-    </para>
-    <para>
-     Build sets may also be used when cleaning.  If you run
-     <command>abuild clean</command>, abuild will clean the current
-     build item, which it does by removing any output directories it
-     created.  The above build sets may also be used as
-     <firstterm>clean sets</firstterm> by invoking <command>abuild
-     --clean=<replaceable>clean-set</replaceable></command> or
-     <command>abuild -c
-     <replaceable>clean-set</replaceable></command>.  When build sets
-     are used as clean sets, they are, by default, not expanded to
-     include dependencies.  If you want them to expand to include
-     dependencies, specify the <option>--apply-targets-to-deps</option>
-     option.
-    </para>
     <sect2 id="ref.build-set.invocation-examples">
      <title>Example Build Set Invocations</title>
      <variablelist>
@@ -2414,7 +2428,8 @@ C:\cygwin\cygwin.bat
        <term><command>abuild clean</command></term>
        <listitem>
         <para>
-         removes all output directories for the current build item
+         removes all output directories for the current build item but
+         not for any of its dependencies
         </para>
        </listitem>
       </varlistentry>
@@ -2655,7 +2670,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <sect2 id="ref.target-selection">
      <title>Target Selection</title>
      <para>
-      Although we have described how various options impact which
+      Although we have described how various options affect which
       build items are built with which build items, we summarize that
       information here so that it all appears in one place.  Put
       simply, the default behavior is that &abuild; applies any
@@ -2753,9 +2768,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      Now that we've seen the topics of build sets and traits, we're
      ready to revisit our previous examples.  This time, we will talk
-     about how traits are used in this build tree, and we will
+     about how traits are used in a build tree, and we will
      demonstrate the results of running &abuild; with different build
-     sets.  We will also introduce the special target
+     sets.  We will also describe the special target
      <command>no-op</command> which can be useful for debugging your
      build trees.
     </para>
@@ -2796,20 +2811,31 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <literal>&lt;native&gt;</literal>):
       <?qtest example.stable-common-no-op.out?>
       Of particular interest here is the order in which &abuild;
-      visited the items.  &Abuild; tries to build items alphabetically,
-      but it overrides the ordering based on dependencies among the
-      build items.  Since <classname>common-lib2.src</classname> depends
-      on <classname>common-lib3.src</classname> (indirectly through its
+      visited the items.  &Abuild; makes no specific commitments about
+      the order in which items will be built except that no item is
+      ever built before its dependencies are built.
+      <footnote>
+       <para>
+        In fact, when &abuild; creates a build order, it starts with a
+        lexically sorted list of build items and overrides the
+        ordering based on dependencies.  The exact order of build
+        items, other than that dependencies are built before items
+        that depend on them, should be considered an implementation
+        detail and not relied upon.
+       </para>
+      </footnote>
+      Since <classname>common-lib2.src</classname> depends on
+      <classname>common-lib3.src</classname> (indirectly through its
       dependency on <classname>common-lib3</classname>), &abuild;
-      automatically builds <classname>common-lib3.src</classname> before
-      it builds <classname>common-lib2.src</classname>.  Since
+      automatically builds <classname>common-lib3.src</classname>
+      before it builds <classname>common-lib2.src</classname>.  Since
       <classname>common-lib2.test</classname> has no dependency on
-      <classname>common-lib3.test</classname>, no reordering is necessary
-      in that case.  If you were to run <command>abuild
-      --clean=local</command> from this directory, you would not observe
-      the same reordering.  &Abuild; does not pay any attention to
-      dependencies when it is running the clean target.  Note also that
-      none of the build items that don't have
+      <classname>common-lib3.test</classname>, no specific ordering is
+      necessary in that case.  If you were to run <command>abuild
+      --clean=local</command> from this directory, you would not
+      observe the same ordering of build items since &abuild; does not
+      pay any attention to dependencies when it is running the clean
+      target.  Note also that none of the build items that don't have
       <filename>Abuild.mk</filename> files are mentioned at all.
       &Abuild; knows that there is nothing to build there and skips
       them when it is building multiple items.
@@ -2837,7 +2863,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <title>Project Code Area</title>
      <para>
       Returning to the project area, we demonstrate how dependencies
-      may be satisfied in externals and the impact this has on the
+      may be satisfied in externals and the effect this has on the
       build set.  Under <filename>stable/project</filename>, we have
       just two public build items called
       <classname>project-main</classname> and
@@ -2874,6 +2900,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <?qtest example.stable-project-main-check.out?>
       In this case, there were no actions performed building the files
       in <filename>common</filename> because they were already built.
+      If individual files had been modified in any of these build
+      items, the appropriate targets would have been rebuilt subject
+      to the ordinary file-based dependency management performed by
+      make or ant.
      </para>
     </sect2>
     <sect2 id="ref.example.trait">
@@ -2902,14 +2932,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       Given that all of our build items are set up in this way, we can
       instruct &abuild; to run the test suites for everything that we
       depend on.  We do this by running <command>abuild --with-deps
-      check --related-by-traits tester check</command>.  This runs the
+      --related-by-traits tester check</command>.  This runs the
       <command>check</command> target for every item that declares
       itself as a tester of the current build item or any of its
       dependencies, and the <command>all</command> target for
       everything else, including any additional dependencies of any of
       those test suites.  That command generates the following output:
       <?qtest example.stable-project-main-trait-test.out?>
-      Observe that the previous unbuilt
+      Observe that the previously unbuilt
       <classname>project-lib.test</classname> build item was built
       using the <command>check</command> target by this command, and
       that all the test suites were run.  If your development area has
@@ -2958,8 +2988,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <filename>common</filename> and <filename>project</filename> as
       well as in <filename>derived</filename>, that only build items
       that contain build files are visited, and that build items are
-      cleaned in alphabetical order, completely disregarding any
-      dependencies that may exist among them.
+      cleaned in an order that completely disregards any dependencies
+      that may exist among them.
      </para>
     </sect2>
    </sect1>
@@ -4602,7 +4632,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <para>
         Any line beginning with a <literal>#</literal> optionally
         preceded by whitespace is treated as a comment.  Comments are
-        completely ignored and, as such, have no impact on line
+        completely ignored and, as such, have no effect on line
         continuation.
        </para>
       </listitem>
@@ -4727,7 +4757,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         &abuild; does support this construct.)
        </para>
        <para>
-        There are some subtleties about the impact of a variable reset
+        There are some subtleties about the effect of a variable reset
         when interface files are loaded.  For details, see <xref
         linkend="ref.interface-implementation"/>.
        </para>
@@ -4818,7 +4848,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         types.  In practice, there is little reason to ever restrict a
         variable to a particular target type, though many of the
         &abuild; predefined variables are restricted.  Note that
-        restricting the target type of a variable impacts only whether
+        restricting the target type of a variable affects only whether
         that variable is passed to the backend.  Regardless of the
         target type of a variable, all assignments and references to
         that variable from <filename>Abuild.interface</filename> files
@@ -5547,7 +5577,7 @@ endif
       automatically generated file with lots of warnings, you could
       explicitly set <varname>WFLAGS_autogen.c</varname> to the empty
       string or to the flag that suppresses warnings.  This would
-      suppress warnings for that file without impacting other files.
+      suppress warnings for that file without affecting other files.
       If you wish to append to the default flags instead of replacing
       them, include the regular variable name in the value, as in
       <literal>WFLAGS_File.cc := $(WFLAGS) -Wextra</literal> or even
@@ -6361,7 +6391,7 @@ endif
      added.  This indicates that old binaries would work with new
      libraries but new binaries may not work with old libraries.  The
      revision number should be incremented if any changes were made to
-     the shared library code that did not impact the interfaces.  This
+     the shared library code that did not affect the interfaces.  This
      just tells the user that the library has changed relative to
      another version that may be installed.  On UNIX platforms,
      &abuild; will build executables that link against shared
@@ -6591,7 +6621,7 @@ endif
      static library implementations later in the development process.
      With careful planning, this type of technique could be used to
      provide a shared-library based stub system that could be swapped
-     out later with very little impact on the overall build system.
+     out later with very little effect on the overall build system.
     </para>
    </sect1>
   </chapter>
@@ -7319,7 +7349,7 @@ endif
      build items with <type>linux.x86.rhel4.xlc</type> and
      <type>vxworks</type> build items with
      <type>vxworks.ppc.6_3.vxgcc</type>.  Here are several platform
-     selectors along with a description of what their impact would be:
+     selectors along with a description of what they mean:
      <variablelist>
       <varlistentry>
        <term><type>type=native:option=debug</type></term>
@@ -8484,7 +8514,7 @@ endif
      which they are listed in a root build item's
      <filename>Abuild.conf</filename>.  Usually this doesn't matter,
      but if multiple plugins add native compilers the order in which
-     plugins are listed can have an impact on which platforms are
+     plugins are listed can have an effect on which platforms are
      built by default.
     </para>
     <para>
@@ -10426,7 +10456,7 @@ native-compiler qcc
      because of some third item that did a reset.  Note also that
      &abuild; uses a single interface parser to load a given interface
      file and any after-build files, so a reset in an after-build
-     actually does effectively remove the impact of any assignments to
+     actually does effectively remove the effect of any assignments to
      that variable in the file that loads it.  Since a reset in an
      after-build file is not visible to the item itself, this is a
      useful construct for clearing interface variables that a build
@@ -10542,8 +10572,8 @@ Y = $(X)
   <appendix id="ref.release-notes">
    <title>Release Notes</title>
    <para>
-    This table includes a list of user-visible changes or changes that
-    impact the documentation.
+    This table includes a list of user-visible changes or changes to
+    the documentation.
    </para>
    <variablelist>
     <varlistentry>
@@ -11717,7 +11747,7 @@ Y = $(X)
          <varname>deps</varname> and <varname>current</varname>
          build/clean sets have been redefined to explicitly include
          expanded dependencies and therefore have no change of
-         semantics.  The main impact of this change is that running
+         semantics.  The main result of this change is that running
          <option>--clean=desc</option> now no longer ever cleans
          anything not below the directory from which &abuild; was
          invoked.
@@ -12145,7 +12175,7 @@ Y = $(X)
        <listitem>
         <para>
          Internal <filename>make</filename> directory has been
-         reorganized.  The two changes that impact the documentation
+         reorganized.  The two changes that affect the documentation
          are that <filename>make/rules/arch-indep</filename> is now
          <filename>make/rules/indep</filename> and
          <filename>make/rules/arch-dep</filename> is now
