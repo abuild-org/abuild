@@ -3567,541 +3567,15 @@ C:\cygwin\cygwin.bat
     </para>
    </sect1>
   </chapter>
-  <chapter id="ref.command-line">
-   <title>Command-Line Reference</title>
+  <chapter id="ref.test-integration">
+   <title>Integration with Automated Test Frameworks</title>
    <para>
-    This chapter presents full detail about how to invoke &abuild;
-    from the command line.  Some of functionality described here is
-    explained in the chapters of <xref linkend="ref.part3"/>.
+    &Abuild; is integrated with two automated test frameworks: QTest,
+    and JUnit.  Additional integrations can be performed with plugins
+    or build item rules or hooks.
    </para>
-   <sect1 id="ref.command-line-arguments">
-    <title>Command-line Arguments</title>
-    <para>
-     Basic Invocation: <command>abuild [options] [targets]</command>
-    </para>
-    <para>
-     Options and targets may appear in any order.  Any argument that
-     starts with a <option>-</option> is treated as an option.
-    </para>
-    <para>
-     The following options are supported by &abuild;:
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>-H|--help</term>
-      <listitem>
-       <para>
-        Print help message and exit.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>-V|--version</term>
-      <listitem>
-       <para>
-        Print the version number of &abuild; and exit.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>-C start-directory</term>
-      <listitem>
-       <para>
-        Change directories to the given directory before building.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--print-abuild-top</term>
-      <listitem>
-       <para>
-        Print the path to the top of &abuild;'s installation.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--make</term>
-      <listitem>
-       <para>
-        Terminate argument parsing and pass all remaining options (up
-        to <option>--ant</option>) to make.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--ant</term>
-      <listitem>
-       <para>
-        Terminate argument parsing and pass all remaining options (up
-        to <option>--make</option>) to ant.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--verbose</term>
-      <listitem>
-       <para>
-        Generate more verbose output.  Also tells
-        <application>make</application> and
-        <application>ant</application> to generate more output.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--silent</term>
-      <listitem>
-       <para>
-        Suppress most non-error output.  Also tells
-        <application>make</application> and
-        <application>ant</application> to generate less output.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--monitored</term>
-      <listitem>
-       <para>
-        Run in monitored mode.  For details, see <xref
-        linkend="ref.monitored-mode"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--build=set | -b set</term>
-      <listitem>
-       <para>
-        Specify which build items should be built.  The default is to
-        not have a build set specified.  In that case, &abuild; just
-        builds in the local directory without attempting to build any
-        dependencies.  For additional details, see <xref
-        linkend="ref.what-to-build"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--with-deps | -d</term>
-      <listitem>
-       <para>
-        Short-hand for <option>--build=current</option>
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--clean=set | -c set</term>
-      <listitem>
-       <para>
-        Run <command>abuild clean</command> in all items in the build
-        set.  The same build sets are defined as with the
-        <option>--build</option> option.  Unlike build sets, clean
-        sets are not expanded to include dependencies, and build items
-        are not cleaned in dependency order.  No targets may be
-        specified in conjunction with this option.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--only-with-traits trait[,trait,...]</term>
-      <listitem>
-       <para>
-        Exclude from the initial build set any items that do not
-        contain all of the named traits.  As always, all dependencies
-        of any item in the build set will remain in the build set
-        regardless of what traits they have.  If not accompanied by the
-        <option>--related-by-traits</option> option, any explicitly
-        named targets will be applied only to items that have all of
-        the named traits.  Other items (those they depend on) will be
-        built with the default <command>all</command> target.  If
-        accompanied by the <option>--related-by-traits</option>
-        option, the <option>--related-by-traits</option> option's
-        behavior with respect to explicit targets takes precedence.
-        For more information about traits, see <xref
-        linkend="ref.traits"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--related-by-traits=trait[,trait,...]</term>
-      <listitem>
-       <para>
-        Expand the build set with items that have all of the named
-        traits relative to any item already in the build set.
-        Specifying this option also causes any explicitly specified
-        targets to be run only for items that have all of these
-        traits.  The default target <command>all</command> is run for
-        all other build items in the build set.  For more information
-        about traits, see <xref linkend="ref.traits"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--apply-targets-to-deps</term>
-      <listitem>
-       <para>
-        Ordinarily, any explicitly specified targets are applied only
-        to items that were directly selected for inclusion in the
-        build set.  With this flag, they are applied to all items
-        being built, including recursively expanded dependencies.  For
-        detailed information about target selection, please see <xref
-        linkend="ref.what-to-build"/>.  When used with a clean set,
-        this option causes the clean set to expanded to include
-        dependencies, which is otherwise not done.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--platform-selector selector | -p selector</term>
-      <listitem>
-       <para>
-        Specify a platform selector for object code platforms.  This
-        argument may be repeated any number of times.  Later instances
-        supersede earlier ones when they specify selection criteria for
-        the same platform type.  When two selectors refer to different
-        platform types, both selectors are used.  Platform selectors
-        may also be given in the
-        <envar>ABUILD_PLATFORM_SELECTION</envar> environment variable.
-        For details on platform selectors, see <xref
-        linkend="ref.platform-selection"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>-jn| --jobs=n</term>
-      <listitem>
-       <para>
-        Build up to n build items in parallel.  Does not cause the
-        backend to run multiple jobs in parallel.  See also
-        <option>--make-jobs</option>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>-k | --keep-going</term>
-      <listitem>
-       <para>
-        Don't stop when a target fails.  Also tells backend to continue
-        on failure.  Even with <option>-k</option>, &abuild; will never
-        try to build an item if any of its dependencies failed.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--full-integrity</term>
-      <listitem>
-       <para>
-        Check &abuild;'s guarantee for all items in all backing areas and
-        external build trees.  Ordinarily, &abuild; performs its
-        integrity check only for items that are being built in the
-        current build.  The <option>--full-integrity</option> flag
-        would generally be useful only for people who are maintaining
-        backing areas that are used by other people.  For detailed
-        information about &abuild;'s integrity guarantee, please see
-        <xref linkend="ref.integrity-checks"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--dump-data</term>
-      <listitem>
-       <para>
-        Dump to standard output all information computed by &abuild;.
-        Useful for debugging or for tools that need in-depth
-        information about what &abuild; knows.
-        <option>--dump-data</option> is mutually exclusive with
-        running any targets.  If you need to see
-        <option>--dump-data</option> output and build targets at the
-        same time, use <option>--monitored</option> instead (see <xref
-        linkend="ref.monitored-mode"/>).  For details about the format
-        generated by <option>--dump-data</option>, please see <xref
-        linkend="ref.dump-data"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--list-traits</term>
-      <listitem>
-       <para>
-        Prints the names of all traits known in the local build tree,
-        its backing areas, and its externals.  This is the list of
-        traits that are available for use on the command line with the
-        <option>--only-with-traits</option> and
-        <option>--related-by-traits</option> options.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--list-platforms</term>
-      <listitem>
-       <para>
-        Prints the names of all object-code platforms categorized by
-        platform type and build tree, and indicates which ones would
-        be built by default.  Note that &abuild; may build on
-        additional platforms beyond those selected by default in order
-        to satisfy dependencies from other items.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--dump-build-graph</term>
-      <listitem>
-       <para>
-        Dump to standard output the complete build graph consisting of
-        items and platforms.  This is primarily useful for debugging
-        &abuild; or diagnosing unusual problems relating to which
-        items are built in which order.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--make-jobs[=n]</term>
-      <listitem>
-       <para>
-        Allow make to run up to <command>n</command> jobs in parallel.
-        Omit <command>n</command> to allow make to run as many jobs as
-        it wants.  Be aware that if this option is used in combination
-        with <option>--jobs</option>, the total number of threads
-        could potentially be the product of the two numerical
-        arguments.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--no-abuild-logger</term>
-      <listitem>
-       <para>
-        Do not tell ant to use the custom
-        <classname>AbuildLogger</classname> as its logger.
-        <classname>AbuildLogger</classname> is aware of the possibility
-        of nested targets and also properly suppresses output of empty
-        targets.  As of ant version 1.7, the DefaultLogger and
-        NoBannerLogger produce misleading output when there are nested
-        targets.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>-e | --emacs</term>
-      <listitem>
-       <para>
-        Tell ant to run in emacs mode by passing the
-        <option>-e</option> flag to it and also setting the property
-        <varname>abuild.private.emacs-mode</varname>.  Ant targets can
-        use this information to pass to programs whose output may need
-        to be dependent upon whether or not emacs mode is in effect.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     The following additional argument is recognized and is passed
-     along to GNU Make:
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>-n | --just-print | --dry-run | --recon</term>
-      <listitem>
-       <para>
-        print what make would do without doing it
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     For a list of build sets that can be specified using the
-     <option>--build</option> or <option>--clean</option> options and
-     detailed information about which targets are applied to which
-     build items, see <xref linkend="ref.what-to-build"/>.
-    </para>
-   </sect1>
-   <sect1 id="ref.predefined-targets">
-    <title>Predefined Targets</title>
-    <para>
-     &Abuild;'s <application>make</application> and property-driven
-     <application>ant</application> backends define several targets
-     that are available for use from the command line.  When one of
-     those two build methods is used, you can rely on these targets
-     being defined.  When the build.xml-driven
-     <application>ant</application> method is used (the build file is
-     <filename>Abuild-ant.xml</filename>), then it is up to the author
-     of the build file to provide these targets.
-    </para>
-    <sect2 id="ref.general-targets">
-     <title>General Targets</title>
-     <para>
-      The following targets are available for use with any build item
-      type:
-      <variablelist>
-       <varlistentry>
-        <term>all</term>
-        <listitem>
-         <para>
-          This is the default target.  It is used to build all
-          products that are intended for use by the end user or by
-          other build items.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>check</term>
-        <listitem>
-         <para>
-          This target ensures that the local build item is built and
-          then runs its automated test suite.  For this to work, the
-          build item must have a test suite implemented with a test
-          framework that is integrated with &abuild; or that is made
-          available with a plugin.  &Abuild; is integrated with qtest
-          (the test framework that is used to implement &abuild;'s own
-          automated test suites) and, for Java-based build items, with
-          junit.  The <command>check</command> target is not
-          automatically run by the default target; it must be
-          requested specifically.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>test</term>
-        <listitem>
-         <para>
-          This target is a synonym for <command>check</command>.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>doc</term>
-        <listitem>
-         <para>
-          This target is provided for building documentation that is
-          extracted from source code.  The <command>doc</command>
-          target is not automatically run by the default target; it
-          must be requested explicitly.  It depends on the
-          <command>all</command> target.  There is no internal support
-          for document generation, so this capability must be provided
-          by a plugin.  For <application>ant</application> builds,
-          plugins should define a <command>doc</command> hook.  For
-          <application>make</application> builds, they should make the
-          document generation a dependency of the
-          <command>doc</command> target.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>clean</term>
-        <listitem>
-         <para>
-          This target removes any output directories (see <xref
-          linkend="ref.output-directories"/>) that &abuild; thinks it
-          created.  Well-behaved &abuild; rules, including all the
-          rules that are a standard part of &abuild;, won't create any
-          files or directories outside of these locations.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>no-op</term>
-        <listitem>
-         <para>
-          This target does nothing other than printing the name and
-          platform each build item in the build set, but using it still
-          causes &abuild; to perform all the same validations it would
-          perform if it were going to build something.  The
-          <command>no-op</command> target can be used to get a complete
-          list of all the items and platforms that would be built if
-          building a given build set and will also verify that there
-          are no errors in any <filename>Abuild.conf</filename> files.
-          Note that <filename>Abuild.interface</filename> files are not
-          read when invoking the <command>no-op</command> target.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>rules-help</term>
-        <listitem>
-         <para>
-          For <application>make</application>-based build items, this
-          target prints help information for any rules defined in the
-          <varname>RULES</varname> variable in
-          <filename>Abuild.mk</filename>.  For property-driven
-          <application>ant</application>-based build items, it prints
-          information about properties that can be set in
-          <filename>Abuild-ant.properties</filename>.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>interface-help</term>
-        <listitem>
-         <para>
-          This target prints help information for authors of the
-          <filename>Abuild.interface</filename> file for the current
-          build item.  What is printed is based on which backend is in
-          use and, for <application>make</application>-based build
-          items, the value of the <varname>RULES</varname> variable in
-          <filename>Abuild.mk</filename>.
-         </para>
-        </listitem>
-       </varlistentry>
-      </variablelist>
-     </para>
-    </sect2>
-    <sect2 id="ref.java-specific-targets">
-     <title>Java-specific Targets</title>
-     <para>
-      Java-based build items that use the property-driven build method
-      (<filename>Abuild-ant.properties</filename>) define several
-      additional targets:
-      <variablelist>
-       <varlistentry>
-        <term>properties-help</term>
-        <listitem>
-         <para>
-          This is a synonym for <command>rules-help</command>.  It
-          describes the properties that you can set in
-          <filename>Abuild-ant.properties</filename>.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>hooks-help</term>
-        <listitem>
-         <para>
-          This target shows help information on how to add hooks from
-          build items or in a local build file.  It also describes
-          what hooks are run and when.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>deploy</term>
-        <listitem>
-         <para>
-          This target will deploy any items that can be deployed.  The
-          default implementation doesn't do anything, so deploy hooks
-          have to be written in order to add functionality.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>wrapper</term>
-        <listitem>
-         <para>
-          This target will generate an executable wrapper script
-          around a JAR file if certain properties are defined.  The
-          resulting script or batch file will invoke the Java runtime
-          environment on the JAR file with the specified main class
-          and with the proper classpath.
-         </para>
-        </listitem>
-       </varlistentry>
-      </variablelist>
-      There are other targets that you can invoke, but they are all
-      direct or indirect dependencies of the default
-      <command>all</command> target.  For a complete list of supported
-      targets, run <command>abuild --ant -p</command> from any Java
-      build item.
-     </para>
-    </sect2>
-   </sect1>
    <sect1 id="ref.qtest">
-    <title>Integration With QTest</title>
+    <title>Integration with QTest</title>
     <para>
      &Abuild; is integrated with the qtest test framework.  When using
      either the <application>make</application> or the
@@ -4125,6 +3599,576 @@ C:\cygwin\cygwin.bat
      qtest <classname>TestDriver</classname> object.
     </para>
    </sect1>
+   <sect1 id="ref.junit">
+    <title>Integration with JUnit</title>
+    <para>
+     When performing property-driven
+     <application>ant</application>-based builds, if the
+     <varname>abuild.junit.testsuite</varname> property is set to the
+     name of a class, then the <command>test</command> and
+     <command>check</command> targets will attempt to run a
+     JUnit-based test suite.  JUnit is not bundled with &abuild;, so
+     it is the responsibility of the build tree maintainer to supply
+     the required JUnit JARs to &abuild;.  The easiest way to do this
+     is to create a plugin that adds the JUnit JARs to
+     <varname>abuild.classpath.external</varname> in a
+     <filename>plugin.interface</filename> file.  For more details on
+     plugins, please see <xref linkend="ref.plugins"/>.
+    </para>
+   </sect1>
+  </chapter>
+  <chapter id="ref.command-line">
+   <title>Command-Line Reference</title>
+   <para>
+    This chapter presents full detail about how to invoke &abuild;
+    from the command line.  Some of functionality described here is
+    explained in the chapters of <xref linkend="ref.part3"/>.
+   </para>
+   <sect1 id="ref.command-line-arguments">
+    <title>Basic Invocation</title>
+    <para>
+     When running &abuild;, the basic invocation syntax is as follows:
+     <programlisting><command>abuild [options] [targets]</command>
+</programlisting>
+     Options and targets may appear in any order.  Any argument that
+     starts with a dash (&ldquo;<option>-</option>&rdquo;) is treated
+     as an option.  Anything else is considered to be a target.
+    </para>
+   </sect1>
+   <sect1 id="ref.command-line.informational">
+    <title>Informational Options</title>
+    <para>
+     These options print information and exit without building
+     anything.
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>--dump-build-graph</term>
+      <listitem>
+       <para>
+        Dump to standard output the complete build graph consisting
+        of items and platforms.  This is primarily useful for
+        debugging &abuild; or diagnosing unusual problems relating to
+        which items are built in which order.  Although nothing is
+        built in when this option is specified, &abuild; still
+        performs complete validation including reading of all the
+        interface files.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--dump-data</term>
+      <listitem>
+       <para>
+        Dump to standard output all information computed by &abuild;.
+        Useful for debugging or for tools that need in-depth
+        information about what &abuild; knows.
+        <option>--dump-data</option> is mutually exclusive with
+        running any targets.  If you need to see
+        <option>--dump-data</option> output and build targets at the
+        same time, use <option>--monitored</option> instead (see
+        <xref linkend="ref.monitored-mode"/>).  For details about the
+        format generated by <option>--dump-data</option>, please see
+        <xref linkend="ref.dump-data"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--help|-H</term>
+      <listitem>
+       <para>
+        Print a brief summary of &abuild;'s command-line options.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--list-platforms</term>
+      <listitem>
+       <para>
+        Print the names of all object-code platforms categorized by
+        platform type and build tree, and indicates which ones would
+        be built by default.  Note that &abuild; may build on
+        additional platforms beyond those selected by default in order
+        to satisfy dependencies from other items.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--list-traits</term>
+      <listitem>
+       <para>
+        Print the names of all traits known in the local build tree,
+        its backing areas, and its externals.  This is the list of
+        traits that are available for use on the command line with the
+        <option>--only-with-traits</option> and
+        <option>--related-by-traits</option> options.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-V|--version</term>
+      <listitem>
+       <para>
+        Print the version number of &abuild;.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--print-abuild-top</term>
+      <listitem>
+       <para>
+        Print the path to the top of &abuild;'s installation.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </sect1>
+   <sect1 id="ref.command-line.control">
+    <title>Control Options</title>
+    <para>
+     These options change some aspect of how &abuild; starts or runs.
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>--ant</term>
+      <listitem>
+       <para>
+        Terminate argument parsing and pass all remaining options (up
+        to <option>--make</option>) to ant.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-C start-directory</term>
+      <listitem>
+       <para>
+        Change directories to the given directory before building.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-e | --emacs</term>
+      <listitem>
+       <para>
+        Tell ant to run in emacs mode by passing the
+        <option>-e</option> flag to it and also setting the property
+        <varname>abuild.private.emacs-mode</varname>.  Ant targets can
+        use this information to pass to programs whose output may need
+        to be dependent upon whether or not emacs mode is in effect.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--full-integrity</term>
+      <listitem>
+       <para>
+        Performs &abuild;'s integrity checks for all items in the
+        local tree, externals, and backing areas.  Ordinarily,
+        &abuild; performs its integrity check only for items that are
+        being built in the current build.  The
+        <option>--full-integrity</option> flag would generally be
+        useful only for people who are maintaining backing areas that
+        are used by other people.  For detailed information about
+        &abuild;'s integrity guarantee, please see <xref
+        linkend="ref.integrity-checks"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-jn| --jobs=n</term>
+      <listitem>
+       <para>
+        Build up to n build items in parallel by invoking up to n
+        simultaneous instances of the backend.  Does not cause the
+        backend to run multiple jobs in parallel.  See also
+        <option>--make-jobs</option>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-k | --keep-going</term>
+      <listitem>
+       <para>
+        Don't stop the build after the first failed build item, but
+        instead continue building additional build items that don't
+        depend on any failed items.  Also tells backend to continue on
+        its first failure.  Even with <option>-k</option>, &abuild;
+        will never try to build an item if any of its dependencies
+        failed.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--make</term>
+      <listitem>
+       <para>
+        Terminate argument parsing and pass all remaining options (up
+        to <option>--ant</option>) to make.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--make-jobs[=n]</term>
+      <listitem>
+       <para>
+        Allow make to run up to <command>n</command> jobs in parallel.
+        Omit <command>n</command> to allow make to run as many jobs as
+        it wants.  Be aware that if this option is used in combination
+        with <option>--jobs</option>, the total number of threads
+        could potentially be the product of the two numerical
+        arguments.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--monitored</term>
+      <listitem>
+       <para>
+        Run in monitored mode.  For details, see <xref
+        linkend="ref.monitored-mode"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-n | --just-print | --dry-run | --recon</term>
+      <listitem>
+       <para>
+        For make-based builds only: have make print what it would do
+        without actually doing it.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--no-abuild-logger</term>
+      <listitem>
+       <para>
+        Do not tell ant to use the custom
+        <classname>AbuildLogger</classname> as its logger.
+        <classname>AbuildLogger</classname> is aware of the possibility
+        of nested targets and also properly suppresses output of empty
+        targets.  As of ant version 1.7, the DefaultLogger and
+        NoBannerLogger produce misleading output when there are nested
+        targets.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--platform-selector selector | -p selector</term>
+      <listitem>
+       <para>
+        Specify a platform selector for object code platforms.  This
+        argument may be repeated any number of times.  Later instances
+        supersede earlier ones when they specify selection criteria for
+        the same platform type.  When two selectors refer to different
+        platform types, both selectors are used.  Platform selectors
+        may also be given in the
+        <envar>ABUILD_PLATFORM_SELECTION</envar> environment variable.
+        For details on platform selectors, see <xref
+        linkend="ref.platform-selection"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--silent</term>
+      <listitem>
+       <para>
+        Suppress most non-error output.  Also tells
+        <application>make</application> and
+        <application>ant</application> to generate less output.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--verbose</term>
+      <listitem>
+       <para>
+        Generate more verbose output.  Also tells
+        <application>make</application> and
+        <application>ant</application> to generate more output.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </sect1>
+   <sect1 id="ref.command-line.build">
+    <title>Build Options</title>
+    <para>
+     These options tell &abuild; what to build and what targets to
+     apply to items being built.
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>--apply-targets-to-deps</term>
+      <listitem>
+       <para>
+        Ordinarily, any explicitly specified targets are applied only
+        to items that were directly selected for inclusion in the
+        build set.  With this flag, they are applied to all items
+        being built, including recursively expanded dependencies.  For
+        detailed information about target selection, please see <xref
+        linkend="ref.what-to-build"/>.  When used with a clean set,
+        this option causes the clean set to expanded to include
+        dependencies, which is otherwise not done.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--build=set | -b set</term>
+      <listitem>
+       <para>
+        Specify which build items should be built.  The default is to
+        not have a build set specified.  In that case, &abuild; just
+        builds in the local directory without attempting to build any
+        dependencies.  For additional details including a list of
+        valid values for <replaceable>set</replaceable>, see <xref
+        linkend="ref.what-to-build"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--clean=set | -c set</term>
+      <listitem>
+       <para>
+        Run <command>abuild clean</command> in all items in the build
+        set.  The same build sets are defined as with the
+        <option>--build</option> option.  Unlike build sets, clean
+        sets are not expanded to include dependencies, and build
+        items are not cleaned in dependency order.  No targets may be
+        specified in conjunction with this option.  For additional
+        details including a list of valid values for
+        <replaceable>set</replaceable>, see <xref
+        linkend="ref.what-to-build"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--only-with-traits trait[,trait,...]</term>
+      <listitem>
+       <para>
+        Exclude from the initial build set any items that do not
+        contain all of the named traits.  As always, all dependencies
+        of any item in the reduced build set will remain in the build
+        set regardless of what traits they have.  If not accompanied
+        by the <option>--related-by-traits</option> option, any
+        explicitly named targets will be applied only to items that
+        have all of the named traits.  Other items (those they depend
+        on) will be built with the default <command>all</command>
+        target.  If accompanied by the
+        <option>--related-by-traits</option> option, the
+        <option>--related-by-traits</option> option's behavior with
+        respect to explicit targets takes precedence.  For more
+        information about traits, see <xref linkend="ref.traits"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--related-by-traits=trait[,trait,...]</term>
+      <listitem>
+       <para>
+        Expand the build set with items that have all of the named
+        traits relative to any item already in the build set.
+        Specifying this option also causes any explicitly specified
+        targets to be run only for items that have all of these
+        traits.  The default target <command>all</command> is run for
+        all other build items in the build set.  For more information
+        about traits, see <xref linkend="ref.traits"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--with-deps | -d</term>
+      <listitem>
+       <para>
+        Alternative for <option>--build=current</option>
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </sect1>
+   <sect1 id="ref.targets.general">
+    <title>General Targets</title>
+    <para>
+     &Abuild;'s <application>make</application> and property-driven
+     <application>ant</application> backends define several targets
+     that are available for use from the command line.  When one of
+     those two build methods is used, you can rely on these targets
+     being defined.  When the build.xml-driven
+     <application>ant</application> method is used (the build file is
+     <filename>Abuild-ant.xml</filename>), then it is up to the author
+     of the build file to provide these targets.
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>all</term>
+      <listitem>
+       <para>
+        This is the default target.  It is used to build all
+        products that are intended for use by the end user or by
+        other build items.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>check</term>
+      <listitem>
+       <para>
+        This target ensures that the local build item is built and
+        then runs its automated test suite.  For this to work, the
+        build item must have a test suite implemented with a test
+        framework that is integrated with &abuild; or that is made
+        available with a plugin.  &Abuild; is integrated with qtest
+        (the test framework that is used to implement &abuild;'s
+        own automated test suites) and, for Java-based build items,
+        with junit.  The <command>check</command> target is not
+        automatically run by the default target; it must be
+        requested specifically.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>clean</term>
+      <listitem>
+       <para>
+        This target removes any output directories (see <xref
+        linkend="ref.output-directories"/>) that &abuild; thinks it
+        created.  Well-behaved &abuild; rules, including all the
+        rules that are a standard part of &abuild;, won't create
+        any files or directories outside of these locations.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>doc</term>
+      <listitem>
+       <para>
+        This target is provided for building documentation that is
+        extracted from source code.  The <command>doc</command>
+        target is not automatically run by the default target; it
+        must be requested explicitly.  It depends on the
+        <command>all</command> target.  There is no internal
+        support for document generation, so this capability must be
+        provided by a plugin.  For <application>ant</application>
+        builds, plugins should define a <command>doc</command>
+        hook.  For <application>make</application> builds, they
+        should make the document generation a dependency of the
+        <command>doc</command> target.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>interface-help</term>
+      <listitem>
+       <para>
+        This target prints help information for authors of the
+        <filename>Abuild.interface</filename> file for the current
+        build item.  What is printed is based on which backend is
+        in use and, for <application>make</application>-based build
+        items, the value of the <varname>RULES</varname> variable
+        in <filename>Abuild.mk</filename>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>no-op</term>
+      <listitem>
+       <para>
+        This target does nothing other than printing the name and
+        platform each build item in the build set, but using it
+        still causes &abuild; to perform all the same validations
+        it would perform if it were going to build something.  The
+        <command>no-op</command> target can be used to get a
+        complete list of all the items and platforms that would be
+        built if building a given build set and will also verify
+        that there are no errors in any
+        <filename>Abuild.conf</filename> files.  Note that
+        <filename>Abuild.interface</filename> files are not read
+        when invoking the <command>no-op</command> target.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>rules-help</term>
+      <listitem>
+       <para>
+        For <application>make</application>-based build items, this
+        target prints help information for any rules defined in the
+        <varname>RULES</varname> variable in
+        <filename>Abuild.mk</filename>.  For property-driven
+        <application>ant</application>-based build items, it prints
+        information about properties that can be set in
+        <filename>Abuild-ant.properties</filename>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>test</term>
+      <listitem>
+       <para>
+        This target is a synonym for <command>check</command>.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </sect1>
+   <sect1 id="ref.targets.java">
+    <title>Java-specific Targets</title>
+    <para>
+     Java-based build items that use the property-driven build method
+     (<filename>Abuild-ant.properties</filename>) define several
+     additional targets, listed below.
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>deploy</term>
+      <listitem>
+       <para>
+        This target will deploy any items that can be deployed.  The
+        default implementation doesn't do anything, so deploy hooks
+        have to be written in order to add functionality.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>hooks-help</term>
+      <listitem>
+       <para>
+        This target shows help information on how to add hooks from
+        build items or in a local build file.  It also describes
+        what hooks are run and when.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>properties-help</term>
+      <listitem>
+       <para>
+        This is a synonym for <command>rules-help</command>.  It
+        describes the properties that you can set in
+        <filename>Abuild-ant.properties</filename>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>wrapper</term>
+      <listitem>
+       <para>
+        This target will generate an executable wrapper script
+        around a JAR file if certain properties are defined.  The
+        resulting script or batch file will invoke the Java runtime
+        environment on the JAR file with the specified main class
+        and with the proper classpath.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    <para>
+     There are other targets that you can invoke, but they are all
+     direct or indirect dependencies of the default
+     <command>all</command> target.  For a complete list of supported
+     targets, run <command>abuild --ant -p</command> from any Java
+     build item.
+    </para>
+   </sect1>
   </chapter>
  </part>
  <part id="ref.part3" label="III">
@@ -4132,10 +4176,12 @@ C:\cygwin\cygwin.bat
   <partintro id="ref.part3.intro">
    <para>
     In this part of the manual, we cover the remaining information
-    about &abuild;'s features in complete detail.  In these chapters,
-    we include complete reference guides the &abuild;'s command-line
-    options and configuration files as well as numerous examples to
-    illustrate how to solve specific build problems with &abuild;.
+    about &abuild;'s features in detail.  This part contains complete
+    reference guides to &abuild;'s configuration files, discussions of
+    more advanced topics, and numerous examples to illustrate how to
+    solve specific build problems with &abuild;.  By the end of this
+    part, you should be able to use &abuild; for a wide range of build
+    problems.
    </para>
   </partintro>
   <chapter id="ref.abuild.conf">
