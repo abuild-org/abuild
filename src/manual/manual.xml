@@ -12,7 +12,7 @@
 ]>
 <!--
 
-ahayden comment to-do list
+XXX ahayden comment to-do list
 
 
 
@@ -1212,9 +1212,10 @@ C:\cygwin\cygwin.bat
      name.  Build item names must be unique within their build tree
      and all other build trees accessible to their build tree since
      the build item name is the only way &abuild; has to address a
-     build item.  Build item names consist of period-separated pieces.
-     Each piece may contain mixed case alphanumeric characters,
-     underscores, and dashes.  Build item names are case-sensitive.
+     build item.  Build item names consist of period-separated
+     segments.  Each segment may contain mixed case alphanumeric
+     characters, underscores, and dashes.  Build item names are
+     case-sensitive.
     </para>
     <para>
      The primary mechanism for describing build items is the
@@ -1485,7 +1486,7 @@ C:\cygwin\cygwin.bat
       <primary>access control</primary>
      </indexterm>
      As mentioned above, build item names consist of period-separated
-     pieces.  The period separator in a build item's name is a
+     segments.  The period separator in a build item's name is a
      namespace scope delimiter that is used to determine which build
      items may directly refer to which other build items in their
      <filename>Abuild.conf</filename> files.  This mechanism should
@@ -1773,7 +1774,9 @@ C:\cygwin\cygwin.bat
      <application>qtest</application>-based test suite.
      <application>Qtest</application> is the test framework used to
      implement &abuild;'s own test suite.  It is one of the test
-     frameworks for which support is integrated into &abuild;.
+     frameworks for which support is integrated into &abuild;.  For a
+     discussion of integrated test frameworks, see <xref
+     linkend="ref.test-integration"/>.
     </para>
     <para>
      We will return to this build tree later to study build sets,
@@ -4042,16 +4045,17 @@ C:\cygwin\cygwin.bat
       <listitem>
        <para>
         This target is provided for building documentation that is
-        extracted from source code.  The <command>doc</command>
-        target is not automatically run by the default target; it
-        must be requested explicitly.  It depends on the
-        <command>all</command> target.  There is no internal
-        support for document generation, so this capability must be
-        provided by a plugin.  For <application>ant</application>
-        builds, plugins should define a <command>doc</command>
-        hook.  For <application>make</application> builds, they
-        should make the document generation a dependency of the
-        <command>doc</command> target.
+        extracted from source code.  The <command>doc</command> target
+        is not automatically run by the default target; it must be
+        requested explicitly.  It depends on the
+        <command>all</command> target.  There is no internal support
+        for document generation, so this capability must be provided
+        by a plugin.  For <application>ant</application> builds,
+        plugins should define a <command>doc</command> hook.  For
+        <application>make</application> builds, they should make the
+        document generation a dependency of the <command>doc</command>
+        target.  Contributed plugins to support javadoc and doxygen
+        are available alongside of and released separately from &abuild;.
        </para>
       </listitem>
      </varlistentry>
@@ -4073,15 +4077,14 @@ C:\cygwin\cygwin.bat
       <listitem>
        <para>
         This target does nothing other than printing the name and
-        platform each build item in the build set, but using it
-        still causes &abuild; to perform all the same validations
-        it would perform if it were going to build something.  The
-        <command>no-op</command> target can be used to get a
-        complete list of all the items and platforms that would be
-        built if building a given build set and will also verify
-        that there are no errors in any
-        <filename>Abuild.conf</filename> files.  Note that
-        <filename>Abuild.interface</filename> files are not read
+        platform of each build item in the build set, but using it
+        still causes &abuild; to perform all the same validations it
+        would perform if it were going to build something.  The
+        <command>no-op</command> target can be used to get a complete
+        list of all the items and platforms that would be built if
+        building a given build set and will also verify that there are
+        no errors in any <filename>Abuild.conf</filename> files.  Note
+        that <filename>Abuild.interface</filename> files are not read
         when invoking the <command>no-op</command> target.
        </para>
       </listitem>
@@ -4134,7 +4137,8 @@ C:\cygwin\cygwin.bat
        <para>
         This target shows help information on how to add hooks from
         build items or in a local build file.  It also describes
-        what hooks are run and when.
+        what hooks are run and when.  For information on hooks, please
+        see <xref linkend="ref.java-hooks-and-generators"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -4225,13 +4229,13 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          This key is used to set the name of the build item.  Build
-         item names consist of period-delimited pieces.  Each piece
-         consists of one or more alphanumeric characters, dashes, or
-         underscores.  Some <filename>Abuild.conf</filename> files
-         exist just to connect parent directories with child
-         directories in the file system, as shown in examples below.
-         In those cases, the <property>this</property> key may be
-         omitted.
+         item names consist of period-delimited segments.  Each
+         segment consists of one or more alphanumeric characters,
+         dashes, or underscores.  Some
+         <filename>Abuild.conf</filename> files exist just to connect
+         parent directories with child directories in the file system,
+         as shown in examples below.  In those cases, the
+         <property>this</property> key may be omitted.
         </para>
        </listitem>
       </varlistentry>
@@ -4240,12 +4244,16 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          This optional key can be used to add an information
-         description to the build item.  If present, it will be
-         included in the output to <command>abuild
+         description to the build item.  Description information is
+         intended to be human readable.  For adding information that
+         you may wish to categorize items for build purposes, use
+         traits instead (see <xref linkend="ref.traits"/>).  If
+         present, it will be included in the output to <command>abuild
          --dump-data</command>.  Providing a description here rather
          than just by using a comment in the
          <filename>Abuild.conf</filename> file can be useful to other
-         programs that provide additional visualization of build items.
+         programs that provide additional visualization of build
+         items.
         </para>
        </listitem>
       </varlistentry>
@@ -4266,8 +4274,19 @@ C:\cygwin\cygwin.bat
          &ldquo;<filename>..</filename>&rdquo;.  Although &abuild;
          allows <property>parent-dir</property> to point other than to
          a parent or ancestor directory in the file system, this usage
-         is not recommended, and some operations will not behave as
-         expected if this is done.
+         is not recommended and will likely lead to confusion.
+         <footnote>
+          <para>
+           The main reason that &abuild; allows you to do this it all
+           is that it can be handy as a short-term measure during
+           reorganization of a build tree or to work around disk space
+           issues.
+          </para>
+         </footnote>
+         In particular, the <command>desc</command> build set uses
+         actual file system paths, not
+         <property>parent-dir</property>/<property>child-dirs</property>
+         relationships.
         </para>
        </listitem>
       </varlistentry>
@@ -4381,9 +4400,8 @@ C:\cygwin\cygwin.bat
         <para>
          This key contains a list of whitespace-separated traits that
          are supported by build items in the build tree.  This key is
-         valid only for build items that are at the roots of build
-         trees.  For more information about traits, see <xref
-         linkend="ref.traits"/>.
+         valid only for root build items.  For more information about
+         traits, see <xref linkend="ref.traits"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -4392,9 +4410,9 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          This key contains a list of whitespace-separated traits that
-         apply to this build item.  A trait may be specified referent
-         to one or more additional build items.  To name a referent
-         build item, follow the trait with the
+         apply to this build item.  A trait may be referent to one or
+         more additional build items.  To name a referent build item,
+         follow the trait with the
          <option>-item=<replaceable>build-item</replaceable></option>
          option.  For more information about traits, see <xref
          linkend="ref.traits"/>.
