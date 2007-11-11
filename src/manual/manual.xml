@@ -48,6 +48,13 @@ this document as convenient as possible, we explicitly do not deviate
 from strict docbook by doing things like adding additional elements.
 Instead, we adopt certain conventions.
 
+Place a blank line before each <programlisting> start tag.  This
+prevents fill-paragraph in nxml-mode from filling the contents of the
+programlisting element when run from the text preceding the
+programlisting.  Do not put an extra blank line after the end tag or
+put the start tag flush left as these will interfere with future line
+indentation.
+
 Each chapter, section, or appendix is given an id that starts with
 "ref.".  Each example section is given an id that starts with
 "ref.example.".  We use the "example" processing instruction to
@@ -754,6 +761,7 @@ following checks:
      If you intend to use autoconf from Windows and you have Rational
      Rose installed, you may need to create
      <filename>/usr/bin/hostinfo</filename> as
+
      <programlisting>#!/bin/false
 </programlisting>
      so that <command>./configure</command>'s running of
@@ -768,6 +776,7 @@ following checks:
      following batch file would enable you to run &abuild; from a
      Cygwin environment with the environment set up for running Visual
      C++ from Visual Studio 7.1 (.NET 2003):
+
      <programlisting>@echo off
 call "%VS71COMNTOOLS%"\vsvars32.bat
 C:\cygwin\cygwin.bat
@@ -2540,9 +2549,10 @@ C:\cygwin\cygwin.bat
       the <property>supported-traits</property> key of the root
       <filename>Abuild.conf</filename> file of the local build tree or
       one of its externals.  For example, the following
-      <filename>Abuild.conf</filename> fragment: <programlisting>this:
-      potato.test traits: deployable tester -item=potato.lib
-      -item=potato.bin unclassified
+      <filename>Abuild.conf</filename> fragment:
+
+      <programlisting>this: potato.test
+traits: deployable tester -item=potato.lib -item=potato.bin unclassified
 </programlisting>
       declares that the <classname>potato.test</classname> build item
       is deployable, unclassified, and a tester for the
@@ -3631,6 +3641,7 @@ C:\cygwin\cygwin.bat
     <title>Basic Invocation</title>
     <para>
      When running &abuild;, the basic invocation syntax is as follows:
+
      <programlisting><command>abuild [options] [targets]</command>
 </programlisting>
      Options and targets may appear in any order.  Any argument that
@@ -4473,7 +4484,11 @@ C:\cygwin\cygwin.bat
     <para>
      The <filename>Abuild.interface</filename> file has a fairly
      simple syntax that supports variable declarations, variable
-     assignments, and conditionals.  The vast majority of
+     assignments, and conditionals.  Interface files are rigorously
+     validated.  Any errors detected in an interface file are
+     considered build failures which, as such, will prevent &abuild;
+     from attempting to build the item with the incorrect interface
+     and any items that depend on it.  Most
      <filename>Abuild.interface</filename> files will just set
      existing variables to provide specific information about that
      item's include and library information, classpath information, or
@@ -4498,10 +4513,12 @@ C:\cygwin\cygwin.bat
      global variables, even if they are declared inside the body of a
      conditional, much as is the case with shell scripts or makefiles.
      Although this is not literally what happens, the best way to
-     think about how &abuild; reads interface files is to imagine that
-     they are all concatenated together and that the results of that
-     concatenation are processed from top to bottom, skipping over any
-     blocks inside of false conditional statements.
+     think about how &abuild; reads interface files is to imagine
+     that, for each build item, all of the interface files for its
+     dependencies along with its own interface file are concatenated
+     in dependency order and that the results of that concatenation
+     are processed from top to bottom, skipping over any blocks inside
+     of false conditional statements.
     </para>
     <para>
      The <filename>Abuild.interface</filename> file contains the
@@ -4514,12 +4531,28 @@ C:\cygwin\cygwin.bat
       <listitem><para>Target type restrictions</para></listitem>
       <listitem><para>Conditionals</para></listitem>
      </itemizedlist>
-     Similar to shell script syntax, each statement is terminated by
-     the end of the line.  Whitespace characters (spaces or tabs) are
-     used to separate words.  A backslash (<literal>\</literal>) as
-     the last character of the line may be used to continue long
-     statements onto the next line of the file, in which case the
-     newline is treated as a word delimiter like any other whitespace.
+     Similar to make or shell script syntax, each statement is
+     terminated by the end of the line.  Whitespace characters (spaces
+     or tabs) are used to separate words.  A backslash
+     (<literal>\</literal>) as the last character of the line may be
+     used to continue long statements onto the next line of the file,
+     in which case the newline is treated as a word delimiter like any
+     other whitespace.
+     <footnote>
+      <para>
+       In this way, &abuild;'s handles line continuation like
+       <application>GNU Make</application> and the C shell.  This is
+       different from how the Bourne shell and the C programming
+       language treat line continuation characters: in those
+       environments, a quoted newline disappears entirely.  The only
+       time this matters is if there are no spaces at the beginning of
+       a line following a line continuation character.  For &abuild;,
+       make, and the C shell it doesn't matter whether or not space is
+       present at the beginning of a line following a line
+       continuation character, but for C and the Bourne shell, it
+       does.
+      </para>
+     </footnote>
      Any line that starts with a <literal>#</literal> character
      optionally preceded by whitespace is ignored entirely.  Comment
      lines have no effect on line continuation.  In other words, if
@@ -4527,6 +4560,7 @@ C:\cygwin\cygwin.bat
      comment, line one is continued on line three.  This makes it
      possible to embed comments in multiline lists of values.  In this
      example:
+
      <programlisting>ODDS = \
   one \
 # odd numbers only, please
@@ -4555,7 +4589,7 @@ C:\cygwin\cygwin.bat
      convention, make-based rules use all uppercase letters in
      variable names.  This convention also has the advantage of
      avoiding potential conflict with reserved statements.  Java-based
-     rules typically use lower-case period-separated variables.
+     rules typically use lower-case period-separated properties.
      Ultimately &abuild; interface variables become
      <application>make</application> variables or
      <application>ant</application> properties, which is the basis for
@@ -4640,13 +4674,6 @@ C:\cygwin\cygwin.bat
      assignment below.
     </para>
     <para>
-     There are several ways to assign to variables, depending on the
-     types of variables.  List variables work differently from
-     anything you're likely to have encountered in other environments,
-     but they offer functionality that is particularly useful when
-     building software.
-    </para>
-    <para>
      Scalar variables may be assigned to in one of three ways: normal,
      override, and fallback.  A normal assignment to a scalar variable
      fails if the variable already has a value.  An override
@@ -4659,6 +4686,9 @@ C:\cygwin\cygwin.bat
      initializing it.
     </para>
     <para>
+     List variables work differently from anything you're likely to
+     have encountered in other environments, but they offer
+     functionality that is particularly useful when building software.
      List variables may be assigned to multiple times.  The value in
      each individual assignment may contain zero or more words.
      Depending on whether the variable was declared as
@@ -4700,10 +4730,14 @@ C:\cygwin\cygwin.bat
      will not have to include any target type restrictions.
     </para>
     <para>
-     In order to support supplying interface information that is
-     intended for items that depend on this item but not for this item
-     itself, an <filename>Abuild.interface</filename> file may specify
-     additional interface files that are read only after the item is
+     It is possible for a build item to contain interface information
+     intended for items that depend on it but not intended for the
+     item itself.  Typical uses cases would include when some of this
+     information is a product of the build or when a build item needs
+     to modify interface information provided by a dependency after it
+     has finished using the information itself.  To support this, an
+     <filename>Abuild.interface</filename> file may specify additional
+     interface files that are not to be read until after the item is
      built.  The values in any such files are not available to the
      build item itself, but they are available to any items that
      depend on the build item that exports this interface.  Such files
@@ -4743,7 +4777,10 @@ C:\cygwin\cygwin.bat
         Any line beginning with a <literal>#</literal> optionally
         preceded by whitespace is treated as a comment.  Comments are
         completely ignored and, as such, have no effect on line
-        continuation.
+        continuation.  Note that the <literal>#</literal> does not
+        have any special meaning when it appears in another context.
+        There is no syntax for including comments within a line that
+        contains other content.
        </para>
       </listitem>
      </varlistentry>
@@ -4752,15 +4789,21 @@ C:\cygwin\cygwin.bat
       <listitem>
        <para>
         A scalar variable declaration takes the form
+
         <programlisting>declare <replaceable>variable</replaceable> <replaceable>type</replaceable>
 </programlisting>
         where <replaceable>variable</replaceable> is the name of the
         variable and <replaceable>type</replaceable> is one of
         <type>boolean</type>, <type>string</type>, or
-        <type>filename</type>.
+        <type>filename</type>.  Example scalar variable declarations:
+
+        <programlisting>declare CODEGEN filename
+declare HAS_CLASS boolean
+</programlisting>
        </para>
        <para>
         A list variable declaration takes the form
+
         <programlisting>declare <replaceable>variable</replaceable> list <replaceable>type</replaceable> <replaceable>append-type</replaceable>
 </programlisting>
         where <replaceable>variable</replaceable> is the name of the
@@ -4768,7 +4811,12 @@ C:\cygwin\cygwin.bat
         <type>boolean</type>, <type>string</type>, or
         <type>filename</type>, and
         <replaceable>append-type</replaceable> is one of
-        <type>append</type> or <type>prepend</type>.
+        <type>append</type> or <type>prepend</type>.  Example list
+        variable declarations:
+
+        <programlisting>declare QFLAGS list string append
+declare QPATHS list filename prepend
+</programlisting>
        </para>
        <para>
         Scalar variables start off uninitialized.  List variables
@@ -4782,6 +4830,7 @@ C:\cygwin\cygwin.bat
        <para>
         Scalar variables may be assigned in one of three ways: normal,
         override, or default.  A normal assignment looks like this:
+
         <programlisting><replaceable>variable</replaceable> = <replaceable>value</replaceable>
 </programlisting>
         where <replaceable>variable</replaceable> is the variable name
@@ -4791,12 +4840,20 @@ C:\cygwin\cygwin.bat
        </para>
        <para>
         Override assignments look like this:
+
         <programlisting>override <replaceable>variable</replaceable> = <replaceable>value</replaceable>
 </programlisting>
        </para>
        <para>
         Fallback assignments look like this:
+
         <programlisting>fallback <replaceable>variable</replaceable> = <replaceable>value</replaceable>
+</programlisting>
+        Example scalar variable assignments:
+
+        <programlisting>fallback CODEGEN = gen_code.pl
+HAS_CLASS = 0
+override HAS_CLASS = 1
 </programlisting>
        </para>
       </listitem>
@@ -4807,6 +4864,7 @@ C:\cygwin\cygwin.bat
        <para>
         List variables are assigned using a simple
         <literal>=</literal> operator:
+
         <programlisting><replaceable>list-variable</replaceable> = <replaceable>value</replaceable>
 </programlisting>
         where <replaceable>value</replaceable> consists of zero or
@@ -4816,25 +4874,35 @@ C:\cygwin\cygwin.bat
         the order in which they appear.  For <type>prepend</type>
         lists, the assignment operator <emphasis>prepends</emphasis>
         the words to the existing value of list in the order in which
-        they appear.  The distinction is generally not important to
-        the user, but there are important cases in a build environment
-        in which it is important to prepend to a list.  The most
-        important example is the list of libraries that are linked
-        into an application.  For example, if the variables
+        they appear.  For example, if the variables
         <varname>LIBS</varname> is declared as a prepend list of
         strings, these two statements:
-        <programlisting>LIBS = lib1
-        lib2 LIBS = lib3 lib4
+
+
+        <programlisting>LIBS = lib1 lib2
+LIBS = lib3 lib4
 </programlisting>
         would result in <varname>LIBS</varname> containing the value
-        <literal>lib3 lib4 lib1 lib2</literal>.  Note that multiple
-        assignments to a single list variable would ordinarily not
-        occur in the same <filename>Abuild.interface</filename> file,
-        but would instead occur over successive files.  It is
-        perfectly valid to assign multiple times in the same file,
-        however.  One instance in which this would typically occur
-        would be with private interfaces, as illustrated in <xref
-        linkend="ref.example.private-interface"/>.
+        <literal>lib3 lib4 lib1 lib2</literal>.  The distinction of
+        whether a list is declared as <type>append</type> or
+        <type>prepend</type> generally doesn't matter to the user, but
+        there are cases in a build environment in which it is
+        important to prepend to a list.  One notable example is the
+        list of libraries that are linked into an application: if one
+        library calls functions from another library, the depending
+        library must come <emphasis>before</emphasis> the dependent
+        library in the link command.  Since &abuild; reads the
+        dependent library's interface file first, the depending
+        library must <emphasis>prepend</emphasis> itself to the list
+        of libraries.  Note that multiple assignments to a single list
+        variable would ordinarily not occur in the same
+        <filename>Abuild.interface</filename> file, but would instead
+        occur over successive files.  It is perfectly valid to assign
+        multiple times in the same file, however.  One instance in
+        which this would typically occur would be with private
+        interfaces, as illustrated in <xref
+        linkend="ref.example.private-interface"/>.  Another common
+        case would be with conditional assignments.
        </para>
       </listitem>
      </varlistentry>
@@ -4845,9 +4913,11 @@ C:\cygwin\cygwin.bat
         List and scalar variables can both be reset.  After a variable
         is reset, its value becomes uninitialized just as if it had
         just been declared.  The syntax for resetting a variable is
+
         <programlisting>reset <replaceable>variable</replaceable>
 </programlisting>
         It is also possible to reset all variables with
+
         <programlisting>reset-all
 </programlisting>
         A reset of a specific variable, either by an explicit
@@ -4856,6 +4926,7 @@ C:\cygwin\cygwin.bat
         scope of a single <filename>Abuild.interface</filename> file
         or any files it loads with <function>after-build</function>.
         To block a variable from being reset, use
+
         <programlisting>no-reset <replaceable>variable</replaceable>
 </programlisting>
         Any <function>no-reset</function> commands will apply to the
@@ -4865,6 +4936,13 @@ C:\cygwin\cygwin.bat
         no real reason to use <function>no-reset</function> before a
         specific <function>reset</function> of a specific variable,
         &abuild; does support this construct.)
+       </para>
+       <para>
+        Variable reset operations are used fairly infrequently, but
+        there are use cases that justify all of the various reset
+        operations.  For examples of using them, please see <xref
+        linkend="ref.cross-platform-dependencies"/> and <xref
+        linkend="ref.opaque-wrapper"/>.
        </para>
        <para>
         There are some subtleties about the effect of a variable reset
@@ -4882,11 +4960,12 @@ C:\cygwin\cygwin.bat
         <function>override</function>, <function>fallback</function>,
         scalar, or list) with a <function>flag</function> statement.
         This indicates that that particular assignment will be ignored
-        by build items that use this interface and don't request the
-        particular flag through the
+        by build items that don't request the particular flag through
+        the
         <option>-flag=<replaceable>interface-flag</replaceable></option>
         syntax in their <filename>Abuild.conf</filename> files.  A
         flag-based assignment looks like this:
+
         <programlisting>flag <replaceable>interface-flag</replaceable> <replaceable>assignment-statement</replaceable>
 </programlisting>
        </para>
@@ -4910,11 +4989,13 @@ C:\cygwin\cygwin.bat
         &Abuild; allows you to specify the name of an additional
         interface file with the same syntax as
         <filename>Abuild.interface</filename> that is loaded
-        <emphasis>after</emphasis> the current item has been built.
-        Because the file is loaded after the build has been completed,
-        any directives in this file will be visible to items that
-        depend on this item but not by this item itself.  To specify
-        the name of such a file, use
+        immediately after the current item has been built, before any
+        items that depend on this item are built.  Because the file is
+        loaded after the build has been completed, any directives in
+        this file will be visible to items that depend on this item
+        but not by this item itself.  To specify the name of such a
+        file, use
+
         <programlisting>after-build <replaceable>filename</replaceable>
 </programlisting>
         where <replaceable>filename</replaceable> is the path to the
@@ -4932,9 +5013,9 @@ C:\cygwin\cygwin.bat
         Since interface statements in <function>after-build</function>
         files are visible to items that depend on this build item but
         not to the item itself, this mechanism is useful for changing
-        interface variables for our reverse dependencies without
-        changing what the build item itself sees.  Our Java code
-        generator example (<xref
+        interface variables for the item's reverse dependencies
+        without changing what the build item itself sees.  The Java
+        code generator example (<xref
         linkend="ref.example.java-code-generator"/>) does this.  It
         also makes this construct useful for automatically generated
         interface data.  For an example of that use, see <xref
@@ -4948,6 +5029,7 @@ C:\cygwin\cygwin.bat
        <para>
         To specify the target type to which subsequent variable
         declarations belong, use
+
         <programlisting>target-type <replaceable>type</replaceable>
 </programlisting>
         where <replaceable>type</replaceable> is the name of the
@@ -4957,13 +5039,14 @@ C:\cygwin\cygwin.bat
         indicate that variables should be made available to all target
         types.  In practice, there is little reason to ever restrict a
         variable to a particular target type, though many of the
-        &abuild; predefined variables are restricted.  Note that
-        restricting the target type of a variable affects only whether
-        that variable is passed to the backend.  Regardless of the
-        target type of a variable, all assignments and references to
-        that variable from <filename>Abuild.interface</filename> files
-        are valid for any build item that sees the declaration
-        regardless of its target type.
+        &abuild; predefined variables are restricted.  Restricting the
+        target type of a variable only determines whether that
+        variable is passed to the backend, so the only reason to
+        restrict a variable to a specific target type would be to
+        reduce the number of unneeded variables that were passed to
+        the backend.  It has no impact on variable scope, visibility,
+        or even availability for use in other
+        <filename>Abuild.interface</filename> files.
        </para>
       </listitem>
      </varlistentry>
@@ -4973,6 +5056,7 @@ C:\cygwin\cygwin.bat
        <para>
         Conditionals in <filename>Abuild.interface</filename> take the
         following form:
+
         <programlisting>if (<replaceable>condition</replaceable>)
    ...<replaceable>valid code</replaceable>...
 elseif (<replaceable>condition</replaceable>)
@@ -4996,16 +5080,22 @@ endif
        <para>
         The <replaceable>condition</replaceable>s specified above may
         be of one of the following forms:
+
         <programlisting>$(<replaceable>variable</replaceable>)
 </programlisting>
         where <replaceable>variable</replaceable> is a boolean
         variable, or
+
         <programlisting><replaceable>function</replaceable>(<replaceable>arg</replaceable>, <replaceable>arg</replaceable>, ...)
 </programlisting>
         where <replaceable>function</replaceable> is a valid
         <filename>Abuild.interface</filename> conditional function and
         each <replaceable>arg</replaceable> consists of one or more
-        words.
+        words.  Only variables declared as Boolean and specific
+        conditional functions, described in the next section, are
+        permitted in conditionals.  There are no relational operators,
+        and variables of other types whose values happen to be valid
+        boolean values are not allowed in conditionals.
        </para>
       </listitem>
      </varlistentry>
@@ -5123,309 +5213,316 @@ endif
     <title>Predefined <filename>Abuild.interface</filename> Variables</title>
     <para>
      Before &abuild; reads any <filename>Abuild.interface</filename>
-     files, it provides certain predefined variables.  The following
-     variables are defined automatically by &abuild;:
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>ABUILD_STDOUT_IS_TTY</term>
-      <listitem>
-       <para>
-        A Boolean variable indicate whether &abuild;'s standard output
-        is a terminal.  It can be useful to know this so that this
-        information can be passed to other programs invoked by
-        backends, particularly those (like ant) which redirect output
-        through a pipe that ultimately goes to &abuild;'s standard
-        output.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_THIS</term>
-      <listitem>
-       <para>
-        The name of the current build item
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_TARGET_TYPE</term>
-      <listitem>
-       <para>
-        The target type of the current build item
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM_TYPE</term>
-      <listitem>
-       <para>
-        The platform type of the platform on behalf of which this
-        interface is being read
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM</term>
-      <listitem>
-       <para>
-        The name of the platform on behalf of which this interface is
-        being read
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_OUTPUT_DIR</term>
-      <listitem>
-       <para>
-        The output directory in which this item's products are
-        generated for this platform.  This is the most often
-        referenced &abuild; interface variable as it is normal
-        practice to expand this variable when setting the names of
-        library directories, classpaths, or anything else that
-        references generated targets.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM</term>
-      <listitem>
-       <para>
-        The current platform.  This variable is not used very often.
-        When referring to the output directory, always use
-        <varname>$(ABUILD_OUTPUT_DIR)</varname> instead of writing
-        something in terms of this variable.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM_OS</term>
-      <listitem>
-       <para>
-        For <type>object-code</type> items, this variable contains the
-        <varname>OS</varname> field of the platform.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM_CPU</term>
-      <listitem>
-       <para>
-        For <type>object-code</type> items, this variable contains the
-        <varname>CPU</varname> field of the platform.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM_TOOLSET</term>
-      <listitem>
-       <para>
-        For <type>object-code</type> items, this variable contains the
-        <varname>TOOLSET</varname> field of the platform.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM_COMPILER</term>
-      <listitem>
-       <para>
-        For <type>object-code</type> items, this variable contains the
-        <varname>COMPILER</varname> field of the platform.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>ABUILD_PLATFORM_OPTION</term>
-      <listitem>
-       <para>
-        For <type>object-code</type> items, this variable contains the
-        <varname>OPTION</varname> field of the platform, if any.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     &Abuild; predeclares several variables so that they may be used in
-     <filename>Abuild.interface</filename> files without being
-     declared.  These variables are used by the various backends.
+     files, it provides certain predefined variables.  We divide them
+     into categories based on target type.
     </para>
     <para>
-     The following variables are used by
-     <type>object-code</type> build items:
+     The variables mentioned here, along with any additional variables
+     that are declared in <filename>Abuild.interface</filename> files,
+     are made available to the backends in the form of identically
+     named make variables or ant properties.
     </para>
-    <variablelist>
-     <varlistentry>
-      <term>INCLUDES</term>
-      <listitem>
-       <para>
-        Include directories that users of this build item should add
-        to their include paths
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>LIBS</term>
-      <listitem>
-       <para>
-        The names of libraries (without any prefixes, suffixes, or
-        command-line flags) that this build item provides
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>LIBDIRS</term>
-      <listitem>
-       <para>
-        Directories that users linking with this build item's
-        libraries should add to their library search paths.
-        Typically, this is just set to
-        <varname>$(ABUILD_OUTPUT_DIR)</varname> since this is where
-        &abuild; creates library files.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>XCPPFLAGS</term>
-      <listitem>
-       <para>
-        Additional preprocessor flags that must be added when using
-        this item.  This flag should be used very sparingly as
-        changing the value of this variable does not cause things to
-        automatically recompile.  It is here primarily to support
-        third-party libraries that only work if a certain flag is
-        defined.  If you are using this to change the configuration of
-        a build item, please consider using another method instead,
-        such as defining symbols in a header file or using runtime
-        configuration.  For an example of how to do this based on the
-        value of a variable, see <xref
-        linkend="ref.example.auto-from-variable"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>XCFLAGS</term>
-      <listitem>
-       <para>
-        Additional flags, beyond those in
-        <varname>$(XCPPFLAGS)</varname> to be passed to the compiler
-        when compiling C code.  This variable will be used very
-        infrequently.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>XCXXFLAGS</term>
-      <listitem>
-       <para>
-        Additional flags, beyond those in
-        <varname>$(XCFLAGS)</varname> and
-        <varname>$(XCPPFLAGS)</varname> to be passed to the compiler
-        when compiling C++ code.  This variable will be used very
-        infrequently.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>XLINKFLAGS</term>
-      <listitem>
-       <para>
-        Additional flags to be added to the command-line when linking.
-        The most common use for this would be to support third-party
-        libraries or linker flags required to use third-party
-        libraries.  For adding your own libraries, you should always
-        use <varname>$(LIBDIRS)</varname> and
-        <varname>$(LIBS)</varname> instead.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <warning>
+    <sect2 id="ref.interface.all">
+     <title>Interface Variables Available to All Items</title>
      <para>
-      Although &abuild; allows you to do so, it is strongly
-      recommended that you avoid using these variables to configure
-      your build items by passing preprocessor symbol definitions on
-      the command line.  There are some times when passing
-      preprocessor symbols on the command line is okay, such as when
-      you're passing a parameter required by a third-party library or
-      passing in some truly static value such as the name of the
-      operating system, but passing dynamic configuration information
-      this way is dangerous.  A significant reason for this is that
-      <application>make</application>'s entire dependency system is
-      based on file modification times.  If you change a preprocessor
-      symbol in an <filename>Abuild.mk</filename> or
-      <filename>Abuild.interface</filename> file, there is nothing
-      that triggers anything to get rebuilt.  The result is that you
-      can end up with items that build inconsistently with respect to
-      that symbol.  Furthermore, &abuild; has no way to perform its
-      integrity checks relative to the values of compiler flags in
-      build and interface files.  If you need to have
-      preprocessor-based static configuration of your code, a better
-      way to handle it is by creating a header file and putting your
-      <literal>#define</literal>s there.  That way, when you modify
-      the header file, anything that depends upon that file will
-      rebuild automatically.
+      The following interface variables are available to build items
+      of all target types:
+      <variablelist>
+       <varlistentry>
+        <term>ABUILD_STDOUT_IS_TTY</term>
+        <listitem>
+         <para>
+          A Boolean variable indicate whether &abuild;'s standard output
+          is a terminal.  It can be useful to know this so that this
+          information can be passed to other programs invoked by
+          backends, particularly those (like ant) which redirect output
+          through a pipe that ultimately goes to &abuild;'s standard
+          output.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_THIS</term>
+        <listitem>
+         <para>
+          The name of the current build item
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_TARGET_TYPE</term>
+        <listitem>
+         <para>
+          The target type of the current build item
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_TYPE</term>
+        <listitem>
+         <para>
+          The platform type of the platform on behalf of which this
+          interface is being read
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM</term>
+        <listitem>
+         <para>
+          The name of the platform on behalf of which this interface is
+          being read
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_OUTPUT_DIR</term>
+        <listitem>
+         <para>
+          The output directory in which this item's products are
+          generated for this platform.  This is the most often
+          referenced &abuild; interface variable as it is normal
+          practice to expand this variable when setting the names of
+          library directories, classpaths, or anything else that
+          references generated targets.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM</term>
+        <listitem>
+         <para>
+          The current platform.  This variable is not used very often.
+          When referring to the output directory, always use
+          <varname>$(ABUILD_OUTPUT_DIR)</varname> instead of writing
+          something in terms of this variable.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
      </para>
-    </warning>
-    <para>
-     Note that the various <varname>FLAGS</varname> variables above
-     can also be set in <filename>Abuild.mk</filename> files, as can
-     additional variables to control flags on a per-file basis.
-     Please run <command>abuild rules-help</command> in a C/C++ build
-     item or see <xref linkend="ref.ccxx"/> for details.
-    </para>
-    <para>
-     Any additional variables that are declared in
-     <filename>Abuild.interface</filename> files with
-     <property>target-type</property> set to either <type>all</type>
-     or the build item's own target type will be made available as
-     identically named make variables.
-    </para>
-    <para>
-     The following variables are used by <type>java</type> build
-     items:
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>abuild.classpath</term>
-      <listitem>
-       <para>
-        Generated JAR files to add to the classpath.  This is the
-        variable that the vast majority of build items will assign to.
-        Its value will typically be
-        <filename>$(ABUILD_DIR_OUTPUT)/dist/<replaceable>JarFile.jar</replaceable></filename>,
-        where <replaceable>JarFile.jar</replaceable> is the name of
-        the JAR file you placed in the
-        <varname>abuild.jar-name</varname> property in your
-        <filename>Abuild-ant.properties</filename> file.  Note that
-        although Java allows both files (whose names end with
-        <filename>.jar</filename> or <filename>.zip</filename>) and
-        directories to be added to your classpath, adding directories
-        to the <varname>abuild.classpath</varname> variable will not
-        work in some cases and should therefore be avoided.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>abuild.classpath.external</term>
-      <listitem>
-       <para>
-        Externally supplied JAR files to add to the classpath.  This
-        variable is intended to be used for third-party JAR files.
-        The difference between it and
-        <varname>abuild.classpath</varname> is that JAR files listed
-        here are not added to EAR and WAR files while those in
-        <varname>abuild.classpath</varname> are.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     Any additional variables that are declared in
-     <filename>Abuild.interface</filename> files with
-     <property>target-type</property> set to either <type>all</type>
-     or the build item's own target type will be made available as
-     identically named ant properties variables.
-    </para>
+    </sect2>
+    <sect2 id="ref.interface.object-code">
+     <title>Interface Variables for Object-Code Items</title>
+     <para>
+      The following interface variables are available for object-code
+      build items:
+      <variablelist>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_OS</term>
+        <listitem>
+         <para>
+          For <type>object-code</type> items, this variable contains the
+          <varname>OS</varname> field of the platform (see <xref
+          linkend="ref.platforms.object-code"/>).
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_CPU</term>
+        <listitem>
+         <para>
+          For <type>object-code</type> items, this variable contains the
+          <varname>CPU</varname> field of the platform (see <xref
+          linkend="ref.platforms.object-code"/>).
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_TOOLSET</term>
+        <listitem>
+         <para>
+          For <type>object-code</type> items, this variable contains the
+          <varname>TOOLSET</varname> field of the platform (see <xref
+          linkend="ref.platforms.object-code"/>).
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_COMPILER</term>
+        <listitem>
+         <para>
+          For <type>object-code</type> items, this variable contains the
+          <varname>COMPILER</varname> field of the platform (see <xref
+          linkend="ref.platforms.object-code"/>).
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_OPTION</term>
+        <listitem>
+         <para>
+          For <type>object-code</type> items, this variable contains the
+          <varname>OPTION</varname> field of the platform if present or
+          the empty string otherwise (see <xref
+          linkend="ref.platforms.object-code"/>).
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>INCLUDES</term>
+        <listitem>
+         <para>
+          Include directories that users of this build item should add
+          to their include paths
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>LIBS</term>
+        <listitem>
+         <para>
+          The names of libraries (without any prefixes, suffixes, or
+          command-line flags) that this build item provides
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>LIBDIRS</term>
+        <listitem>
+         <para>
+          Directories that users linking with this build item's
+          libraries should add to their library search paths.
+          Typically, this is just set to
+          <varname>$(ABUILD_OUTPUT_DIR)</varname> since this is where
+          &abuild; creates library files.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>XCPPFLAGS</term>
+        <listitem>
+         <para>
+          Additional preprocessor flags that must be added when using
+          this item.  This flag should be used very sparingly as
+          changing the value of this variable does not cause things to
+          automatically recompile.  It is here primarily to support
+          third-party libraries that only work if a certain flag is
+          defined.  If you are using this to change the configuration of
+          a build item, please consider using another method instead,
+          such as defining symbols in a header file or using runtime
+          configuration.  For an example of how to do this based on the
+          value of a variable, see <xref
+          linkend="ref.example.auto-from-variable"/>.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>XCFLAGS</term>
+        <listitem>
+         <para>
+          Additional flags, beyond those in
+          <varname>$(XCPPFLAGS)</varname> to be passed to the compiler
+          when compiling C code.  This variable will be used very
+          infrequently.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>XCXXFLAGS</term>
+        <listitem>
+         <para>
+          Additional flags, beyond those in
+          <varname>$(XCFLAGS)</varname> and
+          <varname>$(XCPPFLAGS)</varname> to be passed to the compiler
+          when compiling C++ code.  This variable will be used very
+          infrequently.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>XLINKFLAGS</term>
+        <listitem>
+         <para>
+          Additional flags to be added to the command-line when linking.
+          The most common use for this would be to support third-party
+          libraries or linker flags required to use third-party
+          libraries.  For adding your own libraries, you should always
+          use <varname>$(LIBDIRS)</varname> and
+          <varname>$(LIBS)</varname> instead.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+     </para>
+     <warning>
+      <para>
+       Although &abuild; allows you to do so, it is strongly
+       recommended that you avoid using these variables to configure
+       your build items by passing preprocessor symbol definitions on
+       the command line.  There are some times when passing
+       preprocessor symbols on the command line is okay, such as when
+       you're passing a parameter required by a third-party library or
+       passing in some truly static value such as the name of the
+       operating system, but passing dynamic configuration information
+       this way is dangerous.  A significant reason for this is that
+       <application>make</application>'s entire dependency system is
+       based on file modification times.  If you change a preprocessor
+       symbol in an <filename>Abuild.mk</filename> or
+       <filename>Abuild.interface</filename> file, there is nothing
+       that triggers anything to get rebuilt.  The result is that you
+       can end up with items that build inconsistently with respect to
+       that symbol.  Furthermore, &abuild; has no way to perform its
+       integrity checks relative to the values of compiler flags in
+       build and interface files.  If you need to have
+       preprocessor-based static configuration of your code, a better
+       way to handle it is by creating a header file and putting your
+       <literal>#define</literal>s there.  That way, when you modify
+       the header file, anything that depends upon that file will
+       rebuild automatically.
+      </para>
+     </warning>
+     <para>
+      Note that the various <varname>FLAGS</varname> variables above
+      can also be set in <filename>Abuild.mk</filename> files, as can
+      additional variables to control flags on a per-file basis.
+      Please run <command>abuild rules-help</command> in a C/C++ build
+      item or see <xref linkend="ref.ccxx"/> for details.
+     </para>
+    </sect2>
+    <sect2 id="ref.interface.java">
+     <title>Interface Variables for Java Items</title>
+     <para>
+      The following variables are used by <type>java</type> build
+      items:
+      <variablelist>
+       <varlistentry>
+        <term>abuild.classpath</term>
+        <listitem>
+         <para>
+          Generated JAR files to add to the classpath.  This is the
+          variable that the most ordinary Java build items will assign
+          to.  Its value will typically be
+          <filename>$(ABUILD_DIR_OUTPUT)/dist/<replaceable>JarFile.jar</replaceable></filename>,
+          where <replaceable>JarFile.jar</replaceable> is the name of
+          the JAR file you placed in the
+          <varname>abuild.jar-name</varname> property in your
+          <filename>Abuild-ant.properties</filename> file.  Note that
+          although Java allows both files (whose names end with
+          <filename>.jar</filename> or <filename>.zip</filename>) and
+          directories to be added to your classpath, adding
+          directories to the <varname>abuild.classpath</varname>
+          variable will not work properly in some cases with
+          &abuild;'s ant rules and should therefore be avoided.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>abuild.classpath.external</term>
+        <listitem>
+         <para>
+          Externally supplied JAR files to add to the classpath.  This
+          variable is intended to be used for third-party JAR files.
+          The difference between it and
+          <varname>abuild.classpath</varname> is that JAR files listed
+          here are not added to EAR and WAR files while those in
+          <varname>abuild.classpath</varname> are.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+     </para>
+    </sect2>
    </sect1>
   </chapter>
   <chapter id="ref.abuild.mk">
@@ -6027,13 +6124,6 @@ endif
      configuration file for Java build items.  It serves the same
      function for Java build items as <filename>Abuild.mk</filename>
      serves for platform-independent and C/C++ build items.
-    </para>
-    <para>
-     The <filename>Abuild-ant.properties</filename> file is a
-     properties file.  It is loaded after an automatically generated
-     properties file that contains the values of the &abuild;
-     interface variables and may therefore reference those variables
-     as identically named <application>ant</application> properties.
     </para>
     <para>
      To see a list of supported properties, run <command>abuild
@@ -7341,14 +7431,17 @@ endif
      environment, set the variable to contain multiple space-separated
      words.  To specify multiple selectors on the command line,
      provide the command-line option more than once.  For example:
+
      <programlisting>--platform-selector <replaceable>selector</replaceable> [ --platform-selector <replaceable>selector</replaceable> ... ]
 </programlisting>
      or
+
      <programlisting>ABUILD_PLATFORM_SELECTORS="<replaceable>selector</replaceable>[ <replaceable>selector</replaceable> ... ]"
 </programlisting>
     </para>
     <para>
      Each selector is of the form
+
      <programlisting>[<replaceable>platform-type</replaceable>:]<replaceable>criteria</replaceable>
 </programlisting>
     </para>
@@ -8745,8 +8838,8 @@ endif
       platform type declaration on each line.  Comment lines starting
       with the <varname>#</varname> character and blank lines are
       ignored.  Each line may have the following syntax:
-      <programlisting>platform-type
-      <replaceable>new-platform-type</replaceable>
+
+      <programlisting>platform-type <replaceable>new-platform-type</replaceable>
 </programlisting>
      </para>
     </sect2>
@@ -8822,6 +8915,7 @@ endif
      <para>
       Each line of output of <command>list_platforms</command> may
       take one of the following forms:
+
       <programlisting>platform [-lowpri] <replaceable>new-platform</replaceable> -type <replaceable>platform-type</replaceable>
 native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
 </programlisting>
@@ -9233,6 +9327,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       doing it.  Here is the <command>list_platforms</command> program:
       <?example native-compiler/compiler/list_platforms?>
       It generates this output:
+
       <programlisting>native-compiler qcc.release
 native-compiler qcc.debug
 native-compiler qcc
@@ -9367,6 +9462,7 @@ native-compiler qcc
         undefined variable has the empty string as a value.  If it is
         your intention to have an undefined variable default to the
         empty string, then you should include
+
         <programlisting><replaceable>VARIABLE</replaceable> ?=
 </programlisting>
         in your rules, where <varname>VARIABLE</varname> is the name
@@ -9809,6 +9905,7 @@ native-compiler qcc
        During a build, &abuild; outputs state changes from the dependency
        evaluator using this keyword.  State change monitor output lines
        will always have this form:
+
        <programlisting>abuild-monitor: state-change item-name platform state
 </programlisting>
        where <varname>state</varname> is one of the following:
@@ -9875,6 +9972,7 @@ native-compiler qcc
       <para>
        Before &abuild; invokes the backend to perform a build, it will
        output a line of the form
+
        <programlisting>abuild-monitor: targets item-name platform target [target ...]
 </programlisting>
        to indicate a space-separated list of targets that will be
@@ -10595,6 +10693,7 @@ native-compiler qcc
      It does not have any flags set when it references variables
      inside of other <filename>Abuild.interface</filename> files.  For
      example, if <classname>A</classname> does this:
+
      <programlisting>declare X string
 declare Y string
 X = v1
