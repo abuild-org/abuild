@@ -89,7 +89,9 @@ this way.
 
      <attribute name="Main-Class" value="${abuild.main-class}"/>
 
-   How do we do this conditionally upon the existence of that property?
+   How do we do this conditionally upon the existence of that
+   property?  There is a comment in abuild.xml and also various
+   remarks in the documentation.  Search for "manifest".
 
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse
