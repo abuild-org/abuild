@@ -8238,30 +8238,52 @@ endif
    <sect1 id="ref.example.mixed-classification">
     <title>Mixed Classification Example</title>
     <para>
-     This example shows a sample implementation of how one might
-     implement a mixed classification development environment.  To
-     avoid any potential confusion, we'll call our two classification
-     levels &ldquo;public&rdquo; and &ldquo;sensitive.&rdquo; In order
-     to avoid any accidental dependencies between items in the public
-     area and items in the sensitive area, the sensitive items are
-     implemented in a separate build tree that has the public area as
-     an external.
+     This example shows a sample implementation of how one might solve
+     certain development problems in a mixed classification
+     development environment.  To avoid any potential confusion, we'll
+     call our two classification levels &ldquo;public&rdquo; and
+     &ldquo;sensitive.&rdquo;.  These could corresponding to different
+     levels of protection of information and could apply to any
+     environment in which people have to be granted special access in
+     order to use parts of a system.
     </para>
     <para>
-     In this example, we have a library of handlers and an executable
-     program that calls each registered handler on a given number.  The
-     handlers themselves are implemented in terms of a helper function.
-     The public version of handler library includes two handlers.  The
-     sensitive version adds two more handlers and also completely
-     overrides the helper function defined in the public version.  In
-     order for this to work, the helper function's interface and
-     implementation are separated as we will describe below.
+     In this example, we'll create a very simple message processing
+     system.  When a message is received, it is processed by a
+     <firstterm>message processor</firstterm> and then dispatched to a
+     series of <firstterm>message consumers</firstterm>.  Our system
+     allows message consumers to be registered with a special message
+     consumer table.  Each message consumer is passed a reference to a
+     message processor.  Then, for each message, each consumer
+     processes the message the message processor and then does
+     whatever it needs to do with the results.
     </para>
     <para>
-     Primarily for purposes of illustration, we implement the handler
-     build item not as one library but actually as one library per
-     handler.  This example is implemented in Java, but there is
-     nothing about it that wouldn't work the same way in C or C++.
+     In the public version of the system, we have some message
+     consumers and a message processor.  In the sensitive version of
+     the system, we want access to the public consumers, but we also
+     want to register some additional consumers that are only allowed
+     to work in the sensitive environment.  In addition, we want to be
+     able to replace the message processor with a different
+     implementation such that even the public consumers can operate on
+     the messages after being processed by the sensitive processor.
+     Furthermore, we wish to be able to achieve these goals with as
+     little code duplication as possible and without losing the
+     ability to run the public version of the system even when
+     operating in the sensitive environment as this may be important
+     for testing the system.  We also wish to protect ourselves
+     against ever accidentally creating a dependency from a public
+     implementation to a sensitive implementation of any particular
+     part of the system.
+    </para>
+    <para>
+     In our sample implementation, each message is an integer, and the
+     message processor receives the integer as input and returns a
+     string.  Rather than having &ldquo;messages&rdquo; actually be
+     &ldquo;received&rdquo;, we just accept integers on the command
+     line and pass through the process/consume loop in the system.
+     This example is implemented in Java, but there is nothing about
+     it that wouldn't work the same way in C or C++.
     </para>
     <para>
      This example may be found in
@@ -8272,108 +8294,136 @@ endif
      first.
     </para>
     <para>
+     In this example, we have a library of consumers and an executable
+     program that calls each registered consumer the numbers passed in
+     on the command line.  The consumers each call the processor
+     function through an interface, an instance of which is passed to
+     the consumer with each message.  The public version of consumer
+     library includes two consumers.  The sensitive version adds two
+     more consumers and also provides a new processor that completely
+     replaces the one defined in the public version.  In order for
+     this to work, the processor function's interface and
+     implementation are separated as we will describe below.
+    </para>
+    <para>
      There are several things to note about the dependencies and
      directory layout.  First, observe that the Java
-     <classname>Helper</classname> class defined in the
-     <classname>helper</classname> build item implements a Java
-     interface (not to be confused with an &abuild; interface) that is
-     actually defined in the <classname>handlers.interface</classname>
-     build item in the <filename>handlers/interface</filename>
-     directory.  This means that the <classname>helper</classname>
-     build item depends on <classname>handlers</classname> and the
-     <classname>handlers</classname> build items do not depend on
-     <classname>helper</classname>.  This helps enforce that the
-     implementation of the helper function can never be a dependency
-     of the handlers (as that would create a circular dependency),
-     thus allowing it to remain completely separate from the handler
-     implementations.  The handlers themselves accept a
-     <classname>HelperInterface</classname> instance as a parameter:
-     <?example mixed-classification/public/helper/Abuild.conf?>
-     <?example mixed-classification/public/handlers/Abuild.conf?>
+     <classname>MessageProcessor</classname> class defined in the
+     <classname>message-processor</classname> build item implements a
+     Java interface (not to be confused with an &abuild; interface)
+     that is actually defined in the
+     <classname>message-consumers.interface</classname> build item in
+     the <filename>message-consumers/interface</filename> directory.
+     Here is the interface from the
+     <classname>message-consumers.interface</classname> build itme:
+     <?example mixed-classification/public/message-consumers/interface/src/java/com/example/consumers/ProcessorInterface.java?>
+     Here is its implementation from the
+     <classname>message-processor</classname> build item:
+     <?example mixed-classification/public/message-processor/src/java/com/example/processor/MessageProcessor.java?>
+     This means that the <classname>message-processor</classname>
+     build item depends on <classname>message-consumers</classname>
+     and the <classname>message-consumers</classname> build items do
+     not depend on <classname>message-processor</classname>.  This
+     helps enforce that the implementation of the processor function
+     can never be a dependency of the consumers (as that would create
+     a circular dependency), thus allowing it to remain completely
+     separate from the consumer implementations.
+     <?example mixed-classification/public/message-processor/Abuild.conf?>
+     <?example mixed-classification/public/message-consumers/Abuild.conf?>
+     The consumers
+     themselves accept a <classname>ProcessorInterface</classname>
+     instance as a parameter, as you can see from the consumer
+     interface:
+     <?example mixed-classification/public/message-consumers/interface/src/java/com/example/consumers/Consumer.java?>
     </para>
     <para>
      Next we will study the executable.  If you look at the
      <classname>executable</classname> build item, you will observe that
-     it depends on <classname>helper</classname> and
+     it depends on <classname>message-processor</classname> and
      <classname>executable.entry</classname>:
      <?example mixed-classification/public/executable/Abuild.conf?>
      Its <filename>Main.java</filename> is very minimal: it just
      invokes <varname>Entry.runExecutable</varname> passing to it an
-     instantiated <classname>Helper</classname> object and whatever
-     arguments were passed to <varname>main</varname>:
+     instantiated <classname>MessageProcessor</classname> object and
+     whatever arguments were passed to <varname>main</varname>:
      <?example mixed-classification/public/executable/src/java/com/example/executable/Main.java?>
      It is important to keep this main routine minimal because we will
      have to have a separate main in the sensitive area as that is the
-     only way we can have the sensitive version of the code include
-     sensitive handlers.  If this were C++, the inclusion of the
-     sensitive handlers would be achieved through linking with
-     additional libraries.  In Java, it is achieved by adding
-     additional JAR files to the classpath.  In either case, with
-     &abuild;, it is achieved by simply adding additional dependencies
-     to the build item.  We will see this in more depth when we look
-     at the sensitive version of the code.
+     only way we can have the sensitive version of the code register
+     sensitive consumers prior to calling <function>main</function>.
+     If this were C++, the inclusion of the sensitive consumers would
+     be achieved through linking with additional libraries.  In Java,
+     it is achieved by adding additional JAR files to the classpath.
+     In either case, with &abuild;, it is achieved by simply adding
+     additional dependencies to the build item.  We will see this in
+     more depth when we look at the sensitive version of the code.
     </para>
     <para>
      Turning our attention to the public
      <classname>executable.entry</classname> build item, we can see
      that our <filename>Entry.java</filename> file has a static
-     initializer that registers our two handlers,
-     <varname>H1</varname> and <varname>H2</varname>:
+     initializer that registers our two consumers,
+     <varname>C1</varname> and <varname>C2</varname>:
      <?example mixed-classification/public/executable/entry/src/java/com/example/executable/entry/Entry.java?>
-     If this were a C++ program and portability to Windows were not
-     required, we could omit this static initializer block entirely
-     and put the static initializers in <varname>H1</varname> and
-     <varname>H2</varname> themselves as long as we used the whole
-     archive flag with those libraries.  (For information about the
-     whole archive flag, see <xref
-     linkend="ref.example.whole-library"/>.)  As with C++, however,
-     there is no clean and portable way to force static initializers
-     to run in a class before the class is loaded.  Even though no
-     place else in the code has to know about <varname>H1</varname>
-     and <varname>H2</varname> specifically, we do have to register
-     them explicitly with the table of handlers so that the rest of
-     the application can use them.  The main
+     <footnote>
+      <para>
+       If this were a C++ program and portability to Windows were not
+       required, we could omit this static initializer block entirely
+       and put the static initializers in <varname>C1</varname> and
+       <varname>C2</varname> themselves as long as we used the whole
+       archive flag with those libraries.  (For information about the
+       whole archive flag, see <xref
+       linkend="ref.example.whole-library"/>.)  As with C++, however,
+       there is no clean and portable way to force static initializers
+       to run in a class before the class is loaded.
+      </para>
+     </footnote>
+     Even though no place else in the code has to know about
+     <varname>C1</varname> and <varname>C2</varname> specifically, we
+     do have to register them explicitly with the table of consumers
+     so that the rest of the application can use them.  The main
      <varname>runExecutable</varname> function parses the command-line
      argument and then passes it along with the
-     <varname>Helper</varname> object to each handler in turn.  Adding
-     additional handlers would require just making sure that they are
-     registered.  Look at the code for the handlers and the code in
-     the <filename>handler.interface</filename> build item for details
-     on how the registration of handlers is implemented in this
-     example.
+     <classname>MessageProcessor</classname> object to each consumer
+     in turn.  Adding additional consumers would entail just making
+     sure that they are registered.  Observe in the source to one of
+     the consumers how we register the consumer in the consumer table:
+     <?example mixed-classification/public/message-consumers/c1/src/java/com/example/consumers/c1/C1.java?>
     </para>
     <para>
      Now we will look at the sensitive version of the code.  We have
      the same three subdirectories in <filename>sensitive</filename>
      as in <filename>public</filename>.  In our
-     <filename>handlers</filename> directory, we define new handlers
-     <varname>H3</varname> and <varname>H4</varname>.  They are
-     essentially identical to the public handlers
-     <varname>H1</varname> and <varname>H2</varname>.  The
-     <filename>helper</filename> directory defines the sensitive
-     version of the <classname>Helper</classname> class.  Note that
-     the class name is the same as in the public version, which means
-     that the public and sensitive versions cannot be used
-     simultaneously in the same executable.  Also observe that the
-     name of the build item is actually
-     <classname>helper.sensitive</classname> and that the build item
-     sets its visibility to <varname>*</varname>:
-     <?example mixed-classification/sensitive/helper/Abuild.conf?>
+     <filename>message-consumers</filename> directory, we define new
+     consumers <varname>C3</varname> and <varname>C4</varname>.  They
+     are essentially identical to the public consumers
+     <varname>C1</varname> and <varname>C2</varname>.  The
+     <filename>message-processor</filename> directory defines the
+     sensitive version of the <classname>MessageProcessor</classname>
+     class.  Note that the class name is the same as in the public
+     version, which means that the public and sensitive versions
+     cannot be used simultaneously in the same executable.  Also
+     observe that the name of the build item is actually
+     <classname>message-processor.sensitive</classname> and that the
+     build item sets its visibility to <varname>*</varname>:
+     <?example mixed-classification/sensitive/message-processor/Abuild.conf?>
      In this particular example, there's no reason that we couldn't
      have given the build item a public name as there are no
-     subcomponents of the public <classname>helper</classname> that
-     the sensitive one needs.  In a real situation, perhaps this would
-     be the real <classname>helper</classname> build item and the
-     public one would be called something like
-     <classname>helper-stub</classname>.  In any case, all &abuild;
-     cares about is that they have different names.
+     subcomponents of the public
+     <classname>message-processor</classname> build item that the
+     sensitive one needs.  In a real situation, perhaps this would be
+     the real <classname>message-processor</classname> build item and
+     the public one would be called something like
+     <classname>message-processor-stub</classname>.  In any case, all
+     &abuild; cares about is that the build items have different
+     names.
     </para>
     <para>
      Looking at the sensitive version of the executable, we can
      observe that there is no separate sensitive version of the
      <varname>Entry</varname> class.  This effectively means that we
      are using the public main routine even though we have sensitive
-     handlers.  This provides an example of how to implement the case
+     consumers.  This provides an example of how to implement the case
      that people might be inclined to implement by having conditional
      inclusion of sensitive JAR files or conditional linking of
      sensitive libraries.  Since &abuild; doesn't support doing
@@ -8387,15 +8437,15 @@ endif
      code in the <filename>executable</filename> directory, you will
      see that the build item is called
      <classname>executable.sensitive</classname> and that it depends
-     on <classname>handlers.sensitive</classname> and
-     <classname>helper.sensitive</classname>, both of which have made
-     themselves visible to <varname>*</varname> in their respective
-     <filename>Abuild.conf</filename> files.  We saw
-     <classname>helper.sensitive</classname>'s
+     on <classname>message-consumers.sensitive</classname> and
+     <classname>message-processor.sensitive</classname>, both of which
+     have made themselves visible to <varname>*</varname> in their
+     respective <filename>Abuild.conf</filename> files.  We saw
+     <classname>message-processor.sensitive</classname>'s
      <filename>Abuild.conf</filename> file above.  Here is
-     <classname>handler.sensitive</classname>'s
+     <classname>message-consumers.sensitive</classname>'s
      <filename>Abuild.conf</filename>:
-     <?example mixed-classification/sensitive/handlers/Abuild.conf?>
+     <?example mixed-classification/sensitive/message-consumers/Abuild.conf?>
      Also observe that <classname>executable.sensitive</classname>
      depends on <classname>executable.entry</classname> just like the
      public version of the executable did:
@@ -8403,7 +8453,7 @@ endif
      Looking at the sensitive executable's
      <filename>Main.java</filename>, we can see that it is essentially
      identical to the public version except that it registers some
-     additional handlers that were not available in the public
+     additional consumers that were not available in the public
      version:
      <?example mixed-classification/sensitive/executable/src/java/com/example/executable/Main.java?>
     </para>
@@ -8438,9 +8488,9 @@ endif
       <listitem>
        <para>
         Although, in this example, the sensitive versions of the
-        handlers don't actually access any private build items from
+        consumers don't actually access any private build items from
         the public version of the code, the use of the build item name
-        <classname>handler.sensitive</classname> and the
+        <classname>message-consumers.sensitive</classname> and the
         <varname>visible-to</varname> key would make it possible for
         them to do so.
        </para>
