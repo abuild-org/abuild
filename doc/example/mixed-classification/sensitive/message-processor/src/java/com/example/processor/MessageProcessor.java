@@ -1,11 +1,11 @@
-package com.example.helper;
+package com.example.processor;
 
-import com.example.handlers.HelperInterface;
+import com.example.consumers.ProcessorInterface;
 
-public class Helper implements HelperInterface
+public class MessageProcessor implements ProcessorInterface
 {
-    public String help(int n)
+    public String process(int n)
     {
-	return "sensitive helper: n*n = " + n*n;
+	return "sensitive processor: n*n = " + n*n;
     }
 }

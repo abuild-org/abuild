@@ -1,6 +1,6 @@
-package com.example.handlers;
+package com.example.consumers;
 
-public interface HelperInterface
+public interface ProcessorInterface
 {
-    public String help(int n);
+    public String process(int n);
 }

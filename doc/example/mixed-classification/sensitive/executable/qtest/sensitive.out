@@ -1,4 +1,4 @@
-sensitive H3: sensitive helper: n*n = 9
-sensitive H4: sensitive helper: n*n = 9
-public H1: sensitive helper: n*n = 9
-public H2: sensitive helper: n*n = 9
+sensitive C3: sensitive processor: n*n = 9
+sensitive C4: sensitive processor: n*n = 9
+public C1: sensitive processor: n*n = 9
+public C2: sensitive processor: n*n = 9

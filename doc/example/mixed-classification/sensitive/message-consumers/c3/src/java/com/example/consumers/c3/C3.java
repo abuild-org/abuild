@@ -1,18 +1,18 @@
-package com.example.handlers.h3;
+package com.example.consumers.c3;
 
-import com.example.handlers.HelperInterface;
-import com.example.handlers.Handler;
-import com.example.handlers.HandlerTable;
+import com.example.consumers.ProcessorInterface;
+import com.example.consumers.Consumer;
+import com.example.consumers.ConsumerTable;
 
-public class H3 implements Handler
+public class C3 implements Consumer
 {
     public void register()
     {
-	HandlerTable.registerHandler(this);
+	ConsumerTable.registerConsumer(this);
     }
 
-    public void handle(HelperInterface helper, int n)
+    public void consume(ProcessorInterface processor, int n)
     {
-	System.out.println("sensitive H3: " + helper.help(n));
+	System.out.println("sensitive C3: " + processor.process(n));
     }
 };

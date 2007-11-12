@@ -1,18 +1,18 @@
-package com.example.handlers.h1;
+package com.example.consumers.c1;
 
-import com.example.handlers.HelperInterface;
-import com.example.handlers.Handler;
-import com.example.handlers.HandlerTable;
+import com.example.consumers.ProcessorInterface;
+import com.example.consumers.Consumer;
+import com.example.consumers.ConsumerTable;
 
-public class H1 implements Handler
+public class C1 implements Consumer
 {
     public void register()
     {
-	HandlerTable.registerHandler(this);
+	ConsumerTable.registerConsumer(this);
     }
 
-    public void handle(HelperInterface helper, int n)
+    public void consume(ProcessorInterface processor, int n)
     {
-	System.out.println("public H1: " + helper.help(n));
+	System.out.println("public C1: " + processor.process(n));
     }
-};
+}

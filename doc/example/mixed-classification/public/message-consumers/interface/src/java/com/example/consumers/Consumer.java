@@ -1,7 +1,7 @@
-package com.example.handlers;
+package com.example.consumers;
 
-public interface Handler
+public interface Consumer
 {
     public void register();
-    public void handle(HelperInterface helper, int number);
+    public void consume(ProcessorInterface processor, int number);
 }

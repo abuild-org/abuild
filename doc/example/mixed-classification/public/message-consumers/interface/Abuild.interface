@@ -1,1 +1,1 @@
-abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/handler-interface.jar
+abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/consumers-interface.jar

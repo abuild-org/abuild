@@ -1,22 +1,21 @@
 package com.example.executable.entry;
 
-import java.util.Vector;
-import java.util.Iterator;
-import com.example.handlers.HelperInterface;
-import com.example.handlers.Handler;
-import com.example.handlers.HandlerTable;
-import com.example.handlers.h1.H1;
-import com.example.handlers.h2.H2;
+import com.example.consumers.ProcessorInterface;
+import com.example.consumers.Consumer;
+import com.example.consumers.ConsumerTable;
+import com.example.consumers.c1.C1;
+import com.example.consumers.c2.C2;
 
 public class Entry
 {
     static
     {
-	new H1().register();
-	new H2().register();
+	new C1().register();
+	new C2().register();
     }
 
-    public static void runExecutable(HelperInterface helper, String args[])
+    public static void runExecutable(ProcessorInterface processor,
+				     String args[])
     {
 	int n = 0;
 	if (args.length > 0)
@@ -32,11 +31,9 @@ public class Entry
 	    }
 	}
 
-	Iterator<Handler> iter = HandlerTable.getHandlers().iterator();
-	while (iter.hasNext())
+	for (Consumer c: ConsumerTable.getConsumers())
 	{
-	    Handler h = iter.next();
-	    h.handle(helper, n);
+	    c.consume(processor, n);
 	}
     }
-};
+}

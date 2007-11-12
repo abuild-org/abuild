@@ -1,18 +1,18 @@
-package com.example.handlers;
+package com.example.consumers;
 
 import java.util.Vector;
 
-public class HandlerTable
+public class ConsumerTable
 {
-    static private Vector<Handler> handlers = new Vector<Handler>();
+    static private Vector<Consumer> consumers = new Vector<Consumer>();
 
-    static public void registerHandler(Handler h)
+    static public void registerConsumer(Consumer h)
     {
-	handlers.add(h);
+	consumers.add(h);
     }
 
-    static public Vector<Handler> getHandlers()
+    static public Vector<Consumer> getConsumers()
     {
-	return handlers;
+	return consumers;
     }
 }

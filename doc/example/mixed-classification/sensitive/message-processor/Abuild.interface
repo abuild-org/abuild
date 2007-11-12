@@ -1,1 +1,1 @@
-abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/helper.jar
+abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/processor.jar

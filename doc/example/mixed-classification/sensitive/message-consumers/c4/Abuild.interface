@@ -1,1 +1,1 @@
-abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/handlers-h4.jar
+abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/consumers-c4.jar
