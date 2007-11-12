@@ -8099,13 +8099,13 @@ endif
     linkend="ref.build-item-access-control"/>.  In some rare
     instances, in order to resolve a conflict between what a given
     build item is supposed to be able to see and which items a given
-    item is supposed to be seen by, it is necessary to override the
+    item is supposed to be seen by, it is necessary to increase the
     visibility of a build item.  In this chapter, we describe a
     mechanism for doing this and present a real-world example in which
     it would be required.
    </para>
    <sect1 id="ref.overriding-visibility">
-    <title>Changing a Build Item's Visibility</title>
+    <title>Increasing a Build Item's Visibility</title>
     <para>
      The <filename>Abuild.conf</filename> file supports an optional
      <property>visible-to</property> key has a value consisting of a
@@ -8137,7 +8137,13 @@ endif
      anything else under <classname>A</classname> would be allowed to
      access it directly.  Even though it is hidden beneath
      <classname>A.B</classname>, access to it would be checked as if
-     it were directly under <classname>A</classname>.
+     it were directly under <classname>A</classname>.  The
+     <classname>A.B.C</classname> build item would increase its
+     visibility by adding this line to its
+     <filename>Abuild.conf</filename>:
+
+     <programlisting>visible-to: A.*
+</programlisting>
     </para>
     <para>
      Here we describe a more concrete example.  The next section
@@ -8150,8 +8156,8 @@ endif
      should never be allowed to see the sensitive ones.  To achieve
      this, we create an public build tree and a sensitive build tree,
      and then we have the sensitive build tree list the public build
-     tree as an external area.  See <xref
-     linkend="fig.build-item-visibility"/>.
+     tree as an external area.  The explanation that follows refers to
+     <xref linkend="fig.build-item-visibility"/>.
      <figure id="fig.build-item-visibility">
       <title>Build Item Visibility</title>
       <mediaobject>
@@ -8189,10 +8195,10 @@ endif
      <classname>A</classname> and <classname>B</classname> in a
      completely separate build tree.  Suppose <classname>B</classname>
      has sensitive subcomponents <classname>B.W</classname> and
-     <classname>B.X</classname>.  We place those under the scope
-     <classname>B</classname> so that they have direct access to
-     <classname>B.Q</classname> and <classname>B.R</classname> as
-     needed.  Now we can create a facade build item called
+     <classname>B.X</classname>.  Those need to be under the scope
+     <classname>B</classname> so that they can see
+     <classname>B.Q</classname> and <classname>B.R</classname>.  Now
+     we can create a facade build item called
      <classname>B.sensitive</classname> that depends on
      <classname>B</classname> and also on <classname>B.W</classname>
      and <classname>B.X</classname>.  Then anyone who depends on
@@ -8212,8 +8218,8 @@ endif
      <classname>B.sensitive</classname> make itself globally visible
      by adding <literal>visible-to: *</literal> to its
      <filename>Abuild.conf</filename>.  Now any build item that can
-     resolve its name (which means only build items in the sensitive
-     build tree) can declare a dependency directly on
+     resolve its name, which by design means only build items in the
+     sensitive build tree, can declare a dependency directly on
      <classname>B.sensitive</classname>.  That way, the public
      <classname>A</classname> build item depends on the public
      <classname>B</classname> build item, and the sensitive
@@ -8221,8 +8227,12 @@ endif
      sensitive <classname>B.sensitive</classname> build item, and all
      constraints are satisfied.  This pattern can be useful whenever
      an external area is used to add new private subcomponents to
-     something defined in a different build tree.  The next section
-     demonstrates an actual implementation of this pattern.
+     something defined in a different build tree.  In this case, the
+     use of an external tree creates what is effectively a
+     <firstterm>one-way dependency gate</firstterm>: items in the
+     sensitive tree can see items in the public tree, but items in the
+     public tree can't see items in the sensitive tree.  The next
+     section demonstrates an actual implementation of this pattern.
     </para>
    </sect1>
    <sect1 id="ref.example.mixed-classification">
