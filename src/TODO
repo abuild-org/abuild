@@ -4,6 +4,8 @@
 
  * Look at all XXX comments.
 
+ * Add copyright and license information
+
  * Absolute externals may be wrong:
 
     - They are read write just like regular externals which makes them
