@@ -7648,8 +7648,8 @@ endif
         <para>
          on the native platform type, build with the first platform
          that has the <type>debug</type> option.  If none, build with
-         the first type regardless of its options.  (This is always
-         the behavior when there are no platforms that fit the
+         the first platform regardless of its options.  (This is
+         always the behavior when there are no platforms that fit the
          criteria, so this will not repeated for each example.)  In
          this case, we would build <type>native</type> items on
          <type>linux.x86.rhel4.xlc.debug</type>.
@@ -7694,7 +7694,9 @@ endif
        <listitem>
         <para>
          On the native platform type, build all platforms that have
-         the <type>debug</type> option.
+         the <type>debug</type> option:
+         <type>linux.x86.rhel4.xlc.debug</type> and
+         <type>linux.x86.rhel4.gcc.debug</type>.
         </para>
        </listitem>
       </varlistentry>
@@ -7702,7 +7704,13 @@ endif
        <term><type>type=native:compiler=*.*</type></term>
        <listitem>
         <para>
-         On the native platform type, build all platforms.
+         On the native platform type, build all platforms:
+         <type>linux.x86.rhel4.xlc</type>,
+         <type>linux.x86.rhel4.xlc.debug</type>,
+         <type>linux.x86.rhel4.xlc.release</type>,
+         <type>linux.x86.rhel4.gcc</type>,
+         <type>linux.x86.rhel4.gcc.debug</type>, and
+         <type>linux.x86.rhel4.gcc.release</type>.
         </para>
        </listitem>
       </varlistentry>
@@ -7711,7 +7719,8 @@ endif
        <listitem>
         <para>
          On vxworks, build for all platforms that have the
-         <type>debug</type> option.
+         <type>debug</type> option:
+         <type>vxworks.x86.6_3.vxgcc.debug</type>.
         </para>
        </listitem>
       </varlistentry>
@@ -7720,7 +7729,9 @@ endif
        <listitem>
         <para>
          On vxworks, build all platforms that have <type>x86</type> as
-         the <type>cpu</type> field.
+         the <type>cpu</type> field:
+         <type>vxworks.x86.6_3.vxgcc</type> and
+         <type>vxworks.x86.6_3.vxgcc.debug</type>.
         </para>
        </listitem>
       </varlistentry>
@@ -7738,7 +7749,11 @@ endif
        <listitem>
         <para>
          For all otherwise unspecified platform types, build for all
-         platforms that have an empty <type>option</type> field.
+         platforms that have an empty <type>option</type> field:
+         <type>vxworks.ppc.6_3.vxgcc</type>,
+         <type>vxworks.x86.6_3.vxgcc</type>,
+         <type>linux.x86.rhel4.xlc</type>, and
+         <type>linux.x86.rhel4.gcc</type>.
         </para>
        </listitem>
       </varlistentry>
@@ -7825,10 +7840,22 @@ endif
        </caption>
       </mediaobject>
      </figure>
-     Since the documentation doesn't provide a specific example that
-     illustrates that case, we will provide a description of how it
-     would work.  Suppose you had a plugin to support VxWorks, an
-     embedded operating system, that added a platform type
+     The documentation doesn't provide a specific example that
+     illustrates that case because this type of usage would be fairly
+     unusual.
+     <footnote>
+      <para>
+       Okay, we don't provide an example because it's tricky to make
+       one that would be more illustrative than confusing without an
+       actual embedded platform to work with.  If we did create an
+       example, we'd have to make up some kind of simulated embedded
+       platform with a plugin, and that would probably create more
+       confusion than it would be worth.
+      </para>
+     </footnote>
+     Instead, we will provide a description of how it would work.
+     Suppose you had a plugin to support VxWorks, an embedded
+     operating system, that added a platform type
      <type>vxworks</type>, and you wanted to provide a custom
      threading library that worked for your native platform and for
      VxWorks.  Suppose also that your native library implementation
@@ -7876,7 +7903,8 @@ endif
      code generator that calls a C++ program to do some of its work.
      We also show a program that uses this code generator.  We'll
      examine these build items from the bottom up in the dependency
-     chain.
+     chain.  Our first several items are quite straightforward and are
+     no different in how they work from what we've seen before.
     </para>
     <para>
      First, look at <filename>lib</filename>:
@@ -7898,12 +7926,27 @@ endif
      column 1 and the square of the number in column 2.  It uses the
      <function>f</function> function in <classname>lib</classname> to
      do the square calculation, and therefore depends on the
-     <classname>lib</classname> build item.  The
-     <classname>calculate</classname> build item exports the name of its
-     program in an interface variable in its
-     <filename>Abuild.interface</filename> file:
+     <classname>lib</classname> build item.
+    </para>
+    <para>
+     So far, we haven't seen anything particularly unusual in this
+     example, but this is where it starts to get interesting.  The
+     material here is tricky.  To follow this, you need to remember
+     that variables set in <filename>Abuild.interface</filename> files
+     of build items you depend on are available to you as
+     <application>make</application> variables.  We can use
+     <application>make</application>'s <function>export</function>
+     command to make those variables available in the environment.
+    </para>
+    <para>
+     The <classname>calculate</classname> build item exports the name
+     of its program in an interface variable in its
+     <filename>Abuild.interface</filename> file by creating a variable
+     called <varname>CALCULATE</varname>:
      <?example cross-platform/calculate/Abuild.interface?>
-     It also includes the <function>after-build</function> file
+     As with all interface variables, this will be available as a make
+     variable within <filename>Abuild.mk</filename>.  It also includes
+     the <function>after-build</function> file
      <filename>after.interface</filename>:
      <?example cross-platform/calculate/after.interface?>
      This file protects the <varname>CALCULATE</varname> variable from
@@ -7911,28 +7954,55 @@ endif
      this way, items that depend on <classname>calculate</classname>
      will not automatically inherit the interface from
      <classname>lib</classname> or any of its dependencies.  This
-     represents the intention that a dependency on
-     <classname>calculate</classname> would be set up if you wanted to
-     <emphasis>run</emphasis> the <filename>calculate</filename>
-     program rather than to link with or include header files from the
-     libraries used to build <classname>calculate</classname>.  Don't
-     worry if you forget to do this: the only bad thing that would
-     happen would be some excess libraries, include files, and library
-     directories being added to your compilation commands.  This would
-     usually be harmless, but it could create unanticipated code
-     dependencies or static initializers in some more complex cases.
+     represents the intention that a dependency on the
+     <classname>calculate</classname> build item would be set up if
+     you wanted to <emphasis>run</emphasis> the
+     <filename>calculate</filename> program rather than to link with
+     or include header files from the libraries used to build
+     <classname>calculate</classname>.  In other words, we treat
+     <classname>calculate</classname> as a black box and don't care
+     how it was built.  This works because the
+     <varname>CALCULATE</varname> variable, which contains the name of
+     the <filename>calculate</filename> program, was protected from
+     reset, but the <varname>LIBS</varname>,
+     <varname>LIBDIRS</varname>, and <varname>INCLUDES</varname>
+     variables have been cleared.  In that way, a user of the
+     <classname>calculate</classname> build item won't link against
+     the <filename>lib</filename> library or be able to include the
+     <filename>lib.hh</filename> header file unless they had also
+     declared a dependency on <classname>lib</classname>.  If we
+     hadn't cleared these variables, any code that depended on the
+     <classname>calculate</classname> build item may well still have
+     worked, but it would have had some excess libraries, include
+     files, and library directories added to its compilation commands.
+     In some cases, this could create unanticipated code dependencies,
+     expose you to namespace collisions, or cause unwanted static
+     initializers to be run.
     </para>
     <para>
      Next, look at the <classname>codegen</classname> build item.
-     This is a code generator build item that provides a
-     <filename>Rules.mk</filename> for creating a file called
-     <filename>generate.cc</filename>.  It calls the
-     <filename>calculate</filename> program, which it finds from the
-     <varname>CALCULATE</varname> interface variable, to do its job,
-     and it uses the file named in the <varname>NUMBERS</varname>
-     variable to get the arguments to pass to
-     <varname>$(CALCULATE)</varname>:
+     This build item runs a code generator,
+     <filename>gen_code.pl</filename>, which in turn runs the
+     <filename>calculate</filename> program.  We provide the name of
+     our code generator in the <filename>Abuild.interface</filename>
+     file:
+     <?example cross-platform/codegen/Abuild.interface?>
+     This build item provides a <filename>Rules.mk</filename> for
+     creating a file called <filename>generate.cc</filename>.  It
+     calls the <filename>gen_code.pl</filename> program, which it
+     finds using the <varname>CODEGEN</varname> interface variable, to
+     do its job.  The <filename>gen_code.pl</filename> program uses
+     the <envar>CALCULATE</envar> environment variable to find the
+     actual calculate program.  Although we have the
+     <varname>CALCULATE</varname> variable as a make variable
+     (initialized from <classname>calculate</classname>'s
+     <filename>Abuild.interface</filename> file), we need to export it
+     so that it will become available in the environment.  We also
+     pass the file named in the <varname>NUMBERS</varname>
+     variable to the code generator.  Here are the
+     <filename>Rules.mk</filename> file and the code generator:
      <?example cross-platform/codegen/Rules.mk?>
+     <?example cross-platform/codegen/gen_code.pl?>
      In order for this to work, the <classname>codegen</classname>
      build item must depend on the <classname>calculate</classname>
      build item.  Ordinarily, &abuild; will not allow this since the
@@ -7959,21 +8029,21 @@ endif
      linkend="ref.construction-of-build-graph"/>.
     </para>
     <para>
-     Notice that this code generator uses an interface variable to
-     refer to a file in the <classname>calculate</classname> build
-     item.  Not only is this a best practice since it avoids having us
-     have to know the location of a file in another build item, but it
-     is actually the only way we can find the
-     <filename>calculate</filename> program: &abuild; doesn't provide
-     any way for us to know the name of the output directory from the
-     <classname>calculate</classname> build item we are using except
-     through the interface system.  (The value of the
-     <varname>ABUILD_OUTPUT_DIR</varname> variable would be the output
-     directory for the item currently being built, not the output
-     directory that we want from the <classname>calculate</classname>
-     build item.)  We also use an interface variable to refer to the
-     code generator within our own build item, though in this case, it
-     would not be harmful to use
+     Notice that this code generator uses an interface variable, in
+     this case <varname>$(CALCULATE)</varname>, to refer to a file in
+     the <classname>calculate</classname> build item.  Not only is
+     this a best practice since it avoids having us have to know the
+     location of a file in another build item, but it is actually the
+     only way we can find the <filename>calculate</filename> program:
+     &abuild; doesn't provide any way for us to know the name of the
+     output directory from the <classname>calculate</classname> build
+     item we are using except through the interface system.  (The
+     value of the <varname>ABUILD_OUTPUT_DIR</varname> variable would
+     be the output directory for the item currently being built, not
+     the output directory that we want from the
+     <classname>calculate</classname> build item.)  We also use an
+     interface variable to refer to the code generator within our own
+     build item, though in this case, it would not be harmful to use
      <varname>$(abDIR_codegen)/gen_code.pl</varname> instead.
      <footnote>
       <para>
@@ -7982,19 +8052,19 @@ endif
        or an <filename>Abuild.mk</filename> file, &abuild; would not
        allow this build item to declare a platform type, and it would
        automatically inherit its platform type from its dependency or
-       become a special build item of platform type <type>all</type>.
-       In that case, &abuild; would not allow us to declare a
-       platform-specific dependency, and although the code generator
-       would still work just fine, this wouldn't be much of an
-       example!  If you really want to declare something as a
-       particular platform type and don't have any reason to have a
-       build or interface file, you can &ldquo;trick&rdquo; &abuild;
-       into letting you declare a platform type by creating an empty
-       <filename>Abuild.interface</filename> file.  Note that this
-       problem has more to do with trying to keep this example simple
-       than with a limitation in &abuild;&mdash;the example would
-       still work if this build item didn't have platform type
-       <type>indep</type>, but then it would be a trivial example.
+       become a special build item of platform type <type>all</type>,
+       as discussed in <xref
+       linkend="ref.construction-of-build-graph"/>.  In that case,
+       &abuild; would not allow us to declare a platform-specific
+       dependency, and although the code generator would still work
+       just fine, this wouldn't be much of an example!  The construct
+       illustrated here is still useful though as this is exactly how
+       it would have to work if there were other values to be exported
+       through <filename>Abuild.interface</filename> or any products
+       that needed to be built by this build item itself.  For
+       example, if the code generator example had been written in Java
+       instead of perl, this pattern would have been the only way to
+       achieve the goal.
       </para>
      </footnote>
     </para>
