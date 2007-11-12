@@ -564,6 +564,12 @@
    <metainf dir="${abuild.private.dir.conf}"/>
    <metainf dir="${abuild.private.dir.generated-conf}"/>
    <manifest>
+    <!--  XXX We should put a Main-Class attribute here if the     -->
+    <!--  abuild.main-class property is set, but there doesn't     -->
+    <!--  seem to be any good way of making the existence of the   -->
+    <!--  attribute conditional upon the value or presence of a    -->
+    <!--  property, and having an empty attribute is different     -->
+    <!--  from not having an attribute.                            -->
     <attribute name="Class-Path" value="${manifest-classpath}"/>
    </manifest>
   </jar>
