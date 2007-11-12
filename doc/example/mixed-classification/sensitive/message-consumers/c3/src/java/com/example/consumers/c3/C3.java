@@ -15,4 +15,4 @@ public class C3 implements Consumer
     {
 	System.out.println("sensitive C3: " + processor.process(n));
     }
-};
+}
