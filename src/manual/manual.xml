@@ -5531,11 +5531,11 @@ endif
     <primary>Abuild.mk</primary>
    </indexterm>
    <para>
-    The <filename>Abuild.mk</filename> must appear in every directory
-    in which something is to be built using the <application>GNU
-    Make</application> backend.  In this chapter, we describe how to
-    use it in general and provide details specific to the built-in
-    rule sets provided by &abuild;.
+    An <filename>Abuild.mk</filename> file must appear in every
+    directory in which something is to be built using the
+    <application>GNU Make</application> backend.  In this chapter, we
+    describe how to use it in general and provide details specific to
+    the built-in rule sets provided by &abuild;.
    </para>
    <sect1 id="ref.abuild.mk.general">
     <title>General <filename>Abuild.mk</filename> Syntax</title>
@@ -5572,17 +5572,18 @@ endif
      linkend="ref.build-item-access-control"/>).
     </para>
     <para>
-     In rare instances, it may be necessary to create local rules for a
-     specific build item.  Examples may include one-off,
+     In rare instances, it may be necessary to create local rules for
+     a specific build item.  Examples may include one-off,
      special-purpose code generators that are specific to a particular
      build item.  To use local rules, place a list of files that
      contain definitions of your rules in the
      <varname>LOCAL_RULES</varname> variable.  Files listed there are
-     resolved relative to the <filename>Abuild.mk</filename>.  They may
-     contain any valid <application>GNU Make</application> code.  If
-     you have written the same local rule in more than one or two
-     places, you are probably doing something wrong and should be using
-     build item-specific rules or plugins instead.
+     resolved relative to the <filename>Abuild.mk</filename>.  They
+     may contain any valid <application>GNU Make</application> code.
+     If you have written the same local rule in more than one or two
+     places, you are probably doing something wrong and should be
+     using build item-specific rules or plugins (<xref
+     linkend="ref.plugins"/>) instead.
     </para>
     <para>
      Please note that local rules are run from the context of the
@@ -5803,6 +5804,24 @@ endif
       output directory.  Its contents will be the output of running
       the preprocessor over the specified source file with all the
       same flags that would be used during actual compilation.
+      <footnote>
+       <para>
+        The <filename>.i</filename> suffix is a traditional UNIX
+        suffix for preprocessed C code and was created as an
+        intermediate file by some compilers.  GCC recognizes this as
+        preprocessed C code and also recognizes
+        <filename>.ii</filename> as a suffix for preprocessed C++
+        code.  When &abuild; is given a <filename>.i</filename> file
+        as a suffix, its make rules use a pattern-based rule to run
+        the preprocessor over the file, it never uses the resulting
+        files as input to the compiler.  &Abuild; uses the original
+        suffix of the file (<filename>.c</filename>,
+        <filename>.cc</filename>, or <filename>.cpp</filename>) to
+        determine whether the file is a C or C++ source file and does
+        not therefore need to distinguish between
+        <filename>.i</filename> and <filename>.ii</filename>.
+       </para>
+      </footnote>
      </para>
      <para>
       As is the case for any rule set, you can run <command>abuild
@@ -5877,18 +5896,30 @@ endif
      </indexterm>
      <para>
       The <filename>autoconf</filename> rules provide rules for
-      including autoconf fragments for a build item.  Rather than
-      having a monolithic autoconf-based component in a source tree,
-      it is recommended that individual build items use autoconf for
-      only those things they need.  This reduces the likelihood that
-      something may fail to build due to lack of support for something
-      it doesn't need (but that is checked for by a monolithic
-      autoconf component).  The <filename>autoconf</filename> rules
-      don't supply any special targets.  Please run <command>abuild
-      rules-help</command> and <command>abuild
-      interface-help</command> from a build item that uses
-      <filename>autoconf</filename> rules for full information on
-      using these rules.
+      including autoconf fragments for a build item.
+      <footnote>
+       <para>
+        <ulink
+        url="http://www.gnu.org/software/autoconf">Autoconf</ulink> is
+        a package used to help software developers create portable
+        code.  This section assumes some familiarity with autoconf.
+       </para>
+      </footnote>
+      Rather than having a monolithic autoconf-based component in a
+      source tree, it is recommended that individual build items use
+      autoconf for only those things they need.  This reduces the
+      likelihood that something may fail to build due to lack of
+      support for something it doesn't need (but that is checked for
+      by a monolithic autoconf component).  The
+      <filename>autoconf</filename> rules don't supply any special
+      targets.  Please run <command>abuild rules-help</command> and
+      <command>abuild interface-help</command> from a build item that
+      uses <filename>autoconf</filename> rules for full information on
+      using these rules.  (Creating an <filename>Abuild.mk</filename>
+      with the one line <literal>RULES := autoconf</literal> and
+      running <command>abuild rules-help</command> would suffice.)  An
+      example of using autoconf follows in <xref
+      linkend="ref.example.autoconf"/>.
      </para>
      <para>
       Autoconf properly honors your C/C++ toolchain and runs
@@ -5902,8 +5933,8 @@ endif
       <filename>Abuild.interface</filename>.  This means that the
       autoconf-based build item itself may not include code that is
       conditional upon the results of running autoconf.  It is okay,
-      however, for build items that depend on an autoconf-based
-      build item to include conditional code in their
+      however, for build items that depend on an autoconf-based build
+      item to include conditional code in their
       <filename>Abuild.interface</filename> and
       <filename>Abuild.mk</filename> files based on variables defined
       in its <filename>autoconf.interface</filename> should this be
@@ -5943,6 +5974,18 @@ endif
      is somewhat contrived, but it demonstrates the core functionality
      and patterns required to do this.  Our example resides in
      <filename>doc/example/user/derived/stub-library</filename>.
+     <note>
+      <para>
+       In our example, we have used build item names containing the
+       word <classname>stub</classname>.  This is because it is our
+       stub library example.  In an actual implementation of this
+       pattern, you would be much more likely to name the build items
+       after the library that was potentially being stubbed and
+       letting the fact that stubs are being substituted behind the
+       scenes be a private detail not reflected in the names of the
+       public build items.
+      </para>
+     </note>
     </para>
     <para>
      Notice that the <filename>Abuild.conf</filename> in the
@@ -5990,17 +6033,17 @@ endif
      Here is the <filename>autoconf/configure.ac</filename> file:
      <?example user/derived/stub-library/autoconf/configure.ac?>
      This contains normal autoconf macros.  The main things to note
-     here are the <varname>AC_CONFIG_FILES</varname> macro which
-     generates the <filename>autoconf.interface</filename> file as
-     well as the <varname>AC_CONFIG_HEADERS</varname> call which takes
-     name of the file set as value of the
-     <varname>AUTOCONFIGH</varname> variable in
-     <filename>Abuild.mk</filename>.  The need to duplicate this
-     information is unfortunate, and this may be improved in a future
-     version of &abuild;.  Note that the autoconf macros don't have
-     any knowledge of the &abuild; output directory.  This works
-     because we actually run autoconf inside the output directory with
-     copies of the input files.
+     here are the <varname>AC_CONFIG_FILES</varname> macro which tells
+     autoconf to generate the <filename>autoconf.interface</filename>
+     file from <filename>autoconf.interface.in</filename> as well as
+     the <varname>AC_CONFIG_HEADERS</varname> call which takes name of
+     the file set as value of the <varname>AUTOCONFIGH</varname>
+     variable in <filename>Abuild.mk</filename>.  The need to
+     duplicate this information is unfortunate, and this may be
+     improved in a future version of &abuild;.  Note that the autoconf
+     macros don't have any knowledge of the &abuild; output directory.
+     This works because we actually run autoconf inside the output
+     directory with copies of the input files.
     </para>
     <para>
      Next, we examine the <filename>autoconf.interface.in</filename>
@@ -6065,17 +6108,6 @@ endif
      an example of this by looking at <filename>main.cpp</filename> in
      <filename>user/derived/main/src</filename>:
      <?example user/derived/main/src/main.cpp?>
-    </para>
-    <para>
-     One final note: in our example, we have used build item names
-     containing the word <classname>stub</classname>.  This is because
-     it is our stub library example.  In a real environment, you would
-     be much more likely to name the build items after the real
-     functionality that they were providing (such as calling this
-     <filename>world-peace</filename> instead of
-     <filename>stub-library</filename>) and letting the fact that
-     stubs are being substituted behind the scenes be a private detail
-     not reflected in the names of the public build items.
     </para>
    </sect1>
   </chapter>
@@ -6663,7 +6695,7 @@ endif
      make sure that code compiled in this way is not eventually linked
      into a shared library.  If you try to link
      non-position-independent code into a shared library, it may not
-     link at all, or it may cause undefined and hard to trace
+     link at all, or it may cause undefined and hard-to-trace
      behavior.  Use of this feature is not recommended unless
      absolutely needed to fix some specific problem.
     </para>
@@ -6767,7 +6799,11 @@ endif
      place, this effectively prevents any one build item from
      simultaneously depending on both
      <classname>shared.impl1</classname> and
-     <classname>shared.impl2</classname>.
+     <classname>shared.impl2</classname>.  Please note that we have
+     included the name of the public item,
+     &ldquo;<classname>shared</classname>&rdquo; in the name of the
+     mutex variable &ldquo;<varname>shared_MUTEX</varname>&ldquo; to
+     avoid namespace collisions with other unrelated build items.
     </para>
     <para>
      Our second implementation is not in the dependency chain of our
@@ -6790,14 +6826,32 @@ endif
      <?example shared-library/shared/impl2/Abuild.interface?>
      <?example shared-library/shared/impl2/after.interface?>
      Notice that we reset the <varname>LIBS</varname> variable and add
-     our own library to it after the build has completed.  This makes
-     the static library added in
-     <classname>shared.impl2.static</classname>'s
-     <filename>Abuild.interface</filename> available to
+     our own library to it after the build has completed.  This
+     effectively replaces everything that was previously in the
+     <varname>LIBS</varname> variable with our library for items that
+     depend on us.  In this case, the
+     <classname>shared.impl2.static</classname> build item had added
+     <filename>static</filename> to <varname>LIBS</varname> in its
+     <filename>Abuild.interface</filename> file:
+     <?example shared-library/shared/impl2/static/Abuild.interface?>
+     The effect of our reset that the <filename>static</filename>
+     library added to <varname>LIBS</varname> there is available to
      <classname>shared.impl2</classname> during its linking but not
      available to those who depend on
-     <classname>shared.impl2</classname>:
-     <?example shared-library/shared/impl2/static/Abuild.interface?>
+     <classname>shared.impl2</classname>.
+     <footnote>
+      <para>
+       What is going on here is a bit subtle.  At first, resetting
+       <varname>LIBS</varname> may seem quite drastic, but it really
+       isn't.  The reset statement only resets the state of
+       <varname>LIBS</varname> as it was at the time that this
+       <filename>Abuild.interface</filename> file was processed.  Any
+       build item that depends on this item will still have all the
+       other items that were added to <filename>LIBS</filename> by
+       other build items.  To really understand how this works, please
+       see <xref linkend="ref.interface-implementation"/>.
+      </para>
+     </footnote>
     </para>
     <para>
      Finally, we can run our program.  Remember that in order to run
@@ -6876,7 +6930,7 @@ endif
      <filename>Abuild.mk</filename> files is strongly discouraged as
      it can cause your build tree to contain path-based dependencies
      instead of name-based dependencies which would defeat one of the
-     most compelling advantages by &abuild;.  The best practice is to
+     most compelling advantages of &abuild;.  The best practice is to
      refer to files in your own build item from your own files by
      using the abuild-provided variable name to find your own path,
      and to define interface variables for files that you intend for
@@ -6925,7 +6979,7 @@ endif
      this output when you run <command>abuild rules-help</command>.
      When writing rules help, please remember that the strings you are
      echoing are subject to <application>make</application>'s ordinary
-     variable interpolation rules.  It's best to actually test by
+     variable substitution rules.  It's best to actually test by
      running <command>abuild rules-help</command> to make sure that it
      echoes properly.  Alternatively, you can have your
      <command>rules-help</command> target display the contents of a
