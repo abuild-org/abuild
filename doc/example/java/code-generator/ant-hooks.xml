@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!--  This ant fragment class the "codegen" task, provided by      -->
+<!--  This ant fragment provides the "codegen" task, provided by   -->
 <!--  this build item, to generate a class named by the user of    -->
 <!--  the build item.                                              -->
 
