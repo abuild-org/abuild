@@ -8242,21 +8242,21 @@ endif
      certain development problems in a mixed classification
      development environment.  To avoid any potential confusion, we'll
      call our two classification levels &ldquo;public&rdquo; and
-     &ldquo;sensitive.&rdquo;.  These could corresponding to different
+     &ldquo;sensitive.&rdquo;.  These could correspond to different
      levels of protection of information and could apply to any
      environment in which people have to be granted special access in
      order to use parts of a system.
     </para>
     <para>
-     In this example, we'll create a very simple message processing
-     system.  When a message is received, it is processed by a
-     <firstterm>message processor</firstterm> and then dispatched to a
-     series of <firstterm>message consumers</firstterm>.  Our system
-     allows message consumers to be registered with a special message
-     consumer table.  Each message consumer is passed a reference to a
-     message processor.  Then, for each message, each consumer
-     processes the message the message processor and then does
-     whatever it needs to do with the results.
+     In this example, we'll demonstrate a very simple message
+     processing system.  When a message is received, it is processed
+     by a <firstterm>message processor</firstterm> and then dispatched
+     to a series of <firstterm>message consumers</firstterm>.  Our
+     system allows message consumers to be registered with a special
+     message consumer table.  Each message consumer is passed a
+     reference to a message processor.  Then, for each message, each
+     consumer processes the message with the message processor and
+     then does whatever it needs to do with the results.
     </para>
     <para>
      In the public version of the system, we have some message
@@ -8266,32 +8266,32 @@ endif
      to work in the sensitive environment.  In addition, we want to be
      able to replace the message processor with a different
      implementation such that even the public consumers can operate on
-     the messages after being processed by the sensitive processor.
+     the messages after processing them with the sensitive processor.
      Furthermore, we wish to be able to achieve these goals with as
      little code duplication as possible and without losing the
      ability to run the public version of the system even when
      operating in the sensitive environment as this may be important
      for testing the system.  We also wish to protect ourselves
      against ever accidentally creating a dependency from a public
-     implementation to a sensitive implementation of any particular
-     part of the system.
+     implementation to a sensitive implementation of any part of the
+     system.
     </para>
     <para>
      In our sample implementation, each message is an integer, and the
      message processor receives the integer as input and returns a
      string.  Rather than having &ldquo;messages&rdquo; actually be
      &ldquo;received&rdquo;, we just accept integers on the command
-     line and pass through the process/consume loop in the system.
-     This example is implemented in Java, but there is nothing about
-     it that wouldn't work the same way in C or C++.
+     line and pass them through the process/consume loop in the
+     system.
     </para>
     <para>
      This example may be found in
      <filename>doc/example/mixed-classification</filename>.  The
      public code is in the <filename>public</filename> subdirectory,
      and the sensitive code is in the <filename>sensitive</filename>
-     subdirectory.  We will study the <filename>public</filename> area
-     first.
+     subdirectory.  The example is implemented in Java, but there is
+     nothing about it that wouldn't work the same way in C or C++.  We
+     will study the <filename>public</filename> area first.
     </para>
     <para>
      In this example, we have a library of consumers and an executable
@@ -8299,58 +8299,73 @@ endif
      on the command line.  The consumers each call the processor
      function through an interface, an instance of which is passed to
      the consumer with each message.  The public version of consumer
-     library includes two consumers.  The sensitive version adds two
-     more consumers and also provides a new processor that completely
-     replaces the one defined in the public version.  In order for
-     this to work, the processor function's interface and
-     implementation are separated as we will describe below.
+     library includes two consumers.  In order for us to allow the
+     sensitive version to add two more consumers and provide a new
+     processor that completely replaces the one defined in the public
+     version, the processor function's interface and implementation
+     are separated as we will describe below.
     </para>
     <para>
      There are several things to note about the dependencies and
      directory layout.  First, observe that the Java
-     <classname>MessageProcessor</classname> class defined in the
-     <classname>message-processor</classname> build item implements a
+     <classname>Processor</classname> class defined in the
+     <classname>processor</classname> build item implements a
      Java interface (not to be confused with an &abuild; interface)
      that is actually defined in the
-     <classname>message-consumers.interface</classname> build item in
-     the <filename>message-consumers/interface</filename> directory.
+     <classname>consumers.interface</classname> build item in
+     the <filename>consumers/interface</filename> directory.
      Here is the interface from the
-     <classname>message-consumers.interface</classname> build itme:
-     <?example mixed-classification/public/message-consumers/interface/src/java/com/example/consumers/ProcessorInterface.java?>
+     <classname>consumers.interface</classname> build itme:
+     <?example mixed-classification/public/consumers/interface/src/java/com/example/consumers/ProcessorInterface.java?>
      Here is its implementation from the
-     <classname>message-processor</classname> build item:
-     <?example mixed-classification/public/message-processor/src/java/com/example/processor/MessageProcessor.java?>
-     This means that the <classname>message-processor</classname>
-     build item depends on <classname>message-consumers</classname>
-     and the <classname>message-consumers</classname> build items do
-     not depend on <classname>message-processor</classname>.  This
+     <classname>processor</classname> build item:
+     <?example mixed-classification/public/processor/src/java/com/example/processor/Processor.java?>
+     This means that the <classname>processor</classname>
+     build item depends on <classname>consumers</classname>
+     and the <classname>consumers</classname> build items do
+     not depend on <classname>processor</classname>.  This
      helps enforce that the implementation of the processor function
      can never be a dependency of the consumers (as that would create
      a circular dependency), thus allowing it to remain completely
      separate from the consumer implementations.
-     <?example mixed-classification/public/message-processor/Abuild.conf?>
-     <?example mixed-classification/public/message-consumers/Abuild.conf?>
+     <?example mixed-classification/public/processor/Abuild.conf?>
+     <?example mixed-classification/public/consumers/Abuild.conf?>
      The consumers
      themselves accept a <classname>ProcessorInterface</classname>
      instance as a parameter, as you can see from the consumer
      interface:
-     <?example mixed-classification/public/message-consumers/interface/src/java/com/example/consumers/Consumer.java?>
+     <?example mixed-classification/public/consumers/interface/src/java/com/example/consumers/Consumer.java?>
     </para>
     <para>
      Next we will study the executable.  If you look at the
      <classname>executable</classname> build item, you will observe that
-     it depends on <classname>message-processor</classname> and
+     it depends on <classname>processor</classname> and
      <classname>executable.entry</classname>:
      <?example mixed-classification/public/executable/Abuild.conf?>
      Its <filename>Main.java</filename> is very minimal: it just
      invokes <varname>Entry.runExecutable</varname> passing to it an
-     instantiated <classname>MessageProcessor</classname> object and
+     instantiated <classname>Processor</classname> object and
      whatever arguments were passed to <varname>main</varname>:
      <?example mixed-classification/public/executable/src/java/com/example/executable/Main.java?>
      It is important to keep this main routine minimal because we will
      have to have a separate main in the sensitive area as that is the
      only way we can have the sensitive version of the code register
      sensitive consumers prior to calling <function>main</function>.
+     <footnote>
+      <para>
+       Well, it's not really the only way.  You could also do
+       something like having a
+       <classname>RegisterConsumers</classname> object that both
+       versions of the code would implement and provide in separate
+       jar files much as we do with the
+       <classname>Processor</classname> object.  One reason for doing
+       it this way, though, is that it makes the example easier to map
+       to languages with static linkage.  In other words, we're trying
+       to avoid doing anything that would only work in Java to make
+       the example as illustrative as possible.  This is, after all,
+       not a Java tutorial.
+      </para>
+     </footnote>
      If this were C++, the inclusion of the sensitive consumers would
      be achieved through linking with additional libraries.  In Java,
      it is achieved by adding additional JAR files to the classpath.
@@ -8364,57 +8379,61 @@ endif
      that our <filename>Entry.java</filename> file has a static
      initializer that registers our two consumers,
      <varname>C1</varname> and <varname>C2</varname>:
-     <?example mixed-classification/public/executable/entry/src/java/com/example/executable/entry/Entry.java?>
      <footnote>
       <para>
        If this were a C++ program and portability to Windows were not
        required, we could omit this static initializer block entirely
        and put the static initializers in <varname>C1</varname> and
        <varname>C2</varname> themselves as long as we used the whole
-       archive flag with those libraries.  (For information about the
-       whole archive flag, see <xref
-       linkend="ref.example.whole-library"/>.)  As with C++, however,
-       there is no clean and portable way to force static initializers
-       to run in a class before the class is loaded.
+       archive flag (see <xref linkend="ref.example.whole-library"/>)
+       with those libraries.  As with C++, however, there is no clean
+       and portable way to force static initializers to run in a class
+       before the class is loaded.
       </para>
      </footnote>
+     <?example mixed-classification/public/executable/entry/src/java/com/example/executable/entry/Entry.java?>
      Even though no place else in the code has to know about
      <varname>C1</varname> and <varname>C2</varname> specifically, we
      do have to register them explicitly with the table of consumers
      so that the rest of the application can use them.  The main
      <varname>runExecutable</varname> function parses the command-line
-     argument and then passes it along with the
-     <classname>MessageProcessor</classname> object to each consumer
-     in turn.  Adding additional consumers would entail just making
-     sure that they are registered.  Observe in the source to one of
-     the consumers how we register the consumer in the consumer table:
-     <?example mixed-classification/public/message-consumers/c1/src/java/com/example/consumers/c1/C1.java?>
+     arguments and then passes each one along with the
+     <classname>Processor</classname> object to each consumer in turn.
+     Adding additional consumers would entail just making sure that
+     they are registered.  Observe in the source to one of the
+     consumers how we register the consumer in the consumer table:
+     <?example mixed-classification/public/consumers/c1/src/java/com/example/consumers/c1/C1.java?>
+     The consumer table is a simple vector of consumers:
+     <?example mixed-classification/public/consumers/interface/src/java/com/example/consumers/ConsumerTable.java?>
     </para>
     <para>
      Now we will look at the sensitive version of the code.  We have
      the same three subdirectories in <filename>sensitive</filename>
      as in <filename>public</filename>.  In our
-     <filename>message-consumers</filename> directory, we define new
-     consumers <varname>C3</varname> and <varname>C4</varname>.  They
-     are essentially identical to the public consumers
+     <filename>consumers</filename> directory, we define new consumers
+     <varname>C3</varname> and <varname>C4</varname>.  They are
+     essentially identical to the public consumers
      <varname>C1</varname> and <varname>C2</varname>.  The
-     <filename>message-processor</filename> directory defines the
-     sensitive version of the <classname>MessageProcessor</classname>
-     class.  Note that the class name is the same as in the public
-     version, which means that the public and sensitive versions
-     cannot be used simultaneously in the same executable.  Also
-     observe that the name of the build item is actually
-     <classname>message-processor.sensitive</classname> and that the
-     build item sets its visibility to <varname>*</varname>:
-     <?example mixed-classification/sensitive/message-processor/Abuild.conf?>
+     <filename>processor</filename> directory defines the sensitive
+     version of the <classname>Processor</classname> class:
+     <?example mixed-classification/sensitive/processor/src/java/com/example/processor/Processor.java?>
+     Note that the class name is the same as in the public version,
+     which means that the public and sensitive versions cannot be used
+     simultaneously in the same executable.  Also observe that the
+     name of the build item is actually
+     <classname>processor.sensitive</classname>, to make it different
+     from <classname>processor</classname>, and that the build item
+     sets its visibility to <varname>*</varname> so that it can be a
+     dependency of the sensitive version of the executable:
+     <?example mixed-classification/sensitive/processor/Abuild.conf?>
      In this particular example, there's no reason that we couldn't
      have given the build item a public name as there are no
      subcomponents of the public
-     <classname>message-processor</classname> build item that the
+     <classname>processor</classname> build item that the
      sensitive one needs.  In a real situation, perhaps this would be
-     the real <classname>message-processor</classname> build item and
+     the real <classname>processor</classname> build item and
      the public one would be called something like
-     <classname>message-processor-stub</classname>.  In any case, all
+     <classname>processor-stub</classname>.  In any case, all
      &abuild; cares about is that the build items have different
      names.
     </para>
@@ -8431,21 +8450,27 @@ endif
      testing for the existence of a build item, this provides an
      alternative approach.  This approach is actually better because
      it enables the public version of the system to run intact even in
-     the sensitive environment.  By pushing what would have been
-     <function>main</function> into a library, we can avoid
-     duplicating the code.  If you look at the actual build item and
-     code in the <filename>executable</filename> directory, you will
-     see that the build item is called
+     the sensitive environment.  After all, if the system
+     <emphasis>automatically</emphasis> used the sensitive handlers
+     whenever they were potentially available, we couldn't run the
+     public version of the test suite in the sensitive environment.
+     This would make it too easy, while working in the sensitive
+     environment, to make modifications to the system that break the
+     system in a way that would only be visible in the public version.
+     By pushing what would have been <function>main</function> into a
+     library, we can avoid duplicating the code.  If you look at the
+     actual build item and code in the <filename>executable</filename>
+     directory, you will see that the build item is called
      <classname>executable.sensitive</classname> and that it depends
-     on <classname>message-consumers.sensitive</classname> and
-     <classname>message-processor.sensitive</classname>, both of which
-     have made themselves visible to <varname>*</varname> in their
+     on <classname>consumers.sensitive</classname> and
+     <classname>processor.sensitive</classname>, both of which have
+     made themselves visible to <varname>*</varname> in their
      respective <filename>Abuild.conf</filename> files.  We saw
-     <classname>message-processor.sensitive</classname>'s
+     <classname>processor.sensitive</classname>'s
      <filename>Abuild.conf</filename> file above.  Here is
-     <classname>message-consumers.sensitive</classname>'s
+     <classname>consumers.sensitive</classname>'s
      <filename>Abuild.conf</filename>:
-     <?example mixed-classification/sensitive/message-consumers/Abuild.conf?>
+     <?example mixed-classification/sensitive/consumers/Abuild.conf?>
      Also observe that <classname>executable.sensitive</classname>
      depends on <classname>executable.entry</classname> just like the
      public version of the executable did:
@@ -8490,7 +8515,7 @@ endif
         Although, in this example, the sensitive versions of the
         consumers don't actually access any private build items from
         the public version of the code, the use of the build item name
-        <classname>message-consumers.sensitive</classname> and the
+        <classname>consumers.sensitive</classname> and the
         <varname>visible-to</varname> key would make it possible for
         them to do so.
        </para>
