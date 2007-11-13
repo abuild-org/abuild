@@ -63,8 +63,9 @@ makes it easier for people who just want examples to find them
 quickly.
 
 We also make use of the "qtest" processing instruction to pull files
-from the "../src/qtest/abuild" directory and the "dump-data"
-processing instruction to include the DTD for the dump data format.
+from the "../src/qtest/abuild" directory, the "dump-data"
+processing instruction to include the DTD for the dump data format,
+and the "ccxx-mk" processing instruction to include ccxx.mk.
 Our processing program requires processing instructions to be on a
 line by themselves, so it is technically not a purely xml-aware
 processor.
@@ -1053,7 +1054,7 @@ C:\cygwin\cygwin.bat
      </footnote>
      Notice that &abuild; builds
      <classname>cxx-library</classname> first and then
-     <classname>cxx-program</classname>.
+     <classname>cxx-program</classname>:
      <?qtest example.basic-cxx-program.out?>
     </para>
    </sect1>
@@ -1154,7 +1155,7 @@ C:\cygwin\cygwin.bat
      example, the output has been modified slightly: in addition to
      the <literal>--topdir--</literal> substitution, we have also
      filtered out time stamps and other strings that could potentially
-     differ between platforms.
+     differ between platforms:
      <?qtest example.basic-java-program.out?>
     </para>
    </sect1>
@@ -1966,8 +1967,9 @@ C:\cygwin\cygwin.bat
         the <filename>ccxx</filename> rules.  Users can provide their
         own compiler toolchains as long as they provide the required
         support files.  Details appear in the comments in the
-        <filename>make/object-code/ccxx.mk</filename> rules file.  The
-        mechanism for adding new compilers is described in <xref
+        <filename>make/object-code/ccxx.mk</filename> rules file
+        (<xref linkend="ref.ccxx.mk"/>).  The mechanism for adding new
+        compilers is described in <xref
         linkend="ref.adding-platform-types-and-platforms"/>.
        </para>
       </listitem>
@@ -2543,15 +2545,15 @@ C:\cygwin\cygwin.bat
       the <property>supported-traits</property> key of the root
       <filename>Abuild.conf</filename> file of the local build tree or
       one of its externals.  For example, the following
-      <filename>Abuild.conf</filename> fragment:
+      <filename>Abuild.conf</filename> fragment declares that the
+      <classname>potato.test</classname> build item is deployable,
+      unclassified, and a tester for the
+      <classname>potato.lib</classname> and
+      <classname>potato.bin</classname> build items:
 
       <programlisting>this: potato.test
 traits: deployable tester -item=potato.lib -item=potato.bin unclassified
 </programlisting>
-      declares that the <classname>potato.test</classname> build item
-      is deployable, unclassified, and a tester for the
-      <classname>potato.lib</classname> and
-      <classname>potato.bin</classname> build items.
      </para>
     </sect2>
     <sect2 id="ref.specifying-traits">
@@ -2979,7 +2981,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       the case even though they are not actually descendants of the
       current directory.  This again illustrates how &abuild; adds
       additional items to the build set as required to satisfy
-      dependencies.
+      dependencies:
       <?qtest example.stable-derived-check.out?>
       We can also observe that we do not see this behavior with the
       special <command>clean</command> target.  Both <command>abuild
@@ -4553,7 +4555,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      line one ends with a continuation character and line two is a
      comment, line one is continued on line three.  This makes it
      possible to embed comments in multiline lists of values.  In this
-     example:
+     example, the value of <varname>ODDS</varname> would be
+     <literal>one three</literal>:
 
      <programlisting>ODDS = \
   one \
@@ -4561,8 +4564,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
   # two \
   three
 </programlisting>
-     the value of <varname>ODDS</varname> would be <literal>one
-     three</literal>.
     </para>
     <para>
      Characters that have special meanings (space, comma,
@@ -4870,26 +4871,26 @@ override HAS_CLASS = 1
         the words to the existing value of list in the order in which
         they appear.  For example, if the variables
         <varname>LIBS</varname> is declared as a prepend list of
-        strings, these two statements:
-
+        strings, these two statements would result in
+        <varname>LIBS</varname> containing the value <literal>lib3
+        lib4 lib1 lib2</literal>:
 
         <programlisting>LIBS = lib1 lib2
 LIBS = lib3 lib4
 </programlisting>
-        would result in <varname>LIBS</varname> containing the value
-        <literal>lib3 lib4 lib1 lib2</literal>.  The distinction of
-        whether a list is declared as <type>append</type> or
-        <type>prepend</type> generally doesn't matter to the user, but
-        there are cases in a build environment in which it is
-        important to prepend to a list.  One notable example is the
-        list of libraries that are linked into an application: if one
-        library calls functions from another library, the depending
-        library must come <emphasis>before</emphasis> the dependent
-        library in the link command.  Since &abuild; reads the
-        dependent library's interface file first, the depending
-        library must <emphasis>prepend</emphasis> itself to the list
-        of libraries.  Note that multiple assignments to a single list
-        variable would ordinarily not occur in the same
+        The distinction of whether a list is declared as
+        <type>append</type> or <type>prepend</type> generally doesn't
+        matter to the user, but there are cases in a build environment
+        in which it is important to prepend to a list.  One notable
+        example is the list of libraries that are linked into an
+        application: if one library calls functions from another
+        library, the depending library must come
+        <emphasis>before</emphasis> the dependent library in the link
+        command.  Since &abuild; reads the dependent library's
+        interface file first, the depending library must
+        <emphasis>prepend</emphasis> itself to the list of libraries.
+        Note that multiple assignments to a single list variable would
+        ordinarily not occur in the same
         <filename>Abuild.interface</filename> file, but would instead
         occur over successive files.  It is perfectly valid to assign
         multiple times in the same file, however.  One instance in
@@ -5878,9 +5879,9 @@ endif
       There is a lot more to &abuild;'s C and C++ generation than is
       discussed here.  For a complete understanding of how it works,
       you are encouraged to read <filename>make/ccxx.mk</filename> in
-      the &abuild; distribution.  There you will find copious comments
-      and a lot of pretty hair <application>GNU Make</application>
-      code.
+      the &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).
+      There you will find copious comments and a lot of pretty hair
+      <application>GNU Make</application> code.
      </para>
     </sect2>
     <sect2 id="ref.autoconf">
@@ -8085,7 +8086,7 @@ endif
      fact, running <command>abuild ccxx_debug</command> will show that
      <classname>prog</classname>'s <varname>INCLUDES</varname>,
      <varname>LIBS</varname>, and <varname>LIBDIRS</varname> variables
-     are all empty.
+     are all empty:
      <?qtest example.cross-platform-ccxx_debug.out?>
     </para>
    </sect1>
@@ -8546,6 +8547,13 @@ endif
     necessarily reflect realistic dependencies among different archive
     types, but they do serve to illustrate how &abuild; handles
     different archive types in a fairly general way.
+    <note>
+     <para>
+      Creation of Java archives is a weak point of &abuild; at this
+      time.  Suggestions about how to improve this are actively
+      encouraged.
+     </para>
+    </note>
    </para>
    <sect1 id="ref.example.jar-like-archives">
     <title>JAR-like Archives</title>
@@ -8574,33 +8582,37 @@ endif
      <?example archive-types/har/Abuild-ant.properties?>
      <?example archive-types/har/Abuild.interface?>
      Note that the HAR file created here probably wouldn't work as a
-     HAR file.  We're just naming it this way for purposes of
-     illustration.  If you needed to add other things to the HAR file,
-     you would do so in the same way as you would for any other JAR
-     file (adding to <filename>src/conf</filename>,
+     HAR (hibernate archive) file.  We're just naming it this way for
+     purposes of illustration.  If you needed to add other things to
+     the HAR file, you would do so in the same way as you would for
+     any other JAR file (adding to <filename>src/conf</filename>,
      <filename>src/resources</filename>, or their automatically
      generated counterparts as appropriate).  Here are the contents of
      the HAR file:
      <?qtest example.har-contents.out?>
-     Next, look at the JAR example.  It is essentially identical to
-     the HAR example except that this build item depends on
-     <classname>har-example</classname>:
+     Note that the <filename>META-INF</filename> directory and the
+     <filename>MANIFEST.MF</filename> file are created automatically
+     during the JAR creation process.  Next, look at the JAR example.
+     It is essentially identical to the HAR example except that this
+     build item depends on <classname>har-example</classname>:
      <?example archive-types/jar/Abuild-ant.properties?>
      <?example archive-types/jar/Abuild.interface?>
      The <filename>JarExample.java</filename> class imports a class
      defined in the HAR file to illustrate that it works in &abuild;
      to add a HAR file to the <varname>abuild.classpath</varname>
-     variable even if it wouldn't work in straight ant.  Here are the
-     contents of the JAR file:
+     variable even if it wouldn't work in straight ant.  This is
+     because &abuild; is creating a file whose ends with
+     <filename>.har.jar</filename> and is adding that to the real
+     classpath instead.  Here are the contents of the JAR file:
      <?qtest example.jar-contents.out?>
     </para>
    </sect1>
    <sect1 id="ref.example.war-files">
     <title>WAR Files</title>
     <para>
-     Next, look at the WAR example.  The structure of WAR files is
-     slightly different from the structure of ordinary JAR files.  In
-     particular, when constructing a WAR file, the
+     Next, look at the WAR (web archive) example.  The structure of
+     WAR files is slightly different from the structure of ordinary
+     JAR files.  In particular, when constructing a WAR file, the
      <filename>src/resources</filename> directory is ignored and the
      <filename>src/web</filename> directory is used instead.  Anything
      in <filename>src/web</filename> is added to the WAR file at its
@@ -8619,7 +8631,8 @@ endif
      instead of at the root as with a normal JAR file.
     </para>
     <para>
-     If <varname>abuild.war-type</varname> has the value
+     If the <varname>abuild.war-type</varname> property in
+     <filename>Abuild-ant.properties</filename> has the value
      <varname>server</varname>, we copy all JAR files in the
      <varname>abuild.classpath</varname> variable into the
      <filename>WEB-INF/lib</filename> directory.  If
@@ -8656,25 +8669,25 @@ endif
      which in turn depends on <classname>har-example</classname>.
      Notice that &abuild; has added
      <filename>har-example.har.jar</filename> to the WAR file instead
-     of adding <filename>har-example.har</filename>.  This behavior
-     may change if it turns out to be incorrect.  Note that this
-     example is somewhat contrived anyway though.  Generally speaking,
-     WAR files will not have a lot of dependencies, and the idea of a
-     WAR file depending on something that's not a JAR file is a bit
-     contrived.  Another thing to observe about the WAR example is
-     that it adds its WAR file to the
-     <varname>abuild.classpath</varname> variable.  This is another
-     thing that may change in the future.  It's not really accurate to
-     say that the WAR file is in the classpath, but for the time being
-     at least, this is the mechanism used for population of EAR files.
-     &Abuild; will attempt to add
-     <filename>example-war.war.jar</filename> to the classpath of
+     of adding <filename>har-example.har</filename>.  This, again, is
+     to work around the fact that <command>javac</command> ignores
+     classpath elements that are files whose names don't end with
+     <filename>.jar</filename> or <filename>.zip</filename>.  This
+     behavior may change if it turns out to be incorrect.  Another
+     thing to observe about the WAR example is that it adds its WAR
+     file to the <varname>abuild.classpath</varname> variable.  This
+     is another thing that may change in the future.  It's not really
+     accurate to say that the WAR file is in the classpath, but for
+     the time being at least, this is the mechanism used for
+     population of EAR files.  &Abuild; will attempt to add
+     <filename>war-example.war.jar</filename> to the classpath of
      build items that depend on <filename>example-war</filename>, but
-     since this file won't exist, it turns out to be harmless.  It's
-     possible that an error might result if a WAR file depends on
-     another WAR file, but there's no reason for this to ever happen.
-     Additionally, observe that the <varname>abuild.web-xml</varname>
-     property has to be set in the
+     since this file won't exist during EAR creation (as the appending
+     of <filename>.jar</filename> happens only during compilation), it
+     turns out to be harmless.  It's possible that an error might
+     result if a WAR file depends on another WAR file, but there's no
+     reason for this to ever happen.  Additionally, observe that the
+     <varname>abuild.web-xml</varname> property has to be set in the
      <filename>Abuild-ant.properties</filename> file in addition to
      the <filename>abuild.war-name</filename> property when creating
      WAR files.
@@ -8685,7 +8698,7 @@ endif
     <para>
      Next, look at the EAR example.  The
      <classname>ear-example</classname> build item directly or
-     indirectly depends on many the other build items we've seen so
+     indirectly depends on many of the other build items we've seen so
      far.  It also depends on a private build item,
      <filename>ear-example.local-jar</filename> that builds a JAR file
      for inclusion in the EAR file.  There's nothing special about
@@ -8696,13 +8709,14 @@ endif
      <?example archive-types/ear/Abuild-ant.properties?>
      Unlike with WAR files, EAR files actually contain the direct
      products produced by other build items, not their JAR
-     counterparts.  Observe the contents of the EAR file:
+     counterparts: notice that the HAR and WAR files are directly
+     contained in the EAR file:
      <?qtest example.ear-contents.out?>
-     Notice that the HAR and WAR files are directly contained in the
-     EAR file.  This is different from how WAR files are constructed.
      Note also that the EAR file contains the WAR file and it also
-     directly contains its contents.  This behavior may change in the
-     future.  Also, observe that the
+     directly contains some of its contents, notably the JAR and HAR
+     files.  (The HAR file is included in the WAR by a different name;
+     the JAR file is included with the same name.)  This behavior may
+     change in the future.  Also, observe that the
      <varname>abuild.application-xml</varname> property has to be set
      in <filename>Abuild-ant.properties</filename> in addition to the
      <varname>abuild.ear-name</varname> property in order for an EAR
@@ -8722,10 +8736,10 @@ endif
      <filename>local.xml</filename>:
      <?example archive-types/other-ear/local.xml?>
      This same mechanism can be used to create hybrid client/server
-     WAR files.  The main problem with this
-     approach is that it requires you to know the name of the archives
-     you want to move or remove, though this is not as bad as knowing
-     their locations.  If necessary, you could define custom interface
+     WAR files.  The main problem with this approach is that it
+     requires you to know the name of the archives you want to move or
+     remove, though this is not as bad as knowing their locations.  A
+     comparable alternative would be to define custom interface
      variables in your dependencies to name the actual archives.
      These interface variables would be available as
      <application>ant</application> properties from your local build
@@ -8742,37 +8756,8 @@ endif
      The above examples illustrate how other archive types are
      constructed in &abuild; at the present time.  There are several
      potential problems that may be addressed in a future release of
-     &abuild;:
-     <itemizedlist>
-      <listitem>
-       <para>
-        EAR and WAR files are currently populated from the contents of
-        the <varname>abuild.classpath</varname> interface variable.
-        It may be necessary to have some other mechanism for
-        specifying the contents of these types of archive files should
-        it be necessary to have a build item create and
-        &ldquo;export&rdquo; something without wanting it to be
-        deployed.  This problem will be addressed again as the need
-        arises.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        EAR and WAR files both contain items that are copied from
-        <varname>abuild.classpath</varname>.  There is no general
-        facility for allowing this functionality.  If we were to have
-        to support some other archive type such as a RAR file that
-        also contains items from other build items, there would be no
-        convenient way to handle this using &abuild;'s JAR creation
-        abilities.  It would be possible to implement it by defining a
-        <varname>generate</varname> hook that copied files into the
-        generated <filename>src/resources</filename> directory.  The
-        names of these files could come from any
-        <filename>Abuild.interface</filename> variable, including one
-        provided by a build item for this purpose.
-       </para>
-      </listitem>
-     </itemizedlist>
+     &abuild;.  For details, please see <xref
+     linkend="ref.known-limitations"/>.
     </para>
    </sect1>
   </chapter>
@@ -8808,39 +8793,44 @@ endif
      and <filename>lib2</filename> directories both contain
      self-contained classes and have static variables that call those
      classes' constructors:
+     <?example whole-library/lib1/thing1.hh?>
      <?example whole-library/lib1/thing1.cc?>
+     <?example whole-library/lib2/thing2.hh?>
      <?example whole-library/lib2/thing2.cc?>
      Neither library is referenced by <filename>main.cc</filename> (in
      <filename>bin</filename>):
      <?example whole-library/bin/Abuild.conf?>
      <?example whole-library/bin/main.cc?>
-     Therefore, the linker would not ordinarily link them in in spite
-     of the dependency on both library build items.
+     Therefore, the linker would not ordinarily link them in even with
+     the dependency on both library build items.
     </para>
     <para>
      In this example, we force <filename>lib1</filename> to be linked
      in but not <filename>lib2</filename>.  This is done by adding the
-     variable <varname>WHOLE_lib_thing1</varname> to
+     variable <varname>WHOLE_lib_thing1</varname> (since
+     <filename>thing1</filename> is the name of the library) to
      <filename>lib1</filename>'s
      <filename>Abuild.interface</filename>:
      <?example whole-library/lib1/Abuild.interface?>
-     Note that <filename>thing1</filename> is the name of the library
-     provided by <filename>lib1</filename>.  On systems that support
-     this, defining this variable causes the corresponding library to
-     be linked in its entirety into any executables that use the
-     library.  This facility may not be supported by all compilers.
-     In particular, it is not supported for Microsoft Visual C++ in
-     versions at least through .NET 2005.  For cases in which some
-     users of a library may want to link in the whole library and
-     others may not, it is also possible to set the
+     On systems that support this, defining this variable causes the
+     corresponding library to be linked in its entirety into any
+     executables that use the library.  This facility may not be
+     supported by all compilers.  In particular, it is not supported
+     for Microsoft Visual C++ in versions at least through .NET 2005,
+     in which case setting this variable has cause an error.
+    </para>
+    <para>
+     For cases in which some users of a library may want to link in
+     the whole library and others may not, it is also possible to set
+     the
      <varname>WHOLE_lib_<replaceable>libname</replaceable></varname>
-     variable can be set in an <filename>Abuild.mk</filename>.  For
-     example, if you were converting a static library to a shared
-     library, you might want to do this in the shared library build
-     item's <filename>Abuild.mk</filename> rather than the static
-     library's <filename>Abuild.interface</filename> file.  That would
-     prevent other users of the static library from needlessly linking
-     with the whole library.
+     variable in an <filename>Abuild.mk</filename>.  For example, if
+     you were converting a static library to a shared library, you
+     might want to do this in the shared library build item's
+     <filename>Abuild.mk</filename> rather than the static library's
+     <filename>Abuild.interface</filename> file.  That would prevent
+     other users of the static library from needlessly linking with
+     the whole library.
     </para>
     <para>
      We do not set this variable for <filename>lib2</filename>:
@@ -8926,7 +8916,9 @@ endif
     familiar with the material covered in <xref
     linkend="ref.best-practices"/>.  If you think you may need to
     modify the main code of &abuild; itself, please see also <xref
-    linkend="ref.abuild-internals"/>.
+    linkend="ref.abuild-internals"/>.  This section covers the most
+    common uses for plugins.  Examples of each topic presented may be
+    found in <xref linkend="ref.example.plugin"/>.
    </para>
    <sect1 id="ref.plugin-functionality">
     <title>Plugin Functionality</title>
@@ -8939,21 +8931,22 @@ endif
      something as a plugin does not automatically make you get it as a
      plugin.  The same applies to backing areas, but in practice, the
      list of plugins is generally effectively inherited because your
-     local build tree's <filename>Abuild.conf</filename> is a copy of
-     its backing area's <filename>Abuild.conf</filename>.  The
-     non-inheritance of plugin status through externals is
-     appropriate: since plugins can change &abuild;'s behavior
-     significantly, it should be possible for a given build tree to
-     retain tight control over which plugins are active and which are
-     not.  For example, a build tree may include a plugin that
-     enforces certain coding practices by default, and use of this
-     build tree as an external should not necessarily cause that same
-     set of restrictions to be applied to the tree that is using it.
-     Plugins themselves are ordinary build items and can be resolved
-     in externals and backing areas just like any other build item.
-     This makes it possible for an external to provide a plugin
-     without using it itself or for a build tree to not use all
-     plugins used by its externals.
+     local build tree's <filename>Abuild.conf</filename> is typically
+     a copy of its backing area's <filename>Abuild.conf</filename>,
+     assuming your partially populated build tree was checked out of
+     the same version control system.  The non-inheritance of plugin
+     status through externals is appropriate: since plugins can change
+     &abuild;'s behavior significantly, it should be possible for a
+     given build tree to retain tight control over which plugins are
+     active and which are not.  For example, a build tree may include
+     a plugin that enforces certain coding practices by default, and
+     use of this build tree as an external should not necessarily
+     cause that same set of restrictions to be applied to the tree
+     that is using it.  Plugins themselves are ordinary build items
+     and can be resolved in externals and backing areas just like any
+     other build item.  This makes it possible for an external to
+     provide a plugin without using it itself or for a build tree to
+     not use all plugins used by its externals.
     </para>
     <para>
      Plugins are loaded by &abuild; and its backends in the order in
@@ -9144,6 +9137,14 @@ endif
       that means that platforms declared in later plugins can override
       earlier ones as well as &abuild;'s internal platform list with
       respect to determining which platforms will be built by default.
+      <footnote>
+       <para>
+        Note, however, that the <option>--list-platforms</option>
+        option shows highest priority platforms first, which
+        effectively means that it shows the user platforms in the
+        opposite of their declaration order.
+       </para>
+      </footnote>
       When specifying a new platform or local compiler, the
       <command>list_platforms</command> program may include the option
       <option>-lowpri</option> to indicate that this is a low priority
@@ -9156,7 +9157,7 @@ endif
       (see <xref linkend="ref.platform-selection"/>).
      </para>
      <para>
-      Each line of output of <command>list_platforms</command> may
+      Each line of output of <command>list_platforms</command> must
       take one of the following forms:
 
       <programlisting>platform [-lowpri] <replaceable>new-platform</replaceable> -type <replaceable>platform-type</replaceable>
@@ -9237,7 +9238,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
      are therefore used by the <filename>ccxx</filename> rules.
      Details on the requirements for such toolchains can be found in
      <filename>make/rules/object-code/ccxx.mk</filename> in the
-     &abuild; distribution.
+     &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).
     </para>
     <para>
      Once you have written a support file for a new compiler, you will
@@ -9263,12 +9264,20 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
     <para>
      There are still other uses for plugins.  For instance, one can
      use a plugin to enforce additional build tree-specific rules that
-     fall outside of &abuild;'s normally dependency checking
+     fall outside of &abuild;'s normal dependency checking
      capabilities.  As an example, suppose you had a build item that
      you wanted all <type>object-code</type> build items to depend on
      and that you couldn't make it a plugin because it had to build
-     something.  You could have that build item declare a variable in
-     its <filename>Abuild.interface</filename> file and set it to some
+     something.
+     <footnote>
+      <para>
+       Recall that plugins are not allowed to build anything
+       themselves.  This may prove to be too great of a restriction
+       and may be relaxed somewhat in a future version of &abuild;.
+      </para>
+     </footnote>
+     You could have that build item declare a variable in its
+     <filename>Abuild.interface</filename> file and set it to some
      value.  Then you could create a plugin that would check to make
      sure everyone depended on it.  This plugin would have a
      <filename>plugin.mk</filename> file that would check to make sure
@@ -9302,14 +9311,15 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
      &Abuild; enforces that no plugin may have dependencies or be
      declared as a dependency of another build item.  Still, it's good
      practice to name plugins by placing them in a private namespace.
-     This prevents build trees that may have access to these items but
-     may not presently declare them as plugins from declaring them as
-     dependencies.  In these examples, we always place our plugins in
-     the <classname>plugin</classname> name space by starting their
-     names with <classname>plugin.</classname> even though we have no
-     actual <classname>plugin</classname> build item.  In order to use
-     the plugins in this tree, we have to declare them as plugins in
-     the root build item's <filename>Abuild.conf</filename>:
+     This prevents build trees that may have access to these items
+     (but may not presently declare them as plugins) from declaring
+     them as dependencies.  In these examples, we always place our
+     plugins in the <classname>plugin</classname> namespace by
+     starting their names with <classname>plugin.</classname> even
+     though we have no actual <classname>plugin</classname> build
+     item.  In order to use the plugins in this tree, we have to
+     declare them as plugins in the root build item's
+     <filename>Abuild.conf</filename>:
      <?example plugin/Abuild.conf?>
     </para>
     <sect2 id="ref.example.plugins-with-rules-and-interfaces">
@@ -9332,18 +9342,20 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       items' <filename>Abuild.interface</filename> files.  The file
       <filename>count.mk</filename> in the
       <filename>rules/platform-independent</filename> directory is the
-      file that a build item may include in its
-      <varname>RULES</varname> file:
+      file that a build item may include by placing <literal>RULES :=
+      count</literal> in its <filename>Abuild.mk</filename> file:
       <?example plugin/plugins/counter/rules/platform-independent/count.mk?>
-      If it does, then any files listed in <varname>TO_COUNT</varname>
-      will have their lines counted with <command>wc -l</command> when
-      the user runs &abuild; with the <command>count</command> target.
-      The intention here is that items that the target build item
-      depends on would add files to <varname>TO_COUNT</varname> in
-      their <filename>Abuild.interface</filename> files.  Then the
-      build item that actually uses the <filename>count</filename>
-      rule would display the line counts of all of the files named by
-      its dependencies.
+      If a build item includes <filename>count</filename> in the value
+      of its <varname>RULES</varname> variable, then any files listed
+      in <varname>TO_COUNT</varname> will have their lines counted
+      with <command>wc -l</command> when the user runs &abuild; with
+      the <command>count</command> target.  The intention here is that
+      items that the target build item depends on would add files to
+      <varname>TO_COUNT</varname> in their
+      <filename>Abuild.interface</filename> files.  Then the build
+      item that actually uses the <filename>count</filename> rule
+      would display the line counts of all of the files named by its
+      dependencies.
      </para>
      <para>
       This is admittedly a contrived example, but it illustrates an
@@ -9379,13 +9391,18 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       For an example of a build item that uses this plugin's
       capabilities, see the build items under
       <filename>doc/example/plugin/other/indep</filename>.  Here we
-      have a build item in <filename>a</filename> that adds a file to
+      have the build item <classname>indep-a</classname> in the
+      <filename>a</filename> directory that adds a file to
       <varname>TO_COUNT</varname> in its
-      <filename>Abuild.interface</filename>, and a build item in
-      <filename>b</filename> that uses the <filename>count</filename>
-      rule in its <varname>RULES</varname> variable in its
-      <filename>Abuild.mk</filename> file:
+      <filename>Abuild.interface</filename>:
+      <?example plugin/other/indep/a/Abuild.conf?>
       <?example plugin/other/indep/a/Abuild.interface?>
+      We also have the build item <classname>indep-b</classname>
+      (which depends on <classname>indep-a</classname>) in the
+      <filename>b</filename> directory that uses the
+      <filename>count</filename> rule in its <varname>RULES</varname>
+      variable in its <filename>Abuild.mk</filename> file:
+      <?example plugin/other/indep/b/Abuild.conf?>
       <?example plugin/other/indep/b/Abuild.mk?>
       Here is the output of running <command>abuild count</command>
       from the <filename>plugin/other/b</filename> directory:
@@ -9427,7 +9444,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       declared as a dependency of <command>all</command> in
       <filename>count.mk</filename>, we see the output of the
       <command>count</command> target as well as the output from the
-      <classname>plugin.echoer</classname> build item.
+      <classname>plugin.echoer</classname> build item:
       <?qtest example.echo-b.out?>
      </para>
     </sect2>
@@ -9456,11 +9473,10 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <footnote>
        <para>
         This odd name has been picked to facilitate testing of all
-        examples in &abuild;'s own automated test
-        suite.  By staring the platform name with
-        <literal>zz</literal>, we effectively ensure that it will
-        always appear alphabetically after whatever the real native
-        platform is on our build system.
+        examples in &abuild;'s own automated test suite.  By starting
+        the platform name with <literal>zz</literal>, we effectively
+        ensure that it will always appear alphabetically after
+        whatever the real native platform is on our build system.
        </para>
       </footnote>
       To add this platform, we print its name from the
@@ -9483,8 +9499,9 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <?example plugin/plugins/printer/toolchains/abc.mk?>
       To understand this file, you should read through the comments in
       <filename>make/rules/object-code/ccxx.mk</filename> in the
-      &abuild; distribution.  In this case, our plugin also creates
-      the compiler itself in <filename>bin/abc</filename> and
+      &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).  In this
+      case, our plugin also creates the compiler itself in
+      <filename>bin/abc</filename> and
       <filename>bin/abc-link</filename>.  Our &ldquo;compilers&rdquo;
       here just create text files of the source code with numbered
       lines.  Doing this particular operation with a plugin is a bit
@@ -9524,7 +9541,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       Here is the <filename>print-program</filename> file.  This file
       contains the concatenation of all the source files used to
       create the executable as well as the &ldquo;libraries&rdquo; it
-      &ldquo;links&rdquo; against.
+      &ldquo;links&rdquo; against:
       <?qtest example.printer-program.out?>
      </para>
     </sect2>
@@ -9569,22 +9586,22 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       relatively common operation, &abuild; provides a short syntax for
       doing it.  Here is the <command>list_platforms</command> program:
       <?example native-compiler/compiler/list_platforms?>
-      It generates this output:
+      It generates this output which automatically creates platforms
+      with the same first three fields (<type>os</type>,
+      <type>cpu</type>, and <type>toolset</type>) as other native
+      platforms, with the <type>qcc</type> compiler as the fourth
+      field, and with <type>release</type>, <type>debug</type>, or
+      nothing as the fifth field:
 
       <programlisting>native-compiler qcc.release
 native-compiler qcc.debug
 native-compiler qcc
 </programlisting>
-      which automatically creates platforms with the same first three
-      fields (<type>os</type>, <type>cpu</type>, and
-      <type>toolset</type>) as other native platforms, with the
-      <type>qcc</type> compiler as the fourth field, and with
-      <type>release</type>, <type>debug</type>, or nothing as the
-      fifth field.  Since new platforms take precedence over old
-      platforms by default when &abuild; chooses which platform to use
-      for a given platform type, our <command>list_platforms</command>
-      script offers the user a way of suppressing this platform and
-      also of making these low priority compilers.  In this case, our
+      Since new platforms take precedence over old platforms by
+      default when &abuild; chooses which platform to use for a given
+      platform type, our <command>list_platforms</command> script
+      offers the user a way of suppressing this platform and also of
+      making these low priority compilers.  In this case, our
       <command>list_platforms</command> program doesn't generate any
       output if the <envar>NO_QCC</envar> environment variable is set,
       and if the QCC_LOWPRI environment variable is set, it declares
@@ -9614,7 +9631,7 @@ native-compiler qcc
       functions that <filename>ccxx.mk</filename> requires.  For
       details, please read the comments in
       <filename>make/toolchains/ccxx.mk</filename> in the &abuild;
-      distribution.
+      distribution (<xref linkend="ref.ccxx.mk"/>).
      </para>
      <para>
       In the <filename>native-compiler/outside</filename> directory,
@@ -9625,17 +9642,18 @@ native-compiler qcc
       This tree doesn't know about the <filename>qcc</filename>
       compiler, so when we build the <classname>outside</classname>
       build item, it would build only with the default native
-      compiler.  In a default invocation of &abuild;, the
-      <classname>lib</classname> build item on which this depends
+      compiler.  In a default invocation of &abuild;
+      (<emphasis>i.e.</emphasis>, one without any platform selectors),
+      the <classname>lib</classname> build item on which this depends
       would only be built with <filename>qcc</filename> because of the
-      plugin in that build tree.  However, the
-      <classname>lib</classname> build item <emphasis>could</emphasis>
-      also be build with the default native compiler.  &Abuild;
-      recognizes this fact and will therefore compile
-      <classname>lib</classname> with both <filename>qcc</filename>
-      and the default native compiler.  This is an example of
-      &abuild;'s ability to add additional build platforms on an
-      as-needed basis based on the dependency graph.
+      plugin in its build tree (which is an external relative to this
+      tree).  However, the <classname>lib</classname> build item
+      <emphasis>could</emphasis> also be built with the default native
+      compiler.  &Abuild; recognizes this fact and will therefore
+      compile <classname>lib</classname> with both
+      <filename>qcc</filename> and the default native compiler.  This
+      is an example of &abuild;'s ability to add additional build
+      platforms as needed based on the dependency graph:
       <?qtest example.as-needed-platforms.out?>
      </para>
     </sect2>
@@ -9743,13 +9761,14 @@ native-compiler qcc
       <listitem>
        <para>
         If your rules require certain variables to be set, check for
-        those variables and given an error if they are not defined.  For
-        an example of this, see <xref
+        those variables and given an error if they are not defined.
+        For an example of this, see <xref
         linkend="ref.example.code-generator"/>.  The
-        <filename>ccxx.mk</filename> rules in the &abuild; sources provide
-        a somewhat more elaborate example of doing this since they
-        actually generate dynamically in terms of other values the list
-        of variables that should be defined.
+        <filename>ccxx.mk</filename> rules in the &abuild; sources
+        (<xref linkend="ref.ccxx.mk"/>) provide a somewhat more
+        elaborate example of doing this since they actually generate
+        dynamically in terms of other values the list of variables
+        that should be defined.
        </para>
       </listitem>
       <listitem>
@@ -10371,7 +10390,7 @@ native-compiler qcc
      local tree would never be able to diverge in directory structure
      from the backing area.  One side effect of this is that it is not
      possible to <emphasis>remove</emphasis> a build item name from
-     the name space in a local tree if that name is present in a
+     the namespace in a local tree if that name is present in a
      backing area by simply removing it from the local tree.  If you
      need to remove an item in this way, you must also list its name
      in the <property>deleted</property> key of the root build item's
@@ -12781,6 +12800,35 @@ Y = $(X)
       </para>
      </listitem>
     </varlistentry>
+    <varlistentry>
+     <term>Java archive creation</term>
+     <listitem>
+      <para>
+       EAR and WAR files are currently populated from the contents
+       of the <varname>abuild.classpath</varname> interface
+       variable.  It may be necessary to have some other mechanism
+       for specifying the contents of these types of archive files
+       should it be necessary to have a build item create and
+       &ldquo;export&rdquo; something without wanting it to be
+       deployed.  This problem will be addressed again as the need
+       arises.
+      </para>
+      <para>
+       EAR and WAR files both contain items that are copied from
+       <varname>abuild.classpath</varname>.  There is no general
+       facility for allowing this functionality.  If we were to have
+       to support some other archive type such as a RAR file that
+       also contains items from other build items, there would be no
+       convenient way to handle this using &abuild;'s JAR creation
+       abilities.  It would be possible to implement it by defining
+       a <varname>generate</varname> hook that copied files into the
+       generated <filename>src/resources</filename> directory.  The
+       names of these files could come from any
+       <filename>Abuild.interface</filename> variable, including one
+       provided by a build item for this purpose.
+      </para>
+     </listitem>
+    </varlistentry>
    </variablelist>
   </appendix>
   <appendix id="ref.dump-data">
@@ -12811,6 +12859,14 @@ Y = $(X)
     included here for reference.
     <?dump-data?>
    </para>
+  </appendix>
+  <appendix id="ref.ccxx.mk">
+   <title>The <filename>ccxx.mk</filename> File</title>
+   <para>
+    Here we include a complete copy of
+    <filename>make/rules/object-code/ccxx.mk</filename>.
+   </para>
+   <?ccxx-mk?>
   </appendix>
   <appendix id="ref.list-of-examples">
    <title>List of Examples</title>
