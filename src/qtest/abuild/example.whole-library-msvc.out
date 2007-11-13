@@ -1,0 +1,14 @@
+abuild: thing1 (abuild-<native>): all
+make: Entering directory `--topdir--/whole-library/lib1/abuild-<native>'
+Compiling ../thing1.cc as C++
+Creating thing1 library
+make: Leaving directory `--topdir--/whole-library/lib1/abuild-<native>'
+abuild: thing2 (abuild-<native>): all
+make: Entering directory `--topdir--/whole-library/lib2/abuild-<native>'
+Compiling ../thing2.cc as C++
+Creating thing2 library
+make: Leaving directory `--topdir--/whole-library/lib2/abuild-<native>'
+abuild: main (abuild-<native>): all
+make: Entering directory `--topdir--/whole-library/bin/abuild-<native>'
+--abuild-dir--/make/rules/object-code/ccxx.mk:nn: *** WHOLE_lib is not supported by msvc.  Stop.
+make: Leaving directory `--topdir--/whole-library/bin/abuild-<native>'

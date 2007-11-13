@@ -433,28 +433,35 @@ $td->runtest("run program",
 
 cd("work/whole-library");
 
-$td->runtest("whole archive",
-	     {$td->COMMAND => "abuild --build=all",
-	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.whole-library-all.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
+my $have_whole_archive = 1;
+if ($platform_native =~ m/windows.*msvc/)
 {
-    # Windows with MSVC doesn't appear to support anything like the
-    # whole-archive flag, so this feature is not implemented under
-    # Windows with MSVC.
+    $have_whole_archive = 0;
+}
 
-    my $flags = $td->NORMALIZE_NEWLINES;
-    if ($platform_native =~ m/windows.*msvc/)
-    {
-	$flags |= $td->EXPECT_FAILURE;
-    }
+if ($have_whole_archive)
+{
+    $td->runtest("whole archive",
+		 {$td->COMMAND => "abuild --build=all",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/example.whole-library-all.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
     $td->runtest("whole archive output",
 		 {$td->COMMAND => "bin/$native_out/main"},
 		 {$td->FILE => "$top/example.whole-library.out",
-		      $td->EXIT_STATUS => 0},
-		 $flags);
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    $td->runtest("whole archive",
+		 {$td->COMMAND => "abuild --build=all",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/example.whole-library-msvc.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
 }
 
 cd("work/opaque-wrapper");
@@ -2527,7 +2534,10 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(254 + ($in_windows ? 1 : 7) + ($test_java ? 16 : 0));
+$td->report(253 +
+	    ($in_windows ? 1 : 7) +
+	    ($test_java ? 16 : 0) +
+	    ($have_whole_archive ? 2 : 1));
 
 sub cleanup
 {
