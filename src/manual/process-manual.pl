@@ -42,6 +42,10 @@ while (<IN>)
     {
 	generate_dump_data();
     }
+    elsif (m/<\?ccxx-mk\?>/)
+    {
+	generate_ccxx_mk();
+    }
     else
     {
 	if (m/<(?:chapter|sect\d)\s*id=\"([^\"]+)\"/)
@@ -108,9 +112,22 @@ sub generate_dump_data
     print OUT "]]></programlisting>\n";
 }
 
+sub generate_ccxx_mk
+{
+    print OUT "<programlisting><![CDATA[";
+    open(F, "<../../../make/rules/object-code/ccxx.mk") or
+	die "$whoami: can't open ccxx.mk: $!\n";
+    while (<F>)
+    {
+	print OUT process_line($_, 80, 72);
+    }
+    close(F);
+    print OUT "]]></programlisting>\n";
+}
+
 sub process_line
 {
-    my $line = shift;
+    my ($line, $maxlength, $chunklength) = @_;
 
     # expand tabs
     my $new = "";
@@ -122,13 +139,16 @@ sub process_line
     }
     $line = $new . $line;
 
-#    $new = "";
-#    while (length($line) > 72)
-#    {
-#	$new = substr($line, 0, 72) . "\\\n";
-#	$line = substr($line, 72);
-#    }
-#    $line = $new . $line;
+    if (defined $maxlength)
+    {
+	$new = "";
+	while (length($line) > $maxlength)
+	{
+	    $new = substr($line, 0, $chunklength) . "\\\n";
+	    $line = substr($line, $chunklength);
+	}
+	$line = $new . $line;
+    }
 
     $line;
 }
