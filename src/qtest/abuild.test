@@ -462,6 +462,10 @@ else
 		 {$td->FILE => "$top/example.whole-library-msvc.out",
 		  $td->EXIT_STATUS => 2},
 		 $td->NORMALIZE_NEWLINES);
+
+    # Make sure main.cc is accessed
+    open(F, "<bin/main.cc") or die;
+    close(F);
 }
 
 cd("work/opaque-wrapper");
