@@ -2,3 +2,7 @@ sensitive C3: sensitive processor: n*n = 9
 sensitive C4: sensitive processor: n*n = 9
 public C1: sensitive processor: n*n = 9
 public C2: sensitive processor: n*n = 9
+sensitive C3: sensitive processor: n*n = 16
+sensitive C4: sensitive processor: n*n = 16
+public C1: sensitive processor: n*n = 16
+public C2: sensitive processor: n*n = 16

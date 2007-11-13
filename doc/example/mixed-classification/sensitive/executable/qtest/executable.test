@@ -8,7 +8,7 @@ require TestDriver;
 my $td = new TestDriver('sensitive');
 
 $td->runtest("normal case",
-	     {$td->COMMAND => "executable 3"},
+	     {$td->COMMAND => "executable 3 4"},
 	     {$td->FILE => "sensitive.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

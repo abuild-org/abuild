@@ -17,23 +17,23 @@ public class Entry
     public static void runExecutable(ProcessorInterface processor,
 				     String args[])
     {
-	int n = 0;
-	if (args.length > 0)
+	for (String arg: args)
 	{
+	    int n = 0;
 	    try
 	    {
-		n = Integer.parseInt(args[0]);
+		n = Integer.parseInt(arg);
 	    }
 	    catch (NumberFormatException e)
 	    {
 		System.err.println("bad number " + args[0]);
 		System.exit(2);
 	    }
-	}
 
-	for (Consumer c: ConsumerTable.getConsumers())
-	{
-	    c.consume(processor, n);
+	    for (Consumer c: ConsumerTable.getConsumers())
+	    {
+		c.consume(processor, n);
+	    }
 	}
     }
 }
