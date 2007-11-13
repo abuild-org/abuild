@@ -5,8 +5,8 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.b2">
-<!ENTITY lastreleased "November 2, 2007">
+<!ENTITY swversion "1.0.b2+">
+<!ENTITY lastreleased "November 13, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 ]>
