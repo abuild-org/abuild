@@ -21,6 +21,15 @@
    just like backing areas.  Another would be to have a new key in
    Abuild.conf for build item libraries.
 
+ * Release notes: mention that we now detect and report an error if
+   WHOLE_lib is used for msvc.
+
+ * There may still be some parallel autoconf problems lurking.
+
+ * Rework ref.plugins.other-ideas as a section about using plugins to
+   enforce rules.  Then add an example at the end of the
+   ref.example.plugin section.
+
 Documentation
 -------------
 
