@@ -3,6 +3,10 @@
 # PLEASE KEEP EXACTLY ONE BLANK LINE AFTER THIS COMMENT
 # BLOCK.
 #
+# THIS INFORMATION IS DUPLICATED IN THE ABUILD MANUAL.  WHEN
+# EDITING THIS FILE, PLEASE KEEP IT CONSISTENT WITH THE
+# MANUAL.
+#
 
 Abuild's main ant build file invokes various hooks at
 various times during the build process.  This facility
