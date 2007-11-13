@@ -1,0 +1,9 @@
+abuild: auto-provider (abuild-indep): all
+make: Entering directory `--topdir--/rule-checker/auto-provider/abuild-indep'
+Generating auto.h
+make: Leaving directory `--topdir--/rule-checker/auto-provider/abuild-indep'
+abuild: item2 (abuild-<native>): all
+make: Entering directory `--topdir--/rule-checker/item2/abuild-<native>'
+Compiling ../item2.c as C
+Creating item2 executable
+make: Leaving directory `--topdir--/rule-checker/item2/abuild-<native>'

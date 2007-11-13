@@ -847,6 +847,30 @@ $td->runtest("dump data with plugin platform",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/rule-checker/item2");
+
+$td->runtest("build item2",
+	     {$td->COMMAND => "abuild -d",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.rule-checker-item2-build.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run item2",
+	     {$td->COMMAND => "$native_out/item2"},
+	     {$td->STRING => "818\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/rule-checker/item1");
+
+$td->runtest("build item1",
+	     {$td->COMMAND => "abuild -d",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.rule-checker-item1-error.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/shared-library");
 
 $td->runtest("build shared library",
@@ -2538,7 +2562,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(252 +
+$td->report(255 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 16 : 0) +
 	    ($have_whole_archive ? 2 : 1));

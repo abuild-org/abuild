@@ -1,0 +1,11 @@
+# The plugin.auto-checker plugin must be enabled on any build tree
+# whose item depend on this since its plugin.interface file provides a
+# declaration for the SAW_AUTO_PROVIDER variable.  Additionally, the
+# plugin.auto-checker plugin makes sure everyone depends on this
+# item.  This item cannot itself be a plugin because it has an
+# Abuild.mk file.
+
+SAW_AUTO_PROVIDER = 1
+
+# Make the automatically generated file visible
+INCLUDES = $(ABUILD_OUTPUT_DIR)

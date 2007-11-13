@@ -9483,36 +9483,6 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
      additional details.
     </para>
    </sect1>
-   <sect1 id="ref.plugins.other-ideas">
-    <title>Other Uses for Plugins</title>
-    <para>
-     There are still other uses for plugins.  For instance, one can
-     use a plugin to enforce additional build tree-specific rules that
-     fall outside of &abuild;'s normal dependency checking
-     capabilities.  As an example, suppose you had a build item that
-     you wanted all <type>object-code</type> build items to depend on
-     and that you couldn't make it a plugin because it had to build
-     something.
-     <footnote>
-      <para>
-       Recall that plugins are not allowed to build anything
-       themselves.  This may prove to be too great of a restriction
-       and may be relaxed somewhat in a future version of &abuild;.
-      </para>
-     </footnote>
-     You could have that build item declare a variable in its
-     <filename>Abuild.interface</filename> file and set it to some
-     value.  Then you could create a plugin that would check to make
-     sure everyone depended on it.  This plugin would have a
-     <filename>plugin.mk</filename> file that would check to make sure
-     that the variable was set if
-     <varname>$(ABUILD_TARGET_TYPE)</varname> had the value
-     <type>object-code</type> and report an error if not.  Since all
-     build items would see the plugin code, it would make this plugin
-     an effective checker for enforcing some rule that can't otherwise
-     by expressed.
-    </para>
-   </sect1>
    <sect1 id="ref.example.plugin">
     <title>Plugin Examples</title>
     <para>
@@ -9879,6 +9849,106 @@ native-compiler qcc
       is an example of &abuild;'s ability to add additional build
       platforms as needed based on the dependency graph:
       <?qtest example.as-needed-platforms.out?>
+     </para>
+    </sect2>
+    <sect2 id="ref.example.plugin.rule-checker">
+     <title>Checking Project-Specific Rules</title>
+     <para>
+      There are still other uses for plugins.  For instance, one can
+      use a plugin to enforce additional build tree-specific rules
+      that fall outside of &abuild;'s normal dependency checking
+      capabilities.  As an example, suppose you had a build item that
+      you wanted all build items to depend on and that you couldn't
+      make it a plugin because it had to build something.
+      <footnote>
+       <para>
+        Recall that plugins are not allowed to build anything
+        themselves.  This may prove to be too great of a restriction
+        and may be relaxed somewhat in a future version of &abuild;.
+       </para>
+      </footnote>
+      You could have that build item set a variable to some specific
+      value in its <filename>Abuild.interface</filename> file.  Then
+      you could create a plugin that would check that the variable had
+      that value, which would effectively make sure everyone depended
+      on the item that set the variable.  This plugin would have a
+      <filename>plugin.mk</filename> file that would check to make
+      sure that the variable was set and report an error if not.
+      Since all build items would see the plugin code, it would make
+      this plugin an effective checker for enforcing some rule that
+      can't otherwise by expressed.
+     </para>
+     <para>
+      We illustrate this pattern in our
+      <filename>rule-checker</filename> example which can be found in
+      <filename>doc/example/rule-checker</filename>.  This directory
+      includes four build items:
+      <classname>plugin.auto-checker</classname>,
+      <classname>auto-provider</classname>,
+      <classname>item1</classname>, and <classname>item2</classname>.
+      The goal is that every build item whose target type is
+      <type>object-code</type> should depend on
+      <classname>auto-provider</classname>.  This rule is enforced
+      with the <classname>plugin.auto-checker</classname> plugin which
+      is declared as a plugin in the tree's root
+      <filename>Abuild.conf</filename>:
+      <?example rule-checker/Abuild.conf?>
+      The <classname>plugin.auto-checker</classname> build item
+      contains two files aside from its
+      <filename>Abuild.conf</filename>.  It has a
+      <filename>plugin.interface</filename> file that declares a
+      variable that indicates whether the
+      <classname>auto-provider</classname> build item has been seen:
+      <?example rule-checker/auto-checker/plugin.interface?>
+      This plugin interface file is automatically loaded by all build
+      items before their own interface files or any of the interface
+      files of their dependencies.  We include a fallback assignment
+      of a false value to this variable.  The
+      <classname>auto-provider</classname> build item sets this
+      variable to true in its <filename>Abuild.interface</filename>
+      file:
+      <?example rule-checker/auto-provider/Abuild.interface?>
+      For completeness, here are the rest of the files from
+      <classname>auto-provider</classname>:
+      <?example rule-checker/auto-provider/Abuild.mk?>
+      <?example rule-checker/auto-provider/provide-auto.mk?>
+     </para>
+     <para>
+      Since <classname>auto-provider</classname> sets the
+      <varname>SAW_AUTO_PROVIDER</varname> variable, it possible for
+      the <classname>plugin.auto-checker</classname> build item to
+      detect that <classname>auto-provider</classname> is in the
+      dependency list by checking the value of that variable.  It does
+      this in its <filename>plugin.mk</filename> file, which is
+      included by &abuild;'s <application>make</application> code for
+      every <application>make</application>-based build item:
+      <?example rule-checker/auto-checker/plugin.mk?>
+     </para>
+     <para>
+      To see what happens when a build item forgets to depend on
+      <classname>auto-provider</classname>, we will look at
+      <classname>item1</classname>.  Here is its
+      <filename>Abuild.conf</filename>:
+      <?example rule-checker/item1/Abuild.conf?>
+      As you can see, there is no dependency on
+      <classname>auto-provider</classname>.  When we try to build this
+      item, we get the following error:
+      <?qtest example.rule-checker-item1-error.out?>
+      This is the error that was issued from
+      <classname>plugin.auto-checker</classname>'s
+      <filename>plugin.mk</filename> above.  The build item
+      <classname>item2</classname> does declare the appropriate
+      dependency:
+      <?example rule-checker/item2/Abuild.conf?>
+      Its build proceeds normally:
+      <?qtest example.rule-checker-item2-build.out?>
+     </para>
+     <para>
+      This examples shows how little code is required to implement
+      your own rule checking.  The possibilities for use of this
+      technique are endless.  Such techniques could be used to enforce
+      all sorts of project-specific architectural constraints, build
+      item naming conventions, or any number of other possibilities.
      </para>
     </sect2>
    </sect1>

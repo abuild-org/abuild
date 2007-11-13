@@ -1,0 +1,2 @@
+declare SAW_AUTO_PROVIDER boolean
+fallback SAW_AUTO_PROVIDER = 0

@@ -1,0 +1,4 @@
+abuild: item1 (abuild-<native>): all
+make: Entering directory `--topdir--/rule-checker/item1/abuild-<native>'
+../../auto-checker/plugin.mk:3: *** This item is supposed to depend on auto-provider, but it does not.  Stop.
+make: Leaving directory `--topdir--/rule-checker/item1/abuild-<native>'

@@ -26,10 +26,6 @@
 
  * There may still be some parallel autoconf problems lurking.
 
- * Rework ref.plugins.other-ideas as a section about using plugins to
-   enforce rules.  Then add an example at the end of the
-   ref.example.plugin section.
-
 Documentation
 -------------
 
