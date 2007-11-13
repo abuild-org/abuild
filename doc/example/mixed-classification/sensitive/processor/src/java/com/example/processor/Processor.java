@@ -2,7 +2,7 @@ package com.example.processor;
 
 import com.example.consumers.ProcessorInterface;
 
-public class MessageProcessor implements ProcessorInterface
+public class Processor implements ProcessorInterface
 {
     public String process(int n)
     {
