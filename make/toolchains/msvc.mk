@@ -49,6 +49,12 @@ COMPILE_cxx = $(CXX)
 LINK_c = $(CC)
 LINK_cxx = $(CC)
 
+define link_with
+$(if $(value WHOLE_lib_$(1)),\
+     $(error WHOLE_lib is not supported by $(CCXX_TOOLCHAIN)),
+     -l$(1))
+endef
+
 # Usage: $(call include_flags,include-dirs)
 define include_flags
 	$(foreach I,$(1),/I$(I))
@@ -66,7 +72,7 @@ endef
 define make_bin
 	$(LINKWRAPPER) $(1) $(2) $(4) /link /OUT:$(call binname,$(7)) \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
-		$(foreach L,$(6),$(L).lib) $(3)
+		$(foreach L,$(6),$(call link_with,$(L))) $(3)
 endef
 
 # Usage: $(call make_shlib,linker,compiler-flags,link-flags,objects,libdirs,libs,binary-filename,major,minor,revision)
@@ -74,7 +80,7 @@ define make_shlib
 	$(RM) $(call shlibname,$(7))
 	$(LINKWRAPPER) $(1) $(2) $(4) /LD /Fe$(call shlibname,$(7)) /link \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
-		$(foreach L,$(6),$(L).lib) $(3)
+		$(foreach L,$(6),$(call link_with,$(L))) $(3)
 endef
 
 clean::
