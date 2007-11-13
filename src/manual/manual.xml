@@ -1091,18 +1091,17 @@ C:\cygwin\cygwin.bat
      <property>java</property> instead of the value
      <property>native</property>.  This is always true for Java build
      items.  Next, we'll look at the
-     <filename>Abuild-ant.properties</filename> file.  Property-driven
-     Java build items have this file instead of
-     <filename>Abuild.mk</filename>:
+     <filename>Abuild-ant.properties</filename> file:
      <?example basic/java-library/Abuild-ant.properties?>
-     The only thing we have to set here is the property
-     <varname>abuild.jar-name</varname>.  For Java build items, we
-     don't explicitly list the source files.  Instead &abuild;
-     automatically finds sources in the <filename>src/java</filename>
-     directory.  There are more properties that can be set, and there
-     are other ways to get files into the JAR file.  We provide
-     detailed information about the directory structure for
-     property-driven Java builds in <xref
+     Property-driven Java build items have this file instead of
+     <filename>Abuild.mk</filename>.  The only thing we have to set
+     here is the property <varname>abuild.jar-name</varname>.  For
+     Java build items, we don't explicitly list the source files.
+     Instead &abuild; automatically finds sources in the
+     <filename>src/java</filename> directory.  There are more
+     properties that can be set, and there are other ways to get files
+     into the JAR file.  We provide detailed information about the
+     directory structure for property-driven Java builds in <xref
      linkend="ref.directory-structure-for-java-builds"/>.  Finally,
      look at the <filename>Abuild.interface</filename> file.  This
      file provides information to other build items about what they
@@ -1714,16 +1713,16 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      This build item doesn't mention any child directories.  It is a
-     leaf in the file system hierarchy.  It also happens not to declare
-     any dependencies, so it is also a leaf in the dependency tree,
-     though one does not imply the other.  This build item
+     leaf in the file system hierarchy.  It also happens not to
+     declare any dependencies, so it is also a leaf in the dependency
+     tree, though one does not imply the other.  This build item
      configuration file contains the
      <property>platform-types</property> key, as is required for all
-     build items that contain build or interface files.  In addition to
-     the <filename>Abuild.conf</filename> file, we have an
-     <filename>Abuild.mk</filename> file:
+     build items that contain build or interface files.  In addition
+     to the <filename>Abuild.conf</filename> file, we have an
+     <filename>Abuild.mk</filename> file and an
+     <filename>Abuild.interface</filename> file:
      <?example stable/common/lib1/src/Abuild.mk?>
-     and an <filename>Abuild.interface</filename> file:
      <?example stable/common/lib1/src/Abuild.interface?>
      There is nothing in these files that is fundamentally different
      from the basic C++ library example shown in <xref
@@ -3227,6 +3226,71 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      root.
     </para>
    </sect1>
+   <sect1 id="ref.integrity-checks">
+    <title>Integrity Checks</title>
+    <para>
+     In plain English, &abuild; guarantees that if
+     <classname>A</classname> depends on <classname>B</classname> and
+     <classname>B</classname> depends on <classname>C</classname>,
+     <classname>A</classname> and <classname>B</classname> see the
+     same copy of <classname>C</classname>.  To be more precise,
+     &abuild; checks to make sure that no build item in a backing area
+     references as a dependency or plugin (<xref
+     linkend="ref.plugins"/>) an item that is shadowed in the local
+     tree.
+    </para>
+    <para>
+     For example, suppose that build items <classname>A</classname>,
+     <classname>B</classname>, and <classname>C</classname> are
+     defined in build tree <filename>T2</filename> and that
+     <classname>A</classname> depends on <classname>B</classname> and
+     <classname>B</classname> depends on <classname>C</classname>.
+     Now suppose you have a local build tree called
+     <filename>T1</filename> that has <filename>T2</filename> as its
+     backing area, and that you have build items
+     <classname>A</classname> and <classname>C</classname> copied
+     locally into <filename>T1</filename>, but that
+     <classname>B</classname> is resolved in the backing area (see
+     <xref linkend="fig.shadowed-dependency"/>).
+     <figure id="fig.shadowed-dependency">
+      <title>Shadowed Dependency</title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="shadowed-dependency.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         <classname>A</classname> in <filename>/T1</filename> sees
+         <classname>B</classname> in <filename>/T2</filename> and
+         <classname>C</classname> in <filename>/T1</filename>, but
+         <classname>B</classname> in <filename>/T2</filename> sees
+         <classname>C</classname> in <filename>/T2</filename>.  This
+         means <classname>A</classname> in <filename>/T1</filename>
+         builds with two different copies of <classname>C</classname>.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
+     If you were to attempt to build <classname>A</classname>,
+     <classname>A</classname> would refer to files in
+     <classname>B</classname>, which comes from a backing area.
+     <classname>B</classname> would therefore already be built, and it
+     would have been built with the copy of <classname>C</classname>
+     from the backing area.  <classname>A</classname>, on the other
+     hand, would see <classname>C</classname> in the local build tree.
+     That means that <classname>A</classname> is indirectly using two
+     different copies of <classname>C</classname>.  Depending on what
+     changes were made to <classname>C</classname> in the local build
+     tree, this would likely cause the build of
+     <classname>A</classname> to be unreproducible at best and
+     completely unstable at worst.  The situation of
+     <classname>B</classname> coming from a backing area and depending
+     on <classname>C</classname>, which is shadowed locally, is what
+     we mean when we say that <classname>B</classname> has shadowed
+     dependencies.  The way to resolve this would be to copy
+     <classname>B</classname> into <filename>T1</filename>.
+    </para>
+   </sect1>
    <sect1 id="ref.example.task-branch">
     <title>Task Branch Example</title>
     <para>
@@ -3294,16 +3358,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      that copy of <classname>project-main</classname> would not see
      our local copy of <classname>project-lib</classname>: it would
      see the copy in its own local build tree, which we have shadowed.
-     <footnote>
-      <para>
-       We would say that <classname>project-main</classname> has
-       shadowed dependencies.  This is an advanced topic and is
-       discussed in more detail in <xref
-       linkend="ref.integrity-checks"/>.
-      </para>
-     </footnote>
-     This is the output we see when running <command>abuild
-     --build=all check</command> from
+     This is an example of a shadowed dependency as described in <xref
+     linkend="ref.integrity-checks"/>.  This is the output we see when
+     running <command>abuild --build=all check</command> from
      <filename>task/project</filename>:
      <?qtest example.task-project-check.out?>
      As with the <command>no-op</command> build, we only see output
@@ -3779,7 +3836,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         <option>--full-integrity</option> flag would generally be
         useful only for people who are maintaining backing areas that
         are used by other people.  For detailed information about
-        &abuild;'s integrity guarantee, please see <xref
+        &abuild;'s integrity checks, please see <xref
         linkend="ref.integrity-checks"/>.
        </para>
       </listitem>
@@ -4515,6 +4572,22 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      in dependency order and that the results of that concatenation
      are processed from top to bottom, skipping over any blocks inside
      of false conditional statements.
+    </para>
+    <para>
+     Once &abuild; parses the <filename>Abuild.interface</filename>
+     files of all of a build item's dependencies and that of the build
+     item itself, the names and values of the resulting variables are
+     passed to the backends by writing them to the &abuild;
+     <firstterm>dynamic output file</firstterm>, which is called
+     <filename>.ab-dynamic.mk</filename> for
+     <application>make</application>-based builds and
+     <filename>.ab-dynamic-ant.properties</filename> for
+     <application>ant</application>-based builds.  The dynamic output
+     file is created in the output directory.  Although users running
+     &abuild; don't even have to know this file exists, peeking at it
+     is a useful way to see the results of parsing all the
+     <filename>Abuild.interface</filename> files in a build item's
+     dependency chain.
     </para>
     <para>
      The <filename>Abuild.interface</filename> file contains the
@@ -7269,6 +7342,170 @@ endif
     a build.xml-driven Java build item interoperate with
     property-driven build items.
    </para>
+   <sect1 id="ref.ant-hooks">
+    <title>Ant Hooks</title>
+    <!--  This information is duplicated in ant/hooks-help.txt.    -->
+    <!--  Please ensure that the material there is consistent      -->
+    <!--  with the material here.                                  -->
+    <para>
+     In order to make it possible for users to add additional steps to
+     the build process, &abuild;'s <application>ant</application> code
+     makes extensive use of hooks.
+    </para>
+    <para>
+     Since hooks are called in separate projects from the main build,
+     it is not useful to set properties from hook targets and expect
+     them to be available to later targets not invoked directly by the
+     hook.
+    </para>
+    <para>
+     We define several hooks whose names start with
+     <command>-pre-</command> or <command>-post-</command>.  These
+     hooks are run before and after the corresponding target, and they
+     are run even when the target itself is not being run.  For
+     example, the <command>-post-package</command> hook may be run
+     even if the package target is not run.  This makes it possible to
+     implement packaging or compilation strategies, for example, that
+     would be beyond &abuild;'s ant code's ordinary purview.  An
+     example may be the implementation of a wrapper post-package hook
+     that can create a wrapper around things in an item's classpath
+     even if that item itself doesn't generate any new packages.
+    </para>
+    <para>
+     The following hooks are defined:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <command>init</command>: called from the
+        <command>init</command> target after any internal
+        initialization has been completed.  Use this to perform any
+        additional initialization.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>generate</command>: called from the
+        <command>generate</command> target, which is a dependency of
+        the <command>compile</command> target.  Use this hook to
+        automatically generate code to be compiled as part of the
+        calling build item.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>pre-compile</command>: called right before
+        compilation.  Use this hook to perform any compilation tasks
+        that should precede invocation of the Java compiler but follow
+        automatic generation of any source files.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>post-compile</command>: called right after
+        compilation.  Use this hook to perform any operations that
+        should follow invocation of the Java compiler and should be
+        performed whether or not packaging is being done.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>pre-package</command>: called right before packaging.
+        Use this hook to perform any operations that should be
+        performed before packaging is performed but after all
+        compilation steps have been completed.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>post-package</command>: called right after packaging.
+        Use this hook to perform any operations that must follow
+        packaging.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>pre-test</command>: called before any test suites are
+        executed.  Use this to perform any unconditional setup
+        required for automated testing.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>test</command>: called after any internally supported
+        test suites are run but after pre-test and before post-test.
+        Use this hook to provide support for additional automated test
+        frameworks beyond those supported directly by abuild.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>post-test</command>: called after any internally
+        supported or externally provided test suites have been run.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>deploy</command>: called from the
+        <command>deploy</command> target.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>doc</command>: called from the <command>doc</command>
+        target.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>other</command>: called from the
+        <command>other</command> target.  This hook is provided as a
+        mechanism for allowing build-item-specific or local targets to
+        be defined that don't fit into the build in any other way.
+        The expected mode of operation is that your
+        <command>-other</command> target would depend upon various
+        other targets that would be invoked conditionally upon the
+        value of some user-provided property.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>properties-help</command>: called from the
+        <command>properties-help</command> target.  Use this hook to
+        provide help to your users about any properties that may need
+        to set to make use of the services provided by your hooks.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <command>interface-help</command>: called from the
+        <command>interface-help</command> target.  Use this hook to
+        provide help to your users about any variables that may need
+        to set to set in their Abuild.interface files.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     Any file that provides hooks must create an
+     <filename>ant-hooks.xml</filename> file.  For each hook that it
+     wants to provide, it should create a target called
+     <replaceable>-hook</replaceable> where
+     <replaceable>hook</replaceable> is replaced by the hook name
+     above.  For example, a hook file that provides a
+     <command>generate</command> hook would define a target called
+     <command>-generate</command>.
+     <footnote>
+      <para>
+       We use target names that start with a hyphen
+       (&ldquo;<literal>-</literal>&rdquo;) because
+       <application>ant</application> considers these to be private
+       targets.  This prevents users from invoking them explicitly
+       from the command line but still allows them to be invoked as
+       dependencies of other targets.
+      </para>
+     </footnote>
+    </para>
+   </sect1>
    <sect1 id="ref.example.java-code-generator">
     <title>Java Code Generator Example</title>
     <para>
@@ -7364,24 +7601,11 @@ endif
      files:
      <?example java/code-generator/Abuild.interface?>
      <?example java/code-generator/ant-hooks.xml?>
-     For more details on hooks, run <command>abuild
-     hooks-help</command> from any java build item.  This particular
-     build item provides two hooks: a <command>generate</command>
-     hook, and a <command>properties-help</command> hook.  These are
-     implemented by defining targets called
-     <command>-generate</command> and
-     <command>-properties-help</command>.
-     <footnote>
-      <para>
-       We use target names that start with a hyphen
-       (&ldquo;<literal>-</literal>&rdquo;) because
-       <application>ant</application> considers these to be private
-       targets.  This prevents users from invoking them explicitly
-       from the command line but still allows them to be invoked as
-       dependencies of other targets.
-      </para>
-     </footnote>
-     It is proper for all build
+     This particular build item provides two hooks: a
+     <command>generate</command> hook, and a
+     <command>properties-help</command> hook.  These are implemented
+     by defining targets called <command>-generate</command> and
+     <command>-properties-help</command>.  It is proper for all build
      items that provide hooks to provide a
      <command>properties-help</command> hook if the hooks expect any
      additional properties to be set.  In this case, we are generating
@@ -9685,7 +9909,7 @@ native-compiler qcc
         (accessed with the <varname>LOCAL_RULES</varname> variable),
         exported rules provided by a build item (accessed with the
         <varname>BUILD_ITEM_RULES</varname> variable), or whether they
-        should be globally accessible through being included in a
+        should be made globally accessible by being included in a
         plugin.  The latter case will be rare and should only be used
         for functionality that really should work &ldquo;out of the
         box&rdquo; in a particular build tree.  Note also that rules
@@ -9854,10 +10078,10 @@ native-compiler qcc
     <title>Guidelines For Ant Target Authors</title>
     <para>
      The primary mechanism for extending the functionality of
-     Java-based builds with &abuild; is by writing hook targets.  For
-     description of how to do this, run <command>abuild
-     hooks-help</command> from any Java build item.  There are also
-     examples of creating hooks in this document.  A build item hook
+     Java-based builds with &abuild; is by writing hook targets (see
+     <xref linkend="ref.ant-hooks"/>).  There are also examples of
+     creating hooks in this document (<xref
+     linkend="ref.example.java-code-generator"/>).  A build item hook
      file must be called <filename>ant-hooks.xml</filename>.  It is
      also possible to declare ant hooks files in plugins.  The plugin
      ant hooks file must be called
@@ -9871,12 +10095,13 @@ native-compiler qcc
         &Abuild; provides property names for most of the directories
         that it uses.  The names of these properties generally start
         with <varname>abuild.private</varname>.  This doesn't mean you
-        shouldn't reference those properties; it must means that end
+        shouldn't reference those properties; it just means that end
         users should not set them or access them in their
         <filename>Abuild-ant.properties</filename> files or attempt to
-        override them from the command-line.  They are private to
-        <application>ant</application> code, not to &abuild;'s
-        internal implementation.
+        override them from the command-line.  They are intended to be
+        private to <application>ant</application> code that is either
+        user-supplied or included in &abuild;'s
+        <application>ant</application> framework.
        </para>
       </listitem>
       <listitem>
@@ -9897,7 +10122,9 @@ native-compiler qcc
         <command>properties-help</command> hook (by creating a
         <command>-properties-help</command> target) that describes any
         additional properties your users should set in their
-        <filename>Abuild-ant.properties</filename> files.
+        <filename>Abuild-ant.properties</filename> files.  For an
+        example, see <xref
+        linkend="ref.example.java-code-generator"/>.
        </para>
       </listitem>
       <listitem>
@@ -9993,7 +10220,7 @@ native-compiler qcc
      something else in <classname>A</classname> appears in
      <classname>B</classname>, then anything that depends on
      <classname>A</classname> and <classname>B</classname> will have a
-     link error.  This is a hidden circular dependency.
+     link error.
      <footnote>
       <para> Use of shared libraries or repeating libraries in the
       link statement could actually work around this specific case,
@@ -10003,6 +10230,9 @@ native-compiler qcc
       thing.
       </para>
      </footnote>
+     This is a hidden circular dependency.  The best way to avoid this
+     situation is to not split <classname>A-headers</classname> from
+     <classname>A</classname>.
      <figure id="fig.hidden-circular-dependency">
       <title>Hidden Circular Dependency</title>
       <mediaobject>
@@ -10026,15 +10256,15 @@ native-compiler qcc
      As long as <classname>A-src</classname> declares a dependency on
      <classname>B-headers</classname>, we'll never notice that
      <classname>A-headers</classname> forgot to declare its dependency
-     because <classname>A-headers</classname> isn't actually built.  We
-     might later try to build something else that declares a
+     because <classname>A-headers</classname> isn't actually built.
+     We might later try to build something else that declares a
      dependency on <classname>A-headers</classname>.  This other build
      may fail because of <classname>B-headers</classname> not being
      known.  We've then created a hidden dependency situation: anyone
      who depends on <classname>A-headers</classname> must also depend
-     on <classname>B-headers</classname>.  The best way to avoid both
-     of these situations is to not split
-     <classname>A-headers</classname> from <classname>A</classname>.
+     on <classname>B-headers</classname>.  The best way to this
+     situation is also to not split <classname>A-headers</classname>
+     from <classname>A</classname>.
     </para>
     <para>
      One cost of not separating these is that if one library depends
@@ -10090,11 +10320,11 @@ native-compiler qcc
      <classname>B</classname> add <filename>../include</filename> to
      <varname>INCLUDES</varname> in their
      <filename>Abuild.interface</filename> files, any build item that
-     depends upon <classname>A</classname> could accidentally include
+     depends on <classname>A</classname> could accidentally include
      <classname>B</classname>'s header files and therefore
-     accidentally depend on <classname>B</classname> as well.  A
-     simple way to avoid this without having to distribute the public
-     header files throughout <filename>module</filename>'s directory
+     accidentally require <classname>B</classname> as well.  A simple
+     way to avoid this without having to distribute the public header
+     files throughout <filename>module</filename>'s directory
      structure would be to create separate directories under include,
      such as shown in <xref linkend="fig.separate-include"/>.
      <figure id="fig.separate-include">
@@ -10120,11 +10350,23 @@ native-compiler qcc
     When run with the <option>--monitored</option> flag, &abuild; runs
     in <emphasis>monitored mode</emphasis>.  In this mode, &abuild;
     generates output that would be useful to an external program that
-    may be monitoring its progress.  All additional information in
-    monitored mode is either prefixed by the string
-    <varname>abuild-monitored:</varname> followed by a keyword or is
-    delimited on both ends by strings so prefixed.  The following
-    information is provided in monitored mode:
+    may be monitoring its progress.  This includes the output of
+    <option>--dump-data</option> (see <xref
+    linkend="ref.dump-data"/>).  With the data output in monitored
+    mode, it is possible to present information to the user that
+    reveals considerable detail about &abuild;'s progress during the
+    course of a build.  Monitored mode was introduced into &abuild; to
+    support <application>Xenon</application>, an
+    <application>Eclipse</application> plugin for &abuild;, but it
+    could be useful for other purposes as well.  For information about
+    <application>Xenon</application>, please see the links on <ulink
+    url="http://www.abuild.org">&abuild;'s web site</ulink>.
+   </para>
+   <para>
+    All additional information in monitored mode is either prefixed by
+    the string <varname>abuild-monitored:</varname> followed by a
+    keyword or is delimited on both ends by strings so prefixed.  The
+    following information is provided in monitored mode:
    </para>
    <variablelist>
     <varlistentry>
@@ -10257,9 +10499,9 @@ native-compiler qcc
     workings of parts of &abuild;.  Understanding this material is not
     essential even for using &abuild; in an advanced way, but reading
     it may provide insight into some of the reasons that &abuild;
-    works the way it does.  Understanding this material is essential
-    to anyone who would want to modify any of &abuild;'s core
-    functionality.
+    works the way it does.  Understanding this material
+    <emphasis>is</emphasis> essential to anyone who would want to
+    modify any of &abuild;'s core functionality.
    </para>
    <sect1 id="ref.avoiding-recursive-make">
     <title>Avoiding Recursive Make</title>
@@ -10375,26 +10617,27 @@ native-compiler qcc
      directory relative to the top of the local build tree and then
      checks to see whether there is a valid build item at the same
      position relative to the root of one of the build trees in your
-     backing area chain.  If there is, then we don't consider the lack
-     of that child directory to be an error.  Note that we do not do
-     anything with the information about what is actually at that
-     location, we just keep traversing as if that directory were there
-     and had been traversed successfully.  In effect, this is exactly
-     what has happened since we have completed traversal of the
-     backing area in which we found the path.  This policy has the
-     same effect as searching for unknown build item names in our
-     backing area chain.  There is no need to determine that the
-     location in the backing area is the same item or even is a named
-     item at all.  In fact, doing so would make it impossible to
-     rearrange build items in local trees with backing areas since our
-     local tree would never be able to diverge in directory structure
-     from the backing area.  One side effect of this is that it is not
-     possible to <emphasis>remove</emphasis> a build item name from
-     the namespace in a local tree if that name is present in a
-     backing area by simply removing it from the local tree.  If you
-     need to remove an item in this way, you must also list its name
-     in the <property>deleted</property> key of the root build item's
-     <filename>Abuild.conf</filename> as discussed in <xref
+     backing area chain (but <emphasis>not</emphasis> your externals;
+     they are handled differently).  If there is, then we don't
+     consider the lack of that child directory to be an error.  Note
+     that we do not do anything with the information about what is
+     actually at that location, we just keep traversing as if that
+     directory were there and had been traversed successfully.  In
+     effect, this is exactly what has happened since we have completed
+     traversal of the backing area in which we found the path.  This
+     policy has the same effect as searching for unknown build item
+     names in our backing area chain.  There is no need to determine
+     that the location in the backing area is the same item or even is
+     a named item at all.  In fact, doing so would make it impossible
+     to rearrange build items in local trees with backing areas since
+     our local tree would never be able to diverge in directory
+     structure from the backing area.  One side effect of this is that
+     it is not possible to <emphasis>remove</emphasis> a build item
+     name from the namespace in a local tree if that name is present
+     in a backing area by simply removing it from the local tree.  If
+     you need to remove an item in this way, you must also list its
+     name in the <property>deleted</property> key of the root build
+     item's <filename>Abuild.conf</filename> as discussed in <xref
      linkend="ref.example.deleted-item"/>.
     </para>
     <para>
@@ -10488,31 +10731,36 @@ native-compiler qcc
      <filename>A3</filename> doesn't depend on anything in one of the
      <filename>B</filename> areas.  This flexibility makes it possible
      to do things like add dependencies on new externals or remove
-     dependencies on externals from a branch.  If &abuild; placed
-     restrictions on the shape of the backing area/external tree, many
-     of these operations would not be possible.  &Abuild; enforces its
-     integrity guarantee directly, and that's really a strong enough
-     check to ensure that backing area/external anomalies that matter
-     will be caught.
+     dependencies on externals from a side branch in your version
+     control system.  If &abuild; placed restrictions on the shape of
+     the backing area/external tree, many of these operations would
+     not be possible.  &Abuild; enforces its integrity guarantee
+     directly, and that's really a strong enough check to ensure that
+     backing area/external anomalies that matter will be caught.
     </para>
     <para>
      There is nothing inherent about &abuild; that would preclude an
-     implementation that allows multiple backing areas, but given the
-     availability of externals and the fact that backing areas are
-     transitive (a build tree inherits from its backing area's backing
-     area), it should be sufficient to have only a single backing
-     area, and it simplifies both &abuild;'s own internal logic and
-     the ability for a user to figure out what is going to be found
-     where.  Besides, in order for &abuild;'s guarantee to be
-     satisfied, it would be necessary for every build tree to search
-     its backing areas' backing areas in the same order anyway.  If
-     there is a strong case to be made for the need for more than one
-     backing area to be searched from a given build tree that can't be
-     satisfied by simply having one of the backing areas back to the
-     other backing area, please present the case.  It may result in an
-     improvement of your understanding of the current intended use, or
-     you may succeed in causing &abuild; to be modified to support
-     multiple backing areas.
+     implementation that allows multiple parallel backing areas to be
+     declared for a single build tree, but given the availability of
+     externals and the fact that backing areas are transitive (a build
+     tree inherits from its backing area's backing area), it should be
+     sufficient to have only a single backing area, and it simplifies
+     both &abuild;'s own internal logic and the ability for a user to
+     figure out what is going to be found where.  Besides, in order
+     for &abuild;'s guarantee to be satisfied, it would be necessary
+     for every build tree to search its backing areas' backing areas
+     in the same order anyway.
+     <footnote>
+      <para>
+       If there is a strong case to be made for the need for more than
+       one backing area to be searched from a given build tree that
+       can't be satisfied by simply having one of the backing areas
+       back to the other backing area, please present the case.  It
+       may result in an improvement of your understanding of the
+       current intended use, or you may succeed in causing &abuild; to
+       be modified to support multiple backing areas.
+      </para>
+     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.computing-valid-traits">
@@ -10528,93 +10776,42 @@ native-compiler qcc
      To construct the list of valid traits for a build tree, &abuild;
      creates the union of the supported traits declared in a tree's
      own root <filename>Abuild.conf</filename> with those in any of
-     its externals.  Backing areas are not consulted.  Since an
-     external itself may be resolved to a backing area, this case must
-     be handled.  In that case, &abuild; internally has a build tree
-     that has no root build item.  In this case alone, &abuild; copies
-     the list of supported traits from its backing area.  Since such a
+     its externals.  Backing areas are not consulted since the
+     assumption is that a build tree's root
+     <filename>Abuild.conf</filename> generally starts out as a copy
+     of the one from its backing area and therefore initially lists
+     the same traits.  There is one notable case in which the
+     assumption does not apply: when an external is resolved from a
+     backing area.
+     <footnote>
+      <para>
+       Such an external shows up in &abuild;'s
+       <option>--dump-data</option> output (see <xref
+       linkend="ref.dump-data"/>) with the
+       <literal>backed="1"</literal> attribute.
+      </para>
+     </footnote>
+     We handle that case specially in order to include that external's
+     traits.  When an external is resolved from a backing area,
+     &abuild; internally creates a build tree object that has no root
+     build item.  In this case alone, &abuild; copies the list of
+     supported traits from that tree's backing area.  Since such a
      build tree can, by its very nature, never have any local build
      items, the effect of this is that the resolved external is
      treated identically to any actual external that actually exists
      at its specified location.  This makes externals that are
      resolved to backing areas behave properly with respect to traits.
      The corner cases of this logic are exercised in &abuild;'s test
-     suite.
-    </para>
-   </sect1>
-   <sect1 id="ref.integrity-checks">
-    <title>Integrity Checks</title>
-    <para>
-     In plain English, &abuild; guarantees that if
-     <classname>A</classname> depends on <classname>B</classname> and
-     <classname>B</classname> depends on <classname>C</classname>,
-     <classname>A</classname> and <classname>B</classname> see the
-     same copy of <classname>C</classname>.  To be more precise,
-     &abuild; checks to make sure that no build item in a backing area
-     references as a dependency or plugin another item that is
-     shadowed in the local tree.
-    </para>
-    <para>
-     To explain this in a little bit more depth, recall from <xref
-     linkend="ref.traversal-details"/> that &abuild; maintains a copy
-     of each <classname>BuildItem</classname> object in each build
-     tree in which that build item is accessible.  A
-     <classname>BuildItem</classname> object includes a reference to
-     the build tree from which it originated.  Suppose build items
-     <classname>A</classname>, <classname>B</classname>, and
-     <classname>C</classname> are defined in build tree
-     <filename>T2</filename> and that <classname>A</classname> depends
-     on <classname>B</classname> and <classname>B</classname> depends
-     on <classname>C</classname>.  Now suppose you have a local build
-     tree called <filename>T1</filename> that has
-     <filename>T2</filename> as its backing area, and that you have
-     build items <classname>A</classname> and <classname>C</classname>
-     copied locally into <filename>T1</filename>, but that
-     <classname>B</classname> is resolved in the backing area (see
-     <xref linkend="fig.shadowed-dependency"/>).
-     <figure id="fig.shadowed-dependency">
-      <title>Shadowed Dependency</title>
-      <mediaobject>
-       <imageobject>
-        <imagedata fileref="shadowed-dependency.png"/>
-       </imageobject>
-       <caption>
-        <para>
-         <classname>A</classname> in <filename>/T1</filename> sees
-         <classname>B</classname> in <filename>/T2</filename> and
-         <classname>C</classname> in <filename>/T1</filename>, but
-         <classname>B</classname> in <filename>/T2</filename> sees
-         <classname>C</classname> in <filename>/T2</filename>.  This
-         means <classname>A</classname> in <filename>/T1</filename>
-         builds with two different copies of <classname>C</classname>.
-        </para>
-       </caption>
-      </mediaobject>
-     </figure>
-     If you were to attempt to build <classname>A</classname>,
-     <classname>A</classname> would refer to files in
-     <classname>B</classname>, which comes from a backing area.
-     <classname>B</classname> would therefore already be built, and it
-     would have been built with the copy of <classname>C</classname>
-     from the backing area.  <classname>A</classname>, on the other
-     hand, would see <classname>C</classname> in the local build tree.
-     That means that <classname>A</classname> is indirectly using two
-     different copies of <classname>C</classname>.  Depending on what
-     changes were made to <classname>C</classname> in the local build
-     tree, this would likely cause the build of
-     <classname>A</classname> to be unreproducible at best and
-     completely unstable at worst.  The situation of
-     <classname>B</classname> coming from a backing area and depending
-     on <classname>C</classname>, which is shadowed locally, is what
-     we mean when we say that <classname>B</classname> has shadowed
-     dependencies.
+     suite.  It also makes it possible to remove traits that were
+     present in your backing area by simply removing them from your
+     own build tree's root <filename>Abuild.conf</filename>.
     </para>
    </sect1>
    <sect1 id="ref.construction-of-build-sets">
     <title>Construction of the Build Set</title>
     <para>
      This section describes the process that &abuild; uses to
-     construct the build.  First, &abuild; creates a list of build
+     construct the build set.  First, &abuild; creates a list of build
      items that directly match the criteria of the specified build
      set.  If <option>--only-with-traits</option> was specified, only
      build items that match the build set criteria and have all of the
@@ -10700,7 +10897,7 @@ native-compiler qcc
       Once we have determined the list of platform types for each
       build item, we can figure out which platforms a build item may
       be built on.  We refer to the list as the <firstterm>buildable
-      platform</firstterm> list.  The buildable platform list for a
+      platform list</firstterm>.  The buildable platform list for a
       build item is included in the <option>--dump-data</option>
       output (see <xref linkend="ref.dump-data"/>).  Note that this is
       generally a broader list than the list of platforms on which a
@@ -10724,7 +10921,7 @@ native-compiler qcc
       computations, in fact, are determined at startup for every build
       item in every known build tree regardless of whether the items
       are in the build set.  During this validation, we also perform
-      checks to insure that each build item's dependencies have
+      checks to ensure that each build item's dependencies have
       appropriate platform types.  Specifically, a build item of
       target type <type>all</type> may depend on any build item, and
       any build item may depend on an item of target type
@@ -10740,9 +10937,9 @@ native-compiler qcc
       <classname>B</classname> which has types <type>X</type>,
       <type>Y</type>, and <type>Z</type>, this is okay because
       <classname>B</classname> has all of <classname>A</classname>'s
-      platform types.  It would be in error if
+      platform types.  It would be an error if
       <classname>B</classname> depended on <classname>A</classname> in
-      this case though since the instances of <classname>B</classname>
+      this case since the instances of <classname>B</classname>
       building for platform type <type>Z</type> would not be able to
       satisfy their dependences on <classname>A</classname> since it
       doesn't support that platform type.
@@ -10770,8 +10967,8 @@ native-compiler qcc
       <filename>Abuild.cc</filename> in the &abuild; sources.  We
       construct the build graph in reverse build order;
       <emphasis>i.e.</emphasis>, we start with most dependent build
-      item and end with to least dependent build item.  For each build
-      item, we add to the list of <firstterm>build
+      item and end with the least dependent build item.  For each
+      build item, we add to the list of <firstterm>build
       platforms</firstterm> (platforms on which the item will actually
       be built), based on our platform selection criteria, as
       described in <xref linkend="ref.platform-selection"/>.  The list
@@ -10807,17 +11004,17 @@ native-compiler qcc
      <para>
       Even if the exact steps of constructing the build graph are
       involved, there are some implications that are relatively easy
-      to understand.  In particular, the way build graph works implies
-      that, in general, a build item may only depend on another build
-      item if the dependent item builds on all the depending item's
-      platforms.  There are two ways around this: one is to use a
-      platform selector on a dependency, and the other is to use a
-      build item of target type <type>all</type>.  A build item of
-      target type <type>all</type> is a pass-through build item, as
-      described in <xref linkend="ref.build-item-types"/>.  A build
-      item gets to be this way by not having a build or interface
-      file, not declaring any platform types, and depending on items
-      with different groups of platform types.
+      to understand.  In particular, the way the build graph works
+      implies that, in general, a build item may only depend on
+      another build item if the dependent item builds on all the
+      depending item's platforms.  There are two ways around this: one
+      is to use a platform selector on a dependency, and the other is
+      to use a build item of target type <type>all</type>.  A build
+      item of target type <type>all</type> is a pass-through build
+      item, as described in <xref linkend="ref.build-item-types"/>.  A
+      build item gets to be this way by not having a build or
+      interface file, not declaring any platform types, and depending
+      on items with different groups of platform types.
      </para>
     </sect2>
    </sect1>
@@ -10951,9 +11148,11 @@ native-compiler qcc
     <para>
      &Abuild; only turns on interface flags when it retrieves variable
      values for export into the automatically generated file used by
-     the back end (the <firstterm>dynamic output file</firstterm>).
-     It does not have any flags set when it references variables
-     inside of other <filename>Abuild.interface</filename> files.  For
+     the back end (the <firstterm>dynamic output file</firstterm>,
+     first introduced in <xref
+     linkend="ref.abuild-interface-functionality-overview"/>).  It
+     does not have any flags set when it references variables inside
+     of other <filename>Abuild.interface</filename> files.  For
      example, if <classname>A</classname> does this:
 
      <programlisting>declare X string
@@ -12875,7 +13074,7 @@ Y = $(X)
     <filename>doc/example</filename>.  Many of the files from the
     example directory are included in the document, but not all of
     them are.  For the maximum benefit, you are encouraged to make a
-    copy of the <filename>doc/example</filename> directory so that
+    copy of the <filename>doc/example</filename> directory so that you
     can follow along and make modifications.
    </para>
    <?list-of-examples?>
