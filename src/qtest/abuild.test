@@ -2534,7 +2534,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(253 +
+$td->report(252 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 16 : 0) +
 	    ($have_whole_archive ? 2 : 1));
