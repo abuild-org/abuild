@@ -188,6 +188,12 @@ following checks:
    conditions as well.
   </para>
  </preface>
+ <preface id="ref.acknowledgments">
+  <title>Acknowledgments</title>
+  <para>
+   XXX write this
+  </para>
+ </preface>
  <preface id="ref.preface-to-beta-manual">
   <!-- XXX remove or change title before 1.0 -->
   <title>Preface to Beta Documentation</title>
@@ -384,12 +390,11 @@ following checks:
       <term>Build Integrity</term>
       <listitem>
        <para>
-        <!-- XXX make this stronger -->
         &Abuild; puts the integrity of the build over all other
-        concerns.  &Abuild; includes a number of integrity and
-        consistency checks throughout its implementation in order to
-        ensure that the principles upon which it is designed are
-        maintained and rigorously enforced.
+        concerns.  &Abuild; includes several rigorously enforced
+        integrity checks throughout its implementation in order to
+        prevent many of the most common causes of build integrity
+        problems.
        </para>
       </listitem>
      </varlistentry>
@@ -2148,6 +2153,46 @@ C:\cygwin\cygwin.bat
      is specified by a relative path, then &abuild; will attempt to
      resolve it in a backing area (see <xref
      linkend="ref.backing-areas.resolving"/>) if it is not found.
+    </para>
+    <para>
+     In addition to paths, there are two options that may be specified
+     for each path: the <option>-ro</option> option, which makes an
+     external area read-only, and the
+     <option>-winpath=<replaceable>windows-path</replaceable></option>
+     option, which allows an alternative path to be used only when
+     running in a Windows environment.
+     <footnote>
+      <para>
+       Our syntax does not allow spaces to appear in any external path
+       names, including the argument to <option>-winpath</option>.  In
+       Windows, you can always use the short form of the name, which
+       you can find using the <command>dir /x</command> command from
+       the Windows command prompt.
+      </para>
+     </footnote>
+     For example, this line makes <filename>../common</filename> a
+     regular external and <filename>/opt/abuild_library</filename> a
+     read-only external that can be found at
+     <filename>O:/abuild_library</filename> on Windows systems and
+     <filename>/opt/abuild_library</filename> on non-Windows systems:
+
+     <programlisting>external-dirs: ../common /opt/abuild_library -winpath=O:/abuild_library -ro
+</programlisting>
+     &Abuild; will never attempt to build an item in a read-only
+     external tree when the build is started in a tree that declares
+     it as a read-only external.  You must therefore make sure that
+     all your read-only externals are fully built for all platforms on
+     which you will use their items.  Read-only externals can be
+     useful for making libraries of utility build items available to a
+     large number of projects, or they can just be used to speed up
+     your builds if your external area is relatively static and you
+     don't mind manually rebuilding it when you make changes to it.
+     If more than one developer is making use of the same physical
+     external tree, it is recommended that they all declare that tree
+     as a read-only external since this will prevent multiple users
+     from trying to build the same items at the same time.
+    </para>
+    <para>
      Once you set up another tree as an external to your tree, all
      build items defined in the external tree are available to you
      (subject to normal access control rules) as if they were in your
@@ -2366,8 +2411,8 @@ C:\cygwin\cygwin.bat
        <term><option>all</option></term>
        <listitem>
         <para>
-         all items in the local build tree and all external build trees
-         that it references
+         all items in the local build tree and all writable external
+         build trees that it references
         </para>
        </listitem>
       </varlistentry>
@@ -11342,11 +11387,32 @@ Y = $(X)
     <varlistentry>
      <term>1.0.b3: XXX, 2007</term>
      <listitem>
-      <para>
-       Support has been added for read only externals and for
-       specifying a separate path for an external that is used only on
-       Windows.
-      </para>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Support has been added for read only externals and for
+         specifying a separate path for an external that is used only
+         on Windows.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         If a
+         <varname>WHOLE_lib_<replaceable>libname</replaceable></varname>
+         variable is set during a build using the
+         <filename>msvc</filename> compiler, an error message would be
+         generated.  Previously, the whole library instruction would
+         be silently ignored.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Numerous improvements have been made to the documentation,
+         thanks to input from reviewers mentioned in <xref
+         linkend="ref.acknowledgments"/>.
+        </para>
+       </listitem>
+      </itemizedlist>
      </listitem>
     </varlistentry>
    </variablelist>
