@@ -6,28 +6,20 @@
 
  * Add copyright and license information
 
- * Absolute externals may be wrong:
+ * ccosta comments
 
-    - They are read write just like regular externals which makes them
-      unsuitable for use for build item libraries
+    - introduce "continue on error" earlier
 
-    - They break build tree platform independence, at least where
-      Windows is concerned
+    - revisit use of no-op earlier in the document
 
-   We may need some concept of read-only externals explicitly to
-   support build item libraries.  One possibility would be to have any
-   absolute path externals automatically be read only with the
-   rationale that they are prone to being accessed by multiple people
-   just like backing areas.  Another would be to have a new key in
-   Abuild.conf for build item libraries.
+    - expand "Integration with QTest" to discuss qtest in one
+      paragraph and include a reference to the qtest documentation and
+      software
 
- * Release notes: mention that we now detect and report an error if
-   WHOLE_lib is used for msvc.
+    - recheck XXX
 
  * There may still be some parallel autoconf problems lurking.
 
- * -winpath=path: document that no spaces are allowed and to use the
-    short form of the path if needed
 
 Documentation
 -------------
@@ -39,8 +31,6 @@ Documentation
     - Joe Davidson
     - Gavin Mulligan - bug reporting
     - Argon ST
-
- * Incorporate Andrew Hayden's comments
 
  * Make sure documentation for integration with third party packages
    is sufficient.
