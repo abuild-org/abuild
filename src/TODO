@@ -2,6 +2,9 @@
 1.0.b4 or 1.0
 =============
 
+ * Make sure the README and Artistic files are handled sensibly at
+   release time.
+
  * Look at all XXX comments.
 
 
