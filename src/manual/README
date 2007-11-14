@@ -4,8 +4,11 @@ docbook version 4.4 and converted to HTML and FO with the sourceforge
 docbook stylesheets.  PDF rendering is performed using apache fop.
 
 In order to process this manual, the following environment or make
-variables must be se:
+variables must be set:
 
   DOCBOOK_DTD: the XML docbook DTD
   DOCBOOK_XSL: the root of the docbook stylesheets
   FOP_HOME: the fop installation directory, unless fop is in the path
+
+In addition, the "dia" program must be available to process the
+figures.
