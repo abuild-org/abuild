@@ -14,7 +14,7 @@
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
-std::string const Abuild::ABUILD_VERSION = "1.0.b3-prerelease";
+std::string const Abuild::ABUILD_VERSION = "1.0.b3";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
@@ -115,7 +115,15 @@ Abuild::runInternal()
 	std::string first_arg = argv[1];
 	if ((first_arg == "-V") || (first_arg == "--version"))
 	{
-	    this->logger.logInfo(this->whoami + " version " + ABUILD_VERSION);
+	    boost::function<void(std::string const&)> l =
+		boost::bind(&Logger::logInfo, &(this->logger), _1);
+	    l(this->whoami + " version " + ABUILD_VERSION);
+	    l("");
+	    l("Copyright (c) 2007 Jay Berkenbilt, Argon ST");
+	    l("This software may be distributed under the terms of version 2 of");
+	    l("the Artistic License which may be found in the source and binary");
+	    l("distributions.  It is provided \"as is\" without express or");
+	    l("implied warranty.");
 	    exit_now = true;
 	}
 	else if ((first_arg == "-H") || (first_arg == "--help"))

@@ -5,7 +5,7 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.b2+">
+<!ENTITY swversion "1.0.b3">
 <!ENTITY lastreleased "November 13, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
@@ -130,18 +130,33 @@ following checks:
   <author>
    <firstname>Jay</firstname><surname>Berkenbilt</surname>
   </author>
+  <copyright>
+   <year>2007</year>
+   <holder>Jay Berkenbilt, Argon ST</holder>
+  </copyright>
+  <legalnotice>
+   <para>
+    This software and documentation may be distributed under the terms
+    of version 2 of the Artistic License which may be found in the
+    source and binary distributions.  They are provided &ldquo;as
+    is&rdquo; without express or implied warranty.
+   </para>
+  </legalnotice>
  </bookinfo>
  <preface id="ref.how-to-read-this-manual">
   <title>How to Read This Manual</title>
   <para>
-   Welcome to the &abuild; manual!  This manual is designed to get you
-   up and running with &abuild; quickly.  Then, when you are ready,
-   you can come back for documentation on the full depth of &abuild;'s
-   functionality.  The most essential and common topics are presented
-   first so that top-down learners can just start at the beginning and
-   stop reading when they feel that they've seen enough to get going.
-   As each new concept is presented, it is enhanced with examples.  A
-   list of all the examples in the document can be found in <xref
+   Welcome to the &abuild; manual!  You may always find the latest
+   copy of this manual on <ulink
+   url="http://www.abuild.org">&abuild;'s website</ulink>.  This
+   manual is designed to get you up and running with &abuild; quickly.
+   Then, when you are ready, you can come back for documentation on
+   the full depth of &abuild;'s functionality.  The most essential and
+   common topics are presented first so that top-down learners can
+   just start at the beginning and stop reading when they feel that
+   they've seen enough to get going.  As each new concept is
+   presented, it is enhanced with examples.  A list of all the
+   examples in the document can be found in <xref
    linkend="ref.list-of-examples"/>.  If you are just looking for
    changes from previous versions of &abuild;, please see <xref
    linkend="ref.release-notes"/>.
@@ -191,44 +206,95 @@ following checks:
  <preface id="ref.acknowledgments">
   <title>Acknowledgments</title>
   <para>
-   XXX write this
-  </para>
- </preface>
- <preface id="ref.preface-to-beta-manual">
-  <!-- XXX remove or change title before 1.0 -->
-  <title>Preface to Beta Documentation</title>
-  <para>
-   This is a beta release of the &Abuild; documentation.  If you find
-   anything confusing or see any errors of any type (content,
-   spelling/grammar, punctuation, etc.) no matter how small, please
-   report the problem.
+   The creation of &abuild; would not have been possible without the
+   enthusiastic support of my employer, <ulink
+   url="http://www.argonst.com">Argon ST</ulink>.  Argon not only
+   recognized the important role of a strong build tool in
+   contributing to the overall quality and reliability of its
+   software, but saw the value of releasing it to the open source
+   community in hopes of making an even broader contribution.
   </para>
   <para>
-   There are a small handful of known issues with this version of the
-   documentation:
+   There are many people within Argon who helped take &abuild; to
+   where it is now, but among these, a handful of people deserve
+   special mention:
    <itemizedlist>
     <listitem>
      <para>
-      For the PDF version of the documentation, there are many bad
-      line breaks.  Sometimes words are incorrectly hyphenated, and
-      line breaks also occur between two dashes in command line
-      options and even between the two <literal>+</literal> characters
-      of &ldquo;C++&rdquo;.  This appears to be a problem with the
-      formatting software.
+      Chris Costa, who served as a sounding board and contributed
+      numerous ideas throughout the entire development process of
+      &abuild;, including conducting a thorough review of much of this
+      document
      </para>
     </listitem>
     <listitem>
      <para>
-      The index is relatively incomplete.  If you have ideas for other
-      index terms, please suggest them.
+      Andrew Hayden, who spent many hours reviewing and critiquing
+      this entire document and who was the visionary behind Xenon, the
+      &abuild; Eclipse plugin
      </para>
     </listitem>
     <listitem>
      <para>
-      There are some paragraphs that appear to have extra
-      indentation.  This is because the formatting software generates
-      a hard space whenever we have an index term marker in the text.
-      This is a bug in the formatting system.
+      Joe Davidson, the primary &abuild; evangelist who has been
+      invaluable in getting &abuild; to become as widely accepted
+      within Argon ST as it is
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Gavin Mulligan, who has consistently taken the time to report
+      any problem, no matter how small, and who is probably
+      responsible for reporting more issues than everyone else
+      combined
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Bob Tamaru, who in addition to being a mentor and supporter for
+      most of my career, provided considerable assistance to me as I
+      presented the case to Argon ST to allow me to release &abuild;
+      as an open source project
+     </para>
+    </listitem>
+   </itemizedlist>
+  </para>
+ </preface>
+ <preface id="ref.preface-documentation-format">
+  <title>Notes About Documentation Formatting</title>
+  <para>
+   This manual is written in docbook.  The PDF version of the manual
+   was generated with Apache fop, which as of this writing, is still
+   incomplete.  There are a few known issues with the PDF version of
+   the documentation.  Hopefully these issues will all be addressed as
+   fop matures.
+   <itemizedlist>
+    <listitem>
+     <para>
+      There are many bad line breaks.  Sometimes words are incorrectly
+      hyphenated, and line breaks also occur between two dashes in
+      command line options and even between the two
+      <literal>+</literal> characters of &ldquo;C++&rdquo;.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      In many of the example listings, there are long lines that
+      overflow the shaded boxes.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Some paragraphs appear to have extra indentation.  This is
+      because the formatting software generates a hard space whenever
+      we have an index term marker in the text.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      There are no bookmarks.  It would be good if we could create
+      bookmarks to the chapter headings, but as of this writing, the
+      documented procedure for doing this does not appear to work.
      </para>
     </listitem>
    </itemizedlist>
@@ -581,8 +647,10 @@ following checks:
    <sect1 id="ref.system.requirements">
     <title>System Requirements</title>
     <para>
-     To use &abuild;, the following items must be available on your
-     system:
+     You may always find the latest version of &abuild; by following
+     the links on <ulink url="http://www.abuild.org">&abuild;'s
+     website</ulink>.  To use &abuild;, the following items must be
+     available on your system:
     </para>
     <itemizedlist>
      <listitem>
@@ -700,7 +768,8 @@ following checks:
     <para>
      To build &abuild; and use it in a Windows environment for
      <application>make</application>-based builds, certain pieces of
-     the Cygwin environment are required.
+     the <ulink url="http://www.cygwin.com/">Cygwin</ulink>
+     environment are required.
      <footnote>
       <para>
        This may cease to be true in a future version of &abuild;.
@@ -11385,7 +11454,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0.b3: XXX, 2007</term>
+     <term>1.0.b3: November 13, 2007</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -11400,7 +11469,7 @@ Y = $(X)
          If a
          <varname>WHOLE_lib_<replaceable>libname</replaceable></varname>
          variable is set during a build using the
-         <filename>msvc</filename> compiler, an error message would be
+         <filename>msvc</filename> compiler, an error message will be
          generated.  Previously, the whole library instruction would
          be silently ignored.
         </para>

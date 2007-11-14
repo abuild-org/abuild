@@ -1,10 +1,12 @@
 
-1.0.b3 or 1.0
+1.0.b4 or 1.0
 =============
 
  * Look at all XXX comments.
 
- * Add copyright and license information
+
+Documentation
+-------------
 
  * ccosta comments
 
@@ -17,20 +19,6 @@
       software
 
     - recheck XXX
-
- * There may still be some parallel autoconf problems lurking.
-
-
-Documentation
--------------
-
- * Acknowledgments
-
-    - Andrew Hayden - doc and sounding board
-    - Chris Costa - sounding board
-    - Joe Davidson
-    - Gavin Mulligan - bug reporting
-    - Argon ST
 
  * Make sure documentation for integration with third party packages
    is sufficient.
@@ -75,6 +63,9 @@ Bugs
    search directories represented in the source lists, but that
    wouldn't help if we removed the last file from a subdirectory.  For
    now, we'll just not handle this case.
+
+ * Cass Dalton reports that he sometimes gets "resource busy" errors
+   when running autoconf with --make-jobs.
 
 
 Java Problems
