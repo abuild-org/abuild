@@ -246,8 +246,8 @@ following checks:
    <sect1 id="ref.introduction.overview">
     <title>&Abuild; Overview</title>
     <para>
-     &Abuild; is a system to designed to build large software projects
-     or related families of software projects that are divided into a
+     &Abuild; is a system designed to build large software projects or
+     related families of software projects that are divided into a
      potentially large number of components.  It is specifically
      designed for software projects that are continually evolving and
      that may span multiple languages and platforms.  The basic idea
@@ -257,7 +257,7 @@ following checks:
      requires each component developer to declare, by name, the list
      of other components on which his or her component depends.  It is
      then &abuild;'s responsibility to provide whatever is needed to
-     the build environment to make the other components visible.
+     the build environment to make other required items visible.
     </para>
     <para>
      You might want to think of &abuild; as an
@@ -278,7 +278,7 @@ following checks:
     </para>
     <para>
      To implement this core functionality, &abuild; provides its own
-     system for managing build items and the dependencies and
+     system for managing build items as well as the dependencies and
      relationships among them.  It also provides various build rules
      implemented with underlying tools, specifically <application>GNU
      Make</application> and <application>Apache Ant</application>, to
@@ -289,30 +289,35 @@ following checks:
      rich functionality as well.  &Abuild; is intended to
      <emphasis>be</emphasis> your build system.  It is not intended,
      as some other tools are, to wrap around your existing build
-     system.  &Abuild; can, however, interoperate with other build
-     systems as needed.
+     system.
+     <footnote>
+      <para>
+       &Abuild; can, however, interoperate with other build systems as
+       needed, which may be useful while transitioning a software
+       development effort to using &abuild;.
+      </para>
+     </footnote>
     </para>
     <para>
      Support for compilation in multiple programming languages and on
      multiple platforms, including embedded platforms, is central to
-     &abuild;'s design and has been built into &abuild; from the
-     beginning.  &Abuild; is designed to allow build items to be built
-     on multiple platforms simultaneously within a single build tree.
-     An important way in which &abuild; achieves this functionality is
-     to do all of its work inside of an <firstterm>output
-     directory</firstterm>.  When &abuild; does an actual build, it
-     always creates an output directory named
+     &abuild;'s design.  &Abuild; is designed to allow build items to
+     be built on multiple platforms simultaneously.  An important way
+     in which &abuild; achieves this functionality is to do all of its
+     work inside of an <firstterm>output directory</firstterm>.  When
+     &abuild; performs the actual build, it always creates an output
+     directory named
      <filename>abuild-<replaceable>platform</replaceable></filename>
-     and invokes the backend from that directory.  By actually
-     invoking the backend from that directory, &abuild; avoids the
-     situation of temporary files conflicting with each other on
-     multiple simultaneous builds of a single build item on multiple
-     platforms.  &Abuild; is designed to never create or remove any
-     output files outside of its output directories.  This enables
-     &abuild;'s special <command>clean</command> target to simply
-     remove all output directories created by any instance of
-     &abuild;, and also reduces the likelihood of unintentionally
-     mixing generated products with version-controlled sources.
+     and invokes the backend in that directory.  By actually invoking
+     the backend in that directory, &abuild; avoids the situation of
+     temporary files conflicting with each other on multiple
+     simultaneous builds of a given build item on multiple platforms.
+     &Abuild; is designed to never create or remove any output files
+     outside of its output directories.  This enables &abuild;'s
+     cleanup operation to simply remove all output directories created
+     by any instance of &abuild;, and also reduces the likelihood of
+     unintentionally mixing generated products with version-controlled
+     sources.
     </para>
    </sect1>
    <sect1 id="ref.typographic-conventions">
@@ -376,19 +381,15 @@ following checks:
     -->
     <variablelist>
      <varlistentry>
-      <term>Focus on Local Builds</term>
+      <term>Build Integrity</term>
       <listitem>
        <para>
-        When using &abuild;, you are generally able to focus on
-        building the local build item without having to worry about
-        the details of the items it depends on.  &Abuild; does all the
-        work of figuring out what your environment has to look like to
-        give you access to your dependencies.  It can then start a
-        local build from anywhere and pass the right information to
-        that local build.  This is achieved through encapsulation of
-        knowledge about a build item's products inside the build item
-        itself and making that knowledge available to its users
-        through an &abuild;-specific interface.
+        <!-- XXX make this stronger -->
+        &Abuild; puts the integrity of the build over all other
+        concerns.  &Abuild; includes a number of integrity and
+        consistency checks throughout its implementation in order to
+        ensure that the principles upon which it is designed are
+        maintained and rigorously enforced.
        </para>
       </listitem>
      </varlistentry>
@@ -427,24 +428,42 @@ following checks:
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>Focus on One Item at a Time</term>
+      <listitem>
+       <para>
+        When using &abuild;, you are generally able to focus on
+        building just the item you are working on without having to
+        worry about the details of the items it depends on.  &Abuild;
+        does all the work of figuring out what your environment has to
+        look like to give you access to your dependencies.  It can
+        then start a local build from anywhere and pass the right
+        information to that local build.  This is achieved through
+        encapsulation of knowledge about a build item's products
+        inside the build item itself and making that knowledge
+        available to its users through an &abuild;-specific interface.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>Environment Independence</term>
       <listitem>
        <para>
         &Abuild; does not require you to have any project-specific or
-        source tree-specific environment variables set or to be using
-        any particular shell or operating system, and the &abuild;
-        software itself doesn't have to be installed in any particular
-        location.  &Abuild; is designed so that having the
-        <command>abuild</command> command in your path should be
-        sufficient for doing a build.  This keeps &abuild; independent
-        from any specific source tree or project.  &Abuild; can be
-        used to build a single-source-file stand-alone program or an
+        source tree-specific environment variables set, be using any
+        particular shell or operating system, or have the &abuild;
+        software itself installed in any particular location.
+        &Abuild; is designed so that having the
+        <command>abuild</command> command in your path is sufficient
+        for doing a build.  This keeps &abuild; independent from any
+        specific source tree or project.  &Abuild; can be used to
+        build a single-source-file, stand-alone program or an
         elaborate product line consisting of hundreds or thousands of
-        components, and it can be used for multiple projects on the
+        components.  It can be also used for multiple projects on the
         same system at the same time.  No special path settings or
         environment variable settings are required to use &abuild;,
-        other than ensuring that the external tools it invokes (GNU
-        Make, compilers, etc.)  are available and in your path.
+        other than ensuring that the external tools that your build
+        requires (GNU Make, compilers, etc.) are available and in your
+        path.
        </para>
       </listitem>
      </varlistentry>
@@ -472,20 +491,8 @@ following checks:
        <para>
         &Abuild; was designed to work on multiple platforms.  It
         includes a structure for referring to platforms and for
-        encapsulating platform-specific knowledge that makes it easier
-        to create portable build structures for portable code.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>Build Integrity</term>
-      <listitem>
-       <para>
-        &Abuild; puts the integrity of the build over all other
-        concerns.  &Abuild; includes a number of integrity and
-        consistency checks throughout its implementation in order to
-        ensure that the principles upon which it is designed are
-        maintained and rigorously enforced.
+        encapsulating platform-specific knowledge.  This makes it
+        easier to create portable build structures for portable code.
        </para>
       </listitem>
      </varlistentry>
@@ -514,13 +521,12 @@ following checks:
       <listitem>
        <para>
         Build items encapsulate knowledge about what is required by
-        their users in order to make use of them at build time.  Build
-        items may also implement themselves in terms of nested private
-        build items that cannot be declared as direct dependencies by
-        &ldquo;outside&rdquo; build items.  This makes it possible to
-        refactor or reorganize individual components of a system
-        without affecting the build files of other build items that
-        depend on them.
+        their users in order to make use of them at build time.  The
+        user may also create build items with restricted scope, thus
+        allowing private things to be kept private.  This makes it
+        possible to refactor or reorganize individual components of a
+        system without affecting the build files of other build items
+        that depend on them.
        </para>
       </listitem>
      </varlistentry>
@@ -578,9 +584,9 @@ following checks:
       <para>
        <ulink url="http://www.gnu.org/software/make/"><application>GNU
        Make</application></ulink> version 3.81 or higher is required
-       if you are building any build items that use make as a backend.
-       This would include platform-independent code and C/C++ code,
-       but not Java code.
+       if you are building any build items that use <application>GNU
+       Make</application> as a backend.  This would include
+       platform-independent code and C/C++ code, but not Java code.
       </para>
      </listitem>
      <listitem>
@@ -617,7 +623,7 @@ following checks:
        Cygwin and Perl are not required.  It is hoped that a future
        version of &abuild; will not require Cygwin.  For details on
        using Cygwin with &abuild;, please see <xref
-       linkend="ref.cygwin-requirements"/>.
+       linkend="ref.windows-requirements"/>.
       </para>
      </listitem>
     </itemizedlist>
@@ -626,16 +632,16 @@ following checks:
      the <ulink url="http://www.boost.org/">boost</ulink> regex and
      thread libraries.  (&Abuild; is known to work with the boost 1.32
      in Red Hat Enterprise Linux 4, but it may not work with that
-     version of boost on other systems.)  &abuild; is known to build
-     with gcc, xlc, Microsoft Visual C++ (7.1 or newer), and <ulink
-     url="http://www.mingw.org/">mingw</ulink>.  &Abuild; itself
-     contains C++ code and Java code, so all the runtime requirements
-     for both systems are required to build &abuild;.
+     version of boost on other systems.)  &abuild; is known to
+     buildable by gcc, xlc, Microsoft Visual C++ (7.1 or newer), and
+     <ulink url="http://www.mingw.org/">mingw</ulink>.  &Abuild;
+     itself contains C++ code and Java code, so all the runtime
+     requirements for both systems are required to build &abuild;.
     </para>
     <para>
-     &Abuild; figures out where it is being run from when it is
-     invoked, so &abuild; does not have to be built specifically to be
-     installed in a given location.  It finds the root of its
+     Since &abuild; determines where it is being run from when it is
+     invoked, a binary distribution of &abuild; is not tied to a
+     particular installation path.  It finds the root of its
      installation directory by walking up the path from the &abuild;
      executable until it finds a directory that contains
      <filename>make/abuild.mk</filename>.  This makes it easy to have
@@ -657,13 +663,12 @@ following checks:
     <title>Building &Abuild;</title>
     <para>
      &Abuild; is self-hosting: it can be built with itself, or for
-     bootstrapping, it can be built with a special GNU Makefile that
-     uses &abuild;'s internal <application>GNU Make</application>
-     support.  To build &abuild;'s Java code, you also need
-     <application>Apache Ant</application> and a Java development
-     environment.  Please see the file
-     <filename>src/README.build</filename> in the source distribution
-     for instructions on building abuild.
+     bootstrapping, it can be built with a GNU Makefile that uses
+     &abuild;'s internal <application>GNU Make</application> support.
+     To build &abuild;'s Java code, you also need <application>Apache
+     Ant</application> and a Java development environment.  Please see
+     the file <filename>src/README.build</filename> in the source
+     distribution for instructions on building abuild.
     </para>
    </sect1>
    <sect1 id="ref.installation.install">
@@ -685,8 +690,8 @@ following checks:
      its executable.
     </para>
    </sect1>
-   <sect1 id="ref.cygwin-requirements">
-    <title>Cygwin Requirements</title>
+   <sect1 id="ref.windows-requirements">
+    <title>Additional Requirements for Windows Environments</title>
     <para>
      To build &abuild; and use it in a Windows environment for
      <application>make</application>-based builds, certain pieces of
@@ -696,11 +701,11 @@ following checks:
        This may cease to be true in a future version of &abuild;.
       </para>
      </footnote>
-     Note that &abuild; is able to build using Visual C++ on Windows.
-     It uses Cygwin only for its development tools.  Cygwin is not
-     required to run executables built by &abuild; in a Windows
-     environment, including &abuild; itself.  However, Cygwin is
-     required to supply <command>make</command> and
+     Note that &abuild; is able to build with and be built by Visual
+     C++ on Windows.  It uses Cygwin only for its development tools.
+     Cygwin is not required to run executables built by &abuild; in a
+     Windows environment, including &abuild; itself.  However, Cygwin
+     is required to supply <command>make</command> and
      <command>perl</command> to &abuild;.  The following parts of
      Cygwin are required:
      <variablelist>
@@ -755,7 +760,8 @@ following checks:
     <para>
      If you intend to use autoconf from Windows and you have Rational
      Rose installed, you may need to create
-     <filename>/usr/bin/hostinfo</filename> as
+     <filename>/usr/bin/hostinfo</filename> (inside of the Cygwin
+     environment) as
 
      <programlisting>#!/bin/false
 </programlisting>
@@ -790,17 +796,17 @@ C:\cygwin\cygwin.bat
     <title>Version Control Considerations</title>
     <para>
      &Abuild; creates output directories in the source directory, and
-     all generated files are created inside of output directories.
-     All output directories are named <filename>abuild-*</filename>.
-     It is recommended to configure hooks or triggers in your version
-     control system to prevent these directories or their contents
-     from being accidentally checked in.  It may also be useful to
-     prevent <filename>Abuild.backing</filename> from being checked in
-     since this file always contains information about the local
-     configuration rather than something that would be CM
-     controlled.  If it is your policy to allow these to be checked
-     in, they should be prevented from appearing in shared areas such
-     as the trunk.
+     all generated files are created inside of these
+     &abuild;-generated directories.  All output directories are named
+     <filename>abuild-*</filename>.  It is recommended to configure
+     hooks or triggers in your version control system to prevent these
+     directories or their contents from being accidentally checked in.
+     It may also be useful to prevent
+     <filename>Abuild.backing</filename> from being checked in since
+     this file always contains information about the local
+     configuration rather than something that would be CM controlled.
+     If it is your policy to allow these to be checked in, they should
+     be prevented from appearing in shared areas such as the trunk.
      <footnote>
       <para>
        Note, however, that the &abuild; test suite contains
@@ -817,14 +823,18 @@ C:\cygwin\cygwin.bat
   <chapter id="ref.basic-operation">
    <title>Basic Operation</title>
    <para>
-    In this chapter, we will describe the basics of running &abuild; on
-    a few simple build items, and we will describe how those build
-    items are put together.  We will gloss over many details that will
-    be covered later in the documentation.  The goal of this chapter is
-    to give you enough information to work on simple build items that
-    belong to existing build trees.  The examples we refer to in this
-    chapter can be found in <filename>doc/example/basic</filename> in
-    your &abuild; source or binary distribution.
+    In this chapter, we will describe the basics of running &abuild;
+    on a few simple build items, and we will describe how those build
+    items are constructed.  We will gloss over many details that will
+    be covered later in the documentation.  The goal of this chapter
+    is to give you enough information to work on simple build items
+    that belong to existing build trees.  Definitions of
+    <firstterm>build item</firstterm> and <firstterm>build
+    tree</firstterm> appear below.  More detailed information on them
+    can be found in <xref linkend="ref.build-items-and-trees"/>.  The
+    examples we refer to in this chapter can be found in
+    <filename>doc/example/basic</filename> in your &abuild; source or
+    binary distribution.
    </para>
    <sect1 id="ref.system-considerations">
     <title>System Considerations</title>
@@ -940,15 +950,15 @@ C:\cygwin\cygwin.bat
      this file is what makes this into a build item.  We present the
      file here:
      <?example basic/cxx-library/Abuild.conf?>
-     The <property>this</property> key in this file gives the name of
-     the build item, the <property>parent-dir</property> key is
-     used to connect this build item into the build tree, and the
-     <property>platform-types</property> key is used to help
-     &abuild; figure out on which platforms it should attempt to build
-     this item.  Finally, we want this build item to be able to make
-     the resulting library and header file available to other build
-     items.  This is done in its <filename>Abuild.interface</filename>
-     file:
+     In this file, the <property>this</property> key is used to
+     specify the name of the build item, the
+     <property>parent-dir</property> key is used to connect this build
+     item into the build tree, and the
+     <property>platform-types</property> key is used to help &abuild;
+     figure out on which platforms it should attempt to build this
+     item.  Finally, we want this build item to be able to make the
+     resulting library and header file available to other build items.
+     This is done in its <filename>Abuild.interface</filename> file:
      <?example basic/cxx-library/Abuild.interface?>
      This tells &abuild; to add the directory containing this file to
      the include path, the output directory in which the generated
@@ -957,13 +967,10 @@ C:\cygwin\cygwin.bat
      libraries to be linked with.  Notice that the name of the library
      assigned to the <varname>LIBS</varname> variable is the same as
      the value assigned to the <varname>TARGETS_lib</varname> variable
-     in the <filename>Abuild.mk</filename> file.
-    </para>
-    <para>
-     There is a lot of capability hiding beneath the surface here and
-     quite a bit of flexibility in the exact way in which this can be
-     done, but this is the basic pattern you will observe for the
-     majority of C and C++ library build items.
+     in the <filename>Abuild.mk</filename> file, and that the
+     &abuild;-provided variable
+     <varname>$(ABUILD_OUTPUT_DIR)</varname> is used as the library
+     directory.
     </para>
     <para>
      To build this item, you would run the command
@@ -975,6 +982,12 @@ C:\cygwin\cygwin.bat
      directory to which the variable
      <varname>$(ABUILD_OUTPUT_DIR)</varname> refers in the
      <filename>Abuild.interface</filename> file.
+    </para>
+    <para>
+     There is a lot of capability hiding beneath the surface here and
+     quite a bit of flexibility in the exact way in which this can be
+     done, but this is the basic pattern you will observe for the
+     majority of C and C++ library build items.
     </para>
    </sect1>
    <sect1 id="ref.example.basic.cxx-program">
@@ -1004,15 +1017,17 @@ C:\cygwin\cygwin.bat
      <classname>cxx-library</classname> build item by name.  This is
      done in its <filename>Abuild.conf</filename>:
      <?example basic/cxx-program/Abuild.conf?>
-     Notice the addition of the <property>deps</property> key in
-     this file.  This tells &abuild; that our program build item
+     Notice the addition of the <property>deps</property> key in this
+     file.  This tells &abuild; that our program build item
      <firstterm>depends</firstterm> on the library build item.  When
      &abuild; sees this, it automatically makes all the information in
      <classname>cxx-library</classname>'s
      <filename>Abuild.interface</filename> available to
-     <classname>cxx-program</classname>'s build.  This will also tell
-     &abuild; that <classname>cxx-library</classname> must be built
-     before we can build <classname>cxx-program</classname>.
+     <classname>cxx-program</classname>'s build, alleviating the need
+     for the <classname>cxx-program</classname> build item to know the
+     locations of these files.  This will also tell &abuild; that
+     <classname>cxx-library</classname> must be built before we can
+     build <classname>cxx-program</classname>.
     </para>
     <para>
      To build this item, we could just run the
@@ -1056,6 +1071,14 @@ C:\cygwin\cygwin.bat
      <classname>cxx-library</classname> first and then
      <classname>cxx-program</classname>:
      <?qtest example.basic-cxx-program.out?>
+    </para>
+    <para>
+     To remove all of the files that &abuild; created in any build
+     item's directory, you can run <command>abuild clean</command> in
+     that directory.  To clean everything in the build tree, run
+     <command>abuild --clean=all</command>.  More details of how to
+     specify what to build and what to clean can be found in <xref
+     linkend="ref.what-to-build"/>.
     </para>
    </sect1>
    <sect1 id="ref.example.basic.java-library">
