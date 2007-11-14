@@ -465,6 +465,9 @@ else
 
     # Make sure main.cc is accessed
     open(F, "<bin/main.cc") or die;
+    while (<F>)
+    {
+    }
     close(F);
 }
 
