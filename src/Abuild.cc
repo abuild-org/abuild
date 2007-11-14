@@ -14,7 +14,7 @@
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
-std::string const Abuild::ABUILD_VERSION = "1.0.b2";
+std::string const Abuild::ABUILD_VERSION = "1.0.b3-prerelease";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
@@ -1330,6 +1330,7 @@ Abuild::resolveItems(BuildTree_map& buildtrees,
 	 ext_iter != externals.end(); ++ext_iter)
     {
 	ExternalData const& external_data = (*ext_iter).second;
+	bool read_only_external = external_data.isReadOnly();
 	BuildTree& external_tree =
 	    *(buildtrees[external_data.getAbsolutePath()]);
 	BuildItem_map const& external_items =
@@ -1370,6 +1371,10 @@ Abuild::resolveItems(BuildTree_map& buildtrees,
             {
                 builditems[item_name].reset(new BuildItem(item));
 		builditems[item_name]->incrementExternalDepth();
+		if (read_only_external)
+		{
+		    builditems[item_name]->setReadOnly();
+		}
             }
         }
     }
@@ -2664,8 +2669,12 @@ Abuild::dumpData(BuildTree_map& buildtrees)
 	     iter != externals.end(); ++iter)
 	{
 	    o << "   <external build-tree=\"bt-"
-	      << tree_numbers[(*iter).second.getAbsolutePath()]
-	      << "\"/>" << std::endl;
+	      << tree_numbers[(*iter).second.getAbsolutePath()] << "\"";
+	    if ((*iter).second.isReadOnly())
+	    {
+		o << " read-only=\"1\"";
+	    }
+	    o << "/>" << std::endl;
 	}
 	for (std::map<std::string, ExternalData>::const_iterator iter =
 		 backed_externals.begin();
@@ -2673,7 +2682,12 @@ Abuild::dumpData(BuildTree_map& buildtrees)
 	{
 	    o << "   <external build-tree=\"bt-"
 	      << tree_numbers[(*iter).second.getAbsolutePath()]
-	      << "\" backed=\"1\"/>" << std::endl;
+	      << "\" backed=\"1\"";
+	    if ((*iter).second.isReadOnly())
+	    {
+		o << " read-only=\"1\"";
+	    }
+	    o << "/>" << std::endl;
 	}
 	if (! deleted_items.empty())
 	{
@@ -4124,7 +4138,8 @@ Abuild::buildItem(std::string const& item_name,
     {
 	// Assume that this item has previously been built
 	// successfully.
-	QTC::TC("abuild", "Abuild not building read-only build item");
+	QTC::TC("abuild", "Abuild not building read-only build item",
+		(build_item.getBackingDepth() == 0) ? 0 : 1);
 	return true;
     }
 

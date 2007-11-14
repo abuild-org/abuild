@@ -207,6 +207,41 @@
   </build-tree>
   <build-tree
    id="bt-4"
+   absolute-path="--topdir--/multi/c"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="c"
+    home-tree="bt-4"
+    absolute-path="--topdir--/multi/c"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   id="bt-5"
    absolute-path="--topdir--/multi/product"
   >
    <platform-data>
@@ -223,6 +258,7 @@
     </platform-type>
    </platform-data>
    <external build-tree="bt-3"/>
+   <external build-tree="bt-4" read-only="1"/>
    <external build-tree="bt-2"/>
    <build-item
     name="common"
@@ -296,8 +332,25 @@
     </buildable-platforms>
    </build-item>
    <build-item
-    name="product"
+    name="c"
     home-tree="bt-4"
+    absolute-path="--topdir--/multi/c"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="product"
+    home-tree="bt-5"
     absolute-path="--topdir--/multi/product"
     backing-depth="0"
     external-depth="0"
@@ -308,12 +361,14 @@
     <declared-dependencies>
      <dependency name="a"/>
      <dependency name="b"/>
+     <dependency name="c"/>
      <dependency name="common"/>
     </declared-dependencies>
     <expanded-dependencies>
      <dependency name="common"/>
      <dependency name="b"/>
      <dependency name="a"/>
+     <dependency name="c"/>
     </expanded-dependencies>
     <platform-types>
      <platform-type name="native"/>

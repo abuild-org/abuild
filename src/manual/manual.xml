@@ -11317,6 +11317,18 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>1.0.b3: XXX, 2007</term>
+     <listitem>
+      <para>
+       Support has been added for read only externals and for
+       specifying a separate path for an external that is used only on
+       Windows.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <variablelist>
+    <varlistentry>
      <term>1.0.b2: November 2, 2007</term>
      <listitem>
       <itemizedlist>

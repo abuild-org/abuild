@@ -1,3 +1,3 @@
-abuild: common (abuild-<native>): no-op
-abuild: b (abuild-<native>): no-op
-abuild: a (abuild-<native>): no-op
+abuild: common (abuild-<native>): all
+abuild: b (abuild-<native>): all
+abuild: a (abuild-<native>): all

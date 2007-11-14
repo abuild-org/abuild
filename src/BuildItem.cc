@@ -15,6 +15,7 @@ BuildItem::BuildItem(std::string const& item_name,
     tree_top(tree_top),
     backing_depth(0),
     external_depth(0),
+    force_read_only(false),
     target_type(TargetType::tt_unknown),
     plugin(false),
     plugin_anywhere(false)
@@ -303,7 +304,7 @@ BuildItem::matchesPattern(boost::regex& pattern) const
 bool
 BuildItem::isWritable() const
 {
-    return (this->backing_depth == 0);
+    return (! (this->force_read_only || (this->backing_depth > 0)));
 }
 
 bool
@@ -402,6 +403,12 @@ void
 BuildItem::incrementExternalDepth()
 {
     ++this->external_depth;
+}
+
+void
+BuildItem::setReadOnly()
+{
+    this->force_read_only = true;
 }
 
 void

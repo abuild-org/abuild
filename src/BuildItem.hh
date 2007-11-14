@@ -74,6 +74,7 @@ class BuildItem
 
     void incrementBackingDepth();
     void incrementExternalDepth();
+    void setReadOnly();
     void addShadowedPlugin(std::string const& local_tree,
 			   std::string const& remote_tree);
     void setPlatformTypes(std::set<std::string> const& platform_types);
@@ -109,6 +110,7 @@ class BuildItem
     std::string tree_top;	// containing tree
     unsigned int backing_depth;	// 0 in local build tree and externals
     unsigned int external_depth;    // 0 in local build tree and backing chain
+    bool force_read_only;
     pt_map platform_types;	    // platform types and associated platforms
     std::map<std::string, std::string> platform_to_type;
     std::set<std::string> build_platforms; // platforms we will build on

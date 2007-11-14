@@ -417,13 +417,58 @@ ItemConfig::checkPlatforms()
 void
 ItemConfig::checkExternals()
 {
+    // For now, don't provide any mechanism to allow spaces in
+    // winpath.  Even if we did, it probably wouldn't work right with
+    // make.  People can always use the short forms of the paths.
+    static boost::regex winpath_re("-winpath=(\\S+)");
+    boost::smatch match;
+
     std::list<std::string> words =
 	Util::splitBySpace(this->kv.getVal(k_EXTERNAL));
     for (std::list<std::string>::iterator iter = words.begin();
 	 iter != words.end(); ++iter)
     {
-	// XXX handle -ro and -winpath=
-	this->externals.push_back(ExternalData(*iter, false));
+	std::string const& word = *iter;
+	if (word == "-ro")
+	{
+	    if (this->externals.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR ro without external");
+		this->error.error(this->location, "-ro is not preceded by"
+				  " external directory");
+	    }
+	    else
+	    {
+		QTC::TC("abuild", "ItemConfig read-only external");
+		ExternalData data = this->externals.back();
+		this->externals.pop_back();
+		this->externals.push_back(
+		    ExternalData(data.getDeclaredPath(), true));
+	    }
+	}
+	else if (boost::regex_match(word, match, winpath_re))
+	{
+	    if (this->externals.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR winpath without external");
+		this->error.error(this->location, "-winpath is not preceded by"
+				  " external directory");
+	    }
+	    else
+	    {
+		QTC::TC("abuild", "ItemConfig winpath");
+#ifdef _WIN32
+		ExternalData data = this->externals.back();
+		this->externals.pop_back();
+		this->externals.push_back(
+		    ExternalData(match.str(1), data.isReadOnly()));
+#endif
+	    }
+	}
+	else
+	{
+	    this->externals.push_back(ExternalData(*iter, false));
+	}
     }
 }
 

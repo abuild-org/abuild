@@ -106,10 +106,13 @@
 <!--  contains a reference to the external build tree.  Externals  -->
 <!--  that don't explicitly exist but are resolved through a       -->
 <!--  backing area appear with the backed="1" attribute.           -->
+<!--  Externals that are declared read-only appear with the        -->
+<!--  read-only="1" attribute.                                     -->
 <!ELEMENT external EMPTY>
 <!ATTLIST external
   build-tree     IDREF     #REQUIRED
   backed         %boolean; #IMPLIED
+  read-only      %boolean; #IMPLIED
 >
 
 <!--  The deleted-items element contains a list of build items     -->

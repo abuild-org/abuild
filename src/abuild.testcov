@@ -88,7 +88,7 @@ Abuild buildset current 1
 Abuild empty buildset 0
 Abuild clean 0
 Abuild no local build 0
-Abuild not building read-only build item 0
+Abuild not building read-only build item 1
 Abuild not building with no build file 1
 Abuild no-op 0
 ccxx.mk ccxx_compile 0
@@ -214,3 +214,7 @@ Abuild add platform 1
 Abuild add native compiler 1
 Abuild absolute external 0
 ccxx.mk ERR .. in srcs 0
+ItemConfig ERR ro without external 0
+ItemConfig ERR winpath without external 0
+ItemConfig read-only external 0
+ItemConfig winpath 0

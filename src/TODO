@@ -26,6 +26,9 @@
 
  * There may still be some parallel autoconf problems lurking.
 
+ * -winpath=path: document that no spaces are allowed and to use the
+    short form of the path if needed
+
 Documentation
 -------------
 

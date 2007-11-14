@@ -1735,10 +1735,11 @@ cd("work/multi/product");
     close(IN);
     open(OUT, ">Abuild.conf") or die;
     my $cwd = getcwd();
-    my $newpath = windir(dirname($cwd) . "/b");
+    my $newpath = dirname($cwd) . "/b";
+    my $winpath = windir($newpath);
     for (@lines)
     {
-	s,(external-dirs:.*?)(\Q../b\E),$1$newpath,;
+	s,(external-dirs:.*?)(\Q../b\E),$1$newpath -winpath=$winpath,;
 	print OUT;
     }
     close(OUT);
@@ -1837,8 +1838,15 @@ $td->runtest("dump data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("build multi/c",
+	     {$td->COMMAND => "abuild -C ../c",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test6.multi-c.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("multiple external paths",
-	     {$td->COMMAND => "abuild --build=deps no-op",
+	     {$td->COMMAND => "abuild --build=deps",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test6.multi.out",
 	      $td->EXIT_STATUS => 0},
@@ -2562,7 +2570,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(255 +
+$td->report(256 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 16 : 0) +
 	    ($have_whole_archive ? 2 : 1));
