@@ -52,7 +52,7 @@ BuildItem::getChildren() const
     return this->config->getChildren();
 }
 
-std::list<std::string> const&
+std::list<ExternalData> const&
 BuildItem::getExternals() const
 {
     return this->config->getExternals();

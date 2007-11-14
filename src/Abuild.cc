@@ -1073,16 +1073,16 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 		": backing area traversal completed");
     }
 
-    std::map<std::string, std::string> externals;
-    std::map<std::string, std::string> backed_externals;
+    std::map<std::string, ExternalData> externals;
+    std::map<std::string, ExternalData> backed_externals;
     std::set<std::string> traits;
     std::set<std::string> deleted_items;
     std::list<std::string> plugins;
     if (config)
     {
-	std::list<std::string> const& config_externals =
+	std::list<ExternalData> const& config_externals =
 	    config->getExternals();
-	for (std::list<std::string>::const_iterator iter =
+	for (std::list<ExternalData>::const_iterator iter =
 		 config_externals.begin();
 	     iter != config_externals.end(); ++iter)
         {
@@ -1090,42 +1090,51 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 	    // actual build tree here.  This can only happen in an
 	    // error condition in which other error messages have been
 	    // issued.
-	    std::string ext_dir = *iter;
-	    if (Util::isAbsolutePath(ext_dir))
+	    ExternalData external_data = *iter;
+	    std::string const& declared_path = external_data.getDeclaredPath();
+	    if (Util::isAbsolutePath(declared_path))
 	    {
 		QTC::TC("abuild", "Abuild absolute external");
+		external_data.setAbsolutePath(declared_path);
 	    }
 	    else
 	    {
-		ext_dir = Util::canonicalizePath(top_path + "/" + ext_dir);
+		external_data.setAbsolutePath(
+		    Util::canonicalizePath(top_path + "/" + declared_path));
 	    }
-            if (Util::isDirectory(ext_dir))
+
+            if (Util::isDirectory(external_data.getAbsolutePath()))
             {
-		verbose("build tree " + top_path + " has external " + ext_dir);
-                traverse(buildtrees, ext_dir, visiting,
+		std::string const& absolute_path =
+		    external_data.getAbsolutePath();
+		verbose("build tree " + top_path + " has external " +
+			absolute_path);
+                traverse(buildtrees, absolute_path, visiting,
 			 FileLocation(top_conf, 0, 0),
 			 "external of " + top_path);
 		verbose("build tree " + top_path +
-			": traversal of external " + ext_dir + " completed");
-                if (buildtrees.count(ext_dir))
+			": traversal of external " + absolute_path +
+			" completed");
+                if (buildtrees.count(absolute_path))
                 {
-                    externals[*iter] = ext_dir;
+                    externals[declared_path] = external_data;
                 }
             }
             else
             {
-		if (haveExternal(buildtrees, backing_area, *iter, ext_dir))
+		if (haveExternal(buildtrees, backing_area, external_data))
                 {
 		    verbose("build tree " + top_path + " resolved external " +
-			    ext_dir + " in backing area");
+			    external_data.getAbsolutePath() +
+			    " in backing area");
                     QTC::TC("abuild", "Abuild external in backing area");
-                    backed_externals[*iter] = ext_dir;
+                    backed_externals[declared_path] = external_data;
 		}
 		else
 		{
                     QTC::TC("abuild", "Abuild ERR can't resolve external");
                     error(FileLocation(top_conf, 0, 0),
-			  "unable to find external " + *iter);
+			  "unable to find external " + declared_path);
                 }
             }
         }
@@ -1307,7 +1316,7 @@ Abuild::resolveItems(BuildTree_map& buildtrees,
 		     std::string const& top_path)
 {
     BuildTree& tree_data = *(buildtrees[top_path]);
-    std::map<std::string, std::string> const& externals =
+    std::map<std::string, ExternalData> const& externals =
 	tree_data.getExternals();
     BuildItem_map& builditems = tree_data.getBuildItems();
     std::set<std::string> const& deleted_items = tree_data.getDeletedItems();
@@ -1316,11 +1325,13 @@ Abuild::resolveItems(BuildTree_map& buildtrees,
     // Resolve any build items visible in our externals.  Anything
     // visible in an external and also visible here is an error.
 
-    for (std::map<std::string, std::string>::const_iterator ext_iter =
+    for (std::map<std::string, ExternalData>::const_iterator ext_iter =
 	     externals.begin();
 	 ext_iter != externals.end(); ++ext_iter)
     {
-	BuildTree& external_tree = *(buildtrees[(*ext_iter).second]);
+	ExternalData const& external_data = (*ext_iter).second;
+	BuildTree& external_tree =
+	    *(buildtrees[external_data.getAbsolutePath()]);
 	BuildItem_map const& external_items =
 	    external_tree.getBuildItems();
 	std::set<std::string> const& external_deleted =
@@ -1438,16 +1449,17 @@ Abuild::resolveTraits(BuildTree_map& buildtrees,
 {
     // Merge supported traits of this tree's externals into this tree.
     BuildTree& tree_data = *(buildtrees[top_path]);
-    std::map<std::string, std::string> externals =
+    std::map<std::string, ExternalData> externals =
 	tree_data.getExternals();
-    std::map<std::string, std::string> const& backed_externals =
+    std::map<std::string, ExternalData> const& backed_externals =
 	tree_data.getBackedExternals();
     externals.insert(backed_externals.begin(), backed_externals.end());
-    for (std::map<std::string, std::string>::const_iterator iter =
+    for (std::map<std::string, ExternalData>::const_iterator iter =
 	     externals.begin();
 	 iter != externals.end(); ++iter)
     {
-	tree_data.addTraits(buildtrees[(*iter).second]->getSupportedTraits());
+	tree_data.addTraits(
+	    buildtrees[(*iter).second.getAbsolutePath()]->getSupportedTraits());
     }
 }
 
@@ -2395,16 +2407,17 @@ Abuild::readBacking(std::string const& dir,
 bool
 Abuild::haveExternal(BuildTree_map& buildtrees,
 		     std::string const& backing_top,
-		     std::string const& external,
-		     std::string& external_dir)
+		     ExternalData& external)
 {
     if (backing_top.empty())
     {
 	return false;
     }
 
+    std::string const& declared_path = external.getDeclaredPath();
+
     // Don't attempt to resolve absolute path externals.
-    if (Util::isAbsolutePath(external))
+    if (Util::isAbsolutePath(declared_path))
     {
 	return false;
     }
@@ -2415,18 +2428,19 @@ Abuild::haveExternal(BuildTree_map& buildtrees,
     }
     BuildTree& tree_data = *(buildtrees[backing_top]);
 
-    std::map<std::string, std::string> const& externals =
+    std::map<std::string, ExternalData> const& externals =
 	tree_data.getExternals();
     bool result = false;
-    if (externals.count(external))
+    if (externals.count(declared_path))
     {
         result = true;
-	external_dir = (*(externals.find(external))).second;
+	external.setAbsolutePath(
+	    (*(externals.find(declared_path))).second.getAbsolutePath());
     }
     else
     {
 	std::string const& backing_area = tree_data.getBackingArea();
-        result = haveExternal(buildtrees, backing_area, external, external_dir);
+        result = haveExternal(buildtrees, backing_area, external);
     }
     return result;
 }
@@ -2567,13 +2581,13 @@ Abuild::dumpData(BuildTree_map& buildtrees)
 	{
 	    g.addDependency(path, backing_area);
 	}
-	std::map<std::string, std::string> const& externals =
+	std::map<std::string, ExternalData> const& externals =
 	    tree.getExternals();
-	for (std::map<std::string, std::string>::const_iterator iter =
+	for (std::map<std::string, ExternalData>::const_iterator iter =
 		 externals.begin();
 	     iter != externals.end(); ++iter)
 	{
-	    g.addDependency(path, (*iter).second);
+	    g.addDependency(path, (*iter).second.getAbsolutePath());
 	}
     }
     // Even if there were errors, the build tree graph must always be
@@ -2612,9 +2626,9 @@ Abuild::dumpData(BuildTree_map& buildtrees)
 	tree_numbers[tree_path] = ++cur_tree;
 	BuildTree& tree_data = *(buildtrees[tree_path]);
 	std::string const& backing_area = tree_data.getBackingArea();
-	std::map<std::string, std::string> const& externals =
+	std::map<std::string, ExternalData> const& externals =
 	    tree_data.getExternals();
-	std::map<std::string, std::string> const& backed_externals =
+	std::map<std::string, ExternalData> const& backed_externals =
 	    tree_data.getBackedExternals();
 	BuildItem_map& builditems = tree_data.getBuildItems();
 	std::set<std::string> const& traits = tree_data.getSupportedTraits();
@@ -2645,20 +2659,20 @@ Abuild::dumpData(BuildTree_map& buildtrees)
 	      << tree_numbers[backing_area]
 	      << "\"/>" << std::endl;
 	}
-	for (std::map<std::string, std::string>::const_iterator iter =
+	for (std::map<std::string, ExternalData>::const_iterator iter =
 		 externals.begin();
 	     iter != externals.end(); ++iter)
 	{
 	    o << "   <external build-tree=\"bt-"
-	      << tree_numbers[(*iter).second]
+	      << tree_numbers[(*iter).second.getAbsolutePath()]
 	      << "\"/>" << std::endl;
 	}
-	for (std::map<std::string, std::string>::const_iterator iter =
+	for (std::map<std::string, ExternalData>::const_iterator iter =
 		 backed_externals.begin();
 	     iter != backed_externals.end(); ++iter)
 	{
 	    o << "   <external build-tree=\"bt-"
-	      << tree_numbers[(*iter).second]
+	      << tree_numbers[(*iter).second.getAbsolutePath()]
 	      << "\" backed=\"1\"/>" << std::endl;
 	}
 	if (! deleted_items.empty())

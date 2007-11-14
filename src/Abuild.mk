@@ -113,6 +113,7 @@ SRCS_bin_abuild := \
 	PlatformData.cc \
 	TraitData.cc \
 	PlatformSelector.cc \
+	ExternalData.cc \
 	ItemConfig.cc \
 	BuildTree.cc \
 	BuildItem.cc \

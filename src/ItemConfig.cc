@@ -417,7 +417,14 @@ ItemConfig::checkPlatforms()
 void
 ItemConfig::checkExternals()
 {
-    this->externals = Util::splitBySpace(this->kv.getVal(k_EXTERNAL));
+    std::list<std::string> words =
+	Util::splitBySpace(this->kv.getVal(k_EXTERNAL));
+    for (std::list<std::string>::iterator iter = words.begin();
+	 iter != words.end(); ++iter)
+    {
+	// XXX handle -ro and -winpath=
+	this->externals.push_back(ExternalData(*iter, false));
+    }
 }
 
 void
@@ -666,7 +673,7 @@ ItemConfig::getChildren() const
     return this->children;
 }
 
-std::list<std::string> const&
+std::list<ExternalData> const&
 ItemConfig::getExternals() const
 {
     return this->externals;

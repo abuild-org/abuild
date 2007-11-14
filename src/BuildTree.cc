@@ -2,8 +2,8 @@
 #include <QEXC.hh>
 
 BuildTree::BuildTree(std::string const& backing_area,
-		     std::map<std::string, std::string> const& externals,
-		     std::map<std::string, std::string> const& backed_externals,
+		     std::map<std::string, ExternalData> const& externals,
+		     std::map<std::string, ExternalData> const& backed_externals,
 		     std::set<std::string> const& declared_traits,
 		     std::set<std::string> const& deleted_items,
 		     std::list<std::string> const& plugins,
@@ -50,13 +50,13 @@ BuildTree::getBackingArea() const
     return this->backing_area;
 }
 
-std::map<std::string, std::string> const&
+std::map<std::string, ExternalData> const&
 BuildTree::getExternals() const
 {
     return this->externals;
 }
 
-std::map<std::string, std::string> const&
+std::map<std::string, ExternalData> const&
 BuildTree::getBackedExternals() const
 {
     return this->backed_externals;

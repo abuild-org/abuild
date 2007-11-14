@@ -13,8 +13,8 @@ class BuildTree
 {
   public:
     BuildTree(std::string const& backing_area,
-	      std::map<std::string, std::string> const& externals,
-	      std::map<std::string, std::string> const& backed_externals,
+	      std::map<std::string, ExternalData> const& externals,
+	      std::map<std::string, ExternalData> const& backed_externals,
 	      std::set<std::string> const& declared_traits,
 	      std::set<std::string> const& deleted_items,
 	      std::list<std::string> const& plugins,
@@ -31,8 +31,8 @@ class BuildTree
     PlatformData& getPlatformData();
 
     std::string const& getBackingArea() const;
-    std::map<std::string, std::string> const& getExternals() const;
-    std::map<std::string, std::string> const& getBackedExternals() const;
+    std::map<std::string, ExternalData> const& getExternals() const;
+    std::map<std::string, ExternalData> const& getBackedExternals() const;
     BuildItem_map& getBuildItems();
     std::map<std::string, std::string> const& getPaths() const;
     std::list<std::string> const& getSortedItemNames() const;
@@ -44,9 +44,9 @@ class BuildTree
     // absolute path of backing area root
     std::string backing_area;
     // relative external path -> absolute path to external root
-    std::map<std::string, std::string> externals;
+    std::map<std::string, ExternalData> externals;
     // externals resolved through a backing areas
-    std::map<std::string, std::string> backed_externals;
+    std::map<std::string, ExternalData> backed_externals;
     // build item name -> BuildItem
     BuildItem_map build_items;
     // tree-relative path -> item_name || ""

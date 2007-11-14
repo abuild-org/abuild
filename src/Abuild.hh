@@ -93,8 +93,7 @@ class Abuild
     void readBacking(std::string const& dir,
 		     std::string& backing_area);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
-		      std::string const& external,
-		      std::string& external_dir);
+		      ExternalData& external);
     bool checkBuilditemPath(BuildTree_map& buildtrees,
 			    std::string const& backing_area,
 			    std::string const& child_tree_relative);
