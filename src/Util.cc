@@ -792,6 +792,76 @@ Util::getProgramOutput(std::string cmd)
     return result;
 }
 
+#ifdef _WIN32
+
+// On Windows, if we run a child process that shares the console with
+// this program and if that child process is a batch file, we will run
+// into trouble if the user hits CTRL-C.  Our process will exit
+// immediately, as will any other processes that don't do anything
+// special with CTRL-C.  However, any batch files, which were run with
+// cmd /c, will prompt the user with "Terminate batch job? (Y/N)".
+// There is no way to turn this behavior off.  If we exit before they
+// do, the user will not have any way of answering those prompts, and
+// his/her console will be hosed.  To avoid this, we keep track of
+// child processes that we are running and wait for all of them to
+// exit before exiting ourselves if the user has hit CTRL-C.
+
+// To achieve this, we keep a mutex-protected set of running process
+// information pointers.  Whenever a process is created or destroyed,
+// it must be done while holding the mutex.
+static boost::mutex running_process_mutex;
+static std::set<PROCESS_INFORMATION*> running_processes;
+
+static bool
+cleanProcess(PROCESS_INFORMATION* pi)
+{
+    // This function must be called with the running_process_mutex
+    // locked.  It actually waits for the process to exit and then
+    // cleans up after it.  It returns true if the program exited
+    // normally.
+
+    DWORD exit_status;
+    GetExitCodeProcess(pi->hProcess, &exit_status);
+    CloseHandle(pi->hProcess);
+    CloseHandle(pi->hThread);
+    return (exit_status == 0);
+}
+
+static void
+waitForProcessesAndExit()
+{
+    // Wait for all processes to exit, and then force the process to
+    // exit.
+    boost::mutex::scoped_lock lock(running_process_mutex);
+    while (! running_processes.empty())
+    {
+	PROCESS_INFORMATION* pi = *(running_processes.begin());
+	running_processes.erase(pi);
+	WaitForSingleObject(pi->hProcess, INFINITE);
+	cleanProcess(pi);
+    }
+    ExitProcess(2);
+}
+
+static BOOL ctrlHandler(DWORD ctrl_type)
+{
+    // Trap windows CTRL-C event
+
+    switch (ctrl_type)
+    {
+        case CTRL_C_EVENT:
+        case CTRL_CLOSE_EVENT:
+        case CTRL_BREAK_EVENT:
+	  waitForProcessesAndExit();
+	  return TRUE;
+
+        default:
+	  return FALSE;
+    }
+}
+
+#endif // _WIN32
+
 bool
 Util::runProgram(std::string const& progname,
 		 std::vector<std::string> const& args,
@@ -802,6 +872,17 @@ Util::runProgram(std::string const& progname,
     bool status = true;
 
 #ifdef _WIN32
+    static bool installed_ctrl_handler = false;
+
+    if (! installed_ctrl_handler)
+    {
+	if (! SetConsoleCtrlHandler((PHANDLER_ROUTINE) ctrlHandler, TRUE))
+	{
+	    throw QEXC::General("could not set control handler");
+	}
+	installed_ctrl_handler = true;
+    }
+
     std::string progpath = progname;
     appendExe(progpath);
     std::string suffix = getExtension(progpath);
@@ -883,32 +964,41 @@ Util::runProgram(std::string const& progname,
     char* env = new char[env_str.length()];
     memcpy(env, env_str.c_str(), env_str.length());
 
-    BOOL result =
-	CreateProcess(appname.c_str(), // LPCTSTR lpApplicationName,
-		      cmdline,  // LPTSTR lpCommandLine,
-		      NULL,	// LPSECURITY_ATTRIBUTES lpProcessAttributes,
-		      NULL,     // LPSECURITY_ATTRIBUTES lpThreadAttributes,
-		      TRUE,	// BOOL bInheritHandles,
-		      0,        // DWORD dwCreationFlags,
-		      env,      // LPVOID lpEnvironment,
-		      dir.c_str(), // LPCTSTR lpCurrentDirectory,
-		      &si,      // LPSTARTUPINFO lpStartupInfo,
-		      &pi);     // LPPROCESS_INFORMATION lpProcessInformation);
+    BOOL result = false;
 
-    delete [] cmdline;
-    delete [] env;
+    { // private scope
+	boost::mutex::scoped_lock lock(running_process_mutex);
 
-    if (! result)
-    {
-	return false;
+	result =
+	    CreateProcess(appname.c_str(), // LPCTSTR lpApplicationName,
+			  cmdline,	   // LPTSTR lpCommandLine,
+			  NULL,	// LPSECURITY_ATTRIBUTES lpProcessAttributes,
+			  NULL,	// LPSECURITY_ATTRIBUTES lpThreadAttributes,
+			  TRUE,	// BOOL bInheritHandles,
+			  0,	// DWORD dwCreationFlags,
+			  env,	// LPVOID lpEnvironment,
+			  dir.c_str(), // LPCTSTR lpCurrentDirectory,
+			  &si,	// LPSTARTUPINFO lpStartupInfo,
+			  &pi);	// LPPROCESS_INFORMATION lpProcessInformation);
+
+	delete [] cmdline;
+	delete [] env;
+
+	if (! result)
+	{
+	    return false;
+	}
+
+	running_processes.insert(&pi);
     }
 
     WaitForSingleObject(pi.hProcess, INFINITE);
-    DWORD exit_status;
-    GetExitCodeProcess(pi.hProcess, &exit_status);
-    status = (exit_status == 0);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
+
+    { // private scope
+	boost::mutex::scoped_lock lock(running_process_mutex);
+	running_processes.erase(&pi);
+	status = cleanProcess(&pi);
+    }
 #else
     int pid = fork();
     if (pid == -1)
