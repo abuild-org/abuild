@@ -843,7 +843,8 @@ waitForProcessesAndExit()
     ExitProcess(2);
 }
 
-static BOOL ctrlHandler(DWORD ctrl_type)
+static BOOL
+ctrlHandler(DWORD ctrl_type)
 {
     // Trap windows CTRL-C event
 
