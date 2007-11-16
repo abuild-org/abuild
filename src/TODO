@@ -1,18 +1,11 @@
 
-1.0.b4 or 1.0
-=============
+Next Release
+============
 
  * Make sure the README and Artistic files are handled sensibly at
    release time.
 
  * Look at all XXX comments.
-
-Release notes:
-
- * When Ctrl-C is hit on Windows, abuild waits for any child processes
-   to exit before exiting itself.  If you are running subsidiary ant
-   processes, you will need to answer "Y" to each "Terminate batch
-   job?" prompt before abuild will exit.
 
 
 Documentation
@@ -30,9 +23,6 @@ Documentation
 
     - recheck XXX
 
- * Make sure documentation for integration with third party packages
-   is sufficient.
-
  * Consider adding a trouble shooting section
 
     - example: library name inconsistency between Abuild.mk and
@@ -42,22 +32,13 @@ Documentation
 Abuild Contrib
 --------------
 
- * Include pieces of the abuild library including at least doxygen and
-   javadoc plugins.  Mention this in the installation part of the
-   documentation.
+ * Include pieces of the abuild library including at least doxygen,
+   javadoc, and pkg-config plugins.  Mention this in the installation
+   part of the documentation.
 
 
 Bugs
 ====
-
- * There are some Windows path issues.  Find out the real story behind
-   Windows paths.  See whether using absolute paths is better than
-   relative paths for Windows.  If so, this has implications as there
-   is a mixture of Windows native and cygwin tools in use.
-
- * Wade Taylor reports: I just noticed a quirk in
-   Abuild-ant.properties: whitespace is not "trimmed" after an
-   abuild.hook-build-item.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
@@ -160,9 +141,6 @@ See also "Known Limitations" in the documentation.
  * To check for all Abuild.mk files that define local targets:
    pcregrep '^\s*\S+\s*:(\Z|[^=])' **/Abuild.mk
 
- * Consider having an option for abuild to look upward until it finds
-   an Abuild.conf.  This must not be the default behavior.
-
  * It might be useful to have the ability to find all references to a
    particular interface variable and/or to find the origin and
    variable history for a specific variable.  This comes back to the
@@ -171,14 +149,14 @@ See also "Known Limitations" in the documentation.
    to know who uses it, or I see some variable in someone's
    Abuild-ant.properties or Abuild.mk and want to know who defines it.
 
- * Use re-entrant scanners instead of C++ scanners.  This requires
-   flex >= 2.5.33.  Have abuild's own build process detect whether or
-   not a new enough version of flex is available.  If so, it should
-   generate the parsers and attempt to update a cached copy of the
-   automatically generated files if they have changed.  Otherwise, it
-   should use the cached files by adding them to SRCS in place of the
-   automatically generated ones.  We also need to disable warnings for
-   the flex-generated code.  Use %option nounistd.
+ * Consider useing re-entrant scanners instead of C++ scanners.  This
+   requires flex >= 2.5.33.  Have abuild's own build process detect
+   whether or not a new enough version of flex is available.  If so,
+   it should generate the parsers and attempt to update a cached copy
+   of the automatically generated files if they have changed.
+   Otherwise, it should use the cached files by adding them to SRCS in
+   place of the automatically generated ones.  We also need to disable
+   warnings for the flex-generated code.  Use %option nounistd.
 
  * Test, at least informally, backing areas on different drive letters
    on Windows.  Not sure whether it's worth putting this in the test
@@ -194,14 +172,6 @@ See also "Known Limitations" in the documentation.
 
  * Clean up ~/source/examples/java/native/abuild and use as JNI
    example
-
- * Think about the idea of having some kind of extended plugin
-   interface to allow additional policy validations to be made on a
-   per-project basis.  Examples would be things like tier-based
-   dependency rules, facade class interfaces not being violated, not
-   having nested build items under directories that have items that
-   build stuff, etc.  If this is done, update the documentation on
-   custom access rules.
 
  * ccxx: Consider enforcing that no object file may appear both as a
    program and a library object file and that no object file may be
@@ -225,3 +195,8 @@ See also "Known Limitations" in the documentation.
    search directories represented in the source lists, but that
    wouldn't help if we removed the last file from a subdirectory.  For
    now, we'll just not handle this case.
+
+ * There are some Windows path issues.  Find out the real story behind
+   Windows paths.  See whether using absolute paths is better than
+   relative paths for Windows.  If so, this has implications as there
+   is a mixture of Windows native and cygwin tools in use.
