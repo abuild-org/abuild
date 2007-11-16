@@ -29,14 +29,6 @@ Documentation
       Abuild.interface
 
 
-Abuild Contrib
---------------
-
- * Include pieces of the abuild library including at least doxygen,
-   javadoc, and pkg-config plugins.  Mention this in the installation
-   part of the documentation.
-
-
 Bugs
 ====
 
