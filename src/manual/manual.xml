@@ -703,13 +703,20 @@ following checks:
     <para>
      To build &abuild;, you must also have version 1.33.1 or newer of
      the <ulink url="http://www.boost.org/">boost</ulink> regex and
-     thread libraries.  (&Abuild; is known to work with the boost 1.32
-     in Red Hat Enterprise Linux 4, but it may not work with that
-     version of boost on other systems.)  &abuild; is known to
-     buildable by gcc, xlc, Microsoft Visual C++ (7.1 or newer), and
-     <ulink url="http://www.mingw.org/">mingw</ulink>.  &Abuild;
-     itself contains C++ code and Java code, so all the runtime
-     requirements for both systems are required to build &abuild;.
+     thread libraries.
+     <footnote>
+      <para>
+       &Abuild; is known to work with the boost 1.32 in Red Hat
+       Enterprise Linux 4, but it may not work with that version of
+       boost on other systems.  It has also been tested with boost
+       1.34 and 1.34.1.
+      </para>
+     </footnote>
+     &Abuild; is known to buildable by gcc, xlc, Microsoft Visual C++
+     (7.1 or newer), and <ulink
+     url="http://www.mingw.org/">mingw</ulink>.  &Abuild; itself
+     contains C++ code and Java code, so all the runtime requirements
+     for both systems are required to build &abuild;.
     </para>
     <para>
      Since &abuild; determines where it is being run from when it is
@@ -730,6 +737,18 @@ following checks:
      honor it when selecting which copy of
      <application>ant</application> to run.  Otherwise, it will run
      <application>ant</application> from your path.
+    </para>
+    <para>
+     As you begin using &abuild;, you may find yourself generating a
+     collection of useful utility build items for things like specific
+     third-party libraries, external compilers, documentation
+     generators, or test frameworks.  There is a small collection of
+     contributed build items in the
+     <filename>abuild-contrib</filename> package, which is available
+     at <ulink url="http://www.abuild.org">&abuild;'s web
+     site</ulink>.  These may have additional requirements.  For
+     details, please see the information about
+     <filename>abuild-contrib</filename> on the website.
     </para>
    </sect1>
    <sect1 id="ref.installation.build">
@@ -1746,6 +1765,66 @@ C:\cygwin\cygwin.bat
      get a clear picture of the dependencies in the entire tree.  (For
      information on the <option>--dump-data</option> option, see <xref
      linkend="ref.dump-data"/>.)
+    </para>
+   </sect1>
+   <sect1 id="ref.third-party-software">
+    <title>Integrating with Third-Party Software</title>
+    <para>
+     Virtually every software development project has some need to
+     integrate with third-party software libraries.  In a traditional
+     build system, you might list the include paths, libraries, and
+     library directories right in your <filename>Makefile</filename>
+     or configuration file for whatever build system you are using.
+     With &abuild;, the best way to integrate with a third-party
+     library is to use a build item whose sole purpose is to export
+     that library's information using an
+     <filename>Abuild.interface</filename> file.  In the simplest
+     cases, a third-party library build item might be an interface
+     only build item (described above) that just includes the
+     appropriate library directives in a static
+     <filename>Abuild.interface</filename> file.  For example, a build
+     item that provides access to the PCRE (Perl-compatible regular
+     expression) libraries on a Linux distribution that has them
+     installed in the system's standard include path might just
+     include an <filename>Abuild.interface</filename> with the
+     following contents:
+
+     <programlisting>LIBS = pcrecpp pcre
+</programlisting>
+     For Java build items, a third-party JAR build item would
+     typically append the path to the JAR file to the
+     <varname>abuild.classpath.external</varname> interface variable.
+     Sometimes, the process may be more involved.  For example, on a
+     UNIX system, it is often desirable to use
+     <application>autoconf</application> to determine what interface
+     is required for a particular library.  We present an example of
+     using <application>autoconf</application> with &abuild; in <xref
+     linkend="ref.example.autoconf"/>.  Still other libraries may use
+     <application>pkg-config</application>.  For those libraries, it
+     may make sense to create a simple set of build rules that
+     automatically generate an <filename>Abuild.interface</filename>
+     <function>after-build</function> file (also discussed in <xref
+     linkend="ref.example.autoconf"/>) by running the
+     <command>pkg-config</command> command.
+     <footnote>
+      <para>
+       An example <application>pkg-config</application> build item may
+       be found in the <filename>abuild-contrib</filename> package
+       available at <ulink url="http://www.abuild.org">&abuild;'s web
+       site</ulink>.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     Whichever way you do it for a given package, the idea is that you
+     should always create a build item whose job it is to provide the
+     glue between &abuild; and the third-party library.  Other build
+     items that need to use the third-party library can then just
+     declare a dependency on the build item that provides the
+     third-party library's interface.  This simplifies the process of
+     using third-party libraries and makes it possible to create a
+     uniform standard for doing so within any specific &abuild; build
+     tree.
     </para>
    </sect1>
    <sect1 id="ref.example.simple-build-tree">
@@ -11453,6 +11532,31 @@ Y = $(X)
     the documentation.
    </para>
    <variablelist>
+    <varlistentry>
+     <term>1.0.rc1: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Hitting CTRL-C in Windows while &abuild; was running
+         <application>ant</application> would sometimes leave the
+         console window in an unusable state as
+         <application>ant</application>, a batch file, tried to ask
+         the user whether to terminate the batch job.  On Windows,
+         &abuild; now waits for subsidiary processes to exit before
+         exiting itself.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Trailing whitespace is now trimmed around
+         <varname>abuild.hook-build-items</varname> in
+         <filename>Abuild-ant.properties</filename>.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.0.b3: November 13, 2007</term>
      <listitem>
