@@ -7,6 +7,13 @@
 
  * Look at all XXX comments.
 
+Release notes:
+
+ * When Ctrl-C is hit on Windows, abuild waits for any child processes
+   to exit before exiting itself.  If you are running subsidiary ant
+   processes, you will need to answer "Y" to each "Terminate batch
+   job?" prompt before abuild will exit.
+
 
 Documentation
 -------------
@@ -51,21 +58,6 @@ Bugs
  * Wade Taylor reports: I just noticed a quirk in
    Abuild-ant.properties: whitespace is not "trimmed" after an
    abuild.hook-build-item.
-
- * Spencer Allain reports: I'm not quite sure what is going on, but
-   doing a Ctrl-C on abuild under Windows results in my console
-   session being totally hosed permanently.
-
- * Ant seems to not complain when populating an ear file from a
-   classpath that contains non-existent items.  In general, there may
-   be an issue with not getting any notification of non-existent
-   classpath items.
-
- * Orphan target detection won't find orphan targets in
-   subdirectories.  This is very hard to fix in general.  We could
-   search directories represented in the source lists, but that
-   wouldn't help if we removed the last file from a subdirectory.  For
-   now, we'll just not handle this case.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
@@ -117,6 +109,11 @@ this way.
  * Consider supporting creation of multiple jar files with different
    contents analogous to different libraries being created from a
    single C++ build item.
+
+ * Ant seems to not complain when populating an ear file from a
+   classpath that contains non-existent items.  In general, there may
+   be an issue with not getting any notification of non-existent
+   classpath items.
 
 
 Other
@@ -222,3 +219,9 @@ See also "Known Limitations" in the documentation.
    information about a specific compiler.  This would be especially
    useful for figuring out what flags to use for PIC when building
    shared libraries.
+
+ * Orphan target detection won't find orphan targets in
+   subdirectories.  This is very hard to fix in general.  We could
+   search directories represented in the source lists, but that
+   wouldn't help if we removed the last file from a subdirectory.  For
+   now, we'll just not handle this case.
