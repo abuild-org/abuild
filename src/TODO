@@ -89,8 +89,8 @@ this way.
    though haltonfailure="yes" is passed in to the junit task.
 
 
-Other
-=====
+Issues, Enhancement Ideas
+=========================
 
 See also "Known Limitations" in the documentation.
 
