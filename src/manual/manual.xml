@@ -154,9 +154,11 @@ following checks:
    the full depth of &abuild;'s functionality.  The most essential and
    common topics are presented first so that top-down learners can
    just start at the beginning and stop reading when they feel that
-   they've seen enough to get going.  As each new concept is
-   presented, it is enhanced with examples.  A list of all the
-   examples in the document can be found in <xref
+   they've seen enough to get going.  If you come across something in
+   the first reading that you don't understand, it's probably safe to
+   skip it and come back when you're more comfortable.  As each new
+   concept is presented, it is enhanced with examples.  A list of all
+   the examples in the document can be found in <xref
    linkend="ref.list-of-examples"/>.  If you are just looking for
    changes from previous versions of &abuild;, please see <xref
    linkend="ref.release-notes"/>.
@@ -1330,11 +1332,10 @@ C:\cygwin\cygwin.bat
      All build items that provide a service are required to have a
      name.  Build item names must be unique within their build tree
      and all other build trees accessible to their build tree since
-     the build item name is the only way &abuild; has to address a
-     build item.  Build item names consist of period-separated
-     segments.  Each segment may contain mixed case alphanumeric
-     characters, underscores, and dashes.  Build item names are
-     case-sensitive.
+     the build item name is show &abuild; addresses a build item.
+     Build item names consist of period-separated segments.  Each
+     segment may contain mixed case alphanumeric characters,
+     underscores, and dashes.  Build item names are case-sensitive.
     </para>
     <para>
      The primary mechanism for describing build items is the
@@ -1421,90 +1422,58 @@ C:\cygwin\cygwin.bat
      the <property>parent-dir</property> key is
      &ldquo;<filename>..</filename>&rdquo;, but it doesn't have to be.
      It is also customary to have the value of
-     <property>child-dirs</property> contain single path components,
-     but this is also not a hard restriction.  When &abuild; starts
-     up, it looks for an <filename>Abuild.conf</filename> in the
-     current directory and looks for its
-     <property>parent-dir</property> key.  Using that, it locates the
-     parent build item's <filename>Abuild.conf</filename> file and
-     reads it for its <property>parent-dir</property> key.  This
-     process is repeated until &abuild; discovers a build item that
-     does not have a <property>parent-dir</property> key.  This build
-     item is known as the <firstterm>root build item</firstterm> of
-     the build tree.
+     <property>child-dirs</property> contain single path components
+     (<emphasis>i.e.</emphasis>just a file without a directory), but
+     this is also not a hard restriction.  When &abuild; starts up, it
+     looks for an <filename>Abuild.conf</filename> in the current
+     directory and looks for its <property>parent-dir</property> key.
+     Using that, it locates the parent build item's
+     <filename>Abuild.conf</filename> file and reads it for its
+     <property>parent-dir</property> key.  This process is repeated
+     until &abuild; discovers a build item that does not have a
+     <property>parent-dir</property> key.  This build item is known as
+     the <firstterm>root build item</firstterm> of the build tree.
     </para>
     <para>
-     Please note that the hierarchy defined by the layout of build
-     items in the file system is a file system hierarchy and nothing
-     more.  It doesn't have to have any bearing at all on the
-     dependency relationships among the build items.  That said, it is
-     sensible to organize build items in a manner that relates to the
+     Note that the hierarchy defined by the layout of build items in
+     the file system is a file system hierarchy and nothing more.  It
+     doesn't have to have any bearing at all on the dependency
+     relationships among the build items.  That said, it is sensible
+     to organize build items in a manner that relates to the
      architecture of the system, and this in turn usually has
      implications about dependencies.  Still, it is important to keep
      in mind that &abuild; is not file-system driven but rather is
-     dependency driven.  In fact, &abuild; doesn't even maintain the
-     information about the parents and children of build items in the
-     file system.  This information is used only at startup to locate
-     the root of the build tree and to find the locations of all of
-     the build items in the tree so that they may be later referred to
-     only by name.
+     dependency driven.
+     <footnote>
+      <para>
+       This information is used only at startup to locate the root of
+       the build tree and to find the locations of all of the build
+       items in the tree so that they may be later referred to only by
+       name. In fact, &abuild; doesn't even retain the information
+       about the parents and children of build items in the file
+       system after it uses the information during startup.
+      </para>
+     </footnote>
     </para>
     <para>
-     In addition to containing build items, build trees contain other
-     attributes.  Among these are references to other build trees, a
-     list of <firstterm>supported traits</firstterm>, and a list of
-     <firstterm>plugins</firstterm>.  We will discuss these topics
-     later in the document.  Most of a build tree's attributes appear
-     in the root build item's <filename>Abuild.conf</filename> file.
+     In addition to containing build items, build trees can contain
+     other attributes.  Among these are references to other build
+     trees, a list of <firstterm>supported traits</firstterm>, and a
+     list of <firstterm>plugins</firstterm>.  We will discuss these
+     topics later in the document.  Most of a build tree's attributes
+     appear in the root build item's <filename>Abuild.conf</filename>
+     file.
     </para>
    </sect1>
    <sect1 id="ref.build-item-types">
-    <title>Types of Build Items</title>
+    <title>Special Types of Build Items</title>
     <para>
      In further describing build items and their attributes, it is
-     useful to classify build items into several types.  We describe
-     certain special types of build items here.
+     useful to classify build items into several types.  Most build
+     items serve the purpose of providing code to be compiled.  There
+     are a number of special types of build items that serve other
+     purposes.  We discuss these here:
      <variablelist>
-      <varlistentry>
-       <term>unnamed</term>
-       <listitem>
-        <para>
-         <indexterm>
-          <primary>unnamed build item</primary>
-         </indexterm>
-         <indexterm>
-          <primary>build item</primary>
-          <secondary>unnamed</secondary>
-         </indexterm>
-         In order to refer to one build item from another, both build
-         items must have names.  &Abuild; requires that every named
-         build item in a build tree be named uniquely within that
-         tree.  A name is given to build item by setting the
-         <property>this</property> key in its
-         <filename>Abuild.conf</filename>.
-         <footnote>
-          <para>
-           Perhaps <property>name</property> would have been a better
-           name for this key, but it's too late to change it now.  Maybe
-           this key will be renamed in a future major release of
-           &abuild;.
-          </para>
-         </footnote>
-         Sometimes, a build item exists for the sole purpose of
-         bridging its parent with its children in the file system.
-         Such items do not need to be referenced by other build items,
-         so they do not need names.  The only use of an unnamed build
-         item is to serve as an intermediary during traversal of the
-         file system.  Such a build item's
-         <filename>Abuild.conf</filename> contains only the
-         <property>parent-dir</property> and
-         <property>child-dirs</property> keys.  &Abuild; doesn't
-         maintain any information about these build items.  It simply
-         traverses through them when locating build items at startup
-         time.
-        </para>
-       </listitem>
-      </varlistentry>
       <varlistentry>
        <term>root</term>
        <listitem>
@@ -1527,6 +1496,46 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term>unnamed</term>
+       <listitem>
+        <para>
+         <indexterm>
+          <primary>unnamed build item</primary>
+         </indexterm>
+         <indexterm>
+          <primary>build item</primary>
+          <secondary>unnamed</secondary>
+         </indexterm>
+         In order to refer to one build item from another, both build
+         items must have names.  &Abuild; requires that every named
+         build item in a build tree be named uniquely within that
+         tree.  A name is given to a build item by setting the
+         <property>this</property> key in its
+         <filename>Abuild.conf</filename>.
+         <footnote>
+          <para>
+           Perhaps <property>name</property> would have been a better
+           name for this key, but it's too late to change it now.
+           This key might be renamed in a future major release of
+           &abuild;.
+          </para>
+         </footnote>
+         Sometimes, a build item exists for the sole purpose of
+         bridging its parent with its children in the file system.
+         Such items do not need to be referenced by other build items,
+         so they do not need names.  The only use of an unnamed build
+         item is to serve as an intermediary during traversal of the
+         file system.  Such a build item's
+         <filename>Abuild.conf</filename> may only contain the
+         <property>parent-dir</property> and
+         <property>child-dirs</property> keys.  &Abuild; doesn't
+         retain any information about these build items.  It simply
+         traverses through them when locating build items at startup
+         time.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term>interface-only</term>
        <listitem>
         <para>
@@ -1537,18 +1546,20 @@ C:\cygwin\cygwin.bat
           <primary>build item</primary>
           <secondary>interface-only</secondary>
          </indexterm>
-         Interface-only build items are build items that contain an
-         <filename>Abuild.interface</filename> file but no build files
-         (such as <filename>Abuild.mk</filename> or
-         <filename>Abuild-ant.properties</filename>).  &Abuild; never
-         actually invokes a backend to build these items since they
-         have nothing to build.  They are, however, included in all
-         dependency and integrity checks.  A typical use of
-         interface-only build items would be to add the locations of
-         external libraries to the include and library paths (or to
-         the classpaths for Java items).  There may also be some
-         interface-only build items that consist solely of static
-         files (templated C++ classes, lists of constants, etc.).
+         Interface-only build items are build items that contain (in
+         addition to <filename>Abuild.conf</filename>) an
+         <filename>Abuild.interface</filename> file.  They do not
+         build anything and therefore do not contain build files (such
+         as <filename>Abuild.mk</filename> or
+         <filename>Abuild-ant.properties</filename>).  Since they have
+         nothing to build, &abuild; never actually invokes a backend
+         on them.  They are, however, included in all dependency and
+         integrity checks.  A typical use of interface-only build
+         items would be to add the locations of external libraries to
+         the include and library paths (or to the classpaths for Java
+         items).  There may also be some interface-only build items
+         that consist solely of static files (templated C++ classes,
+         lists of constants, etc.).
         </para>
        </listitem>
       </varlistentry>
@@ -1563,18 +1574,19 @@ C:\cygwin\cygwin.bat
           <primary>build item</primary>
           <secondary>pass-through</secondary>
          </indexterm>
-         Pass-through build items are build items that contain no
-         build or interface files, but they are named and have
-         dependencies.  This makes pass-through build items useful as
-         top-level facades for hiding more complicated build item
-         structures.  This could include build items that have private
-         names relative to the pass-through item, and it could also
-         include structures containing build items that cross language
-         and platform boundaries.  Several examples in the
-         documentation use pass-through build items to hide private
-         build item names.  For further discussion of using
-         pass-through build items in a cross-platform environment,
-         please see <xref linkend="ref.cross-platform-dependencies"/>.
+         Pass-through build items are useful for solving some more
+         advanced &abuild; problems.  They contain no build or
+         interface files, but they are named and have dependencies.
+         This makes pass-through build items useful as top-level
+         facades for hiding more complicated build item structures.
+         This could include build items that have private names
+         relative to the pass-through item, and it could also include
+         structures containing build items that cross language and
+         platform boundaries.  Several examples in the documentation
+         use pass-through build items to hide private build item
+         names.  For further discussion of using pass-through build
+         items in a cross-platform environment, please see <xref
+         linkend="ref.cross-platform-dependencies"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -1582,12 +1594,12 @@ C:\cygwin\cygwin.bat
        <term>plugin</term>
        <listitem>
         <para>
-         A plugins is a special type of build item that is capable of
+         Plugins are a special type of build item that is capable of
          extending the functionality of &abuild; beyond what can be
          accomplished in regular build items.  Plugins must be named
-         and not have any dependencies.  Other build items may depend
-         on them.  Plugins are a topic in their own right.  They are
-         discussed in depth in <xref linkend="ref.plugins"/>.
+         and not have any dependencies.  No other build items may
+         depend on them.  Plugins are a topic in their own right.
+         They are discussed in depth in <xref linkend="ref.plugins"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -1604,16 +1616,25 @@ C:\cygwin\cygwin.bat
      <indexterm>
       <primary>access control</primary>
      </indexterm>
-     As mentioned above, build item names consist of period-separated
-     segments.  The period separator in a build item's name is a
-     namespace scope delimiter that is used to determine which build
-     items may directly refer to which other build items in their
-     <filename>Abuild.conf</filename> files.  This mechanism should
-     not be viewed as strong access control as there are ways to get
-     around it, but it is a useful mechanism for allowing a build item
-     to hide the fact that it is composed of lower-level build items
-     by blocking others from accessing those lower-level items
-     directly.
+     <indexterm>
+      <primary>scope</primary>
+     </indexterm>
+     <indexterm>
+      <primary>scope</primary>
+      <secondary>ancestor</secondary>
+     </indexterm>
+     <indexterm>
+      <primary>scope</primary>
+      <secondary>descendant</secondary>
+     </indexterm>
+     Build item names consist of period-separated segments.  The
+     period separator in a build item's name is a namespace scope
+     delimiter that is used to determine which build items may
+     directly refer to which other build items in their
+     <filename>Abuild.conf</filename> files.  It is a useful mechanism
+     for allowing a build item to hide the fact that it is composed of
+     lower-level build items by blocking others from accessing those
+     lower-level items directly.
     </para>
     <para>
      Each build item belongs to a namespace scope equal to the name of
@@ -1622,15 +1643,16 @@ C:\cygwin\cygwin.bat
      &ldquo;<classname>A.B.C.D</classname>&rdquo; is in the scope
      called &ldquo;<classname>A.B.C</classname>&rdquo;.  We would
      consider &ldquo;<classname>A.B</classname>&rdquo; and
-     &ldquo;<classname>A</classname>&rdquo; to be ancestor scopes.
-     The build item name itself also defines a scope.  In this case,
-     the scope &ldquo;<classname>A.B.C.D</classname>&rdquo; would
-     contain &ldquo;<classname>A.B.C.D.E</classname>&rdquo;.  Any
-     build item name scope that starts with
+     &ldquo;<classname>A</classname>&rdquo; to be <firstterm>ancestor
+     scopes</firstterm>.  The build item name itself also defines a
+     scope.  In this case, the scope
+     &ldquo;<classname>A.B.C.D</classname>&rdquo; would contain
+     &ldquo;<classname>A.B.C.D.E</classname>&rdquo;.  Any build item
+     name scope that starts with
      &ldquo;<classname>A.B.C.D.</classname>&rdquo; (including the
-     period) would be a descendant scope to
+     period) would be a <firstterm>descendant scope</firstterm> to
      &ldquo;<classname>A.B.C.D</classname>&rdquo;.  Any build item
-     whose name does not contain a periods is considered to belong to
+     whose name does not contain a period is considered to belong to
      the global scope and is accessible by all build items.
     </para>
     <para>
