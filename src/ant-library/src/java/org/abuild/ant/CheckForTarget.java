@@ -12,8 +12,12 @@ import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
 
-// XXX Need to add javadoc comments to this file.
-
+/**
+ * Implements an Ant Task that determines whether a particular build
+ * file contains a given target.  It does by creating a sub-ant and,
+ * rather than calling the target, just checking to see whether it is
+ * there.
+ */
 public class CheckForTarget extends Task
 {
     private final static Map<String, Set<String> > targetsByFilename =
