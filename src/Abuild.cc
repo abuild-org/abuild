@@ -284,6 +284,10 @@ Abuild::parseArgv()
 	    }
 	    this->start_dir = *argp++;
 	}
+	else if (arg == "--find-conf")
+	{
+	    this->start_dir = findConf();
+	}
 	else if (arg == "--make")
 	{
 	    while (*argp)
@@ -584,6 +588,31 @@ Abuild::checkBuildsetName(std::string const& kind, std::string const& name)
     {
 	usage("unknown " + kind + " set " + name);
     }
+}
+
+std::string
+Abuild::findConf()
+{
+    // Find the first directory at or above the current directory that
+    // contains an ItemConfig::FILE_CONF.
+
+    std::string dir = Util::getCurrentDirectory();
+    while (true)
+    {
+	if (Util::fileExists(dir + "/" + ItemConfig::FILE_CONF))
+	{
+	    break;
+	}
+	std::string last_dir = dir;
+	dir = Util::dirname(dir);
+	if (dir == last_dir)
+	{
+	    fatal("unable to find " + ItemConfig::FILE_CONF +
+		  " at or above the current directory");
+	}
+    }
+
+    return dir;
 }
 
 void
@@ -930,7 +959,7 @@ Abuild::findTop()
 {
     // Find the top directory of the system containing this build item
     // directory.  That is the first directory above us that contains
-    // a ItemConfig::FILE_CONF file without a parent-dir key.  Cycles
+    // an ItemConfig::FILE_CONF file without a parent-dir key.  Cycles
     // are detected, so this is not an infinite loop.
 
     std::string dir = this->this_config_dir;
@@ -4587,6 +4616,8 @@ Abuild::help()
     h("  -e | --emacs      pass the -e flags to ant and also set a property");
     h("                    telling our ant build file that we are running in");
     h("                    emacs mode.");
+    h("  --find-conf       look above the current directory to find a directory");
+    h("                    that contains Abuild.conf and run abuild from there");
     h("  --full-integrity  check integrity for all items, not just items being built");
     h("  --jobs=n | -jn    build up to n build items in parallel");
     h("  --keep-going |    don't stop when a build item fails; also tells backend");
