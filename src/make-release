@@ -318,6 +318,7 @@ if ($save_auto)
 }
 
 rmrf("src");
+safe_unlink("README.source-distribution");
 safe_chdir($tmpdir);
 
 if ($windows)
