@@ -275,6 +275,7 @@
   <foreach list="${abuild.plugins}"
            target="-query-plugin-hooks"
            param="abuild.private.plugin-dir"
+           trim="true"
            inheritall="true"/>
  </target>
 
@@ -288,6 +289,7 @@
   <foreach list="${abuild.hook-build-items}"
            target="-query-build-item-hooks"
            param="abuild.private.hook-item"
+           trim="true"
            inheritall="true"/>
  </target>
 
