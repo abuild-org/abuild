@@ -40,7 +40,7 @@ END
 
 usage() unless @ARGV >= 1;
 my $src_dist = shift(@ARGV);
-usage() unless $src_dist =~ m/^abuild-(\d+\.\d+(?:\.[ab]\d+)?)\.tar.bz2$/;
+usage() unless $src_dist =~ m/^abuild-(\d+\.\d+(?:\.(a|b|rc)\d+)?)\.tar.bz2$/;
 my $version = $1;
 
 my $java_dist = undef;
