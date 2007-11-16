@@ -21,7 +21,7 @@ if ((@ARGV == 1) && ($ARGV[0] eq '--windows'))
 my @compilers = ();
 if ($windows)
 {
-    # XXX Need a better way to know whether to get mingw.  If this is
+    # We need a better way to know whether to get mingw.  If this is
     # cygwin and some appropriate API header file and gcc binary
     # exist, and if NO_MINGW is not set, then enable mingw.  Make sure
     # we set NO_MINGW in the test suite if we have msvc so we don't

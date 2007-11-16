@@ -274,12 +274,11 @@ if ($windows)
 {
     safe_copy("$abuild.exe", "bin/abuild.exe");
 
-    # XXX Attempt to copy Windows DLLs required by this program.  This
-    # is not really a good solution, but it should work okay on a
-    # default installation of MSVC .NET 2003.  For .NET 2005,
-    # something other than copying the DLL files into the bin
-    # directory is required.  For mingw, no external DLLs should be
-    # needed.
+    # Attempt to copy Windows DLLs required by this program.  This is
+    # not really a good solution, but it should work okay on a default
+    # installation of MSVC .NET 2003.  For .NET 2005, something other
+    # than copying the DLL files into the bin directory is required.
+    # For mingw, no external DLLs should be needed.
 
     # We check for objdump at the start of this program.
     my @dlls = ();

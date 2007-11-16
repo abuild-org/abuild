@@ -13384,6 +13384,28 @@ Y = $(X)
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Incomplete mingw Support</term>
+     <listitem>
+      <para>
+       Although mingw is partially supported and the mingw compiler
+       passes the compiler verification support, mingw support is not
+       really complete in &abuild;.  In particular, we only offer
+       mingw as a valid compiler if the <envar>MINGW</envar>
+       environment variable is set to <literal>1</literal>, and we use
+       <command>gcc -mnocygwin</command> from cygwin to get mingw.
+       This means that absolute Windows paths won't work.  Although
+       &abuild; tries to use relative paths when possible, paths on
+       different drive letters are always given as absolute paths.  In
+       spite of these limitations, mingw support should work okay for
+       build environments in which everything is under the same drive
+       letter.  If necessary, builds that have to work with both
+       Microsoft Visual C++ and mingw can have conditionals in their
+       build or interface files.  Hopefully a future version of
+       &abuild; will better address this.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>Java archive creation</term>
      <listitem>
       <para>

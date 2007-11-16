@@ -746,7 +746,7 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 #ifdef _WIN32
 	cmd = "perl " + cmd + " --windows";
 #endif
-	// XXX Perhaps we should pass native_{os,cpu,toolset} to
+	// Perhaps we should pass native_{os,cpu,toolset} to
 	// list_platforms somehow either via arguments or environment
 	// variables.  Environment variables might be easier, but our
 	// getProgramOutput implementation doesn't allow them to be
@@ -3807,6 +3807,14 @@ Abuild::findAnt()
 	}
     }
 
+    // Abuild with ant will fail without ant_library except when
+    // bootstrapping because it will try to load a custom ant task.
+    // We handle bootstrapping by setting a property in ant-library's
+    // Abuild-ant.properties.  When not bootstrapping, it would be
+    // nice if we could fail here if abuild-ant-library.jar is not
+    // found, but this would require us to actually invoke abuild with
+    // special flags during the bootstrapping process or to otherwise
+    // be able to tell.
     if (this->ant_library.empty())
     {
 	std::string candidate =
@@ -3816,12 +3824,6 @@ Abuild::findAnt()
 	    this->ant_library = candidate;
 	}
     }
-
-    // XXX abuild with ant will fail without ant_library except when
-    // bootstrapping.  We handle bootstrapping by setting a property
-    // in ant-library's Abuild-ant.properties.  When not
-    // bootstrapping, we should actually fail quickly if
-    // abuild-ant-library.jar is not found.
 }
 
 bool
@@ -4512,12 +4514,12 @@ Abuild::invokeBackend(std::string const& progname,
     }
     else
     {
-        // XXX Consider doing something to capture the backend's
-        // output so that it is not arbitrarily interleaved with other
-        // things.  We can't call flushLog here because other threads
-        // may be logging.  Ideally, we should capture output, prefix
-        // it with the build item name, and output it line by line or
-        // else de-interleave output from different build items.
+        // Consider doing something to capture the backend's output so
+        // that it is not arbitrarily interleaved with other things.
+        // We can't call flushLog here because other threads may be
+        // logging.  Ideally, we should capture output, prefix it with
+        // the build item name, and output it line by line or else
+        // de-interleave output from different build items.
     }
 
     return Util::runProgram(progname, args, environment, old_env, dir);

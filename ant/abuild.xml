@@ -462,8 +462,6 @@
   <run-hooks name="generate"/>
  </target>
 
- <!--  XXX Need configurable way of setting debug, etc.  Get list  -->
- <!--  of things that are like this.                               -->
  <target name="compile" depends="generate,-pre-compile,-do-compile,-copy-classpath,-post-compile"
          description="Compile sources"/>
 
@@ -566,7 +564,7 @@
    <metainf dir="${abuild.private.dir.conf}"/>
    <metainf dir="${abuild.private.dir.generated-conf}"/>
    <manifest>
-    <!--  XXX We should put a Main-Class attribute here if the     -->
+    <!--  We should put a Main-Class attribute here if the         -->
     <!--  abuild.main-class property is set, but there doesn't     -->
     <!--  seem to be any good way of making the existence of the   -->
     <!--  attribute conditional upon the value or presence of a    -->
@@ -680,8 +678,8 @@
  <target name="wrapper" description="create executable wrapper"
          if="abuild.private.need-wrapper">
   <pathconvert property="wrapper.classpath">
-   <!--  XXX This is going to create command lines that are too    -->
-   <!--  long because of the absolute path.                        -->
+   <!--  This is likely to create command lines that are too long  -->
+   <!--  because of the absolute path.                             -->
    <path refid="complete-classpath-jar"/>
    <fileset dir="${abuild.private.dir.dist}" includes="*.jar"/>
   </pathconvert>
@@ -742,12 +740,9 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
   <isset property="abuild.junit.testsuite"/>
  </condition>
 
- <!--  XXX The build doesn't fail if the test suite fails.  Why    -->
- <!--  not?                                                        -->
- <!--  XXX Requires something in the classpath or in ant's lib     -->
- <!--  directory that provides junit test cases.  By what          -->
- <!--  mechanism do we guarantee that this is always there?        -->
- <!--  Maybe we treat it like antcontrib?                          -->
+ <!--  Abuild is not distributed with JUnit.  The documentation    -->
+ <!--  discusses this: it is the user's responsibility to make     -->
+ <!--  sure that JUnit is present in the classpath.                -->
  <target name="-test-junit" depends="package"
          if="abuild.private.need-junit">
   <mkdir dir="junit"/>
