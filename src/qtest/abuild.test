@@ -1340,12 +1340,17 @@ $td->runtest("interface help",
 
 cd("work/ext");
 
+mkdir "subdir", 0777 or die;
+cd("work/ext/subdir");
+
 $td->runtest("clean all from ext",
-	     {$td->COMMAND => "abuild --clean=all",
+	     {$td->COMMAND => "abuild --find-conf --clean=all",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test1.allclean1.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+cd("work/ext");
 
 $td->runtest("clean named",
 	     {$td->COMMAND => "abuild --clean=name:aa,cb",
