@@ -4,6 +4,8 @@ version 2 of the Artistic License which may be found in the source and
 binary distributions.  They are provided "as is" without express or
 implied warranty.
 
-Please see abuild's documentation in the "src/manual" directory, or
-read formatted versions of it at abuild's website,
+For build information, see src/README.build.
+
+For full documentation, see abuild's documentation in the "src/manual"
+directory, or read formatted versions of it at abuild's website,
 <http://www.abuild.org/>.
