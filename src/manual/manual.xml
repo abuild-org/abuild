@@ -4042,6 +4042,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>--find-conf</term>
+      <listitem>
+       <para>
+        Locates the first directory at or above the current directory
+        that contains an <filename>Abuild.conf</filename> file, and
+        changes directories to that location before building.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>--full-integrity</term>
       <listitem>
        <para>
@@ -11552,6 +11562,14 @@ Y = $(X)
          Trailing whitespace is now trimmed around
          <varname>abuild.hook-build-items</varname> in
          <filename>Abuild-ant.properties</filename>.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         New command line option <option>--find-conf</option>
+         directs &abuild; to find the first
+         <filename>Abuild.conf</filename> at or above the current
+         directory and to run the build from there.
         </para>
        </listitem>
       </itemizedlist>
