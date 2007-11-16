@@ -43,6 +43,7 @@ class Abuild
     bool runInternal();
     void getThisPlatform();
     void parseArgv();
+    std::string findConf();
     void checkBuildsetName(std::string const& kind, std::string const& name);
     void initializePlatforms();
     void initializeJavaPlatforms();
