@@ -1606,8 +1606,340 @@ C:\cygwin\cygwin.bat
      </variablelist>
     </para>
    </sect1>
+   <sect1 id="ref.third-party-software">
+    <title>Integrating with Third-Party Software</title>
+    <para>
+     Virtually every software development project has some need to
+     integrate with third-party software libraries.  In a traditional
+     build system, you might list the include paths, libraries, and
+     library directories right in your <filename>Makefile</filename>
+     or configuration file for whatever build system you are using.
+     With &abuild;, the best way to integrate with a third-party
+     library is to use a build item whose sole purpose is to export
+     that library's information using an
+     <filename>Abuild.interface</filename> file.  In the simplest
+     cases, a third-party library build item might be an interface
+     only build item (described above) that just includes the
+     appropriate library directives in a static
+     <filename>Abuild.interface</filename> file.  For example, a build
+     item that provides access to the PCRE (Perl-compatible regular
+     expression) libraries on a Linux distribution that has them
+     installed in the system's standard include path might just
+     include an <filename>Abuild.interface</filename> with the
+     following contents:
+
+     <programlisting>LIBS = pcrecpp pcre
+</programlisting>
+     For Java build items, a third-party JAR build item would
+     typically append the path to the JAR file to the
+     <varname>abuild.classpath.external</varname> interface variable.
+     Sometimes, the process may be more involved.  For example, on a
+     UNIX system, it is often desirable to use
+     <application>autoconf</application> to determine what interface
+     is required for a particular library.  We present an example of
+     using <application>autoconf</application> with &abuild; in <xref
+     linkend="ref.example.autoconf"/>.  Still other libraries may use
+     <application>pkg-config</application>.  For those libraries, it
+     may make sense to create a simple set of build rules that
+     automatically generate an <filename>Abuild.interface</filename>
+     <function>after-build</function> file (also discussed in <xref
+     linkend="ref.example.autoconf"/>) by running the
+     <command>pkg-config</command> command.
+     <footnote>
+      <para>
+       An example <application>pkg-config</application> build item may
+       be found in the <filename>abuild-contrib</filename> package
+       available at <ulink url="http://www.abuild.org">&abuild;'s web
+       site</ulink>.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     Whichever way you do it for a given package, the idea is that you
+     should always create a build item whose job it is to provide the
+     glue between &abuild; and the third-party library.  Other build
+     items that need to use the third-party library can then just
+     declare a dependency on the build item that provides the
+     third-party library's interface.  This simplifies the process of
+     using third-party libraries and makes it possible to create a
+     uniform standard for doing so within any specific &abuild; build
+     tree.
+    </para>
+   </sect1>
+  </chapter>
+  <chapter id="ref.platforms">
+   <title>Target Types, Platform Types, and Platforms</title>
+   <para>
+    &Abuild; was designed with multiplatform operation in mind from
+    the beginning.  Up to this point, we have largely glossed over how
+    &abuild; deals with multiple platforms.  In this chapter, we will
+    cover this aspect of &abuild;'s operation in detail.
+   </para>
+   <sect1 id="ref.platform-structure">
+    <title>Platform Structure</title>
+    <para>
+     &Abuild; classifies platforms into a three-level hierarchy.  The
+     three levels are described by the following terms:
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>target type</term>
+      <listitem>
+       <para>
+        <indexterm>
+         <primary>target type</primary>
+        </indexterm>
+        A <firstterm>target type</firstterm> encompasses the overall
+        kind of targets that are being built.  A target type
+        essentially encapsulates a build paradigm.  &Abuild;
+        understands three target types:
+        <type>platform-independent</type> for truly
+        platform-independent products like scripts and documentation,
+        <type>object-code</type> for compiled object code like C and
+        C++, and <type>java</type> for Java byte code and related
+        products.  One could argue that Java code is
+        platform-independent, but since Java code has its own build
+        paradigm, &abuild; considers it to be a separate target type.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>platform type</term>
+      <listitem>
+       <para>
+        <indexterm>
+         <primary>platform type</primary>
+        </indexterm>
+        A <firstterm>platform type</firstterm> essentially defines a
+        grouping of platforms.  Platform types belong to target types
+        and contain platforms.  When configuring build items,
+        developers assign build items to platform types rather than to
+        platforms or target types.  The
+        <type>platform-independent</type> target type has only platform
+        type: <type>indep</type>.  The <type>java</type> target type
+        has only one platform type: <type>java</type>.
+        <footnote>
+         <para>
+          At one time, it was planned for &abuild; to support
+          different platform types for different versions of Java byte
+          code.  Although this would have been useful for build trees
+          that had complex requirements for mixing JDKs of different
+          versions, this capability would have added a lot of
+          complexity to support a practice that is unusually and
+          largely undesirable.
+         </para>
+        </footnote>
+        Platform types are most useful in the <type>object-code</type>
+        target type.  &Abuild; has only one built-in platform type in
+        the <type>object-code</type> target type: <type>native</type>.
+        The <type>native</type> platform type applies to build items
+        that are expected to be able to be built and run on the host
+        platform.  Additional platform types to support embedded
+        platforms or cross compilers can be added in plugins (see
+        <xref linkend="ref.adding-platform-types-and-platforms"/>).
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>platform</term>
+      <listitem>
+       <para>
+        <indexterm>
+         <primary>platform</primary>
+        </indexterm>
+        The &abuild; <firstterm>platform</firstterm> is the lowest
+        level of detail in describing the environment in which a
+        target is intended to be used.  The expectation is that
+        compiled products (object files, libraries, binary
+        executables, java class files, etc.) produced for one platform
+        are always compatible with other products produced for that
+        platform but are not necessarily compatible with products
+        produced for a different platform.  If two different versions
+        of a compiler generate incompatible object code (because of
+        incompatible runtime library versions or different C++ name
+        mangling conventions, for example), then a host running one
+        compiler may generate output belonging to a different platform
+        from the same host running a different version of the
+        compiler.  For the <type>indep</type> platform type in the
+        <type>platform-independent</type> target type, there is only
+        one platform, which has the same name as the platform type:
+        <type>indep</type>.  For the <type>java</type> platform type
+        in the <type>java</type> target type, there is also only one
+        platform, which also shares its name with the platform type:
+        <type>java</type>.  Platforms become interesting within the
+        <type>object-code</type> target type.  When we refer to
+        platforms, we are almost always talking about
+        <type>object-code</type> platforms.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    <para>
+     When a build item is defined with multiple platform types, they
+     must all belong to the same target type.  Some interface
+     variables are also based on target type.  For example, it may be
+     permissible for a java build item to depend on a C++ build item
+     if the C++ build item exports native code or provides an
+     executable code generator, but it would never make sense for a
+     java build item to have an include path or library path in the
+     sense of a C/C++ build item.  When one build item depends on
+     another, the platforms on which the two build items are being
+     built come into play.  We discuss this later in <xref
+     linkend="ref.cross-platform-dependencies"/>.
+    </para>
+   </sect1>
+   <sect1 id="ref.platforms.object-code">
+    <title>Object-Code Platforms</title>
+    <para>
+     For target type <type>object-code</type>, platform identifiers
+     are of the form
+     <type>os</type>.<type>cpu</type>.<type>toolset</type>.<type>compiler</type>[.<type>option</type>],
+     described below.  In all cases, each field of the platform
+     identifier must consist only of lower-case letters, numbers,
+     dash, or underscore.  The fields of the platform identifier are
+     as follows:
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>os</term>
+      <listitem>
+       <para>
+        A broad description of the operating system, such as
+        <type>linux</type>, <type>solaris</type>,
+        <type>windows</type>, <type>cygwin</type>, or
+        <type>vxworks</type>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>cpu</term>
+      <listitem>
+       <para>
+        A standard CPU type identifier such as <type>ix86</type>,
+        <type>x86_64</type>, <type>ppc</type>,
+        <type>ppc64</type>, or <type>sparc</type>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>toolset</term>
+      <listitem>
+       <para>
+        A user-defined label for a collection of tools.  This is a
+        convenience field to separate things like different versions
+        of compilers or runtime libraries.  It can be set to any
+        string, at which point the user is responsible for ensuring
+        that it does in fact define a meaningful collection of tools.
+        By default, &abuild; will create a toolset name based on the
+        operating system distribution or similar factors.  Examples
+        include <type>rhel4</type> on a Red Hat Enterprise Linux 4
+        system, or <type>deb4_0</type> on a Debian GNU/Linux 4.0
+        system.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>compiler</term>
+      <listitem>
+       <para>
+        An identifier for the C/C++ compiler toolchain.  &Abuild; will
+        load a <firstterm>toolchain support file</firstterm> for the
+        compiler named in this field.  This file is a <application>GNU
+        Make</application> fragment that is responsible for defining
+        certain variables and macros used by the
+        <filename>ccxx</filename> rules.  Details appear in the
+        comments in the <filename>make/object-code/ccxx.mk</filename>
+        rules file (<xref linkend="ref.ccxx.mk"/>).  Users can provide
+        their own compiler toolchains as long as they provide the
+        required support files.  The mechanism for adding new
+        compilers is described in <xref
+        linkend="ref.adding-platform-types-and-platforms"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>option</term>
+      <listitem>
+       <para>
+        An optional field that is used to pass additional information
+        to the compiler toolchain support file.  Typical uses for
+        options would be to define different debugging, profiling, or
+        optimization levels.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    <para>
+     All of the fields of the platform identifier are made available
+     in separate variables within the interface parsing system.  In
+     addition, for <type>object-code</type> build items, the make
+     variable <varname>$(CCXX_TOOLCHAIN)</varname> is set to the value
+     of the compiler field.  Here are some example platform
+     identifiers:
+     <simplelist>
+      <member>linux.ppc64.proj1default.gcc</member>
+      <member>linux.ppc64.proj1default.gcc.release</member>
+      <member>linux.ppc64.proj1default.gcc.debug</member>
+      <member>linux.x86.fc5.gcc</member>
+      <member>linux.x86.fc5.gcc.release</member>
+      <member>linux.x86.fc5.gcc.debug</member>
+      <member>windows.ix86.nt5.msvc</member>
+      <member>windows.ix86.cygwin-nt5.mingw</member>
+      <member>vxworks.pc604.windriver.vxgcc</member>
+     </simplelist>
+    </para>
+   </sect1>
+   <sect1 id="ref.output-directories">
+    <title>Output Directories</title>
+    <indexterm>
+     <primary>output directories</primary>
+    </indexterm>
+    <para>
+     When &abuild; builds an item, it creates an output directory
+     under that item's directory for every platform on which that item
+     is built.  The output directory is of the form
+     <filename>abuild-<replaceable>platform-name</replaceable></filename>.
+     &Abuild; itself and all &abuild;-supplied rules create files only
+     inside of &abuild; output directories.
+     <footnote>
+      <para>
+       &Abuild; considers any directory whose name starts with
+       <filename>abuild-</filename> and which contains a file named
+       <filename>.abuild</filename> to be an output directory.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     When &abuild; invokes a backend to perform the actual compilation
+     steps, it always does so from an output directory.  This is true
+     even for platform-independent build items.  In this way, even
+     temporary files created by compilers or other build systems will
+     not appear in the build item's local directory.  This makes it
+     possible to build a specific item for multiple platforms in
+     parallel without having to be concerned about the separate builds
+     overwriting each other's files.
+    </para>
+   </sect1>
+  </chapter>
+  <chapter id="ref.XXX">
+   <title>Build Item Dependencies</title>
+   <para>
+    XXX This section must describe transitivity of dependencies and
+    must touch upon how interfaces are related to the dependency
+    process.
+   </para>
+   <sect1 id="ref.XXX1">
+    <title>XXX</title>
+    <para>
+     XXX
+    </para>
+   </sect1>
    <sect1 id="ref.build-item-access-control">
     <title>Build Item Access Control</title>
+    <para>
+     XXX say something about name scoping and its relation to
+     dependency management
+    </para>
     <para>
      <indexterm>
       <primary>build item</primary>
@@ -1657,8 +1989,8 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      A build item is allowed to access any other build item by name if
-     the other build item belongs to the accessing build item's scope
-     or any of its ancestor scopes.  <xref
+     the referenced build item belongs to the accessing build item's
+     scope or any of its ancestor scopes.  <xref
      linkend="fig.build-item-scopes"/>, shows a number of build items
      arranged by scope.
      <figure id="fig.build-item-scopes">
@@ -1750,16 +2082,16 @@ C:\cygwin\cygwin.bat
      This means that it would be okay for
      <classname>networking.test</classname> to depend on
      <classname>networking</classname> since doing so would not create
-     any circular dependencies.  Then, anyone who depends on
-     <classname>networking</classname> indirectly depends on
+     any circular dependencies.  Then, any build items that depend on
+     <classname>networking</classname> indirectly depend on
      <classname>networking.src</classname> and would see
      <classname>networking.src</classname>'s
      <filename>Abuild.interface</filename>.
     </para>
     <para>
      There is nothing that a build item can do to allow itself to see
-     items that are private to other scopes: the only way to gain
-     access to a build item is to be its ancestor or to be a
+     build items that are hidden within other scopes: the only way to
+     gain access to a build item is to be its ancestor or to be a
      descendant of its parent.  There are times, however, when it is
      desirable for a build item to allow itself to <emphasis>be
      seen</emphasis> by build items who would ordinarily not have
@@ -1777,76 +2109,17 @@ C:\cygwin\cygwin.bat
       <primary>access control</primary>
       <secondary>custom rules</secondary>
      </indexterm>
-     Although &abuild;'s access control rules for direct dependencies
-     are useful, they are not really a full-fledged access control
-     system.  If your project wishes to enforce custom rules about
-     what items can depend upon what other items, such as enforcing
-     tiers a multi-tier architecture, the recommend approach is to
-     write an external tool that detects and reports violations.
-     Using <command>abuild --dump-data</command>, it is possible to
-     get a clear picture of the dependencies in the entire tree.  (For
-     information on the <option>--dump-data</option> option, see <xref
+     (XXX This paragraph might go.)  Although &abuild;'s access
+     control rules for direct dependencies are useful, they are not
+     really a full-fledged access control system.  If your project
+     wishes to enforce custom rules about what items can depend upon
+     what other items, such as enforcing tiers in a multi-tier
+     architecture, the recommend approach is to write an external tool
+     that detects and reports violations.  Using <command>abuild
+     --dump-data</command>, it is possible to get a clear picture of
+     the dependencies in the entire tree.  (For information on the
+     <option>--dump-data</option> option, see <xref
      linkend="ref.dump-data"/>.)
-    </para>
-   </sect1>
-   <sect1 id="ref.third-party-software">
-    <title>Integrating with Third-Party Software</title>
-    <para>
-     Virtually every software development project has some need to
-     integrate with third-party software libraries.  In a traditional
-     build system, you might list the include paths, libraries, and
-     library directories right in your <filename>Makefile</filename>
-     or configuration file for whatever build system you are using.
-     With &abuild;, the best way to integrate with a third-party
-     library is to use a build item whose sole purpose is to export
-     that library's information using an
-     <filename>Abuild.interface</filename> file.  In the simplest
-     cases, a third-party library build item might be an interface
-     only build item (described above) that just includes the
-     appropriate library directives in a static
-     <filename>Abuild.interface</filename> file.  For example, a build
-     item that provides access to the PCRE (Perl-compatible regular
-     expression) libraries on a Linux distribution that has them
-     installed in the system's standard include path might just
-     include an <filename>Abuild.interface</filename> with the
-     following contents:
-
-     <programlisting>LIBS = pcrecpp pcre
-</programlisting>
-     For Java build items, a third-party JAR build item would
-     typically append the path to the JAR file to the
-     <varname>abuild.classpath.external</varname> interface variable.
-     Sometimes, the process may be more involved.  For example, on a
-     UNIX system, it is often desirable to use
-     <application>autoconf</application> to determine what interface
-     is required for a particular library.  We present an example of
-     using <application>autoconf</application> with &abuild; in <xref
-     linkend="ref.example.autoconf"/>.  Still other libraries may use
-     <application>pkg-config</application>.  For those libraries, it
-     may make sense to create a simple set of build rules that
-     automatically generate an <filename>Abuild.interface</filename>
-     <function>after-build</function> file (also discussed in <xref
-     linkend="ref.example.autoconf"/>) by running the
-     <command>pkg-config</command> command.
-     <footnote>
-      <para>
-       An example <application>pkg-config</application> build item may
-       be found in the <filename>abuild-contrib</filename> package
-       available at <ulink url="http://www.abuild.org">&abuild;'s web
-       site</ulink>.
-      </para>
-     </footnote>
-    </para>
-    <para>
-     Whichever way you do it for a given package, the idea is that you
-     should always create a build item whose job it is to provide the
-     glue between &abuild; and the third-party library.  Other build
-     items that need to use the third-party library can then just
-     declare a dependency on the build item that provides the
-     third-party library's interface.  This simplifies the process of
-     using third-party libraries and makes it possible to create a
-     uniform standard for doing so within any specific &abuild; build
-     tree.
     </para>
    </sect1>
    <sect1 id="ref.example.simple-build-tree">
@@ -1901,7 +2174,7 @@ C:\cygwin\cygwin.bat
      The first thing to notice is this build item's name.  It contains
      a period and is therefore private to the
      <classname>common-lib1</classname> scope.  That means that it is
-     not accessible to build items whose names not also under that
+     not accessible to build items whose names are not also under that
      scope.  In particular, a build item called
      <classname>common-lib2</classname> would not be able to depend
      directly on <classname>common-lib1.src</classname>.  It would
@@ -1910,8 +2183,8 @@ C:\cygwin\cygwin.bat
      indirectly.
     </para>
     <para>
-     This build item doesn't mention any child directories.  It is a
-     leaf in the file system hierarchy.  It also happens not to
+     This build item doesn't list any child directories and, as such,
+     is a leaf in the file system hierarchy.  It also happens not to
      declare any dependencies, so it is also a leaf in the dependency
      tree, though one does not imply the other.  This build item
      configuration file contains the
@@ -1946,17 +2219,16 @@ C:\cygwin\cygwin.bat
      <classname>common-lib1</classname>.  Since its name is also
      private to the <classname>common-lib1</classname> scope, it would
      have been okay for it to declare a dependency directly on
-     <classname>common-lib1.src</classname>, but declaring its
-     dependency on <classname>common-lib1</classname> instead means
-     that this test code is guaranteed to see the same interfaces as
-     would be seen by any outside user of
-     <classname>common-lib1</classname>.  This may be appropriate in
-     some cases and not in others, but it demonstrates that it is okay
-     for a build item that is inside of a particular namespace scope to
-     depend on its parent in the namespace hierarchy.  This build
-     item also declares a trait, but we will revisit this when we
-     discuss traits later in the document (see <xref
-     linkend="ref.traits"/>).
+     <classname>common-lib1.src</classname>.  Declaring its dependency
+     on <classname>common-lib1</classname> instead means that this
+     test code is guaranteed to see the same interfaces as would be
+     seen by any outside user of <classname>common-lib1</classname>.
+     This may be appropriate in some cases and not in others, but it
+     demonstrates that it is okay for a build item that is inside of a
+     particular namespace scope to depend on its parent in the
+     namespace hierarchy.  This build item also declares a trait, but
+     we will revisit this when we discuss traits later in the document
+     (see <xref linkend="ref.traits"/>).
     </para>
     <para>
      In addition to the <filename>lib1</filename> directory, we also
@@ -1970,282 +2242,8 @@ C:\cygwin\cygwin.bat
      <?example stable/common/lib2/src/Abuild.conf?>
     </para>
     <para>
-     Finally, you can see by looking in the example directories that
-     each of the <filename>test</filename> directories contains a
-     <application>qtest</application>-based test suite.
-     <application>Qtest</application> is the test framework used to
-     implement &abuild;'s own test suite.  It is one of the test
-     frameworks for which support is integrated into &abuild;.  For a
-     discussion of integrated test frameworks, see <xref
-     linkend="ref.test-integration"/>.
-    </para>
-    <para>
      We will return to this build tree later to study build sets,
      traits, and examples of various ways to run builds.
-    </para>
-   </sect1>
-  </chapter>
-  <chapter id="ref.platforms">
-   <title>Target Types, Platform Types, and Platforms</title>
-   <para>
-    &Abuild; was designed with multiplatform operation in mind from
-    the beginning.  All of &abuild;'s output is created in
-    platform-specific subdirectories.  Up to this point, we have
-    largely glossed over how &abuild; deals with multiple platforms.
-    In this chapter, we will cover this aspect of &abuild;'s operation
-    in detail.
-   </para>
-   <sect1 id="ref.platform-structure">
-    <title>Platform Structure</title>
-    <para>
-     &Abuild; classifies platforms into a three-level hierarchy.  The
-     three levels are described by the following terms:
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>target type</term>
-      <listitem>
-       <para>
-        <indexterm>
-         <primary>target type</primary>
-        </indexterm>
-        A <firstterm>target type</firstterm> encompasses the overall
-        kind of targets that are being built.  A target type
-        essentially encapsulates a build paradigm.  &Abuild;
-        understands three target types:
-        <type>platform-independent</type> for truly
-        platform-independent products like scripts and documentation,
-        <type>object-code</type> for compiled object code like C and
-        C++, and <type>java</type> for Java byte code and related
-        products.  One could argue that Java code is
-        platform-independent, but since Java code has its own build
-        paradigm, &abuild; considers it to be a separate target type.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>platform type</term>
-      <listitem>
-       <para>
-        <indexterm>
-         <primary>platform type</primary>
-        </indexterm>
-        A <firstterm>platform type</firstterm> essentially defines a
-        grouping of platforms.  Platform types belong to target types
-        and contain platforms.  When configuring build items,
-        developers assign build items to platform types rather than to
-        platforms or target types.  The
-        <type>platform-independent</type> target type has only platform
-        type: <type>indep</type>.  The <type>java</type> target type
-        has only one platform type: <type>java</type>.
-        <footnote>
-         <para>
-          At one time, it was planned for &abuild; to support
-          different platform types for different versions of Java byte
-          code.  Although this would have been useful for build trees
-          that had complex requirements for mixing JDKs of different
-          versions, this capability would have added a lot of
-          complexity to support a practice that is unusually and
-          largely undesirable.
-         </para>
-        </footnote>
-        Platform types are most useful in the <type>object-code</type>
-        target type.  &Abuild; has only one built-in platform type in
-        the <type>object-code</type> target type: <type>native</type>.
-        The <type>native</type> platform type applies to build items
-        that are expected to be able to be built and run on the native
-        platform.  Additional platform types to support embedded
-        platforms or cross compilers can be added in plugins (see <xref
-        linkend="ref.adding-platform-types-and-platforms"/>).
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>platform</term>
-      <listitem>
-       <para>
-        <indexterm>
-         <primary>platform</primary>
-        </indexterm>
-        The &abuild; <firstterm>platform</firstterm> is the lowest
-        level of detail in describing the environment in which a target
-        is intended to be used.  The expectation is that compiled
-        products (object files, libraries, binary executables, java
-        class files, etc.) produced for one platform are always
-        compatible with other products produced for that platform but
-        are not necessarily compatible with products produced for a
-        different platform.  If two different versions of a compiler
-        generate incompatible object code (because of incompatible
-        runtime library versions or different C++ name mangling
-        conventions, for example), then a host running one compiler may
-        generate output belonging to a different platform from the same
-        host running a different version of the compiler.  For the
-        <type>indep</type> platform type in the
-        <type>platform-independent</type> target type, there is only
-        one platform, also called <type>indep</type>.  For the
-        <type>java</type> platform type in the <type>java</type>
-        platform type, there is only one platform, also called
-        <type>java</type>.  Platforms become interesting within the
-        <type>object-code</type> target type.  When we refer to
-        platforms, we are almost always talking about
-        <type>object-code</type> platforms.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     When a build item is defined with multiple platform types, they
-     must all belong to the same target type.  Some interface
-     variables are also based on target type.  For example, it may be
-     permissible for a java build item to depend on a C++ build item
-     if the C++ build item exports native code or provides an
-     executable code generator, but it would never make sense for a
-     java build item to have an include path or library path in the
-     sense of a C/C++ build item.  When one build item depends on
-     another, the platforms on which the two build items are being
-     built come into play.  We discuss this later in <xref
-     linkend="ref.cross-platform-dependencies"/>.
-    </para>
-   </sect1>
-   <sect1 id="ref.platforms.object-code">
-    <title>Object-Code Platforms</title>
-    <para>
-     For target type <type>object-code</type>, platform identifiers
-     are of the form
-     <type>os</type>.<type>cpu</type>.<type>toolset</type>.<type>compiler</type>[.<type>option</type>],
-     described below.  In all cases, each field of the platform
-     identifier must consist only of lower-case letters, numbers,
-     dash, or underscore.  The fields of the platform identifier are
-     as follows:
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>os</term>
-      <listitem>
-       <para>
-        A broad description of the operating system, such as
-        <type>linux</type>, <type>solaris</type>,
-        <type>windows</type>, <type>cygwin</type>, or
-        <type>vxworks</type>
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>cpu</term>
-      <listitem>
-       <para>
-        A standard CPU type identifier such as <type>ix86</type>,
-        <type>x86_64</type>, <type>ppc</type>,
-        <type>ppc64</type>, or <type>sparc</type>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>toolset</term>
-      <listitem>
-       <para>
-        A user-defined label for a collection of tools.  This is a
-        convenience field to separate things like different versions of
-        compilers or runtime libraries.  It can be set to any string,
-        at which point the user is responsible for ensuring that it
-        does in fact define a meaningful collection of tools.  By
-        default, &abuild; will construct a toolset based on the
-        operating system distribution or similar factors.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>compiler</term>
-      <listitem>
-       <para>
-        An identifier for the compiler C/C++ compiler toolchain to be
-        used.  &Abuild; will load a toolchain support file that is
-        responsible for defining certain variables and macros used by
-        the <filename>ccxx</filename> rules.  Users can provide their
-        own compiler toolchains as long as they provide the required
-        support files.  Details appear in the comments in the
-        <filename>make/object-code/ccxx.mk</filename> rules file
-        (<xref linkend="ref.ccxx.mk"/>).  The mechanism for adding new
-        compilers is described in <xref
-        linkend="ref.adding-platform-types-and-platforms"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>option</term>
-      <listitem>
-       <para>
-        An optional field that is used to pass additional information
-        to the compiler toolchain support file.  Typical uses for
-        options would be to define different debugging, profiling, or
-        optimization levels.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     All of the fields of the platform identifier are made available
-     in separate variables within the interface parsing system.  In
-     addition, for <type>object-code</type> build items, the make
-     variable <varname>$(CCXX_TOOLCHAIN)</varname> is set to the value
-     of the compiler field.  Here are some example platform
-     identifiers:
-     <simplelist>
-      <member>linux.ppc64.proj1default.gcc</member>
-      <member>linux.ppc64.proj1default.gcc.release</member>
-      <member>linux.ppc64.proj1default.gcc.debug</member>
-      <member>linux.x86.fc5.gcc</member>
-      <member>linux.x86.fc5.gcc.release</member>
-      <member>linux.x86.fc5.gcc.debug</member>
-      <member>windows.ix86.nt5.msvc</member>
-      <member>windows.ix86.cygwin-nt5.mingw</member>
-      <member>vxworks.pc604.windriver.vxgcc</member>
-     </simplelist>
-    </para>
-   </sect1>
-   <sect1 id="ref.output-directories">
-    <title>Output Directories</title>
-    <indexterm>
-     <primary>output directories</primary>
-    </indexterm>
-    <para>
-     When &abuild; runs, it creates an output directory for each item
-     for every platform on which that item is built.  The output
-     directory is of the form
-     <filename>abuild-<replaceable>platform-name</replaceable></filename>.
-     &Abuild; itself and all &abuild;-supplied rules create files only
-     inside of &abuild; output directories.  The
-     <command>clean</command> target removes output directories rather
-     than invoking a backend.
-     <footnote>
-      <para>
-       &Abuild; considers any directory whose name starts with
-       <filename>abuild-</filename> and which contains a file called
-       <filename>.abuild</filename> to be an output directory.
-      </para>
-     </footnote>
-    </para>
-    <para>
-     When &abuild; invokes a backend to perform the actual compilation
-     steps, it always does so from an output directory.  This is true
-     even for platform-independent build items.  In this way, even
-     temporary files created by compilers or other build systems will
-     not appear in the build item's local directory.  This makes it
-     possible to be building a specific item for multiple platforms in
-     parallel without having to be concerned about the separate builds
-     overwriting each other's files.
-    </para>
-    <para>
-     If &abuild; is invoked in an output subdirectory, it will run a
-     build only for that specific platform on that specific item, and
-     it will explicitly not allow you to specify a build set or clean
-     set.  It will also, as a special case, pass the
-     <command>clean</command> target to the backend.  The main use for
-     this feature would be in testing rules, but it could also be
-     useful in helping to track down some hard-to-trace build problem
-     that apply to only one of several platforms that are being built
-     for a specific build item.  Most users will never use this
-     functionality.
     </para>
    </sect1>
   </chapter>
