@@ -104,8 +104,13 @@
 #   encouraged to prepend the variable $(LINKWRAPPER) to link
 #   statements.  This makes it possible for the user to set
 #   LINKWRAPPER to some program that wraps the link step.  Examples of
-#   programs that do this include Purify and Quantify.
-
+#   programs that do this include Purify and Quantify.  NOTE: Your
+#   make_bin function should do something with the
+#   WHOLE_lib_$(libname) variables: either it should link in the whole
+#   library or issue an error that it is not supported.  See
+#   toolchains/unix_compiler.mk and toolchains/msvc.mk for examples of
+#   each case.
+#
 #   $(call make_shlib,linker,compiler-flags,link-flags,objects,lib-dirs,libs,shlibbase,major,minor,revision):
 #   function that creates a library with the given base name.  This
 #   function must take the same arguments as make_bin plus the shared
