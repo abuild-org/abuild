@@ -1957,8 +1957,8 @@ C:\cygwin\cygwin.bat
      XXX
     </para>
    </sect1>
-   <sect1 id="ref.build-item-access-control">
-    <title>Build Item Access Control</title>
+   <sect1 id="ref.build-item-name-scoping">
+    <title>Build Item Name Scoping</title>
     <para>
      XXX say something about name scoping and its relation to
      dependency management
@@ -1966,10 +1966,7 @@ C:\cygwin\cygwin.bat
     <para>
      <indexterm>
       <primary>build item</primary>
-      <secondary>access control</secondary>
-     </indexterm>
-     <indexterm>
-      <primary>access control</primary>
+      <secondary>scope</secondary>
      </indexterm>
      <indexterm>
       <primary>scope</primary>
@@ -2123,26 +2120,6 @@ C:\cygwin\cygwin.bat
      <filename>Abuild.conf</filename>.  We defer discussion of this
      feature until later; see <xref
      linkend="ref.build-item-visibility"/>.
-    </para>
-    <para>
-     <indexterm>
-      <primary>lint</primary>
-     </indexterm>
-     <indexterm>
-      <primary>access control</primary>
-      <secondary>custom rules</secondary>
-     </indexterm>
-     (XXX This paragraph might go.)  Although &abuild;'s access
-     control rules for direct dependencies are useful, they are not
-     really a full-fledged access control system.  If your project
-     wishes to enforce custom rules about what items can depend upon
-     what other items, such as enforcing tiers in a multi-tier
-     architecture, the recommend approach is to write an external tool
-     that detects and reports violations.  Using <command>abuild
-     --dump-data</command>, it is possible to get a clear picture of
-     the dependencies in the entire tree.  (For information on the
-     <option>--dump-data</option> option, see <xref
-     linkend="ref.dump-data"/>.)
     </para>
    </sect1>
    <sect1 id="ref.example.simple-build-tree">
@@ -2388,14 +2365,14 @@ C:\cygwin\cygwin.bat
     <para>
      Once you set up another tree as an external to your tree, all
      build items defined in the external build tree are available to
-     you (subject to normal access control rules) as if they were in
-     your local build tree.  This means that none of the build items
-     in your build tree may have the same name as any build item in
-     the external tree.  Note that the external build tree is not
-     affected in any way by being referred to as an external.  In
-     order to avoid build item name clashes, it's a good idea to pick
-     a naming convention for your build items that includes some kind
-     of tree-based prefix, as we have done with names like
+     you (subject to normal scoping rules) as if they were in your
+     local build tree.  This means that none of the build items in
+     your build tree may have the same name as any build item in the
+     external tree.  Note that the external build tree is not affected
+     in any way by being referred to as an external.  In order to
+     avoid build item name clashes, it's a good idea to pick a naming
+     convention for your build items that includes some kind of
+     tree-based prefix, as we have done with names like
      <classname>common-lib1</classname>.
     </para>
     <para>
@@ -4811,11 +4788,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          This optional key's value is an indicator of the scope at
          which this build item is visible.  It is used to allow other
          build items to access this build item directly when they
-         would ordinarily be prevented from doing so by normal access
-         control rules.  For information about access control and
+         would ordinarily be prevented from doing so by normal scoping
+         rules.  For information about build item name scopes and
          build item visibility, see <xref
-         linkend="ref.build-item-access-control"/>.  For a discussion
-         of the <property>visible-to</property> key in particular, see
+         linkend="ref.build-item-name-scoping"/>.  For a discussion of
+         the <property>visible-to</property> key in particular, see
          <xref linkend="ref.build-item-visibility"/>
         </para>
        </listitem>
@@ -6027,8 +6004,8 @@ endif
      build item's <filename>Rules.mk</filename> to be loaded.  You
      must also list that build item as a dependency in your
      <filename>Abuild.conf</filename> file, and you must be allowed to
-     see the item subject to access control rules (see <xref
-     linkend="ref.build-item-access-control"/>).
+     see the item subject to scoping rules (see <xref
+     linkend="ref.build-item-name-scoping"/>).
     </para>
     <para>
      In rare instances, it may be necessary to create local rules for
@@ -7223,7 +7200,7 @@ endif
      implementations of this interface that reside in two different
      shared libraries.  By making this build item private to the
      <classname>shared</classname> build item name scope (see <xref
-     linkend="ref.build-item-access-control"/>), we effectively
+     linkend="ref.build-item-name-scoping"/>), we effectively
      prevent outside build items from depending on it directly.
     </para>
     <para>
@@ -8711,14 +8688,14 @@ endif
    <para>
     By default, build items are allowed to refer to other build items
     directly in their <filename>Abuild.conf</filename> files subject
-    to certain access control rules as described in <xref
-    linkend="ref.build-item-access-control"/>.  In some rare
-    instances, in order to resolve a conflict between what a given
-    build item is supposed to be able to see and which items a given
-    item is supposed to be seen by, it is necessary to increase the
-    visibility of a build item.  In this chapter, we describe a
-    mechanism for doing this and present a real-world example in which
-    it would be required.
+    to certain scoping rules as described in <xref
+    linkend="ref.build-item-name-scoping"/>.  In some rare instances,
+    in order to resolve a conflict between what a given build item is
+    supposed to be able to see and which items a given item is
+    supposed to be seen by, it is necessary to increase the visibility
+    of a build item.  In this chapter, we describe a mechanism for
+    doing this and present a real-world example in which it would be
+    required.
    </para>
    <sect1 id="ref.overriding-visibility">
     <title>Increasing a Build Item's Visibility</title>
@@ -12097,13 +12074,12 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           Build item access control rules have changed slightly: a
-           build item no longer has automatic access to items in
-           grandchild scopes or lower (<classname>A</classname> can
-           still see <classname>A.B</classname>, but it can no longer
-           see <classname>A.B.C</classname>).  Access can still be
-           granted using the <property>visible-to</property> key if
-           needed.
+           Build item scoping rules have changed slightly: a build
+           item no longer has automatic access to items in grandchild
+           scopes or lower (<classname>A</classname> can still see
+           <classname>A.B</classname>, but it can no longer see
+           <classname>A.B.C</classname>).  Access can still be granted
+           using the <property>visible-to</property> key if needed.
           </para>
          </listitem>
          <listitem>
@@ -12720,10 +12696,10 @@ Y = $(X)
          please run <filename>misc/upgrade-scope-names</filename> from
          the &abuild; installation directory.  Two consecutive dashes
          (<varname>--</varname>) no longer has any special meaning in
-         build item names.  &Abuild; also no longer requires the public
-         parent of a private build item to exist.  For details on the
-         new access control system, see <xref
-         linkend="ref.build-item-access-control"/>.
+         build item names.  &Abuild; also no longer requires the
+         public parent of a private build item to exist.  For details
+         on the new accessibility system, see <xref
+         linkend="ref.build-item-name-scoping"/>.
         </para>
        </listitem>
        <listitem>
@@ -12731,7 +12707,7 @@ Y = $(X)
          Added optional <varname>visible-to</varname> field to the
          <filename>Abuild.conf</filename> file to allow build items to
          expand their visibility as otherwise restricted by the new
-         access control rules.  This is also an optional attribute to
+         scoping rules.  This is also an optional attribute to
          <classname>BuildItem</classname> in the
          <option>--dump-data</option> output.
         </para>
