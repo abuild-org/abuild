@@ -1944,24 +1944,113 @@ C:\cygwin\cygwin.bat
     </para>
    </sect1>
   </chapter>
-  <chapter id="ref.XXX">
+  <chapter id="ref.build-item-dependencies">
    <title>Build Item Dependencies</title>
    <para>
-    XXX This section must describe transitivity of dependencies and
-    must touch upon how interfaces are related to the dependency
-    process.
+    Management of dependencies among build items is central to
+    &abuild;'s functionality.  We have already gotten a taste of this
+    capability in the basic examples included in <xref
+    linkend="ref.basic-operation"/>.  In this chapter, we will examine
+    dependencies in a bit more depth.
    </para>
-   <sect1 id="ref.XXX1">
-    <title>XXX</title>
+   <sect1 id="ref.dependencies.direct-and-indirect">
+    <title>Direct and Indirect Dependencies</title>
     <para>
-     XXX
+     The principle mechanism for declaring dependencies among build
+     items in &abuild; is the <property>deps</property> key in a build
+     item's <filename>Abuild.conf</filename>.  Suppose build item
+     <classname>A</classname> declares build item
+     <classname>B</classname> as a dependency.  The following line
+     would appear in <classname>A</classname>'s
+     <filename>Abuild.conf</filename>:
+
+     <programlisting>deps: B
+</programlisting>
+     This declaration causes two things to happen:
+     <itemizedlist>
+      <listitem>
+       <para>
+        It ensures that <classname>B</classname> will be built before
+        <classname>A</classname> in any dependency-aware build.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        It enables <classname>A</classname> to see all of the variable
+        declarations and assignments in <classname>B</classname>'s
+        <filename>Abuild.interface</filename> file.
+       </para>
+      </listitem>
+     </itemizedlist>
+     We illustrate both of these principles later in this chapter.
+     For an in-depth discussion of build ordering and dependency-aware
+     builds, see <xref linkend="ref.what-to-build"/>.  For an in-depth
+     discussion of &abuild;'s interface system, see <xref
+     linkend="ref.abuild-interface-system"/>.
+    </para>
+    <para>
+     <indexterm>
+      <primary>dependency</primary>
+     </indexterm>
+     <indexterm>
+      <primary>dependency</primary>
+      <secondary>direct</secondary>
+     </indexterm>
+     <indexterm>
+      <primary>dependency</primary>
+      <secondary>indirect</secondary>
+     </indexterm>
+     Another very important point about dependencies in &abuild; is
+     that they are <firstterm>transitive</firstterm>.  In other words,
+     if <classname>A</classname> depends on <classname>B</classname>
+     and <classname>B</classname> depends on <classname>C</classname>,
+     then <classname>A</classname> implicitly also depends on
+     <classname>C</classname>.  This means that
+     <classname>C</classname> is built before <classname>A</classname>
+     (which it has to be anyway since it is built before
+     <classname>B</classname> and <classname>B</classname> is built
+     before <classname>A</classname>) and that
+     <classname>A</classname> sees <classname>C</classname>'s
+     interface in addition to seeing <classname>B</classname>'s
+     interface.
+     <footnote>
+      <para>
+       In fact, since <classname>B</classname> depends on
+       <classname>C</classname>, <classname>C</classname>'s interface
+       is effectively included as part of <classname>B</classname>'s
+       interface.  This makes <classname>C</classname>'s interface
+       visible to all build items that depend on
+       <classname>B</classname>.  The exact mechanism by which this
+       works is described in <xref
+       linkend="ref.abuild-interface-system"/>.
+      </para>
+     </footnote>
+     Assuming that
+     <classname>A</classname> does not explicitly list
+     <classname>C</classname> in its <property>deps</property> key, we
+     would call <classname>B</classname> a <firstterm>direct
+     dependency</firstterm> of <classname>A</classname> and
+     <classname>C</classname> an <firstterm>indirect
+     dependency</firstterm> of <classname>A</classname>.  We also say
+     that build item dependencies are <firstterm>inherited</firstterm>
+     when we wish to refer to the fact that build ordering and
+     interface visibility are influenced by both direct and indirect
+     dependencies.
+    </para>
+    <para> By default, any build item can depend on any other build
+    item by name.  &Abuild; offers two mechanisms to restrict which
+    items can depend on which other items.  One mechanism is through
+    build item name scoping rules, discussed below.  The other
+    mechanism is through use of external build trees, discussed in
+    <xref linkend="ref.externals"/>.
     </para>
    </sect1>
    <sect1 id="ref.build-item-name-scoping">
     <title>Build Item Name Scoping</title>
     <para>
-     XXX say something about name scoping and its relation to
-     dependency management
+     In this section, we discuss build item name scoping rules.  Build
+     item name scoping is one mechanism that can be used to restrict
+     which build items may directly depend on which other build items.
     </para>
     <para>
      <indexterm>
@@ -2012,7 +2101,14 @@ C:\cygwin\cygwin.bat
      the referenced build item belongs to the accessing build item's
      scope or any of its ancestor scopes.  <xref
      linkend="fig.build-item-scopes"/>, shows a number of build items
-     arranged by scope.
+     arranged by scope.  In this figure, each build item defines a
+     scope whose members appear in a gray box at the end of a
+     semicircular arrowhead originating from the defining build item.
+     Each build item in this figure can see the build items that are
+     direct members of the scope that it defines, the build items that
+     are siblings to it in its own scope, and the build items inside
+     of any of its ancestor scopes.  You may wish to study the figure
+     while you follow along with the text below.
      <figure id="fig.build-item-scopes">
       <title>Build Item Scopes</title>
       <mediaobject>
@@ -2027,27 +2123,97 @@ C:\cygwin\cygwin.bat
        </caption>
       </mediaobject>
      </figure>
-     In this example, <classname>A1.B1.C1</classname> can access
-     <classname>A1.B1.C1.D1</classname> because it belongs to
-     <classname>A1.B1.C1</classname>'s scope,
-     <classname>A1.B1.C2</classname> and <classname>A1.B2</classname>
-     because they belong to ancestor scopes
-     <classname>A1.B1</classname> and <classname>A1</classname>, and
-     <classname>Q</classname> because they are global.  It can't
-     access <classname>A1.B1.C1.D1.E1</classname> because it is
-     private to <classname>A1.B1.C1.D1</classname>,
-     <classname>A1.B1.C2.D1</classname> because it is private to
-     <classname>A1.B1.C2</classname>, or <classname>Q.R</classname>
-     because it is private to <classname>Q</classname>.  The item
-     <classname>A1.B1.C1</classname> can be accessed by
-     <classname>A1.B1</classname> because it is its parent and by
-     <classname>A1.B1.C1.D1</classname> and
-     <classname>A1.B1.C1.D1.E1</classname> because they are its
-     descendants.  It cannot be accessed by
-     <classname>A1.B2</classname> because it is hidden beneath
-     <classname>A1.B1</classname> or by <classname>A1</classname>,
-     <classname>Q</classname>, or <classname>Q.R</classname> because
-     it is hidden beneath <classname>A1</classname>.
+     To illustrate, we will consider item
+     <classname>A1.B1.C1</classname>.  The build item
+     <classname>A1.B1.C1</classname> can access the following items
+     for the following reasons:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <classname>A1.B1.C1.D1</classname> because it belongs to the
+        scope that it defines: <classname>A1.B1.C1</classname>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1.B1.C2</classname> because it is in the same
+        scope as <classname>A1.B1.C1</classname>:
+        <classname>A1.B1</classname>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1.B1</classname> and <classname>A1.B2</classname>
+        because they belong to an ancestor scope:
+        <classname>A1</classname>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1</classname> and <classname>Q</classname> because
+        they are global
+       </para>
+      </listitem>
+     </itemizedlist>
+     It cannot access these items:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <classname>A1.B1.C1.D1.E1</classname> because it is hidden in
+        scope <classname>A1.B1.C1.D1</classname>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1.B1.C2.D1</classname> because it is hidden in
+        scope <classname>A1.B1.C2</classname>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>Q.R</classname> because it is hidden in scope
+        <classname>Q</classname>
+       </para>
+      </listitem>
+     </itemizedlist>
+     The item <classname>A1.B1.C1</classname> can <emphasis>be
+     accessed by</emphasis> the following items:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <classname>A1.B1</classname> because it is its parent
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1.B1.C2</classname> because it is its sibling
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1.B1.C1.D1</classname> and
+        <classname>A1.B1.C1.D1.E1</classname> because they are its
+        descendants
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <classname>A1.B1.C2.D1</classname> because it can see
+        <classname>A1.B1.C1</classname> as a member of its ancestor
+        scope <classname>A1.B1</classname>
+       </para>
+      </listitem>
+     </itemizedlist>
+     It cannot be accessed by these items:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <classname>A1.B2</classname>, <classname>A1</classname>,
+        <classname>Q</classname>, and <classname>Q.R</classname>, none
+        of which can see inside of <classname>A1.B1</classname>
+       </para>
+      </listitem>
+     </itemizedlist>
     </para>
     <para>
      To give a more concrete example, suppose you have a globally
