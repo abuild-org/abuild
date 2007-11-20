@@ -5,6 +5,8 @@ Next Release
 Documentation
 -------------
 
+ * Check XXX
+
  * ccosta comments
 
     - introduce "continue on error" earlier
@@ -14,6 +16,62 @@ Documentation
     - expand "Integration with QTest" to discuss qtest in one
       paragraph and include a reference to the qtest documentation and
       software
+
+    - To go along with "Build Item Scopes" figure, consider a table
+      with each build item having a column and a row.  A mark in (x,
+      y) means build item x can see build item y.  Alternatively,
+      describe how to get this from the figure a little more clearly.
+
+ * The first section of "telling abuild what to build" should be about
+   targets.  It should define "target" (making a clear distinction
+   from "target type" and pointing out that the use of "target" here
+   is just like with make and ant), and it should talk about custom
+   targets and predefined targets with an xref to command-line
+   reference.  Introduce special targets "clean" and "no-op"
+
+ * In expansino/contraction stuff with traits, give information about
+   rationale.
+
+ * Come up with better name for ref.invocation-examples
+
+ * Put some section somewhere about "clean".
+
+ * Change "Build Item Access Control" to "Build Item Name Scoping" and
+   purge the document of the term "access control".
+
+ * End chapter 4 after third party integration
+
+ * Move the rest of chapter 4 along with additional section, which
+   should be first, about dependencies to after the platform types
+   chapter.
+
+ * Somewhere in platform types chapter, have a table with the built-in
+   platforms showing platform, platform type, and target type.
+
+ * There is a footnote in the output directories section that used to
+   be near "The <command>clean</command> target removes output
+   directories rather than invoking a backend."  Somewhere, we need to
+   make sure we cover that this is exactly what
+   <command>clean</command> does.
+
+ * Find a place for this:
+
+    <para>
+     If &abuild; is invoked in an output subdirectory, it will run a
+     build only for that specific platform on that specific item.  It
+     will explicitly prohibit specification of a build set or clean
+     set.  It will also, as a special case, pass the
+     <command>clean</command> target to the backend.  The main use for
+     this feature would be in testing rules, but it could also be
+     useful in helping to track down some hard-to-trace build problem
+     that apply to only one of several platforms that are being built
+     for a specific build item.  Most users will never use this
+     functionality.
+    </para>
+
+
+ * Do something about stable, task, and user.  Move all three into a
+   common directory, and change the name of stable.
 
  * Consider adding a trouble shooting section
 

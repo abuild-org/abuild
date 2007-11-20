@@ -2250,11 +2250,11 @@ C:\cygwin\cygwin.bat
   <chapter id="ref.externals">
    <title>External Build Trees</title>
    <para>
-    In large development environments, it is common to have a
-    collection of code that may be shared across multiple projects.
-    Ideally, such collections of code should be accessible by other
-    projects but should not be able to access code from the other
-    projects themselves.  By creating this one-way relationship between
+    In large development environments, it is common to have
+    collections of code that may be shared across multiple projects.
+    Ideally, such collections of shared code should be accessible by
+    multiple projects but should not be able to access code from the
+    those projects.  By creating this one-way relationship between
     project code and common code, it is possible to ensure that the
     common code is not modified to <emphasis>accidentally</emphasis>
     depend on project code.  &Abuild; provides the ability to do this
@@ -2273,7 +2273,8 @@ C:\cygwin\cygwin.bat
         <indexterm>
          <primary>local build tree</primary>
         </indexterm>
-        the build tree that contains the current directory
+        The <firstterm>local build tree</firstterm> is the build tree
+        that contains the current directory.
        </para>
       </listitem>
      </varlistentry>
@@ -2291,11 +2292,11 @@ C:\cygwin\cygwin.bat
         <indexterm>
          <primary>external</primary>
         </indexterm>
-        a build tree that another build tree refers to from its root
-        build item's configuration file; all build items in the local
-        build tree can resolve the names of all build items in external
-        build trees, but build items in external build trees cannot see
-        items in the local tree
+        An <firstterm>external build tree</firstterm> is a separate
+        build tree that can supplement the local build tree.  Build
+        items in the local build tree can resolve the names of build
+        items in external build trees, but build items in external
+        build trees cannot see items in the local tree.
        </para>
       </listitem>
      </varlistentry>
@@ -2305,22 +2306,23 @@ C:\cygwin\cygwin.bat
     <title>Using External Build Trees</title>
     <para>
      There is nothing special about a build tree that makes it able to
-     be an external: any tree can be one.  In order for one build tree
-     to reference another build tree as an external, the first tree
-     must configure its root build item's
+     be an external: any tree can be an external.  In order for one
+     build tree to reference another build tree as an external, the
+     first tree must configure its root build item's
      <filename>Abuild.conf</filename> to point to the external tree's
      root directory.  This is done by adding an
      <property>external-dirs</property> key to the root build item's
      <filename>Abuild.conf</filename>.  The
      <property>external-dirs</property> key, like the
      <property>child-dirs</property> key, contains a space-separated
-     list of paths, though in this case, there is no reciprocation;
-     <emphasis>i.e.</emphasis>, nothing in the external tree points
-     back to the referring tree.  External trees can be specified as
-     either relative paths or as absolute paths.  If an external tree
-     is specified by a relative path, then &abuild; will attempt to
-     resolve it in a backing area (see <xref
-     linkend="ref.backing-areas.resolving"/>) if it is not found.
+     list of paths.  Unlike with <property>child-dirs</property>, in
+     this case, there is no reciprocation; <emphasis>i.e.</emphasis>,
+     nothing in the external tree points back to the referring tree.
+     External trees can be specified as either relative paths or as
+     absolute paths.  If an external tree is specified by a relative
+     path, then &abuild; will attempt to resolve it in a backing area
+     (see <xref linkend="ref.backing-areas.resolving"/>) if it is not
+     found.
     </para>
     <para>
      In addition to paths, there are two options that may be specified
@@ -2362,15 +2364,16 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      Once you set up another tree as an external to your tree, all
-     build items defined in the external tree are available to you
-     (subject to normal access control rules) as if they were in your
-     local tree.  This means that none of the build items in your tree
-     may have the same name as any build item in the external tree.
-     Note that the external tree is not affected in any way by being
-     referred to as an external.  In order to avoid build item name
-     clashes, it's a good idea to pick a naming convention for your
-     build items that includes some kind of tree-based prefix, as we
-     have done with names like <classname>common-lib1</classname>.
+     build items defined in the external build tree are available to
+     you (subject to normal access control rules) as if they were in
+     your local build tree.  This means that none of the build items
+     in your build tree may have the same name as any build item in
+     the external tree.  Note that the external build tree is not
+     affected in any way by being referred to as an external.  In
+     order to avoid build item name clashes, it's a good idea to pick
+     a naming convention for your build items that includes some kind
+     of tree-based prefix, as we have done with names like
+     <classname>common-lib1</classname>.
     </para>
     <para>
      When declaring an external, you must give some thought as to
@@ -2406,31 +2409,32 @@ C:\cygwin\cygwin.bat
    <sect1 id="ref.example.external-build-tree">
     <title>External Build Tree Example</title>
     <para>
-     We will examine a new build tree that makes use of our previous
-     build tree (see <xref linkend="ref.example.simple-build-tree"/>)
-     as an external.  This new tree can be found at
-     <filename>doc/example/stable/project</filename>.  The first file
-     to look at is the root build item's
+     We will examine a new build tree that uses the build tree from
+     our previous example (see <xref
+     linkend="ref.example.simple-build-tree"/>) as an external.  This
+     new tree, which we will call the project build tree, can be found
+     at <filename>doc/example/stable/project</filename>.  The first
+     file we examine is the new build tree's root build item's
      <filename>Abuild.conf</filename>:
      <?example stable/project/Abuild.conf?>
      This build item configuration file, in addition to having the
      <property>child-dirs</property> key, also has an
      <property>external-dirs</property> key.  In this case, the value
      of this key is the relative path <filename>../common</filename>.
-     It is typical for an external tree to be in a parallel directory
+     It is common for an external tree to be in a parallel directory
      structure to your build tree, so having the location start with
-     &ldquo;<filename>..</filename>&rdquo; is common.  &Abuild; does
-     not require you to do this, however, and there may be reasons to
-     have an external tree nested inside of your own tree.  As always,
-     it's best to come up with some conventions and to follow them
-     uniformly.
+     &ldquo;<filename>..</filename>&rdquo; is not unusual.  There are
+     also valid reasons to have an external build tree nested inside
+     of your own tree.  As always, it's best to come up with some
+     conventions and to follow them uniformly.
     </para>
     <para>
-     Inside this build tree, the <classname>project-lib</classname>
-     build item is defined inside the <filename>lib</filename>
-     directory.  It is set up exactly the same way as
-     <classname>common-lib1</classname> and the other libraries in the
-     external tree.  Here is its <filename>Abuild.conf</filename>:
+     Inside the project build tree, the
+     <classname>project-lib</classname> build item is defined inside
+     the <filename>lib</filename> directory.  It is set up exactly the
+     same way as <classname>common-lib1</classname> and the other
+     libraries in the external tree.  Here is its
+     <filename>Abuild.conf</filename>:
      <?example stable/project/lib/Abuild.conf?>
      Now look at <classname>project-lib.src</classname>'s
      <filename>Abuild.conf</filename>:
@@ -2438,8 +2442,7 @@ C:\cygwin\cygwin.bat
      Notice that it declares a dependency on
      <classname>common-lib1</classname>, which is defined in the
      external tree.  This works because &abuild; automatically makes
-     available to you all the build items in any build tree you declare
-     as an external.
+     available to you all the build items in any external build tree.
     </para>
     <para>
      This build tree also includes a main program, but we will not go
@@ -2450,18 +2453,20 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      When you declare another build tree as an external, you
-     automatically inherit any externals that that tree declared as
-     well.  It has to be this way or else &abuild; would not be able to
-     resolve dependencies declared in the external that are resolved in
-     its externals.  To illustrate this, we have a third build tree
-     located in <filename>doc/example/stable/derived</filename>.  Here
-     is its root <filename>Abuild.conf</filename>:
+     automatically inherit any externals that
+     <emphasis>that</emphasis> tree declared as externals as well.  If
+     this were not the case, &abuild; would not be able to resolve
+     dependencies declared in the external if those dependencies were
+     resolved in <emphasis>its</emphasis> externals.  To illustrate
+     this, we have a third build tree located in
+     <filename>doc/example/stable/derived</filename>.  Here is its
+     root <filename>Abuild.conf</filename>:
      <?example stable/derived/Abuild.conf?>
      This build tree declares <filename>../project</filename> as an
-     external.  It contains a <classname>derived-main</classname> build
-     item structure identically to the C++ program build items we've
-     seen earlier.  Here at the main program's
-     <filename>Abuild.conf</filename>:
+     external build tree.  It contains a
+     <classname>derived-main</classname> build item structure
+     identically to the C++ program build items we've seen earlier.
+     Here at the main program's <filename>Abuild.conf</filename>:
      <?example stable/derived/main/src/Abuild.conf?>
      In this file, you can see that
      <classname>derived-main.src</classname> depends on
@@ -2478,26 +2483,23 @@ C:\cygwin\cygwin.bat
    <para>
     Up to this point, we have seen only simple invocations of &abuild;
     to build a single item or an item with all of its dependencies.
-    &Abuild; actually offers several ways of creating sets of build
-    items to build or clean.  These are known as <firstterm>build
-    sets</firstterm>.  In addition, &abuild;'s list of which items to
-    build can be expanded or restricted based on
+    &Abuild; offers several ways of creating sets of build items to
+    build or clean.  These are known as <firstterm>build
+    sets</firstterm>.  In addition, &abuild;'s list of items to build
+    can be expanded or restricted based on
     <firstterm>traits</firstterm> that are assigned to build items.
    </para>
    <sect1 id="ref.build-sets">
     <title>Build Sets</title>
     <para>
-     When &abuild; is invoked with no command line options, it tries
-     to build the build item whose <filename>Abuild.conf</filename> is
-     in the current directory, and it assumes that all items that this
-     build item depends on are up to date.  We have already seen the
-     <option>--with-deps</option> option which tells &abuild; to also
-     try to build all the items on which the current item depends.
-     Now we generalize on this concept by introducing <firstterm>build
-     sets</firstterm>.  A build set is a collection of build items
-     defined by certain criteria.  Build sets can be used both to tell
-     &abuild; which items to build and also to tell it which items to
-     clean.
+     We have already seen the <option>--with-deps</option> option,
+     which tells &abuild; to build all the build items on which the
+     current item depends (directly or indirectly) in addition to
+     building the current item.  Now we generalize on this concept by
+     introducing <firstterm>build sets</firstterm>.  A build set is a
+     collection of build items defined by certain criteria.  Build
+     sets can be used both to tell &abuild; which items to build and
+     also to tell it which items to clean.
      <footnote>
       <para>
        In retrospect, the term <firstterm>build item set</firstterm>
@@ -2507,8 +2509,30 @@ C:\cygwin\cygwin.bat
        sometimes call them <firstterm>clean sets</firstterm> instead.
       </para>
      </footnote>
-     To instruct &abuild; to build all the items in a specific
-     build set, run <command>abuild
+     When &abuild; is invoked with no build set specified and without
+     the <option>--with-deps</option>, it builds the build item whose
+     <filename>Abuild.conf</filename> is in the current directory,
+     assuming that all items that this build item depends on are up to
+     date.  When any build set is specified, &abuild; attempts to
+     build all dependencies, just like when
+     <option>--with-deps</option> is specified.
+     <footnote>
+      <para>
+       Ideally, one would never invoke &abuild; in this way: the
+       maximum reliability would be achieved if &abuild; always
+       checked all dependent build items.  In practice, however, the
+       typical development process involves multiple cycles of
+       changing files and recompiling individual units of code while
+       the rest of the system stays the same.  In these cases, having
+       &abuild; re-evaluate all the dependencies when you know that
+       nothing has changed would cause an unnecessary increase in the
+       amount of time you spend waiting for &abuild; to run.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     To instruct &abuild; to build all the items in a specific build
+     set, run <command>abuild
      --build=<replaceable>set-name</replaceable></command> (or
      <command>abuild -b
      <replaceable>set-name</replaceable></command>).  To instruct
@@ -2580,15 +2604,15 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          all items in the local build tree and all writable external
-         build trees that it references
+         build trees
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><option>name:<replaceable>item[,item,...]</replaceable></option></term>
+       <term><option>name:<replaceable>item-name[,item-name,...]</replaceable></option></term>
        <listitem>
         <para>
-         all items whose names are listed
+         all build items whose names are listed
         </para>
        </listitem>
       </varlistentry>
@@ -2596,8 +2620,8 @@ C:\cygwin\cygwin.bat
        <term><option>pattern:<replaceable>regular-expression</replaceable></option></term>
        <listitem>
         <para>
-         all items whose names match the given perl compatible regular
-         expression
+         all build items whose names match the given perl-compatible
+         regular expression
         </para>
        </listitem>
       </varlistentry>
@@ -2627,8 +2651,10 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><command>abuild --with-deps check</command></term>
-       <term><command>abuild --build=current check</command></term>
+       <term>
+        <command>abuild --with-deps check</command>
+        (or <command>abuild --build=current check</command>)
+       </term>
        <listitem>
         <para>
          builds the <command>check</command> target for the current
@@ -2658,21 +2684,23 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term>
+        <command>abuild --clean=current</command> (or <command>abuild
+        clean</command>
+       </term>
+       <listitem>
+        <para>
+         removes all output directories for the current build item but
+         not for any of its dependencies
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term><command>abuild --clean=desc</command></term>
        <listitem>
         <para>
          removes all output directories for all build items at or below
          the current directory
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><command>abuild --clean=current</command></term>
-       <term><command>abuild clean</command></term>
-       <listitem>
-        <para>
-         removes all output directories for the current build item but
-         not for any of its dependencies
         </para>
        </listitem>
       </varlistentry>
@@ -2691,7 +2719,7 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          removes all output directories for all build items at or
-         below the current directory and any of their direct or
+         below the current directory and all of their direct or
          indirect dependencies
         </para>
        </listitem>
@@ -2727,50 +2755,78 @@ C:\cygwin\cygwin.bat
     </indexterm>
     <para>
      In &abuild;, it is possible to assign certain traits to a build
-     item.  A trait may apply to a build item directly, or it may
-     apply to one build item with respect to another build item.  For
-     example, a build item could declare itself to have the
-     <property>deployable</property> trait or to have the
-     <property>tester</property> trait relative to zero or more other
-     build items.  (A build item could declare itself to be the tester
-     of something or just to be a general system-wide tester, for
-     example.)  Traits are used in the construction of build sets.  In
+     item.  Traits are a very powerful feature of &abuild;.  This
+     material is somewhat more complicated than anything introduced up
+     to this point, so don't worry if you have to read this section
+     more than once.
+    </para>
+    <para>
+     Traits are used for two main purposes.  Throughout this material,
+     we will refer back to the two purposes, so be sure that you
+     understand this section well before reading the rest of the
+     chapter.
+    </para>
+    <para>
+     The first purpose is
+     creation of semantically defined groups of build items.  In this
+     case, a trait corresponding to the grouping criteria would be
+     applied to a build item directly.  For example, all build items
+     that can be deployed could be assigned the
+     <property>deployable</property> trait.
+    </para>
+    <para>
+     A second purpose of traits is to create specific relationships
+     among build items.  These relationships may or may not correspond
+     to dependencies among build items.  These traits may be applied
+     to a build item by itself or in reference to other build items.
+     For example, the <property>tester</property> trait may be applied
+     to a general system test build item by itself and may be applied
+     to every test suite build item with a reference to the specific
+     item being tested.
+    </para>
+    <para>
+     Traits are used to assist in the construction of build sets.  In
      particular, you can narrow a build set by removing all items that
-     don't have all of a specified list of traits, and you can expand
-     a build set to add any build items that relate to any items
-     already in the set by referring to them through all of a
+     don't have all of a specified list of traits.  You can also
+     expand a build set to add any build items that relate to any
+     items already in the set by referring to them through all of a
      specified list of traits.  This makes it possible to say things
      like &ldquo;run the <command>deploy</command> target for every
      build item that has the <property>deployable</property>
      trait,&rdquo; or &ldquo;run the <command>test</command> target
      for every item that tests my local build item or anything it
-     depends on.&rdquo; Since traits are visible in abuild's
-     <option>--dump-data</option> output (see <xref
-     linkend="ref.dump-data"/>), making them available to scripts or
-     front ends to &abuild;, they may also be used for purely
-     informational purposes such as specifying the classification
-     level of a build item or applying a uniform label to all build
-     items that belong to some group.  Trait names are subject to the
-     same constraints as build item names: they are case-sensitive and
-     may consist of mixed case alphanumeric characters, numbers,
-     underscores, dashes, and periods.  Unlike with build items, the
-     period does not have any semantic meaning when used in a trait
-     name.
+     depends on.&rdquo;
+    </para>
+    <para>
+     Since traits are visible in abuild's <option>--dump-data</option>
+     output (see <xref linkend="ref.dump-data"/>), they are available
+     to scripts or front ends to &abuild;.  They may also be used for
+     purely informational purposes such as specifying the
+     classification level of a build item or applying a uniform label
+     to all build items that belong to some group.  Trait names are
+     subject to the same constraints as build item names: they are
+     case-sensitive and may consist of mixed case alphanumeric
+     characters, numbers, underscores, dashes, and periods.  Unlike
+     with build items, the period does not have any semantic meaning
+     when used in a trait name.
     </para>
     <sect2 id="ref.declaring-traits">
      <title>Declaring Traits</title>
      <para>
       In order to specify the list of traits that are valid for use in
-      a particular build tree, the root build item of a build tree must
-      include the <property>supported-traits</property> key in its
-      <filename>Abuild.conf</filename> file.  Any named build item in
-      that tree, including the root item, may include a
+      a particular build tree, the root build item of a build tree
+      must include the <property>supported-traits</property> key in
+      its <filename>Abuild.conf</filename> file.  Any named build item
+      in that tree, including the root item, may include a
       <property>traits</property> key that lists one or more of the
-      supported traits for that build tree.  The list of supported
-      traits is inherited through external trees, so any trait declared
-      as valid in any external trees are also available.  The set of
-      traits that can be specified on the command line is the union of
-      all traits allowed by all known trees.
+      traits that are supported for that build tree.  The list of
+      supported traits is given as the value of the
+      <property>supported-traits</property> key in the root build
+      item's <filename>Abuild.conf</filename>.  The list of supported
+      traits is inherited through external trees, so any trait
+      declared as valid in any external trees are also available.  The
+      set of traits that can be specified on the command line is the
+      union of all traits allowed by all known trees.
      </para>
      <para>
       Traits listed in the <property>traits</property> key can be made
@@ -2798,25 +2854,49 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <option>--only-with-traits</option> and
       <option>--related-by-traits</option> command-line options to
       &abuild;.  These options must be combined with the specification
-      of a build set.
+      of a build set.  They correspond to the two purposes of traits
+      discussed above.
      </para>
      <para>
       To build all build items that have all of a specified list of
       traits, run <command>abuild
       --build=<replaceable>set</replaceable> --only-with-traits
       <replaceable>trait</replaceable>[,<replaceable>trait</replaceable>,...]</command>.
-      To expand a build set by adding to it any build items that refer
-      to a build item already in the set by all of a specified list of
-      traits, run <command>abuild
-      --build=<replaceable>set</replaceable> --related-by-traits
+      This is particularly useful when semantically grouped build
+      items share a common custom target.  For example, if all the
+      deployable build items had a special <command>deploy</command>
+      target, you could run the <command>deploy</command> target for
+      all deployable items in the local build tree with the command
+
+      <programlisting>abuild --build=local --only-with-traits deployable deploy
+</programlisting>
+      If multiple traits are specified at once, only build items with
+      all of the specified traits are included.
+     </para>
+     <para>
+      Once a build set has been constructed, you may want to add
+      additional items to the set based on traits.  Specifically, you
+      may want to add all items related by a trait to items already in
+      the build set.  To expand a build set in this way, run
+      <command>abuild --build=<replaceable>set</replaceable>
+      --related-by-traits
       <replaceable>trait</replaceable>[,<replaceable>trait</replaceable>,...]</command>
-      If multiple traits are specified at once as arguments to either
-      option, only build items that have all the specified traits are
-      considered.  It is also possible to combine these options.  In
-      that case, the traits listed in the
-      <option>--related-by-traits</option> option are used to expand
-      the build set after it has been restricted by those in the
-      <option>--only-with-traits</option> option.
+      For example, if you wanted to run the <command>test</command>
+      target for all build items are declared as testers (using the
+      <property>tester</property> trait) of your build item or any of
+      its dependencies, you could run the command
+
+      <programlisting>abuild --build=current --related-by-traits=tester test
+</programlisting>
+      As above, if multiple traits are specified at once, only build
+      items that are related by all of the specified traits are
+      included.
+     </para>
+     <para>
+      It is also possible to combine these options.  In that case, the
+      build set is first restricted using
+      <option>--only-with-traits</option> and then expanded using the
+      <option>--related-by-traits</option> as shown in examples below.
      </para>
      <para>
       Ordinarily, when a specific target is specified as an argument
@@ -2826,24 +2906,28 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       item initially in the build set (before dependency expansion).
       When the build set is expanded or restricted based on traits,
       any explicitly specified targets are run only for build items
-      that have the specified traits.  If
-      <option>--related-by-traits</option> and
+      that have the specified traits.  This is important because it
+      enables you to use traits to group build items that define
+      specific custom targets.
+     </para>
+     <para>
+      If <option>--related-by-traits</option> and
       <option>--only-with-traits</option> are both specified, any
       explicit targets are applied only to traits named in
       <option>--related-by-traits</option> as it is the most
       restrictive option.  All other build items are built with the
-      <command>all</command> target.  This makes traits also useful
-      for grouping build items that support a non-standard target.
-      Note that the <option>--apply-targets-to-deps</option> option
-      will cause any explicit targets to be applied to all build
-      items, as always.
+      <command>all</command> target.  Note that the
+      <option>--apply-targets-to-deps</option> option will cause any
+      explicit targets to be applied to all build items, as always.
+      Later in this chapter, we review the exact rules that &abuild;
+      uses to decide which targets to apply to which build items.
      </para>
      <para>
       The <option>--list-traits</option> flag provides information
-      about which traits can be used on the command line.  Information
-      about what traits are available in which build trees may be
-      obtained by looking at the output of <command>abuild
-      --dump-data</command>.
+      about which traits can be used on the command line.  To see more
+      detailed information about which traits were made available in
+      which build trees, you can examine the output of <command>abuild
+      --dump-data</command> (see <xref linkend="ref.dump-data"/>).
      </para>
      <para>
       For more information about how traits are handled with respect
@@ -2862,11 +2946,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        deployable deploy</command></term>
        <listitem>
         <para>
-         run the <command>deploy</command> target for all items at or
+         Run the <command>deploy</command> target for all items at or
          below the current directory that have the
-         <property>deployable</property> trait and the
+         <property>deployable</property> trait, and run the
          <command>all</command> target for all items that they depend
-         on
+         on.
         </para>
        </listitem>
       </varlistentry>
@@ -2875,12 +2959,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        tester test</command></term>
        <listitem>
         <para>
-         build the current build item and all of its dependencies with
+         Build the current build item and all of its dependencies with
          the <command>all</command> target, and run the
          <command>test</command> target for any build items that
-         declared themselves as a tester for any of those items; any
+         declared themselves as a tester for any of those items.  Any
          additional dependencies of the testers would also be built
-         with the <command>all</command> target
+         with the <command>all</command> target.
         </para>
        </listitem>
       </varlistentry>
@@ -2889,12 +2973,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        deployable,tester deploy test</command></term>
        <listitem>
         <para>
-         run both the <command>deploy</command> and the
+         Run both the <command>deploy</command> and the
          <command>test</command> targets for any build items in the
          local build tree (the current build item's tree excluding its
          externals) that have both the <property>deployable</property>
-         and the <property>tester</property> traits and the
-         <command>all</command> target for any of their dependencies
+         and the <property>tester</property> traits.  Run the
+         <command>all</command> target for their dependencies.
         </para>
        </listitem>
       </varlistentry>
@@ -2904,12 +2988,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        hwtest</command></term>
        <listitem>
         <para>
-         run the <command>all</command> target for all items that have
+         Run the <command>all</command> target for all items that have
          the <property>requires-hw</property> trait as well as any of
          their dependencies, and run the <command>hwtest</command>
-         target for all items that test any of them; additional
+         target for all items that test any of them.  Additional
          dependencies of the testers would also be built with the
-         <command>all</command> target
+         <command>all</command> target.
         </para>
        </listitem>
       </varlistentry>
@@ -2919,13 +3003,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <title>Target Selection</title>
      <para>
       Although we have described how various options affect which
-      build items are built with which build items, we summarize that
+      build items are built with which targets, we summarize that
       information here so that it all appears in one place.  Put
       simply, the default behavior is that &abuild; applies any
       explicitly named targets to all build items that directly match
       the criteria for belonging to the named build set.  Any build
-      items that it is building just to satisfy dependencies are built
-      with the <command>all</command> target.  This behavior is
+      items that &abuild; is building just to satisfy dependencies are
+      built with the <command>all</command> target.  This behavior is
       overridden by specifying
       <option>--apply-targets-to-deps</option>, which causes &abuild;
       to build all build items with the explicit targets.  The exact
@@ -3018,7 +3102,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      ready to revisit our previous examples.  This time, we will talk
      about how traits are used in a build tree, and we will
      demonstrate the results of running &abuild; with different build
-     sets.  We will also describe the special target
+     sets.  We will also make use of the special target
      <command>no-op</command> which can be useful for debugging your
      build trees.
     </para>
