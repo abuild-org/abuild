@@ -230,15 +230,15 @@ if ($test_java)
 		 $td->NORMALIZE_NEWLINES);
 }
 
-cd("work/stable/common");
+cd("work/general/reference/common");
 
 # Demonstrate the build order without building anything.  The output
 # of this test case appears literally in the documentation and is
 # referred to by name.
-$td->runtest("no-op in stable common",
+$td->runtest("no-op in reference common",
 	     {$td->COMMAND => "abuild --build=local no-op",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-common-no-op.out",
+	     {$td->FILE => "$top/example.reference-common-no-op.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -246,7 +246,7 @@ $td->runtest("no-op with release",
 	     {$td->COMMAND =>
 		  "abuild --build=desc no-op -p native:option=release",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-common-no-op-release.out",
+	     {$td->FILE => "$top/example.reference-common-no-op-release.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -255,14 +255,14 @@ $td->runtest("no-op with release again",
 		  "ABUILD_PLATFORM_SELECTORS='platform=*.*.*.*.release'" .
 		  " abuild -b desc no-op",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-common-no-op-release.out",
+	     {$td->FILE => "$top/example.reference-common-no-op-release.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("no-op with all options",
 	     {$td->COMMAND => "abuild --build=desc no-op -p native:option='*'",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-common-no-op-all-options.out",
+	     {$td->FILE => "$top/example.reference-common-no-op-all-options.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -272,44 +272,44 @@ $td->runtest("invalid platform selector",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("build stable common",
+$td->runtest("build reference common",
 	     {$td->COMMAND => "abuild -b desc check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-common-check.out",
+	     {$td->FILE => "$top/example.reference-common-check.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/stable/project/main/src");
+cd("work/general/reference/project/main/src");
 
-$td->runtest("no-op in stable project-main",
+$td->runtest("no-op in reference project-main",
 	     {$td->COMMAND => "abuild --build=current no-op",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-project-main-no-op.out",
+	     {$td->FILE => "$top/example.reference-project-main-no-op.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("check in stable project-main",
+$td->runtest("check in reference project-main",
 	     {$td->COMMAND =>
 		  "abuild --build=current --apply-targets-to-deps check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-project-main-check.out",
+	     {$td->FILE => "$top/example.reference-project-main-check.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("trait-based test in stable project-main",
+$td->runtest("trait-based test in reference project-main",
 	     {$td->COMMAND => "abuild --with-deps" .
 		  " --related-by-traits tester check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-project-main-trait-test.out",
+	     {$td->FILE => "$top/example.reference-project-main-trait-test.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/stable/derived");
+cd("work/general/reference/derived");
 
 $td->runtest("check for derived",
 	     {$td->COMMAND => "abuild --build=desc check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-derived-check.out",
+	     {$td->FILE => "$top/example.reference-derived-check.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -317,21 +317,28 @@ $td->runtest("check for derived",
 $td->runtest("clean desc",
 	     {$td->COMMAND => "abuild --clean=desc",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-derived-clean-local.out",
+	     {$td->FILE => "$top/example.reference-derived-clean-local.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("clean local",
 	     {$td->COMMAND => "abuild --clean=local",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-derived-clean-local.out",
+	     {$td->FILE => "$top/example.reference-derived-clean-local.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("clean all",
 	     {$td->COMMAND => "abuild --clean=all",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-derived-clean.out",
+	     {$td->FILE => "$top/example.reference-derived-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean local in common",
+	     {$td->COMMAND => "abuild --clean=local -C ../common",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.reference-common-clean-local.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -339,18 +346,18 @@ $td->runtest("rebuild local",
 	     {$td->COMMAND =>
 		  "abuild --build=local --apply-targets-to-deps check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-derived-check2-local.out",
+	     {$td->FILE => "$top/example.reference-derived-check2-local.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("rebuild all",
 	     {$td->COMMAND => "abuild --build=all check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
-	     {$td->FILE => "$top/example.stable-derived-check2.out",
+	     {$td->FILE => "$top/example.reference-derived-check2.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/task/project");
+cd("work/general/task/project");
 
 $td->runtest("task branch no-op",
 	     {$td->COMMAND => "abuild --build=all no-op",
@@ -366,7 +373,7 @@ $td->runtest("test task branch",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/task/project/main/src");
+cd("work/general/task/project/main/src");
 
 $td->runtest("trait-based task test",
 	     {$td->COMMAND => "abuild --with-deps check".
@@ -376,7 +383,7 @@ $td->runtest("trait-based task test",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/user/derived");
+cd("work/general/user/derived");
 
 validate_dump_data();
 
@@ -2578,7 +2585,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(256 +
+$td->report(257 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 16 : 0) +
 	    ($have_whole_archive ? 2 : 1));

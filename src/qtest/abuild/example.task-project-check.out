@@ -1,10 +1,10 @@
 abuild: project-lib.src (abuild-<native>): check
-make: Entering directory `--topdir--/task/project/lib/src/abuild-<native>'
+make: Entering directory `--topdir--/general/task/project/lib/src/abuild-<native>'
 Compiling ../ProjectLib.cpp as C++
 Creating project-lib library
-make: Leaving directory `--topdir--/task/project/lib/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/task/project/lib/src/abuild-<native>'
 abuild: project-lib.test (abuild-<native>): check
-make: Entering directory `--topdir--/task/project/lib/test/abuild-<native>'
+make: Entering directory `--topdir--/general/task/project/lib/test/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating lib_test executable
 
@@ -28,9 +28,9 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/task/project/lib/test/abuild-<native>'
+make: Leaving directory `--topdir--/general/task/project/lib/test/abuild-<native>'
 abuild: project-main.src (abuild-<native>): check
-make: Entering directory `--topdir--/task/project/main/src/abuild-<native>'
+make: Entering directory `--topdir--/general/task/project/main/src/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating main executable
 
@@ -54,4 +54,4 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/task/project/main/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/task/project/main/src/abuild-<native>'

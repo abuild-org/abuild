@@ -3,7 +3,7 @@ abuild: common-lib3.src (abuild-<native>): all
 abuild: common-lib2.src (abuild-<native>): all
 abuild: project-lib.src (abuild-<native>): all
 abuild: derived-main.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/derived/main/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/derived/main/src/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating main executable
 
@@ -27,4 +27,4 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/derived/main/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/derived/main/src/abuild-<native>'

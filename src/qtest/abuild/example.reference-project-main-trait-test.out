@@ -1,6 +1,6 @@
 abuild: common-lib1.src (abuild-<native>): all
 abuild: common-lib1.test (abuild-<native>): check
-make: Entering directory `--topdir--/stable/common/lib1/test/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/common/lib1/test/abuild-<native>'
 
 *********************************
 STARTING TESTS on ---timestamp---
@@ -22,11 +22,11 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/common/lib1/test/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/common/lib1/test/abuild-<native>'
 abuild: common-lib3.src (abuild-<native>): all
 abuild: common-lib2.src (abuild-<native>): all
 abuild: common-lib2.test (abuild-<native>): check
-make: Entering directory `--topdir--/stable/common/lib2/test/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/common/lib2/test/abuild-<native>'
 
 *********************************
 STARTING TESTS on ---timestamp---
@@ -48,9 +48,9 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/common/lib2/test/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/common/lib2/test/abuild-<native>'
 abuild: common-lib3.test (abuild-<native>): check
-make: Entering directory `--topdir--/stable/common/lib3/test/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/common/lib3/test/abuild-<native>'
 
 *********************************
 STARTING TESTS on ---timestamp---
@@ -72,10 +72,10 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/common/lib3/test/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/common/lib3/test/abuild-<native>'
 abuild: project-lib.src (abuild-<native>): all
 abuild: project-lib.test (abuild-<native>): check
-make: Entering directory `--topdir--/stable/project/lib/test/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/project/lib/test/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating lib_test executable
 
@@ -99,9 +99,9 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/project/lib/test/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/project/lib/test/abuild-<native>'
 abuild: project-main.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/project/main/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/project/main/src/abuild-<native>'
 
 *********************************
 STARTING TESTS on ---timestamp---
@@ -123,4 +123,4 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/project/main/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/project/main/src/abuild-<native>'

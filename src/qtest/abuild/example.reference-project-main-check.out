@@ -2,12 +2,12 @@ abuild: common-lib1.src (abuild-<native>): check
 abuild: common-lib3.src (abuild-<native>): check
 abuild: common-lib2.src (abuild-<native>): check
 abuild: project-lib.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/project/lib/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/project/lib/src/abuild-<native>'
 Compiling ../ProjectLib.cpp as C++
 Creating project-lib library
-make: Leaving directory `--topdir--/stable/project/lib/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/project/lib/src/abuild-<native>'
 abuild: project-main.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/project/main/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/project/main/src/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating main executable
 
@@ -31,4 +31,4 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/project/main/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/project/main/src/abuild-<native>'

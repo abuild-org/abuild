@@ -1,25 +1,25 @@
 abuild: common-lib1.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/common/lib1/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/common/lib1/src/abuild-<native>'
 Compiling ../CommonLib1.cpp as C++
 Creating common-lib1 library
-make: Leaving directory `--topdir--/stable/common/lib1/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/common/lib1/src/abuild-<native>'
 abuild: common-lib3.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/common/lib3/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/common/lib3/src/abuild-<native>'
 Compiling ../CommonLib3.cpp as C++
 Creating common-lib3 library
-make: Leaving directory `--topdir--/stable/common/lib3/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/common/lib3/src/abuild-<native>'
 abuild: common-lib2.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/common/lib2/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/common/lib2/src/abuild-<native>'
 Compiling ../CommonLib2.cpp as C++
 Creating common-lib2 library
-make: Leaving directory `--topdir--/stable/common/lib2/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/common/lib2/src/abuild-<native>'
 abuild: project-lib.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/project/lib/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/project/lib/src/abuild-<native>'
 Compiling ../ProjectLib.cpp as C++
 Creating project-lib library
-make: Leaving directory `--topdir--/stable/project/lib/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/project/lib/src/abuild-<native>'
 abuild: derived-main.src (abuild-<native>): check
-make: Entering directory `--topdir--/stable/derived/main/src/abuild-<native>'
+make: Entering directory `--topdir--/general/reference/derived/main/src/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating main executable
 
@@ -43,4 +43,4 @@ Expected Failures: 0
 Missing Tests: 0
 Extra Tests: 0
 
-make: Leaving directory `--topdir--/stable/derived/main/src/abuild-<native>'
+make: Leaving directory `--topdir--/general/reference/derived/main/src/abuild-<native>'

@@ -20,7 +20,7 @@
  <build-trees>
   <build-tree
    id="bt-1"
-   absolute-path="--topdir--/stable/common"
+   absolute-path="--topdir--/general/reference/common"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -41,7 +41,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/src"
+    absolute-path="--topdir--/general/reference/common/lib1/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -60,7 +60,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1"
+    absolute-path="--topdir--/general/reference/common/lib1"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -85,7 +85,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/test"
+    absolute-path="--topdir--/general/reference/common/lib1/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -116,7 +116,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -135,7 +135,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -160,7 +160,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -186,7 +186,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -213,7 +213,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -246,7 +246,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -277,7 +277,7 @@
   </build-tree>
   <build-tree
    id="bt-2"
-   absolute-path="--topdir--/stable/project"
+   absolute-path="--topdir--/general/reference/project"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -299,7 +299,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/src"
+    absolute-path="--topdir--/general/reference/common/lib1/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -318,7 +318,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1"
+    absolute-path="--topdir--/general/reference/common/lib1"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -343,7 +343,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/test"
+    absolute-path="--topdir--/general/reference/common/lib1/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -374,7 +374,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -393,7 +393,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -418,7 +418,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -444,7 +444,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -471,7 +471,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -504,7 +504,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -535,7 +535,7 @@
    <build-item
     name="project-lib.src"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/lib/src"
+    absolute-path="--topdir--/general/reference/project/lib/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -561,7 +561,7 @@
    <build-item
     name="project-lib"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/lib"
+    absolute-path="--topdir--/general/reference/project/lib"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -588,7 +588,7 @@
    <build-item
     name="project-lib.test"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/lib/test"
+    absolute-path="--topdir--/general/reference/project/lib/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -621,7 +621,7 @@
    <build-item
     name="project-main.src"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/main/src"
+    absolute-path="--topdir--/general/reference/project/main/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -659,7 +659,7 @@
    <build-item
     name="project-main"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/main"
+    absolute-path="--topdir--/general/reference/project/main"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -692,7 +692,7 @@
   </build-tree>
   <build-tree
    id="bt-3"
-   absolute-path="--topdir--/stable/derived"
+   absolute-path="--topdir--/general/reference/derived"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -714,7 +714,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/src"
+    absolute-path="--topdir--/general/reference/common/lib1/src"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -733,7 +733,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1"
+    absolute-path="--topdir--/general/reference/common/lib1"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -758,7 +758,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/test"
+    absolute-path="--topdir--/general/reference/common/lib1/test"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -789,7 +789,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -808,7 +808,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -833,7 +833,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -859,7 +859,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -886,7 +886,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -919,7 +919,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -950,7 +950,7 @@
    <build-item
     name="project-lib.src"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/lib/src"
+    absolute-path="--topdir--/general/reference/project/lib/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -976,7 +976,7 @@
    <build-item
     name="project-lib"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/lib"
+    absolute-path="--topdir--/general/reference/project/lib"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -1003,7 +1003,7 @@
    <build-item
     name="derived-main.src"
     home-tree="bt-3"
-    absolute-path="--topdir--/stable/derived/main/src"
+    absolute-path="--topdir--/general/reference/derived/main/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1041,7 +1041,7 @@
    <build-item
     name="derived-main"
     home-tree="bt-3"
-    absolute-path="--topdir--/stable/derived/main"
+    absolute-path="--topdir--/general/reference/derived/main"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1074,7 +1074,7 @@
    <build-item
     name="project-lib.test"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/lib/test"
+    absolute-path="--topdir--/general/reference/project/lib/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -1107,7 +1107,7 @@
    <build-item
     name="project-main.src"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/main/src"
+    absolute-path="--topdir--/general/reference/project/main/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -1145,7 +1145,7 @@
    <build-item
     name="project-main"
     home-tree="bt-2"
-    absolute-path="--topdir--/stable/project/main"
+    absolute-path="--topdir--/general/reference/project/main"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -1178,7 +1178,7 @@
   </build-tree>
   <build-tree
    id="bt-4"
-   absolute-path="--topdir--/task/project"
+   absolute-path="--topdir--/general/task/project"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -1201,7 +1201,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/src"
+    absolute-path="--topdir--/general/reference/common/lib1/src"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1220,7 +1220,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1"
+    absolute-path="--topdir--/general/reference/common/lib1"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1245,7 +1245,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/test"
+    absolute-path="--topdir--/general/reference/common/lib1/test"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1276,7 +1276,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1295,7 +1295,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1320,7 +1320,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1346,7 +1346,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1373,7 +1373,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1406,7 +1406,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -1437,7 +1437,7 @@
    <build-item
     name="project-lib.src"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib/src"
+    absolute-path="--topdir--/general/task/project/lib/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1463,7 +1463,7 @@
    <build-item
     name="project-lib"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib"
+    absolute-path="--topdir--/general/task/project/lib"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1490,7 +1490,7 @@
    <build-item
     name="project-lib.extra"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib/extra"
+    absolute-path="--topdir--/general/task/project/lib/extra"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1509,7 +1509,7 @@
    <build-item
     name="project-lib.test"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib/test"
+    absolute-path="--topdir--/general/task/project/lib/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1544,7 +1544,7 @@
    <build-item
     name="project-main.src"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main/src"
+    absolute-path="--topdir--/general/task/project/main/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1582,7 +1582,7 @@
    <build-item
     name="project-main"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main"
+    absolute-path="--topdir--/general/task/project/main"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -1615,7 +1615,7 @@
   </build-tree>
   <build-tree
    id="bt-5"
-   absolute-path="--topdir--/task/derived"
+   absolute-path="--topdir--/general/task/derived"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -1638,7 +1638,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/src"
+    absolute-path="--topdir--/general/reference/common/lib1/src"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1657,7 +1657,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1"
+    absolute-path="--topdir--/general/reference/common/lib1"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1682,7 +1682,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib1/test"
+    absolute-path="--topdir--/general/reference/common/lib1/test"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1713,7 +1713,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1732,7 +1732,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1757,7 +1757,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1783,7 +1783,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1810,7 +1810,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1843,7 +1843,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -1874,7 +1874,7 @@
    <build-item
     name="project-lib.src"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib/src"
+    absolute-path="--topdir--/general/task/project/lib/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -1900,7 +1900,7 @@
    <build-item
     name="project-lib"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib"
+    absolute-path="--topdir--/general/task/project/lib"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -1927,7 +1927,7 @@
    <build-item
     name="derived-main.src"
     home-tree="bt-3"
-    absolute-path="--topdir--/stable/derived/main/src"
+    absolute-path="--topdir--/general/reference/derived/main/src"
     backing-depth="1"
     external-depth="0"
     has-shadowed-references="1"
@@ -1966,7 +1966,7 @@
    <build-item
     name="derived-main"
     home-tree="bt-3"
-    absolute-path="--topdir--/stable/derived/main"
+    absolute-path="--topdir--/general/reference/derived/main"
     backing-depth="1"
     external-depth="0"
     has-shadowed-references="1"
@@ -2000,7 +2000,7 @@
    <build-item
     name="project-lib.extra"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib/extra"
+    absolute-path="--topdir--/general/task/project/lib/extra"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2019,7 +2019,7 @@
    <build-item
     name="project-lib.test"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/lib/test"
+    absolute-path="--topdir--/general/task/project/lib/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2054,7 +2054,7 @@
    <build-item
     name="project-main.src"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main/src"
+    absolute-path="--topdir--/general/task/project/main/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2092,7 +2092,7 @@
    <build-item
     name="project-main"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main"
+    absolute-path="--topdir--/general/task/project/main"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2125,7 +2125,7 @@
   </build-tree>
   <build-tree
    id="bt-6"
-   absolute-path="--topdir--/user/common"
+   absolute-path="--topdir--/general/user/common"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -2147,7 +2147,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1/src"
+    absolute-path="--topdir--/general/user/common/lib1/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -2166,7 +2166,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1"
+    absolute-path="--topdir--/general/user/common/lib1"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -2191,7 +2191,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1/test"
+    absolute-path="--topdir--/general/user/common/lib1/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -2222,7 +2222,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="1"
     external-depth="0"
     target-type="object-code"
@@ -2241,7 +2241,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="1"
     external-depth="0"
     target-type="object-code"
@@ -2266,7 +2266,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="1"
     external-depth="0"
     target-type="object-code"
@@ -2292,7 +2292,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="1"
     external-depth="0"
     target-type="object-code"
@@ -2319,7 +2319,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="1"
     external-depth="0"
     target-type="object-code"
@@ -2352,7 +2352,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="1"
     external-depth="0"
     target-type="object-code"
@@ -2383,7 +2383,7 @@
   </build-tree>
   <build-tree
    id="bt-7"
-   absolute-path="--topdir--/user/project"
+   absolute-path="--topdir--/general/user/project"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -2410,7 +2410,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1/src"
+    absolute-path="--topdir--/general/user/common/lib1/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2429,7 +2429,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1"
+    absolute-path="--topdir--/general/user/common/lib1"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2454,7 +2454,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1/test"
+    absolute-path="--topdir--/general/user/common/lib1/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -2485,7 +2485,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -2504,7 +2504,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -2529,7 +2529,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -2555,7 +2555,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -2582,7 +2582,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -2615,7 +2615,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="1"
     external-depth="1"
     target-type="object-code"
@@ -2646,7 +2646,7 @@
    <build-item
     name="project-lib.src"
     home-tree="bt-7"
-    absolute-path="--topdir--/user/project/lib/src"
+    absolute-path="--topdir--/general/user/project/lib/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -2675,7 +2675,7 @@
    <build-item
     name="project-lib"
     home-tree="bt-7"
-    absolute-path="--topdir--/user/project/lib"
+    absolute-path="--topdir--/general/user/project/lib"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -2702,7 +2702,7 @@
    <build-item
     name="project-lib.test"
     home-tree="bt-7"
-    absolute-path="--topdir--/user/project/lib/test"
+    absolute-path="--topdir--/general/user/project/lib/test"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -2739,7 +2739,7 @@
    <build-item
     name="project-main.src"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main/src"
+    absolute-path="--topdir--/general/task/project/main/src"
     backing-depth="1"
     external-depth="0"
     has-shadowed-references="1"
@@ -2778,7 +2778,7 @@
    <build-item
     name="project-main"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main"
+    absolute-path="--topdir--/general/task/project/main"
     backing-depth="1"
     external-depth="0"
     has-shadowed-references="1"
@@ -2812,7 +2812,7 @@
   </build-tree>
   <build-tree
    id="bt-8"
-   absolute-path="--topdir--/user/derived"
+   absolute-path="--topdir--/general/user/derived"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -2836,7 +2836,7 @@
    <build-item
     name="common-lib1.src"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1/src"
+    absolute-path="--topdir--/general/user/common/lib1/src"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -2855,7 +2855,7 @@
    <build-item
     name="common-lib1"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1"
+    absolute-path="--topdir--/general/user/common/lib1"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -2880,7 +2880,7 @@
    <build-item
     name="common-lib1.test"
     home-tree="bt-6"
-    absolute-path="--topdir--/user/common/lib1/test"
+    absolute-path="--topdir--/general/user/common/lib1/test"
     backing-depth="0"
     external-depth="2"
     target-type="object-code"
@@ -2911,7 +2911,7 @@
    <build-item
     name="common-lib3.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/src"
+    absolute-path="--topdir--/general/reference/common/lib3/src"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -2930,7 +2930,7 @@
    <build-item
     name="common-lib3"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3"
+    absolute-path="--topdir--/general/reference/common/lib3"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -2955,7 +2955,7 @@
    <build-item
     name="common-lib2.src"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/src"
+    absolute-path="--topdir--/general/reference/common/lib2/src"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -2981,7 +2981,7 @@
    <build-item
     name="common-lib2"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2"
+    absolute-path="--topdir--/general/reference/common/lib2"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -3008,7 +3008,7 @@
    <build-item
     name="common-lib2.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib2/test"
+    absolute-path="--topdir--/general/reference/common/lib2/test"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -3041,7 +3041,7 @@
    <build-item
     name="common-lib3.test"
     home-tree="bt-1"
-    absolute-path="--topdir--/stable/common/lib3/test"
+    absolute-path="--topdir--/general/reference/common/lib3/test"
     backing-depth="1"
     external-depth="2"
     target-type="object-code"
@@ -3072,7 +3072,7 @@
    <build-item
     name="derived-code-generator"
     home-tree="bt-8"
-    absolute-path="--topdir--/user/derived/code-generator"
+    absolute-path="--topdir--/general/user/derived/code-generator"
     backing-depth="0"
     external-depth="0"
     target-type="all"
@@ -3082,7 +3082,7 @@
    <build-item
     name="project-lib.src"
     home-tree="bt-7"
-    absolute-path="--topdir--/user/project/lib/src"
+    absolute-path="--topdir--/general/user/project/lib/src"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -3111,7 +3111,7 @@
    <build-item
     name="project-lib"
     home-tree="bt-7"
-    absolute-path="--topdir--/user/project/lib"
+    absolute-path="--topdir--/general/user/project/lib"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -3138,7 +3138,7 @@
    <build-item
     name="stub-library.autoconf"
     home-tree="bt-8"
-    absolute-path="--topdir--/user/derived/stub-library/autoconf"
+    absolute-path="--topdir--/general/user/derived/stub-library/autoconf"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3157,7 +3157,7 @@
    <build-item
     name="stub-library.implementation"
     home-tree="bt-8"
-    absolute-path="--topdir--/user/derived/stub-library/implementation"
+    absolute-path="--topdir--/general/user/derived/stub-library/implementation"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3182,7 +3182,7 @@
    <build-item
     name="stub-library"
     home-tree="bt-8"
-    absolute-path="--topdir--/user/derived/stub-library"
+    absolute-path="--topdir--/general/user/derived/stub-library"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3208,7 +3208,7 @@
    <build-item
     name="derived-main.src"
     home-tree="bt-8"
-    absolute-path="--topdir--/user/derived/main/src"
+    absolute-path="--topdir--/general/user/derived/main/src"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3253,7 +3253,7 @@
    <build-item
     name="derived-main"
     home-tree="bt-8"
-    absolute-path="--topdir--/user/derived/main"
+    absolute-path="--topdir--/general/user/derived/main"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3290,7 +3290,7 @@
    <build-item
     name="project-lib.test"
     home-tree="bt-7"
-    absolute-path="--topdir--/user/project/lib/test"
+    absolute-path="--topdir--/general/user/project/lib/test"
     backing-depth="0"
     external-depth="1"
     target-type="object-code"
@@ -3327,7 +3327,7 @@
    <build-item
     name="project-main.src"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main/src"
+    absolute-path="--topdir--/general/task/project/main/src"
     backing-depth="1"
     external-depth="1"
     has-shadowed-references="1"
@@ -3366,7 +3366,7 @@
    <build-item
     name="project-main"
     home-tree="bt-4"
-    absolute-path="--topdir--/task/project/main"
+    absolute-path="--topdir--/general/task/project/main"
     backing-depth="1"
     external-depth="1"
     has-shadowed-references="1"
