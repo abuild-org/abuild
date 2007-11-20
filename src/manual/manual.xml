@@ -6040,7 +6040,7 @@ endif
      <para>
       For each target <replaceable>target</replaceable> listed in
       <varname>TARGETS_lib</varname>, you must define the variable
-      <varname>TARGETS_lib_<replaceable>target</replaceable></varname>
+      <varname>SRCS_lib_<replaceable>target</replaceable></varname>
       to contain a list of source files used to build the library.
       Likewise, for each binary target in
       <varname>TARGETS_bin</varname>, you must define
