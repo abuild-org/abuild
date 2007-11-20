@@ -1009,6 +1009,29 @@ C:\cygwin\cygwin.bat
         </para>
        </listitem>
       </varlistentry>
+      <varlistentry>
+       <term>target</term>
+       <listitem>
+        <para>
+         <indexterm>
+          <primary>
+           target
+          </primary>
+         </indexterm>
+         A <firstterm>target</firstterm> is some specific product to
+         be build.  The term &ldquo;target&rdquo; means exactly the
+         same thing with &abuild; as it does with other build systems
+         such as <application>make</application> or
+         <application>ant</application>.  In fact, with the exception
+         of a small handful of &ldquo;special&rdquo; targets, &abuild;
+         simply passes any targets given to it onto the backend build
+         system for processing.  The most common targets are
+         <command>all</command> and <command>clean</command>.  For a
+         more complete discussion of targets, see <xref
+         linkend="ref.targets"/>.
+        </para>
+       </listitem>
+      </varlistentry>
      </variablelist>
      For a more complete description of build items and build trees,
      please see <xref linkend="ref.build-items-and-trees"/>.
@@ -2489,6 +2512,12 @@ C:\cygwin\cygwin.bat
     can be expanded or restricted based on
     <firstterm>traits</firstterm> that are assigned to build items.
    </para>
+   <sect1 id="ref.targets">
+    <title>Build Targets</title>
+    <para>
+     XXX
+    </para>
+   </sect1>
    <sect1 id="ref.build-sets">
     <title>Build Sets</title>
     <para>
