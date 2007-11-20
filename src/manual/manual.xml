@@ -2151,13 +2151,13 @@ C:\cygwin\cygwin.bat
      Now that the topic of build items and build trees has been
      explored in somewhat more depth, let's take a look at a simple but
      complete build tree.  The build tree in
-     <filename>doc/example/stable/common</filename> illustrates many of
+     <filename>doc/example/general/reference/common</filename> illustrates many of
      the concepts described above.
     </para>
     <para>
      The first file to look at is the <filename>Abuild.conf</filename>
      belonging to this tree's root build item:
-     <?example stable/common/Abuild.conf?>
+     <?example general/reference/common/Abuild.conf?>
      This is a root build item configuration file.  Notice that it
      lacks a <property>this</property> key, as is often the case with
      the root build item.  This <filename>Abuild.conf</filename>
@@ -2171,7 +2171,7 @@ C:\cygwin\cygwin.bat
      The first child of the root build item of this tree is in the
      <filename>lib1</filename> directory.  We examine its
      <filename>Abuild.conf</filename>:
-     <?example stable/common/lib1/Abuild.conf?>
+     <?example general/reference/common/lib1/Abuild.conf?>
      This build item is called <classname>common-lib1</classname>.
      Notice that the name of the build item is not the same as the name
      of the directory, but it is based on the name of the directory.
@@ -2193,7 +2193,7 @@ C:\cygwin\cygwin.bat
      Next, look at the <classname>common-lib1.src</classname> build
      item's <filename>Abuild.conf</filename> in the
      <filename>common/lib1/src</filename> directory:
-     <?example stable/common/lib1/src/Abuild.conf?>
+     <?example general/reference/common/lib1/src/Abuild.conf?>
      The first thing to notice is this build item's name.  It contains
      a period and is therefore private to the
      <classname>common-lib1</classname> scope.  That means that it is
@@ -2216,8 +2216,8 @@ C:\cygwin\cygwin.bat
      to the <filename>Abuild.conf</filename> file, we have an
      <filename>Abuild.mk</filename> file and an
      <filename>Abuild.interface</filename> file:
-     <?example stable/common/lib1/src/Abuild.mk?>
-     <?example stable/common/lib1/src/Abuild.interface?>
+     <?example general/reference/common/lib1/src/Abuild.mk?>
+     <?example general/reference/common/lib1/src/Abuild.interface?>
      There is nothing in these files that is fundamentally different
      from the basic C++ library example shown in <xref
      linkend="ref.example.basic.cxx-library"/>.  We can observe,
@@ -2230,14 +2230,14 @@ C:\cygwin\cygwin.bat
      and stick with it for any given build tree.  We will not study
      the source and header files in this example here, but you are
      encouraged to go to the
-     <filename>doc/example/stable/common</filename> directory in your
+     <filename>doc/example/general/reference/common</filename> directory in your
      &abuild; source tree or installation directory to study the files
      further on your own.
     </para>
     <para>
      Next, look at the <filename>test</filename> directory.  Here is
      its <filename>Abuild.conf</filename>:
-     <?example stable/common/lib1/test/Abuild.conf?>
+     <?example general/reference/common/lib1/test/Abuild.conf?>
      Notice that it declares a dependency on
      <classname>common-lib1</classname>.  Since its name is also
      private to the <classname>common-lib1</classname> scope, it would
@@ -2260,9 +2260,9 @@ C:\cygwin\cygwin.bat
      will not inspect every file.  We will draw your attention to one
      file in particular: observe that the
      <classname>common-lib2.src</classname> build item in
-     <filename>stable/common/lib2/src</filename> declares a dependency
+     <filename>reference/common/lib2/src</filename> declares a dependency
      on <classname>common-lib3</classname>:
-     <?example stable/common/lib2/src/Abuild.conf?>
+     <?example general/reference/common/lib2/src/Abuild.conf?>
     </para>
     <para>
      We will return to this build tree later to study build sets,
@@ -2436,10 +2436,10 @@ C:\cygwin\cygwin.bat
      our previous example (see <xref
      linkend="ref.example.simple-build-tree"/>) as an external.  This
      new tree, which we will call the project build tree, can be found
-     at <filename>doc/example/stable/project</filename>.  The first
+     at <filename>doc/example/general/reference/project</filename>.  The first
      file we examine is the new build tree's root build item's
      <filename>Abuild.conf</filename>:
-     <?example stable/project/Abuild.conf?>
+     <?example general/reference/project/Abuild.conf?>
      This build item configuration file, in addition to having the
      <property>child-dirs</property> key, also has an
      <property>external-dirs</property> key.  In this case, the value
@@ -2458,10 +2458,10 @@ C:\cygwin\cygwin.bat
      same way as <classname>common-lib1</classname> and the other
      libraries in the external tree.  Here is its
      <filename>Abuild.conf</filename>:
-     <?example stable/project/lib/Abuild.conf?>
+     <?example general/reference/project/lib/Abuild.conf?>
      Now look at <classname>project-lib.src</classname>'s
      <filename>Abuild.conf</filename>:
-     <?example stable/project/lib/src/Abuild.conf?>
+     <?example general/reference/project/lib/src/Abuild.conf?>
      Notice that it declares a dependency on
      <classname>common-lib1</classname>, which is defined in the
      external tree.  This works because &abuild; automatically makes
@@ -2482,15 +2482,15 @@ C:\cygwin\cygwin.bat
      dependencies declared in the external if those dependencies were
      resolved in <emphasis>its</emphasis> externals.  To illustrate
      this, we have a third build tree located in
-     <filename>doc/example/stable/derived</filename>.  Here is its
+     <filename>doc/example/general/reference/derived</filename>.  Here is its
      root <filename>Abuild.conf</filename>:
-     <?example stable/derived/Abuild.conf?>
+     <?example general/reference/derived/Abuild.conf?>
      This build tree declares <filename>../project</filename> as an
      external build tree.  It contains a
      <classname>derived-main</classname> build item structure
      identically to the C++ program build items we've seen earlier.
      Here at the main program's <filename>Abuild.conf</filename>:
-     <?example stable/derived/main/src/Abuild.conf?>
+     <?example general/reference/derived/main/src/Abuild.conf?>
      In this file, you can see that
      <classname>derived-main.src</classname> depends on
      <classname>project-lib</classname> from the
@@ -3159,9 +3159,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       or build files (<filename>Abuild.mk</filename>, etc.).
      </para>
      <para>
-      We return now to the <filename>stable/common</filename> directory
+      We return now to the <filename>reference/common</filename> directory
       to demonstrate both the <command>no-op</command> target and some
-      build sets.  From the <filename>stable/common</filename>
+      build sets.  From the <filename>reference/common</filename>
       directory, we can run <command>abuild --build=local
       no-op</command> to tell &abuild; to run the special
       <command>no-op</command> target for every build item in the local
@@ -3170,7 +3170,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       tree.  Running this command produces the following results (with
       the native platform again replaced by the string
       <literal>&lt;native&gt;</literal>):
-      <?qtest example.stable-common-no-op.out?>
+      <?qtest example.reference-common-no-op.out?>
       Of particular interest here is the order in which &abuild;
       visited the items.  &Abuild; makes no specific commitments about
       the order in which items will be built except that no item is
@@ -3203,14 +3203,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
      <para>
       If you are following along, then go to the
-      <filename>stable/common</filename> directory and run
+      <filename>reference/common</filename> directory and run
       <command>abuild --build=desc check</command>.  This will build
       and run the test suites for all build items at or below that
       directory, which in this case, is the same collection of build
       items as the <option>local</option> build set.  This produces the
       following output, again with some system-specific strings
       replaced with generic values:
-      <?qtest example.stable-common-check.out?>
+      <?qtest example.reference-common-check.out?>
       This example includes the output of
       <application>qtest</application> test suites.
       <application>Qtest</application> is a simple and robust
@@ -3225,7 +3225,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <para>
       Returning to the project area, we demonstrate how dependencies
       may be satisfied in externals and the effect this has on the
-      build set.  Under <filename>stable/project</filename>, we have
+      build set.  Under <filename>reference/project</filename>, we have
       just two public build items called
       <classname>project-main</classname> and
       <classname>project-lib</classname>.  The
@@ -3234,7 +3234,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <classname>project-main</classname> build item has a
       <filename>src</filename> directory that builds an executable and
       has its own test suite.  We have already seen that
-      <filename>stable/project/Abuild.conf</filename> has an
+      <filename>reference/project/Abuild.conf</filename> has an
       <property>external-dirs</property> key that points to
       <filename>../common</filename> and that items from the project
       tree depend on build items from <filename>../common</filename>.
@@ -3245,10 +3245,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <classname>common-lib3</classname>.
      </para>
      <para>
-      If we go to <filename>stable/project/main/src</filename> and run
+      If we go to <filename>reference/project/main/src</filename> and run
       <command>abuild --build=current no-op</command>, we see the
       following output:
-      <?qtest example.stable-project-main-no-op.out?>
+      <?qtest example.reference-project-main-no-op.out?>
       Notice here that only the build items whose names end with
       <classname>.src</classname> were built, and the we built items
       in dependency order.  We can also run <command>abuild
@@ -3258,7 +3258,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       We also add the <option>--apply-target-to-deps</option> flag so
       that the <command>check</command> target will be run for our
       dependencies as well.  This generates the following output:
-      <?qtest example.stable-project-main-check.out?>
+      <?qtest example.reference-project-main-check.out?>
       In this case, there were no actions performed building the files
       in <filename>common</filename> because they were already built.
       If individual files had been modified in any of these build
@@ -3282,14 +3282,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <filename>common</filename> build tree declared the
       <property>tester</property> trait in its root build item's
       <filename>Abuild.conf</filename>.  Here is that file again:
-      <?example stable/common/Abuild.conf?>
+      <?example general/reference/common/Abuild.conf?>
       Also, recall that all the test suites declared themselves as
       testers of the items that they tested.  Here again is
       <classname>common-lib1.test</classname>'s
       <filename>Abuild.conf</filename>, which declares
       <classname>common-lib1.test</classname> to be a tester of
       <classname>common-lib1.src</classname>:
-      <?example stable/common/lib1/test/Abuild.conf?>
+      <?example general/reference/common/lib1/test/Abuild.conf?>
       Given that all of our build items are set up in this way, we can
       instruct &abuild; to run the test suites for everything that we
       depend on.  We do this by running <command>abuild --with-deps
@@ -3299,7 +3299,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       dependencies, and the <command>all</command> target for
       everything else, including any additional dependencies of any of
       those test suites.  That command generates the following output:
-      <?qtest example.stable-project-main-trait-test.out?>
+      <?qtest example.reference-project-main-trait-test.out?>
       Observe that the previously unbuilt
       <classname>project-lib.test</classname> build item was built
       using the <command>check</command> target by this command, and
@@ -3315,14 +3315,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <title>Derived Project</title>
      <para>
       Finally, we'll return to our derived project build tree in
-      <filename>stable/derived</filename>.  This build tree declares
+      <filename>reference/derived</filename>.  This build tree declares
       <filename>../project</filename> as an external.  As pointed out
       before, although <filename>derived</filename> does not declare
       <filename>../common</filename> as an external, it can still use
       build items in <filename>../common</filename> because a build
       tree automatically inherits externals from its externals.  If we
       run <command>abuild --build=desc check</command> from
-      <filename>stable/derived</filename>, we will see all our
+      <filename>reference/derived</filename>, we will see all our
       dependencies in <filename>../common</filename> and
       <filename>../project</filename> being built (though all are up to
       date at this point) before our own test suite is run.  This is
@@ -3330,13 +3330,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       current directory.  This again illustrates how &abuild; adds
       additional items to the build set as required to satisfy
       dependencies:
-      <?qtest example.stable-derived-check.out?>
+      <?qtest example.reference-derived-check.out?>
       We can also observe that we do not see this behavior with the
       special <command>clean</command> target.  Both <command>abuild
       --clean=desc</command> and <command>abuild
       --clean=local</command> produce this output when run from
-      <filename>stable/derived</filename>:
-      <?qtest example.stable-derived-clean-local.out?>
+      <filename>reference/derived</filename>:
+      <?qtest example.reference-derived-clean-local.out?>
      </para>
      <para>
       As another demonstration of the transitive nature of externals
@@ -3344,7 +3344,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <command>abuild --clean=all</command> from the root of the
       <filename>derived</filename> build tree.  That generates this
       output:
-      <?qtest example.stable-derived-clean.out?>
+      <?qtest example.reference-derived-clean.out?>
       Notice that we clean all build items in
       <filename>common</filename> and <filename>project</filename> as
       well as in <filename>derived</filename>, that only build items
@@ -3649,11 +3649,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      which to do our work.  We would populate this build tree with
      whatever parts of <filename>project</filename> we wanted to
      modify.  We have set up this build tree in
-     <filename>doc/example/task/project</filename>.  We have set this
+     <filename>doc/example/general/task/project</filename>.  We have set this
      build tree's backing area to
-     <filename>../../stable/project</filename> so that it would resolve
+     <filename>../../reference/project</filename> so that it would resolve
      any missing build items or externals to that location:
-     <?example task/project/Abuild.backing?>
+     <?example general/task/project/Abuild.backing?>
      Note that, although we used a relative path for our backing area
      in this example, we would ordinarily set our backing area to an
      absolute path.  We use a relative path here only so that the
@@ -3664,16 +3664,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>task/common</filename>, even though our root
      <filename>Abuild.conf</filename> lists
      <filename>../common</filename> as an external:
-     <?example task/project/Abuild.conf?>
+     <?example general/task/project/Abuild.conf?>
      Since that relative path exists as a valid build tree relative to
      our backing area, &abuild; will just use
      <filename>../common</filename> relative to the backing area
-     (<filename>../../stable/project/../common</filename>, which is
-     <filename>../../stable/common</filename>) to resolve the
+     (<filename>../../reference/project/../common</filename>, which is
+     <filename>../../reference/common</filename>) to resolve the
      external.  As always, for this example to work properly, our
      backing area must be fully built.  If you are following along, to
      make sure this is the case, you should run <command>abuild
-     --build=all</command> in <filename>stable/derived</filename>.
+     --build=all</command> in <filename>reference/derived</filename>.
      Next run <command>abuild --build=all no-op</command> in
      <filename>task/project</filename>.  This generates the following
      output:
@@ -3686,7 +3686,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      If you study <filename>include/ProjectLib.hpp</filename> and
      <filename>src/ProjectLib.cpp</filename> in
      <filename>task/project/lib</filename> in comparison to their
-     counterparts in <filename>stable/project/lib</filename>, you'll
+     counterparts in <filename>reference/project/lib</filename>, you'll
      notice that the only change we made in this task branch is the
      addition of an optional parameter to
      <classname>ProjectLib</classname>'s constructor.  We also updated the
@@ -3697,8 +3697,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>task/project/lib/extra/Abuild.conf</filename>:
      and also added the <filename>extra</filename> directory in
      <filename>task/project/lib/Abuild.conf</filename>:
-     <?example task/project/lib/extra/Abuild.conf?>
-     <?example task/project/lib/Abuild.conf?>
+     <?example general/task/project/lib/extra/Abuild.conf?>
+     <?example general/task/project/lib/Abuild.conf?>
      We didn't modify anything under
      <filename>task/project/main</filename> at all, but we included it
      in our task branch so we could run its test suite.  Remember that
@@ -3811,10 +3811,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <title>Deleted Build Item</title>
     <para>
      Here we present a new series of build trees located under
-     <filename>doc/example/user</filename>.  These build trees back to
-     our task branch and stable build tree from earlier examples.
-     (That is, they declare them as their backing areas.)  We will use
-     these build trees to illustrate the use of the
+     <filename>doc/example/general/user</filename>.  These build trees
+     back to our task branch and reference build tree from earlier
+     examples.  (That is, they declare them as their backing areas.)
+     We will use these build trees to illustrate the use of the
      <property>deleted</property> key in a build tree's root build
      item's <filename>Abuild.conf</filename>, and we also present a
      concrete example of using interface flags to implement private
@@ -3823,21 +3823,24 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      Suppose we have a user who is working on changes that are related
      in some way to the task branch.  We want to create a user branch
-     that backs to the task branch.  Our user branch contains all three
-     areas: <filename>common</filename>, <filename>project</filename>,
-     and <filename>derived</filename>.  We will ignore
-     <filename>derived</filename> for the moment and focus only
-     <filename>common</filename> and <filename>project</filename>.
-     Observe that <filename>common</filename> contains only the
+     that backs to the task branch.  Our user branch contains all
+     three areas: <filename>common</filename>,
+     <filename>project</filename>, and <filename>derived</filename>.
+     We will ignore <filename>derived</filename> for the moment and
+     focus only <filename>common</filename> and
+     <filename>project</filename>.  Observe that
+     <filename>common</filename> contains only the
      <filename>lib1</filename> directory and that
      <filename>project</filename> contains only the
      <filename>lib</filename> directory.  We make a gratuitous change
-     to a source file in <classname>common-lib1.src</classname> just as
-     another example of shadowing a build item from our backing area.
-     Since our task branch didn't contain <filename>common</filename>,
-     the <filename>common</filename> in our user branch has to back to
-     stable.  Here is <filename>user/common/Abuild.backing</filename>:
-     <?example user/common/Abuild.backing?>
+     to a source file in <classname>common-lib1.src</classname> just
+     as another example of shadowing a build item from our backing
+     area.  Since our task branch didn't contain
+     <filename>common</filename>, the <filename>common</filename> in
+     our <filename>user</filename> branch has to back to
+     <filename>reference</filename>.  Here is
+     <filename>user/common/Abuild.backing</filename>:
+     <?example general/user/common/Abuild.backing?>
     </para>
     <para>
      In <filename>project</filename>, we have made changes to
@@ -3850,7 +3853,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>project/lib</filename> and from the
      <property>child-dirs</property> key in
      <filename>project/lib/Abuild.conf</filename>:
-     <?example user/project/lib/Abuild.conf?>
+     <?example general/user/project/lib/Abuild.conf?>
      That in itself was not sufficient since, even though the
      <filename>extra</filename> directory is no longer present in the
      <property>child-dirs</property> key of
@@ -3861,7 +3864,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <property>deleted</property> key in
      <filename>user/project</filename>'s
      <filename>Abuild.conf</filename>:
-     <?example user/project/Abuild.conf?>
+     <?example general/user/project/Abuild.conf?>
      This has effectively prevented &abuild; from looking for
      <classname>project-lib.extra</classname> in the backing area
      chain.  If any build item in the local tree references
@@ -3882,12 +3885,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      in the <filename>src</filename> directory, you will see that it
      lists <property>private</property> in its
      <property>supported-flags</property> key:
-     <?example user/project/lib/src/Abuild.conf?>
+     <?example general/user/project/lib/src/Abuild.conf?>
      In its <filename>Abuild.interface</filename> file, it adds
      <filename>../private-include</filename> to
      <varname>INCLUDES</varname> only when the
      <property>private</property> flag is set:
-     <?example user/project/lib/src/Abuild.interface?>
+     <?example general/user/project/lib/src/Abuild.interface?>
      This makes the headers in the
      <filename>private-include</filename> directory visible to it and
      any build item that depends on it with
@@ -3909,7 +3912,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      build item is to put the new source file
      <filename>ProjectLib_private.cpp</filename> in a
      <filename>private</filename> subdirectory:
-     <?example user/project/lib/src/Abuild.mk?>
+     <?example general/user/project/lib/src/Abuild.mk?>
      The only reason we did this was to demonstrate that &abuild;
      allows multicomponent paths (<emphasis>i.e.</emphasis>, paths
      with subdirectories in them) in your source variables.  Just
@@ -3934,7 +3937,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>ProjectLib_private.hpp</filename> and called a function
      in that file to get the value with which we initialize
      <varname>cl1</varname>:
-     <?example user/project/lib/src/private/ProjectLib_private.cpp?>
+     <?example general/user/project/lib/src/private/ProjectLib_private.cpp?>
      This isn't a particularly useful example of how one would use a
      private interface, but it will suffice to illustrate how they
      work.  Private interfaces can be particularly useful in any
@@ -3954,7 +3957,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>test</filename> directory mentions
      <classname>project-lib.src</classname> explicitly in its dependency
      list, and that it is followed by <option>-flag=private</option>:
-     <?example user/project/lib/test/Abuild.conf?>
+     <?example general/user/project/lib/test/Abuild.conf?>
      This means that when <classname>project-lib.test</classname>
      reads <classname>project-lib.src</classname>'s
      <filename>Abuild.interface</filename> file, any assignments that
@@ -6400,7 +6403,7 @@ endif
      external library if that library is not available.  Our example
      is somewhat contrived, but it demonstrates the core functionality
      and patterns required to do this.  Our example resides in
-     <filename>doc/example/user/derived/stub-library</filename>.
+     <filename>doc/example/general/user/derived/stub-library</filename>.
      <note>
       <para>
        In our example, we have used build item names containing the
@@ -6419,11 +6422,11 @@ endif
      <filename>stub-library</filename> directory itself defines a
      pass-through build item that depends on the
      <classname>stub-library.implementation</classname> build item:
-     <?example user/derived/stub-library/Abuild.conf?>
+     <?example general/user/derived/stub-library/Abuild.conf?>
      The <classname>stub-library.implementation</classname> build
      item, in turn, depends on the
      <classname>stub-library.autoconf</classname> build item:
-     <?example user/derived/stub-library/implementation/Abuild.conf?>
+     <?example general/user/derived/stub-library/implementation/Abuild.conf?>
     </para>
     <para>
      The <classname>stub-library.autoconf</classname> build item's
@@ -6433,7 +6436,7 @@ endif
      declares <filename>autoconf.interface</filename> in its output
      directory as an after-build file using the
      <function>after-build</function> statement:
-     <?example user/derived/stub-library/autoconf/Abuild.interface?>
+     <?example general/user/derived/stub-library/autoconf/Abuild.interface?>
      This means that the <filename>autoconf.interface</filename> file
      won't be included when this build item is built but will be
      included when other build items that depend on this one are
@@ -6442,7 +6445,7 @@ endif
     </para>
     <para>
      Next, look at the <filename>autoconf/Abuild.mk</filename> file:
-     <?example user/derived/stub-library/autoconf/Abuild.mk?>
+     <?example general/user/derived/stub-library/autoconf/Abuild.mk?>
      Here, we set the variables that the <varname>autoconf</varname>
      rules require.  You can learn more about these variables by run
      <command>abuild interface-help</command> from an autoconf-based
@@ -6458,7 +6461,7 @@ endif
     </para>
     <para>
      Here is the <filename>autoconf/configure.ac</filename> file:
-     <?example user/derived/stub-library/autoconf/configure.ac?>
+     <?example general/user/derived/stub-library/autoconf/configure.ac?>
      This contains normal autoconf macros.  The main things to note
      here are the <varname>AC_CONFIG_FILES</varname> macro which tells
      autoconf to generate the <filename>autoconf.interface</filename>
@@ -6475,7 +6478,7 @@ endif
     <para>
      Next, we examine the <filename>autoconf.interface.in</filename>
      file:
-     <?example user/derived/stub-library/autoconf/autoconf.interface.in?>
+     <?example general/user/derived/stub-library/autoconf/autoconf.interface.in?>
      This is just like any other file generated by autoconf: it
      contains substitution tokens surrounded by @ signs.  Since it is
      an &abuild; interface file, it has &abuild; interface syntax.
@@ -6507,14 +6510,14 @@ endif
      preprocessor symbol as generated by autoconf.  It also makes use
      of printf and checks to make sure it's there, just to demonstrate
      how you might do such a thing:
-     <?example user/derived/stub-library/implementation/stub.cc?>
+     <?example general/user/derived/stub-library/implementation/stub.cc?>
      The implementation provides a header file called
      <filename>world_peace.hh</filename>, which is presumably the same
      as the name of the header provided by the real implementation and
      which would have been made available by the
      <filename>stub-library.autoconf</filename> build item if the
      library were found:
-     <?example user/derived/stub-library/implementation/world_peace.hh?>
+     <?example general/user/derived/stub-library/implementation/world_peace.hh?>
      The <filename>Abuild.interface</filename> file in the
      <filename>implementation</filename> directory actually adds
      <filename>stub-library</filename> to the list of libraries only
@@ -6523,7 +6526,7 @@ endif
      <filename>autoconf.interface</filename> file, is false.  So if we
      had a real <function>create_world_peace</function> function, we
      wouldn't have to use our stub library:
-     <?example user/derived/stub-library/implementation/Abuild.interface?>
+     <?example general/user/derived/stub-library/implementation/Abuild.interface?>
     </para>
     <para>
      Note that users of the <filename>stub-library</filename> build
@@ -6534,7 +6537,7 @@ endif
      that you have the appropriate interfaces available.  You can see
      an example of this by looking at <filename>main.cpp</filename> in
      <filename>user/derived/main/src</filename>:
-     <?example user/derived/main/src/main.cpp?>
+     <?example general/user/derived/main/src/main.cpp?>
     </para>
    </sect1>
   </chapter>
@@ -7388,7 +7391,7 @@ endif
     <title>Code Generator Example</title>
     <para>
      The <classname>derived-code-generator</classname> build item in
-     <filename>doc/example/user/derived/code-generator</filename>
+     <filename>doc/example/general/user/derived/code-generator</filename>
      contains a trivial code generator.  All it does is generate a
      source and header file that define a function that returns a
      constant, which is read from a file.  We have modified
@@ -7413,7 +7416,7 @@ endif
      The important part of this is <filename>Rules.mk</filename>, so
      we'll study it carefully.  Here is the
      <filename>Rules.mk</filename> file:
-     <?example user/derived/code-generator/Rules.mk?>
+     <?example general/user/derived/code-generator/Rules.mk?>
      The first thing we do here is to define a
      <command>rules-help</command> target that prints some help
      information about using the rules.  By placing the name of this
@@ -7521,10 +7524,10 @@ endif
      the code generator in <filename>Abuild.conf</filename> using
      traits.  Here are the relevant files from
      <classname>derived-main.src</classname>:
-     <?example user/derived/main/src/Abuild.conf?>
-     <?example user/derived/main/src/Abuild.mk?>
+     <?example general/user/derived/main/src/Abuild.conf?>
+     <?example general/user/derived/main/src/Abuild.mk?>
      Here is the modified <filename>main.cpp</filename> file:
-     <?example user/derived/main/src/main.cpp?>
+     <?example general/user/derived/main/src/main.cpp?>
     </para>
    </sect1>
    <sect1 id="ref.example.auto-from-variable">
