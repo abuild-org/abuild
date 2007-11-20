@@ -3075,7 +3075,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <emphasis>was not</emphasis> specified.  In this case, all
          items belonging to the original build set and having all of
          the named traits are built with the explicit targets.  Other
-         items are built with the <command>all</command> target.
+         items (dependencies of build items with the named traits but
+         that do not have the named traits themselves) are built with
+         the <command>all</command> target.
         </para>
        </listitem>
        <listitem>
@@ -3085,7 +3087,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <option>--related-by-traits</option> <emphasis>was</emphasis>
          specified.  In this case, the build set is first constructed
          normally and then restricted to any items that have all the
-         traits specified in the <option>--related-by-traits</option>
+         traits specified in the <option>--only-with-traits</option>
          option, if any.  Then it is expanded to include any build
          item related to one of the original build set members by all
          the traits named in <option>--related-by-traits</option>.
@@ -3110,17 +3112,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       integrity checks or invoke a backend.
      </para>
      <para>
-      The special target <command>no-op</command> is also not passed to
-      a backend and may not be combined with other targets.  When given
-      this target, &abuild; does not invoke a backend or load interface
-      files, but it does perform all its integrity validations, and it
-      also visits build items in dependency order and for each platform
-      on which they would have been built.  This is useful primarily
-      for testing as it provides a fast way for you to see which build
-      items would be built by any given build command.  The
-      <command>no-op</command> target, when specified, applies to all
-      targets regardless of the specification of any trait-based build
-      or expansion sets.
+      The special target <command>no-op</command> is also not passed
+      to a backend and may not be combined with other targets.  When
+      given this target, &abuild; does not invoke a backend or load
+      interface files.  It does, however, still perform all its
+      integrity validations, and it also visits build items in
+      dependency order and for each platform on which they would have
+      been built.  This is useful primarily for testing as it provides
+      a fast way for you to see which build items would be built by
+      any given build command.  The <command>no-op</command> target,
+      when specified, applies to all targets regardless of the
+      specification of any trait-based build or expansion sets.
      </para>
     </sect2>
    </sect1>
@@ -3159,16 +3161,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       or build files (<filename>Abuild.mk</filename>, etc.).
      </para>
      <para>
-      We return now to the <filename>reference/common</filename> directory
-      to demonstrate both the <command>no-op</command> target and some
-      build sets.  From the <filename>reference/common</filename>
-      directory, we can run <command>abuild --build=local
-      no-op</command> to tell &abuild; to run the special
-      <command>no-op</command> target for every build item in the local
-      build tree.  Since this tree has no externals, there is no chance
-      that there are any dependencies that are satisfied outside of the
-      tree.  Running this command produces the following results (with
-      the native platform again replaced by the string
+      We return now to the <filename>reference/common</filename>
+      directory to demonstrate both the <command>no-op</command>
+      target and some build sets.  From the
+      <filename>reference/common</filename> directory, we can run
+      <command>abuild --build=local no-op</command> to tell &abuild;
+      to run the special <command>no-op</command> target for every
+      build item in the local build tree.  Since this tree has no
+      externals, there is no chance that there are any dependencies
+      that are satisfied outside of the local build tree.  Running
+      this command produces the following results (with the native
+      platform again replaced by the string
       <literal>&lt;native&gt;</literal>):
       <?qtest example.reference-common-no-op.out?>
       Of particular interest here is the order in which &abuild;
@@ -3189,17 +3192,20 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <classname>common-lib3.src</classname> (indirectly through its
       dependency on <classname>common-lib3</classname>), &abuild;
       automatically builds <classname>common-lib3.src</classname>
-      before it builds <classname>common-lib2.src</classname>.  Since
-      <classname>common-lib2.test</classname> has no dependency on
-      <classname>common-lib3.test</classname>, no specific ordering is
-      necessary in that case.  If you were to run <command>abuild
-      --clean=local</command> from this directory, you would not
-      observe the same ordering of build items since &abuild; does not
-      pay any attention to dependencies when it is running the clean
-      target.  Note also that none of the build items that don't have
-      <filename>Abuild.mk</filename> files are mentioned at all.
-      &Abuild; knows that there is nothing to build there and skips
-      them when it is building multiple items.
+      before it builds <classname>common-lib2.src</classname>.  On the
+      other hand, since <classname>common-lib2.test</classname> has no
+      dependency on <classname>common-lib3.test</classname>, no
+      specific ordering is necessary in that case.  If you were to run
+      <command>abuild --clean=local</command> from this directory, you
+      would not observe the same ordering of build items since
+      &abuild; does not pay any attention to dependencies when it is
+      running the clean target, as shown:
+      <?qtest example.reference-common-clean-local.out?>
+      Note also that only the build items that have
+      <filename>Abuild.mk</filename> files are cleaned.  &Abuild;
+      knows that there is nothing to build in items without
+      <filename>Abuild.mk</filename> files and skips them when it is
+      building or cleaning multiple items.
      </para>
      <para>
       If you are following along, then go to the
@@ -3207,9 +3213,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <command>abuild --build=desc check</command>.  This will build
       and run the test suites for all build items at or below that
       directory, which in this case, is the same collection of build
-      items as the <option>local</option> build set.  This produces the
-      following output, again with some system-specific strings
-      replaced with generic values:
+      items as the <option>local</option> build set.
+      <footnote>
+       <para>
+        The test suites in this example are implemented with <ulink
+        url="http://qtest.qbilt.org">QTest</ulink>, which therefore
+        must be installed for you to run them.  See <xref
+        linkend="ref.test-integration"/>.
+       </para>
+      </footnote>
+      This produces the following output, again with some
+      system-specific strings replaced with generic values:
       <?qtest example.reference-common-check.out?>
       This example includes the output of
       <application>qtest</application> test suites.
@@ -3221,7 +3235,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
     </sect2>
     <sect2 id="ref.example.project-code-area">
-     <title>Project Code Area</title>
+     <title>External Build Tree Example: Project Code Area</title>
      <para>
       Returning to the project area, we demonstrate how dependencies
       may be satisfied in externals and the effect this has on the
@@ -3249,31 +3263,31 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <command>abuild --build=current no-op</command>, we see the
       following output:
       <?qtest example.reference-project-main-no-op.out?>
-      Notice here that only the build items whose names end with
-      <classname>.src</classname> were built, and the we built items
-      in dependency order.  We can also run <command>abuild
-      --build=current check</command>, or equivalently,
-      <command>abuild --with-deps check</command> to run the
-      <command>check</command> target for each of these build items.
-      We also add the <option>--apply-target-to-deps</option> flag so
-      that the <command>check</command> target will be run for our
-      dependencies as well.  This generates the following output:
+      Notice here that &abuild; only built the build items whose names
+      end with <classname>.src</classname>, and that it built the
+      items in dependency order.  We can also run <command>abuild
+      --build=current --apply-targets-to-deps check</command> to run
+      the <command>check</command> target for each of these build
+      items.  This generates the following output:
       <?qtest example.reference-project-main-check.out?>
-      In this case, there were no actions performed building the files
-      in <filename>common</filename> because they were already built.
-      If individual files had been modified in any of these build
-      items, the appropriate targets would have been rebuilt subject
-      to the ordinary file-based dependency management performed by
-      make or ant.
+      The presence of the <option>--apply-target-to-deps</option> flag
+      caused the <command>check</command> target will be run for our
+      dependencies as well as the current build item.  In this case,
+      there were no actions performed building the files in
+      <filename>common</filename> because they were already built.  If
+      individual files had been modified in any of these build items,
+      the appropriate targets would have been rebuilt subject to the
+      ordinary file-based dependency management performed by make or
+      ant.
      </para>
     </sect2>
     <sect2 id="ref.example.trait">
      <title>Trait Example</title>
      <para>
-      In our previous example, although we see the
-      <command>check</command> target being run for each item, since
-      the items other than <classname>project-main</classname> don't
-      contain their own test suites, we see only the test suite for
+      In our previous example, we saw the <command>check</command>
+      target run for each item (that has a build file).  Since the
+      items other than <classname>project-main</classname> don't
+      contain their own test suites, we see the test suite only for
       <classname>project-main</classname>.  Sometimes we might like to
       run all the test suites of all the build items we depend on,
       even if we don't depend on their test suites directly.  We can
@@ -3304,29 +3318,31 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <classname>project-lib.test</classname> build item was built
       using the <command>check</command> target by this command, and
       that all the test suites were run.  If your development area has
-      good test suites, setting up the <property>tester</property>
-      trait in this way enables you to run test suites in this way.
-      This can give you significant assurance that everything you
-      depend on is working the way it is supposed to be each time you
-      start a development process.
+      good test suites, you are encouraged to use a trait to indicate
+      which items they test as we have done here using the
+      <property>tester</property> trait.  This enables you to run the
+      test suites of items in your dependency chain.  This can give
+      you significant assurance that everything you depend on is
+      working the way it is supposed to be each time you start a
+      development or debugging session.
      </para>
     </sect2>
     <sect2 id="ref.example.derived-project">
-     <title>Derived Project</title>
+     <title>Derived Project Example</title>
      <para>
-      Finally, we'll return to our derived project build tree in
-      <filename>reference/derived</filename>.  This build tree declares
-      <filename>../project</filename> as an external.  As pointed out
-      before, although <filename>derived</filename> does not declare
-      <filename>../common</filename> as an external, it can still use
-      build items in <filename>../common</filename> because a build
-      tree automatically inherits externals from its externals.  If we
-      run <command>abuild --build=desc check</command> from
-      <filename>reference/derived</filename>, we will see all our
-      dependencies in <filename>../common</filename> and
-      <filename>../project</filename> being built (though all are up to
-      date at this point) before our own test suite is run.  This is
-      the case even though they are not actually descendants of the
+      Finally, we return to our derived project build tree in
+      <filename>reference/derived</filename>.  This build tree
+      declares <filename>../project</filename> as an external.  As
+      pointed out before, although <filename>derived</filename> does
+      not declare <filename>../common</filename> as an external, it
+      can still use build items in <filename>../common</filename>
+      because a build tree automatically inherits externals from its
+      externals.  If we run <command>abuild --build=desc
+      check</command> from <filename>reference/derived</filename>, we
+      will see all our dependencies in <filename>../common</filename>
+      and <filename>../project</filename> being built (though all are
+      up to date at this point) before our own test suite is run.
+      This is the case even though they are not all descendants of the
       current directory.  This again illustrates how &abuild; adds
       additional items to the build set as required to satisfy
       dependencies:
@@ -3345,12 +3361,27 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <filename>derived</filename> build tree.  That generates this
       output:
       <?qtest example.reference-derived-clean.out?>
-      Notice that we clean all build items in
-      <filename>common</filename> and <filename>project</filename> as
-      well as in <filename>derived</filename>, that only build items
-      that contain build files are visited, and that build items are
-      cleaned in an order that completely disregards any dependencies
-      that may exist among them.
+      Here are a few things to notice:
+      <itemizedlist>
+       <listitem>
+        <para>
+         We clean all build items in <filename>common</filename> and
+         <filename>project</filename> as well as in
+         <filename>derived</filename>.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Only build items that contain build files are visited.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Build items are cleaned in an order that completely
+         disregards any dependencies that may exist among them.
+        </para>
+       </listitem>
+      </itemizedlist>
      </para>
     </sect2>
    </sect1>
@@ -3362,14 +3393,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <primary>backing area</primary>
     </indexterm>
     In a large development environment, it is very common for a
-    developer to have a local work area that contains only a small
-    portion of the overall software baseline.  The developer would
-    typically have a local copy of only the parts of the system that he
-    or she is actually working on.  Any parts of the software that are
-    required to resolve dependencies would be resolved through some
-    kind of external, most likely read-only, reference area.  &Abuild;
-    provides this functionality through the use of <firstterm>backing
-    areas</firstterm>.
+    developer to have a local work area that contains only the parts
+    of the system that he or she is actually working on.  Any parts of
+    the software that are required to resolve dependencies would be
+    resolved through some kind of outside, most likely read-only,
+    reference area.  &Abuild; provides this functionality through the
+    use of <firstterm>backing areas</firstterm>.
    </para>
    <sect1 id="ref.backing-areas.setup">
     <title>Setting Up Backing Areas</title>
@@ -3400,15 +3429,15 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      generally be controlled in a version control system since they
      are a property of the developer's work area rather than of the
      software baseline.  If they are controlled, they should generally
-     not be &ldquo;promoted&rdquo; out of a developer's work area.
+     not be visible outside of the developer's work area.
     </para>
     <note>
      <para>
       Changing backing area configuration should generally be followed
       by a clean build.  This is also true when a build item is
-      removed from a local tree and reverts to a backing area.  The
-      reason is that changing the location of a build item changes the
-      actual dependencies, but if those dependencies are older than
+      removed from a local build tree and reverts to a backing area.
+      The reason is that changing the location of a build item changes
+      the actual dependencies.  If those dependencies are older than
       the last build time, even if they were newer than the files they
       replaced, <application>make</application> will not notice
       because it uses modification time-based dependencies.  In other
@@ -3428,24 +3457,24 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      mechanism that &abuild; uses to handle backing areas and
      externals with enough detail to fully understand the subtleties
      of how they work, please see <xref
-     linkend="ref.traversal-details"/>.  To get started, the
-     explanations provided here should suffice.
+     linkend="ref.traversal-details"/>.
     </para>
     <para>
      The purpose of a backing area is to enable a developer to create
      a partially populated build tree and to fall back to a more
      complete area for build items that are omitted in the local build
-     tree.  A build tree may have at most one backing area, but your
-     backing area's backing area is also searched, thus effectively
-     providing you with a chain of backing areas.  When &abuild;
-     attempts to resolve a name to a path, if it is unable to resolve
-     the name in your local build tree, it effectively searches for
-     the name in your backing area chain, using whichever location it
-     finds first.
+     tree.  A build tree may have at most one backing area, but its
+     backing area's backing area is also searched, thus creating a
+     chain of backing areas.  When &abuild; attempts to resolve a name
+     to a path, if it is unable to resolve the name in your local
+     build tree or its externals, it effectively searches for the name
+     in your backing area chain, using whichever location it finds
+     first.
      <footnote>
       <para>
        The actual implementation differs from this description, but
-       the effect is the same.
+       the effect is the same.  For the real story, see <xref
+       linkend="ref.traversal-details"/>.
       </para>
      </footnote>
      In this respect, your local build tree may
