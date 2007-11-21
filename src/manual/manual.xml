@@ -3627,6 +3627,323 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </sect2>
    </sect1>
   </chapter>
+  <chapter id="ref.interface-flags">
+   <title>Interface Flags</title>
+   <para>
+    In this chapter, we will example interface flags.  Ordinarily,
+    when a an interface variable is set in an
+    <filename>Abuild.interface</filename> file, that assignment is
+    visible automatically to all build items that depend on the
+    assigning build item.  Interface flags provide a mechanism to make
+    certain variable assignments conditional upon the presence of a
+    certain flag.  For a complete understanding of how &abuild;'s
+    interface system works, please see <xref
+    linkend="ref.abuild-interface-system"/>.  For a discussion of how
+    it is implemented, please see <xref
+    linkend="ref.interface-implementation"/>.  In this chapter, we
+    will explore this topic just enough to see how to use it to
+    implement private interfaces.
+   </para>
+   <sect1 id="ref.using-flags">
+    <title>Using Interface Flags</title>
+    <para>
+     There are three parts to interface flags.  The first part is that
+     a build item declares what flags it supports by listing them in
+     the <property>supported-flags</property> key of its
+     <filename>Abuild.conf</filename>.  The second part is that a
+     build item specifies which flags it wants set for its direct
+     dependencies, if any, by specifying them in the
+     <property>deps</property> key of its
+     <filename>Abuild.conf</filename> file.  When one build item
+     indicates that it should depend on other build item with a
+     particular flag set, &abuild; checks to make sure that the
+     dependent build item supports that flag, reporting an error if it
+     does not.  The third part is that a build item may associate a
+     variable assignment (and only a variable assignment) in its
+     <filename>Abuild.interface</filename> file with a particular
+     flag.
+    </para>
+    <para>
+     When an <filename>Abuild.interface</filename> file is read by
+     another build item, assignments flagged with a particular flag
+     are processed only if the depending build item has explicitly
+     requested the flag through a
+     <option>-flag=<replaceable>interface-flag</replaceable></option>
+     option to a dependency in the <property>deps</property> key of
+     its <filename>Abuild.conf</filename> file.  Note that these
+     variable assignments are in effect only when the variables are
+     being exported to the back end, not when being accessed from
+     other <filename>Abuild.interface</filename> files.  Also, a build
+     item always implicitly has all its own flags set when its own
+     interfaces are exported to itself.  For example, suppose
+     <classname>B</classname> has an <filename>include</filename>
+     directory and a <filename>private-include</filename> directory
+     and wants to make the <filename>private-include</filename>
+     directory visible only to other build items that specifically ask
+     for it.  <classname>B</classname> could indicate that it supports
+     the <property>private</property> flag and could add the
+     <filename>private-include</filename> directory to
+     <varname>INCLUDES</varname> conditionally upon that flag.  Then
+     <classname>A</classname> could indicate that it wants the
+     <property>private</property> flag when it reads
+     <classname>B</classname>'s <filename>Abuild.interface</filename>.
+     When <classname>A</classname> reads <classname>B</classname>'s
+     <filename>Abuild.interface</filename> file, it will see the
+     <filename>private-include</filename> assignment, and
+     <classname>B</classname> will also see that assignment itself.
+     If a third build item <classname>X</classname> depended on
+     <classname>A</classname>, it would not see the
+     <filename>private-include</filename> directory as that assignment
+     would not be inherited through <classname>A</classname>'s
+     interface.  (See <xref linkend="fig.private-flag"/>.)
+     <figure id="fig.private-flag">
+      <title>Private Interface Flag</title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="private-flag.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         <classname>A</classname> and <classname>B</classname> see
+         <filename>private-include</filename>, but
+         <classname>X</classname> does not.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
+     This is a bit tricky to understand.  For additional
+     clarification, see the example below, <xref
+     linkend="ref.example.private-interface"/>.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.deleted-item">
+    <title>Deleted Build Item</title>
+    <para>
+     Here we present a new series of build trees located under
+     <filename>doc/example/general/user</filename>.  These build trees
+     back to our task branch and reference build tree from earlier
+     examples.  (That is, they declare them as their backing areas.)
+     We will use these build trees to illustrate the use of the
+     <property>deleted</property> key in a build tree's root build
+     item's <filename>Abuild.conf</filename>, and we also present a
+     concrete example of using interface flags to implement private
+     interfaces.
+    </para>
+    <para>
+     Suppose we have a user who is working on changes that are related
+     in some way to the task branch.  We want to create a user branch
+     that backs to the task branch.  Our user branch contains all
+     three areas: <filename>common</filename>,
+     <filename>project</filename>, and <filename>derived</filename>.
+     We will ignore <filename>derived</filename> for the moment and
+     focus only <filename>common</filename> and
+     <filename>project</filename>.  Observe that
+     <filename>common</filename> contains only the
+     <filename>lib1</filename> directory and that
+     <filename>project</filename> contains only the
+     <filename>lib</filename> directory.  We make a gratuitous change
+     to a source file in <classname>common-lib1.src</classname> just
+     as another example of shadowing a build item from our backing
+     area.  Since our task branch didn't contain
+     <filename>common</filename>, the <filename>common</filename> in
+     our <filename>user</filename> branch has to back to
+     <filename>reference</filename>.  Here is
+     <filename>user/common/Abuild.backing</filename>:
+     <?example general/user/common/Abuild.backing?>
+    </para>
+    <para>
+     In <filename>project</filename>, we have made changes to
+     <filename>project-lib</filename> to make use of private
+     interfaces, which we discuss in the next section.  We have also
+     deleted the new build item
+     <classname>project-lib.extra</classname> that we added in the
+     task branch.  To delete the build item, we removed the
+     <filename>extra</filename> directory from
+     <filename>project/lib</filename> and from the
+     <property>child-dirs</property> key in
+     <filename>project/lib/Abuild.conf</filename>:
+     <?example general/user/project/lib/Abuild.conf?>
+     That in itself was not sufficient since, even though the
+     <filename>extra</filename> directory is no longer present in the
+     <property>child-dirs</property> key of
+     <classname>project-lib</classname>'s
+     <filename>Abuild.conf</filename>, we would just inherit
+     <classname>project-lib.extra</classname> from our backing area.
+     To really delete the build item, we also had to add a
+     <property>deleted</property> key in
+     <filename>user/project</filename>'s
+     <filename>Abuild.conf</filename>:
+     <?example general/user/project/Abuild.conf?>
+     This has effectively prevented &abuild; from looking for
+     <classname>project-lib.extra</classname> in the backing area
+     chain.  If any build item in the local tree references
+     <classname>project-lib.extra</classname>, an error will be
+     reported because &abuild; now considers that to be an unknown
+     build item.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.private-interface">
+    <title>Private Interface Example</title>
+    <indexterm>
+     <primary>private interfaces</primary>
+    </indexterm>
+    <para>
+     In our user branch, we have modified the
+     <classname>project-lib</classname> library to make use of private
+     interfaces.  If you look at the <filename>Abuild.conf</filename>
+     in the <filename>src</filename> directory, you will see that it
+     lists <property>private</property> in its
+     <property>supported-flags</property> key:
+     <?example general/user/project/lib/src/Abuild.conf?>
+     In its <filename>Abuild.interface</filename> file, it adds
+     <filename>../private-include</filename> to
+     <varname>INCLUDES</varname> only when the
+     <property>private</property> flag is set:
+     <?example general/user/project/lib/src/Abuild.interface?>
+     This makes the headers in the
+     <filename>private-include</filename> directory visible to it and
+     any build item that depends on it with
+     <option>-flag=private</option>.
+     <footnote>
+      <para>
+       Note that when the <property>private</property> flag is set,
+       <emphasis>both</emphasis> assignments to
+       <varname>INCLUDES</varname> take effect.  To understand why
+       this is, please see <xref
+       linkend="ref.interface-implementation"/>.
+      </para>
+     </footnote>
+     Note that the
+     <classname>project-lib.src</classname> build item didn't have to
+     do anything special to see its own private interfaces.  This is
+     because a build item automatically operates with all of its own
+     interface flags set for itself.  Another thing we've done in this
+     build item is to put the new source file
+     <filename>ProjectLib_private.cpp</filename> in a
+     <filename>private</filename> subdirectory:
+     <?example general/user/project/lib/src/Abuild.mk?>
+     The only reason we did this was to demonstrate that &abuild;
+     allows multicomponent paths (<emphasis>i.e.</emphasis>, paths
+     with subdirectories in them) in your source variables.  Just
+     avoid putting &ldquo;<filename>..</filename>&rdquo; anywhere in
+     the path.
+     <footnote>
+      <para>
+       Such constructs, if permitted, would potentially cause &abuild;
+       to write files outside the output directory.  For example, if
+       you had <filename>../A.cc</filename> as a source file, &abuild;
+       would construct
+       <filename>abuild-<replaceable>platform</replaceable>/../A.o</filename>
+       as the object file name.  Fortunately, &abuild; actually
+       detects this case and reports an error.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     If you study <filename>ProjectLib.cpp</filename> in
+     <filename>user/project/lib/src</filename>, you will notice that
+     we have included the file
+     <filename>ProjectLib_private.hpp</filename> and called a function
+     in that file to get the value with which we initialize
+     <varname>cl1</varname>:
+     <?example general/user/project/lib/src/private/ProjectLib_private.cpp?>
+     This isn't a particularly useful example of how one would use a
+     private interface, but it will suffice to illustrate how they
+     work.  Private interfaces can be particularly useful in any
+     implementation that hides implementation details from outside
+     users because it can prevent accidentally accessing restricted
+     header files.  This type of construct is most useful in straight
+     C code rather than C++ code since C doesn't provide any
+     encapsulation capability other than use of opaque types defined
+     in private header files.  It is somewhat akin to using the
+     <function>friend</function> keyword in C++.
+    </para>
+    <para>
+     The test code in <filename>main.cpp</filename> in
+     <filename>user/project/lib/test</filename> also calls a function
+     defined in the private header file.  Note that the
+     <filename>Abuild.conf</filename> file in the
+     <filename>test</filename> directory mentions
+     <classname>project-lib.src</classname> explicitly in its dependency
+     list, and that it is followed by <option>-flag=private</option>:
+     <?example general/user/project/lib/test/Abuild.conf?>
+     This means that when <classname>project-lib.test</classname>
+     reads <classname>project-lib.src</classname>'s
+     <filename>Abuild.interface</filename> file, any assignments that
+     are flagged with the <property>private</property> flag will be
+     processed.
+    </para>
+    <para>
+     Although we have used a single and generically named
+     <property>private</property> flag for this example, there's no
+     reason that other special-purpose flags couldn't be introduced to
+     provide fine-grained control over which parts of a build item are
+     to be visible to other build items.  In most cases, use of a
+     simple flag like <property>private</property> should suffice.  To
+     reduce confusion among developers in a project, it is recommended
+     that a project adopt its own conventions about how interface flags
+     will be used.
+    </para>
+    <para>
+     The alert reader may notice that we have also assigned the trait
+     <property>interesting</property> to this build item.  Although the
+     build item is somewhat interesting, the primary purpose of doing
+     this is to illustrate the use of a trait without a referent build
+     item and to show how a trait can be added in a specific tree to
+     supplement traits that are available because of our externals.
+    </para>
+   </sect1>
+  </chapter>
+  <chapter id="ref.test-integration">
+   <title>Integration with Automated Test Frameworks</title>
+   <para>
+    &Abuild; is integrated with two automated test frameworks: QTest,
+    and JUnit.  Additional integrations can be performed with plugins
+    or build item rules or hooks.
+   </para>
+   <sect1 id="ref.qtest">
+    <title>Integration with QTest</title>
+    <para>
+     &Abuild; is integrated with the qtest test framework.  When using
+     either the <application>make</application> or the
+     <application>ant</application> backends, if a directory called
+     <filename>qtest</filename> exists, then the
+     <command>test</command> and <command>check</command> targets will
+     invoke <command>qtest-driver</command> to run qtest-based test
+     suites.  If a single file with the <filename>.testcov</filename>
+     extension exists in the build item directory, &abuild; will
+     invoke <command>qtest-driver</command> so that it can find the
+     test coverage file and activate test coverage support.  Note that
+     &abuild; runs <command>qtest-driver</command> from the output
+     directory, so the coverage output files and
+     <filename>test.log</filename> file will appear in that directory.
+     If you wish to have a qtest-based test suite be runnable on
+     multiple platforms simultaneously, it's best to avoid creating
+     temporary files in the <filename>qtest</filename> directory.  If
+     you wish to use the &abuild; output directory for your temporary
+     files, you can retrieve the full path to this directory by
+     calling the <function>get_start_dir</function> method of the
+     qtest <classname>TestDriver</classname> object.
+    </para>
+   </sect1>
+   <sect1 id="ref.junit">
+    <title>Integration with JUnit</title>
+    <para>
+     When performing property-driven
+     <application>ant</application>-based builds, if the
+     <varname>abuild.junit.testsuite</varname> property is set to the
+     name of a class, then the <command>test</command> and
+     <command>check</command> targets will attempt to run a
+     JUnit-based test suite.  JUnit is not bundled with &abuild;, so
+     it is the responsibility of the build tree maintainer to supply
+     the required JUnit JARs to &abuild;.  The easiest way to do this
+     is to create a plugin that adds the JUnit JARs to
+     <varname>abuild.classpath.external</varname> in a
+     <filename>plugin.interface</filename> file.  For more details on
+     plugins, please see <xref linkend="ref.plugins"/>.
+    </para>
+   </sect1>
+  </chapter>
   <chapter id="ref.backing-areas">
    <title>Backing Areas</title>
    <para>
@@ -4005,323 +4322,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      As with the <command>no-op</command> build, we only see output
      relating to local build items, not to build items in our backing
      areas as they are assumed to be already built.
-    </para>
-   </sect1>
-  </chapter>
-  <chapter id="ref.interface-flags">
-   <title>Interface Flags</title>
-   <para>
-    In this chapter, we will example interface flags.  Ordinarily,
-    when a an interface variable is set in an
-    <filename>Abuild.interface</filename> file, that assignment is
-    visible automatically to all build items that depend on the
-    assigning build item.  Interface flags provide a mechanism to make
-    certain variable assignments conditional upon the presence of a
-    certain flag.  For a complete understanding of how &abuild;'s
-    interface system works, please see <xref
-    linkend="ref.abuild-interface-system"/>.  For a discussion of how
-    it is implemented, please see <xref
-    linkend="ref.interface-implementation"/>.  In this chapter, we
-    will explore this topic just enough to see how to use it to
-    implement private interfaces.
-   </para>
-   <sect1 id="ref.using-flags">
-    <title>Using Interface Flags</title>
-    <para>
-     There are three parts to interface flags.  The first part is that
-     a build item declares what flags it supports by listing them in
-     the <property>supported-flags</property> key of its
-     <filename>Abuild.conf</filename>.  The second part is that a
-     build item specifies which flags it wants set for its direct
-     dependencies, if any, by specifying them in the
-     <property>deps</property> key of its
-     <filename>Abuild.conf</filename> file.  When one build item
-     indicates that it should depend on other build item with a
-     particular flag set, &abuild; checks to make sure that the
-     dependent build item supports that flag, reporting an error if it
-     does not.  The third part is that a build item may associate a
-     variable assignment (and only a variable assignment) in its
-     <filename>Abuild.interface</filename> file with a particular
-     flag.
-    </para>
-    <para>
-     When an <filename>Abuild.interface</filename> file is read by
-     another build item, assignments flagged with a particular flag
-     are processed only if the depending build item has explicitly
-     requested the flag through a
-     <option>-flag=<replaceable>interface-flag</replaceable></option>
-     option to a dependency in the <property>deps</property> key of
-     its <filename>Abuild.conf</filename> file.  Note that these
-     variable assignments are in effect only when the variables are
-     being exported to the back end, not when being accessed from
-     other <filename>Abuild.interface</filename> files.  Also, a build
-     item always implicitly has all its own flags set when its own
-     interfaces are exported to itself.  For example, suppose
-     <classname>B</classname> has an <filename>include</filename>
-     directory and a <filename>private-include</filename> directory
-     and wants to make the <filename>private-include</filename>
-     directory visible only to other build items that specifically ask
-     for it.  <classname>B</classname> could indicate that it supports
-     the <property>private</property> flag and could add the
-     <filename>private-include</filename> directory to
-     <varname>INCLUDES</varname> conditionally upon that flag.  Then
-     <classname>A</classname> could indicate that it wants the
-     <property>private</property> flag when it reads
-     <classname>B</classname>'s <filename>Abuild.interface</filename>.
-     When <classname>A</classname> reads <classname>B</classname>'s
-     <filename>Abuild.interface</filename> file, it will see the
-     <filename>private-include</filename> assignment, and
-     <classname>B</classname> will also see that assignment itself.
-     If a third build item <classname>X</classname> depended on
-     <classname>A</classname>, it would not see the
-     <filename>private-include</filename> directory as that assignment
-     would not be inherited through <classname>A</classname>'s
-     interface.  (See <xref linkend="fig.private-flag"/>.)
-     <figure id="fig.private-flag">
-      <title>Private Interface Flag</title>
-      <mediaobject>
-       <imageobject>
-        <imagedata fileref="private-flag.png"/>
-       </imageobject>
-       <caption>
-        <para>
-         <classname>A</classname> and <classname>B</classname> see
-         <filename>private-include</filename>, but
-         <classname>X</classname> does not.
-        </para>
-       </caption>
-      </mediaobject>
-     </figure>
-     This is a bit tricky to understand.  For additional
-     clarification, see the example below, <xref
-     linkend="ref.example.private-interface"/>.
-    </para>
-   </sect1>
-   <sect1 id="ref.example.deleted-item">
-    <title>Deleted Build Item</title>
-    <para>
-     Here we present a new series of build trees located under
-     <filename>doc/example/general/user</filename>.  These build trees
-     back to our task branch and reference build tree from earlier
-     examples.  (That is, they declare them as their backing areas.)
-     We will use these build trees to illustrate the use of the
-     <property>deleted</property> key in a build tree's root build
-     item's <filename>Abuild.conf</filename>, and we also present a
-     concrete example of using interface flags to implement private
-     interfaces.
-    </para>
-    <para>
-     Suppose we have a user who is working on changes that are related
-     in some way to the task branch.  We want to create a user branch
-     that backs to the task branch.  Our user branch contains all
-     three areas: <filename>common</filename>,
-     <filename>project</filename>, and <filename>derived</filename>.
-     We will ignore <filename>derived</filename> for the moment and
-     focus only <filename>common</filename> and
-     <filename>project</filename>.  Observe that
-     <filename>common</filename> contains only the
-     <filename>lib1</filename> directory and that
-     <filename>project</filename> contains only the
-     <filename>lib</filename> directory.  We make a gratuitous change
-     to a source file in <classname>common-lib1.src</classname> just
-     as another example of shadowing a build item from our backing
-     area.  Since our task branch didn't contain
-     <filename>common</filename>, the <filename>common</filename> in
-     our <filename>user</filename> branch has to back to
-     <filename>reference</filename>.  Here is
-     <filename>user/common/Abuild.backing</filename>:
-     <?example general/user/common/Abuild.backing?>
-    </para>
-    <para>
-     In <filename>project</filename>, we have made changes to
-     <filename>project-lib</filename> to make use of private
-     interfaces, which we discuss in the next section.  We have also
-     deleted the new build item
-     <classname>project-lib.extra</classname> that we added in the
-     task branch.  To delete the build item, we removed the
-     <filename>extra</filename> directory from
-     <filename>project/lib</filename> and from the
-     <property>child-dirs</property> key in
-     <filename>project/lib/Abuild.conf</filename>:
-     <?example general/user/project/lib/Abuild.conf?>
-     That in itself was not sufficient since, even though the
-     <filename>extra</filename> directory is no longer present in the
-     <property>child-dirs</property> key of
-     <classname>project-lib</classname>'s
-     <filename>Abuild.conf</filename>, we would just inherit
-     <classname>project-lib.extra</classname> from our backing area.
-     To really delete the build item, we also had to add a
-     <property>deleted</property> key in
-     <filename>user/project</filename>'s
-     <filename>Abuild.conf</filename>:
-     <?example general/user/project/Abuild.conf?>
-     This has effectively prevented &abuild; from looking for
-     <classname>project-lib.extra</classname> in the backing area
-     chain.  If any build item in the local tree references
-     <classname>project-lib.extra</classname>, an error will be
-     reported because &abuild; now considers that to be an unknown
-     build item.
-    </para>
-   </sect1>
-   <sect1 id="ref.example.private-interface">
-    <title>Private Interface Example</title>
-    <indexterm>
-     <primary>private interfaces</primary>
-    </indexterm>
-    <para>
-     In our user branch, we have modified the
-     <classname>project-lib</classname> library to make use of private
-     interfaces.  If you look at the <filename>Abuild.conf</filename>
-     in the <filename>src</filename> directory, you will see that it
-     lists <property>private</property> in its
-     <property>supported-flags</property> key:
-     <?example general/user/project/lib/src/Abuild.conf?>
-     In its <filename>Abuild.interface</filename> file, it adds
-     <filename>../private-include</filename> to
-     <varname>INCLUDES</varname> only when the
-     <property>private</property> flag is set:
-     <?example general/user/project/lib/src/Abuild.interface?>
-     This makes the headers in the
-     <filename>private-include</filename> directory visible to it and
-     any build item that depends on it with
-     <option>-flag=private</option>.
-     <footnote>
-      <para>
-       Note that when the <property>private</property> flag is set,
-       <emphasis>both</emphasis> assignments to
-       <varname>INCLUDES</varname> take effect.  To understand why
-       this is, please see <xref
-       linkend="ref.interface-implementation"/>.
-      </para>
-     </footnote>
-     Note that the
-     <classname>project-lib.src</classname> build item didn't have to
-     do anything special to see its own private interfaces.  This is
-     because a build item automatically operates with all of its own
-     interface flags set for itself.  Another thing we've done in this
-     build item is to put the new source file
-     <filename>ProjectLib_private.cpp</filename> in a
-     <filename>private</filename> subdirectory:
-     <?example general/user/project/lib/src/Abuild.mk?>
-     The only reason we did this was to demonstrate that &abuild;
-     allows multicomponent paths (<emphasis>i.e.</emphasis>, paths
-     with subdirectories in them) in your source variables.  Just
-     avoid putting &ldquo;<filename>..</filename>&rdquo; anywhere in
-     the path.
-     <footnote>
-      <para>
-       Such constructs, if permitted, would potentially cause &abuild;
-       to write files outside the output directory.  For example, if
-       you had <filename>../A.cc</filename> as a source file, &abuild;
-       would construct
-       <filename>abuild-<replaceable>platform</replaceable>/../A.o</filename>
-       as the object file name.  Fortunately, &abuild; actually
-       detects this case and reports an error.
-      </para>
-     </footnote>
-    </para>
-    <para>
-     If you study <filename>ProjectLib.cpp</filename> in
-     <filename>user/project/lib/src</filename>, you will notice that
-     we have included the file
-     <filename>ProjectLib_private.hpp</filename> and called a function
-     in that file to get the value with which we initialize
-     <varname>cl1</varname>:
-     <?example general/user/project/lib/src/private/ProjectLib_private.cpp?>
-     This isn't a particularly useful example of how one would use a
-     private interface, but it will suffice to illustrate how they
-     work.  Private interfaces can be particularly useful in any
-     implementation that hides implementation details from outside
-     users because it can prevent accidentally accessing restricted
-     header files.  This type of construct is most useful in straight
-     C code rather than C++ code since C doesn't provide any
-     encapsulation capability other than use of opaque types defined
-     in private header files.  It is somewhat akin to using the
-     <function>friend</function> keyword in C++.
-    </para>
-    <para>
-     The test code in <filename>main.cpp</filename> in
-     <filename>user/project/lib/test</filename> also calls a function
-     defined in the private header file.  Note that the
-     <filename>Abuild.conf</filename> file in the
-     <filename>test</filename> directory mentions
-     <classname>project-lib.src</classname> explicitly in its dependency
-     list, and that it is followed by <option>-flag=private</option>:
-     <?example general/user/project/lib/test/Abuild.conf?>
-     This means that when <classname>project-lib.test</classname>
-     reads <classname>project-lib.src</classname>'s
-     <filename>Abuild.interface</filename> file, any assignments that
-     are flagged with the <property>private</property> flag will be
-     processed.
-    </para>
-    <para>
-     Although we have used a single and generically named
-     <property>private</property> flag for this example, there's no
-     reason that other special-purpose flags couldn't be introduced to
-     provide fine-grained control over which parts of a build item are
-     to be visible to other build items.  In most cases, use of a
-     simple flag like <property>private</property> should suffice.  To
-     reduce confusion among developers in a project, it is recommended
-     that a project adopt its own conventions about how interface flags
-     will be used.
-    </para>
-    <para>
-     The alert reader may notice that we have also assigned the trait
-     <property>interesting</property> to this build item.  Although the
-     build item is somewhat interesting, the primary purpose of doing
-     this is to illustrate the use of a trait without a referent build
-     item and to show how a trait can be added in a specific tree to
-     supplement traits that are available because of our externals.
-    </para>
-   </sect1>
-  </chapter>
-  <chapter id="ref.test-integration">
-   <title>Integration with Automated Test Frameworks</title>
-   <para>
-    &Abuild; is integrated with two automated test frameworks: QTest,
-    and JUnit.  Additional integrations can be performed with plugins
-    or build item rules or hooks.
-   </para>
-   <sect1 id="ref.qtest">
-    <title>Integration with QTest</title>
-    <para>
-     &Abuild; is integrated with the qtest test framework.  When using
-     either the <application>make</application> or the
-     <application>ant</application> backends, if a directory called
-     <filename>qtest</filename> exists, then the
-     <command>test</command> and <command>check</command> targets will
-     invoke <command>qtest-driver</command> to run qtest-based test
-     suites.  If a single file with the <filename>.testcov</filename>
-     extension exists in the build item directory, &abuild; will
-     invoke <command>qtest-driver</command> so that it can find the
-     test coverage file and activate test coverage support.  Note that
-     &abuild; runs <command>qtest-driver</command> from the output
-     directory, so the coverage output files and
-     <filename>test.log</filename> file will appear in that directory.
-     If you wish to have a qtest-based test suite be runnable on
-     multiple platforms simultaneously, it's best to avoid creating
-     temporary files in the <filename>qtest</filename> directory.  If
-     you wish to use the &abuild; output directory for your temporary
-     files, you can retrieve the full path to this directory by
-     calling the <function>get_start_dir</function> method of the
-     qtest <classname>TestDriver</classname> object.
-    </para>
-   </sect1>
-   <sect1 id="ref.junit">
-    <title>Integration with JUnit</title>
-    <para>
-     When performing property-driven
-     <application>ant</application>-based builds, if the
-     <varname>abuild.junit.testsuite</varname> property is set to the
-     name of a class, then the <command>test</command> and
-     <command>check</command> targets will attempt to run a
-     JUnit-based test suite.  JUnit is not bundled with &abuild;, so
-     it is the responsibility of the build tree maintainer to supply
-     the required JUnit JARs to &abuild;.  The easiest way to do this
-     is to create a plugin that adds the JUnit JARs to
-     <varname>abuild.classpath.external</varname> in a
-     <filename>plugin.interface</filename> file.  For more details on
-     plugins, please see <xref linkend="ref.plugins"/>.
     </para>
    </sect1>
   </chapter>
