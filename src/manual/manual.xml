@@ -1024,7 +1024,7 @@ C:\cygwin\cygwin.bat
           </primary>
          </indexterm>
          A <firstterm>target</firstterm> is some specific product to
-         be build.  The term &ldquo;target&rdquo; means exactly the
+         be built.  The term &ldquo;target&rdquo; means exactly the
          same thing with &abuild; as it does with other build systems
          such as <application>make</application> or
          <application>ant</application>.  In fact, with the exception
@@ -1956,7 +1956,7 @@ C:\cygwin\cygwin.bat
     &abuild;'s functionality.  We have already gotten a taste of this
     capability in the basic examples included in <xref
     linkend="ref.basic-operation"/>.  In this chapter, we will examine
-    dependencies in a bit more depth.
+    dependencies in more depth.
    </para>
    <sect1 id="ref.dependencies.direct-and-indirect">
     <title>Direct and Indirect Dependencies</title>
@@ -2009,15 +2009,16 @@ C:\cygwin\cygwin.bat
      that they are <firstterm>transitive</firstterm>.  In other words,
      if <classname>A</classname> depends on <classname>B</classname>
      and <classname>B</classname> depends on <classname>C</classname>,
-     then <classname>A</classname> implicitly also depends on
-     <classname>C</classname>.  This means that
-     <classname>C</classname> is built before <classname>A</classname>
-     (which it has to be anyway since it is built before
-     <classname>B</classname> and <classname>B</classname> is built
-     before <classname>A</classname>) and that
-     <classname>A</classname> sees <classname>C</classname>'s
-     interface in addition to seeing <classname>B</classname>'s
-     interface.
+     then <classname>A</classname> also implicitly depends on
+     <classname>C</classname>.  This means that the conditions above
+     apply to <classname>A</classname> and <classname>C</classname>.
+     That is, <classname>C</classname> is built before
+     <classname>A</classname> (which it would be anyway since it is
+     built before <classname>B</classname> and
+     <classname>B</classname> is built before
+     <classname>A</classname>), and <classname>A</classname> sees
+     <classname>C</classname>'s interface in addition to seeing
+     <classname>B</classname>'s interface.
      <footnote>
       <para>
        In fact, since <classname>B</classname> depends on
@@ -2042,12 +2043,23 @@ C:\cygwin\cygwin.bat
      interface visibility are influenced by both direct and indirect
      dependencies.
     </para>
-    <para> By default, any build item can depend on any other build
-    item by name.  &Abuild; offers two mechanisms to restrict which
-    items can depend on which other items.  One mechanism is through
-    build item name scoping rules, discussed below.  The other
-    mechanism is through use of external build trees, discussed in
-    <xref linkend="ref.externals"/>.
+    <para>
+     &Abuild; performs various validations on dependencies.  The most
+     important of these is that no cyclic dependencies are permitted.
+     In other words, if <classname>A</classname> depends on
+     <classname>B</classname> either directly or indirectly, then
+     <classname>B</classname> cannot depend on
+     <classname>A</classname> directly or indirectly.  There are other
+     dependency validations which are discussed in various places
+     throughout the document.
+    </para>
+    <para>
+     By default, any build item can depend on any other build item by
+     name.  &Abuild; offers two mechanisms to restrict which items can
+     depend on which other items.  One mechanism is through build item
+     name scoping rules, discussed below.  The other mechanism is
+     through use of external build trees, discussed in <xref
+     linkend="ref.externals"/>.
     </para>
    </sect1>
    <sect1 id="ref.build-item-name-scoping">
@@ -2102,7 +2114,7 @@ C:\cygwin\cygwin.bat
      the global scope and is accessible by all build items.
     </para>
     <para>
-     A build item is allowed to access any other build item by name if
+     One build item is allowed to access another build item by name if
      the referenced build item belongs to the accessing build item's
      scope or any of its ancestor scopes.  <xref
      linkend="fig.build-item-scopes"/>, shows a number of build items
@@ -2281,14 +2293,15 @@ C:\cygwin\cygwin.bat
      <filename>Abuild.interface</filename>.
     </para>
     <para>
-     There is nothing that a build item can do to allow itself to see
-     build items that are hidden within other scopes: the only way to
-     gain access to a build item is to be its ancestor or to be a
-     descendant of its parent.  There are times, however, when it is
-     desirable for a build item to allow itself to <emphasis>be
-     seen</emphasis> by build items who would ordinarily not have
-     access to it.  This is accomplished by using the
-     <property>visible-to</property> key in
+     There is nothing that a build item can do to allow itself to
+     declare a direct dependency on another build item that is hidden
+     within another scope: the only way to gain direct access to a
+     build item is to be its ancestor or to be a descendant of its
+     parent.  (There are no restrictions on indirect access.)  There
+     are times, however, when it is desirable for a build item to
+     allow itself to <emphasis>be seen</emphasis> by build items who
+     would ordinarily not have access to it.  This is accomplished by
+     using the <property>visible-to</property> key in
      <filename>Abuild.conf</filename>.  We defer discussion of this
      feature until later; see <xref
      linkend="ref.build-item-visibility"/>.
@@ -2671,9 +2684,9 @@ C:\cygwin\cygwin.bat
      several standard targets (see <xref
      linkend="ref.command-line"/>).  We have already encountered
      <command>all</command> and <command>clean</command> in earlier
-     examples.  It is also possible to add new targets as we discuss
-     in various places throughout this document.  For now, you really
-     only need to know a few things about targets:
+     examples.  It is also possible to add new targets through
+     mechanisms that are covered later in the document.  For now, you
+     really only need to know a few things about targets:
      <itemizedlist>
       <listitem>
        <para>
@@ -2684,12 +2697,13 @@ C:\cygwin\cygwin.bat
        <para>
         The <command>all</command> target is &abuild;'s default
         target.  When &abuild; builds a build item in order to satisfy
-        a dependency, it builds that build item's
-        <command>all</command> target.  This means that the
-        <command>all</command> target is responsible for building all
-        parts of a build item that are potentially needed by any of
-        its dependencies.  This may seem significant, but it's a
-        detail that takes care of itself most of the time.
+        a dependency, building the <command>all</command> target is
+        required to be sufficient to satisfy the needs of items that
+        depend on it.  This means that the <command>all</command>
+        target is responsible for building all parts of a build item
+        that are potentially needed by any of its dependencies.  This
+        may seem significant, but it's a detail that takes care of
+        itself most of the time.
        </para>
       </listitem>
       <listitem>
@@ -2704,9 +2718,9 @@ C:\cygwin\cygwin.bat
     <para>
      &Abuild; defines two <firstterm>special targets</firstterm>:
      <command>clean</command> and <command>no-op</command>.  These
-     targets are special in two ways: &abuild; does now allow them to
+     targets are special in two ways: &abuild; does not allow them to
      be combined with other targets, and &abuild; handles them itself
-     without passing them to the backend.
+     without passing them to a backend.
     </para>
     <para>
      The <command>clean</command> target is used to remove the
@@ -2935,7 +2949,7 @@ C:\cygwin\cygwin.bat
       <varlistentry>
        <term>
         <command>abuild --clean=current</command> (or <command>abuild
-        clean</command>
+        clean</command>)
        </term>
        <listitem>
         <para>
@@ -2977,10 +2991,10 @@ C:\cygwin\cygwin.bat
        <term><command>abuild --build=name:lib1,lib2 xyz</command></term>
        <listitem>
         <para>
-         builds the <command>xyz</command> target for
+         builds the custom <command>xyz</command> target for the
          <classname>lib1</classname> and <classname>lib2</classname>
-         and the <command>all</command> target for any of their direct
-         or indirect dependencies
+         build items and the <command>all</command> target for their
+         direct or indirect dependencies
         </para>
        </listitem>
       </varlistentry>
@@ -3139,13 +3153,20 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
 </programlisting>
       As above, if multiple traits are specified at once, only build
       items that are related by all of the specified traits are
-      included.
+      included.  Note that the same trait may be used referent to
+      another build item or in isolation.  The
+      <option>--related-by-traits</option> option only applies to
+      traits used in reference to other build items.  For example, if
+      a build item had the <property>tester</property> trait not
+      referent to any build item, it would not be picked up by the
+      above command.
      </para>
      <para>
       It is also possible to combine these options.  In that case, the
       build set is first restricted using
       <option>--only-with-traits</option> and then expanded using the
       <option>--related-by-traits</option> as shown in examples below.
+      The order of the arguments has no effect on this behavior.
      </para>
      <para>
       Ordinarily, when a specific target is specified as an argument
@@ -3163,9 +3184,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       If <option>--related-by-traits</option> and
       <option>--only-with-traits</option> are both specified, any
       explicit targets are applied only to traits named in
-      <option>--related-by-traits</option> as it is the most
-      restrictive option.  All other build items are built with the
-      <command>all</command> target.  Note that the
+      <option>--related-by-traits</option> as the effect of that
+      option is applied last.  All other build items are built with
+      the <command>all</command> target.  Note that the
       <option>--apply-targets-to-deps</option> option will cause any
       explicit targets to be applied to all build items, as always.
       Later in this chapter, we review the exact rules that &abuild;
@@ -3620,6 +3641,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     reference area.  &Abuild; provides this functionality through the
     use of <firstterm>backing areas</firstterm>.
    </para>
+   <para>
+    At first glance, backing areas may seem very similar to externals,
+    but they are different in some important ways.  As opposed to
+    externals, backing areas are generally of more concern to baseline
+    administrators than to developers.  The uses cases for them are
+    also different.  We discuss this in more depth during this
+    chapter.
+   </para>
    <sect1 id="ref.backing-areas.setup">
     <title>Setting Up Backing Areas</title>
     <para>
@@ -3737,16 +3766,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      In addition to being able to resolve build items to backing
      areas, it is also possible to resolve externals in backing areas
      as long as they are specified as relative paths.  In this case,
-     &abuild; does use the path of the external relative to the root
-     of the build tree.  This is not an inconsistency: build items are
-     always accessed by name, and externals are always accessed by
-     path.  If you have a build tree that has an external and you wish
-     to shadow just the build tree without shadowing its external,
-     just create a new build tree that backs to the original one, and
-     don't worry about the externals.  More likely than not, your new
-     build tree's root <filename>Abuild.conf</filename> will be a copy
-     of the original build tree's root
-     <filename>Abuild.conf</filename>,
+     &abuild; <emphasis>does</emphasis> use the path of the external
+     relative to the root of the build tree.  This is not an
+     inconsistency: build items are always accessed by name, and
+     externals are always accessed by path.  If you have a build tree
+     that has an external and you wish to shadow just the build tree
+     without shadowing its external, just create a new build tree that
+     backs to the original one, and don't worry about the externals.
+     More likely than not, your new build tree's root
+     <filename>Abuild.conf</filename> will be a copy of the original
+     build tree's root <filename>Abuild.conf</filename>,
      <property>external-dirs</property> key and all.  When &abuild;
      looks for the external in your local tree and fails to find it,
      it will check to see whether that external can be resolved in
@@ -3887,6 +3916,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      we mean when we say that <classname>B</classname> has shadowed
      dependencies.  The way to resolve this would be to copy
      <classname>B</classname> into <filename>T1</filename>.
+    </para>
+   </sect1>
+   <sect1 id="ref.backing-areas-vs-externals">
+    <title>Comparison of Backing Areas and Externals</title>
+    <para>
+     XXX Discuss differences in use case.  Draw attention to the fact
+     that shadowing in an external is an error while shadowing in a
+     backing area is normal.  Pre-built reference areas vs. libraries
+     of additional items or common code.  Talk about branching and
+     backing areas as segue to example.  Dependencies: externals
+     implement one-way gate, but backing areas come into play with
+     integrity checks.
     </para>
    </sect1>
    <sect1 id="ref.example.task-branch">
