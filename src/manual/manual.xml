@@ -1450,7 +1450,7 @@ C:\cygwin\cygwin.bat
      the <property>parent-dir</property> key is
      &ldquo;<filename>..</filename>&rdquo;, but it doesn't have to be.
      It is also customary to have the value of
-     <property>child-dirs</property> contain single path components
+     <property>child-dirs</property> contain single path elements
      (<emphasis>i.e.</emphasis>just a file without a directory), but
      this is also not a hard restriction.  When &abuild; starts up, it
      looks for an <filename>Abuild.conf</filename> in the current
@@ -3782,7 +3782,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>private</filename> subdirectory:
      <?example general/user/project/lib/src/Abuild.mk?>
      The only reason we did this was to demonstrate that &abuild;
-     allows multicomponent paths (<emphasis>i.e.</emphasis>, paths
+     allows multi-element paths (<emphasis>i.e.</emphasis>, paths
      with subdirectories in them) in your source variables.  Just
      avoid putting &ldquo;<filename>..</filename>&rdquo; anywhere in
      the path.
@@ -5158,9 +5158,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <filename>Abuild.conf</filename> must have a
          <property>parent-dir</property> key that points back to this
          directory.  Generally, the <property>child-dirs</property>
-         key contains a list of single path components, but &abuild;
-         does allow lower-level directories to be specified
-         (corresponding with more
+         key contains a list of single-element paths
+         (<emphasis>i.e.</emphasis> paths with no directory names in
+         them), but &abuild; does allow lower-level directories to be
+         specified (corresponding with more
          &ldquo;<filename>..</filename>&rdquo;'s in the lower-level
          items' <property>parent-dir</property> keys), though, for
          clarity, this practice is not recommended.
