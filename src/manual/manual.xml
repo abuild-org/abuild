@@ -5,8 +5,8 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.b3">
-<!ENTITY lastreleased "November 13, 2007">
+<!ENTITY swversion "1.0-pre">
+<!ENTITY lastreleased "November 21, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 ]>
@@ -1033,7 +1033,10 @@ C:\cygwin\cygwin.bat
          system for processing.  The most common targets are
          <command>all</command> and <command>clean</command>.  For a
          more complete discussion of targets, see <xref
-         linkend="ref.targets"/>.
+         linkend="ref.targets"/>.  Be careful not to confuse
+         <firstterm>target</firstterm> with <firstterm>target
+         type</firstterm>, defined in <xref
+         linkend="ref.platform-structure"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -1728,6 +1731,9 @@ C:\cygwin\cygwin.bat
         products.  One could argue that Java code is
         platform-independent, but since Java code has its own build
         paradigm, &abuild; considers it to be a separate target type.
+        Be careful not to confuse <firstterm>target type</firstterm>
+        with <firstterm>target</firstterm>, defined in <xref
+        linkend="ref.basic-terminology"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -1802,6 +1808,40 @@ C:\cygwin\cygwin.bat
       </listitem>
      </varlistentry>
     </variablelist>
+    <para>
+     This table (<xref linkend="table.platforms"/>) shows the target
+     types along with the built-in platform types and platforms that
+     belong to them.
+     <table id="table.platforms" frame="all">
+      <title>Built-in Platforms, Platform Types, and Target Types</title>
+      <tgroup cols="3" align="left" colsep="1" rowsep="1">
+       <thead>
+        <row>
+         <entry>Target Type</entry>
+         <entry>Platform Type</entry>
+         <entry>Platform</entry>
+        </row>
+       </thead>
+       <tbody>
+        <row>
+         <entry><type>object-code</type></entry>
+         <entry><type>native</type></entry>
+         <entry>based on available tools</entry>
+        </row>
+        <row>
+         <entry><type>java</type></entry>
+         <entry><type>java</type></entry>
+         <entry><type>java</type></entry>
+        </row>
+        <row>
+         <entry><type>platform-independent</type></entry>
+         <entry><type>indep</type></entry>
+         <entry><type>indep</type></entry>
+        </row>
+       </tbody>
+      </tgroup>
+     </table>
+    </para>
     <para>
      When a build item is defined with multiple platform types, they
      must all belong to the same target type.  Some interface
@@ -3468,11 +3508,32 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <?qtest example.reference-common-check.out?>
       This example includes the output of
       <application>qtest</application> test suites.
-      <application>Qtest</application> is a simple and robust
+      <application>QTest</application> is a simple and robust
       automated test framework that is integrated with &abuild; and
-      used for &abuild;'s own test suite.  That framework is
-      documented separately, and a discussion of the details of it are
-      out of scope for this document.
+      used for &abuild;'s own test suite.  For information, see <xref
+      linkend="ref.qtest"/>.
+     </para>
+     <para>
+      By default, when &abuild; builds multiple build items using a
+      build set, it will stop after the first build failure.
+      Sometimes, particularly when building a large build tree, you
+      may want &abuild; to try to build as many build items as it can,
+      continuing on failure.  In this case, you may pass the
+      <option>-k</option> option to &abuild;.  When run with the
+      <option>-k</option> option, &abuild; will continue building
+      other items after one item fails.  Note, however, that if one
+      build item fails, &abuild; will not attempt to build any other
+      items that depend on the failed item even when run with
+      <option>-k</option>.  It will also exit with an abnormal exit
+      status after it builds everything that it can.  When run with
+      <option>-k</option>, &abuild; also passes the corresponding
+      flags to the backends so that they will try to build as much as
+      they can without stopping on the first error.  Both
+      <application>make</application> and
+      <application>ant</application> behave similarly to &abuild;:
+      they will keep going on failure, skip any targets that depend on
+      failed targets, and exit abnormally if any failures are
+      detected.
      </para>
     </sect2>
     <sect2 id="ref.example.project-code-area">
@@ -3850,8 +3911,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <sect1 id="ref.qtest">
     <title>Integration with QTest</title>
     <para>
-     &Abuild; is integrated with the qtest test framework.  When using
-     either the <application>make</application> or the
+     &Abuild; is integrated with the <ulink
+     url="http://qtest.qbilt.org">QTest</ulink> test framework.  The
+     QTest framework is a perl-based test framework intended to
+     support a <emphasis>design for testability</emphasis> testing
+     mentality.  &Abuild;'s own test suite is implemented using QTest.
+     When using either the <application>make</application> or the
      <application>ant</application> backends, if a directory called
      <filename>qtest</filename> exists, then the
      <command>test</command> and <command>check</command> targets will
@@ -12164,7 +12229,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0.rc1: XXX</term>
+     <term>1.0: XXX</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -12191,6 +12256,13 @@ Y = $(X)
          directs &abuild; to find the first
          <filename>Abuild.conf</filename> at or above the current
          directory and to run the build from there.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Many additional improvements have been made to the
+         documentation, thanks to input from reviewers mentioned in
+         <xref linkend="ref.acknowledgments"/>.
         </para>
        </listitem>
       </itemizedlist>
