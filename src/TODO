@@ -5,24 +5,6 @@ Next Release
 Documentation
 -------------
 
- * Check XXX
-
- * ccosta comments
-
-    - introduce "continue on error" earlier
-
-    - revisit use of no-op earlier in the document
-
-    - expand "Integration with QTest" to discuss qtest in one
-      paragraph and include a reference to the qtest documentation and
-      software
-
- * In expansion/contraction stuff with traits, give information about
-   rationale.
-
- * Somewhere in platform types chapter, have a table with the built-in
-   platforms showing platform, platform type, and target type.
-
  * Consider figures for relationships among build trees in "general".
 
  * Consider adding a trouble shooting section
