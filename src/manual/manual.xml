@@ -11281,17 +11281,6 @@ native-compiler qcc
      build problem that applies to only one of several platforms that
      are being built for a specific build item.  Most users will never
      use this functionality.
-     <footnote>
-      <para>
-       In fact, this functionality is left over from version of
-       &abuild; prior to 1.0.a11.  At that time, &abuild; invoked
-       itself recursively inside each output directory and the
-       recursive invocation of &abuild; started the backend.  Once
-       &abuild; was modified to no longer invoke itself recursively,
-       this feature could have been removed, but it was left in place
-       because of its usefulness in debugging certain problems.
-      </para>
-     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.traversal-details">
