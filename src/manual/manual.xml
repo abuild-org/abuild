@@ -96,6 +96,11 @@ Definitive Guide"):
    type - The classification of a value
    varname - The name of a variable
 
+We somewhat misuse the firstterm element in this document as a way to
+italicize terms when they are used for the first time in a given
+section of the document.  Some terms may appear more than once inside
+the firstterm element.
+
 Several types of items discussed in the document do not fit neatly
 into one of the categories above.  For those, we have adopted
 conventions which are illustrated in the Typographic Conventions
@@ -2131,7 +2136,8 @@ C:\cygwin\cygwin.bat
       <listitem>
        <para>
         <classname>A1.B1.C1.D1</classname> because it belongs to the
-        scope that it defines: <classname>A1.B1.C1</classname>
+        scope that <classname>A1.B1.C1</classname> defines:
+        <classname>A1.B1.C1</classname>
        </para>
       </listitem>
       <listitem>
@@ -2658,7 +2664,78 @@ C:\cygwin\cygwin.bat
    <sect1 id="ref.targets">
     <title>Build Targets</title>
     <para>
-     XXX
+     As defined in <xref linkend="ref.basic-terminology"/>, the term
+     <firstterm>target</firstterm> refers to a specific build product.
+     In most cases, &abuild; passes any targets specified on the
+     command line to the backend build system.  &Abuild; provides
+     several standard targets (see <xref
+     linkend="ref.command-line"/>).  We have already encountered
+     <command>all</command> and <command>clean</command> in earlier
+     examples.  It is also possible to add new targets as we discuss
+     in various places throughout this document.  For now, you really
+     only need to know a few things about targets:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Different targets tell &abuild; to build different things
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <command>all</command> target is &abuild;'s default
+        target.  When &abuild; builds a build item in order to satisfy
+        a dependency, it builds that build item's
+        <command>all</command> target.  This means that the
+        <command>all</command> target is responsible for building all
+        parts of a build item that are potentially needed by any of
+        its dependencies.  This may seem significant, but it's a
+        detail that takes care of itself most of the time.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        With the exception of two <firstterm>special
+        targets</firstterm>, &abuild; doesn't do anything itself with
+        targets other than pass them onto the backend build tool.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     &Abuild; defines two <firstterm>special targets</firstterm>:
+     <command>clean</command> and <command>no-op</command>.  These
+     targets are special in two ways: &abuild; does now allow them to
+     be combined with other targets, and &abuild; handles them itself
+     without passing them to the backend.
+    </para>
+    <para>
+     The <command>clean</command> target is used to remove the
+     artifacts that are built by the other targets.  &Abuild;
+     implements the <command>clean</command> target by simply removing
+     all &abuild;-generated output directories (see <xref
+     linkend="ref.output-directories"/>).  When &abuild; processes the
+     <command>clean</command> target, it ignores any dependency
+     relationships among build items.  Since it ignores dependencies
+     and performs the cleanup itself without invoking a backend,
+     running the <command>clean</command> target or cleaning multiple
+     items using a clean set (described below) is very fast.
+    </para>
+    <para>
+     The <command>no-op</command> target is used primarily for
+     debugging build tree problems.  When &abuild; is invoked with the
+     <command>no-op</command> target, it goes through all the motions
+     of performing a build except that it does not read any
+     <filename>Abuild.interface</filename> files or invoke any
+     backends.  It does, however, perform full validation of
+     <filename>Abuild.conf</filename> files including dependency and
+     integrity checking.  This makes <command>abuild no-op</command>,
+     especially with a build set (described below), very useful for
+     taking a quick look at what items would be built on what
+     platforms and in what order.  We make heavy use of the
+     <command>no-op</command> target in the examples at the end of
+     this chapter so that we can illustrate certain aspects of build
+     ordering without being concerned about the actual output of the
+     builds.
     </para>
    </sect1>
    <sect1 id="ref.build-sets">
@@ -3269,8 +3346,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
     </sect2>
    </sect1>
-   <sect1 id="ref.invocation-examples">
-    <title>Invocation Examples</title>
+   <sect1 id="ref.general-build-examples">
+    <title>Build Set and Trait Examples</title>
     <para>
      Now that we've seen the topics of build sets and traits, we're
      ready to revisit our previous examples.  This time, we will talk
@@ -6195,11 +6272,17 @@ endif
      directory that contains the <filename>Abuild.mk</filename> file.
      Also, local rules should avoid creating files outside of the
      output directory since these files will not be removed by the
-     <command>clean</command> target.  (Defining your own
-     <command>clean</command> target can be useful, but remember that
-     it is only run if you manually run &abuild; from inside the output
-     directory, which most people would never do except when debugging
-     &abuild;.)
+     <command>clean</command> target.
+     <footnote>
+      <para>
+       Defining your own <command>clean</command> target can be
+       useful, but remember that it is only run if you manually run
+       &abuild; from inside the output directory, which most people
+       would never do except when debugging &abuild;.  For details
+       about running &abuild; from an output directory, see <xref
+       linkend="ref.running-in-output-directory"/>.
+      </para>
+     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.make-rule-specific-targets">
@@ -7678,7 +7761,7 @@ endif
      only run when the user invokes &abuild; from the output
      directory.  For this reason, adding a <command>clean</command>
      target is optional.  For more detail on this, please see <xref
-     linkend="ref.output-directories"/>.
+     linkend="ref.running-in-output-directory"/>.
     </para>
     <para>
      To use this code generator from
@@ -11151,6 +11234,64 @@ native-compiler qcc
      between granularity and ease of maintenance and makes &abuild;'s
      approach robust and efficient for both small and large build
      trees.
+    </para>
+   </sect1>
+   <sect1 id="ref.running-in-output-directory">
+    <title>Starting &Abuild; in an Output Directory</title>
+    <para>
+     When &abuild; starts up, it decides that it is running in an
+     output directory if all of the following conditions hold:
+     <itemizedlist>
+      <listitem>
+       <para>
+        The current directory <emphasis>does not</emphasis> contain an
+        <filename>Abuild.conf</filename> file
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The parent directory <emphasis>does</emphasis> contain an
+        <filename>Abuild.conf</filename> file
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The current directory name starts with <filename>abuild-</filename>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The current directory contains a file called
+        <filename>.abuild</filename>
+       </para>
+      </listitem>
+     </itemizedlist>
+     If &abuild; is invoked in an output directory, it determines the
+     current platform from the name of the output directory (which is
+     always called
+     <filename>abuild-<replaceable>platform</replaceable></filename>)
+     and the current build item from the
+     <filename>Abuild.conf</filename> in the parent directory.  Then
+     it will run a build only for that specific platform on that
+     specific build item.  In this mode, &abuild; explicitly prohibits
+     specification of a build set or clean set.  It also, as a special
+     case, passes the <command>clean</command> target to the backend.
+     The main use for this feature would be in testing rules, but it
+     could also be useful in helping to track down some hard-to-trace
+     build problem that applies to only one of several platforms that
+     are being built for a specific build item.  Most users will never
+     use this functionality.
+     <footnote>
+      <para>
+       In fact, this functionality is left over from version of
+       &abuild; prior to 1.0.a11.  At that time, &abuild; invoked
+       itself recursively inside each output directory and the
+       recursive invocation of &abuild; started the backend.  Once
+       &abuild; was modified to no longer invoke itself recursively,
+       this feature could have been removed, but it was left in place
+       because of its usefulness in debugging certain problems.
+      </para>
+     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.traversal-details">
