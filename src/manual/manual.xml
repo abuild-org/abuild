@@ -3741,74 +3741,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      flags will be used.
     </para>
    </sect1>
-   <sect1 id="ref.example.deleted-item">
-    <!-- XXX Move this section out of here, and take the example along
-    with it if needed. Put this in the backing areas chapter. -->
-    <title>Deleted Build Item</title>
-    <para>
-     Here we present a new series of build trees located under
-     <filename>doc/example/general/user</filename>.  These build trees
-     back to our task branch and reference build tree from earlier
-     examples.  (That is, they declare them as their backing areas.)
-     We will use these build trees to illustrate the use of the
-     <property>deleted</property> key in a build tree's root build
-     item's <filename>Abuild.conf</filename>, and we also present a
-     concrete example of using interface flags to implement private
-     interfaces.
-    </para>
-    <para>
-     Suppose we have a user who is working on changes that are related
-     in some way to the task branch.  We want to create a user branch
-     that backs to the task branch.  Our user branch contains all
-     three areas: <filename>common</filename>,
-     <filename>project</filename>, and <filename>derived</filename>.
-     We will ignore <filename>derived</filename> for the moment and
-     focus only <filename>common</filename> and
-     <filename>project</filename>.  Observe that
-     <filename>common</filename> contains only the
-     <filename>lib1</filename> directory and that
-     <filename>project</filename> contains only the
-     <filename>lib</filename> directory.  We make a gratuitous change
-     to a source file in <classname>common-lib1.src</classname> just
-     as another example of shadowing a build item from our backing
-     area.  Since our task branch didn't contain
-     <filename>common</filename>, the <filename>common</filename> in
-     our <filename>user</filename> branch has to back to
-     <filename>reference</filename>.  Here is
-     <filename>user/common/Abuild.backing</filename>:
-     <?example general/user/common/Abuild.backing?>
-    </para>
-    <para>
-     In <filename>project</filename>, we have made changes to
-     <filename>project-lib</filename> to make use of private
-     interfaces, which we discuss in the next section.  We have also
-     deleted the new build item
-     <classname>project-lib.extra</classname> that we added in the
-     task branch.  To delete the build item, we removed the
-     <filename>extra</filename> directory from
-     <filename>project/lib</filename> and from the
-     <property>child-dirs</property> key in
-     <filename>project/lib/Abuild.conf</filename>:
-     <?example general/user/project/lib/Abuild.conf?>
-     That in itself was not sufficient since, even though the
-     <filename>extra</filename> directory is no longer present in the
-     <property>child-dirs</property> key of
-     <classname>project-lib</classname>'s
-     <filename>Abuild.conf</filename>, we would just inherit
-     <classname>project-lib.extra</classname> from our backing area.
-     To really delete the build item, we also had to add a
-     <property>deleted</property> key in
-     <filename>user/project</filename>'s
-     <filename>Abuild.conf</filename>:
-     <?example general/user/project/Abuild.conf?>
-     This has effectively prevented &abuild; from looking for
-     <classname>project-lib.extra</classname> in the backing area
-     chain.  If any build item in the local tree references
-     <classname>project-lib.extra</classname>, an error will be
-     reported because &abuild; now considers that to be an unknown
-     build item.
-    </para>
-   </sect1>
    <sect1 id="ref.example.private-interface">
     <title>Private Interface Example</title>
     <indexterm>
@@ -4347,6 +4279,72 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      As with the <command>no-op</command> build, we only see output
      relating to local build items, not to build items in our backing
      areas as they are assumed to be already built.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.deleted-item">
+    <title>Deleted Build Item</title>
+    <para>
+     Here we present a new series of build trees located under
+     <filename>doc/example/general/user</filename>.  These build trees
+     back to our task branch and reference build tree from earlier
+     examples.  (That is, they declare them as their backing areas.)
+     We will use these build trees to illustrate the use of the
+     <property>deleted</property> key in a build tree's root build
+     item's <filename>Abuild.conf</filename>, and we also present a
+     concrete example of using interface flags to implement private
+     interfaces.
+    </para>
+    <para>
+     Suppose we have a user who is working on changes that are related
+     in some way to the task branch.  We want to create a user branch
+     that backs to the task branch.  Our user branch contains all
+     three areas: <filename>common</filename>,
+     <filename>project</filename>, and <filename>derived</filename>.
+     We will ignore <filename>derived</filename> for the moment and
+     focus only <filename>common</filename> and
+     <filename>project</filename>.  Observe that
+     <filename>common</filename> contains only the
+     <filename>lib1</filename> directory and that
+     <filename>project</filename> contains only the
+     <filename>lib</filename> directory.  We make a gratuitous change
+     to a source file in <classname>common-lib1.src</classname> just
+     as another example of shadowing a build item from our backing
+     area.  Since our task branch didn't contain
+     <filename>common</filename>, the <filename>common</filename> in
+     our <filename>user</filename> branch has to back to
+     <filename>reference</filename>.  Here is
+     <filename>user/common/Abuild.backing</filename>:
+     <?example general/user/common/Abuild.backing?>
+    </para>
+    <para>
+     In <filename>project</filename>, we have made changes to
+     <filename>project-lib</filename> to make use of private
+     interfaces, which we discuss in the next section.  We have also
+     deleted the new build item
+     <classname>project-lib.extra</classname> that we added in the
+     task branch.  To delete the build item, we removed the
+     <filename>extra</filename> directory from
+     <filename>project/lib</filename> and from the
+     <property>child-dirs</property> key in
+     <filename>project/lib/Abuild.conf</filename>:
+     <?example general/user/project/lib/Abuild.conf?>
+     That in itself was not sufficient since, even though the
+     <filename>extra</filename> directory is no longer present in the
+     <property>child-dirs</property> key of
+     <classname>project-lib</classname>'s
+     <filename>Abuild.conf</filename>, we would just inherit
+     <classname>project-lib.extra</classname> from our backing area.
+     To really delete the build item, we also had to add a
+     <property>deleted</property> key in
+     <filename>user/project</filename>'s
+     <filename>Abuild.conf</filename>:
+     <?example general/user/project/Abuild.conf?>
+     This has effectively prevented &abuild; from looking for
+     <classname>project-lib.extra</classname> in the backing area
+     chain.  If any build item in the local tree references
+     <classname>project-lib.extra</classname>, an error will be
+     reported because &abuild; now considers that to be an unknown
+     build item.
     </para>
    </sect1>
   </chapter>
