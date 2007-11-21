@@ -4028,48 +4028,43 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    </sect1>
    <sect1 id="ref.backing-areas.resolving-externals">
     <title>Resolving Externals to Backing Areas</title>
-    <!--XXX These two paragraphs need to be combined and clarified. -->
     <para>
      In addition to being able to resolve build items to backing
-     areas, it is also possible to resolve externals in backing areas
-     as long as they are specified as relative paths.  In this case,
-     &abuild; <emphasis>does</emphasis> use the path of the external
-     relative to the root of the build tree.  This is not an
-     inconsistency: build items are always accessed by name, and
-     externals are always accessed by path.  If you have a build tree
-     that has an external and you wish to shadow just the build tree
-     without shadowing its external, just create a new build tree that
-     backs to the original one, and don't worry about the externals.
-     More likely than not, your new build tree's root
-     <filename>Abuild.conf</filename> will be a copy of the original
-     build tree's root <filename>Abuild.conf</filename>,
-     <property>external-dirs</property> key and all.  When &abuild;
-     looks for the external in your local tree and fails to find it,
-     it will check to see whether that external can be resolved in
-     your backing area chain.  If it can, then &abuild; will be
-     satisfied and will allow those build items to be inherited
-     through your backing area chain.  This makes it possible for you
-     to override build items in one tree without having to create a
-     tree for each of that tree's externals.
-    </para>
-    <para>
+     areas, it is also possible to resolve externals to backing areas.
+     Specifically, if &abuild; can't find the specified external
+     relative to the root of the current build tree, it will search
+     for it relative to the roots of each tree in the backing area
+     chain.
+     <footnote>
+      <para>
+       &Abuild; only attempts to resolve externals to backing areas
+       when the externals are specified with relative paths.  Since an
+       absolute path is absolute, it doesn't make any sense to
+       consider it relative to one path or another.
+      </para>
+     </footnote>
      This is illustrated in <xref linkend="fig.backed-external"/>.  In
      this case, we have a build tree at
      <filename>/backing/1</filename> that declares
-     <filename>../ext</filename> as an external.  &Abuild; finds this
-     external at <filename>/backing/ext</filename>.  Then we have a
-     tree at <filename>/tree/1</filename> that declares
-     <filename>/backing/1</filename> as a backing area.  It also
-     declares <filename>../ext</filename> as an external since its
-     root <filename>Abuild.conf</filename> is a copy of the one from
-     <filename>/backing/1</filename>.  When &abuild; attempts to find
-     the external, it looks first in <filename>/tree/ext</filename>.
-     Since that path does not exist, &abuild; will look for
-     <filename>../ext</filename> relative to each backing area in the
-     backing area chain.  In this case, it finds
-     <filename>/backing/ext</filename> as <filename>../ext</filename>
-     relative to backing area <filename>/backing/1</filename>, thus
-     successfully resolving the external to the backing area.
+     <filename>../ext</filename> as an external in its root
+     <filename>Abuild.conf</filename>.  &Abuild; finds this external
+     at <filename>/backing/ext</filename>.  We also have a tree at
+     <filename>/tree/1</filename> that declares
+     <filename>/backing/1</filename> as a backing area.  As is typical
+     with build trees that have backing areas, the new build tree's
+     root <filename>Abuild.conf</filename> is initially a copy of the
+     root <filename>Abuild.conf</filename> from its backing area.  It
+     therefore also declares <filename>../ext</filename> as an
+     external.  When &abuild; attempts to find the external, it looks
+     first in <filename>../ext</filename> relative to
+     <filename>/tree/1</filename>, which would be
+     <filename>/tree/ext</filename>.  Since that path does not exist,
+     &abuild; will look for <filename>../ext</filename> relative to
+     each backing area in the backing area chain.  In this case, it
+     finds <filename>/backing/ext</filename> as
+     <filename>../ext</filename> relative to backing area
+     <filename>/backing/1</filename>, thus successfully resolving the
+     external to the backing area.
      <figure id="fig.backed-external">
       <title>External Resolved in a Backing Area</title>
       <mediaobject>
@@ -4085,15 +4080,25 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </caption>
       </mediaobject>
      </figure>
+     The upshot of this behavior is that, when you wish to shadow
+     build items in a particular build tree but you don't need to
+     shadow any of the build items in its externals, you can just
+     ignore the externals.  &Abuild; will resolve them to the backing
+     area just as it would resolve any build items you omitted from
+     your local tree.
     </para>
     <para>
      There is one corner case with backing areas and externals.  It
      will very seldom occur, but it's worth mentioning for
      completeness.  Understanding this case is not essential to make
-     use of &abuild; for the vast majority of cases.  Now suppose that
-     you still didn't actually want to shadow any of the build items
-     in the external tree but you wanted your local tree to see the
-     external in some location other than
+     use of &abuild; for the vast majority of cases, so if this
+     doesn't make sense to you, just continue reading at the beginning
+     of the next section.
+    </para>
+    <para>
+     For this case, suppose that you still didn't actually want to
+     shadow any of the build items in the external tree but you wanted
+     your local tree to see the external in some location other than
      <filename>/backing/ext</filename>, say
      <filename>/other/ext</filename>.  You could create a directory
      called <filename>/tree/ext</filename> and place within that
@@ -4195,13 +4200,126 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <sect1 id="ref.backing-areas-vs-externals">
     <title>Comparison of Backing Areas and Externals</title>
     <para>
-     XXX Discuss differences in use case.  Draw attention to the fact
-     that shadowing in an external is an error while shadowing in a
-     backing area is normal.  Pre-built reference areas vs. libraries
-     of additional items or common code.  Talk about branching and
-     backing areas as segue to example.  Dependencies: externals
-     implement one-way gate, but backing areas come into play with
-     integrity checks.
+     Although backing areas an externals serve completely different
+     purposes, there are a number of similarities between them.  For
+     this reason, people often get confused initially about which one
+     to use for a particular case.  Here is a list of use cases, each
+     of which is accompanied by a discussion of which type of outside
+     build tree to use.
+     <variablelist>
+      <varlistentry>
+       <term>Common Code Area</term>
+       <listitem>
+        <para>
+         If you had a collection of build items implementing common
+         code, you would reference the common code build tree as an
+         external.  The common code build tree would be expected to be
+         a stand-alone build tree (possibly with its own additional
+         externals and backing area) that could exist completely
+         independently from your local build tree.  Your local tree
+         would include additional build items that may depend on
+         these, but it would not override or replace any build items
+         from the common code area.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Pre-built Read-only Reference Area</term>
+       <listitem>
+        <para>
+         Suppose you had a large software baseline consisting of
+         thousands of build items, and that you didn't want your
+         developers to all have to have fully populated local copies
+         of the build tree.  Instead, you wanted to provide a
+         read-only reference area that was fully built, say, once a
+         day.  Then your developers could create local work areas
+         populated only with the portions of the code that they were
+         actually modifying.  Each developer could set their backing
+         area to the location of this read-only reference area.  Each
+         developer's local tree would most likely shadow some build
+         items from the backing area, and they may also add new build
+         items corresponding to development of new code.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Third-Party Support Area</term>
+       <listitem>
+        <para>
+         If you had a collection of build items that provided &abuild;
+         wrappers around third-party software, such as
+         <filename>Abuild.interface</filename> files that add those
+         libraries to the library path or classpath, you would likely
+         put those utility items in an external.  As with the common
+         code area, developers would depend on the items from the
+         third-party support area but would not override or replace
+         them.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Task Branch Development Area</term>
+       <listitem>
+        <para>
+         Suppose you wanted to make modifications to a project to
+         complete a particular task.  You may create a side branch for
+         that task in your version control system.  In this case, you
+         might have a build tree based on the branch point of your
+         side branch that would serve as the backing area for the task
+         branch.  You could modify some components in your local work
+         area and simply omit any unmodified portions of the system
+         from that work area.  We provide an example of this usage
+         below.
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+     A good rule of thumb is this: if your purpose is to make
+     modifications to a part of a build tree without having to have
+     local copies of the part of the system that you are not changing,
+     you should be using a backing area.  If your purpose is to make
+     use of a separate and self-contained collection of build items,
+     you should be using an external.  It is very common for externals
+     to correspond to separate development efforts.  Backing areas
+     typically correspond to earlier or more stable versions of the
+     same development effort.
+    </para>
+    <para>
+     Here we will draw a comparison to how &abuild; treats certain
+     situations with respect to backing areas and externals:
+     <variablelist>
+      <varlistentry>
+       <term>Duplicated Build Item Name</term>
+       <listitem>
+        <para>
+         If a build item in your local tree has the same name as a
+         build item in one of its externals, &abuild; considers this
+         to be an error and reports it as a duplicated build item
+         name.  If a build item in your local tree has the same name
+         as a build item in its backing area, this is the normal case
+         of using a local tree to shadow a backing area.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Resolving Dependencies</term>
+       <listitem>
+        <para>
+         A build item in a local tree is free to depend on a build
+         item located in either an external or a backing area.  If a
+         build item in an external tried to depend on a build item in
+         the local tree, &abuild; would report this a dependency on an
+         unknown build item because the build items in the external
+         have no knowledge of the build items in the local tree.  If a
+         build item in a backing area had a dependency on a build item
+         that was shadowed in the local tree, &abuild; would report
+         this as an integrity error and require you to make a local
+         copy of the build item from the backing area, as discussed
+         above in <xref linkend="ref.integrity-checks"/>.
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
     </para>
    </sect1>
    <sect1 id="ref.example.task-branch">
