@@ -230,7 +230,7 @@ following checks:
      <para>
       Chris Costa, who served as a sounding board and contributed
       numerous ideas throughout the entire development process of
-      &abuild;, including conducting a thorough review of much of this
+      &abuild;, including conducting a thorough review of this
       document
      </para>
     </listitem>
@@ -2690,7 +2690,7 @@ C:\cygwin\cygwin.bat
      <itemizedlist>
       <listitem>
        <para>
-        Different targets tell &abuild; to build different things
+        Different targets tell &abuild; to build different things.
        </para>
       </listitem>
       <listitem>
@@ -3633,16 +3633,15 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     In this chapter, we will example interface flags.  Ordinarily,
     when a an interface variable is set in an
     <filename>Abuild.interface</filename> file, that assignment is
-    visible automatically to all build items that depend on the
+    automatically visible to all build items that depend on the
     assigning build item.  Interface flags provide a mechanism to make
     certain variable assignments conditional upon the presence of a
-    certain flag.  For a complete understanding of how &abuild;'s
-    interface system works, please see <xref
-    linkend="ref.abuild-interface-system"/>.  For a discussion of how
-    it is implemented, please see <xref
-    linkend="ref.interface-implementation"/>.  In this chapter, we
-    will explore this topic just enough to see how to use it to
-    implement private interfaces.
+    specified flag.  In this chapter, we will explore the interface
+    system enough to see how to use it to implement private
+    interfaces.  For a complete understanding of &abuild;'s interface
+    system, please see <xref linkend="ref.abuild-interface-system"/>.
+    For a discussion of how it is implemented, please see <xref
+    linkend="ref.interface-implementation"/>.
    </para>
    <sect1 id="ref.using-flags">
     <title>Using Interface Flags</title>
@@ -3665,7 +3664,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
     <para>
      When an <filename>Abuild.interface</filename> file is read by
-     another build item, assignments flagged with a particular flag
+     another build item, assignments associated with a particular flag
      are processed only if the depending build item has explicitly
      requested the flag through a
      <option>-flag=<replaceable>interface-flag</replaceable></option>
@@ -3673,15 +3672,28 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      its <filename>Abuild.conf</filename> file.  Note that these
      variable assignments are in effect only when the variables are
      being exported to the back end, not when being accessed from
-     other <filename>Abuild.interface</filename> files.  Also, a build
-     item always implicitly has all its own flags set when its own
-     interfaces are exported to itself.  For example, suppose
-     <classname>B</classname> has an <filename>include</filename>
-     directory and a <filename>private-include</filename> directory
-     and wants to make the <filename>private-include</filename>
-     directory visible only to other build items that specifically ask
-     for it.  <classname>B</classname> could indicate that it supports
-     the <property>private</property> flag and could add the
+     other <filename>Abuild.interface</filename> files.
+     <footnote>
+      <para>
+       If you're getting the feeling that we're covering something up,
+       you're right.  If your goal is to just understand how to use
+       private interfaces, read on.  If you're getting confused about
+       why it works this way and how it could possibly work, you may
+       want to bite the bullet and read <xref
+       linkend="ref.interface-implementation"/>.  All is revealed
+       there.
+      </para>
+     </footnote>
+     Also, a build item always implicitly has all its own flags set
+     when its own interfaces are exported to itself.  For example,
+     suppose <classname>B</classname> has an
+     <filename>include</filename> directory and a
+     <filename>private-include</filename> directory.  Furthermore,
+     suppose <classname>B</classname> wants to make the
+     <filename>private-include</filename> directory visible only to
+     other build items that specifically ask for it.
+     <classname>B</classname> could indicate that it supports the
+     <property>private</property> flag and could add the
      <filename>private-include</filename> directory to
      <varname>INCLUDES</varname> conditionally upon that flag.  Then
      <classname>A</classname> could indicate that it wants the
@@ -3689,13 +3701,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <classname>B</classname>'s <filename>Abuild.interface</filename>.
      When <classname>A</classname> reads <classname>B</classname>'s
      <filename>Abuild.interface</filename> file, it will see the
-     <filename>private-include</filename> assignment, and
-     <classname>B</classname> will also see that assignment itself.
-     If a third build item <classname>X</classname> depended on
-     <classname>A</classname>, it would not see the
-     <filename>private-include</filename> directory as that assignment
-     would not be inherited through <classname>A</classname>'s
-     interface.  (See <xref linkend="fig.private-flag"/>.)
+     <filename>private-include</filename> assignment, as will
+     <classname>B</classname>.  If a third build item
+     <classname>X</classname> depended on <classname>A</classname>, it
+     would not see the <filename>private-include</filename> directory
+     as that assignment would not be inherited through
+     <classname>A</classname>'s interface.  (See <xref
+     linkend="fig.private-flag"/>.)
      <figure id="fig.private-flag">
       <title>Private Interface Flag</title>
       <mediaobject>
@@ -3715,8 +3727,23 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      clarification, see the example below, <xref
      linkend="ref.example.private-interface"/>.
     </para>
+    <para>
+     Although we have used a single and generically named
+     <property>private</property> flag for this example, there is
+     nothing special about the name
+     &ldquo;<property>private</property>&rdquo;.  There's no reason
+     that other special-purpose flags couldn't be introduced to
+     provide fine-grained control over which parts of a build item are
+     to be visible to other build items.  In most cases, use of a
+     simple flag like <property>private</property> should suffice.  To
+     reduce confusion among developers in a project, it is recommended
+     that a project adopt its own conventions about how interface
+     flags will be used.
+    </para>
    </sect1>
    <sect1 id="ref.example.deleted-item">
+    <!-- XXX Move this section out of here, and take the example along
+    with it if needed. Put this in the backing areas chapter. -->
     <title>Deleted Build Item</title>
     <para>
      Here we present a new series of build trees located under
@@ -3847,9 +3874,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      in that file to get the value with which we initialize
      <varname>cl1</varname>:
      <?example general/user/project/lib/src/private/ProjectLib_private.cpp?>
-     This isn't a particularly useful example of how one would use a
-     private interface, but it will suffice to illustrate how they
-     work.  Private interfaces can be particularly useful in any
+     Private interfaces can be particularly useful in any
      implementation that hides implementation details from outside
      users because it can prevent accidentally accessing restricted
      header files.  This type of construct is most useful in straight
@@ -3872,17 +3897,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>Abuild.interface</filename> file, any assignments that
      are flagged with the <property>private</property> flag will be
      processed.
-    </para>
-    <para>
-     Although we have used a single and generically named
-     <property>private</property> flag for this example, there's no
-     reason that other special-purpose flags couldn't be introduced to
-     provide fine-grained control over which parts of a build item are
-     to be visible to other build items.  In most cases, use of a
-     simple flag like <property>private</property> should suffice.  To
-     reduce confusion among developers in a project, it is recommended
-     that a project adopt its own conventions about how interface flags
-     will be used.
     </para>
     <para>
      The alert reader may notice that we have also assigned the trait
@@ -4014,7 +4028,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </note>
    </sect1>
    <sect1 id="ref.backing-areas.resolving">
-    <title>Resolving to Backing Areas</title>
+    <title>Resolving Build Items to Backing Areas</title>
     <para>
      In this section, we will discuss backing areas from a
      functionality standpoint.  This section presents a somewhat
@@ -4079,6 +4093,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      illustrates the use of the <property>deleted</property> key (see
      <xref linkend="ref.example.deleted-item"/>).
     </para>
+   </sect1>
+   <sect1 id="ref.backing-areas.resolving-externals">
+    <title>Resolving Externals to Backing Areas</title>
+    <!--XXX These two paragraphs need to be combined and clarified. -->
     <para>
      In addition to being able to resolve build items to backing
      areas, it is also possible to resolve externals in backing areas
@@ -4103,22 +4121,23 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      tree for each of that tree's externals.
     </para>
     <para>
-     There is one corner case with backing areas and externals.  It
-     will very seldom occur, but it's worth mentioning for
-     completeness.  Understanding this case is not essential to make
-     use of &abuild; for the vast majority of cases.  Suppose you have
-     a build tree <filename>/tree/1</filename> that backs to
-     <filename>/backing/1</filename>, which has no further backing
-     areas, and that your tree declares an external at
-     <filename>../ext</filename>.  Since
-     <filename>/backing/1</filename> has no backing area, we know that
-     <filename>/backing/ext</filename> (which is
-     <filename>/backing/1/../ext</filename>) exists.  If
-     <filename>/tree/ext</filename> does not exist, then
-     <filename>/tree/1</filename> will resolve this external through
-     the backing area, as described above.  This is the normal case of
-     resolving externals with backing areas.  (See <xref
-     linkend="fig.backed-external"/>.)
+     This is illustrated in <xref linkend="fig.backed-external"/>.  In
+     this case, we have a build tree at
+     <filename>/backing/1</filename> that declares
+     <filename>../ext</filename> as an external.  &Abuild; finds this
+     external at <filename>/backing/ext</filename>.  Then we have a
+     tree at <filename>/tree/1</filename> that declares
+     <filename>/backing/1</filename> as a backing area.  It also
+     declares <filename>../ext</filename> as an external since its
+     root <filename>Abuild.conf</filename> is a copy of the one from
+     <filename>/backing/1</filename>.  When &abuild; attempts to find
+     the external, it looks first in <filename>/tree/ext</filename>.
+     Since that path does not exist, &abuild; will look for
+     <filename>../ext</filename> relative to each backing area in the
+     backing area chain.  In this case, it finds
+     <filename>/backing/ext</filename> as <filename>../ext</filename>
+     relative to backing area <filename>/backing/1</filename>, thus
+     successfully resolving the external to the backing area.
      <figure id="fig.backed-external">
       <title>External Resolved in a Backing Area</title>
       <mediaobject>
@@ -4134,9 +4153,15 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </caption>
       </mediaobject>
      </figure>
-     Now suppose that you didn't actually want to shadow any of the
-     build items in the external tree but you wanted your local tree
-     to see the external in some location other than
+    </para>
+    <para>
+     There is one corner case with backing areas and externals.  It
+     will very seldom occur, but it's worth mentioning for
+     completeness.  Understanding this case is not essential to make
+     use of &abuild; for the vast majority of cases.  Now suppose that
+     you still didn't actually want to shadow any of the build items
+     in the external tree but you wanted your local tree to see the
+     external in some location other than
      <filename>/backing/ext</filename>, say
      <filename>/other/ext</filename>.  You could create a directory
      called <filename>/tree/ext</filename> and place within that
@@ -4250,16 +4275,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <sect1 id="ref.example.task-branch">
     <title>Task Branch Example</title>
     <para>
-     In our next example, we'll demonstrate a task branch.  Suppose our
-     task branch makes changes to <filename>project</filename> but not
-     to <filename>common</filename>.  We can set up a new build tree in
-     which to do our work.  We would populate this build tree with
-     whatever parts of <filename>project</filename> we wanted to
+     In our next example, we'll demonstrate a task branch.  Suppose
+     our task branch makes changes to <filename>project</filename> but
+     not to <filename>common</filename>.  We can set up a new build
+     tree in which to do our work.  We would populate this build tree
+     with whatever parts of <filename>project</filename> we wanted to
      modify.  We have set up this build tree in
-     <filename>doc/example/general/task/project</filename>.  We have set this
-     build tree's backing area to
-     <filename>../../reference/project</filename> so that it would resolve
-     any missing build items or externals to that location:
+     <filename>doc/example/general/task/project</filename>.
+     Additionally, we have set this build tree's backing area to
+     <filename>../../reference/project</filename> so that it would
+     resolve any missing build items or externals to that location:
      <?example general/task/project/Abuild.backing?>
      Note that, although we used a relative path for our backing area
      in this example, we would ordinarily set our backing area to an
@@ -4442,8 +4467,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>--ant</term>
       <listitem>
        <para>
-        Terminate argument parsing and pass all remaining options (up
-        to <option>--make</option>) to ant.
+        Terminate argument parsing and pass all remaining arguments
+        (up to <option>--make</option>) to ant.
        </para>
       </listitem>
      </varlistentry>
@@ -4521,8 +4546,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>--make</term>
       <listitem>
        <para>
-        Terminate argument parsing and pass all remaining options (up
-        to <option>--ant</option>) to make.
+        Terminate argument parsing and pass all remaining arguments
+        (up to <option>--ant</option>) to make.
        </para>
       </listitem>
      </varlistentry>
@@ -4636,7 +4661,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <listitem>
        <para>
         Specify which build items should be built.  The default is to
-        not have a build set specified.  In that case, &abuild; just
+        have no build set specified.  In that case, &abuild; just
         builds in the local directory without attempting to build any
         dependencies.  For additional details including a list of
         valid values for <replaceable>set</replaceable>, see <xref
