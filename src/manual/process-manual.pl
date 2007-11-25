@@ -72,6 +72,12 @@ sub process
 	    " with ref.example\n";
     }
 
+    my @xargs = ();
+    if ($what eq 'qtest')
+    {
+	push(@xargs, 77, 72);
+    }
+
     my $dir = "$dirname/$dirs{$what}";
     my $path = "$dir/$file";
     my $fh = new IO::File("<$path") or
@@ -82,7 +88,7 @@ sub process
 <programlisting>\<![CDATA[";
     while (<$fh>)
     {
-	print OUT process_line($_);
+	print OUT process_line($_, @xargs);
     }
     print OUT "]]></programlisting>
 ";
@@ -144,7 +150,7 @@ sub process_line
 	$new = "";
 	while (length($line) > $maxlength)
 	{
-	    $new = substr($line, 0, $chunklength) . "\\\n";
+	    $new = substr($line, 0, $chunklength) . "\\\n\\";
 	    $line = substr($line, $chunklength);
 	}
 	$line = $new . $line;
