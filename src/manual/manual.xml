@@ -3728,11 +3728,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </indexterm>
     In a large development environment, it is very common for a
     developer to have a local work area that contains only the parts
-    of the system that he or she is actually working on.  Any parts of
-    the software that are required to resolve dependencies would be
-    resolved through some kind of outside, most likely read-only,
-    reference area.  &Abuild; provides this functionality through the
-    use of <firstterm>backing areas</firstterm>.
+    of the system that he or she is actually working on.  Any
+    additional parts of the software that are required in order to
+    satisfy dependencies would be resolved through some kind of
+    outside, most likely read-only, reference area.  &Abuild; provides
+    this functionality through the use of <firstterm>backing
+    areas</firstterm>.
    </para>
    <para>
     At first glance, backing areas may seem very similar to externals,
@@ -3746,12 +3747,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <title>Setting Up Backing Areas</title>
     <para>
      Any build tree can be a backing area.  If &abuild; needs to
-     reference a build item that it is found in the local build tree
-     or its externals, it will use that copy of the build item.  If
+     reference a build item that is found in the local build tree or
+     its externals, it will use that copy of the build item.  If
      &abuild; can't find an item in the local tree or its externals,
      it will use the backing area to resolve that build item.  Since
      &abuild; never attempts to build or otherwise modify an item in a
-     backing area, backing areas should always be fully built on all
+     backing area, backing areas must always be fully built on all
      platforms for which they will be used as backing areas.  (For
      additional details on platforms, please see <xref
      linkend="ref.platforms"/>.)  To designate another tree as your
@@ -3777,15 +3778,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <para>
       Changing backing area configuration should generally be followed
       by a clean build.  This is also true when a build item is
-      removed from a local build tree and reverts to a backing area.
-      The reason is that changing the location of a build item changes
-      the actual dependencies.  If those dependencies are older than
-      the last build time, even if they were newer than the files they
-      replaced, <application>make</application> will not notice
-      because it uses modification time-based dependencies.  In other
-      words, any operation that can replace one file with another file
-      in such a way that the new file is not more recent than the last
-      build should be followed by a clean build.
+      removed from a local build tree and therefore causes the build
+      item with that name to resolve to the copy in backing area.  The
+      reason is that changing the location of a build item changes the
+      actual files on which the build target depends.  If those
+      dependencies are older than the last build time, even if they
+      were newer than the files they replaced,
+      <application>make</application> and
+      <application>ant</application> will not notice because the use
+      modification time-based dependencies.  In other words, any
+      operation that can replace one file with another file in such a
+      way that the new file is not more recent than the last build
+      should be followed by a clean build.
      </para>
     </note>
    </sect1>
@@ -3837,23 +3841,23 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      items in backing areas.  When &abuild; looks for a build item, it
      looks for it only by name, not by path.  This means that a build
      item in your local build tree does not have to have the same
-     location relative to the root of the tree as the same item has in
-     the backing area.  This is very important as it allows you to use
-     a local build tree to refactor or reorganize build items.  Note
-     that this means that if you delete a build item from your local
-     build tree and that build item exists in your backing area, the
-     build item doesn't really go away from &abuild;'s perspective;
-     rather it moves from the local build tree to the backing area.
-     If it is actually your intention to <emphasis>remove</emphasis>
-     the build item so that its name is not known to other build items
-     in your build tree, you can do this by adding the name of the
-     build item to the <property>deleted</property> key of the root
-     build item's <filename>Abuild.conf</filename> file.  If a build
-     item is listed there, &abuild; requires that the build item be
-     present in the backing area chain but not in the local build
-     tree.  We present an example later in the document that
-     illustrates the use of the <property>deleted</property> key (see
-     <xref linkend="ref.example.deleted-item"/>).
+     location relative to the root of the tree as that item has in the
+     backing area.  This is very important as it allows you to use a
+     local build tree to reorganize build items.  Note that this means
+     that if you delete a build item from your local build tree and
+     that build item exists in your backing area, the build item
+     doesn't really go away from &abuild;'s perspective; rather it
+     moves from the local build tree to the backing area.  If it is
+     actually your intention to <emphasis>remove</emphasis> the build
+     item so that its name is not known to other build items in your
+     build tree, you can do this by adding the name of the build item
+     to the <property>deleted</property> key of the root build item's
+     <filename>Abuild.conf</filename> file.  If a build item is listed
+     there, &abuild; requires that the build item be present in the
+     backing area chain but not in the local build tree.  We present
+     an example that illustrates the use of the
+     <property>deleted</property> key in <xref
+     linkend="ref.example.deleted-item"/>.
     </para>
    </sect1>
    <sect1 id="ref.backing-areas.resolving-externals">
@@ -3870,7 +3874,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        &Abuild; only attempts to resolve externals to backing areas
        when the externals are specified with relative paths.  Since an
        absolute path is absolute, it doesn't make any sense to
-       consider it relative to one path or another.
+       consider it relative to one location or another.
       </para>
      </footnote>
      This is illustrated in <xref linkend="fig.backed-external"/>.  In
@@ -3930,17 +3934,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      shadow any of the build items in the external tree but you wanted
      your local tree to see the external in some location other than
      <filename>/backing/ext</filename>, say
-     <filename>/other/ext</filename>.  You could create a directory
-     called <filename>/tree/ext</filename> and place within that
-     directory an <filename>Abuild.backing</filename> containing
+     <filename>/other/ext</filename>.  As illustrated in <xref
+     linkend="fig.external-with-backing-area"/>, you could create a
+     directory called <filename>/tree/ext</filename> and place within
+     that directory an <filename>Abuild.backing</filename> containing
      <filename>/other/ext</filename> as the only file in
      <filename>/tree/ext</filename>; <emphasis>i.e.</emphasis>, there
      would be no <filename>/tree/ext/Abuild.conf</filename> file.  In
      this case, the build tree at <filename>/tree/ext</filename> would
      be an empty build tree that resolves <emphasis>all</emphasis> of
      its build items from its backing area,
-     <filename>/other/ext</filename>.  (See <xref
-     linkend="fig.external-with-backing-area"/>)
+     <filename>/other/ext</filename>.
      <figure id="fig.external-with-backing-area">
       <title>External with Separate Backing Area</title>
       <mediaobject>
@@ -3971,12 +3975,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <classname>A</classname> and <classname>B</classname> see the
      same copy of <classname>C</classname>.  To be more precise,
      &abuild; checks to make sure that no build item in a backing area
-     references as a dependency or plugin (<xref
-     linkend="ref.plugins"/>) an item that is shadowed in the local
-     tree.
+     references as a dependency or plugin an item that is shadowed in
+     the local tree.  (Plugins are covered in <xref
+     linkend="ref.plugins"/>.)
     </para>
     <para>
-     For example, suppose that build items <classname>A</classname>,
+     We illustrate this in <xref linkend="fig.shadowed-dependency"/>.
+     Suppose that build items <classname>A</classname>,
      <classname>B</classname>, and <classname>C</classname> are
      defined in build tree <filename>T2</filename> and that
      <classname>A</classname> depends on <classname>B</classname> and
@@ -3986,8 +3991,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      backing area, and that you have build items
      <classname>A</classname> and <classname>C</classname> copied
      locally into <filename>T1</filename>, but that
-     <classname>B</classname> is resolved in the backing area (see
-     <xref linkend="fig.shadowed-dependency"/>).
+     <classname>B</classname> is resolved in the backing area.
      <figure id="fig.shadowed-dependency">
       <title>Shadowed Dependency</title>
       <mediaobject>
@@ -4155,11 +4159,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <sect1 id="ref.example.task-branch">
     <title>Task Branch Example</title>
     <para>
-     In our next example, we'll demonstrate a task branch.  Suppose
-     our task branch makes changes to <filename>project</filename> but
-     not to <filename>common</filename>.  We can set up a new build
-     tree in which to do our work.  We would populate this build tree
-     with whatever parts of <filename>project</filename> we wanted to
+     In this example, we'll demonstrate a task branch.  Suppose our
+     task branch makes changes to <filename>project</filename> but not
+     to <filename>common</filename>.  We can set up a new build tree
+     in which to do our work.  We would populate this build tree with
+     whatever parts of <filename>project</filename> we wanted to
      modify.  We have set up this build tree in
      <filename>doc/example/general/task/project</filename>.
      Additionally, we have set this build tree's backing area to
@@ -4192,7 +4196,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <?qtest example.task-project-no-op.out?>
      This includes only items in our task branch.  No items in our
      backing area are included because &abuild; never attempts to
-     modify build items in backing areas.
+     build or modify build items in backing areas.
     </para>
     <para>
      If you study <filename>include/ProjectLib.hpp</filename> and
@@ -4234,13 +4238,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      Here we present a new series of build trees located under
      <filename>doc/example/general/user</filename>.  These build trees
-     back to our task branch and reference build tree from earlier
-     examples.  (That is, they declare them as their backing areas.)
+     back to our <filename>task</filename> and
+     <filename>reference</filename> build trees from earlier examples.
      We will use these build trees to illustrate the use of the
      <property>deleted</property> key in a build tree's root build
-     item's <filename>Abuild.conf</filename>, and we also present a
-     concrete example of using interface flags to implement private
-     interfaces.
+     item's <filename>Abuild.conf</filename>.
     </para>
     <para>
      Suppose we have a user who is working on changes that are related
@@ -4267,8 +4269,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      In <filename>project</filename>, we have made changes to
      <filename>project-lib</filename> to make use of private
-     interfaces, which we discuss in the next section.  We have also
-     deleted the new build item
+     interfaces, which we discuss in <xref
+     linkend="ref.interface-flags"/> and will ignore for the moment.
+     We have also deleted the new build item
      <classname>project-lib.extra</classname> that we added in the
      task branch.  To delete the build item, we removed the
      <filename>extra</filename> directory from
@@ -4429,11 +4432,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <primary>private interfaces</primary>
     </indexterm>
     <para>
-     In our user branch, we have modified the
-     <classname>project-lib</classname> library to make use of private
-     interfaces.  If you look at the <filename>Abuild.conf</filename>
-     in the <filename>src</filename> directory, you will see that it
-     lists <property>private</property> in its
+     Here we return to our <filename>user</filename> trees in
+     <filename>doc/example/general/user</filename>.  In our user
+     branch, we have modified the <classname>project-lib</classname>
+     library to make use of private interfaces.  If you look at the
+     <filename>Abuild.conf</filename> in the <filename>src</filename>
+     directory, you will see that it lists
+     <property>private</property> in its
      <property>supported-flags</property> key:
      <?example general/user/project/lib/src/Abuild.conf?>
      In its <filename>Abuild.interface</filename> file, it adds
@@ -4484,18 +4489,29 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      If you study <filename>ProjectLib.cpp</filename> in
      <filename>user/project/lib/src</filename>, you will notice that
      we have included the file
-     <filename>ProjectLib_private.hpp</filename> and called a function
-     in that file to get the value with which we initialize
-     <varname>cl1</varname>:
-     <?example general/user/project/lib/src/private/ProjectLib_private.cpp?>
+     <filename>ProjectLib_private.hpp</filename>, which is located in
+     the <filename>private-include</filename> directory, and that we
+     have called a function that is declared in that file to get the
+     value with which we initialize <varname>cl1</varname>:
+     <?example general/user/project/lib/private-include/ProjectLib_private.hpp?>
+     <?example general/user/project/lib/src/ProjectLib.cpp?>
      Private interfaces can be particularly useful in any
      implementation that hides implementation details from outside
      users because it can prevent accidentally accessing restricted
      header files.  This type of construct is most useful in straight
      C code rather than C++ code since C doesn't provide any
      encapsulation capability other than use of opaque types defined
-     in private header files.  It is somewhat akin to using the
-     <function>friend</function> keyword in C++.
+     in private header files.  This is somewhat akin to using the
+     <function>friend</function> keyword in C++, except that access to
+     private interfaces is requested by the accessor rather than the
+     accessee.
+     <footnote>
+      <para>
+       Since the build item that supports the
+       <property>private</property> flag is also protected by the
+       scope of its name, this gives us an added layer of protection.
+      </para>
+     </footnote>
     </para>
     <para>
      The test code in <filename>main.cpp</filename> in
@@ -4503,8 +4519,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      defined in the private header file.  Note that the
      <filename>Abuild.conf</filename> file in the
      <filename>test</filename> directory mentions
-     <classname>project-lib.src</classname> explicitly in its dependency
-     list, and that it is followed by <option>-flag=private</option>:
+     <classname>project-lib.src</classname> explicitly in its
+     dependency list, and that it is followed by
+     <option>-flag=private</option>:
      <?example general/user/project/lib/test/Abuild.conf?>
      This means that when <classname>project-lib.test</classname>
      reads <classname>project-lib.src</classname>'s
@@ -4552,13 +4569,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>--dump-build-graph</term>
       <listitem>
        <para>
-        Dump to standard output the complete build graph consisting
-        of items and platforms.  This is primarily useful for
-        debugging &abuild; or diagnosing unusual problems relating to
-        which items are built in which order.  Although nothing is
-        built in when this option is specified, &abuild; still
-        performs complete validation including reading of all the
-        interface files.
+        Dump to standard output the complete build graph consisting of
+        items and platforms.  This is primarily useful for debugging
+        &abuild; or diagnosing unusual problems relating to which
+        items are built in which order.  Although nothing is built in
+        when this option is specified, &abuild; still performs
+        complete validation including reading of all the interface
+        files.  The build graph is discussed in <xref
+        linkend="ref.construction-of-build-graph"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -4592,10 +4610,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <listitem>
        <para>
         Print the names of all object-code platforms categorized by
-        platform type and build tree, and indicates which ones would
-        be built by default.  Note that &abuild; may build on
-        additional platforms beyond those selected by default in order
-        to satisfy dependencies from other items.
+        platform type and build tree, and indicate which ones would be
+        built by default.  Note that &abuild; may build on additional
+        platforms beyond those selected by default in order to satisfy
+        dependencies from other items.
        </para>
       </listitem>
      </varlistentry>
@@ -4612,18 +4630,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>-V|--version</term>
-      <listitem>
-       <para>
-        Print the version number of &abuild;.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
       <term>--print-abuild-top</term>
       <listitem>
        <para>
         Print the path to the top of &abuild;'s installation.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>-V|--version</term>
+      <listitem>
+       <para>
+        Print the version number of &abuild;.
        </para>
       </listitem>
      </varlistentry>
@@ -4694,10 +4712,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>-jn| --jobs=n</term>
       <listitem>
        <para>
-        Build up to n build items in parallel by invoking up to n
-        simultaneous instances of the backend.  Does not cause the
-        backend to run multiple jobs in parallel.  See also
-        <option>--make-jobs</option>.
+        Build up to <emphasis>n</emphasis> build items in parallel by
+        invoking up to <emphasis>n</emphasis> simultaneous instances
+        of the backend.  Does not cause the backend to run multiple
+        jobs in parallel.  See also <option>--make-jobs</option>.
        </para>
       </listitem>
      </varlistentry>
@@ -4707,10 +4725,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <para>
         Don't stop the build after the first failed build item, but
         instead continue building additional build items that don't
-        depend on any failed items.  Also tells backend to continue on
-        its first failure.  Even with <option>-k</option>, &abuild;
-        will never try to build an item if any of its dependencies
-        failed.
+        depend on any failed items.  Also tells backend to continue
+        after its first failure.  Even with <option>-k</option>,
+        &abuild; will never try to build an item if any of its
+        dependencies failed.
        </para>
       </listitem>
      </varlistentry>
@@ -4727,8 +4745,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>--make-jobs[=n]</term>
       <listitem>
        <para>
-        Allow make to run up to <command>n</command> jobs in parallel.
-        Omit <command>n</command> to allow make to run as many jobs as
+        Allow make to run up to <emphasis>n</emphasis> jobs in parallel.
+        Omit <emphasis>n</emphasis> to allow make to run as many jobs as
         it wants.  Be aware that if this option is used in combination
         with <option>--jobs</option>, the total number of threads
         could potentially be the product of the two numerical
@@ -4760,11 +4778,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <para>
         Do not tell ant to use the custom
         <classname>AbuildLogger</classname> as its logger.
-        <classname>AbuildLogger</classname> is aware of the possibility
-        of nested targets and also properly suppresses output of empty
-        targets.  As of ant version 1.7, the DefaultLogger and
-        NoBannerLogger produce misleading output when there are nested
-        targets.
+        <classname>AbuildLogger</classname> is aware of the
+        possibility of nested ant targets and also properly suppresses
+        output of empty ant targets.  As of ant version 1.7, the
+        <classname>DefaultLogger</classname> and
+        <classname>NoBannerLogger</classname> loggers produce
+        misleading output when there are nested ant targets.
        </para>
       </listitem>
      </varlistentry>
@@ -4820,11 +4839,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         Ordinarily, any explicitly specified targets are applied only
         to items that were directly selected for inclusion in the
         build set.  With this flag, they are applied to all items
-        being built, including recursively expanded dependencies.  For
-        detailed information about target selection, please see <xref
-        linkend="ref.what-to-build"/>.  When used with a clean set,
-        this option causes the clean set to expanded to include
-        dependencies, which is otherwise not done.
+        being built, including recursively expanded dependencies.
+        When used with a clean set, this option causes the clean set
+        to expanded to include dependencies, which is otherwise not
+        done.  For detailed information about target selection, please
+        see <xref linkend="ref.what-to-build"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -4884,10 +4903,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         Expand the build set with items that have all of the named
         traits relative to any item already in the build set.
         Specifying this option also causes any explicitly specified
-        targets to be run only for items that have all of these
-        traits.  The default target <command>all</command> is run for
-        all other build items in the build set.  For more information
-        about traits, see <xref linkend="ref.traits"/>.
+        targets to be run only for those items.  The default target
+        <command>all</command> is run for all other build items in the
+        build set.  For more information about traits, see <xref
+        linkend="ref.traits"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -4929,15 +4948,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <listitem>
        <para>
         This target ensures that the local build item is built and
-        then runs its automated test suite.  For this to work, the
-        build item must have a test suite implemented with a test
-        framework that is integrated with &abuild; or that is made
-        available with a plugin.  &Abuild; is integrated with qtest
-        (the test framework that is used to implement &abuild;'s
-        own automated test suites) and, for Java-based build items,
-        with junit.  The <command>check</command> target is not
-        automatically run by the default target; it must be
-        requested specifically.
+        then runs its automated test suite, if any.  For this to do
+        anything, the build item must have a test suite implemented
+        with a test framework that is integrated with &abuild; or that
+        is made available with a plugin.  &Abuild; is integrated with
+        QTest and, for Java-based build items, also with JUnit.  The
+        <command>check</command> target is not automatically run by
+        the default target; it must be requested specifically.
        </para>
       </listitem>
      </varlistentry>
@@ -4945,11 +4962,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>clean</term>
       <listitem>
        <para>
-        This target removes any output directories (see <xref
-        linkend="ref.output-directories"/>) that &abuild; thinks it
-        created.  Well-behaved &abuild; rules, including all the
-        rules that are a standard part of &abuild;, won't create
-        any files or directories outside of these locations.
+        This target removes any output directories that &abuild;
+        thinks it created.  (Output directories are discussed in <xref
+        linkend="ref.output-directories"/>.)  Well-behaved &abuild;
+        rules, including all the rules that are a standard part of
+        &abuild;, won't create any files or directories outside of
+        these locations.
        </para>
       </listitem>
      </varlistentry>
@@ -4968,7 +4986,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         <application>make</application> builds, they should make the
         document generation a dependency of the <command>doc</command>
         target.  Contributed plugins to support javadoc and doxygen
-        are available alongside of and released separately from &abuild;.
+        are available in <filename>abuild-contrib</filename>, which is
+        released separately from &abuild;.
        </para>
       </listitem>
      </varlistentry>
@@ -5039,8 +5058,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <listitem>
        <para>
         This target will deploy any items that can be deployed.  The
-        default implementation doesn't do anything, so deploy hooks
-        have to be written in order to add functionality.
+        default implementation doesn't do anything, so
+        <command>deploy</command> hooks have to be written in order to
+        add functionality.
        </para>
       </listitem>
      </varlistentry>
@@ -5069,11 +5089,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>wrapper</term>
       <listitem>
        <para>
-        This target will generate an executable wrapper script
-        around a JAR file if certain properties are defined.  The
-        resulting script or batch file will invoke the Java runtime
-        environment on the JAR file with the specified main class
-        and with the proper classpath.
+        This target will generate an executable wrapper script around
+        a JAR file if certain properties are defined.  The resulting
+        script or batch file will invoke the Java runtime environment
+        on the JAR file with the specified main class and with the
+        proper classpath.  This target is run automatically by the
+        <command>all</command> target.
        </para>
       </listitem>
      </varlistentry>
