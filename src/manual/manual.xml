@@ -286,8 +286,12 @@ following checks:
     </listitem>
     <listitem>
      <para>
-      In many of the example listings, there are long lines that
-      overflow the shaded boxes.
+      In many of the example listings, there are lines that would be
+      longer than the shaded boxes in the PDF output.  We wrap those
+      lines and place a backslash (<literal>\</literal>) character
+      just before and after the extra line breaks.  This is done for
+      both the HTML and the PDF output even though the long lines are
+      only a problem for the PDF output.
      </para>
     </listitem>
     <listitem>
@@ -675,9 +679,9 @@ following checks:
        Ant</application></ulink> version 1.7.0 or newer with <ulink
        url="http://ant-contrib.sourceforge.net/"><application>ant-contrib</application></ulink>
        version 1.0.b3 or later installed in ant's lib directory is
-       required if you are building any Java code.  &Abuild;'s Java
-       code requires a Java 5 Java SDK, but could likely be ported
-       fairly easily to any Java SDK that can build Apache Ant.
+       required if you are building any Java code.  &Abuild;'s own
+       Java code requires a Java 5 Java SDK, but it could likely be
+       ported fairly easily to any Java SDK that can build Apache Ant.
       </para>
      </listitem>
      <listitem>
@@ -721,9 +725,11 @@ following checks:
      </footnote>
      &Abuild; is known to buildable by gcc, xlc, Microsoft Visual C++
      (7.1 or newer), and <ulink
-     url="http://www.mingw.org/">mingw</ulink>.  &Abuild; itself
-     contains C++ code and Java code, so all the runtime requirements
-     for both systems are required to build &abuild;.
+     url="http://www.mingw.org/">mingw</ulink>, and it should be
+     buildable by on any system and with any compiler that supports
+     the boost thread and regular expression libraries.  &Abuild;
+     itself contains C++ code and Java code, so all the runtime
+     requirements for both systems are required to build &abuild;.
     </para>
     <para>
      Since &abuild; determines where it is being run from when it is
@@ -775,18 +781,17 @@ following checks:
     <para>
      If you are creating a binary distribution or installing from
      source, please see the file <filename>src/README.build</filename>
-     from the source directory.  If you are installing from a
-     pre-built binary distribution, simply extract the binary
-     distribution in any directory.  &Abuild; imposes no requirements
-     on where the directory should be or what it should be called as
-     long as its contents remain in the correct relative locations.
-     You may make a symbolic link to the actual
-     <filename>bin/abuild</filename> executable from a directory in
-     your path.  &Abuild; will follow this link when attempting to
-     discover the path of its installation directory.  You may also
-     add the &abuild; distribution's <filename>bin</filename>
-     directory to your path, or invoke &abuild; by the full path to
-     its executable.
+     in the source directory.  If you are installing from a pre-built
+     binary distribution, simply extract the binary distribution in
+     any directory.  &Abuild; imposes no requirements on where the
+     directory should be or what it should be called as long as its
+     contents remain in the correct relative locations.  You may make
+     a symbolic link to the actual <filename>bin/abuild</filename>
+     executable from a directory in your path.  &Abuild; will follow
+     this link when attempting to discover the path of its
+     installation directory.  You may also add the &abuild;
+     distribution's <filename>bin</filename> directory to your path,
+     or invoke &abuild; by the full path to its executable.
     </para>
    </sect1>
    <sect1 id="ref.windows-requirements">
@@ -847,7 +852,7 @@ following checks:
      certain modules.  (Although &abuild; itself doesn't call
      <function>fork</function> from perl,
      <application>qtest</application>, which is used for &abuild;'s
-     test suite, does.
+     test suite, does.)
     </para>
     <para>
      Other modules may also be desirable.  In particular,
@@ -898,10 +903,10 @@ C:\cygwin\cygwin.bat
      &Abuild; creates output directories in the source directory, and
      all generated files are created inside of these
      &abuild;-generated directories.  All output directories are named
-     <filename>abuild-*</filename>.  It is recommended to configure
-     hooks or triggers in your version control system to prevent these
-     directories or their contents from being accidentally checked in.
-     It may also be useful to prevent
+     <filename>abuild-*</filename>.  It is recommended that you
+     configure hooks or triggers in your version control system to
+     prevent these directories or their contents from being
+     accidentally checked in.  It may also be useful to prevent
      <filename>Abuild.backing</filename> from being checked in since
      this file always contains information about the local
      configuration rather than something that would be CM controlled.
@@ -1005,12 +1010,12 @@ C:\cygwin\cygwin.bat
          <indexterm>
           <primary>build tree</primary>
          </indexterm>
-         A <firstterm>build tree</firstterm> is a hierarchically
-         arranged collection of build items.  All build items in a
-         build tree may refer to each other by name.  Each build item
-         knows the locations of its parents and children within the
-         file system hierarchy and the names of the build items on
-         which it depends.
+         A <firstterm>build tree</firstterm> is a collection of build
+         items arranged hierarchically in the file system.  All build
+         items in a build tree may refer to each other by name.  Each
+         build item knows the locations of its parents and children
+         within the file system hierarchy and the names of the build
+         items on which it depends.
         </para>
        </listitem>
       </varlistentry>
@@ -1259,9 +1264,9 @@ C:\cygwin\cygwin.bat
      <?example basic/java-library/Abuild.interface?>
      As with the C++ library, it is possible to build this item by
      running <command>abuild</command> from the
-     <filename>java</filename> directory.  Notice that &abuild; puts
-     the JAR file in the <filename>dist</filename> subdirectory of the
-     &abuild; output directory.
+     <filename>basic/java-library</filename> directory.  Notice that
+     &abuild; puts the JAR file in the <filename>dist</filename>
+     subdirectory of the &abuild; output directory.
     </para>
    </sect1>
    <sect1 id="ref.example.basic.java-program">
@@ -1342,17 +1347,16 @@ C:\cygwin\cygwin.bat
      A precise definition of <firstterm>build item</firstterm> would
      state that a build item is any directory that contains an
      <filename>Abuild.conf</filename>.  Perhaps a more useful
-     definition would be say that a build item is the basic object
-     that participates in &abuild;'s object-oriented view of a
-     software build.  A build item provides some
-     <emphasis>service</emphasis> within a build tree.  Most build
-     items build some kind of code: usually a library, executable, or
-     Java archive.  Build items may provide other kinds of services as
-     well.  For example, a build item may implement a code generator,
-     support for a new compiler, or the ability to make use of a
-     third-party software library.  In addition, a build item may have
-     certain attributes including a list of
-     <firstterm>dependencies</firstterm>, a list of
+     definition would say that a build item is the basic object that
+     participates in &abuild;'s object-oriented view of a software
+     build.  A build item provides some <emphasis>service</emphasis>
+     within a build tree.  Most build items build some kind of code:
+     usually a library, executable, or Java archive.  Build items may
+     provide other kinds of services as well.  For example, a build
+     item may implement a code generator, support for a new compiler,
+     or the ability to make use of a third-party software library.  In
+     addition, a build item may have certain attributes including a
+     list of <firstterm>dependencies</firstterm>, a list of
      <firstterm>supported flags</firstterm>, information about what
      types of platforms the build item may be built on, a list of
      <firstterm>traits</firstterm>, and other non-dependency
@@ -1442,12 +1446,12 @@ C:\cygwin\cygwin.bat
    <sect1 id="ref.build-trees">
     <title>Build Trees</title>
     <para>
-     A build tree, as defined before, is a hierarchically arranged
-     collection of build items.  A build tree is formed as a result of
-     the items it contains holding references to the locations of
-     their parents and children within the file system hierarchy.
-     These locations are named as relative paths in the
-     <property>parent-dir</property> and
+     A build tree, as defined before, is a collection of build items
+     arranged hierarchically in the file system.  A build tree is
+     formed as a result of the items it contains holding references to
+     the locations of their parents and children within the file
+     system hierarchy.  These locations are named as relative paths in
+     the <property>parent-dir</property> and
      <property>child-dirs</property> keys of the items'
      <filename>Abuild.conf</filename> files.  Ordinarily, the value of
      the <property>parent-dir</property> key is
@@ -1469,12 +1473,7 @@ C:\cygwin\cygwin.bat
      Note that the hierarchy defined by the layout of build items in
      the file system is a file system hierarchy and nothing more.  It
      doesn't have to have any bearing at all on the dependency
-     relationships among the build items.  That said, it is sensible
-     to organize build items in a manner that relates to the
-     architecture of the system, and this in turn usually has
-     implications about dependencies.  Still, it is important to keep
-     in mind that &abuild; is not file-system driven but rather is
-     dependency driven.
+     relationships among the build items.
      <footnote>
       <para>
        This information is used only at startup to locate the root of
@@ -1485,6 +1484,11 @@ C:\cygwin\cygwin.bat
        system after it uses the information during startup.
       </para>
      </footnote>
+     That said, it is sensible to organize build items in a manner
+     that relates to the architecture of the system, and this in turn
+     usually has implications about dependencies.  Still, it is
+     important to keep in mind that &abuild; is not file-system driven
+     but rather is dependency driven.
     </para>
     <para>
      In addition to containing build items, build trees can contain
@@ -1518,11 +1522,11 @@ C:\cygwin\cygwin.bat
          </indexterm>
          The root build item of a build tree is the item in that tree
          that has no <property>parent-dir</property> key.  It is often
-         the case that the root build item is unnamed, but in addition
-         to being able to have a <property>child-dirs</property> key,
-         there are many other keys that are permitted.  In particular,
-         keys that define attributes of the build tree may appear only
-         in the root build item's <filename>Abuild.conf</filename>.
+         the case that the root build item is unnamed and therefore
+         lacks a <property>this</property> key.  (See below for a
+         discussion of unnamed build items.)  Keys that define
+         attributes of the build tree may appear only in the root
+         build item's <filename>Abuild.conf</filename>.
         </para>
        </listitem>
       </varlistentry>
@@ -1625,12 +1629,12 @@ C:\cygwin\cygwin.bat
        <term>plugin</term>
        <listitem>
         <para>
-         Plugins are a special type of build item that is capable of
-         extending the functionality of &abuild; beyond what can be
-         accomplished in regular build items.  Plugins must be named
-         and not have any dependencies.  No other build items may
-         depend on them.  Plugins are a topic in their own right.
-         They are discussed in depth in <xref linkend="ref.plugins"/>.
+         Plugins are capable of extending the functionality of
+         &abuild; beyond what can be accomplished in regular build
+         items.  Plugins must be named and not have any dependencies.
+         No other build items may depend on them.  Plugins are a topic
+         in their own right.  They are discussed in depth in <xref
+         linkend="ref.plugins"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -1694,7 +1698,8 @@ C:\cygwin\cygwin.bat
      third-party library's interface.  This simplifies the process of
      using third-party libraries and makes it possible to create a
      uniform standard for doing so within any specific &abuild; build
-     tree.
+     tree.  It also alleviates the need to duplicate information about
+     the third-party library throughout your source tree.
     </para>
    </sect1>
   </chapter>
@@ -1759,8 +1764,8 @@ C:\cygwin\cygwin.bat
           code.  Although this would have been useful for build trees
           that had complex requirements for mixing JDKs of different
           versions, this capability would have added a lot of
-          complexity to support a practice that is unusually and
-          largely undesirable.
+          complexity to support a practice that is unusual and largely
+          undesirable.
          </para>
         </footnote>
         Platform types are most useful in the <type>object-code</type>
@@ -1852,7 +1857,7 @@ C:\cygwin\cygwin.bat
      java build item to have an include path or library path in the
      sense of a C/C++ build item.  When one build item depends on
      another, the platforms on which the two build items are being
-     built come into play.  We discuss this later in <xref
+     built come into play.  We discuss this in <xref
      linkend="ref.cross-platform-dependencies"/>.
     </para>
    </sect1>
@@ -1883,9 +1888,9 @@ C:\cygwin\cygwin.bat
       <term>cpu</term>
       <listitem>
        <para>
-        A standard CPU type identifier such as <type>ix86</type>,
-        <type>x86_64</type>, <type>ppc</type>,
-        <type>ppc64</type>, or <type>sparc</type>.
+        A CPU type identifier such as <type>ix86</type>,
+        <type>x86_64</type>, <type>ppc</type>, <type>ppc64</type>, or
+        <type>sparc</type>.
        </para>
       </listitem>
      </varlistentry>
@@ -1910,18 +1915,12 @@ C:\cygwin\cygwin.bat
       <term>compiler</term>
       <listitem>
        <para>
-        An identifier for the C/C++ compiler toolchain.  &Abuild; will
-        load a <firstterm>toolchain support file</firstterm> for the
-        compiler named in this field.  This file is a <application>GNU
-        Make</application> fragment that is responsible for defining
-        certain variables and macros used by the
-        <filename>ccxx</filename> rules.  Details appear in the
-        comments in the <filename>make/object-code/ccxx.mk</filename>
-        rules file (<xref linkend="ref.ccxx.mk"/>).  Users can provide
-        their own compiler toolchains as long as they provide the
-        required support files.  The mechanism for adding new
-        compilers is described in <xref
-        linkend="ref.adding-platform-types-and-platforms"/>.
+        An identifier for the compiler C/C++ compiler toolchain to be
+        used.  &Abuild; has built-in support for gcc on UNIX systems
+        and for Microsoft Visual C++ and mingw on Windows systems.
+        Users can provide their own compiler toolchains in addition to
+        these.  The mechanism for adding new compilers is described in
+        <xref linkend="ref.adding-platform-types-and-platforms"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -1930,8 +1929,9 @@ C:\cygwin\cygwin.bat
       <listitem>
        <para>
         An optional field that is used to pass additional information
-        to the compiler toolchain support file.  Typical uses for
-        options would be to define different debugging, profiling, or
+        to the <application>GNU Make</application> code that
+        implements support for the compiler.  Typical uses for options
+        would be to define different debugging, profiling, or
         optimization levels.
        </para>
       </listitem>
@@ -2544,15 +2544,15 @@ C:\cygwin\cygwin.bat
      this case, there is no reciprocation; <emphasis>i.e.</emphasis>,
      nothing in the external tree points back to the referring tree.
      External trees can be specified as either relative paths or as
-     absolute paths.  If an external tree is specified by a relative
+     absolute paths.  If an external tree is specified as a relative
      path, then &abuild; will attempt to resolve it in a backing area
-     (see <xref linkend="ref.backing-areas.resolving"/>) if it is not
-     found.
+     (see <xref linkend="ref.backing-areas.resolving-externals"/>) if
+     it is not found.
     </para>
     <para>
      In addition to paths, there are two options that may be specified
-     for each path: the <option>-ro</option> option, which makes an
-     external area read-only, and the
+     for each external: the <option>-ro</option> option, which makes
+     an external read-only, and the
      <option>-winpath=<replaceable>windows-path</replaceable></option>
      option, which allows an alternative path to be used only when
      running in a Windows environment.
@@ -2623,7 +2623,8 @@ C:\cygwin\cygwin.bat
        a copy of your backing area's root
        <filename>Abuild.conf</filename>, you can't shadow the external
        locally without modifying your root
-       <filename>Abuild.conf</filename>.  If your external were
+       <filename>Abuild.conf</filename>.  (Backing areas are discussed
+       in <xref linkend="ref.backing-areas"/>.)  If your external were
        specified as a relative path, you would be able to shadow it by
        simply creating it in the correct location, thus preventing it
        from being resolved in the backing area.
@@ -2684,8 +2685,9 @@ C:\cygwin\cygwin.bat
      dependencies declared in the external if those dependencies were
      resolved in <emphasis>its</emphasis> externals.  To illustrate
      this, we have a third build tree located in
-     <filename>doc/example/general/reference/derived</filename>.  Here is its
-     root <filename>Abuild.conf</filename>:
+     <filename>doc/example/general/reference/derived</filename>.  This
+     build tree is for a second project that is derived from the first
+     project.  Here is its root <filename>Abuild.conf</filename>:
      <?example general/reference/derived/Abuild.conf?>
      This build tree declares <filename>../project</filename> as an
      external build tree.  It contains a
@@ -2699,7 +2701,9 @@ C:\cygwin\cygwin.bat
      <filename>../project</filename> build tree and also
      <classname>common-lib2</classname> which is found in
      <filename>../project</filename>'s external located at
-     <filename>../common</filename>.
+     <filename>../common</filename>.  We will return to this build
+     tree in the examples at the end of <xref
+     linkend="ref.what-to-build"/>.
     </para>
    </sect1>
   </chapter>
@@ -2816,9 +2820,7 @@ C:\cygwin\cygwin.bat
      the <option>--with-deps</option>, it builds the build item whose
      <filename>Abuild.conf</filename> is in the current directory,
      assuming that all items that this build item depends on are up to
-     date.  When any build set is specified, &abuild; attempts to
-     build all dependencies, just like when
-     <option>--with-deps</option> is specified.
+     date.
      <footnote>
       <para>
        Ideally, one would never invoke &abuild; in this way: the
@@ -2832,6 +2834,9 @@ C:\cygwin\cygwin.bat
        amount of time you spend waiting for &abuild; to run.
       </para>
      </footnote>
+     When any build set is specified, &abuild; attempts to build all
+     dependencies, just like when <option>--with-deps</option> is
+     specified.
     </para>
     <para>
      To instruct &abuild; to build all the items in a specific build
@@ -3065,17 +3070,15 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      Traits are used for two main purposes.  Throughout this material,
-     we will refer back to the two purposes, so be sure that you
-     understand this section well before reading the rest of the
-     chapter.
+     we will refer back to the two purposes.  We will also provide
+     clarifying examples later in the chapter.
     </para>
     <para>
-     The first purpose is
-     creation of semantically defined groups of build items.  In this
-     case, a trait corresponding to the grouping criteria would be
-     applied to a build item directly.  For example, all build items
-     that can be deployed could be assigned the
-     <property>deployable</property> trait.
+     The first purpose of traits is creation of semantically defined
+     groups of build items.  In this case, a trait corresponding to
+     the grouping criteria would be applied to a build item directly.
+     For example, all build items that can be deployed could be
+     assigned the <property>deployable</property> trait.
     </para>
     <para>
      A second purpose of traits is to create specific relationships
@@ -3116,29 +3119,21 @@ C:\cygwin\cygwin.bat
     <sect2 id="ref.declaring-traits">
      <title>Declaring Traits</title>
      <para>
-      In order to specify the list of traits that are valid for use in
-      a particular build tree, the root build item of a build tree
-      must include the <property>supported-traits</property> key in
-      its <filename>Abuild.conf</filename> file.  Any named build item
-      in that tree, including the root item, may include a
-      <property>traits</property> key that lists one or more of the
-      traits that are supported for that build tree.  The list of
-      supported traits is given as the value of the
-      <property>supported-traits</property> key in the root build
-      item's <filename>Abuild.conf</filename>.  The list of supported
-      traits is inherited through external trees, so any trait
-      declared as valid in any external trees are also available.  The
-      set of traits that can be specified on the command line is the
-      union of all traits allowed by all known trees.
+      Any named build item may include a <property>traits</property>
+      key that lists one or more of the traits that are supported in
+      its build tree.  The list of traits supported in a build tree is
+      given as the value of the <property>supported-traits</property>
+      key in the root build item's <filename>Abuild.conf</filename>.
+      The list of supported traits is inherited through external
+      trees, so any trait declared as valid in any external trees are
+      also available.  The set of traits that can be specified on the
+      command line is the union of all traits allowed by all known
+      trees.
      </para>
      <para>
       Traits listed in the <property>traits</property> key can be made
       referent to other build items by listing the other build items
-      in an <option>-item</option> option.  Any trait listed in a
-      build item's <property>traits</property> key must be listed in
-      the <property>supported-traits</property> key of the root
-      <filename>Abuild.conf</filename> file of the local build tree or
-      one of its externals.  For example, the following
+      in an <option>-item</option> option.  For example, the following
       <filename>Abuild.conf</filename> fragment declares that the
       <classname>potato.test</classname> build item is deployable,
       unclassified, and a tester for the
@@ -3199,7 +3194,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       traits used in reference to other build items.  For example, if
       a build item had the <property>tester</property> trait not
       referent to any build item, it would not be picked up by the
-      above command.
+      above command.  The <option>--only-with-traits</option> option
+      picks up all build items that have the named traits either in
+      isolation or referent to other build items.
      </para>
      <para>
       It is also possible to combine these options.  In that case, the
@@ -3287,7 +3284,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <command>test</command> targets for any build items in the
          local build tree (the current build item's tree excluding its
          externals) that have both the <property>deployable</property>
-         and the <property>tester</property> traits.  Run the
+         and the <property>tester</property> traits either specified
+         alone or in reference to other build items.  Run the
          <command>all</command> target for their dependencies.
         </para>
        </listitem>
@@ -3381,29 +3379,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       For more detailed information on how the build set is
       constructed, please see <xref
       linkend="ref.construction-of-build-sets"/>.
-     </para>
-     <para>
-      The special target <command>clean</command> is not passed to the
-      backend (such as <command>make</command> or
-      <command>ant</command>) and may not be combined with any other
-      targets.  &Abuild; simply removes all output directories in the
-      current directory when the clean target is given.  (Output
-      directories are discussed in <xref
-      linkend="ref.output-directories"/>.)  It does not perform
-      integrity checks or invoke a backend.
-     </para>
-     <para>
-      The special target <command>no-op</command> is also not passed
-      to a backend and may not be combined with other targets.  When
-      given this target, &abuild; does not invoke a backend or load
-      interface files.  It does, however, still perform all its
-      integrity validations, and it also visits build items in
-      dependency order and for each platform on which they would have
-      been built.  This is useful primarily for testing as it provides
-      a fast way for you to see which build items would be built by
-      any given build command.  The <command>no-op</command> target,
-      when specified, applies to all targets regardless of the
-      specification of any trait-based build or expansion sets.
      </para>
     </sect2>
    </sect1>
@@ -3714,14 +3689,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      build item specifies which flags it wants set for its direct
      dependencies, if any, by specifying them in the
      <property>deps</property> key of its
-     <filename>Abuild.conf</filename> file.  When one build item
-     indicates that it should depend on other build item with a
-     particular flag set, &abuild; checks to make sure that the
-     dependent build item supports that flag, reporting an error if it
-     does not.  The third part is that a build item may associate a
-     variable assignment (and only a variable assignment) in its
-     <filename>Abuild.interface</filename> file with a particular
-     flag.
+     <filename>Abuild.conf</filename> file.  The third part is that a
+     build item may associate a variable assignment (and only a
+     variable assignment) in its <filename>Abuild.interface</filename>
+     file with a particular flag.
+    </para>
+    <para>
+     When one build item indicates that it should depend on other
+     build item with a particular flag set, &abuild; checks to make
+     sure that the dependent build item supports that flag, reporting
+     an error if it does not.  Abuild also allows a build item to
+     associate an interface variable assignment with a flag only if
+     that flag is one of that build item's supported flags.
     </para>
     <para>
      When an <filename>Abuild.interface</filename> file is read by
@@ -3730,10 +3709,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      requested the flag through a
      <option>-flag=<replaceable>interface-flag</replaceable></option>
      option to a dependency in the <property>deps</property> key of
-     its <filename>Abuild.conf</filename> file.  Note that these
-     variable assignments are in effect only when the variables are
-     being exported to the back end, not when being accessed from
-     other <filename>Abuild.interface</filename> files.
+     its <filename>Abuild.conf</filename> file.  Flag-based
+     assignments are not evaluated until interface data is passed to
+     the backends.  This means that flag-based assignments are not
+     inherited through dependencies.  As such, the effects of these
+     variable assignments are not visible in other
+     <filename>Abuild.interface</filename> files.
      <footnote>
       <para>
        If you're getting the feeling that we're covering something up,
@@ -3746,29 +3727,33 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </para>
      </footnote>
      Also, a build item always implicitly has all its own flags set
-     when its own interfaces are exported to itself.  For example,
-     suppose <classname>B</classname> has an
-     <filename>include</filename> directory and a
-     <filename>private-include</filename> directory.  Furthermore,
-     suppose <classname>B</classname> wants to make the
-     <filename>private-include</filename> directory visible only to
-     other build items that specifically ask for it.
+     when its own interfaces are exported to itself.  For example, in
+     <xref linkend="fig.private-flag"/>, <classname>B</classname> has
+     an <filename>include</filename> directory and a
+     <filename>private-include</filename> directory.  It wants the
+     <filename>include</filename> directory to be visible to all build
+     items that depend on it, but the
+     <filename>private-include</filename> directory should be visible
+     only to other build items that specifically ask for it.
      <classname>B</classname> could indicate that it supports the
      <property>private</property> flag and could add the
      <filename>private-include</filename> directory to
-     <varname>INCLUDES</varname> conditionally upon that flag.  Then
-     <classname>A</classname> could indicate that it wants the
-     <property>private</property> flag when it reads
-     <classname>B</classname>'s <filename>Abuild.interface</filename>.
-     When <classname>A</classname> reads <classname>B</classname>'s
+     <varname>INCLUDES</varname> conditionally upon that flag.  If
+     <classname>A</classname> wanted to see the
+     <filename>private-include</filename> directory, it could indicate
+     that it wants the <property>private</property> flag set when it
+     reads <classname>B</classname>'s
+     <filename>Abuild.interface</filename>.  Then, when
+     <classname>A</classname> reads <classname>B</classname>'s
      <filename>Abuild.interface</filename> file, it will see the
-     <filename>private-include</filename> assignment, as will
-     <classname>B</classname>.  If a third build item
-     <classname>X</classname> depended on <classname>A</classname>, it
-     would not see the <filename>private-include</filename> directory
-     as that assignment would not be inherited through
-     <classname>A</classname>'s interface.  (See <xref
-     linkend="fig.private-flag"/>.)
+     <filename>private-include</filename> assignment.
+     <classname>B</classname> will also see it because build items
+     always see all of their own flag-based assignments.  If a third
+     build item <classname>X</classname> depended on
+     <classname>A</classname>, it would not see
+     <classname>B</classname>'s <filename>private-include</filename>
+     directory as that assignment would not be inherited through
+     <classname>A</classname>'s interface.
      <figure id="fig.private-flag">
       <title>Private Interface Flag</title>
       <mediaobject>
@@ -4024,7 +4009,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
     </note>
    </sect1>
-   <sect1 id="ref.backing-areas.resolving">
+   <sect1 id="ref.backing-areas.resolving-items">
     <title>Resolving Build Items to Backing Areas</title>
     <para>
      In this section, we will discuss backing areas from a
