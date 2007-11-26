@@ -66,16 +66,19 @@ To build on Windows, perform the following steps:
 COMMON
 ======
 
-Once built, run abuild --build=all in the current directory to build
-other pieces of abuild.
+Once built, run "abuild --build=all" in the current directory to build
+other pieces of abuild.  See manual/README for additional requirements
+for building the documentation.  If you don't want to build the
+documentation but still want to build the Java portion of abuild, run
+"abuild -C ant-library".
 
 
 CREATION OF SOURCE RELEASE
 ==========================
 
 Do a clean export of abuild from the version control system.  Rename
-abuild to abuild-version.  Create abuild-version.tar.bz2 containing
-that directory.
+abuild to abuild-version.  Create abuild-version.tar.bz2 (and/or
+abuild-version.tar.gz) containing that directory.
 
 
 INSTALLATION/CREATION OF BINARY RELEASE
@@ -119,4 +122,5 @@ Basic steps:
    needed.
 
  * If this is an official release, remember to update the
-   web-accessible copies of the documentation.
+   web-accessible copies of the documentation and create a tag in the
+   version control system.
