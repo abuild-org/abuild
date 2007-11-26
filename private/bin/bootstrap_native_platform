@@ -2,8 +2,8 @@
 #
 # This script provides the default native platform for bootstrapping.
 # It is not used by abuild itself, but only by Makefile.bootstrap and
-# make-release.  This logic is duplicated in Abuild.cc, though not
-# exactly in this form.
+# make-binary-distribution.  This logic is duplicated in Abuild.cc,
+# though not exactly in this form.
 #
 
 require 5.008;

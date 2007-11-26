@@ -81,15 +81,15 @@ that directory.
 INSTALLATION/CREATION OF BINARY RELEASE
 =======================================
 
-Use the make-release script to create a binary release.  Run
-make-release with no arguments and check the comments at the top of
-the file for details.
+Use the make-binary-distribution script to create a binary release.
+Run make-binary-distribution with no arguments and check the comments
+at the top of the file for details.
 
 To run abuild's test suite, you must have qtest-driver in your path.
 Note that you are likely to get some test failures on "make sure all
 files were read" tests if you run the test suite over a network file
-system.  make-release will not allow you to create a release if there
-are any test failures.
+system.  make-binary-distribution will not allow you to create a
+release if there are any test failures.
 
 Basic steps:
 
@@ -98,24 +98,25 @@ Basic steps:
  * create abuild-version.tar.bz2 as the source distribution; do not
    delete the source yet
 
- * copy make-release into the same directory as the source
+ * copy make-binary-distribution into the same directory as the source
    distribution
 
  * delete the source directory
 
  * run
 
- ./make-release abuild-version.tar.bz2 --make-java-dist \
+ ./make-binary-distribution abuild-version.tar.bz2 --make-java-dist \
        --make-doc-dist --make-static --save-auto
 
  * save the binary distribution or distributions
 
  * Distribute the auto-srcs directory, source distribution, java
-   distribution, and doc distribution, and make-release as needed to
-   the build hosts
+   distribution, and doc distribution, and make-binary-distribution as
+   needed to the build hosts
 
- * For each build host, run make-release on each build host.  Pass the
-   doc-dist and/or java-dist files as arguments as needed.
+ * For each build host, run make-binary-distribution on each build
+   host.  Pass the doc-dist and/or java-dist files as arguments as
+   needed.
 
  * If this is an official release, remember to update the
    web-accessible copies of the documentation.

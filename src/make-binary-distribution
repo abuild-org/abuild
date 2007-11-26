@@ -10,10 +10,10 @@
 # The usual process for doing a release would to first create a source
 # distribution.  Then, on a system that can build everything, create a
 # binary distribution by running this script with the --make-java-dist
-# and --make-doc-dist flags.  Then copy the make-release script, the
-# source distribution, and whichever of the doc and java distributions
-# are required to the other platform build systems and run this script
-# on each one.
+# and --make-doc-dist flags.  Then copy the make-binary-distribution
+# script, the source distribution, and whichever of the doc and java
+# distributions are required to the other platform build systems and
+# run this script on each one.
 #
 # Note that qtest-driver must be in your path to run the test suites.
 
