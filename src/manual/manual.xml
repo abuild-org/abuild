@@ -2697,13 +2697,33 @@ C:\cygwin\cygwin.bat
      this, we have a third build tree located in
      <filename>doc/example/general/reference/derived</filename>.  This
      build tree is for a second project that is derived from the first
-     project.  Here is its root <filename>Abuild.conf</filename>:
+     project.  This build tree declares
+     <filename>../project</filename> as an external build tree.  For a
+     diagram of the entire <filename>general/reference</filename>
+     collection of build tress, see <xref
+     linkend="fig.general-reference"/>.
+     <figure id="fig.general-reference">
+      <title>Build Trees in <filename>general/reference</filename></title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="general-reference.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         The <filename>derived</filename> build tree declares the
+         <filename>project</filename> build tree as an external.  The
+         <filename>project</filename> build tree declares the
+         <filename>common</filename> build tree as an external.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
+     Here is its root <filename>Abuild.conf</filename>:
      <?example general/reference/derived/Abuild.conf?>
-     This build tree declares <filename>../project</filename> as an
-     external build tree.  It contains a
-     <classname>derived-main</classname> build item structure
-     identically to the C++ program build items we've seen earlier.
-     Here at the main program's <filename>Abuild.conf</filename>:
+     It contains a <classname>derived-main</classname> build item
+     structure identically to the C++ program build items we've seen
+     earlier.  Here at the main program's
+     <filename>Abuild.conf</filename>:
      <?example general/reference/derived/main/src/Abuild.conf?>
      In this file, you can see that
      <classname>derived-main.src</classname> depends on
@@ -4187,11 +4207,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      in this example, we would ordinarily set our backing area to an
      absolute path.  We use a relative path here only so that the
      examples can remain independent of the location of
-     <filename>doc/example</filename>.  Since we are not making
-     modifications to any build items in <filename>common</filename>,
-     we don't have to create a build tree at
-     <filename>task/common</filename>, even though our root
-     <filename>Abuild.conf</filename> lists
+     <filename>doc/example</filename>.  Our task branch also includes
+     the derived project.  Since we are not making modifications to
+     any build items in <filename>common</filename>, we don't have to
+     create a build tree at <filename>task/common</filename>, even
+     though our root <filename>Abuild.conf</filename> lists
      <filename>../common</filename> as an external:
      <?example general/task/project/Abuild.conf?>
      Since that relative path exists as a valid build tree relative to
@@ -4199,7 +4219,34 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>../common</filename> relative to the backing area
      (<filename>../../reference/project/../common</filename>, which is
      <filename>../../reference/common</filename>) to resolve the
-     external.  As always, for this example to work properly, our
+     external.  For a diagram of the task branch build trees, see
+     <xref linkend="fig.general-task"/>.
+     <figure id="fig.general-task">
+      <title>Build Trees in <filename>general/task</filename></title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="general-task.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         The <filename>derived</filename> build tree in the
+         <filename>task</filename> branch declares the
+         <filename>project</filename> build tree as an external.  The
+         <filename>project</filename> build tree in the
+         <filename>task</filename> branch declares the
+         <filename>common</filename> build tree as an external, but
+         since the <filename>common</filename> build tree isn't
+         shadowed in the <filename>task</filename> branch, that
+         external is resolved to the <filename>reference</filename>
+         tree instead.  The <filename>derived</filename> and
+         <filename>project</filename> build trees in the
+         <filename>task</filename> branch both back to their
+         corresponding build trees in <filename>reference</filename>.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
+     As always, for this example to work properly, our
      backing area must be fully built.  If you are following along, to
      make sure this is the case, you should run <command>abuild
      --build=all</command> in <filename>reference/derived</filename>.
@@ -4278,6 +4325,33 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>reference</filename>.  Here is
      <filename>user/common/Abuild.backing</filename>:
      <?example general/user/common/Abuild.backing?>
+     For a diagram of the user build trees, see <xref
+     linkend="fig.general-user"/>.
+     <figure id="fig.general-user">
+      <title>Build Trees in <filename>general/user</filename></title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="general-user.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         The <filename>derived</filename> build tree in the
+         <filename>user</filename> area declares the
+         <filename>project</filename> build tree as an external.  The
+         <filename>project</filename> build tree in the
+         <filename>user</filename> area declares the
+         <filename>common</filename> build tree as an external.  Each
+         backs to its corresponding build tree in
+         <filename>task</filename> except <filename>common</filename>.
+         Since <filename>common</filename> does not exist in the
+         <filename>task</filename> branch, <filename>common</filename>
+         in the <filename>user</filename> area backs directly to
+         <filename>common</filename> in
+         <filename>reference</filename>.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
     </para>
     <para>
      In <filename>project</filename>, we have made changes to
