@@ -1343,6 +1343,9 @@ C:\cygwin\cygwin.bat
    </para>
    <sect1 id="ref.build-items-as-objects">
     <title>Build Items as Objects</title>
+    <indexterm>
+     <primary>build item</primary>
+    </indexterm>
     <para>
      A precise definition of <firstterm>build item</firstterm> would
      state that a build item is any directory that contains an
@@ -1445,6 +1448,9 @@ C:\cygwin\cygwin.bat
    </sect1>
    <sect1 id="ref.build-trees">
     <title>Build Trees</title>
+    <indexterm>
+     <primary>build tree</primary>
+    </indexterm>
     <para>
      A build tree, as defined before, is a collection of build items
      arranged hierarchically in the file system.  A build tree is
@@ -1991,6 +1997,9 @@ C:\cygwin\cygwin.bat
   </chapter>
   <chapter id="ref.build-item-dependencies">
    <title>Build Item Dependencies</title>
+   <indexterm>
+    <primary>dependency</primary>
+   </indexterm>
    <para>
     Management of dependencies among build items is central to
     &abuild;'s functionality.  We have already gotten a taste of this
@@ -2000,6 +2009,18 @@ C:\cygwin\cygwin.bat
    </para>
    <sect1 id="ref.dependencies.direct-and-indirect">
     <title>Direct and Indirect Dependencies</title>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>direct</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>indirect</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>circular</secondary>
+    </indexterm>
     <para>
      The principle mechanism for declaring dependencies among build
      items in &abuild; is the <property>deps</property> key in a build
@@ -2034,17 +2055,6 @@ C:\cygwin\cygwin.bat
      linkend="ref.abuild-interface-system"/>.
     </para>
     <para>
-     <indexterm>
-      <primary>dependency</primary>
-     </indexterm>
-     <indexterm>
-      <primary>dependency</primary>
-      <secondary>direct</secondary>
-     </indexterm>
-     <indexterm>
-      <primary>dependency</primary>
-      <secondary>indirect</secondary>
-     </indexterm>
      Another very important point about dependencies in &abuild; is
      that they are <firstterm>transitive</firstterm>.  In other words,
      if <classname>A</classname> depends on <classname>B</classname>
@@ -2798,6 +2808,9 @@ C:\cygwin\cygwin.bat
    </sect1>
    <sect1 id="ref.build-sets">
     <title>Build Sets</title>
+    <indexterm>
+     <primary>build sets</primary>
+    </indexterm>
     <para>
      We have already seen the <option>--with-deps</option> option,
      which tells &abuild; to build all the build items on which the
@@ -7852,6 +7865,9 @@ endif
    </para>
    <sect1 id="ref.build-item-rules">
     <title>Build Item Rules</title>
+    <indexterm>
+     <primary>Rules.mk</primary>
+    </indexterm>
     <para>
      The most important thing to realize about code generators in
      &abuild; is that code generation can be viewed as a just another
@@ -8224,6 +8240,9 @@ endif
     <!--  This information is duplicated in ant/hooks-help.txt.    -->
     <!--  Please ensure that the material there is consistent      -->
     <!--  with the material here.                                  -->
+    <indexterm>
+     <primary>ant-hooks.xml</primary>
+    </indexterm>
     <para>
      In order to make it possible for users to add additional steps to
      the build process, &abuild;'s <application>ant</application> code
@@ -8589,6 +8608,9 @@ endif
    <title>Cross-Platform Support</title>
    <sect1 id="ref.platform-selection">
     <title>Platform Selection</title>
+    <indexterm>
+     <primary>platform selectors</primary>
+    </indexterm>
     <para>
      When &abuild; starts up, it determines a list of object-code
      platform types and, within each platform type, a list of
@@ -8874,6 +8896,10 @@ endif
    </sect1>
    <sect1 id="ref.cross-platform-dependencies">
     <title>Cross-Platform Dependencies</title>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>cross-platform</secondary>
+    </indexterm>
     <para>
      Ordinarily, when <classname>A</classname> depends on
      <classname>B</classname>, &abuild; requires that
@@ -9247,6 +9273,10 @@ endif
      <programlisting>visible-to: A.*
 </programlisting>
     </para>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>one-way gates</secondary>
+    </indexterm>
     <para>
      Here we describe a more concrete example.  The next section
      demonstrates an actual implementation of the pattern described
@@ -10023,6 +10053,15 @@ endif
    </para>
    <sect1 id="ref.plugin-functionality">
     <title>Plugin Functionality</title>
+    <indexterm>
+     <primary>plugin.interface</primary>
+    </indexterm>
+    <indexterm>
+     <primary>plugin.mk</primary>
+    </indexterm>
+    <indexterm>
+     <primary>plugin-ant.xml</primary>
+    </indexterm>
     <para>
      Plugins are build items that are named in the build tree root's
      <filename>Abuild.conf</filename> in the
