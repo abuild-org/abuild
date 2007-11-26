@@ -1,23 +1,4 @@
 
-Next Release
-============
-
-Documentation
--------------
-
- * Consider adding a trouble shooting section
-
-    - example: library name inconsistency between Abuild.mk and
-      Abuild.interface
-
-
-Bugs
-====
-
- * Cass Dalton reports that he sometimes gets "resource busy" errors
-   when running autoconf with --make-jobs.
-
-
 Java Problems
 =============
 
@@ -198,3 +179,12 @@ See also "Known Limitations" in the documentation.
 
  * Mingw support isn't that complete: see known limitations in the
    documentation and comments in private/list_platforms.
+
+ * Consider adding a trouble shooting section to the documentation,
+   web site, or wiki
+
+    - example: library name inconsistency between Abuild.mk and
+      Abuild.interface
+
+ * Cass Dalton reports that he sometimes gets "resource busy" errors
+   when running autoconf with --make-jobs.

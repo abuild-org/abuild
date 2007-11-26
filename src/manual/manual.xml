@@ -5,7 +5,7 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0-pre">
+<!ENTITY swversion "1.0.rc1">
 <!ENTITY lastreleased "November 26, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
@@ -12354,7 +12354,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0: XXX</term>
+     <term>1.0.rc1: November 26, 2007</term>
      <listitem>
       <itemizedlist>
        <listitem>

@@ -14,7 +14,7 @@
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
-std::string const Abuild::ABUILD_VERSION = "1.0-pre";
+std::string const Abuild::ABUILD_VERSION = "1.0.rc1";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
