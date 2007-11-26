@@ -154,16 +154,16 @@ following checks:
    Welcome to the &abuild; manual!  You may always find the latest
    copy of this manual on <ulink
    url="http://www.abuild.org">&abuild;'s website</ulink>.  This
-   manual is designed to get you up and running with &abuild; quickly.
-   Then, when you are ready, you can come back for documentation on
-   the full depth of &abuild;'s functionality.  The most essential and
-   common topics are presented first so that top-down learners can
-   just start at the beginning and stop reading when they feel that
-   they've seen enough to get going.  If you come across something in
-   the first reading that you don't understand, it's probably safe to
-   skip it and come back when you're more comfortable.  As each new
-   concept is presented, it is enhanced with examples.  A list of all
-   the examples in the document can be found in <xref
+   manual is designed to get you up and running with &abuild; quickly:
+   the most essential and common topics are presented first so that
+   you can just start at the beginning and stop reading when you feel
+   that you've seen enough to get going.  Then, when you are ready,
+   you can come back for documentation on the full depth of &abuild;'s
+   functionality.  If you come across something in the first reading
+   that you don't understand, it's probably safe to skip it and come
+   back when you're more comfortable.  As each new concept is
+   presented, it is enhanced with examples.  A list of all the
+   examples in the document can be found in <xref
    linkend="ref.list-of-examples"/>.  If you are just looking for
    changes from previous versions of &abuild;, please see <xref
    linkend="ref.release-notes"/>.
@@ -194,10 +194,9 @@ following checks:
    for simple projects has been presented by the end of Part II.
   </para>
   <para>
-   In <xref linkend="ref.part3"/>, we introduce advanced topics.  Part
-   III opens with complete reference guides to &abuild;'s command-line
-   options and all the files used by &abuild;.  By the end of Part
-   III, you will have been exposed to every feature of &abuild;.
+   In <xref linkend="ref.part3"/>, we introduce advanced topics.  By
+   the end of Part III, you will have been exposed to every feature of
+   &abuild;.
   </para>
   <para>
    <xref linkend="ref.part4"/> consists of a small handful of
@@ -462,6 +461,23 @@ following checks:
         "Abuild conforms to the principle of ...".  Use title case for
         the items below.
     -->
+    <indexterm>
+     <primary>build</primary>
+     <secondary>parallel</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>build</primary>
+     <secondary>distributed</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>parallel build</primary>
+    </indexterm>
+    <indexterm>
+     <primary>distributed build</primary>
+    </indexterm>
+    <indexterm>
+     <primary>backend</primary>
+    </indexterm>
     <variablelist>
      <varlistentry>
       <term>Build Integrity</term>
@@ -796,6 +812,12 @@ following checks:
    </sect1>
    <sect1 id="ref.windows-requirements">
     <title>Additional Requirements for Windows Environments</title>
+    <indexterm>
+     <primary>Windows</primary>
+    </indexterm>
+    <indexterm>
+     <primary>Cygwin</primary>
+    </indexterm>
     <para>
      To build &abuild; and use it in a Windows environment for
      <application>make</application>-based builds, certain pieces of
@@ -1334,7 +1356,7 @@ C:\cygwin\cygwin.bat
    <title>Build Items and Build Trees</title>
    <para>
     Now that we've had a chance to see &abuild; in action for a simple
-    case, it's time to go into a bit more detail about how things fit
+    case, it's time to go into more detail about how things fit
     together.  In <xref linkend="ref.basic-terminology"/>, we briefly
     defined the terms <firstterm>build item</firstterm> and
     <firstterm>build tree</firstterm>.  In this chapter, we will
@@ -1370,7 +1392,7 @@ C:\cygwin\cygwin.bat
      All build items that provide a service are required to have a
      name.  Build item names must be unique within their build tree
      and all other build trees accessible to their build tree since
-     the build item name is show &abuild; addresses a build item.
+     the build item name is how &abuild; addresses a build item.
      Build item names consist of period-separated segments.  Each
      segment may contain mixed case alphanumeric characters,
      underscores, and dashes.  Build item names are case-sensitive.
@@ -1393,6 +1415,24 @@ C:\cygwin\cygwin.bat
      later in the document, but we touch briefly upon a few of the
      common ones here.
     </para>
+    <indexterm>
+     <primary>Abuild.conf</primary>
+    </indexterm>
+    <indexterm>
+     <primary>Abuild.mk</primary>
+    </indexterm>
+    <indexterm>
+     <primary>Abuild-ant.properties</primary>
+    </indexterm>
+    <indexterm>
+     <primary>Abuild-ant.xml</primary>
+    </indexterm>
+    <indexterm>
+     <primary>build file</primary>
+    </indexterm>
+    <indexterm>
+     <primary>interface file</primary>
+    </indexterm>
     <variablelist>
      <varlistentry>
       <term><filename>Abuild.conf</filename></term>
@@ -1943,6 +1983,9 @@ C:\cygwin\cygwin.bat
       </listitem>
      </varlistentry>
     </variablelist>
+    <indexterm>
+     <primary>CCXX_TOOLCHAIN</primary>
+    </indexterm>
     <para>
      All of the fields of the platform identifier are made available
      in separate variables within the interface parsing system.  In
@@ -5471,6 +5514,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
   </chapter>
   <chapter id="ref.abuild-interface-system">
    <title>The &Abuild; Interface System</title>
+   <indexterm>
+    <primary>interface</primary>
+   </indexterm>
    <para>
     The &abuild; interface system is the mechanism through which
     &abuild; provides encapsulation.  Its purpose is to allow build
@@ -6128,7 +6174,7 @@ endif
     </variablelist>
    </sect1>
    <sect1 id="ref.abuild.interface-conditional-functions">
-    <title>Abuild Interface Conditional Functions</title>
+    <title>&Abuild; Interface Conditional Functions</title>
     <para>
      A single <filename>Abuild.interface</filename> conditional must
      appear in parentheses after an <function>if</function> or
@@ -6250,6 +6296,28 @@ endif
     </para>
     <sect2 id="ref.interface.all">
      <title>Interface Variables Available to All Items</title>
+     <!-- Should have an index term for each variable -->
+     <indexterm>
+      <primary>ABUILD_STDOUT_IS_TTY</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_THIS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_TARGET_TYPE</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM_TYPE</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_OUTPUT_DIR</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM</primary>
+     </indexterm>
      <para>
       The following interface variables are available to build items
       of all target types:
