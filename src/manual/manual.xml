@@ -5284,6 +5284,42 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      For details about configuration backing areas, see
      <xref linkend="ref.backing-areas"/>.
     </para>
+    <indexterm>
+     <primary>this</primary>
+    </indexterm>
+    <indexterm>
+     <primary>description</primary>
+    </indexterm>
+    <indexterm>
+     <primary>parent-dir</primary>
+    </indexterm>
+    <indexterm>
+     <primary>child-dirs</primary>
+    </indexterm>
+    <indexterm>
+     <primary>platform-types</primary>
+    </indexterm>
+    <indexterm>
+     <primary>deps</primary>
+    </indexterm>
+    <indexterm>
+     <primary>visible-to</primary>
+    </indexterm>
+    <indexterm>
+     <primary>external-dirs</primary>
+    </indexterm>
+    <indexterm>
+     <primary>supported-flags</primary>
+    </indexterm>
+    <indexterm>
+     <primary>supported-traits</primary>
+    </indexterm>
+    <indexterm>
+     <primary>traits</primary>
+    </indexterm>
+    <indexterm>
+     <primary>deleted</primary>
+    </indexterm>
     <para>
      The following keys are supported in
      <filename>Abuild.conf</filename>:
@@ -6398,6 +6434,42 @@ endif
     </sect2>
     <sect2 id="ref.interface.object-code">
      <title>Interface Variables for Object-Code Items</title>
+     <indexterm>
+      <primary>ABUILD_PLATFORM_OS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM_CPU</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM_TOOLSET</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM_COMPILER</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_PLATFORM_OPTION</primary>
+     </indexterm>
+     <indexterm>
+      <primary>INCLUDES</primary>
+     </indexterm>
+     <indexterm>
+      <primary>LIBS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>LIBDIRS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XCPPFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XCFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XCXXFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XLINKFLAGS</primary>
+     </indexterm>
      <para>
       The following interface variables are available for object-code
       build items:
@@ -6576,6 +6648,12 @@ endif
     </sect2>
     <sect2 id="ref.interface.java">
      <title>Interface Variables for Java Items</title>
+     <indexterm>
+      <primary>abuild.classpath</primary>
+     </indexterm>
+     <indexterm>
+      <primary>abuild.classpath.external</primary>
+     </indexterm>
      <para>
       The following variables are used by <type>java</type> build
       items:
@@ -6769,6 +6847,27 @@ endif
       we are linking against.  This can be a useful debugging tool for
       solving dependency declaration problems.
      </para>
+     <indexterm>
+      <primary>XCPPFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XCFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XCXXFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>XLINKFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>DFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>OFLAGS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>WFLAGS</primary>
+     </indexterm>
      <para>
       It is also possible to add additional preprocessor, compiler, or
       linker flags globally or on a per-file basis and to specifically
@@ -7257,6 +7356,51 @@ endif
      function for Java build items as <filename>Abuild.mk</filename>
      serves for platform-independent and C/C++ build items.
     </para>
+    <indexterm>
+     <primary>abuild.java-source-version</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.java-target-version</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.use-ant-runtime</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.jar-name</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.main-class</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.wrapper-name</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.ear-name</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.application-xml</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.war-name</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.war-type</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.web-xml</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.hook-build-items</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.local-buildfile</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.use-local-hooks</primary>
+    </indexterm>
+    <indexterm>
+     <primary>abuild.junit.testsuite</primary>
+    </indexterm>
     <para>
      Below is a list of supported properties.  You can also see this
      list by running <command>abuild properties-help</command> (or,
