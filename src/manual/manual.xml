@@ -691,6 +691,15 @@ following checks:
      </listitem>
      <listitem>
       <para>
+       A Java 5 or newer Java SDK is required if you are going to use
+       &abuild; to build Java code.  &Abuild; is known to pass its
+       test suite using GNU gcj 4.2.1 in addition to versions 1.5 or
+       newer of Sun's Java SDK, so it is possible to build and run
+       &abuild; in a pure open source environment.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
        <ulink url="http://ant.apache.org/"><application>Apache
        Ant</application></ulink> version 1.7.0 or newer with <ulink
        url="http://ant-contrib.sourceforge.net/"><application>ant-contrib</application></ulink>

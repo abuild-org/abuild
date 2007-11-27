@@ -5,4 +5,9 @@ import com.example.jar_example.JarExample;
 public class WarExample
 {
     private JarExample j = new JarExample();
+
+    JarExample getJarExample()
+    {
+	return j;
+    }
 }

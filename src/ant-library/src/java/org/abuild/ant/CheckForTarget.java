@@ -74,6 +74,7 @@ public class CheckForTarget extends Task
 		    newProject.setJavaVersionProperty();
 		    getProject().copyUserProperties(newProject);
 
+		    @SuppressWarnings("unchecked")
 		    Enumeration e = getProject().getProperties().keys();
 		    while (e.hasMoreElements())
 		    {
@@ -93,7 +94,7 @@ public class CheckForTarget extends Task
 			getProjectTargets(newProject);
 		    targets = new HashSet<String>(projectTargets.size());
 		    targets.addAll(projectTargets.keySet());
-		    this.targetsByFilename.put(
+		    targetsByFilename.put(
 			this.antFile.getAbsolutePath(), targets);
 		}
 
