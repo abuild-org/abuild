@@ -12612,6 +12612,12 @@ Y = $(X)
        </listitem>
        <listitem>
         <para>
+         Enhance handling of absolute externals so that an absolute
+         external directory may be a symbolic link.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
          Many additional improvements have been made to the
          documentation, thanks to input from reviewers mentioned in
          <xref linkend="ref.acknowledgments"/>.
