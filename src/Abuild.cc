@@ -1132,7 +1132,8 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 	    if (Util::isAbsolutePath(declared_path))
 	    {
 		QTC::TC("abuild", "Abuild absolute external");
-		external_data.setAbsolutePath(declared_path);
+		external_data.setAbsolutePath(
+		    Util::canonicalizePath(declared_path));
 	    }
 	    else
 	    {
