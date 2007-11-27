@@ -4444,14 +4444,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <!--  a backing area.                                           -->
    <title>Interface Flags</title>
    <para>
-    In this chapter, we will example interface flags.  Ordinarily,
+    In this chapter, we will examine interface flags.  Interface flags
+    provide a mechanism to make certain variable assignments
+    conditional upon the presence of a specified flag.  Ordinarily,
     when a an interface variable is set in an
     <filename>Abuild.interface</filename> file, that assignment is
     automatically visible to all build items that depend on the
-    assigning build item.  Interface flags provide a mechanism to make
-    certain variable assignments conditional upon the presence of a
-    specified flag.  In this chapter, we will explore the interface
-    system enough to see how to use it to implement private
+    assigning build item.  In this chapter, we will explore the
+    interface system enough to see how to use it to implement private
     interfaces.  For a complete understanding of &abuild;'s interface
     system, please see <xref linkend="ref.abuild-interface-system"/>.
     For a discussion of how it is implemented, please see <xref
