@@ -209,11 +209,19 @@
   </then>
  </if>
 
+ <condition property="ant.build.javac.target"
+            value="${abuild.java-target-version}">
+  <isset property="abuild.java-target-version"/>
+ </condition>
  <condition property="ant.build.javac.source"
             value="${abuild.java-source-version}">
   <isset property="abuild.java-source-version"/>
  </condition>
- <condition property="ant.build.javac.target"
+ <!--  If the source version wasn't specified but the target       -->
+ <!--  version was, explicitly use the target version as the       -->
+ <!--  source version.  This will have no effect if both were      -->
+ <!--  set.                                                        -->
+ <condition property="ant.build.javac.source"
             value="${abuild.java-target-version}">
   <isset property="abuild.java-target-version"/>
  </condition>
