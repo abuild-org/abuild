@@ -2164,6 +2164,22 @@ C:\cygwin\cygwin.bat
      linkend="ref.externals"/>.
     </para>
    </sect1>
+   <sect1 id="ref.build-ordering">
+    <title>Build Order</title>
+    <para>
+     &Abuild; makes no specific commitments about the order in which
+     items will be built except that no item is ever built before its
+     dependencies are built.  The exact order in which build items are
+     built, other than that dependencies are built before items that
+     depend on them, should be considered an implementation detail and
+     not relied upon.  When &abuild; is invoked in with multiple
+     threads (using the <option>--jobs</option> option, as discussed
+     in <xref linkend="ref.command-line"/>), it may build multiple
+     items in parallel.  Even in this mode, &abuild; will never start
+     building one build item until all of its dependencies have been
+     built successfully.
+    </para>
+   </sect1>
    <sect1 id="ref.build-item-name-scoping">
     <title>Build Item Name Scoping</title>
     <para>
@@ -2841,6 +2857,15 @@ C:\cygwin\cygwin.bat
       </listitem>
      </itemizedlist>
     </para>
+    <indexterm>
+     <primary>clean</primary>
+    </indexterm>
+    <indexterm>
+     <primary>no-op</primary>
+    </indexterm>
+    <indexterm>
+     <primary>special targets</primary>
+    </indexterm>
     <para>
      &Abuild; defines two <firstterm>special targets</firstterm>:
      <command>clean</command> and <command>no-op</command>.  These
@@ -2874,8 +2899,8 @@ C:\cygwin\cygwin.bat
      platforms and in what order.  We make heavy use of the
      <command>no-op</command> target in the examples at the end of
      this chapter so that we can illustrate certain aspects of build
-     ordering without being concerned about the actual output of the
-     builds.
+     ordering without being concerned about the actual compilation
+     steps.
     </para>
    </sect1>
    <sect1 id="ref.build-sets">
@@ -3265,9 +3290,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       --related-by-traits
       <replaceable>trait</replaceable>[,<replaceable>trait</replaceable>,...]</command>
       For example, if you wanted to run the <command>test</command>
-      target for all build items are declared as testers (using the
-      <property>tester</property> trait) of your build item or any of
-      its dependencies, you could run the command
+      target for all build items that are declared as testers (using
+      the <property>tester</property> trait) of your build item or any
+      of its dependencies, you could run the command
 
       <programlisting>abuild --build=current --related-by-traits=tester test
 </programlisting>
@@ -3495,7 +3520,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       target causes &abuild; to go through all the motions of building
       except for actually invoking the backend.  The
       <command>no-op</command> command is useful for seeing what build
-      items would be built and what platforms in a particular
+      items would be built on what platforms in a particular
       invocation of &abuild;.  It does all the same validation on
       <filename>Abuild.conf</filename> files as a regular build, but
       it doesn't look at <filename>Abuild.interface</filename> files
@@ -3870,7 +3895,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       dependencies are older than the last build time, even if they
       were newer than the files they replaced,
       <application>make</application> and
-      <application>ant</application> will not notice because the use
+      <application>ant</application> will not notice because they use
       modification time-based dependencies.  In other words, any
       operation that can replace one file with another file in such a
       way that the new file is not more recent than the last build
@@ -4108,18 +4133,23 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      changes were made to <classname>C</classname> in the local build
      tree, this would likely cause the build of
      <classname>A</classname> to be unreproducible at best and
-     completely unstable at worst.  The situation of
+     completely broken at worst.  The situation of
      <classname>B</classname> coming from a backing area and depending
      on <classname>C</classname>, which is shadowed locally, is what
      we mean when we say that <classname>B</classname> has shadowed
-     dependencies.  The way to resolve this would be to copy
-     <classname>B</classname> into <filename>T1</filename>.
+     dependencies.  If you attempt to build in this situation,
+     &abuild; will provide a detailed error message telling you which
+     build items are shadowed and which other build items depend on
+     them.  The way to resolve this would be to copy the shadowed
+     build items into your local build tree.  In this case, that would
+     mean copying <classname>B</classname> into
+     <filename>T1</filename>.
     </para>
    </sect1>
    <sect1 id="ref.backing-areas-vs-externals">
     <title>Comparison of Backing Areas and Externals</title>
     <para>
-     Although backing areas an externals serve completely different
+     Although backing areas and externals serve completely different
      purposes, there are a number of similarities between them.  For
      this reason, people often get confused initially about which one
      to use for a particular case.  Here is a list of use cases, each
@@ -4127,7 +4157,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      build tree to use.
      <variablelist>
       <varlistentry>
-       <term>Common Code Area</term>
+       <term>Common Code Area: External</term>
        <listitem>
         <para>
          If you had a collection of build items implementing common
@@ -4143,7 +4173,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Pre-built Read-only Reference Area</term>
+       <term>Pre-built Read-only Reference Area: Backing Area</term>
        <listitem>
         <para>
          Suppose you had a large software baseline consisting of
@@ -4162,7 +4192,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Third-Party Support Area</term>
+       <term>Third-Party Support Area: External</term>
        <listitem>
         <para>
          If you had a collection of build items that provided &abuild;
@@ -4177,7 +4207,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Task Branch Development Area</term>
+       <term>Task Branch Development Area: Backing Area</term>
        <listitem>
         <para>
          Suppose you wanted to make modifications to a project to
@@ -4227,8 +4257,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          A build item in a local tree is free to depend on a build
          item located in either an external or a backing area.  If a
          build item in an external tried to depend on a build item in
-         the local tree, &abuild; would report this a dependency on an
-         unknown build item because the build items in the external
+         the local tree, &abuild; would report this as a dependency on
+         an unknown build item because the build items in the external
          have no knowledge of the build items in the local tree.  If a
          build item in a backing area had a dependency on a build item
          that was shadowed in the local tree, &abuild; would report
