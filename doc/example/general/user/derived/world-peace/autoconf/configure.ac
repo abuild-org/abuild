@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
-AC_INIT(stub-library,1.0)
-AC_CONFIG_HEADERS([stub-library-config.h])
+AC_INIT(world-peace,1.0)
+AC_CONFIG_HEADERS([world-peace-config.h])
 AC_CONFIG_FILES([autoconf.interface])
 
 AC_PROG_CXX

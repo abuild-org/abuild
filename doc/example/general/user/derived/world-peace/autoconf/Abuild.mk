@@ -1,3 +1,3 @@
 AUTOFILES := autoconf.interface
-AUTOCONFIGH := stub-library-config.h
+AUTOCONFIGH := world-peace-config.h
 RULES := autoconf
