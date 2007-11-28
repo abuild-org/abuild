@@ -7655,10 +7655,10 @@ endif
     dynamic and evolving code will be best served by sticking with
     static libraries.  Sometimes, however, it may be desirable or
     necessary to create shared library object files.  &Abuild;
-    provides limited support for working with shared libraries on
-    UNIX-based systems and DLLs on Windows systems.  Note that there
-    are many ancillary concerns one must keep in mind when using
-    shared libraries such as binary interface compatibility.  We touch
+    provides support for creating shared libraries on UNIX-based
+    systems and DLLs on Windows systems.  Note that there are many
+    ancillary concerns one must keep in mind when using shared
+    libraries such as binary interface compatibility.  We touch
     lightly on these topics here, but a full discussion is out of
     scope for this document.
    </para>
@@ -7719,7 +7719,8 @@ endif
      shared library instead of a static library.  There is no way to
      create both a shared and a static version of the same library at
      the same time, but it is possible to create a shared library that
-     links against a static library, which achieves the same effect.
+     links against a static library, which can be used to achieve the
+     same effect.
     </para>
     <para>
      By default, when a shared library depends on a static library,
@@ -7734,9 +7735,9 @@ endif
      others don't.  Even in the best case, doing this is wasteful and
      potentially confusing.  In order to tell &abuild; to link a
      static library into a shared library, set the variable
-     <varname>LINK_SHLIBS</varname> to a non-empty value (usually
-     <literal>1</literal>) in your <filename>Abuild.mk</filename>.
-     This applies to all shared libraries built in a build item.
+     <varname>LINK_SHLIBS</varname> to <literal>1</literal> in your
+     <filename>Abuild.mk</filename>.  This applies to all shared
+     libraries built in a build item.
     </para>
     <para>
      &Abuild; allows you to mix executables, shared libraries, and
@@ -7754,7 +7755,7 @@ endif
      from being compiled as position-independent code, set the
      variable
      <varname>NOPIC_<replaceable>filename</replaceable></varname> to
-     some non-empty value where <replaceable>filename</replaceable> is
+     <literal>1</literal> where <replaceable>filename</replaceable> is
      the name of the source file.  For example, the code
      <literal>NOPIC_File.cc := 1</literal> in your
      <filename>Abuild.mk</filename> file would prevent
@@ -7776,6 +7777,43 @@ endif
      include run path information, doing so would potentially preclude
      the ability to swap out shared libraries at runtime, which is
      often the main reason for wanting to use them in the first place.
+     <footnote>
+      <para>
+       The way the runtime loader behaves when shared library location
+       information is compiled into an executable (as run path data)
+       varies from system to system.  In most systems, if the shared
+       library doesn't exist at the compiled-in location, the system
+       will fall back to its standard rules for locating shared
+       libraries.  In some systems, if the shared library does exist
+       in the compiled-in location, that copy of the shared library
+       will be used with no way to override it.  This may have
+       undesired implications.  For example, suppose you were to
+       create an executable that linked with a shared library and
+       included run path information to the development version of the
+       shared library.  If you installed that executable and shared
+       library in standard locations on a system without a copy of the
+       development environment, everything would work fine.  Then
+       suppose you put a development environment on that system and
+       built a newer version of the same shared library.  Your
+       installed executable would actually use the new development
+       copy of the library because it still has that path compiled
+       into it!  This is almost certainly not what would be intended.
+       &Abuild; avoids this issue entirely but not including support
+       for specifying run path data.
+      </para>
+      <para>
+       For another approach to using shared libraries, look at <ulink
+       url="http://www.gnu.org/software/libtool"><application>libtool</application></ulink>.
+       The <application>libtool</application> program gets around this
+       problem by creating wrappers around executables and shared
+       libraries in the development tree.  Although &abuild; is not
+       integrated with <application>libtool</application>, such an
+       integration would be possible.  The possibility of including
+       support for <application>libtool</application> is actually one
+       of the motivations behind allowing library object files and
+       non-library object files to have different extensions.
+      </para>
+     </footnote>
      Instead, you will need to make sure that, one way or another, the
      shared libraries you need are located in a directory that is in
      your shared library path.  On most UNIX systems, you can set the
