@@ -8701,91 +8701,231 @@ endif
    <!--  a backing area.                                           -->
    <title>Interface Flags</title>
    <para>
-    In this chapter, we will examine interface flags.  Interface flags
-    provide a mechanism to make certain variable assignments
-    conditional upon the presence of a specified flag.  Ordinarily,
-    when a an interface variable is set in an
-    <filename>Abuild.interface</filename> file, that assignment is
-    automatically visible to all build items that depend on the
-    assigning build item.  In this chapter, we will explore the
-    interface system enough to see how to use it to implement private
-    interfaces.  For a complete understanding of &abuild;'s interface
-    system, please see <xref linkend="ref.abuild-interface-system"/>.
-    For a discussion of how it is implemented, please see <xref
-    linkend="ref.interface-implementation"/>.
+    In this chapter, we will examine interface flags.  Both interface
+    flags and standard &abuild; interface conditionals allow us to
+    cause a particular interface variable assignment to be evaluated
+    only under a specific condition.  When such assignments are
+    implemented inside normal &abuild; interface conditional blocks,
+    all depending build items will see the results of such assignments
+    in the same way (as would be typical of any variable assignment
+    system).  With interface flags, it is possible to have different
+    build items see the effects of different assignments to certain
+    variables, a concept we describe in greater depth below.  This is
+    an unusual capability, but it is very useful for implementing
+    private interfaces.  In this chapter, we will explore interface
+    flags in enough detail to see how to use them to implement private
+    interfaces, which is their primary use.
    </para>
+   <sect1 id="ref.flags-overview">
+    <title>Interface Flags Conceptual Overview</title>
+    <para>
+     If there were a contest to select the most unusual feature of
+     &abuild;, interface flags would probably be the strongest
+     contender for the prize.  This section presents a conceptual
+     overview that should be good enough to enable you to make use of
+     interface flags to implement private interfaces.  We provide a
+     private interface example at the end of this chapter.  In order
+     to provide a conceptual overview of how interface flags work, we
+     will present a partial but accurate explanation of how they work,
+     and we will focus our attention on list variables only.  To
+     understand interface flags in full detail, see <xref
+     linkend="ref.interface-implementation"/>.
+    </para>
+    <para>
+     Every build item in &abuild;, whether it has an
+     <filename>Abuild.interface</filename> file or not, has an
+     &abuild; interface.  The &abuild; interface for a build item is
+     the union of all the interfaces of all its dependencies, taken in
+     dependency order, along with its own
+     <filename>Abuild.interface</filename>, if any.  To understand
+     what we mean by the &ldquo;union&rdquo; of &abuild; interfaces,
+     you have to know a little bit about how &abuild; stores
+     interfaces.
+    </para>
+    <para>
+     Recall that &abuild; interface files contain a series of variable
+     declarations and assignments, and that variables may be declared
+     in one file and assigned to in other files.  In particular, it is
+     standard operating procedure for numerous
+     <filename>Abuild.interface</filename> files to all assign to the
+     same list variables (<varname>INCLUDES</varname>,
+     <varname>LIBDIRS</varname>, <varname>LIBS</varname>,
+     <varname>abuild.classpath</varname>, etc.).  As &abuild; reads
+     interface files and encounters multiple assignments to the same
+     list variable, it doesn't actually update some internal notion of
+     that variable's value as you might suspect.  Rather than storing
+     the values of variables in a build item's interface, &abuild;
+     actually retains a list of all the assignments to a given
+     variable throughout all the relevant
+     <filename>Abuild.interface</filename> files.  This enables
+     &abuild; to compute the values of variables when they are needed.
+     When we say that an &abuild; interface is the union of the
+     interfaces of its dependencies, what we really mean is that the
+     value of each interface variable comes from the union of all
+     assignments to those variables across all the dependencies'
+     interface files.
+    </para>
+    <para>
+     There are two different times when &abuild; computes the value of
+     an interface variable.  The first is when that variable is
+     expanded in an <filename>Abuild.interface</filename> file using
+     the <varname>$(VARIABLE)</varname> syntax.  The second is when
+     &abuild; generates the dynamic output file as introduced in <xref
+     linkend="ref.abuild-interface-functionality-overview"/>.  In each
+     case, &abuild; computes the value of a variable by looking at all
+     the assignments it knows about at that time and combining them
+     together based on whether the list variable is an
+     <type>append</type> list or a <type>prepend</type> list.  Either
+     way, since &abuild; has a history of all assignments to the
+     variable, it has everything it needs to compute the value of the
+     variable.
+    </para>
+    <para>
+     Now this is where flags come in.  As we saw in <xref
+     linkend="ref.abuild.interface-syntactic-details"/>, it is
+     possible to associate a given variable assignment with an
+     interface flag.  When a variable assignment is associated with an
+     interface flag, &abuild; simply stores this fact in the list of
+     assignments to the variable.  When it is time to compute a value
+     for the variable, &abuild; filters out all assignments that are
+     associated with a flag that isn't set.  Consider the following
+     example.  Suppose the variable <varname>VAR1</varname> is
+     declared as an <type>append</type> list of <type>string</type>s,
+     and that you have the following assignments to
+     <varname>VAR1</varname>:
+
+     <programlisting>VAR1 = one
+flag flag1 VAR1 = two
+VAR1 = three
+</programlisting>
+     If you evaluate this sequence of assignments with the
+     <property>flag1</property> flag set, the value of
+     <varname>VAR1</varname> would be <literal>one two
+     three</literal>.  If you evaluate this list of assignments
+     without the <property>flag1</property> flag set, the value of
+     <varname>VAR1</varname> would just be <literal>one
+     three</literal>.
+    </para>
+    <para>
+     Here is a subtle but important point.  You don't really have to
+     understand it to make use of private interfaces, but if you can
+     understand it, you will be well on your way to grasping how
+     interface flags really work.  This handling of interface flags
+     means that the value of a variable is based on the collection of
+     flags that are set <emphasis>when its value is
+     computed</emphasis>.  As we already noted, there are two
+     instances in which &abuild; computes the values of variables:
+     when it encounters a variable expansion while reading
+     <filename>Abuild.interface</filename> files, and when it creates
+     dynamic output files.  Interface flags are only set when creating
+     dynamic output files.  At the time that
+     <filename>Abuild.interfaces</filename> are being read, flags
+     haven't been set yet.  If this worked any other way, it would not
+     be possible for multiple build items to see different values for
+     certain variables, and that is the whole reason for being of
+     interface flags.  We defer further discussion of this point to
+     <xref linkend="ref.interface-implementation"/>.
+    </para>
+    <para>
+    </para>
+   </sect1>
    <sect1 id="ref.using-flags">
     <title>Using Interface Flags</title>
     <para>
-     There are three parts to interface flags.  The first part is that
-     a build item declares what flags it supports by listing them in
-     the <property>supported-flags</property> key of its
-     <filename>Abuild.conf</filename>.  The second part is that a
-     build item specifies which flags it wants set for its direct
-     dependencies, if any, by specifying them in the
-     <property>deps</property> key of its
-     <filename>Abuild.conf</filename> file.  The third part is that a
-     build item may associate a variable assignment (and only a
-     variable assignment) in its <filename>Abuild.interface</filename>
-     file with a particular flag.
+     In order to associate a particular variable assignment with a
+     flag, the assignment in an <filename>Abuild.interface</filename>
+     file must be prefixed with <literal>flag
+     <replaceable>flagname</replaceable></literal>, as we have seen
+     above.  Before <property>flagname</property> can be associated
+     with an assignment, it must be declared as one of the build
+     item's <firstterm>supported flags</firstterm>.  This is achieved
+     by including the flag in the <property>supported-flags</property>
+     keyword in <filename>Abuild.conf</filename>.  For example:
+
+     <programlisting>supported-flags: flagname
+</programlisting>
     </para>
     <para>
-     When one build item indicates that it should depend on other
-     build item with a particular flag set, &abuild; checks to make
-     sure that the dependent build item supports that flag, reporting
-     an error if it does not.  Abuild also allows a build item to
-     associate an interface variable assignment with a flag only if
-     that flag is one of that build item's supported flags.
+     As we have already seen, the effect of an assignment that is
+     associated with a flag is visible only if the value of the
+     variable is requested when the specified flag is set.  The only
+     time this ever happens is when &abuild; is creating the dynamic
+     output file for a build item.  We mentioned above that &abuild;
+     maintains a list of assignments for each variable and retains a
+     record of any flag that may have been associated with each
+     assignment.  &Abuild; also stores the name of the build item that
+     is responsible for each assignment in a variable's assignment
+     history.  When one build item depends on another, it may request
+     the evaluation of any assignments made by the dependent build
+     item that were associated with a specific flag.  This is done by
+     including the
+     <option>-flag=<replaceable>flagname</replaceable></option> option
+     when declaring the dependency in the
+     <filename>Abuild.conf</filename> file.  For example, if build
+     item <classname>A</classname> wanted to see all assignments that
+     <classname>B</classname> made associated with the
+     <property>private</property> flag, then <classname>A</classname>'s
+     <filename>Abuild.conf</filename> would contain the following
+     line:
+
+     <programlisting>deps: B -flag=private
+</programlisting>
+     When a flag is specified as part of a dependency in this fashion,
+     &abuild; requires that the dependent build item list the given
+     flag as one of its supported flags.  For example, in this case,
+     it would be an error if <classname>B</classname>'s
+     <filename>Abuild.conf</filename> did not list
+     <property>private</property> in its
+     <property>supported-flags</property> key.
     </para>
     <para>
-     When an <filename>Abuild.interface</filename> file is read by
-     another build item, assignments associated with a particular flag
-     are processed only if the depending build item has explicitly
-     requested the flag through a
-     <option>-flag=<replaceable>interface-flag</replaceable></option>
-     option to a dependency in the <property>deps</property> key of
-     its <filename>Abuild.conf</filename> file.  Flag-based
-     assignments are not evaluated until interface data is passed to
-     the backends.  This means that flag-based assignments are not
-     inherited through dependencies.  As such, the effects of these
-     variable assignments are not visible in other
-     <filename>Abuild.interface</filename> files.
-     <footnote>
-      <para>
-       If you're getting the feeling that we're covering something up,
-       you're right.  If your goal is to just understand how to use
-       private interfaces, read on.  If you're getting confused about
-       why it works this way and how it could possibly work, you may
-       want to bite the bullet and read <xref
-       linkend="ref.interface-implementation"/>.  All is revealed
-       there.
-      </para>
-     </footnote>
-     Also, a build item always implicitly has all its own flags set
-     when its own interfaces are exported to itself.  For example, in
-     <xref linkend="fig.private-flag"/>, <classname>B</classname> has
-     an <filename>include</filename> directory and a
+     As mentioned above, the effect of any flag-based assignment is
+     visible only when actually exporting a build item's interface to
+     the dynamic output.  When &abuild; exports a build item's own
+     interface for its own use, it does so with all of the flags
+     supported by that build item in effect.  For example, in <xref
+     linkend="fig.private-flag"/>, <classname>B</classname> has an
+     <filename>include</filename> directory and a
      <filename>private-include</filename> directory.  It wants the
      <filename>include</filename> directory to be visible to all build
      items that depend on it, but the
      <filename>private-include</filename> directory should be visible
      only to other build items that specifically ask for it.
-     <classname>B</classname> could indicate that it supports the
-     <property>private</property> flag and could add the
-     <filename>private-include</filename> directory to
-     <varname>INCLUDES</varname> conditionally upon that flag.  If
-     <classname>A</classname> wanted to see the
+     <classname>B</classname> would indicate that it supports the
+     <property>private</property> flag by adding this line to its
+     <filename>Abuild.conf</filename>:
+
+     <programlisting>supported-flags: private
+</programlisting>
+     If it wanted the header files in <filename>include</filename>
+     directory to be visible to all items that depend on it, but it
+     wanted the header files in the
+     <filename>private-include</filename> directory to be visible only
+     to those build items that specifically requested by depending on
+     it with the <property>private</property> flag, it would include
+     the following lines in its <filename>Abuild.interface</filename>
+     file:
+
+     <programlisting>INCLUDES = include
+flag private INCLUDES = private-include
+</programlisting>
+     If <classname>A</classname> wanted to see the
      <filename>private-include</filename> directory, it could indicate
      that it wants the <property>private</property> flag set when it
      reads <classname>B</classname>'s
-     <filename>Abuild.interface</filename>.  Then, when
-     <classname>A</classname> reads <classname>B</classname>'s
-     <filename>Abuild.interface</filename> file, it will see the
-     <filename>private-include</filename> assignment.
-     <classname>B</classname> will also see it because build items
-     always see all of their own flag-based assignments.  If a third
-     build item <classname>X</classname> depended on
-     <classname>A</classname>, it would not see
+     <filename>Abuild.interface</filename>.  It would do this by
+     including the following in its <filename>Abuild.conf</filename>:
+
+     <programlisting>deps: B -flag=private
+</programlisting>
+     Then, when <classname>A</classname> reads
+     <classname>B</classname>'s <filename>Abuild.interface</filename>
+     file, it will see the <filename>private-include</filename>
+     assignment.  <classname>B</classname> will also see it because
+     build items always see all of their own flag-based assignments.
+     If a third build item <classname>X</classname> depended on
+     <classname>A</classname> without specifying the
+     <property>private</property> flag, it would not see
      <classname>B</classname>'s <filename>private-include</filename>
      directory as that assignment would not be inherited through
      <classname>A</classname>'s interface.
