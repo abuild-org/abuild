@@ -7214,12 +7214,59 @@ endif
      <!--  ant/properties-help.txt                                  -->
      <variablelist>
       <varlistentry>
+       <term>abuild.application-xml</term>
+       <listitem>
+        <para>
+         The name of the <filename>application.xml</filename> to put
+         into an EAR file.  This must be set (along with
+         <varname>abuild.ear-name</varname>) for an EAR file to be
+         generated.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>abuild.ear-name</term>
+       <listitem>
+        <para>
+         The name of the EAR file, including the
+         <filename>.ear</filename> suffix, to be generated.  This must
+         be set for an EAR file to be generated.  EAR files contain
+         any archive files in the <varname>abuild.classpath</varname>
+         property.  They do not contain JAR files in the
+         <varname>abuild.classpath.external</varname> property.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>abuild.hook-build-items</term>
+       <listitem>
+        <para>
+         A comma-separated list of build items from which hooks should
+         be loaded.  For details about using hooks, see <xref
+         linkend="ref.java-hooks-and-generators"/>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>abuild.jar-name</term>
+       <listitem>
+        <para>
+         The name of the JAR file, including the
+         <filename>.jar</filename> or other archive suffix, to be
+         created by this build item.  This must be set in order for a
+         JAR file to be generated.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term>abuild.java-source-version</term>
        <listitem>
         <para>
          If specified, the value of this property will be used for the
-         source attribute of the javac tasks.  Otherwise,
-         the value will come from the Java environment used to run ant.
+         <varname>source</varname> attribute of the
+         <command>javac</command> task.  Otherwise, the value will
+         come from the <varname>abuild.java-target-version</varname>
+         if set or from the Java environment used to run ant if not.
         </para>
        </listitem>
       </varlistentry>
@@ -7228,7 +7275,56 @@ endif
        <listitem>
         <para>
          If specified, the value of this property will be used for the
-         target attribute of the javac task.
+         <varname>target</varname> attribute of the
+         <command>javac</command> task.  If
+         <varname>abuild.java-source-version</varname> is not set and
+         this property is, then this property's value will also be
+         used to set the <varname>source</varname> attribute of the
+         <command>javac</command> task.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>abuild.junit.testsuite</term>
+       <listitem>
+        <para>
+         This property contains the name of the class that implements
+         this build item's junit test suite.  It must be set in order
+         for the <varname>test</varname> target to attempt to run a
+         junit test suite.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>abuild.local-buildfile</term>
+       <listitem>
+        <para>
+         The name of a local build file, specified relative to the
+         build item's directory, that will be imported by
+         <application>ant</application>.  It may contain additional
+         properties that can't be specified in a property file,
+         resource collections, or even additional targets.  If you are
+         using this too often, please consider whether a build item
+         hooks file should be used instead, or whether there is some
+         functionality that is missing from the core &abuild; ant
+         framework code.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>abuild.main-class</term>
+       <listitem>
+        <para>
+         The name of a class, if any, that implements main.  Used when
+         <varname>abuild.wrapper-name</varname> is set.
+         <footnote>
+          <para>
+           Ideally setting <property>abuild.main-class</property>
+           would also cause the manifest file to contain a
+           <property>Main-Class</property> attribute, but this is not
+           presently done in the ant code.
+          </para>
+         </footnote>
         </para>
        </listitem>
       </varlistentry>
@@ -7243,70 +7339,12 @@ endif
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>abuild.jar-name</term>
+       <term>abuild.use-local-hooks</term>
        <listitem>
         <para>
-         The name of the JAR file, including the
-         <filename>.jar</filename> or other archive suffix, to be
-         created by this build item.  This must be set in order for
-         compilation or packaging to take place.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.main-class</term>
-       <listitem>
-        <para>
-         The name of a class, if any, that implements main.  Used when
-         abuild.wrapper-name is set.
-         <footnote>
-          <para>
-           Ideally setting <property>abuild.main-class</property>
-           would also cause the manifest file to contain a
-           <property>Main-Class</property> attribute, but this is not
-           presently done in the ant code.
-          </para>
-         </footnote>
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.wrapper-name</term>
-       <listitem>
-        <para>
-         If this property and <varname>abuild.main-class</varname> are
-         both set, a script by this name will be generated that will
-         invoke the Java runtime environment using this JAR file to
-         invoke this main.  The script will include the classpath as
-         determined by &abuild;.  On Windows, a stand-alone batch file
-         (that does not reference the script) is generated as well,
-         but the script is usable to invoke the application from a
-         Cygwin environment.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.ear-name</term>
-       <listitem>
-        <para>
-         The name of the EAR file, including the
-         <filename>.ear</filename> suffix, to be generated.  This must
-         be set for an EAR file to be generated.  EAR files contain any
-         archive files in the <varname>abuild.classpath</varname>
-         property and any locally generated JAR files.  They do not
-         contain JAR files in the
-         <varname>abuild.classpath.external</varname> property.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.application-xml</term>
-       <listitem>
-        <para>
-         The name of the <filename>application.xml</filename> to put
-         into an EAR file.  This must be set (along with
-         <varname>abuild.ear-name</varname>) for an EAR file to be
-         generated.
+         If this and <varname>abuild.local-buildfile</varname> are both
+         set, &abuild; will attempt to run hooks from the local build file
+         as well as from any hook build items.
         </para>
        </listitem>
       </varlistentry>
@@ -7351,50 +7389,17 @@ endif
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>abuild.hook-build-items</term>
+       <term>abuild.wrapper-name</term>
        <listitem>
         <para>
-         A comma-separated list of build items from which hooks should
-         be loaded.  For details about using hooks, please run
-         <command>abuild hooks-help</command> and see <xref
-         linkend="ref.java-hooks-and-generators"/>.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.local-buildfile</term>
-       <listitem>
-        <para>
-         The name of a local build file, specified relative to the
-         build item's directory, that will be imported by
-         <application>ant</application>.  It may contain additional
-         properties that can't be specified in a property file,
-         resource collections, or even additional targets.  If you are
-         using this too often, please consider whether a build item
-         hooks file should be used instead, or whether there is some
-         functionality that is missing from the core &abuild; ant
-         framework code.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.use-local-hooks</term>
-       <listitem>
-        <para>
-         If this and <varname>abuild.local-buildfile</varname> are both
-         set, &abuild; will attempt to run hooks from the local build file
-         as well as from any hook build items.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>abuild.junit.testsuite</term>
-       <listitem>
-        <para>
-         This property contains the name of the class that implements
-         this build item's junit test suite.  It must be set in order
-         for the <varname>test</varname> target to attempt to run a
-         junit test suite.
+         If this property and <varname>abuild.main-class</varname> are
+         both set, a script by this name will be generated that will
+         invoke the Java runtime environment to invoke this main.  The
+         script will include the classpath as determined by &abuild;.
+         On Windows, the script is usable to invoke the application
+         from a Cygwin environment, and a stand-alone batch file (that
+         does not reference the script or require Cygwin) is generated
+         as well.
         </para>
        </listitem>
       </varlistentry>
@@ -7607,7 +7612,7 @@ endif
      will invoke ant from the <filename>abuild-java</filename>
      directory as if the file were copied to a
      <filename>build.xml</filename> in that directory.  (&Abuild; runs
-     the equivalent of <command>ant -f ../abuild-ant.xml
+     the equivalent of <command>ant -f ../Abuild-ant.xml
      -Dbasedir=.</command> from <filename>abuild-java</filename> when
      it sees <filename>Abuild-ant.xml</filename>.)  This means that
      relative paths in <filename>Abuild-ant.xml</filename> are
@@ -7615,18 +7620,17 @@ endif
      reasons that this file is not called
      <filename>build.xml</filename> as that would imply that you could
      just run ant, which, in general, will not work.  In order to work
-     properly with &abuild;, this file should define a target called
+     properly with &abuild;, this file must define a target called
      <command>all</command> that builds everything needed in order to
-     build items that depend on it.  Ideally, it should also define
-     other targets that &abuild; expects to be defined so that build
-     that run those targets over a build set that includes this item
-     will not fail.  Even though there aren't actually any
-     restrictions on what version of ant you could use for this
-     alternative Java support, &abuild; still requires it to be 1.7 or
-     newer.  This way, you won't run into the situation of having an
-     old version of ant and suddenly needing to upgrade because of the
-     addition of a build item that uses &abuild;'s included ant
-     framework.
+     build items that depend on it.  This file should also define the
+     other standard targets supported by &abuild; (see <xref
+     linkend="ref.targets.general"/>).  Even though there aren't
+     actually any restrictions on what version of ant you could use
+     for this alternative Java support, &abuild; still requires it to
+     be 1.7 or newer.  This way, you won't run into the situation of
+     having an old version of ant and suddenly needing to upgrade
+     because of the addition of a build item that uses &abuild;'s
+     included ant framework.
     </para>
     <para>
      Note that &abuild; still creates the
