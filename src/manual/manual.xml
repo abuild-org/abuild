@@ -5040,7 +5040,156 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
   <chapter id="ref.additional-capabilities">
    <title>Survey of Additional Capabilities</title>
    <para>
-    XXX briefly mention topics to be covered in part 3
+    By now, you should have a pretty good feel for what &abuild; can
+    do and how to use it in several situations.  The remaining
+    chapters of this document cover advanced topics and present
+    examples for solving a wide variety of problems.  Although later
+    chapters sometimes build on information presented in earlier
+    chapters, many of the remaining chapters and examples can probably
+    be understood on their own.  It should therefore be safe to focus
+    your attention on the material that is of interest or potential
+    use to you.
+   </para>
+   <para>
+    <xref linkend="ref.part3"/> opens with detailed descriptions of
+    &abuild;'s configuration files and interface subsystem.  It then
+    continues with explorations of several specific problems.  We
+    present here a brief list of problems that are addressed in the
+    remaining chapters:
+    <variablelist>
+     <varlistentry>
+      <term>Shared Libraries</term>
+      <listitem>
+       <para>
+        &Abuild; includes support for creating shared libraries on
+        UNIX platforms and DLLs on Windows platforms.  In <xref
+        linkend="ref.shared-libraries"/>, we describe the process and
+        explore some of the other concerns you have to consider when
+        using shared libraries with &abuild;.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Code Generators</term>
+      <listitem>
+       <para>
+        There are two chapters that explore how to use code generators
+        with &abuild;.  In <xref linkend="ref.code-generators"/>, we
+        discuss code generators for make-based builds.  In <xref
+        linkend="ref.java-hooks-and-generators"/>, we discuss them for
+        ant-based builds.  Although the concepts are similar, there
+        are some differences depending on which backend you are using.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Private Interfaces</term>
+      <listitem>
+       <para>
+        In general, &abuild; is designed such that all build item
+        interfaces automatically inherit through the dependency
+        chain.  There are some cases when it may be desirable for a
+        build item to have an expanded interface that is available to
+        certain build items upon request.  In <xref
+        linkend="ref.interface-flags"/>, we introduce a feature of
+        &abuild; designed to solve this problem and present an example
+        of using it to implement private interfaces.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Cross-Platform Development</term>
+      <listitem>
+       <para>
+        &Abuild;'s platform system is designed to make building on
+        multiple platforms as easy as possible.  If a build item can
+        be built on multiple platforms, &abuild; will generally sort
+        out all the details of which build of one item another item
+        should depend on.  There are times, however, when it is
+        necessary to take control over this behavior.  We discuss this
+        problem in <xref linkend="ref.cross-platform-support"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Mixed Classification Development</term>
+      <listitem>
+       <para>
+        We all know that security is increasingly important in the
+        software community.  In some cases, it may be necessary to
+        create collections of software that are only allowed to run or
+        even exist in secure environments.  In <xref
+        linkend="ref.build-item-visibility"/>, we describe how to use
+        &abuild;'s build item visibility feature along with externals
+        to create a mixed classification development environment, and
+        we present an example that illustrates one implementation
+        strategy.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Java Archives</term>
+      <listitem>
+       <para>
+        Although &abuild;'s Java support is not as mature as its C and
+        C++ support, &abuild; does include limited support for
+        creation of web archives (WAR files) and enterprise archives
+        (EAR files) for use in Java Enterprise environments.  We
+        explore how to create different types of Java archives in
+        <xref linkend="ref.java-archive-types"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Whole Library Support</term>
+      <listitem>
+       <para>
+        Ordinarily, when an application links with a library, only
+        functions that are actually called are linked into the
+        executable.  On platforms that support this, &abuild; allows
+        you to specify that the entire contents of a library archive
+        should be included in an executable.  In <xref
+        linkend="ref.whole-library"/>, we describe why you might want
+        to do this and how to do it.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Opaque Wrappers</term>
+      <listitem>
+       <para>
+        Some development problems require one interface to be created
+        that opaquely hides another interface.  Since &abuild;'s
+        default behavior is to make all interfaces inherit through the
+        dependency chain, special constructs are required to implement
+        opaque wrappers.  In <xref linkend="ref.opaque-wrapper"/>, we
+        present the mechanisms required to make this work.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Plugins</term>
+      <listitem>
+       <para>
+        There are certain tasks that go beyond simply building targets
+        and making them available.  Examples include adding support
+        for new compilers and performing extra validations that go
+        beyond what can be easily expressed using &abuild;'s built-in
+        mechanisms.  In <xref linkend="ref.plugins"/>, we present a
+        plugin framework that can be used to extend &abuild; in
+        certain ways.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </para>
+   <para>
+    In addition to the above topics, we explore some details of how
+    &abuild; works behind the scenes and present guidelines for how to
+    use &abuild; in the safest and most effective way.  The table of
+    contents at the beginning of <xref linkend="ref.part3"/> includes
+    a complete list of chapters, and each chapter starts with some
+    introductory text that describes the material it covers.
    </para>
   </chapter>
  </part>
