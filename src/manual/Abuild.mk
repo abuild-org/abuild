@@ -10,6 +10,5 @@ DUMMY := $(shell perl $(SRCDIR)/gen-example-list.pl)
 
 FIGURE_SRCS := $(wildcard $(SRCDIR)/figures/*.dia)
 FIGURES := $(foreach F,$(FIGURE_SRCS),$(patsubst %.dia,%.png,$(notdir $(F))))
-EXTRA_DEPS := example-list $(SRCDIR)/../abuild_data.dtd $(FIGURES)
-EXTRA_FILES := stylesheet.css
+EXTRA_DEPS := example-list $(SRCDIR)/../abuild_data.dtd $(FIGURES) stylesheet.css
 LOCAL_RULES := docbook.mk figures.mk extrafiles.mk

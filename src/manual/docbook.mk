@@ -9,7 +9,7 @@ ifneq ($(words $(_UNDEFINED)),0)
 $(error The following variables are undefined: $(_UNDEFINED); see README)
 endif
 
-all:: html pdf $(EXTRA_FILES)
+all:: html pdf
 
 .PHONY: html
 html: html.stamp
