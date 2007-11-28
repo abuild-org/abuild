@@ -3136,9 +3136,9 @@
     </buildable-platforms>
    </build-item>
    <build-item
-    name="stub-library.autoconf"
+    name="world-peace.autoconf"
     home-tree="bt-8"
-    absolute-path="--topdir--/general/user/derived/stub-library/autoconf"
+    absolute-path="--topdir--/general/user/derived/world-peace/autoconf"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3155,9 +3155,9 @@
     </buildable-platforms>
    </build-item>
    <build-item
-    name="stub-library.implementation"
+    name="world-peace.stub"
     home-tree="bt-8"
-    absolute-path="--topdir--/general/user/derived/stub-library/implementation"
+    absolute-path="--topdir--/general/user/derived/world-peace/stub"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3165,10 +3165,10 @@
     is-plugin-anywhere="0"
    >
     <declared-dependencies>
-     <dependency name="stub-library.autoconf"/>
+     <dependency name="world-peace.autoconf"/>
     </declared-dependencies>
     <expanded-dependencies>
-     <dependency name="stub-library.autoconf"/>
+     <dependency name="world-peace.autoconf"/>
     </expanded-dependencies>
     <platform-types>
      <platform-type name="native"/>
@@ -3180,9 +3180,9 @@
     </buildable-platforms>
    </build-item>
    <build-item
-    name="stub-library"
+    name="world-peace"
     home-tree="bt-8"
-    absolute-path="--topdir--/general/user/derived/stub-library"
+    absolute-path="--topdir--/general/user/derived/world-peace"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -3190,11 +3190,11 @@
     is-plugin-anywhere="0"
    >
     <declared-dependencies>
-     <dependency name="stub-library.implementation"/>
+     <dependency name="world-peace.stub"/>
     </declared-dependencies>
     <expanded-dependencies>
-     <dependency name="stub-library.autoconf"/>
-     <dependency name="stub-library.implementation"/>
+     <dependency name="world-peace.autoconf"/>
+     <dependency name="world-peace.stub"/>
     </expanded-dependencies>
     <platform-types>
      <platform-type name="native"/>
@@ -3219,7 +3219,7 @@
      <dependency name="common-lib2"/>
      <dependency name="project-lib"/>
      <dependency name="derived-code-generator"/>
-     <dependency name="stub-library"/>
+     <dependency name="world-peace"/>
     </declared-dependencies>
     <expanded-dependencies>
      <dependency name="common-lib3.src"/>
@@ -3231,9 +3231,9 @@
      <dependency name="project-lib.src"/>
      <dependency name="project-lib"/>
      <dependency name="derived-code-generator"/>
-     <dependency name="stub-library.autoconf"/>
-     <dependency name="stub-library.implementation"/>
-     <dependency name="stub-library"/>
+     <dependency name="world-peace.autoconf"/>
+     <dependency name="world-peace.stub"/>
+     <dependency name="world-peace"/>
     </expanded-dependencies>
     <platform-types>
      <platform-type name="native"/>
@@ -3273,9 +3273,9 @@
      <dependency name="project-lib.src"/>
      <dependency name="project-lib"/>
      <dependency name="derived-code-generator"/>
-     <dependency name="stub-library.autoconf"/>
-     <dependency name="stub-library.implementation"/>
-     <dependency name="stub-library"/>
+     <dependency name="world-peace.autoconf"/>
+     <dependency name="world-peace.stub"/>
+     <dependency name="world-peace"/>
      <dependency name="derived-main.src"/>
     </expanded-dependencies>
     <platform-types>

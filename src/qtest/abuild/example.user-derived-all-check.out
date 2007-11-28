@@ -35,15 +35,15 @@ Compiling ../ProjectLib.cpp as C++
 Compiling ../private/ProjectLib_private.cpp as C++
 Creating project-lib library
 make: Leaving directory `--topdir--/general/user/project/lib/src/abuild-<native>'
-abuild: stub-library.autoconf (abuild-<native>): check
-make: Entering directory `--topdir--/general/user/derived/stub-library/autoconf/abuild-<native>'
+abuild: world-peace.autoconf (abuild-<native>): check
+make: Entering directory `--topdir--/general/user/derived/world-peace/autoconf/abuild-<native>'
 [autoconf output suppressed]
-make: Leaving directory `--topdir--/general/user/derived/stub-library/autoconf/abuild-<native>'
-abuild: stub-library.implementation (abuild-<native>): check
-make: Entering directory `--topdir--/general/user/derived/stub-library/implementation/abuild-<native>'
+make: Leaving directory `--topdir--/general/user/derived/world-peace/autoconf/abuild-<native>'
+abuild: world-peace.stub (abuild-<native>): check
+make: Entering directory `--topdir--/general/user/derived/world-peace/stub/abuild-<native>'
 Compiling ../stub.cc as C++
-Creating stub-library library
-make: Leaving directory `--topdir--/general/user/derived/stub-library/implementation/abuild-<native>'
+Creating world-peace-stub library
+make: Leaving directory `--topdir--/general/user/derived/world-peace/stub/abuild-<native>'
 abuild: derived-main.src (abuild-<native>): check
 make: Entering directory `--topdir--/general/user/derived/main/src/abuild-<native>'
 Generating auto.h and auto.c

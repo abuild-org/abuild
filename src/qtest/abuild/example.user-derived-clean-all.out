@@ -3,5 +3,5 @@ abuild: cleaning common-lib1.test in ../common/lib1/test
 abuild: cleaning derived-main.src in main/src
 abuild: cleaning project-lib.src in ../project/lib/src
 abuild: cleaning project-lib.test in ../project/lib/test
-abuild: cleaning stub-library.autoconf in stub-library/autoconf
-abuild: cleaning stub-library.implementation in stub-library/implementation
+abuild: cleaning world-peace.autoconf in world-peace/autoconf
+abuild: cleaning world-peace.stub in world-peace/stub
