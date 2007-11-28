@@ -235,7 +235,7 @@ if ($build_doc)
     my @html = map { basename $_ } (<src/manual/abuild-indep/html/*>);
     foreach my $p (@html)
     {
-	safe_copy("src/manual/abuild-indep/$p", "doc/html/$p");
+	safe_copy("src/manual/abuild-indep/html/$p", "doc/html/$p");
     }
     if ($make_doc_dist)
     {
