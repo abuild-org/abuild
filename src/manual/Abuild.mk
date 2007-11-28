@@ -1,4 +1,5 @@
 MAIN_DOC := manual
+MAIN_DOC_OUTPUT_PREFIX := abuild-
 
 # Generate example-list as a side effect of initializing DUMMY.  This
 # forces it to be run serially.  This script only updates example-list

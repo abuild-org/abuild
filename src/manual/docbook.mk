@@ -9,20 +9,31 @@ ifneq ($(words $(_UNDEFINED)),0)
 $(error The following variables are undefined: $(_UNDEFINED); see README)
 endif
 
-all:: $(MAIN_DOC).html $(MAIN_DOC).pdf $(EXTRA_FILES)
+all:: html pdf $(EXTRA_FILES)
+
+.PHONY: html
+html: html.stamp
+
+html.stamp: $(MAIN_DOC)-processed.xml html.xsl chunk.xsl
+	@$(PRINT) Generating HTML documents from $<
+	$(RM) -r html
+	mkdir html
+	cp -p *.png *.css html
+	(cd html; xsltproc --output $(MAIN_DOC_OUTPUT_PREFIX)$(MAIN_DOC).html \
+		../html.xsl ../$<)
+	(cd html; xsltproc ../chunk.xsl ../$<)
+	touch html.stamp
+
+pdf: $(MAIN_DOC_OUTPUT_PREFIX)$(MAIN_DOC).pdf
 
 validate: $(MAIN_DOC).xml
 	@$(PRINT) Validating $<
 	xmllint --noout --dtdvalid $(DOCBOOK_DTD) ../$(MAIN_DOC).xml
 	touch validate
 
-%.pdf: %.fo
+$(MAIN_DOC_OUTPUT_PREFIX)%.pdf: %.fo
 	@$(PRINT) Generating $@ from $<
 	$(FOP) $< -pdf $@
-
-%.html: %-processed.xml html.xsl
-	@$(PRINT) Generating $@ from $<
-	xsltproc --output $@ html.xsl $<
 
 .PRECIOUS: %.fo
 %.fo: %-processed.xml print.xsl

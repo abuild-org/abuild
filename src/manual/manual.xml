@@ -12792,7 +12792,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0.rc1: November 26, 2007</term>
+     <term>1.0.rc1: XXX</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -12832,6 +12832,15 @@ Y = $(X)
          Many additional improvements have been made to the
          documentation, thanks to input from reviewers mentioned in
          <xref linkend="ref.acknowledgments"/>.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         The HTML version of this complete document is now in
+         <filename>doc/html/abuild-manual.html</filename> instead of
+         <filename>doc/abuild-manual.html</filename>.  A multi-file
+         version of the HTML documentation is now also generated.  Its
+         entry point is <filename>doc/html/index.html</filename>.
         </para>
        </listitem>
       </itemizedlist>

@@ -23,8 +23,7 @@ Java-based build item:
    be useful for compiling custom ant tasks.
 
  * abuild.jar-name: the name (including extension) of the
-   jar file.  The "compile" target is only run if this is
-   set.  The resulting jar file will be created in the
+   jar file.  The resulting jar file will be created in the
    "dist" directory of the abuild output directory.
 
  * abuild.main-class: the name of a class, if any, that
