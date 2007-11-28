@@ -6506,7 +6506,7 @@ endif
     directory in which something is to be built using the
     <application>GNU Make</application> backend.  In this chapter, we
     describe how to use it in general and provide details specific to
-    the built-in rule sets provided by &abuild;.
+    the rule sets provided by &abuild;.
    </para>
    <sect1 id="ref.abuild.mk.general">
     <title>General <filename>Abuild.mk</filename> Syntax</title>
@@ -6568,11 +6568,11 @@ endif
      <footnote>
       <para>
        Defining your own <command>clean</command> target can be
-       useful, but remember that it is only run if you manually run
-       &abuild; from inside the output directory, which most people
-       would never do except when debugging &abuild;.  For details
-       about running &abuild; from an output directory, see <xref
-       linkend="ref.running-in-output-directory"/>.
+       useful, but keep in mind that it is only run if you manually
+       run &abuild; from inside the output directory, which most
+       people would never do except when debugging &abuild;.  For
+       details about running &abuild; from an output directory, see
+       <xref linkend="ref.running-in-output-directory"/>.
       </para>
      </footnote>
     </para>
@@ -6624,7 +6624,24 @@ endif
       Likewise, for each binary target in
       <varname>TARGETS_bin</varname>, you must define
       <varname>SRCS_bin_<replaceable>target</replaceable></varname>.
-      These variables can contain any mixture of C and C++ files.
+      These variables can contain any mixture of C and C++ files.  The
+      source files listed in these variables are typically located in
+      the same directory as the <filename>Abuild.mk</filename>, but
+      they may also refer to automatically source files that will
+      actually appear in the output directory.
+      <footnote>
+       <para>
+        For example, if you have a local rule that generates
+        <filename>autogen.cc</filename> in the output directory, you
+        can simply list <filename>autogen.cc</filename> in one of your
+        <varname>SRCS</varname> variables, and &abuild; will find it
+        anyway.  This is because &abuild;'s make code uses
+        <application>GNU Make</application>'s
+        <function>vpath</function> feature.  We provide an example of
+        this construct in <xref
+        linkend="ref.example.code-generator"/>.
+       </para>
+      </footnote>
       There are variables that can be used to control the creation of
       shared libraries.  For details, see <xref
       linkend="ref.building-shared-libraries"/>.  Files whose names
@@ -6758,31 +6775,30 @@ endif
      <para>
       Each of the above variables also has a file-specific version.
       For the <varname>X*FLAGS</varname> variables, the file-specific
-      values are added to the general values.  For
-      <varname>DFLAGS</varname>, <varname>OFLAGS</varname>, and
-      <varname>WFLAGS</varname>, the file-specific values
-      <emphasis>replace</emphasis> the general vales.  For example,
-      setting <varname>XCPPFLAGS_File.cc</varname> will cause the
-      value of that variable to be added to the preprocessor, C
-      compiler and C++ compiler invocations for
-      <filename>File.cc</filename>.  File-specific versions of
-      <varname>XCPPFLAGS</varname>, <varname>XCFLAGS</varname>, and
-      <varname>XCXXFLAGS</varname> are used only for compilation and,
-      if appropriate, preprocessing of those specific files.  They are
-      not used at link time.  The file-specific versions of
-      <varname>DFLAGS</varname>, <varname>OFLAGS</varname>, and
-      <varname>WFLAGS</varname> <emphasis>override</emphasis> the
-      default values rather than supplementing them.  This makes it
-      possible to completely change debugging flags, optimization
-      flags, or warning flags for specific source files.  For example,
-      if <filename>Hardware.cc</filename> absolutely cannot be
-      compiled with any optimization, you could set
+      values are added to the general values.  For example, setting
+      <varname>XCPPFLAGS_File.cc</varname> will cause the value of
+      that variable to be added to the preprocessor, C compiler and
+      C++ compiler invocations for <filename>File.cc</filename>.
+      File-specific versions of <varname>XCPPFLAGS</varname>,
+      <varname>XCFLAGS</varname>, and <varname>XCXXFLAGS</varname> are
+      used only for compilation and, if appropriate, preprocessing of
+      those specific files.  They are not used at link time.
+     </para>
+     <para>
+      The file-specific versions of <varname>DFLAGS</varname>,
+      <varname>OFLAGS</varname>, and <varname>WFLAGS</varname>
+      <emphasis>override</emphasis> the default values rather than
+      supplementing them.  This makes it possible to completely change
+      debugging flags, optimization flags, or warning flags for
+      specific source files.  For example, if
+      <filename>Hardware.cc</filename> absolutely cannot be compiled
+      with any optimization, you could set
       <varname>OFLAGS_Hardware.cc</varname> to the empty string to
       suppress optimization on that file regardless of the value of
       OFLAGS.  Similarly, if <filename>autogen.c</filename> were an
       automatically generated file with lots of warnings, you could
       explicitly set <varname>WFLAGS_autogen.c</varname> to the empty
-      string or to the flag that suppresses warnings.  This would
+      string or to a flag that suppresses warnings.  This would
       suppress warnings for that file without affecting other files.
       If you wish to append to the default flags instead of replacing
       them, include the regular variable name in the value, as in
@@ -6847,13 +6863,14 @@ endif
      </para>
      <para>
       Most of the time, &abuild; manages all the dependencies of the
-      source and object files automatically, but there are some rare
-      instances in which you may have to create dependencies on your
-      own, such as when an object file depends on an automatically
-      generate header file that is generated in the same build item.
-      (For an example of this, see <xref
-      linkend="ref.example.auto-from-variable"/>.)  To make it
-      possible to express such dependencies in a portable fashion, the
+      source and object files (as opposed to inter-build-item
+      dependencies) automatically, but there are some rare instances
+      in which you may have to create such dependencies on your own,
+      such as when an object file depends on an automatically generate
+      header file that is generated in the same build item.  For an
+      example of this, see <xref
+      linkend="ref.example.auto-from-variable"/>.  To make it possible
+      to express such dependencies in a portable fashion, the
       <filename>ccxx</filename> rules provide the variables
       <varname>LOBJ</varname> and <varname>OBJ</varname> which are set
       to the object file suffixes for library object files and
@@ -6883,7 +6900,7 @@ endif
       discussed here.  For a complete understanding of how it works,
       you are encouraged to read <filename>make/ccxx.mk</filename> in
       the &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).
-      There you will find copious comments and a lot of pretty hair
+      There you will find copious comments and a lot of pretty hairy
       <application>GNU Make</application> code.
      </para>
     </sect2>
@@ -6910,14 +6927,14 @@ endif
       support for something it doesn't need (but that is checked for
       by a monolithic autoconf component).  The
       <filename>autoconf</filename> rules don't supply any special
-      targets.  Please run <command>abuild rules-help</command> and
-      <command>abuild interface-help</command> from a build item that
-      uses <filename>autoconf</filename> rules for full information on
+      targets.  A reasonably complete example of using autoconf
+      follows in <xref linkend="ref.example.autoconf"/>.  You may also
+      run <command>abuild rules-help</command> and <command>abuild
+      interface-help</command> from a build item that uses
+      <filename>autoconf</filename> rules for full information on
       using these rules.  (Creating an <filename>Abuild.mk</filename>
       with the one line <literal>RULES := autoconf</literal> and
-      running <command>abuild rules-help</command> would suffice.)  An
-      example of using autoconf follows in <xref
-      linkend="ref.example.autoconf"/>.
+      running <command>abuild rules-help</command> would suffice.)
      </para>
      <para>
       Autoconf properly honors your C/C++ toolchain and runs
@@ -6971,40 +6988,29 @@ endif
      external library if that library is not available.  Our example
      is somewhat contrived, but it demonstrates the core functionality
      and patterns required to do this.  Our example resides in
-     <filename>doc/example/general/user/derived/stub-library</filename>.
-     <note>
-      <para>
-       In our example, we have used build item names containing the
-       word <classname>stub</classname>.  This is because it is our
-       stub library example.  In an actual implementation of this
-       pattern, you would be much more likely to name the build items
-       after the library that was potentially being stubbed and
-       letting the fact that stubs are being substituted behind the
-       scenes be a private detail not reflected in the names of the
-       public build items.
-      </para>
-     </note>
+     <filename>doc/example/general/user/derived/world-peace</filename>.
     </para>
     <para>
      Notice that the <filename>Abuild.conf</filename> in the
-     <filename>stub-library</filename> directory itself defines a
-     pass-through build item that depends on the
-     <classname>stub-library.implementation</classname> build item:
-     <?example general/user/derived/stub-library/Abuild.conf?>
-     The <classname>stub-library.implementation</classname> build
+     <filename>world-peace</filename> directory itself defines a
+     <firstterm>pass-through build item</firstterm> (see <xref
+     linkend="ref.build-item-types"/>) that depends on the
+     <classname>world-peace.stub</classname> build item:
+     <?example general/user/derived/world-peace/Abuild.conf?>
+     The <classname>world-peace.stub</classname> build
      item, in turn, depends on the
-     <classname>stub-library.autoconf</classname> build item:
-     <?example general/user/derived/stub-library/implementation/Abuild.conf?>
+     <classname>world-peace.autoconf</classname> build item:
+     <?example general/user/derived/world-peace/stub/Abuild.conf?>
     </para>
     <para>
-     The <classname>stub-library.autoconf</classname> build item's
+     The <classname>world-peace.autoconf</classname> build item's
      <filename>Abuild.interface</filename> file adds its output
      directory to the <varname>INCLUDES</varname> variable since this
      where the autoconf-generated header file will go.  Then it
      declares <filename>autoconf.interface</filename> in its output
      directory as an after-build file using the
      <function>after-build</function> statement:
-     <?example general/user/derived/stub-library/autoconf/Abuild.interface?>
+     <?example general/user/derived/world-peace/autoconf/Abuild.interface?>
      This means that the <filename>autoconf.interface</filename> file
      won't be included when this build item is built but will be
      included when other build items that depend on this one are
@@ -7013,29 +7019,26 @@ endif
     </para>
     <para>
      Next, look at the <filename>autoconf/Abuild.mk</filename> file:
-     <?example general/user/derived/stub-library/autoconf/Abuild.mk?>
+     <?example general/user/derived/world-peace/autoconf/Abuild.mk?>
      Here, we set the variables that the <varname>autoconf</varname>
-     rules require.  You can learn more about these variables by run
-     <command>abuild interface-help</command> from an autoconf-based
-     build item.  The <varname>AUTOFILES</varname> variable is set to
-     the value <filename>autoconf.interface</filename>, which is the
-     same as the file name used as the
+     rules require.  The <varname>AUTOFILES</varname> variable is set
+     to the value <filename>autoconf.interface</filename>, which is
+     the same as the file name used as the
      <function>after-build</function> file in the
      <filename>Abuild.interface</filename> file.  Additionally, we set
      the variable <varname>AUTOCONFIGH</varname> to the name of the
-     header file that we will be generating.  This must match the
-     output file we create in
-     <filename>autoconf/configure.ac</filename>.
+     header file that we will be generating.
     </para>
     <para>
      Here is the <filename>autoconf/configure.ac</filename> file:
-     <?example general/user/derived/stub-library/autoconf/configure.ac?>
-     This contains normal autoconf macros.  The main things to note
-     here are the <varname>AC_CONFIG_FILES</varname> macro which tells
-     autoconf to generate the <filename>autoconf.interface</filename>
-     file from <filename>autoconf.interface.in</filename> as well as
-     the <varname>AC_CONFIG_HEADERS</varname> call which takes name of
-     the file set as value of the <varname>AUTOCONFIGH</varname>
+     <?example general/user/derived/world-peace/autoconf/configure.ac?>
+     This contains normal autoconf macros.  There are two important
+     things to notice here.  The first is the
+     <varname>AC_CONFIG_FILES</varname> macro, which tells autoconf to
+     generate the <filename>autoconf.interface</filename> file from
+     <filename>autoconf.interface.in</filename>.  The second is the
+     <varname>AC_CONFIG_HEADERS</varname> call, which takes name of
+     the file set as the value of the <varname>AUTOCONFIGH</varname>
      variable in <filename>Abuild.mk</filename>.  The need to
      duplicate this information is unfortunate, and this may be
      improved in a future version of &abuild;.  Note that the autoconf
@@ -7046,7 +7049,7 @@ endif
     <para>
      Next, we examine the <filename>autoconf.interface.in</filename>
      file:
-     <?example general/user/derived/stub-library/autoconf/autoconf.interface.in?>
+     <?example general/user/derived/world-peace/autoconf/autoconf.interface.in?>
      This is just like any other file generated by autoconf: it
      contains substitution tokens surrounded by @ signs.  Since it is
      an &abuild; interface file, it has &abuild; interface syntax.
@@ -7068,40 +7071,42 @@ endif
      variables.
     </para>
     <para>
-     Now we turn our attention to the
-     <filename>implementation</filename> directory.  This directory
-     contains our stub implementation of
+     Now we turn our attention to the <filename>stub</filename>
+     directory.  This directory contains our stub implementation of
      <function>create_world_peace</function>.  It is a poor substitute
      for the real thing, but it will at least allow our software to
      compile.  The implementation protects the definition of the
      function with the <constant>HAVE_CREATE_WORLD_PEACE</constant>
      preprocessor symbol as generated by autoconf.  It also makes use
-     of printf and checks to make sure it's there, just to demonstrate
-     how you might do such a thing:
-     <?example general/user/derived/stub-library/implementation/stub.cc?>
-     The implementation provides a header file called
+     of <function>printf</function> and checks to make sure it's
+     there, just to demonstrate how you might do such a thing:
+     <?example general/user/derived/world-peace/stub/stub.cc?>
+     The stub implementation provides a header file called
      <filename>world_peace.hh</filename>, which is presumably the same
      as the name of the header provided by the real implementation and
      which would have been made available by the
-     <filename>stub-library.autoconf</filename> build item if the
+     <filename>world-peace.autoconf</filename> build item if the
      library were found:
-     <?example general/user/derived/stub-library/implementation/world_peace.hh?>
+     <?example general/user/derived/world-peace/stub/world_peace.hh?>
      The <filename>Abuild.interface</filename> file in the
-     <filename>implementation</filename> directory actually adds
-     <filename>stub-library</filename> to the list of libraries only
-     if the <varname>HAVE_CREATE_WORLD_PEACE</varname> variable, as
-     provided by <filename>stub-library.autoconf</filename>'s
-     <filename>autoconf.interface</filename> file, is false.  So if we
-     had a real <function>create_world_peace</function> function, we
-     wouldn't have to use our stub library:
-     <?example general/user/derived/stub-library/implementation/Abuild.interface?>
+     <filename>stub</filename> directory actually adds
+     <filename>world-peace</filename> to the list of libraries only if
+     the <varname>HAVE_CREATE_WORLD_PEACE</varname> variable, as
+     provided by <classname>world-peace.autoconf</classname>'s
+     <filename>autoconf.interface</filename> file, is false.  That
+     way, if we had a real <function>create_world_peace</function>
+     function (whose library would have presumably also been made
+     available to us in <classname>world-piece.autoconf</classname>'s
+     <filename>autoconf.interface</filename> file), we wouldn't
+     provide information about our stub library:
+     <?example general/user/derived/world-peace/stub/Abuild.interface?>
     </para>
     <para>
-     Note that users of the <filename>stub-library</filename> build
+     Note that users of the <filename>world-peace</filename> build
      item actually don't even have to know whether they are using the
      stub library or the real library&mdash;those details are all
      completely hidden inside of its private build items.  Declaring a
-     dependency on <classname>stub-library</classname> will make sure
+     dependency on <classname>world-peace</classname> will make sure
      that you have the appropriate interfaces available.  You can see
      an example of this by looking at <filename>main.cpp</filename> in
      <filename>user/derived/main/src</filename>:
