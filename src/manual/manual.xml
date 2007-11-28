@@ -5,8 +5,8 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.rc1">
-<!ENTITY lastreleased "November 26, 2007">
+<!ENTITY swversion "1.0.rc1-pre">
+<!ENTITY lastreleased "November 28, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 ]>
@@ -12792,7 +12792,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0.rc1: XXX</term>
+     <term>1.0.rc1: [not released]</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -12836,7 +12836,8 @@ Y = $(X)
        </listitem>
        <listitem>
         <para>
-         The HTML version of this complete document is now in
+         The HTML version of this complete document in the binary
+         distributions is now in
          <filename>doc/html/abuild-manual.html</filename> instead of
          <filename>doc/abuild-manual.html</filename>.  A multi-file
          version of the HTML documentation is now also generated.  Its
