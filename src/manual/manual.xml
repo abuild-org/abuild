@@ -5130,17 +5130,66 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <filename>Abuild.conf</filename>:
      <variablelist>
       <varlistentry>
-       <term><property>this</property></term>
+       <term><property>child-dirs</property></term>
        <listitem>
         <para>
-         This key is used to set the name of the build item.  Build
-         item names consist of period-delimited segments.  Each
-         segment consists of one or more alphanumeric characters,
-         dashes, or underscores.  Some
-         <filename>Abuild.conf</filename> files exist just to connect
-         parent directories with child directories in the file system,
-         as shown in examples below.  In those cases, the
-         <property>this</property> key may be omitted.
+         This key is used to specify all subdirectories of this item
+         that contain additional <filename>Abuild.conf</filename>
+         files.  The value is a whitespace-separated list of relative
+         paths.  Every child directory's
+         <filename>Abuild.conf</filename> must have a
+         <property>parent-dir</property> key that points back to this
+         directory.  Generally, the <property>child-dirs</property>
+         key contains a list of single-element paths
+         (<emphasis>i.e.</emphasis> paths with no directory names in
+         them).  Although &abuild; does allow lower-level directories
+         to be specified (corresponding with more
+         &ldquo;<filename>..</filename>&rdquo;'s in the lower-level
+         items' <property>parent-dir</property> keys), for clarity,
+         this practice is not recommended.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>deleted</property></term>
+       <listitem>
+        <para>
+         This key is allowed only in a root build item.  It contains a
+         list of the names of build items that should be removed from
+         this build tree's namespace because they have been deleted.
+         The build item must not be present in the local build tree
+         but must be present in the build item's direct backing area
+         chain (i.e., traversal of backing areas is permitted, but not
+         externals).  &Abuild; would ordinarily inherit build items
+         that are not defined in the local tree but exist in a backing
+         area.  Listing an item in the deleted key prevents this from
+         happening.  Since all items listed here must be found in a
+         backing area, this key would never appear in a build tree
+         with no backing area.  For more information, see <xref
+         linkend="ref.example.deleted-item"/>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>deps</property></term>
+       <listitem>
+        <para>
+         This key's value is a whitespace-separated list of the names
+         of build items on which this build item depends.  This is the
+         sole mechanism within &abuild; to specify inter-build-item
+         dependencies.  Any dependency in this list may be optionally
+         followed by one or more
+         <option>-flag=<replaceable>interface-flag</replaceable></option>
+         arguments.  This causes the
+         <replaceable>interface-flag</replaceable> interface flag to
+         be set when this build item reads the interface of the
+         dependent build item (see <xref
+         linkend="ref.interface-flags"/>).  It is also possible to
+         specify a
+         <option>-platform=<replaceable>selector</replaceable></option>
+         option to a dependency to specify which of the dependent
+         item's platforms applies to this dependency (see <xref
+         linkend="ref.cross-platform-dependencies"/>).
         </para>
        </listitem>
       </varlistentry>
@@ -5148,17 +5197,27 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <term><property>description</property></term>
        <listitem>
         <para>
-         This optional key can be used to add an information
-         description to the build item.  Description information is
-         intended to be human readable.  For adding information that
-         you may wish to categorize items for build purposes, use
-         traits instead (see <xref linkend="ref.traits"/>).  If
-         present, it will be included in the output to <command>abuild
-         --dump-data</command>.  Providing a description here rather
-         than just by using a comment in the
+         This key can be used to add an information description to the
+         build item.  Description information is intended to be human
+         readable.  If present, it will be included in the output to
+         <command>abuild --dump-data</command>.  Providing a
+         description here rather than just by using a comment in the
          <filename>Abuild.conf</filename> file can be useful to other
          programs that provide additional visualization of build
-         items.
+         items.  For adding information that you may wish to
+         categorize items for build purposes, use traits instead (see
+         <xref linkend="ref.traits"/>).
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>external-dirs</property></term>
+       <listitem>
+        <para>
+         This key is allowed only in a root build item. It contains a
+         list of whitespace-separated paths to the root directories of
+         external build trees.  For a discussion of using externals,
+         please see <xref linkend="ref.externals"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -5196,27 +5255,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><property>child-dirs</property></term>
-       <listitem>
-        <para>
-         This key is used to specify all subdirectories of this item
-         that contain additional <filename>Abuild.conf</filename>
-         files.  The value is a whitespace-separated list of relative
-         paths.  Every child directory's
-         <filename>Abuild.conf</filename> must have a
-         <property>parent-dir</property> key that points back to this
-         directory.  Generally, the <property>child-dirs</property>
-         key contains a list of single-element paths
-         (<emphasis>i.e.</emphasis> paths with no directory names in
-         them), but &abuild; does allow lower-level directories to be
-         specified (corresponding with more
-         &ldquo;<filename>..</filename>&rdquo;'s in the lower-level
-         items' <property>parent-dir</property> keys), though, for
-         clarity, this practice is not recommended.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
        <term><property>platform-types</property></term>
        <listitem>
         <para>
@@ -5229,57 +5267,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          Otherwise, it must not be present.  Note that a build item
          may have multiple platform types, but all platform types for
          a given build item must belong to the same target type.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><property>deps</property></term>
-       <listitem>
-        <para>
-         This key's value is a whitespace-separated list of the names
-         of build items on which this build item depends.  This is the
-         sole mechanism within &abuild; to specify inter-build-item
-         dependencies.  Any dependency in this list may be optionally
-         followed by one or more
-         <option>-flag=<replaceable>interface-flag</replaceable></option>
-         arguments.  This causes the
-         <replaceable>interface-flag</replaceable> interface flag to
-         be set when this build item reads the interface of the
-         dependent build item (see <xref
-         linkend="ref.interface-flags"/>).  It is also possible to
-         specify a
-         <option>-platform=<replaceable>selector</replaceable></option>
-         option to a dependency to specify which of the dependent
-         item's platforms applies to this dependency (see <xref
-         linkend="ref.cross-platform-dependencies"/>).
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><property>visible-to</property></term>
-       <listitem>
-        <para>
-         This optional key's value is an indicator of the scope at
-         which this build item is visible.  It is used to allow other
-         build items to access this build item directly when they
-         would ordinarily be prevented from doing so by normal scoping
-         rules.  For information about build item name scopes and
-         build item visibility, see <xref
-         linkend="ref.build-item-name-scoping"/>.  For a discussion of
-         the <property>visible-to</property> key in particular, see
-         <xref linkend="ref.build-item-visibility"/>
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><property>external-dirs</property></term>
-       <listitem>
-        <para>
-         This key contains a list of whitespace-separated paths to the
-         root directories of external build trees.  It may appear in
-         the <filename>Abuild.conf</filename> of a root build item
-         only.  For a discussion of using externals, please see <xref
-         linkend="ref.externals"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -5304,10 +5291,25 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <term><property>supported-traits</property></term>
        <listitem>
         <para>
-         This key contains a list of whitespace-separated traits that
-         are supported by build items in the build tree.  This key is
-         valid only for root build items.  For more information about
+         This key is allowed only in a root build item.  It contains a
+         list of whitespace-separated traits that are supported by
+         build items in the build tree.  For more information about
          traits, see <xref linkend="ref.traits"/>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>this</property></term>
+       <listitem>
+        <para>
+         This key is used to set the name of the build item.  Build
+         item names consist of period-delimited segments.  Each
+         segment consists of one or more alphanumeric characters,
+         dashes, or underscores.  Some
+         <filename>Abuild.conf</filename> files exist just to connect
+         parent directories with child directories in the file system,
+         as shown in examples below.  In those cases, the
+         <property>this</property> key may be omitted.
         </para>
        </listitem>
       </varlistentry>
@@ -5326,22 +5328,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><property>deleted</property></term>
+       <term><property>visible-to</property></term>
        <listitem>
         <para>
-         This key is allowed only in a root build item.  It contains a
-         list of the names of build items that should be removed from
-         this build tree's namespace because they have been deleted.
-         The build item must not be present in the local build tree
-         but must be present in the build item's direct backing area
-         chain (i.e., traversal of backing areas is permitted, but not
-         externals).  &Abuild; would ordinarily inherit build items
-         that are not defined in the local tree but exist in a backing
-         area.  Listing an item in the deleted key prevents this from
-         happening.  Since all items listed here must be found in a
-         backing area, this key would never appear in a build tree
-         with no backing area.  For more information, see <xref
-         linkend="ref.example.deleted-item"/>.
+         This key's value is an indicator of the scope at which this
+         build item is visible.  If present, it allows build items in
+         the named scope to access this build item directly when they
+         would ordinarily be prevented from doing so by normal scoping
+         rules.  For information about build item name scopes and
+         build item visibility, see <xref
+         linkend="ref.build-item-name-scoping"/>.  For a discussion of
+         the <property>visible-to</property> key in particular, see
+         <xref linkend="ref.build-item-visibility"/>
         </para>
        </listitem>
       </varlistentry>
@@ -5361,13 +5359,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    <para>
     The &abuild; interface system is the mechanism through which
     &abuild; provides encapsulation.  Its purpose is to allow build
-    items to provide information about the products they make
-    available to other build items.  Build items provide their
-    interfaces in the <filename>Abuild.interface</filename> file.
-    This chapter describes the interface system and provides details
-    about the syntax and semantics of
-    <filename>Abuild.interface</filename> and other &abuild; interface
-    files.
+    items to provide information about the products they provide to
+    other build items.  Build items provide their interfaces with the
+    <filename>Abuild.interface</filename> file.  This chapter
+    describes the interface system and provides details about the
+    syntax and semantics of <filename>Abuild.interface</filename> and
+    other &abuild; interface files.
    </para>
    <sect1 id="ref.abuild-interface-functionality-overview">
     <title>&Abuild; Interface Functionality Overview</title>
@@ -5495,16 +5492,15 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      All variables must be declared, though most
      <filename>Abuild.interface</filename> files will be assigning to
      variables that have already been declared in other interface
-     files.  There are several types of variables.  There are no
-     variable scoping rules: all variables are global, even if
-     declared inside a conditional block.  Variable names may contain
-     alphanumeric characters, dash, underscore, and period.  By
-     convention, make-based rules use all uppercase letters in
-     variable names.  This convention also has the advantage of
-     avoiding potential conflict with reserved statements.  Java-based
-     rules typically use lower-case period-separated properties.
-     Ultimately &abuild; interface variables become
-     <application>make</application> variables or
+     files.  There are no variable scoping rules: all variables are
+     global, even if declared inside a conditional block.  Variable
+     names may contain alphanumeric characters, dash, underscore, and
+     period.  By convention, make-based rules use all uppercase
+     letters in variable names.  This convention also has the
+     advantage of avoiding potential conflict with reserved
+     statements.  Java-based rules typically use lower-case
+     period-separated properties.  Ultimately &abuild; interface
+     variables become <application>make</application> variables or
      <application>ant</application> properties, which is the basis for
      these conventions.  Note, however, that variables of both naming
      styles may be used by either backend, and some of &abuild;'s
@@ -5613,7 +5609,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      Scalar and list variables can both be reset using the
      <function>reset</function> statement.  This resets the variable back
-     to an uninitialized state.
+     to its initial state, which is uninitialized for scalars and
+     empty for lists.
     </para>
     <para>
      Any variable assignment statement can be made conditional upon
@@ -5644,17 +5641,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
     <para>
      It is possible for a build item to contain interface information
-     intended for items that depend on it but not intended for the
-     item itself.  Typical uses cases would include when some of this
-     information is a product of the build or when a build item needs
-     to modify interface information provided by a dependency after it
-     has finished using the information itself.  To support this, an
-     <filename>Abuild.interface</filename> file may specify additional
-     interface files that are not to be read until after the item is
-     built.  The values in any such files are not available to the
-     build item itself, but they are available to any items that
-     depend on the build item that exports this interface.  Such files
-     may be dynamically generated (such as with
+     that is intended for items that depend on it but not intended for
+     the item itself.  Typical uses cases would include when some of
+     this information is a product of the build or when a build item
+     needs to modify interface information provided by a dependency
+     after it has finished using the information itself.  To support
+     this, an <filename>Abuild.interface</filename> file may specify
+     additional interface files that are not to be read until after
+     the item is built.  The values in any such files are not
+     available to the build item itself, but they are available to any
+     items that depend on the build item that exports this interface.
+     Such files may be dynamically generated (such as with
      <application>autoconf</application>; see <xref
      linkend="ref.example.autoconf"/>), or they may be hand-generated
      files that are just intended not to apply to the build of the
@@ -5788,10 +5785,10 @@ override HAS_CLASS = 1
         lists, the assignment operator <emphasis>prepends</emphasis>
         the words to the existing value of list in the order in which
         they appear.  For example, if the variables
-        <varname>LIBS</varname> is declared as a prepend list of
-        strings, these two statements would result in
-        <varname>LIBS</varname> containing the value <literal>lib3
-        lib4 lib1 lib2</literal>:
+        <varname>LIBS</varname> is declared as a <type>prepend</type>
+        list of <type>string</type>s, these two statements would
+        result in <varname>LIBS</varname> containing the value
+        <literal>lib3 lib4 lib1 lib2</literal>:
 
         <programlisting>LIBS = lib1 lib2
 LIBS = lib3 lib4
@@ -6118,8 +6115,9 @@ endif
      target types a variable applies to.  A build item could, in
      principle, assign to both <varname>INCLUDES</varname> and
      <varname>abuild.classpath</varname> without having to care that
-     only C++ items will see <varname>INCLUDES</varname> and only Java
-     items will see <varname>abuild.classpath</varname>.
+     only <type>object-code</type> items will see
+     <varname>INCLUDES</varname> and only <type>java</type> items will
+     see <varname>abuild.classpath</varname>.
     </para>
    </sect1>
    <sect1 id="ref.predefined-abuild.interface-variables">
@@ -6164,53 +6162,6 @@ endif
       of all target types:
       <variablelist>
        <varlistentry>
-        <term>ABUILD_STDOUT_IS_TTY</term>
-        <listitem>
-         <para>
-          A Boolean variable indicate whether &abuild;'s standard output
-          is a terminal.  It can be useful to know this so that this
-          information can be passed to other programs invoked by
-          backends, particularly those (like ant) which redirect output
-          through a pipe that ultimately goes to &abuild;'s standard
-          output.
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>ABUILD_THIS</term>
-        <listitem>
-         <para>
-          The name of the current build item
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>ABUILD_TARGET_TYPE</term>
-        <listitem>
-         <para>
-          The target type of the current build item
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>ABUILD_PLATFORM_TYPE</term>
-        <listitem>
-         <para>
-          The platform type of the platform on behalf of which this
-          interface is being read
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>ABUILD_PLATFORM</term>
-        <listitem>
-         <para>
-          The name of the platform on behalf of which this interface is
-          being read
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
         <term>ABUILD_OUTPUT_DIR</term>
         <listitem>
          <para>
@@ -6227,10 +6178,49 @@ endif
         <term>ABUILD_PLATFORM</term>
         <listitem>
          <para>
-          The current platform.  This variable is not used very often.
-          When referring to the output directory, always use
+          The name of the platform on behalf of which this interface
+          is being read.  This variable is not used very often.  When
+          referring to the output directory, always use
           <varname>$(ABUILD_OUTPUT_DIR)</varname> instead of writing
           something in terms of this variable.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_PLATFORM_TYPE</term>
+        <listitem>
+         <para>
+          The platform type of the platform on behalf of which this
+          interface is being read
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_STDOUT_IS_TTY</term>
+        <listitem>
+         <para>
+          A Boolean variable indicate whether &abuild;'s standard output
+          is a terminal.  It can be useful to know this so that this
+          information can be passed to other programs invoked by
+          backends, particularly those (like ant) which redirect output
+          through a pipe that ultimately goes to &abuild;'s standard
+          output.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_TARGET_TYPE</term>
+        <listitem>
+         <para>
+          The target type of the current build item
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_THIS</term>
+        <listitem>
+         <para>
+          The name of the current build item
          </para>
         </listitem>
        </varlistentry>
@@ -6280,11 +6270,11 @@ endif
       build items:
       <variablelist>
        <varlistentry>
-        <term>ABUILD_PLATFORM_OS</term>
+        <term>ABUILD_PLATFORM_COMPILER</term>
         <listitem>
          <para>
           For <type>object-code</type> items, this variable contains the
-          <varname>OS</varname> field of the platform (see <xref
+          <varname>COMPILER</varname> field of the platform (see <xref
           linkend="ref.platforms.object-code"/>).
          </para>
         </listitem>
@@ -6295,26 +6285,6 @@ endif
          <para>
           For <type>object-code</type> items, this variable contains the
           <varname>CPU</varname> field of the platform (see <xref
-          linkend="ref.platforms.object-code"/>).
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>ABUILD_PLATFORM_TOOLSET</term>
-        <listitem>
-         <para>
-          For <type>object-code</type> items, this variable contains the
-          <varname>TOOLSET</varname> field of the platform (see <xref
-          linkend="ref.platforms.object-code"/>).
-         </para>
-        </listitem>
-       </varlistentry>
-       <varlistentry>
-        <term>ABUILD_PLATFORM_COMPILER</term>
-        <listitem>
-         <para>
-          For <type>object-code</type> items, this variable contains the
-          <varname>COMPILER</varname> field of the platform (see <xref
           linkend="ref.platforms.object-code"/>).
          </para>
         </listitem>
@@ -6331,20 +6301,31 @@ endif
         </listitem>
        </varlistentry>
        <varlistentry>
-        <term>INCLUDES</term>
+        <term>ABUILD_PLATFORM_OS</term>
         <listitem>
          <para>
-          Include directories that users of this build item should add
-          to their include paths
+          For <type>object-code</type> items, this variable contains the
+          <varname>OS</varname> field of the platform (see <xref
+          linkend="ref.platforms.object-code"/>).
          </para>
         </listitem>
        </varlistentry>
        <varlistentry>
-        <term>LIBS</term>
+        <term>ABUILD_PLATFORM_TOOLSET</term>
         <listitem>
          <para>
-          The names of libraries (without any prefixes, suffixes, or
-          command-line flags) that this build item provides
+          For <type>object-code</type> items, this variable contains the
+          <varname>TOOLSET</varname> field of the platform (see <xref
+          linkend="ref.platforms.object-code"/>).
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>INCLUDES</term>
+        <listitem>
+         <para>
+          This variable is to contain directories that users of this
+          build item should add to their include paths.
          </para>
         </listitem>
        </varlistentry>
@@ -6352,29 +6333,21 @@ endif
         <term>LIBDIRS</term>
         <listitem>
          <para>
-          Directories that users linking with this build item's
-          libraries should add to their library search paths.
-          Typically, this is just set to
+          This variable is to contain directories that users linking
+          with this build item's libraries should add to their library
+          search paths.  Typically, this is just set to
           <varname>$(ABUILD_OUTPUT_DIR)</varname> since this is where
           &abuild; creates library files.
          </para>
         </listitem>
        </varlistentry>
        <varlistentry>
-        <term>XCPPFLAGS</term>
+        <term>LIBS</term>
         <listitem>
          <para>
-          Additional preprocessor flags that must be added when using
-          this item.  This flag should be used very sparingly as
-          changing the value of this variable does not cause things to
-          automatically recompile.  It is here primarily to support
-          third-party libraries that only work if a certain flag is
-          defined.  If you are using this to change the configuration of
-          a build item, please consider using another method instead,
-          such as defining symbols in a header file or using runtime
-          configuration.  For an example of how to do this based on the
-          value of a variable, see <xref
-          linkend="ref.example.auto-from-variable"/>.
+          This variable is to contain the names of libraries (without
+          any prefixes, suffixes, or command-line flags) that this
+          build item provides.
          </para>
         </listitem>
        </varlistentry>
@@ -6382,10 +6355,29 @@ endif
         <term>XCFLAGS</term>
         <listitem>
          <para>
-          Additional flags, beyond those in
-          <varname>$(XCPPFLAGS)</varname> to be passed to the compiler
-          when compiling C code.  This variable will be used very
-          infrequently.
+          This variable is to contain additional flags, beyond those
+          in <varname>$(XCPPFLAGS)</varname> to be passed to the
+          compiler when compiling C code.  This variable will be used
+          very infrequently.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>XCPPFLAGS</term>
+        <listitem>
+         <para>
+          This variable is to contain additional preprocessor flags
+          that must be added when using this item.  This flag should
+          be used very sparingly as changing the value of this
+          variable does not cause things to automatically recompile.
+          It is here primarily to support third-party libraries that
+          only work if a certain flag is defined.  If you are using
+          this to change the configuration of a build item, please
+          consider using another method instead, such as defining
+          symbols in a header file or using runtime configuration.
+          For an example of how to do this based on the value of a
+          variable, see <xref
+          linkend="ref.example.auto-from-variable"/>.
          </para>
         </listitem>
        </varlistentry>
@@ -6393,8 +6385,8 @@ endif
         <term>XCXXFLAGS</term>
         <listitem>
          <para>
-          Additional flags, beyond those in
-          <varname>$(XCFLAGS)</varname> and
+          This variable is to contain additional flags, beyond those
+          in <varname>$(XCFLAGS)</varname> and
           <varname>$(XCPPFLAGS)</varname> to be passed to the compiler
           when compiling C++ code.  This variable will be used very
           infrequently.
@@ -6405,12 +6397,13 @@ endif
         <term>XLINKFLAGS</term>
         <listitem>
          <para>
-          Additional flags to be added to the command-line when linking.
-          The most common use for this would be to support third-party
-          libraries or linker flags required to use third-party
-          libraries.  For adding your own libraries, you should always
-          use <varname>$(LIBDIRS)</varname> and
-          <varname>$(LIBS)</varname> instead.
+          This variable is to contain additional flags to be added to
+          the command-line when linking.  The most common use for this
+          would be to support third-party libraries or linker flags
+          required to use third-party libraries.  For adding your own
+          libraries, you should always use
+          <varname>$(LIBDIRS)</varname> and <varname>$(LIBS)</varname>
+          instead.
          </para>
         </listitem>
        </varlistentry>
@@ -6467,9 +6460,10 @@ endif
         <term>abuild.classpath</term>
         <listitem>
          <para>
-          Generated JAR files to add to the classpath.  This is the
-          variable that the most ordinary Java build items will assign
-          to.  Its value will typically be
+          This variable is to contain generated JAR files to add to
+          the classpath.  This is the variable that the most ordinary
+          Java build items will assign to.  Its value will typically
+          be
           <filename>$(ABUILD_DIR_OUTPUT)/dist/<replaceable>JarFile.jar</replaceable></filename>,
           where <replaceable>JarFile.jar</replaceable> is the name of
           the JAR file you placed in the
@@ -6488,9 +6482,9 @@ endif
         <term>abuild.classpath.external</term>
         <listitem>
          <para>
-          Externally supplied JAR files to add to the classpath.  This
-          variable is intended to be used for third-party JAR files.
-          The difference between it and
+          This variable is to contain externally supplied JAR files to
+          add to the classpath.  This variable is intended to be used
+          for third-party JAR files.  The difference between it and
           <varname>abuild.classpath</varname> is that JAR files listed
           here are not added to EAR and WAR files while those in
           <varname>abuild.classpath</varname> are.
