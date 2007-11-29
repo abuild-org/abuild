@@ -131,7 +131,14 @@ See also "Known Limitations" in the documentation.
 
  * Consider capturing the output of the backend so that we can
    de-interleave output when running parallel builds, separate error
-   from informational output, etc.
+   from informational output, etc.  It is possible to create pipe-like
+   handles with CreatePipe in Windows and to use them to initialize
+   hStdInput, hStdOutput, and hStdError fields of the startupinfo
+   parameter to CreateProcess.  There is an example at
+   http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
+   There is also some kind of Win32 Job API used by the perl
+   Win32::Job classes (CreateJobObject).  This may provide a better
+   solution than our current CTRL-C handling.
 
  * Clean up ~/source/examples/java/native/abuild and use as JNI
    example
