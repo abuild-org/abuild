@@ -167,7 +167,13 @@ if ($in_windows)
 	}
     }
     close(P);
-    if ($have_mingw)
+    if ($platform_native =~ m/\.mingw$/)
+    {
+	$td->runtest("mingw is default compiler",
+		     {$td->STRING => "yes"},
+		     {$td->STRING => "yes"});
+    }
+    elsif ($have_mingw)
     {
 	$td->runtest("mingw compiler verification",
 		     {$td->COMMAND =>
