@@ -752,9 +752,23 @@ following checks:
      (7.1 or newer), and <ulink
      url="http://www.mingw.org/">mingw</ulink>, and it should be
      buildable by on any system and with any compiler that supports
-     the boost thread and regular expression libraries.  &Abuild;
-     itself contains C++ code and Java code, so all the runtime
-     requirements for both systems are required to build &abuild;.
+     the boost thread and regular expression libraries.
+     <footnote>
+      <para>
+       &Abuild; does not pass its test suite reliably when built with
+       mingw, and it also appears to run more slowly when built with
+       mingw than when built with Visual C++.  No serious effort has
+       been put into figuring out why there are problems with &abuild;
+       when built with mingw, but this may be addressed in conjunction
+       of creating a version of &abuild; that works in Windows for
+       C/C++ builds without Cygwin.  &Abuild; appears to work with
+       equal reliability on Windows with Visual C++ as on Linux with
+       gcc.
+      </para>
+     </footnote>
+     &Abuild; itself contains C++ code and Java code, so all the
+     runtime requirements for both systems are required to build
+     &abuild;.
     </para>
     <para>
      Since &abuild; determines where it is being run from when it is
