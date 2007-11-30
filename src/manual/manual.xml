@@ -3798,15 +3798,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      invoke <command>qtest-driver</command> so that it can find the
      test coverage file and activate test coverage support.  Note that
      &abuild; runs <command>qtest-driver</command> from the output
-     directory, so the coverage output files and
-     <filename>test.log</filename> file will appear in that directory.
-     If you wish to have a qtest-based test suite be runnable on
-     multiple platforms simultaneously, it's best to avoid creating
-     temporary files in the <filename>qtest</filename> directory.  If
-     you wish to use the &abuild; output directory for your temporary
-     files, you can retrieve the full path to this directory by
-     calling the <function>get_start_dir</function> method of the
-     qtest <classname>TestDriver</classname> object.
+     directory, so the coverage output files as well as
+     <filename>qtest.log</filename> and
+     <filename>qtest-results.xml</filename> will appear in that
+     directory.  If you wish to have a qtest-based test suite be
+     runnable on multiple platforms simultaneously, it's best to avoid
+     creating temporary files in the <filename>qtest</filename>
+     directory.  If you wish to use the &abuild; output directory for
+     your temporary files, you can retrieve the full path to this
+     directory by calling the <function>get_start_dir</function>
+     method of the qtest <classname>TestDriver</classname> object.
     </para>
    </sect1>
    <sect1 id="ref.junit">

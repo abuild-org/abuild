@@ -6,7 +6,7 @@ check test:: all
 	qtest-driver -datadir $(SRCDIR)/qtest -bindirs $(SRCDIR):. -covdir $(SRCDIR)
 
 clean::
-	$(RM) test.log *.cov_out
+	$(RM) test.log qtest.log qtest-results.xml *.cov_out
 
 else
 
