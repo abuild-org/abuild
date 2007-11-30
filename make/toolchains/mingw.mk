@@ -3,7 +3,7 @@ GDFLAGS = -MD -MF $(value *).$(DEP) -MP
 
 DFLAGS = -g
 OFLAGS = -O2
-WFLAGS = -Wall -Werror
+WFLAGS = -Wall
 
 CC = gcc -mno-cygwin $(GDFLAGS)
 CCPP = gcc -mno-cygwin -E
