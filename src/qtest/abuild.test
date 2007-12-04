@@ -285,6 +285,24 @@ $td->runtest("build reference common",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+sleep 1;
+my $now = time;
+utime $now, $now, "lib3/src/CommonLib3.cpp" or die;
+
+$td->runtest("test-only reference common",
+	     {$td->COMMAND => "abuild -b desc test-only",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.reference-common-test-only.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check reference common",
+	     {$td->COMMAND => "abuild -b desc check",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.reference-common-check2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/general/reference/project/main/src");
 
 $td->runtest("no-op in reference project-main",
@@ -544,6 +562,25 @@ if ($test_java)
 		 {$td->COMMAND => "abuild --build=all test",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
 		 {$td->FILE => "$top/example.java.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    sleep 1;
+    $now = time;
+    utime $now, $now, "../library/src/java/com/example/library/Library.java"
+	or die;
+
+    $td->runtest("java test-only",
+		 {$td->COMMAND => "abuild --build=all test-only",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/example.java-test-only.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("java recheck",
+		 {$td->COMMAND => "abuild --build=all test",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/example.java2.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
@@ -1709,7 +1746,7 @@ $td->runtest("move header",
 	     $td->NORMALIZE_NEWLINES);
 
 sleep 1;
-my $now = time;
+$now = time;
 utime $now, $now, "../util/include2/File1.hpp" or die;
 
 sleep 1;
@@ -2591,9 +2628,9 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(257 +
+$td->report(259 +
 	    ($in_windows ? 1 : 7) +
-	    ($test_java ? 16 : 0) +
+	    ($test_java ? 18 : 0) +
 	    ($have_whole_archive ? 2 : 1));
 
 sub cleanup

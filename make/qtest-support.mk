@@ -2,8 +2,15 @@
 
 ifeq ($(wildcard $(SRCDIR)/qtest),$(SRCDIR)/qtest)
 
-check test:: all
+define run_qtest
 	qtest-driver -datadir $(SRCDIR)/qtest -bindirs $(SRCDIR):. -covdir $(SRCDIR)
+endef
+
+check test:: all
+	$(run_qtest)
+
+test-only::
+	$(run_qtest)
 
 clean::
 	$(RM) test.log qtest.log qtest-results.xml *.cov_out
@@ -11,5 +18,6 @@ clean::
 else
 
 check test:: all ;
+test-only:: ;
 
 endif

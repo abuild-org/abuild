@@ -729,8 +729,11 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
   </not>
  </condition>
 
- <target name="test" depends="all,-pre-test,-do-test,-post-test"
+ <target name="test" depends="all,test-only"
          description="Run test suites"/>
+
+ <target name="test-only" depends="-pre-test,-do-test,-post-test"
+         description="Run test suites; does not depend on 'all'"/>
 
  <target name="-pre-test">
   <run-hooks name="pre-test"/>
@@ -748,10 +751,17 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
   <isset property="abuild.junit.testsuite"/>
  </condition>
 
+<!--  Note: the individual -test targets must not depend on "all"  -->
+<!--  or "package" as that will prevent "test-only" from working   -->
+<!--  to run tests without building first.  The idea is that an    -->
+<!--  autobuilder could run "abuild -k -b all" and then "abuild    -->
+<!--  -k -b all test-only" to avoid having to repeat all the       -->
+<!--  "all" prerequisites when testing.                            -->
+
  <!--  Abuild is not distributed with JUnit.  The documentation    -->
  <!--  discusses this: it is the user's responsibility to make     -->
  <!--  sure that JUnit is present in the classpath.                -->
- <target name="-test-junit" depends="package"
+ <target name="-test-junit"
          if="abuild.private.need-junit">
   <mkdir dir="junit"/>
   <junit printsummary="yes" haltonfailure="yes" fork="true">

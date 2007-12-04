@@ -5,7 +5,7 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.rc1">
+<!ENTITY swversion "1.0.rc1+">
 <!ENTITY lastreleased "December 3, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
@@ -3794,6 +3794,36 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     and JUnit.  Additional integrations can be performed with plugins
     or build item rules or hooks.
    </para>
+   <sect1 id="ref.test-targets">
+    <title>Test Targets</title>
+    <para>
+     &Abuild; defines three built-in targets for running test suites:
+     <command>check</command>, <command>test</command>, and
+     <command>test-only</command>.  The <command>check</command> and
+     <command>test</command> targets are synonyms.  Both targets first
+     ensure that a build item is built (by depending on the
+     <command>all</command> target) and then run the build item's test
+     suites, if any.  The <command>test-only</command> target also
+     runs a build item's test suite, but it does not depend on
+     <command>all</command>.  This means that it will almost certainly
+     fail when run on a clean build tree.  The
+     <command>test-only</command> target is useful for times when you
+     <emphasis>know</emphasis> that a build item is already built and
+     you want to run the test suite on what is there
+     <emphasis>now</emphasis>.  One case in which you might want to do
+     this would be if you had just started editing some source files
+     and decided you wanted to rerun the test suite on the existing
+     executables before rebuilding them.  Another case in which this
+     could be useful is if you had just built a build tree and then
+     wanted to immediately go back and run all the test suites without
+     having to pay the time penalty of checking to make sure each
+     build is up to date.  In this case, you could run <command>abuild
+     --build=all test-only</command> immediately after the build was
+     completed.  Such a usage style might be appropriate for
+     autobuilders or other systems that build and test a build tree in
+     a controlled environment.
+    </para>
+   </sect1>
    <sect1 id="ref.qtest">
     <title>Integration with QTest</title>
     <para>
@@ -4984,6 +5014,22 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <listitem>
        <para>
         This target is a synonym for <command>check</command>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>test-only</term>
+      <listitem>
+       <para>
+        This target runs any automated test suites but does not first
+        try to build.  In other words, the
+        <command>test-only</command> target does not depend on the
+        <command>all</command> target like the
+        <command>check</command> and <command>test</command> targets
+        do.  This can be useful for running a test suite on a build
+        item without first rebuilding it or for running all the test
+        suites on a build tree that you know is up to date because you
+        just built it.
        </para>
       </listitem>
      </varlistentry>
@@ -12955,6 +13001,19 @@ Y = $(X)
     the documentation.
    </para>
    <variablelist>
+    <varlistentry>
+     <term>1.0: [not yet released]</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Added new <command>test-only</command> target to test a build
+         item without depending on <command>all</command>.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.0.rc1: December 3, 2007</term>
      <listitem>

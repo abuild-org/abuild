@@ -1,0 +1,75 @@
+abuild: common-lib1.src (abuild-<native>): test-only
+abuild: common-lib1.test (abuild-<native>): test-only
+make: Entering directory `--topdir--/general/reference/common/lib1/test/abuild-<native>'
+
+*********************************
+STARTING TESTS on ---timestamp---
+*********************************
+
+
+Running ../qtest/lib1.test
+lib1  1 (test lib1 class)                                      ... PASSED
+
+Overall test suite                                             ... PASSED
+
+TESTS COMPLETE.  Summary:
+
+Total tests: 1
+Passes: 1
+Failures: 0
+Unexpected Passes: 0
+Expected Failures: 0
+Missing Tests: 0
+Extra Tests: 0
+
+make: Leaving directory `--topdir--/general/reference/common/lib1/test/abuild-<native>'
+abuild: common-lib3.src (abuild-<native>): test-only
+abuild: common-lib2.src (abuild-<native>): test-only
+abuild: common-lib2.test (abuild-<native>): test-only
+make: Entering directory `--topdir--/general/reference/common/lib2/test/abuild-<native>'
+
+*********************************
+STARTING TESTS on ---timestamp---
+*********************************
+
+
+Running ../qtest/lib2.test
+lib2  1 (test lib2 class)                                      ... PASSED
+
+Overall test suite                                             ... PASSED
+
+TESTS COMPLETE.  Summary:
+
+Total tests: 1
+Passes: 1
+Failures: 0
+Unexpected Passes: 0
+Expected Failures: 0
+Missing Tests: 0
+Extra Tests: 0
+
+make: Leaving directory `--topdir--/general/reference/common/lib2/test/abuild-<native>'
+abuild: common-lib3.test (abuild-<native>): test-only
+make: Entering directory `--topdir--/general/reference/common/lib3/test/abuild-<native>'
+
+*********************************
+STARTING TESTS on ---timestamp---
+*********************************
+
+
+Running ../qtest/lib3.test
+lib3  1 (test lib3 class)                                      ... PASSED
+
+Overall test suite                                             ... PASSED
+
+TESTS COMPLETE.  Summary:
+
+Total tests: 1
+Passes: 1
+Failures: 0
+Unexpected Passes: 0
+Expected Failures: 0
+Missing Tests: 0
+Extra Tests: 0
+
+make: Leaving directory `--topdir--/general/reference/common/lib3/test/abuild-<native>'
