@@ -1,3 +1,9 @@
+1.0
+===
+
+Set up autoconf files and a top level makefile so that ./configure;
+make; make install works from the top level.
+
 
 Java Problems
 =============
