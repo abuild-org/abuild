@@ -6609,9 +6609,10 @@ endif
          <para>
           This variable is to contain additional flags to be added to
           the command-line when linking.  The most common use for this
-          would be to support third-party libraries or linker flags
-          required to use third-party libraries.  For adding your own
-          libraries, you should always use
+          would be to pass flags to the linker that are other than
+          libraries or library paths.  For linking with libraries,
+          whether they are your own libraries or third-party
+          libraries, you are better off using
           <varname>$(LIBDIRS)</varname> and <varname>$(LIBS)</varname>
           instead.
          </para>
@@ -6935,7 +6936,8 @@ endif
         <term>XLINKFLAGS</term>
         <listitem>
          <para>
-          additional flags passed to the linker
+          additional flags passed to the linker&mdash;usually not used
+          for libraries
          </para>
         </listitem>
        </varlistentry>
@@ -13011,6 +13013,14 @@ Y = $(X)
          item without depending on <command>all</command>.
         </para>
        </listitem>
+       <listitem>
+        <para>
+         Documentation update: clarify that
+         <varname>XLINKFLAGS</varname> should not be used for
+         libraries.  The documentation still reflected an earlier idea
+         of what this variable should be used for.
+        </para>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
@@ -14309,7 +14319,9 @@ Y = $(X)
          Remove Windows-only <varname>XLIBS</varname> interface
          variable.  Instead of appending <filename>xyz</filename> to
          <varname>XLIBS</varname>, append <filename>xyz.lib</filename>
-         to <varname>XLINKFLAGS</varname>.
+         to <varname>XLINKFLAGS</varname>.  (Note: in a later change,
+         we now recommend using LIBS and LIBDIRS for third-party
+         libraries just as you would for your own libraries.)
         </para>
        </listitem>
        <listitem>
