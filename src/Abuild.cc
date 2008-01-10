@@ -45,6 +45,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     stdout_is_tty(Util::stdoutIsTty()),
     max_workers(1),
     keep_going(false),
+    no_dep_failures(false),
     full_integrity(false),
     list_traits(false),
     list_platforms(false),
@@ -259,6 +260,10 @@ Abuild::parseArgv()
 	    this->make_args.push_back("-k");
 	    this->ant_args.push_back("-k");
 	    this->keep_going = true;
+	}
+	else if (arg == "--no-dep-failures")
+	{
+	    this->no_dep_failures = true;
 	}
 	else if ((arg == "-n") ||
 		 (arg == "--just-print") ||
@@ -3472,7 +3477,17 @@ Abuild::buildBuildset()
     }
     verbose("starting build");
     this->logger.flushLog();
-    return r.run(! keep_going);
+    bool stop_on_error = true;
+    bool disable_failure_propagation = false;
+    if (this->keep_going)
+    {
+	stop_on_error = false;
+	if (this->no_dep_failures)
+	{
+	    disable_failure_propagation = true;
+	}
+    }
+    return r.run(stop_on_error, disable_failure_propagation);
 }
 
 bool
@@ -4636,6 +4651,8 @@ Abuild::help()
     h("    --dry-run |");
     h("    --recon");
     h("  --no-abuild-logger  ant only: suppress use of AbuildLogger");
+    h("  --no-dep-failures   when used with -k, attempt to build items even when");
+    h("                    one or more of their dependencies have failed");
     h("  --only-with-traits trait[,trait,...]   remove all items from build set");
     h("                    that do not have all of the named traits");
     h("  --platform-selector selector |       specify a platform selector");

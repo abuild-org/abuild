@@ -201,6 +201,7 @@ class Abuild
     std::list<std::string> ant_args;
     std::string start_dir;
     bool keep_going;
+    bool no_dep_failures;
     std::string buildset_name;
     std::set<std::string> buildset_named_items;
     std::string buildset_pattern;

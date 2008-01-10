@@ -1,0 +1,7 @@
+abuild: a (abuild-indep): all
+make: Entering directory `--topdir--/g/a/abuild-indep'
+make: *** [all] Error 1
+make: Leaving directory `--topdir--/g/a/abuild-indep'
+abuild: c (abuild-indep): all
+make: Entering directory `--topdir--/g/c/abuild-indep'
+make: Leaving directory `--topdir--/g/c/abuild-indep'

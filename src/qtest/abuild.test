@@ -1638,6 +1638,29 @@ $td->runtest(".. in source files",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/g");
+
+$td->runtest("build failure: normal",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test2.build-failures.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build failure: keep going",
+	     {$td->COMMAND => "abuild -b all -k",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test2.build-failures-keep-going.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build failure: no dep failures",
+	     {$td->COMMAND => "abuild -b all -k --no-dep-failures",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test2.build-failures-no-dep-failures.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 setup("test3", "test2.not-accessed.out");
 
 $td->runtest("abuild dependency errors",
@@ -2628,7 +2651,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(259 +
+$td->report(262 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 18 : 0) +
 	    ($have_whole_archive ? 2 : 1));
