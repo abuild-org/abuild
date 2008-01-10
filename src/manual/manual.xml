@@ -3620,19 +3620,39 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       continuing on failure.  In this case, you may pass the
       <option>-k</option> option to &abuild;.  When run with the
       <option>-k</option> option, &abuild; will continue building
-      other items after one item fails.  Note, however, that if one
-      build item fails, &abuild; will not attempt to build any other
-      items that depend on the failed item even when run with
-      <option>-k</option>.  It will also exit with an abnormal exit
-      status after it builds everything that it can.  When run with
-      <option>-k</option>, &abuild; also passes the corresponding
-      flags to the backends so that they will try to build as much as
-      they can without stopping on the first error.  Both
-      <application>make</application> and
+      other items after one item fails.  It will also exit with an
+      abnormal exit status after it builds everything that it can.
+      When run with <option>-k</option>, &abuild; also passes the
+      corresponding flags to the backends so that they will try to
+      build as much as they can without stopping on the first error.
+      Both <application>make</application> and
       <application>ant</application> behave similarly to &abuild;:
       they will keep going on failure, skip any targets that depend on
       failed targets, and exit abnormally if any failures are
       detected.
+     </para>
+     <para>
+      Ordinarily, if one build item fails, &abuild; will not attempt
+      to build any other items that depend on the failed item even
+      when run with <option>-k</option>.  If you specify the
+      <option>--no-dep-failures</option> option along with
+      <option>-k</option>, then &abuild; will not only continue after
+      the first failure but will also attempt to build items even when
+      one or more of their dependencies have failed.  Use of this
+      option may result in cascading errors since the build of one
+      item is likely to fail as a result of failures in its
+      dependencies.  There are, however, several cases in which this
+      option may still be useful.  For example, if building a large
+      build tree with known problems in it, it may be useful to first
+      tell &abuild; to build everything it possibly can.  Then you can
+      go back and try to clean up the error conditions without having
+      to wait for the compilation of files that would have been
+      buildable before.  Another case in which this option may be
+      useful is when running test suites: in many cases, we may wish
+      to attempt to run test suites for items even if some of the test
+      suites of their dependencies have failed.  Essentially, running
+      <option>-k --no-dep-failures</option> allows &abuild; to attempt
+      to build everything that the backends will allow it to build.
      </para>
     </sect2>
     <sect2 id="ref.example.project-code-area">
@@ -4702,7 +4722,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         depend on any failed items.  Also tells backend to continue
         after its first failure.  Even with <option>-k</option>,
         &abuild; will never try to build an item if any of its
-        dependencies failed.
+        dependencies failed.  This behavior may be changed by
+        also specifying <option>--no-dep-failures</option>.
        </para>
       </listitem>
      </varlistentry>
@@ -4758,6 +4779,25 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         <classname>DefaultLogger</classname> and
         <classname>NoBannerLogger</classname> loggers produce
         misleading output when there are nested ant targets.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--no-dep-failures</term>
+      <listitem>
+       <para>
+        Must be combined with <option>-k</option>.  By default,
+        &abuild; does not attempt to build any items whose
+        dependencies have failed even if <option>-k</option> is
+        specified.  When the <option>--no-dep-failures</option> option
+        is specified along with <option>-k</option>, &abuild; will
+        attempt to build items even if one or more of their
+        dependencies have failed.  Using <option>-k</option> and
+        <option>--no-dep-failures</option> together enables &abuild;
+        to attempt to build everything that the backends will allow.
+        Note that cascading errors (<emphasis>i.e.</emphasis>, errors
+        resulting from earlier errors) are likely when this option is
+        used.
        </para>
       </listitem>
      </varlistentry>
@@ -13009,7 +13049,14 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
-         Added new <command>test-only</command> target to test a build
+         Added <option>--no-dep-failures</option> option.  When used
+         with <option>-k</option>, tells &abuild; to attempt to build
+         items even when their dependencies have failed.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Added <command>test-only</command> target to test a build
          item without depending on <command>all</command>.
         </para>
        </listitem>
