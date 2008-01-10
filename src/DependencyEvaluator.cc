@@ -4,6 +4,7 @@
 
 DependencyEvaluator::DependencyEvaluator(DependencyGraph const& graph) :
     graph(graph),
+    propagate_failure(true),
     num_running(0),
     change_callback(0)
 {
@@ -69,6 +70,12 @@ DependencyGraph const&
 DependencyEvaluator::getGraph() const
 {
     return this->graph;
+}
+
+void
+DependencyEvaluator::disableFailurePropagation()
+{
+    this->propagate_failure = false;
 }
 
 void
@@ -151,10 +158,10 @@ DependencyEvaluator::setChangeCallback(ChangeCallback callback, bool call_now)
 void
 DependencyEvaluator::evaluate(ItemType const& item)
 {
-    // This routine looks at the given and sets its state based on the
-    // states of its dependencies as described in the comments at the
-    // top of DependencyEvaluator.hh.  When an item's state is set to
-    // failed, that information is automatically propagated
+    // This routine looks at the given item and sets its state based
+    // on the states of its dependencies as described in the comments
+    // at the top of DependencyEvaluator.hh.  When an item's state is
+    // set to failed, that information is automatically propagated
     // recursively to its reverse dependencies.
 
     ItemState istate = this->states[item];
@@ -175,7 +182,10 @@ DependencyEvaluator::evaluate(ItemType const& item)
 	ItemState state = this->states[*dep];
 	if ((state == i_failed) || (state == i_depfailed))
 	{
-	    failed = true;
+	    if (this->propagate_failure)
+	    {
+		failed = true;
+	    }
 	    break;
 	}
 	else if (state != i_completed)

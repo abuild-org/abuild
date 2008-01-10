@@ -314,3 +314,164 @@ States:
   j: 5
   i: 5
 all items are done
+
+Running evaluator
+States:
+  d: 1
+  p: 1
+  r: 1
+  q: 0
+  e: 0
+  f: 0
+  b: 0
+  g: 1
+  h: 1
+  c: 0
+  a: 0
+  n: 1
+  o: 0
+  k: 0
+  l: 1
+  m: 1
+  j: 0
+  i: 0
+item d is ready; running item
+item p is ready; running item
+item r is ready; running item
+item g is ready; running item
+item h is ready; running item
+item n is ready; running item
+item l is ready; running item
+item m is ready; running item
+no more items are ready; marking running items complete
+States:
+  d: 3
+  p: 3
+  r: 3
+  q: 1
+  e: 0
+  f: 0
+  b: 0
+  g: 3
+  h: 3
+  c: 1
+  a: 0
+  n: 3
+  o: 0
+  k: 0
+  l: 3
+  m: 3
+  j: 0
+  i: 0
+item q is ready; running item
+item c is ready; running item
+no more items are ready; marking running items complete
+States:
+  d: 3
+  p: 3
+  r: 3
+  q: 3
+  e: 1
+  f: 1
+  b: 0
+  g: 3
+  h: 3
+  c: 3
+  a: 0
+  n: 3
+  o: 1
+  k: 0
+  l: 3
+  m: 3
+  j: 0
+  i: 0
+item e is ready; running item
+item f is ready; running item
+item o is ready; running item
+no more items are ready; marking running items complete
+marking o as failed
+States:
+  d: 3
+  p: 3
+  r: 3
+  q: 3
+  e: 3
+  f: 3
+  b: 1
+  g: 3
+  h: 3
+  c: 3
+  a: 0
+  n: 3
+  o: 4
+  k: 1
+  l: 3
+  m: 3
+  j: 0
+  i: 0
+item b is ready; running item
+item k is ready; running item
+no more items are ready; marking running items complete
+States:
+  d: 3
+  p: 3
+  r: 3
+  q: 3
+  e: 3
+  f: 3
+  b: 3
+  g: 3
+  h: 3
+  c: 3
+  a: 1
+  n: 3
+  o: 4
+  k: 3
+  l: 3
+  m: 3
+  j: 1
+  i: 0
+item a is ready; running item
+item j is ready; running item
+no more items are ready; marking running items complete
+States:
+  d: 3
+  p: 3
+  r: 3
+  q: 3
+  e: 3
+  f: 3
+  b: 3
+  g: 3
+  h: 3
+  c: 3
+  a: 3
+  n: 3
+  o: 4
+  k: 3
+  l: 3
+  m: 3
+  j: 3
+  i: 1
+item i is ready; running item
+no more items are ready; marking running items complete
+States:
+  d: 3
+  p: 3
+  r: 3
+  q: 3
+  e: 3
+  f: 3
+  b: 3
+  g: 3
+  h: 3
+  c: 3
+  a: 3
+  n: 3
+  o: 4
+  k: 3
+  l: 3
+  m: 3
+  j: 3
+  i: 3
+all items are done

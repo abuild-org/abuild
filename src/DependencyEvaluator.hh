@@ -4,16 +4,22 @@
 // This object is initialized with an error-free dependency graph.  It
 // keeps track of the state of each item in the graph based on the
 // states of the item's dependencies.  An item's state may be
-// "waiting", "ready", "running", "completed", or "failed".  An item's
-// state is "ready" when all of its dependencies have state
-// "completed".  An item is "failed" when any of its dependencies have
-// state "failed" or when it is explicitly set to failed.  Otherwise,
-// an item's state is "waiting".  A "ready" item may have its state
-// explicitly set to "running".  A "running" item may have its state
-// explicitly set to "completed" or "failed", both of which cause
-// re-evaluation of the states of any reverse dependencies.  The
-// DependencyEvaluator may also be asked for the first "ready" item in
-// dependency order.
+// "waiting", "ready", "running", "completed", "failed", or
+// "depfailed".  An item's state is "ready" when all of its
+// dependencies have state "completed".  An item has state "failed"
+// when its state is explicitly set to "failed".  Any item has state
+// "depfailed" when any of its dependencies have state "failed" or
+// "depfailed".  Otherwise, an item's state is "waiting".  A "ready"
+// item may have its state explicitly set to "running".  A "running"
+// item may have its state explicitly set to "completed" or "failed",
+// both of which cause re-evaluation of the states of any reverse
+// dependencies.  The DependencyEvaluator may also be asked for the
+// first "ready" item in dependency order.  If the flag
+// propagate_failure is false, then the "depfailed" state is not used.
+// In this case, an item's state is set to "ready" when all of its
+// dependencies have state "completed" or "failed".
+
+// A dependency evaluator object may be used only once.
 
 #include <DependencyGraph.hh>
 #include <boost/function.hpp>
@@ -44,6 +50,13 @@ class DependencyEvaluator
     // Return a const reference to the graph being used by this
     // evaluator.
     DependencyGraph const& getGraph() const;
+
+    // Turn off failure propagation.  When failure propagation is off,
+    // an item is not skipped when its dependencies fail.  In this
+    // mode, items become ready once all their dependencies have
+    // completed whether successfully or otherwise.  Must be called
+    // before changing any item states.
+    void disableFailurePropagation();
 
     // Item state setters.  These automatically re-evaluate the states
     // of reverse dependencies.
@@ -85,6 +98,7 @@ class DependencyEvaluator
 
     DependencyGraph const& graph;
     std::map<ItemType, ItemState> states;
+    bool propagate_failure;
     int num_running;
     ChangeCallback change_callback;
 };

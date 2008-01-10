@@ -134,6 +134,10 @@ int main()
     std::cout << std::endl;
     DependencyEvaluator e2(g);
     run(e2, true);
+    std::cout << std::endl;
+    DependencyEvaluator e3(g);
+    e3.disableFailurePropagation();
+    run(e3, true);
 
     return 0;
 }
