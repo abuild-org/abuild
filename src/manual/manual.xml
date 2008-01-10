@@ -13056,6 +13056,12 @@ Y = $(X)
        </listitem>
        <listitem>
         <para>
+         Bug fix: a failing JUnit test suite run now causes the build
+         item to fail.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
          Added <command>test-only</command> target to test a build
          item without depending on <command>all</command>.
         </para>
