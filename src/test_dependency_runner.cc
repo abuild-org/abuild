@@ -115,23 +115,26 @@ int main(int argc, char* argv[])
 	exit(2);
     }
 
-    for (int i = 0; i < 4; ++i)
+    for (int i = 0; i < 5; ++i)
     {
 	// i = 0: fail11, ! silent, ! stop_on_first_error
 	// i = 1: fail11, silent, stop_on_first_error
-	// i = 0: ! fail11, silent, ! stop_on_first_error
+	// i = 2: ! fail11, silent, ! stop_on_first_error
+	// i = 3: fail11, silent, ! stop_on_first_error, use_callback
+	// i = 4: 3 + disable_failure_propagation
 	bool fail11 = (i != 2);
 	bool silent = (i != 0);
 	bool stop_on_first_error = (i == 1);
-	bool use_callback = (i == 3);
-	int num_threads = (i == 3 ? 1 : 50);
+	bool disable_failure_propagation = (i == 4);
+	bool use_callback = (i >= 3);
+	int num_threads = (i >= 3 ? 1 : 50);
 	DependencyRunner r(graph, num_threads,
 			   boost::bind(process_item, _1, fail11, silent));
 	if (use_callback)
 	{
 	    r.setChangeCallback(change_callback, true);
 	}
-	bool status = r.run(stop_on_first_error);
+	bool status = r.run(stop_on_first_error, disable_failure_propagation);
 	logger->flushLog();
 	if (status)
 	{

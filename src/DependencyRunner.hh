@@ -19,8 +19,11 @@ class DependencyRunner
 
     // Returns false iff there were any errors.  If
     // stop_on_first_error is true, if any item fails, this method
-    // returns after all currently pending jobs are completed.
-    bool run(bool stop_on_first_error = false);
+    // returns after all currently pending jobs are completed.  If
+    // disable_failure_propagation is true, failure propagation is
+    // disabled in the underlying dependency evaluator.
+    bool run(bool stop_on_first_error = false,
+	     bool disable_failure_propagation = false);
 
     // Return the internally stored evaluator and graph.
     DependencyEvaluator const& getEvaluator() const;

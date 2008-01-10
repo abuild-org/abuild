@@ -30,11 +30,16 @@ DependencyRunner::setChangeCallback(DependencyEvaluator::ChangeCallback callback
 }
 
 bool
-DependencyRunner::run(bool stop_on_first_error)
+DependencyRunner::run(bool stop_on_first_error,
+		      bool disable_failure_propagation)
 {
     bool done = false;
     bool any_errors = false;
     bool stop = false;
+    if (disable_failure_propagation)
+    {
+	evaluator.disableFailurePropagation();
+    }
     while (! done)
     {
 	pool.wait();
