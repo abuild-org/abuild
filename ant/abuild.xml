@@ -770,7 +770,7 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
     <fileset dir="${abuild.private.dir.dist}" includes="*.jar"/>
    </classpath>
    <test name="${abuild.junit.testsuite}"
-         haltonfailure="yes" todir="${abuild.private.dir.dist}">
+         todir="${abuild.private.dir.dist}">
     <formatter type="xml"/>
    </test>
   </junit>
