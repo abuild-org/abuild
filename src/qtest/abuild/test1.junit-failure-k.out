@@ -1,0 +1,69 @@
+abuild: code (abuild-java): test
+Buildfile: --abuild.xml--
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: failing (abuild-java): test
+Buildfile: --abuild.xml--
+
+-test-junit:
+    [junit] Running com.example.FailingTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: <time>
+Target '-test-junit' failed with message 'Test com.example.FailingTest failed'.
+Cannot execute '-do-test' - '-test-junit' failed or was not executed.
+Cannot execute 'test-only' - '-do-test' failed or was not executed.
+Cannot execute 'test' - 'test-only' failed or was not executed.
+
+BUILD FAILED
+--abuild.xml--:nn: Test com.example.FailingTest failed
+
+Total time: <time>
+abuild: test (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/empty
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/classes
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/dist
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/junit/test/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/junit/test/abuild-java/dist/potato-test.jar
+
+-test-junit:
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/junit
+    [junit] Running com.example.PotatoTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
+
+-test-qtest:
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running ../qtest/potato.test
+     [exec] potato  1 (potato)                                 ... PASSED
+     [exec] potato  2 (fail)                                   ... PASSED
+     [exec] 
+     [exec] Overall test suite                                 ... PASSED
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 2
+     [exec] Passes: 2
+     [exec] Failures: 0
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 
+
+BUILD SUCCESSFUL
+Total time: <time>

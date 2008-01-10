@@ -4,12 +4,10 @@
 Set up autoconf files and a top level makefile so that ./configure;
 make; make install works from the top level.
 
-See if we can get a junit test case into abuild's test suite.
-Alternatively, consider moving junit support to a plugin, which is
-probably where it belongs anyway so people can change how they invoke
-the junit task.  See ~/argon/tmp/abuild-junit.  abuild -k -b test
-should show the "failing" build item failing.
-
+We use the privately set "debug" and "deprecation" properties in
+abuild.xml to set debug and deprecation.  These should really be set
+using documented abuild properties, and we should figure out what
+other similar properties we might want to set in this way.
 
 Java Problems
 =============
@@ -62,11 +60,6 @@ this way.
    classpath that contains non-existent items.  In general, there may
    be an issue with not getting any notification of non-existent
    classpath items.
-
- * We use the privately set "debug" and "deprecation" properties in
-   abuild.xml to set debug and deprecation.  These should really be
-   set using document abuild properties, and we should figure out what
-   other similar properties we might want to set in this way.
 
 
 Issues, Enhancement Ideas

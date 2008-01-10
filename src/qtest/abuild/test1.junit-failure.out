@@ -1,0 +1,47 @@
+abuild: code (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/empty
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/classes
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/dist
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/junit/code/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/junit/code/abuild-java/dist/potato.jar
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: failing (abuild-java): test
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/empty
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/classes
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/dist
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/junit/failing/abuild-java/classes
+
+jar:
+      [jar] Building jar: --topdir--/junit/failing/abuild-java/dist/failing-test.jar
+
+-test-junit:
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/junit
+    [junit] Running com.example.FailingTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: <time>
+
+BUILD FAILED
+--abuild.xml--:nn: Test com.example.FailingTest failed
+
+Total time: <time>

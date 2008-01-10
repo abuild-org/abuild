@@ -40,8 +40,12 @@ while (<>)
     # Skip VC++'s DLL creation output
     next if m/Creating library .*\.lib and object .*\.exp/i;
     next if (m/LINK\b.*\bperforming full link/);
+    # Filter junitreport
+    next if m/\[junitreport\]\s/;
     s,--abuild-dir--.*abuild.xml,--abuild.xml--,;
+    s,(--abuild.xml--):(\d+),$1:nn,;
     s/^(Total time: ).*/$1<time>/;
+    s/(\[junit\].*Time elapsed: ).*/$1<time>/;
     print;
     if (m,Entering directory.*/autoconf/,)
     {

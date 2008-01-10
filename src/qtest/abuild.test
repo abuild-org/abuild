@@ -87,6 +87,7 @@ if ($^O =~ m/^(cygwin|MSWin32)$/)
 my $test_java = (! ($ENV{'ABUILD_NO_JAVA'} || 0));
 my $jar = undef;
 my $java = undef;
+my $test_junit = 0;
 if ($test_java)
 {
     if (exists $ENV{'JAVA_HOME'})
@@ -103,6 +104,16 @@ if ($test_java)
     {
 	$jar = "jar";
 	$java = "java";
+    }
+    if ((exists $ENV{'ABUILD_JUNIT_JAR'}) && (-f $ENV{'ABUILD_JUNIT_JAR'}))
+    {
+	$test_junit = 1;
+    }
+    else
+    {
+	$td->emphasize(
+	    "ABUILD_JUNIT_JAR is not set or doesn't point to a file;" .
+	    " junit tests will be skipped");
     }
 }
 
@@ -1464,6 +1475,32 @@ $td->runtest("descendants",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+if ($test_junit)
+{
+    cd("work/junit");
+
+    $td->runtest("junit with failure",
+		 {$td->COMMAND => "abuild -b all test",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/test1.junit-failure.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("junit with failure and -k",
+		 {$td->COMMAND => "abuild -k -b all test",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/test1.junit-failure-k.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("junit with no failures",
+		 {$td->COMMAND => "abuild -d test -C test",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+		 {$td->FILE => "$top/test1.junit-okay.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 # test2 and test3 test various abuild error conditions
 
 setup("test2");
@@ -2654,6 +2691,7 @@ cleanup();
 $td->report(262 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 18 : 0) +
+	    ($test_junit ? 3 : 0) +
 	    ($have_whole_archive ? 2 : 1));
 
 sub cleanup
