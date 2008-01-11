@@ -10,6 +10,10 @@ abuild.xml to set debug and deprecation.  These should really be set
 using documented abuild properties, and we should figure out what
 other similar properties we might want to set in this way.
 
+Document how to use mingw.  Consider whether to improve mingw
+recognition.
+
+
 Java Problems
 =============
 
