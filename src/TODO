@@ -13,6 +13,8 @@ other similar properties we might want to set in this way.
 Document how to use mingw.  Consider whether to improve mingw
 recognition.
 
+ant with build failure appears not to exit abnormally in Windows.
+
 
 Java Problems
 =============
