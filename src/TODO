@@ -15,6 +15,8 @@ recognition.
 
 ant with build failure appears not to exit abnormally in Windows.
 
+Figure out again why we can't add a custom target in ant code.
+
 
 Java Problems
 =============
