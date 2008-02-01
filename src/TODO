@@ -17,6 +17,8 @@ ant with build failure appears not to exit abnormally in Windows.
 
 Figure out again why we can't add a custom target in ant code.
 
+Document: install target is another use of plugins
+
 
 Java Problems
 =============
