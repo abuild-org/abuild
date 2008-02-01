@@ -19,6 +19,17 @@ Figure out again why we can't add a custom target in ant code.
 
 Document: install target is another use of plugins
 
+General
+=======
+
+ * Joe Davison reports: I download abuild 1.0.rc1 from sourceforge
+   today.  It does not build natively under Mac OS 10.5.  The issue is
+   that the build process looks for the pthread library, but that
+   library does not exist under Mac OS.  I commented out the line that
+   adds the pthread library in the build process, and it appears to
+   build correctly.  I don't have qtest installed yet, so I was not
+   able to run the tests.  Additionally, the $(ABUILD_OUTPUT_DIR) is
+   "abuild-darwin.unknown.uknown.gcc", which looks a little odd.
 
 Java Problems
 =============
