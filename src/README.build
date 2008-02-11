@@ -1,3 +1,28 @@
+INTRODUCTION
+============
+
+Abuild currently builds using its own internal compiler support.
+Abuild "ships" with support for gcc and Microsoft Visual C++.  It also
+has partial support for mingw.  In order to build abuild with a
+different compiler, you would have to create a compiler support file
+for it as described in the documentation.  Though this is generally not
+difficult, it is not as easy as just passing a different compiler name
+to a configure script.
+
+Although abuild supports use of autoconf, it does not use autoconf
+itself, mainly for bootstrapping reasons.  There is some manual
+configuration that may be required.  Abuild has not yet been ported to
+very many systems, but the code is quite portable and should work on
+multiple platforms relative easily.
+
+Patches are welcome.  If there is sufficient interest or demand,
+support for some kind of automatic configuration and/or additional
+compiler support may be added to the build process for abuild itself.
+
+For the time being, please read and follow the instructions in this
+file.
+
+
 PREREQUISITES
 =============
 
@@ -43,6 +68,8 @@ make if no version of abuild is available, run
 
 make -f Makefile.bootstrap
 
+Then follow the steps in "COMMON" below.
+
 
 WINDOWS BUILD
 =============
@@ -52,7 +79,14 @@ To build on Windows, perform the following steps:
  * have Visual C++ environment variables and path set (by running the
    batch file provided with Visual C++)
 
- * mkdir abuild-windows.ix86.nt5-cygwin.msvc
+ * Determine the name of the platform directory by running
+   ../private/bin/bootstrap_native_platform If you are on a 32-bit
+   Intel system running Windows XP, you will see the result
+   "abuild-windows.ix86.nt5-cygwin.msvc".  Other systems should see
+   similar results.
+
+ * Create the abuild output directory (e.g., "mkdir
+   abuild-windows.ix86.nt5-cygwin.msvc")
 
  * Go to a UNIX system with a working flex and bison and run "abuild
    save-auto".  [Note: as of 1.0.a15, this doesn't work in a
@@ -62,20 +96,28 @@ To build on Windows, perform the following steps:
    in at least this version.]
 
  * Copy the files in the auto-srcs directory from there into your
-   local abuild-windows.ix86.nt5-cygwin.msvc directory and then delete
-   the auto-srcs directory.
+   local abuild output directory and then delete the auto-srcs
+   directory.
 
- * Follow UNIX build instructions above.
+ * Run
+
+   make -f Makefile.bootstrap
+
+ * Follow the "COMMON" instructions below.
 
 
 COMMON
 ======
 
-Once built, run "abuild --build=all" in the current directory to build
-other pieces of abuild.  See manual/README for additional requirements
-for building the documentation.  If you don't want to build the
-documentation but still want to build the Java portion of abuild, run
-"abuild -C ant-library".
+If you are building both Java support and documentation, run
+"./<output-dir>/abuild --build=all" where "<output-dir>" is replaced
+by the abuild output directory, which will start with "abuild-".
+
+See manual/README for additional requirements for building the
+documentation.  If you don't want to build the documentation but still
+want to build the Java portion of abuild, run "./<output-dir>/abuild
+-C ant-library".  Likewise, to build just the manual without building
+Java support, run "./<output-dir>/abuild -C manual".
 
 
 CREATION OF SOURCE RELEASE
@@ -83,7 +125,9 @@ CREATION OF SOURCE RELEASE
 
 Do a clean export of abuild from the version control system.  Rename
 abuild to abuild-version.  Create abuild-version.tar.bz2 (and/or
-abuild-version.tar.gz) containing that directory.
+abuild-version.tar.gz) containing that directory.  Note that, as of
+the 1.0 release, the source repository is not publicly available, but
+it could be made available if there is a need to do so.
 
 
 INSTALLATION/CREATION OF BINARY RELEASE

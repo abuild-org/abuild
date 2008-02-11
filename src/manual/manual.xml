@@ -9,6 +9,15 @@
 <!ENTITY lastreleased "December 3, 2007">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
+<!ENTITY javawarning "
+<warning>
+<para>
+Note that &abuild;'s Java support is considered alpha as of
+version 1.0.  Version 1.1 of &abuild; may include a Java solution that
+is not backward compatible with the solution in version 1.0.
+</para>
+</warning>
+">
 ]>
 <!--
 
@@ -446,6 +455,134 @@ following checks:
       </member>
      </simplelist>
     </para>
+   </sect1>
+   <sect1 id="ref.release-policy">
+    <title>&Abuild; Version Numbers and Release Policy</title>
+    <para>
+     This section describes what you can expect in terms of &abuild;
+     version numbers and non-compatible changes.
+    </para>
+    <sect2 id="ref.version-numbering">
+     <title>&Abuild; Version Numbers</title>
+     <para>
+      Each &abuild; release is assigned a version number.  For
+      &abuild; releases, we use the following version numbering
+      convention:
+
+      <programlisting>
+      <replaceable>major</replaceable>.<replaceable>minor</replaceable>[<replaceable>patch-or-pre</replaceable>]
+</programlisting>
+     </para>
+     <para>
+      The <replaceable>major</replaceable> field of the version number
+      indicates the major version number.  It changes whenever a major
+      release is made.  A new major release of &abuild; represents a
+      wholesale change in the way &abuild; works.  Major release are
+      expected to be very infrequent.
+     </para>
+     <para>
+      The <replaceable>minor</replaceable> field of the version number
+      indicates the minor version number.  It changes whenever a minor
+      release is made.  A minor release is an incremental release that
+      may introduce new features, fix bugs, or change the way some
+      things work, but it will not fundamentally shift the way
+      &abuild; works.  We impose tight restrictions on the
+      introduction of non-backward-compatible changes in minor
+      releases as discussed below.
+     </para>
+     <para>
+      The <replaceable>patch-or-pre</replaceable> field can indicate
+      either a patch release or a prerelease.  A patch release is a
+      bug-fix only release.  A prerelease is an alpha or beta release
+      or a release candidate that precedes a regular release.
+     </para>
+     <para>
+      Before a regular major or minor release, there may be a series
+      of alpha releases, beta releases, and release candidates.  In
+      those cases, the <replaceable>patch-or-pre</replaceable> field
+      of the version number is either
+      &ldquo;<literal>a</literal>&rdquo;,
+      &ldquo;<literal>b</literal>&rdquo;, or
+      &ldquo;<literal>rc</literal>&rdquo; followed by a number.  The
+      prerelease version numbers clearly indicate which regular
+      release the prerelease applies to.  For example, version
+      <literal>1.3.a4</literal> would be the fourth alpha release
+      preceding the release of version <literal>1.3</literal>.
+     </para>
+     <para>
+      After any major or minor release, it is possible that a small
+      problem may be corrected in a bug-fix release.  In such a
+      release, the <replaceable>patch-or-pre</replaceable> field
+      contains a number that indicates which bug-fix release this is.
+      For example, version <literal>1.2.1</literal> would be a bug-fix
+      release to version <literal>1.2</literal>.
+     </para>
+    </sect2>
+    <sect2 id="ref.compatibility-policy">
+     <title>Backward Compatibility Policy</title>
+     <para>
+      In a new major release of &abuild; (e.g., version 2.0), there is
+      no promise that changes will be backward compatible, nor is
+      there any expectation that configuration files from older
+      &abuild; releases will work with the new version.  When
+      possible, care will be taken to mitigate any inconvenience such
+      as providing upgrade scripts.
+     </para>
+     <para>
+      In each new minor release of &abuild;, there may be new features
+      and backward-compatible changes.  In minor releases, we adopt a
+      stricter policy regarding non-backward-compatible changes.
+      Specifically, non-backward-compatible changes may be introduced
+      only if the changed construct generated a deprecation warning in
+      the previous minor release.  In other words, if particular
+      construct in version <literal>1.3</literal> is going to be
+      dropped or changed in a non-compatible way, the change can't be
+      made until version <literal>1.5</literal>.  In version
+      <literal>1.4</literal>, the new way may work, but use of the
+      deprecated construct must still work and must generate a
+      warning.  The old way can be dropped entirely in version
+      <literal>1.5</literal> once users have had a chance to adjust
+      their configuration files.  In that way, users who take every
+      minor release upgrade can be guaranteed that they will not
+      experience surprise non-compatible changes, and they will not
+      have to update their configuration files at the same time that
+      they upgrade &abuild;.
+     </para>
+     <para>
+      With alpha releases, there is no commitment to avoiding
+      non-compatible changes.  In particular, a feature that was
+      introduced into &abuild; during an alpha testing period may be
+      modified in non-compatible ways or dropped entirely during the
+      course of alpha testing.  During beta testing, every effort will
+      be made to avoid non-compatible changes, but they are still
+      allowed.  No non-compatible changes will be made from the first
+      release candidate through the next minor release.
+     </para>
+     <para>
+      Specific exceptions may be made to any of the above rules, but
+      any such exceptions will be clearly stated in the release notes
+      or the documentation.  It may happen, for example, that a
+      particular new feature is still in development when a release is
+      made.  In that case, the release notes may declare that feature
+      to still be alpha, in which case non-compatible changes can be
+      introduced in the next release.
+     </para>
+     <para>
+      We'll clarify with some concrete examples.  Suppose a new
+      feature is planned for version <literal>1.4</literal> of
+      &abuild;.  It would be okay if the first implementation of that
+      feature appeared in version <literal>1.4.a2</literal> and if the
+      feature were changed in a non-compatible way in
+      <literal>1.4.a6</literal>.  However, after version
+      <literal>1.4.rc1</literal> was released, the next non-compatible
+      change would not be permitted until version
+      <literal>1.5.a1</literal>, and even then, the feature as it
+      worked in version <literal>1.4</literal> would still have to
+      work, though a deprecation warning would be issued.  The old
+      version <literal>1.4</literal> way of doing things could stop
+      working altogether in version <literal>1.6.a1</literal>.
+     </para>
+    </sect2>
    </sect1>
    <sect1 id="ref.introduction.design-features">
     <title>Design Features</title>
@@ -1095,6 +1232,24 @@ C:\cygwin\cygwin.bat
      please see <xref linkend="ref.build-items-and-trees"/>.
     </para>
    </sect1>
+   <sect1 id="ref.compiler-selection">
+    <title>Compiler Selection</title>
+    <para>
+     Full details on compiler support and compiler selection are
+     covered in <xref linkend="ref.platform-selection"/>.  To get
+     started, on Linux systems, &abuild; will build with
+     <application>gcc</application> by default.  On Windows, if you
+     run &abuild; from a shell that is appropriately set up to run
+     Microsoft Visual C++ (such as by running
+     <command>%VS71COMNTOOLS%\vsvars32.bat</command>, or similar for
+     your compiler version), &abuild; will automatically use Visual
+     C++.  If you have cygwin installed with gcc and the mingw runtime
+     environment, &abuild; will attempt to use <command>gcc
+     -mno-cygwin</command> to build as long as you set the
+     <envar>MINGW</envar> environment variable to
+     <literal>1</literal>.
+    </para>
+   </sect1>
    <sect1 id="ref.example.basic.cxx-library">
     <title>Building a C++ Library</title>
     <para>
@@ -1259,6 +1414,7 @@ C:\cygwin\cygwin.bat
    </sect1>
    <sect1 id="ref.example.basic.java-library">
     <title>Building a Java Library</title>
+    &javawarning;
     <para>
      In our next example, we'll demonstrate how to build a simple Java
      library.  &Abuild; has two different ways to build Java code: a
@@ -1316,6 +1472,7 @@ C:\cygwin\cygwin.bat
    </sect1>
    <sect1 id="ref.example.basic.java-program">
     <title>Building a Java Program</title>
+    &javawarning;
     <para>
      In Java, there is really no distinction between a
      &ldquo;library&rdquo; and a &ldquo;program&rdquo; except that a
@@ -5077,6 +5234,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    </sect1>
    <sect1 id="ref.targets.java">
     <title>Java-specific Targets</title>
+    &javawarning;
     <para>
      Java-based build items that use the property-driven build method
      (<filename>Abuild-ant.properties</filename>) define several
@@ -7368,6 +7526,7 @@ endif
   </chapter>
   <chapter id="ref.ant-build-files">
    <title>The Apache Ant Build Files</title>
+    &javawarning;
    <para>
     There are two different Java build files:
     <filename>Abuild-ant.properties</filename> for property-driven
@@ -8613,6 +8772,7 @@ endif
   </chapter>
   <chapter id="ref.java-hooks-and-generators">
    <title>Java Hooks and Code Generators</title>
+    &javawarning;
    <para>
     In this chapter, we explore the use of hooks and code generators
     for property-driven Java builds.  We also demonstrate how to have
@@ -10435,6 +10595,7 @@ flag private INCLUDES = private-include
   </chapter>
   <chapter id="ref.java-archive-types">
    <title>JARs and Other Archives</title>
+    &javawarning;
    <para>
     In this example, we demonstrate how to create different types of
     archive types in Java.  The actual contents of these archives are
@@ -11534,12 +11695,12 @@ native-compiler qcc
     <sect2 id="ref.example.plugin.rule-checker">
      <title>Checking Project-Specific Rules</title>
      <para>
-      There are still other uses for plugins.  For instance, one can
-      use a plugin to enforce additional build tree-specific rules
-      that fall outside of &abuild;'s normal dependency checking
-      capabilities.  As an example, suppose you had a build item that
-      you wanted all build items to depend on and that you couldn't
-      make it a plugin because it had to build something.
+      Another use of a plugin could be to enforce additional build
+      tree-specific rules that fall outside of &abuild;'s normal
+      dependency checking capabilities.  As an example, suppose you
+      had a build item that you wanted all build items to depend on
+      and that you couldn't make it a plugin because it had to build
+      something.
       <footnote>
        <para>
         Recall that plugins are not allowed to build anything
@@ -11631,6 +11792,25 @@ native-compiler qcc
       item naming conventions, or any number of other possibilities.
      </para>
     </sect2>
+    <sect2 id="ref.install-target">
+     <title>Install Target</title>
+     <para>
+      Still another use of plugins could be to implement an
+      <command>install</command> target.  Although &abuild; provides
+      most of what is required to use build products within the source
+      tree, in most real systems, there comes a time when a
+      distribution has to be created.  You can write your own
+      <command>install</command> target or similar using plugins.
+      <footnote>
+       <para>
+        At present, there is no way to add new targets except for in a
+        single build item using &abuild;'s ant support.  This
+        limitation will likely be addressed in a future version of
+        &abuild;.
+       </para>
+      </footnote>
+     </para>
+    </sect2>
    </sect1>
   </chapter>
   <chapter id="ref.best-practices">
@@ -11641,8 +11821,44 @@ native-compiler qcc
     experience using &abuild; and lessons learned from that
     experience.
    </para>
+   <sect1 id="ref.guidelines-for-extension-authors">
+    <title>Guidelines for Extension Authors</title>
+    <para>
+     If you are writing code to extent &abuild; through plugins, hook
+     build items, or build item rules, there are several things you
+     should keep in mind.  This section describes items that pertain
+     to both <application>make</application> and
+     <application>ant</application> extensions.
+     <itemizedlist>
+      <listitem>
+       <para>
+        If your rules or plugin adds support for an optional tool, you
+        must consider carefully what you will do if that tool is not
+        available.  One option would be to fail.  Another option would
+        be to simply not provide the added functionality.  For
+        example, if you are providing a plugin that adds support for a
+        new compiler, your plugin should detect whether the compiler
+        is available, and if it is not, it should avoid listing it as
+        an available compiler or platform.  This makes it possible for
+        people to continue to build with other compilers on systems
+        that lack your additional one.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Since your <command>clean</command> target is not run when
+        &abuild; is invoked normally, please avoid having rules create
+        files outside of the output directory from which they are run.
+        Any such products will not be removed by &abuild; clean as run by
+        ordinary users even if you have coded removal of those products
+        in your own <command>clean</command> target.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+   </sect1>
    <sect1 id="ref.guidelines-for-make-rule-authors">
-    <title>Guidelines For Make Rule Authors</title>
+    <title>Guidelines for Make Rule Authors</title>
     <para>
      The code that goes into a <filename>Rules.mk</filename> or
      <filename>plugin.mk</filename> file is regular <application>GNU
@@ -11763,16 +11979,6 @@ native-compiler qcc
       </listitem>
       <listitem>
        <para>
-        Since your <command>clean</command> target is not run when
-        &abuild; is invoked normally, please avoid having rules create
-        files outside of the output directory from which they are run.
-        Any such products will not be removed by &abuild; clean as run by
-        ordinary users even if you have coded removal of those products
-        in your own <command>clean</command> target.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
         Sometimes it may be useful to provide debugging targets for your
         users that provide some information about the state as your
         rules see it.  The <filename>ccxx.mk</filename> rules provide a
@@ -11825,7 +12031,7 @@ native-compiler qcc
     </para>
    </sect1>
    <sect1 id="ref.guidelines-for-ant-target-authors">
-    <title>Guidelines For Ant Target Authors</title>
+    <title>Guidelines for Ant Target Authors</title>
     <para>
      The primary mechanism for extending the functionality of
      Java-based builds with &abuild; is by writing hook targets (see
@@ -13049,30 +13255,47 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
-         Added <option>--no-dep-failures</option> option.  When used
-         with <option>-k</option>, tells &abuild; to attempt to build
-         items even when their dependencies have failed.
+         <emphasis role="bold">WARNING ABOUT Java SUPPORT</emphasis>:
+         <emphasis>Java support is considered alpha at the time of
+         release of &abuild; version 1.0.  This means the Java support
+         in &abuild; version 1.1 may not be compatible with the Java
+         support in &abuild; version 1.0.</emphasis>  We are in the
+         process of rethinking how &abuild; should support Java, and
+         it is possible that a wholesale redesign of &abuild;'s Java
+         support will be forthcoming.
         </para>
        </listitem>
        <listitem>
-        <para>
-         Bug fix: a failing JUnit test suite run now causes the build
-         item to fail.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Added <command>test-only</command> target to test a build
-         item without depending on <command>all</command>.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Documentation update: clarify that
-         <varname>XLINKFLAGS</varname> should not be used for
-         libraries.  The documentation still reflected an earlier idea
-         of what this variable should be used for.
-        </para>
+        <para>Changes from earlier versions</para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Added <option>--no-dep-failures</option> option.  When used
+           with <option>-k</option>, tells &abuild; to attempt to
+           build items even when their dependencies have failed.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Bug fix: a failing JUnit test suite run now causes the
+           build item to fail.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Added <command>test-only</command> target to test a build
+           item without depending on <command>all</command>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Documentation update: clarify that
+           <varname>XLINKFLAGS</varname> should not be used for
+           libraries.  The documentation still reflected an earlier
+           idea of what this variable should be used for.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
       </itemizedlist>
      </listitem>
@@ -14917,6 +15140,9 @@ Y = $(X)
     <varlistentry>
      <term>Incomplete mingw Support</term>
      <listitem>
+      <indexterm>
+       <primary>mingw</primary>
+      </indexterm>
       <para>
        Although mingw is partially supported and the mingw compiler
        passes the compiler verification support, mingw support is not

@@ -9,3 +9,7 @@ For build information, see src/README.build.
 For full documentation, see abuild's documentation in the "src/manual"
 directory, or read formatted versions of it at abuild's website,
 <http://www.abuild.org/>.
+
+As of version 1.0, abuild Java support should still be considered
+alpha.  It is possible (likely?) that abuild 1.1's Java support will
+have some incompatible changes from abuild 1.0's Java support.

@@ -1,0 +1,7 @@
+#!/bin/sh
+cat << EOF
+
+Please read src/README.build and follow the build instructions there.
+
+EOF
+exit 2
