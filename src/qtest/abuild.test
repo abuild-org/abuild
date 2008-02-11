@@ -1475,10 +1475,10 @@ $td->runtest("descendants",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/junit");
+
 if ($test_junit)
 {
-    cd("work/junit");
-
     $td->runtest("junit with failure",
 		 {$td->COMMAND => "abuild -b all test",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
@@ -1499,6 +1499,11 @@ if ($test_junit)
 		 {$td->FILE => "$top/test1.junit-okay.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    # Make sure these files are accessed.
+    system("(tar cf - . | cat > /dev/null)");
 }
 
 # test2 and test3 test various abuild error conditions
