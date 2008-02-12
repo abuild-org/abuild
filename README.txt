@@ -1,5 +1,5 @@
-The Abuild software and documentaion are copyright (c) 2007 by Jay
-Berkenbilt, Argon ST.  They may be distributed under the terms of
+The Abuild software and documentaion are copyright (c) 2007, 2008 by
+Jay Berkenbilt, Argon ST.  They may be distributed under the terms of
 version 2 of the Artistic License which may be found in the source and
 binary distributions.  They are provided "as is" without express or
 implied warranty.
