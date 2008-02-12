@@ -1479,17 +1479,17 @@ cd("work/junit");
 
 if ($test_junit)
 {
+    # In Windows, ant.bat does not return with an abnormal exit status
+    # when the build fails.  This makes it impossible to tell whether
+    # a build failed or not.
+    my $xflag = $in_windows ? $td->EXPECT_FAILURE : 0;
+
     $td->runtest("junit with failure",
 		 {$td->COMMAND => "abuild -b all test",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
 		 {$td->FILE => "$top/test1.junit-failure.out",
 		  $td->EXIT_STATUS => 2},
-		 $td->NORMALIZE_NEWLINES);
-
-    # In Windows, ant.bat does not return with an abnormal exit status
-    # when the build fails.  This makes it impossible to tell whether
-    # a build failed or not.
-    my $xflag = $in_windows ? $td->EXPECT_FAILURE : 0;
+		 $td->NORMALIZE_NEWLINES | $xflag);
 
     $td->runtest("junit with failure and -k",
 		 {$td->COMMAND => "abuild -k -b all test",
@@ -1503,7 +1503,7 @@ if ($test_junit)
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
 		 {$td->FILE => "$top/test1.junit-okay.out",
 		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES | $xflag);
+		 $td->NORMALIZE_NEWLINES);
 }
 else
 {
