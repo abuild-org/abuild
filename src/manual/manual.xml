@@ -44,6 +44,9 @@ BEFORE EACH RELEASE
 
  * make sure a real date has been included in the release notes
 
+ * Update copyright notice, if needed, in this file, Abuild.cc, and
+   README.source-distribution.
+
 PLEASE READ THESE IMPORTANT NOTES ABOUT EDITING THIS DOCUMENT.
 
 This document confirms to docbook 4.4.  In order to make maintaining
@@ -145,7 +148,7 @@ following checks:
    <firstname>Jay</firstname><surname>Berkenbilt</surname>
   </author>
   <copyright>
-   <year>2007</year>
+   <year>2007, 2008</year>
    <holder>Jay Berkenbilt, Argon ST</holder>
   </copyright>
   <legalnotice>
