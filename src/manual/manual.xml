@@ -5,8 +5,8 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
-<!ENTITY swversion "1.0.rc1+">
-<!ENTITY lastreleased "December 3, 2007">
+<!ENTITY swversion "1.0">
+<!ENTITY lastreleased "February 12, 2008">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13250,7 +13250,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0: [not yet released]</term>
+     <term>1.0: February 12, 2008</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -15049,6 +15049,20 @@ Y = $(X)
     hopefully be addressed over time.
    </para>
    <variablelist>
+    <varlistentry>
+     <term>ant failures not always detected</term>
+     <listitem>
+      <para>
+       In at least some version of ant on at least some versions of
+       Windows, <command>ant.bat</command> does not return an abnormal
+       exit status to the caller when a build fails.  This makes it
+       impossible for &abuild; to detect a failed build.  This could
+       cause extraneous items to be built even when failure is
+       certain, or it could cause an overall &abuild; run to report
+       success in spite of failed build items.
+      </para>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>undefined variable checks</term>
      <listitem>
