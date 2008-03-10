@@ -73,6 +73,15 @@ this way.
    target in ant code that is loaded as a plugin or hook build item.
    Was there a reason we didn't use import?
 
+   I think the reason is this: with make, if two different build items
+   define the same target, if at least one uses a : target instead of
+   a :: target, it's an error.  Otherwise, all the variants of the
+   target get run.  With ant, there is no such facility.  All but one
+   of the definitions of the target will get mangled to
+   project.target, and there's no way to run all of the
+   implementations.  The only way to get this behavior right now is to
+   use hooks.
+
 
 Issues, Enhancement Ideas
 =========================
