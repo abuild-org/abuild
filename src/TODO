@@ -82,6 +82,9 @@ this way.
    implementations.  The only way to get this behavior right now is to
    use hooks.
 
+ * You have to duplicate the archive name (abuild.jar-name, etc.) in
+   the Abuild.interface file.
+
 
 Issues, Enhancement Ideas
 =========================
