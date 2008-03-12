@@ -10,6 +10,17 @@ General
    able to run the tests.  Additionally, the $(ABUILD_OUTPUT_DIR) is
    "abuild-darwin.unknown.uknown.gcc", which looks a little odd.
 
+ * Additional prerequisites:
+
+    - autoconf >= 2.59
+
+    - automake
+
+    - gnu diffutils
+
+    - gcc configured with gnu ld for shared libraries (or edit
+      toolchain support)
+
 Java Problems
 =============
 
@@ -222,3 +233,7 @@ See also "Known Limitations" in the documentation.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
+
+ * Possible windows race condition: abuild -j sometimes causes an
+   assertion failure in the regex library.  Maybe we should eliminate
+   all static regexs.
