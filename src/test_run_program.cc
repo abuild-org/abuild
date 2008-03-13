@@ -51,6 +51,15 @@ int main(int argc, char* argv[], char* envp[])
 	env["MOO"] = "quack";
 	env["OINK"] = "spackle";
 
+	// In some cases, LD_LIBRARY_PATH may be required to run this
+	// program.  If LD_LIBRARY_PATH is present in the old
+	// environment, we need to copy it into the new environment.
+	std::string ld_library_path;
+	if (Util::getEnv("LD_LIBRARY_PATH", &ld_library_path))
+	{
+	    env["LD_LIBRARY_PATH"] = ld_library_path;
+	}
+
 	bool status = false;
 
 	args[1] = "3";
@@ -66,6 +75,12 @@ int main(int argc, char* argv[], char* envp[])
 	args[1] = "0";
 	args[2] = "env = none";
 	env.clear();
+	if (! ld_library_path.empty())
+	{
+	    // Unfortunately, we don't really get to test this with no
+	    // environment at all....
+	    env["LD_LIBRARY_PATH"] = ld_library_path;
+	}
 	status = Util::runProgram(progname, args, env, 0, "/");
 	std::cout << "status: " << status << std::endl << std::endl;
     }

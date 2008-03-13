@@ -31,6 +31,8 @@ while (<>)
     }
 
     s,\\,/,g;
+    # Normalize exit code of make
+    s,(make:.*Error) (\d+)$,$1 1,;
     s/($topdir|(?i:$wtopdir))/--topdir--/g;
     s/($abuild_dir|(?i:$wabuild_dir))/--abuild-dir--/g;
     s,(--abuild-dir--/make/.*:)\d+,${1}nn,;

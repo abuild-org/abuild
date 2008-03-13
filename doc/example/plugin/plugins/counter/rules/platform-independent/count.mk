@@ -6,5 +6,6 @@ ifeq ($(words $(TO_COUNT)), 0)
 $(error plugin.counter: TO_COUNT is empty)
 endif
 
+# Use echo `wc` to normalize whitespace
 count:
-	for i in $(TO_COUNT); do wc -l $$i; done
+	for i in $(TO_COUNT); do echo `wc -l $$i`; done

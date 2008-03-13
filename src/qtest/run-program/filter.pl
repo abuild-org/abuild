@@ -29,6 +29,8 @@ while (<>)
 	    $filtering_env = 1;
 	}
     }
+    # Unconditionally filter LD_LIBRARY_PATH
+    next if m/LD_LIBRARY_PATH=/;
     if ($filtering_env)
     {
 	if ($printing_env)

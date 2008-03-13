@@ -6,7 +6,6 @@ use strict;
 use Cwd;
 use File::Copy;
 use File::Basename;
-use File::stat;
 
 require TestDriver;
 
@@ -47,25 +46,49 @@ my $do_atimes_test = 1;
     # system.
     $td->notify("checking to see whether file access times are updated");
     mkdir "work", 0777 or die;
-    open(F, ">work/file") || die;
+    open(F, ">work/file1") || die;
+    print F "test\n";
+    close(F);
+    open(F, ">work/file2") || die;
     print F "test\n";
     close(F);
     sleep 1;
-    open(F, "<work/file") or die;
+    open(F, ">work/.now") || die;
+    close(F);
+    sleep 1;
+    open(F, "<work/file1") or die;
     scalar(<F>);
     close(F);
-    my $st = stat("work/file");
-    if ($st->atime > $st->mtime)
+
+    # Use find just as we do with the test cases -- this can fail
+    # because find doesn't have anewer as well as because atimes
+    # aren't preserved.
+
+    my $newer =	`find work -type f ! -anewer work/.now -print 2>/dev/null`;
+    my $r = $?;
+    $newer = join(' ', sort (split(/\r?\n/, $newer)));
+    $do_atimes_test = 0;
+    if ($? == 0)
     {
-	$td->notify("access times are updated");
+	if ($newer eq 'work/.now work/file2')
+	{
+	    $do_atimes_test = 1;
+	    $td->notify("access times are updated");
+	}
+	else
+	{
+	    $td->emphasize("file access times are not updated here;" .
+			   " access time tests will be skipped");
+	}
     }
     else
     {
-	$do_atimes_test = 0;
-	$td->emphasize("file access times are not updated here;" .
+	$td->emphasize("cannot run find -anewer;" .
 		       " access time tests will be skipped");
     }
 }
+
+cleanup();
 
 my $have_xmllint = 1;
 if (system("xmllint --version >/dev/null 2>&1") != 0)
