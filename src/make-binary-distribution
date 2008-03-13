@@ -165,7 +165,7 @@ print $bin_dist, "\n";
 
 safe_chdir("src");
 
-if ($windows)
+if (-d "$cwd/auto-srcs")
 {
     safe_mkdir("abuild-$bin_platform");
     run("cp $cwd/auto-srcs/* abuild-$bin_platform");
