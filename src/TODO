@@ -21,6 +21,16 @@ General
     - gcc configured with gnu ld for shared libraries (or edit
       toolchain support)
 
+ * When building a single item, give some kind of indication of no
+   platforms are available.  This way, when someone types "abuild" on
+   a windows system without MINGW=1 or the Visual C++ variable, they
+   don't get silence.
+
+ * Consider creating a ./configure that finds boost libraries
+
+ * Consider packaging auto-srcs with abuild sources
+
+
 Java Problems
 =============
 
