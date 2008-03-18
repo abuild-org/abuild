@@ -33,6 +33,33 @@ General
    and bison files provided that there is an autoconf check for the
    right versions of flex and bison.
 
+ * People want conditional dependencies, but mainly for platform
+   issues.  Consider one or both of the following ideas:
+
+    - Platform restrictions per build item.  If a build item has a
+      platform restriction, it will be excluded from the initial build
+      set construction.  Then what happens if it get pulled in to
+      satisfy a dependency?  This should be an error, but that causes
+      problems in some cases.  See next idea for a possible solution.
+
+    - Sometimes we use dependencies just to force something to build,
+      as in the case of the "compile-all" item in searchlight or some
+      "top-level" builds.  We really need the concept of a
+      "build-also" keyword that specifies build items that should be
+      built if this one is built.  It effectively just adds them to
+      the build set.  The build-also keyword doesn't have any
+      restrictions about cycles -- it is just used during inital build
+      set construction.  As such, it can have platform-based
+      conditionals.
+
+   Using these two features together, it should be possible to achieve
+   the goal of supporting platform-based conditional dependencies in a
+   safe manner.
+
+ * Ant launcher: consider having a Java-based ant launcher that abuild
+   communicates with via some kind of IPC to make launching ant more
+   efficient.
+
 
 Java Problems
 =============
