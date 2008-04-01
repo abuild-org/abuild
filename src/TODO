@@ -60,6 +60,11 @@ General
    communicates with via some kind of IPC to make launching ant more
    efficient.
 
+ * Autoconf support should be smarter about changes to XCPPFLAGS,
+   INCLUDES, etc. so that if an autoconf build item depends on another
+   build item that sets these, the invocation of the compiler will be
+   properly influenced.
+
 
 Java Problems
 =============
