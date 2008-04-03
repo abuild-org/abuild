@@ -58,7 +58,9 @@ General
 
  * Ant launcher: consider having a Java-based ant launcher that abuild
    communicates with via some kind of IPC to make launching ant more
-   efficient.
+   efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
+   23536 in abuild, 4/3/2008, subject "preliminary ant launcher
+   experiment".
 
  * Autoconf support should be smarter about changes to XCPPFLAGS,
    INCLUDES, etc. so that if an autoconf build item depends on another
