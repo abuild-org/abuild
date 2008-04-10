@@ -1,6 +1,8 @@
 General
 =======
 
+ * abuild --verbose should print the make or ant command.
+
  * Joe Davison reports: I download abuild 1.0.rc1 from sourceforge
    today.  It does not build natively under Mac OS 10.5.  The issue is
    that the build process looks for the pthread library, but that
