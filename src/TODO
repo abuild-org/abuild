@@ -1,6 +1,8 @@
 General
 =======
 
+ * Bug: the -lib argument to ant is a directory, not a jar.
+
  * abuild --verbose should print the make or ant command.
 
  * Joe Davison reports: I download abuild 1.0.rc1 from sourceforge
