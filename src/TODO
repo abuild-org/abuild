@@ -1,6 +1,36 @@
 General
 =======
 
+ * Consider abuild tree registry.  Abuild root itme could say
+   something like:
+
+     tree-name: tree3
+     tree-registry: ../../../../Abuild-trees
+     external-trees: tree1 tree2
+
+   Then Abuild-trees could say
+
+     tree1: a/b/c/one-root
+     tree2: a/b/d/two-root
+
+   This moves the knowledge of the relative locations of multiple
+   trees to a central place.
+
+   Notes:
+
+    - external-trees and tree-registry can coexist with external-dirs
+
+    - The tree registry file can be resolved in a backing area.
+
+    - There is no requirement that all trees in the registry be found.
+      However, any tree that is found must have a name that matches
+      the tree-name key in the tree, and any tree that is referenced
+      in an external-trees key must be found.
+
+    - Need to figure out exactly how these work with backing areas and
+      externals; i.e., we need to at least detect inconsistencies
+      while still allowing overrides.
+
  * Bug: the -lib argument to ant is a directory, not a jar.
 
  * abuild --verbose should print the make or ant command.
