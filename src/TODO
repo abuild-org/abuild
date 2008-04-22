@@ -1,6 +1,10 @@
 General
 =======
 
+ * Possible windows race condition: abuild -j sometimes causes an
+   assertion failure in the regex library.  Maybe we should eliminate
+   all static regexs.
+
  * Consider abuild tree registry.  Abuild root itme could say
    something like:
 
@@ -314,7 +318,3 @@ See also "Known Limitations" in the documentation.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
-
- * Possible windows race condition: abuild -j sometimes causes an
-   assertion failure in the regex library.  Maybe we should eliminate
-   all static regexs.
