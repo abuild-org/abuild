@@ -69,7 +69,9 @@ General
    to see if this works with the latest flex.  Consider making the
    re-entrant scanner switch, made possible by controlling the flex
    and bison files provided that there is an autoconf check for the
-   right versions of flex and bison.
+   right versions of flex and bison.  See ~/argon/no-argon-backup/\
+   code/reference/lh3/tps/abuild_library/boost/tps-boost_base/autoconf
+   for sample boost autoconf code.
 
  * People want conditional dependencies, but mainly for platform
    issues.  Consider one or both of the following ideas:
