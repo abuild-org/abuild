@@ -1,15 +1,20 @@
 General
 =======
 
- * Possible windows race condition: abuild -j sometimes causes an
-   assertion failure in the regex library.  Maybe we should eliminate
-   all static regexs.
-
  * autoconf:
 
     - don't call aclocal if there are no m4 files
 
     - don't call autoheader if there is no AUTOCONFIGH
+
+    - Autoconf support should be smarter about changes to XCPPFLAGS,
+      INCLUDES, etc. so that if an autoconf build item depends on another
+      build item that sets these, the invocation of the compiler will be
+      properly influenced.
+
+ * Bug: the -lib argument to ant is a directory, not a jar.
+
+ * abuild --verbose should print the make or ant command.
 
  * Consider abuild tree registry.  Abuild root itme could say
    something like:
@@ -40,10 +45,6 @@ General
     - Need to figure out exactly how these work with backing areas and
       externals; i.e., we need to at least detect inconsistencies
       while still allowing overrides.
-
- * Bug: the -lib argument to ant is a directory, not a jar.
-
- * abuild --verbose should print the make or ant command.
 
  * Joe Davison reports: I download abuild 1.0.rc1 from sourceforge
    today.  It does not build natively under Mac OS 10.5.  The issue is
@@ -107,11 +108,6 @@ General
    efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
    23536 in abuild, 4/3/2008, subject "preliminary ant launcher
    experiment".
-
- * Autoconf support should be smarter about changes to XCPPFLAGS,
-   INCLUDES, etc. so that if an autoconf build item depends on another
-   build item that sets these, the invocation of the compiler will be
-   properly influenced.
 
  * MSVC .NET 2005: see if anything is required for handling manifest
    files.  Matt Nassr says: "I was curious if you could suggest a best

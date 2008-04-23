@@ -7,7 +7,6 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
-#include <boost/regex.hpp>
 #include <Error.hh>
 #include <QEXC.hh>
 #include <BuildTree.hh>
@@ -183,7 +182,7 @@ class Abuild
     static std::string const s_NO_OP;
     static std::string const PLUGIN_PLATFORM;
     static std::string const FILE_PLUGIN_INTERFACE;
-    static boost::regex BUILDER_RE;
+    static std::string const BUILDER_RE;
     static std::set<std::string> special_targets;
     static std::list<std::string> default_targets;
 

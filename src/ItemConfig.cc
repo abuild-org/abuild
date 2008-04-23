@@ -27,15 +27,9 @@ std::string const ItemConfig::k_SUPPORTED_TRAITS = "supported-traits";
 std::string const ItemConfig::k_TRAITS = "traits";
 std::string const ItemConfig::k_DELETED = "deleted";
 std::string const ItemConfig::k_PLUGINS = "plugins";
+std::string const ItemConfig::ITEM_NAME_RE =
+    "[a-zA-Z0-9_-]+(?:\\.[a-zA-Z0-9_-]+)*";
 std::map<std::string, std::string> ItemConfig::valid_keys;
-
-// This boost::regex is static to the file rather than being a static
-// member of the class so that we can avoid having ItemConfig.hh have
-// to include the very expensive boost/regex.hpp.  This regular
-// expression is used for the names build items, flags, traits, and
-// similar.
-static boost::regex ITEM_NAME_RE(
-    "[a-zA-Z0-9_-]+(?:\\.[a-zA-Z0-9_-]+)*");
 
 // Initialize this after all other status
 bool ItemConfig::statics_initialized = ItemConfig::initializeStatics();
@@ -199,8 +193,9 @@ ItemConfig::checkChildren()
 void
 ItemConfig::checkDeps()
 {
-    static boost::regex flag_re("-flag=(\\S+)");
-    static boost::regex platform_re("-platform=(\\S+)");
+    boost::regex flag_re("-flag=(\\S+)");
+    boost::regex platform_re("-platform=(\\S+)");
+    boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
 
     this->deps = Util::splitBySpace(this->kv.getVal(k_DEPS));
@@ -211,7 +206,7 @@ ItemConfig::checkDeps()
     {
 	std::list<std::string>::iterator next = iter;
 	++next;
-	if (boost::regex_match(*iter, match, ITEM_NAME_RE))
+	if (boost::regex_match(*iter, match, item_name_re))
 	{
 	    last_dep = *iter;
 	}
@@ -420,7 +415,7 @@ ItemConfig::checkExternals()
     // For now, don't provide any mechanism to allow spaces in
     // winpath.  Even if we did, it probably wouldn't work right with
     // make.  People can always use the short forms of the paths.
-    static boost::regex winpath_re("-winpath=(\\S+)");
+    boost::regex winpath_re("-winpath=(\\S+)");
     boost::smatch match;
 
     std::list<std::string> words =
@@ -515,7 +510,8 @@ ItemConfig::checkSupportedTraits()
 void
 ItemConfig::checkTraits()
 {
-    static boost::regex item_re("-item=(\\S+)");
+    boost::regex item_re("-item=(\\S+)");
+    boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
 
     std::list<std::string> o_traits =
@@ -525,7 +521,7 @@ ItemConfig::checkTraits()
     for (std::list<std::string>::const_iterator iter = o_traits.begin();
 	 iter != o_traits.end(); ++iter)
     {
-	if (boost::regex_match(*iter, match, ITEM_NAME_RE))
+	if (boost::regex_match(*iter, match, item_name_re))
 	{
 	    last_trait = *iter;
 	    this->trait_data.addTrait(last_trait);
@@ -576,9 +572,10 @@ ItemConfig::checkPlugins()
 bool
 ItemConfig::validName(std::string const& val, std::string const& description)
 {
+    boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
 
-    if (! boost::regex_match(val, match, ITEM_NAME_RE))
+    if (! boost::regex_match(val, match, item_name_re))
     {
 	this->error.error(this->location,
 			  description + " may contain only alphanumeric"

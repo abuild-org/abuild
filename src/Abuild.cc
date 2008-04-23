@@ -30,7 +30,7 @@ std::string const Abuild::s_NO_OP = "no-op";
 // PLUGIN_PLATFORM can't match a real platform name.
 std::string const Abuild::PLUGIN_PLATFORM = "[plugin]";
 std::string const Abuild::FILE_PLUGIN_INTERFACE = "plugin.interface";
-boost::regex Abuild::BUILDER_RE("([^:]+):([^:]+)");
+std::string const Abuild::BUILDER_RE = "([^:]+):([^:]+)";
 std::set<std::string> Abuild::special_targets;
 std::list<std::string> Abuild::default_targets;
 
@@ -218,10 +218,10 @@ Abuild::getThisPlatform()
 void
 Abuild::parseArgv()
 {
-    static boost::regex jobs_re("(?:-j|--jobs=)(\\d+)");
-    static boost::regex make_jobs_re("--make-jobs(?:=(\\d+))?");
-    static boost::regex buildset_re("--build=(\\S+)");
-    static boost::regex cleanset_re("--clean=(\\S+)");
+    boost::regex jobs_re("(?:-j|--jobs=)(\\d+)");
+    boost::regex make_jobs_re("--make-jobs(?:=(\\d+))?");
+    boost::regex buildset_re("--build=(\\S+)");
+    boost::regex cleanset_re("--clean=(\\S+)");
 
     boost::smatch match;
 
@@ -566,8 +566,8 @@ Abuild::parseArgv()
 void
 Abuild::checkBuildsetName(std::string const& kind, std::string const& name)
 {
-    static boost::regex name_re("name:(\\S+)");
-    static boost::regex pattern_re("pattern:(\\S+)");
+    boost::regex name_re("name:(\\S+)");
+    boost::regex pattern_re("pattern:(\\S+)");
     boost::smatch match;
 
     if (boost::regex_match(name, match, name_re))
@@ -686,12 +686,12 @@ Abuild::loadPlatformData(PlatformData& platform_data,
     static std::string component4or5 =
 	component + "\\." + component + "\\." + component + "\\." +
 	component1or2;
-    static boost::regex ignore_re("\\s*(?:#.*)?");
-    static boost::regex platform_type_re("platform-type (" + component + ")");
-    static boost::regex platform_re(
+    boost::regex ignore_re("\\s*(?:#.*)?");
+    boost::regex platform_type_re("platform-type (" + component + ")");
+    boost::regex platform_re(
 	"platform (-lowpri )?(" + component4or5 +
 	") -type (" + component + ")");
-    static boost::regex native_compiler_re(
+    boost::regex native_compiler_re(
 	"native-compiler (-lowpri )?(" + component1or2 + ")");
 
     boost::smatch match;
@@ -1742,7 +1742,7 @@ Abuild::accessibleFrom(BuildItem_map& builditems,
 		       std::string const& accessor_name,
 		       std::string const& accessee_name)
 {
-    static boost::regex scope_re("(.*\\.)[^\\.]+");
+    boost::regex scope_re("(.*\\.)[^\\.]+");
     boost::smatch match;
 
     bool accessible = true;
@@ -3717,7 +3717,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 void
 Abuild::findGnuMakeInPath()
 {
-    static boost::regex gmake_re(".*GNU Make (\\d+)\\.(\\d+).*");
+    boost::regex gmake_re(".*GNU Make (\\d+)\\.(\\d+).*");
     boost::smatch match;
 
     std::list<std::string> candidates = Util::findProgramInPath("gmake");
@@ -3761,7 +3761,7 @@ Abuild::findGnuMakeInPath()
 void
 Abuild::findAnt()
 {
-    static boost::regex ant_re("Apache Ant version (\\d+)\\.(\\d+).*");
+    boost::regex ant_re("Apache Ant version (\\d+)\\.(\\d+).*");
     boost::smatch match;
 
     std::list<std::string> candidates;
@@ -3868,7 +3868,8 @@ Abuild::itemBuilder(
     boost::function<bool(std::string const&, std::string const&)> filter)
 {
     boost::smatch match;
-    assert(boost::regex_match(builder_string, match, BUILDER_RE));
+    boost::regex builder_re(BUILDER_RE);
+    assert(boost::regex_match(builder_string, match, builder_re));
     std::string item_name = match[1].str();
     std::string item_platform = match[2].str();
     BuildItem& build_item = *(this->buildset[item_name]);
@@ -3940,7 +3941,8 @@ Abuild::stateChangeCallback(std::string const& builder_string,
 			    DependencyEvaluator::ItemState state)
 {
     boost::smatch match;
-    assert(boost::regex_match(builder_string, match, BUILDER_RE));
+    boost::regex builder_re(BUILDER_RE);
+    assert(boost::regex_match(builder_string, match, builder_re));
     std::string item_name = match[1].str();
     std::string item_platform = match[2].str();
     std::string item_state = DependencyEvaluator::unparseState(state);
@@ -3981,11 +3983,12 @@ Abuild::createItemInterface(std::string const& builder_string,
     // include the interfaces of our indirect dependencies.
     std::list<std::string> const& deps =
 	this->build_graph.getDirectDependencies(builder_string);
+    boost::regex builder_re(BUILDER_RE);
     for (std::list<std::string>::const_iterator iter = deps.begin();
 	 iter != deps.end(); ++iter)
     {
 	boost::smatch match;
-	assert(boost::regex_match(*iter, match, BUILDER_RE));
+	assert(boost::regex_match(*iter, match, builder_re));
 	std::string dep_name = match[1].str();
 	std::string dep_platform = match[2].str();
 
@@ -4035,7 +4038,7 @@ Abuild::createItemInterface(std::string const& builder_string,
     TargetType::target_type_e target_type = build_item.getTargetType();
     if (target_type == TargetType::tt_object_code)
     {
-	static boost::regex object_code_platform_re(
+	boost::regex object_code_platform_re(
 	    "^([^\\.]+)\\.([^\\.]+)\\.([^\\.]+)\\.([^\\.]+)(?:\\.([^\\.]+))?$");
 	boost::smatch match;
 	if (boost::regex_match(item_platform, match, object_code_platform_re))

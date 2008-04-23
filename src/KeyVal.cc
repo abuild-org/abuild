@@ -40,9 +40,9 @@ KeyVal::KeyVal(char const* filename,
 bool
 KeyVal::readFile()
 {
-    static boost::regex comment_line("\\s*#.*");
-    static boost::regex strip_spaces("\\s*(.*?)\\s*");
-    static boost::regex kv_line("([^\\s:]+)\\s*:\\s*(.*?)");
+    boost::regex comment_line("\\s*#.*");
+    boost::regex strip_spaces("\\s*(.*?)\\s*");
+    boost::regex kv_line("([^\\s:]+)\\s*:\\s*(.*?)");
     boost::smatch match;
 
     std::list<std::string> lines = Util::readLinesFromFile(this->filename);

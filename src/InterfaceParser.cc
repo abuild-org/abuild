@@ -677,7 +677,7 @@ InterfaceParser::evaluateToken(Token const* token)
 std::string
 InterfaceParser::evaluateEnvironment(Token const* token)
 {
-    static boost::regex env_re("\\$\\(ENV:(.*?)\\)");
+    boost::regex env_re("\\$\\(ENV:(.*?)\\)");
     std::string variable = getFirstMatch(token, env_re);
     std::string value;
 
@@ -834,14 +834,14 @@ InterfaceParser::evaluateFunction(nt_Function const* function, bool evaluating,
 std::string
 InterfaceParser::getVariableName(Token const* token)
 {
-    static boost::regex variable_re("\\$\\((.*?)\\)");
+    boost::regex variable_re("\\$\\((.*?)\\)");
     return getFirstMatch(token, variable_re);
 }
 
 std::string
 InterfaceParser::getFunctionName(Token const* token)
 {
-    static boost::regex function_re("(.*?)[ \t]*\\(");
+    boost::regex function_re("(.*?)[ \t]*\\(");
     return getFirstMatch(token, function_re);
 }
 

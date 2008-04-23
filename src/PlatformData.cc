@@ -138,7 +138,7 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 
     // If everything is okay, initialize platforms_by_type
     this->platforms_by_type.clear();
-    static boost::regex platform_re(PLATFORM_PREFIX + "(\\S+)");
+    boost::regex platform_re(PLATFORM_PREFIX + "(\\S+)");
     boost::smatch match;
 
     for (std::map<std::string, TargetType::target_type_e>::const_iterator iter =

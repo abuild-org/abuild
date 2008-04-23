@@ -66,7 +66,7 @@ PlatformSelector::initialize(std::string const& str)
     static std::string option_re = "option=" + component;
     static std::string compiler_re = "compiler=" + component1or2;
     static std::string platform_re = "platform=" + component4or5;
-    static boost::regex selector_re(
+    boost::regex selector_re(
 	"(?:([a-zA-Z0-9_-]+):)?" // platform type
 	"(all|skip|" + option_re + "|" + compiler_re + "|" + platform_re + ")");
 

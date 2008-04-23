@@ -13253,6 +13253,28 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>1.0.1: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Minor updates to test suite to make it more portable.  In
+         particular, &abuild;'s test suite is now known to pass on
+         Solaris 8.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Internal code change: avoid using boost regular expression
+         objects across multiple threads in hopes of solving
+         occasional assertion failures inside the boost library when
+         running with multiple threads under Windows.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.0: February 12, 2008</term>
      <listitem>
       <itemizedlist>
