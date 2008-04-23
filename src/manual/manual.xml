@@ -13268,7 +13268,16 @@ Y = $(X)
          Internal code change: avoid using boost regular expression
          objects across multiple threads in hopes of solving
          occasional assertion failures inside the boost library when
-         running with multiple threads under Windows.
+         running with multiple threads under Windows.  (Thanks, Joe
+         Davidson.)
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         &Abuild; was previously passing a JAR file rather than a
+         directory to <application>ant</application>'s
+         <command>-lib</command> argument.  This has been corrected.
+         (Thanks, Craig Pell.)
         </para>
        </listitem>
       </itemizedlist>

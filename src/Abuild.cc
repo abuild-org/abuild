@@ -4501,7 +4501,7 @@ Abuild::invoke_ant(std::string const& item_name,
     if (! this->ant_library.empty())
     {
 	ant_argv.push_back("-lib");
-	ant_argv.push_back(this->ant_library);
+	ant_argv.push_back(Util::dirname(this->ant_library));
 	if (this->use_abuild_logger)
 	{
 	    ant_argv.push_back("-logger");

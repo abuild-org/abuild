@@ -12,8 +12,6 @@ General
       build item that sets these, the invocation of the compiler will be
       properly influenced.
 
- * Bug: the -lib argument to ant is a directory, not a jar.
-
  * abuild --verbose should print the make or ant command.
 
  * Consider abuild tree registry.  Abuild root itme could say
