@@ -13268,8 +13268,7 @@ Y = $(X)
          Internal code change: avoid using boost regular expression
          objects across multiple threads in hopes of solving
          occasional assertion failures inside the boost library when
-         running with multiple threads under Windows.  (Thanks, Joe
-         Davidson.)
+         running with multiple threads under Windows.
         </para>
        </listitem>
        <listitem>
@@ -13277,7 +13276,7 @@ Y = $(X)
          &Abuild; was previously passing a JAR file rather than a
          directory to <application>ant</application>'s
          <command>-lib</command> argument.  This has been corrected.
-         (Thanks, Craig Pell.)
+         (Reported Craig Pell.)
         </para>
        </listitem>
        <listitem>
@@ -13291,14 +13290,14 @@ Y = $(X)
        <listitem>
         <para>
          When autoconf invokes the compiler, it now honors any flags
-         or includes set by dependent build items.  (Thanks, Joe
+         or includes set by dependent build items.  (Reported by Joe
          Davidson.)
         </para>
        </listitem>
        <listitem>
         <para>
          Include two small patches to make &abuild; build properly in
-         MacOS Darwin.  (Thanks, Joe Davidson.)
+         MacOS Darwin.  (Patches from Joe Davidson.)
         </para>
        </listitem>
       </itemizedlist>
