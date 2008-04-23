@@ -10,7 +10,9 @@ ifneq ($(CCXX_TOOLCHAIN), msvc)
 LIBS += boost_thread$(BOOST_LIB_SUFFIX) boost_regex$(BOOST_LIB_SUFFIX)
 endif
 ifneq ($(ABUILD_PLATFORM_OS),windows)
+ifneq ($(ABUILD_PLATFORM_OS),darwin)
 LIBS += pthread
+endif
 endif
 
 ifdef ABUILD_STATIC
