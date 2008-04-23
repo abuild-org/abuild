@@ -5,6 +5,12 @@ General
    assertion failure in the regex library.  Maybe we should eliminate
    all static regexs.
 
+ * autoconf:
+
+    - don't call aclocal if there are no m4 files
+
+    - don't call autoheader if there is no AUTOCONFIGH
+
  * Consider abuild tree registry.  Abuild root itme could say
    something like:
 
@@ -106,6 +112,15 @@ General
    INCLUDES, etc. so that if an autoconf build item depends on another
    build item that sets these, the invocation of the compiler will be
    properly influenced.
+
+ * MSVC .NET 2005: see if anything is required for handling manifest
+   files.  Matt Nassr says: "I was curious if you could suggest a best
+   way to embed manifest files into C/C++ executables generated with
+   msvc on Windows. It seems that this needs to be done after the exe
+   is generated with the manifest tool (mt.exe), and I’m wondering if
+   I can make this a part of the Abuild build process. Otherwise, I
+   have to copy the exe and the manifest file to the binary directory
+   for deployment."  Let Matt Nassr know when a solution is found.
 
 
 Java Problems
