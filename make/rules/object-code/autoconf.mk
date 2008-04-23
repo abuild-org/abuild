@@ -63,11 +63,15 @@ CONFIGURE_ARGS ?=
 # if they are unchanged when their source is changed.  (./configure
 # doesn't update modification times of its products if the new product
 # is identical to the old product.)
+all:: autoconf.stamp
+
 AC_IN := $(AUTOFILES:%=$(SRCDIR)/%.in)
 AC_M4_DIR := $(wildcard $(SRCDIR)/m4)
 AC_M4_FILES := $(if $(AC_M4_DIR),$(wildcard $(AC_M4_DIR)/*.m4))
 
-all:: autoconf.stamp
+AC_CPPFLAGS := $(call include_flags,$(INCLUDES) $(SRCDIR) .) $(XCPPFLAGS)
+AC_CFLAGS := $(AC_CPPFLAGS) $(XCFLAGS)
+AC_CXXFLAGS := $(AC_CFLAGS) $(XCXXFLAGS)
 
 COMMONDEPS := $(SRCDIR)/configure.ac $(AC_M4_FILES)
 
@@ -77,13 +81,19 @@ ifneq ($(ABUILD_PLATFORM_TYPE),native)
  endif
 endif
 
+AC_SKIP_AUTOHEADER :=
+ifeq ($(words $(AUTOCONFIGH)), 0)
+  AC_SKIP_AUTOHEADER := :
+endif
+
 autoconf.stamp: $(COMMONDEPS) $(AC_IN)
 	cp -f $(SRCDIR)/configure.ac configure.ac
 	for i in $(AUTOFILES); do cp -f $(SRCDIR)/$$i.in .; done
 	aclocal -I $(SRCDIR) $(if $(AC_M4_DIR),-I $(SRCDIR)/m4)
-	autoheader -I $(SRCDIR)
+	$(AC_SKIP_AUTOHEADER) autoheader -I $(SRCDIR)
 	autoconf -I $(SRCDIR)
-	CC="$(COMPILE_c)" CXX="$(COMPILE_cxx)" ./configure $(CONFIGURE_ARGS)
+	CC="$(COMPILE_c) $(AC_CFLAGS)" CXX="$(COMPILE_cxx) $(AC_CXXFLAGS)" \
+		./configure $(CONFIGURE_ARGS)
 	touch autoconf.stamp
 
 clean::
