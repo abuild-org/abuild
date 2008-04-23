@@ -19,7 +19,11 @@ while (<>)
 {
     if ($in_autoconf)
     {
-	if (m,Leaving directory.*/autoconf/,)
+	if (m/--> TEST_MESSAGE: /)
+	{
+	    # Let it go
+	}
+	elsif (m,Leaving directory.*/autoconf/,)
 	{
 	    print "[autoconf output suppressed]\n";
 	    $in_autoconf = 0;

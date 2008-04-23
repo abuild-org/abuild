@@ -1,48 +1,7 @@
 General
 =======
 
- * autoconf:
-
-    - don't call aclocal if there are no m4 files
-
-    - don't call autoheader if there is no AUTOCONFIGH
-
-    - Autoconf support should be smarter about changes to XCPPFLAGS,
-      INCLUDES, etc. so that if an autoconf build item depends on another
-      build item that sets these, the invocation of the compiler will be
-      properly influenced.
-
  * abuild --verbose should print the make or ant command.
-
- * Consider abuild tree registry.  Abuild root itme could say
-   something like:
-
-     tree-name: tree3
-     tree-registry: ../../../../Abuild-trees
-     external-trees: tree1 tree2
-
-   Then Abuild-trees could say
-
-     tree1: a/b/c/one-root
-     tree2: a/b/d/two-root
-
-   This moves the knowledge of the relative locations of multiple
-   trees to a central place.
-
-   Notes:
-
-    - external-trees and tree-registry can coexist with external-dirs
-
-    - The tree registry file can be resolved in a backing area.
-
-    - There is no requirement that all trees in the registry be found.
-      However, any tree that is found must have a name that matches
-      the tree-name key in the tree, and any tree that is referenced
-      in an external-trees key must be found.
-
-    - Need to figure out exactly how these work with backing areas and
-      externals; i.e., we need to at least detect inconsistencies
-      while still allowing overrides.
 
  * Joe Davison reports: I download abuild 1.0.rc1 from sourceforge
    today.  It does not build natively under Mac OS 10.5.  The issue is
@@ -78,29 +37,6 @@ General
    code/reference/lh3/tps/abuild_library/boost/tps-boost_base/autoconf
    for sample boost autoconf code.
 
- * People want conditional dependencies, but mainly for platform
-   issues.  Consider one or both of the following ideas:
-
-    - Platform restrictions per build item.  If a build item has a
-      platform restriction, it will be excluded from the initial build
-      set construction.  Then what happens if it get pulled in to
-      satisfy a dependency?  This should be an error, but that causes
-      problems in some cases.  See next idea for a possible solution.
-
-    - Sometimes we use dependencies just to force something to build,
-      as in the case of the "compile-all" item in searchlight or some
-      "top-level" builds.  We really need the concept of a
-      "build-also" keyword that specifies build items that should be
-      built if this one is built.  It effectively just adds them to
-      the build set.  The build-also keyword doesn't have any
-      restrictions about cycles -- it is just used during inital build
-      set construction.  As such, it can have platform-based
-      conditionals.
-
-   Using these two features together, it should be possible to achieve
-   the goal of supporting platform-based conditional dependencies in a
-   safe manner.
-
  * Ant launcher: consider having a Java-based ant launcher that abuild
    communicates with via some kind of IPC to make launching ant more
    efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
@@ -115,6 +51,71 @@ General
    I can make this a part of the Abuild build process. Otherwise, I
    have to copy the exe and the manifest file to the binary directory
    for deployment."  Let Matt Nassr know when a solution is found.
+
+
+Tree Registry
+=============
+
+Consider abuild tree registry.  Abuild root item could say something
+like:
+
+  tree-name: tree3
+  tree-registry: ../../../../Abuild-trees
+  external-trees: tree1 tree2
+
+Then Abuild-trees could say
+
+  tree1: a/b/c/one-root
+  tree2: a/b/d/two-root
+
+This kind of thing might make sense if you have a single source tree
+that is separated into a bunch of abuild build trees that are all
+expected to be positioned in the same relative positions with each
+other.  It basically makes it more practical to divide up a source
+tree into multiple, stand-alone build trees without having to
+distribute the knowledge of where all the trees are relative to each
+other.
+
+Notes:
+
+ * external-trees and tree-registry can coexist with external-dirs
+
+ * The tree registry file can be resolved in a backing area.
+
+ * There is no requirement that all trees in the registry be found.
+   However, any tree that is found must have a name that matches the
+   tree-name key in the tree, and any tree that is referenced in an
+   external-trees key must be found.
+
+ * Need to figure out exactly how these work with backing areas and
+   externals; i.e., we need to at least detect inconsistencies while
+   still allowing overrides.
+
+
+Platform Conditionals
+=====================
+
+People want conditional dependencies, but mainly for platform issues.
+Consider one or both of the following ideas:
+
+ * Platform restrictions per build item.  If a build item has a
+   platform restriction, it will be excluded from the initial build
+   set construction.  Then what happens if it get pulled in to satisfy
+   a dependency?  This should be an error, but that causes problems in
+   some cases.  See next idea for a possible solution.
+
+ * Sometimes we use dependencies just to force something to build, as
+   in the case of the "compile-all" item in searchlight or some
+   "top-level" builds.  We really need the concept of a "build-also"
+   keyword that specifies build items that should be built if this one
+   is built.  It effectively just adds them to the build set.  The
+   build-also keyword doesn't have any restrictions about cycles -- it
+   is just used during inital build set construction.  As such, it can
+   have platform-based conditionals.
+
+Using these two features together, it should be possible to achieve
+the goal of supporting platform-based conditional dependencies in a
+safe manner.
 
 
 Java Problems

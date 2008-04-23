@@ -1,0 +1,10 @@
+abuild: a1 (abuild-<native>): all
+make: Entering directory `--topdir--/autoconf/a1/abuild-<native>'
+--> TEST_MESSAGE: header-b.h was not found
+[autoconf output suppressed]
+make: Leaving directory `--topdir--/autoconf/a1/abuild-<native>'
+abuild: a2 (abuild-<native>): all
+make: Entering directory `--topdir--/autoconf/a2/abuild-<native>'
+--> TEST_MESSAGE: header-b.h was found
+[autoconf output suppressed]
+make: Leaving directory `--topdir--/autoconf/a2/abuild-<native>'

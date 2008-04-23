@@ -13280,6 +13280,21 @@ Y = $(X)
          (Thanks, Craig Pell.)
         </para>
        </listitem>
+       <listitem>
+        <para>
+         If <varname>AUTOCONFIGH</varname> is not set, &abuild;'s
+         autoconf rules will not run <command>autoheader</command>.
+         This makes it possible to create an autoconf build item
+         without generating a header file if desired.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         When autoconf invokes the compiler, it now honors any flags
+         or includes set by dependent build items.  (Thanks Joe
+         Davidson.)
+        </para>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>

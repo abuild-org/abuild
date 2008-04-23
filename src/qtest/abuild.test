@@ -1498,6 +1498,15 @@ $td->runtest("descendants",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/autoconf");
+
+$td->runtest("autoconf compiler invocation",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.autoconf.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/junit");
 
 if ($test_junit)
@@ -2721,7 +2730,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(262 +
+$td->report(263 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 18 : 0) +
 	    ($test_junit ? 3 : 0) +
