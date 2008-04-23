@@ -861,7 +861,21 @@ following checks:
        Perl version 5.8 or newer and <ulink
        url="http://qtest.qbilt.org/">qtest</ulink> version 1.0 or
        newer are required if you are using the qtest automated test
-       framework.  &Abuild;'s own test suite uses qtest.
+       framework.  &Abuild;'s own test suite uses qtest.  Note also
+       that qtest requires <ulink
+       url="http://www.gnu.org/software/diffutils">GNU
+       diffutils</ulink>.  Any version should do.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       In order to use &abuild;'s autoconf support, you need <ulink
+       url="http://www.gnu.org/software/autoconf">autoconf</ulink>
+       version 2.59 or newer, <ulink
+       url="http://www.gnu.org/software/automake">automake</ulink>
+       version 1.9 or newer.  These are also required for &abuild;'s
+       test suite to pass since the test suite exercises its autoconf
+       support.
       </para>
      </listitem>
      <listitem>
@@ -890,9 +904,7 @@ following checks:
      </footnote>
      &Abuild; is known to buildable by gcc, xlc, Microsoft Visual C++
      (7.1 or newer), and <ulink
-     url="http://www.mingw.org/">mingw</ulink>, and it should be
-     buildable by on any system and with any compiler that supports
-     the boost thread and regular expression libraries.
+     url="http://www.mingw.org/">mingw</ulink>,
      <footnote>
       <para>
        &Abuild; does not pass its test suite reliably when built with
@@ -904,6 +916,21 @@ following checks:
        C/C++ builds without Cygwin.  &Abuild; appears to work with
        equal reliability on Windows with Visual C++ as on Linux with
        gcc.
+      </para>
+     </footnote>
+     and it should be buildable by on any system and with any compiler
+     that supports the boost thread and regular expression libraries.
+     In order for shared library support to work properly with gcc,
+     gcc must be configured to use the GNU linker.
+     <footnote>
+      <para>
+       The only reason for the GNU linker requirement is that &abuild;
+       currently knows about <command>-fPIC</command>.  It would be
+       better to have a more robust way of configuring flags for
+       position-independent-code, but it's not clear how to do this
+       without replicating all the knowledge built into
+       <application>libtool</application> or having some autoconf-like
+       method of configuring &abuild; at runtime.
       </para>
      </footnote>
      &Abuild; itself contains C++ code and Java code, so all the
@@ -13305,6 +13332,13 @@ Y = $(X)
          With <command>--verbose</command>, &abuild; now prints the
          backend command that is invoking.  (Thanks for the suggestion
          from Craig Pell.)
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Documentation updated to add autoconf, automake, and GNU
+         diffutils, and gcc configured with gnu ld to the list of
+         system requirements.
         </para>
        </listitem>
       </itemizedlist>

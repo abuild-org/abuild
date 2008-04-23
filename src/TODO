@@ -1,17 +1,6 @@
 General
 =======
 
- * Additional prerequisites:
-
-    - autoconf >= 2.59
-
-    - automake
-
-    - gnu diffutils
-
-    - gcc configured with gnu ld for shared libraries (or edit
-      toolchain support)
-
  * When building a single item, give some kind of indication of no
    platforms are available.  This way, when someone types "abuild" on
    a windows system without MINGW=1 or the Visual C++ variable, they
