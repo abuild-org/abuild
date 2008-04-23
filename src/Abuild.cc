@@ -4541,6 +4541,13 @@ Abuild::invokeBackend(std::string const& progname,
         // de-interleave output from different build items.
     }
 
+    if (this->verbose_mode)
+    {
+	// Put this in the if statement to avoid the needless cal to
+	// join if not in verbose mode.
+	verbose("running " + Util::join(" ", args));
+    }
+
     return Util::runProgram(progname, args, environment, old_env, dir);
 }
 

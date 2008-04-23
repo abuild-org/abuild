@@ -1,8 +1,6 @@
 General
 =======
 
- * abuild --verbose should print the make or ant command.
-
  * Additional prerequisites:
 
     - autoconf >= 2.59
