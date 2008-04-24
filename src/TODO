@@ -1,9 +1,6 @@
 General
 =======
 
- * If there are any native build items in the build set and there are
-   no native platforms, give some kind of warning.
-
  * Consider creating a ./configure that finds boost libraries and
    deals properly with pthread.  Then consider packaging auto-srcs
    with abuild sources.  Check on debian to see if this works with the

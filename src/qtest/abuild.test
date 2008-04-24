@@ -1235,6 +1235,13 @@ $td->runtest("no native platform type",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("empty with no native",
+	     {$td->COMMAND => "abuild -C ../../c/ca -p native:skip",
+	      $td->FILTER => "perl $top/filter-abuild.pl | grep -v cygwin"},
+	     {$td->FILE => "$top/test1.no-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("no object-code platform types",
 	     {$td->COMMAND => "ABUILD_PLATFORM_SELECTORS=echo:skip" .
 		  " abuild -b local --platform-selector native:skip",
@@ -2730,7 +2737,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(263 +
+$td->report(264 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 18 : 0) +
 	    ($test_junit ? 3 : 0) +

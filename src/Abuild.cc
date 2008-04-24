@@ -3329,6 +3329,7 @@ Abuild::buildBuildset()
     // addItemToBuildGraph in reverse dependency order.  See comments
     // there for details.
 
+    bool some_native_items_skipped = false;
     bool need_gmake = false;
     bool need_ant = false;
     for (std::vector<std::string>::const_iterator iter =
@@ -3360,6 +3361,32 @@ Abuild::buildBuildset()
 		break;
 	    }
 	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild some items skipped");
+	    verbose("skipping build item " + item_name +
+		    " because there are no platforms for its platform types");
+	    std::set<std::string> const& platform_types =
+		item.getPlatformTypes();
+	    if (platform_types.count("native"))
+	    {
+		some_native_items_skipped = true;
+	    }
+	}
+    }
+
+    if ((! need_ant) && (! need_gmake) && some_native_items_skipped)
+    {
+	QTC::TC("abuild", "Abuild some native items skipped");
+	info("some native items were skipped because there are"
+	     " no valid native platforms");
+#ifdef _WIN32
+	if (! this->have_perl)
+	{
+	    info("Note that cygwin perl and a properly configured compiler"
+		 " are required to support native builds on Windows.");
+	}
+#endif
     }
 
     exitIfErrors();

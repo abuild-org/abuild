@@ -13341,6 +13341,18 @@ Y = $(X)
          system requirements.
         </para>
        </listitem>
+       <listitem>
+        <para>
+         &Abuild; now mentions when nothing is built but some native
+         build items were skipped due to lack of available platforms.
+         Hopefully this will reduce confusion when Windows users
+         without any valid compilers or cygwin perl type &abuild; and
+         don't get any output.  Also, when
+         <command>--verbose</command> is specified, &abuild; always
+         mentions when it skips any build item because of lack of
+         build platforms.
+        </para>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
