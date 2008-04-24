@@ -1,11 +1,8 @@
 General
 =======
 
- * When building a single item, give some kind of indication of no
-   platforms are available.  This way, when someone types "abuild" on
-   a windows system without MINGW=1 or the Visual C++ variable, they
-   don't get silence.  Alternatively, consider printing this
-   notification for all items when running in verbose mode.
+ * If there are any native build items in the build set and there are
+   no native platforms, give some kind of warning.
 
  * Consider creating a ./configure that finds boost libraries and
    deals properly with pthread.  Then consider packaging auto-srcs
