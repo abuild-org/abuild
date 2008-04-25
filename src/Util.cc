@@ -736,13 +736,13 @@ Util::absToRel(std::string const& path, std::string container)
     {
 	result += join("/", pitems);
     }
-    if (*(result.rbegin()) == '/')
-    {
-	result.erase(result.length() - 1);
-    }
     if (result.empty())
     {
 	result = ".";
+    }
+    else if (*(result.rbegin()) == '/')
+    {
+	result.erase(result.length() - 1);
     }
 
     return result;
