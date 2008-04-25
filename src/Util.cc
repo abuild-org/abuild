@@ -1153,8 +1153,12 @@ Util::removeFileRecursively(std::string const& path)
     {
 #ifdef _WIN32
 	SetFileAttributes(path.c_str(), FILE_ATTRIBUTE_NORMAL);
+# define unlink _unlink
 #endif
 	QEXC::errno_wrapper("remove " + path, unlink(path.c_str()));
+#ifdef _WIN32
+# undef unlink
+#endif
     }
 }
 
