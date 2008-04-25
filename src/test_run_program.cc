@@ -36,6 +36,25 @@ int main(int argc, char* argv[], char* envp[])
     }
     else
     {
+	// There are some environment variables that we can't do
+	// without when running the program.  Make sure we always have
+	// them.
+	std::vector<std::string> save_environment_vars;
+	save_environment_vars.push_back("LD_LIBRARY_PATH");
+	save_environment_vars.push_back("SYSTEMROOT");
+
+	std::map<std::string, std::string> save_environment;
+	for (std::vector<std::string>::iterator iter =
+		 save_environment_vars.begin();
+	     iter != save_environment_vars.end(); ++iter)
+	{
+	    std::string val;
+	    if (Util::getEnv(*iter, &val))
+	    {
+		save_environment[*iter] = val;
+	    }
+	}
+
 	std::string progname;
 	assert(Util::getProgramFullPath(argv[0], progname));
 
@@ -51,13 +70,11 @@ int main(int argc, char* argv[], char* envp[])
 	env["MOO"] = "quack";
 	env["OINK"] = "spackle";
 
-	// In some cases, LD_LIBRARY_PATH may be required to run this
-	// program.  If LD_LIBRARY_PATH is present in the old
-	// environment, we need to copy it into the new environment.
-	std::string ld_library_path;
-	if (Util::getEnv("LD_LIBRARY_PATH", &ld_library_path))
+	for (std::map<std::string, std::string>::iterator iter =
+		 save_environment.begin();
+	     iter != save_environment.end(); ++iter)
 	{
-	    env["LD_LIBRARY_PATH"] = ld_library_path;
+	    env[(*iter).first] = (*iter).second;
 	}
 
 	bool status = false;
@@ -75,11 +92,13 @@ int main(int argc, char* argv[], char* envp[])
 	args[1] = "0";
 	args[2] = "env = none";
 	env.clear();
-	if (! ld_library_path.empty())
+	// Unfortunately, we don't really get to test this with no
+	// environment at all....
+	for (std::map<std::string, std::string>::iterator iter =
+		 save_environment.begin();
+	     iter != save_environment.end(); ++iter)
 	{
-	    // Unfortunately, we don't really get to test this with no
-	    // environment at all....
-	    env["LD_LIBRARY_PATH"] = ld_library_path;
+	    env[(*iter).first] = (*iter).second;
 	}
 	status = Util::runProgram(progname, args, env, 0, "/");
 	std::cout << "status: " << status << std::endl << std::endl;
