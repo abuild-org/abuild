@@ -304,3 +304,11 @@ See also "Known Limitations" in the documentation.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
+
+ * Scott Lemke points out that abuild has a lot of knowledge about
+   things that are not relevant to any particular build.  One thing to
+   consider would be having abuild analyze error conditions to
+   determine which ones are not relevant to the local build.  This
+   might enable abuild, in some cases, to build a local group of items
+   even when there are integrity errors in other parts of the build
+   tree.  This may or may not be a desirable feature.
