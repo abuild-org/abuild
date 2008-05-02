@@ -1,6 +1,8 @@
 General
 =======
 
+ * Add executable jar support.
+
  * Consider creating a ./configure that finds boost libraries and
    deals properly with pthread.  Then consider packaging auto-srcs
    with abuild sources.  Check on debian to see if this works with the
