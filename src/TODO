@@ -314,3 +314,9 @@ See also "Known Limitations" in the documentation.
    might enable abuild, in some cases, to build a local group of items
    even when there are integrity errors in other parts of the build
    tree.  This may or may not be a desirable feature.
+
+ * It would be nice if plugins could have type indep and could build
+   stuff.  It would be nice, for example, to be able to implement a
+   compiler plugin that uses autoconf to figure out the correct
+   compiler invocation so that it would be possible to support a
+   generic unix compiler or libtool from a plugin.
