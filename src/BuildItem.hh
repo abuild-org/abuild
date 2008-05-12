@@ -67,7 +67,6 @@ class BuildItem
     // True iff item has all listed traits.  Returns true if list is empty.
     bool hasTraits(std::list<std::string> const& traits) const;
     bool isPlugin() const;
-    bool isPluginAnywhere() const;
     std::list<std::string> const& getPlugins() const;
     // Return a list of all items this item references, including itself
     std::set<std::string> getReferences() const;
@@ -120,7 +119,6 @@ class BuildItem
     std::map<std::string, boost::shared_ptr<Interface> > interfaces;
     TargetType::target_type_e target_type;
     bool plugin;		// plugin in the containing tree
-    bool plugin_anywhere;	// plugin in any tree known to this tree
     std::list<std::string> plugins;
 };
 

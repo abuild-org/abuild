@@ -17,8 +17,7 @@ BuildItem::BuildItem(std::string const& item_name,
     external_depth(0),
     force_read_only(false),
     target_type(TargetType::tt_unknown),
-    plugin(false),
-    plugin_anywhere(false)
+    plugin(false)
 {
     // An item is always writable and always has backing depth 0
     // relative to its local build tree.
@@ -356,12 +355,6 @@ BuildItem::isPlugin() const
     return this->plugin;
 }
 
-bool
-BuildItem::isPluginAnywhere() const
-{
-    return this->plugin_anywhere;
-}
-
 std::list<std::string> const&
 BuildItem::getPlugins() const
 {
@@ -496,10 +489,6 @@ BuildItem::setPlugin(bool val)
 {
     // allowed for non-local build items
     this->plugin = val;
-    if (val)
-    {
-	this->plugin_anywhere = val;
-    }
 }
 
 void

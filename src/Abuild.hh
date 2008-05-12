@@ -63,6 +63,7 @@ class Abuild
     void checkPlugins(BuildTree& tree_data,
 		      BuildItem_map& builditems,
 		      std::string const& top_path);
+    bool isPluginAnywhere(std::string const& item_name);
     void checkPlatformTypes(BuildTree& tree_data,
 			    BuildItem_map& builditems,
 			    std::string const& top_path);
@@ -237,6 +238,7 @@ class Abuild
     PlatformData internal_platform_data;
     std::set<std::string> valid_traits;
     BuildItem_map buildset;
+    std::set<std::string> plugins_anywhere;
 #ifdef _WIN32
     bool have_perl;
 #endif

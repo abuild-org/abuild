@@ -1539,6 +1539,7 @@ Abuild::checkPlugins(BuildTree& tree_data,
 	{
 	    BuildItem& item = *(builditems[item_name]);
 	    item.setPlugin(true);
+	    this->plugins_anywhere.insert(item_name);
 	    bool item_error = false;
 	    // Although whether or not an item has dependencies is not
 	    // context-specific, whether or not an item is a plugin
@@ -1620,6 +1621,12 @@ Abuild::checkPlugins(BuildTree& tree_data,
 	// Store the list of plugins
 	item.setPlugins(plugins);
     }
+}
+
+bool
+Abuild::isPluginAnywhere(std::string const& item)
+{
+    return (this->plugins_anywhere.count(item) != 0);
 }
 
 void
@@ -2881,7 +2888,7 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
       << "    is-plugin=\"" << (item.isPlugin() ? "1" : "0") << "\""
       << std::endl
       << "    is-plugin-anywhere=\""
-      << (item.isPluginAnywhere() ? "1" : "0") << "\""
+      << (isPluginAnywhere(name) ? "1" : "0") << "\""
       << std::endl;
     if (any_subelements)
     {
@@ -3471,10 +3478,10 @@ Abuild::buildBuildset()
     for (BuildItem_map::iterator iter = this->buildset.begin();
 	 iter != this->buildset.end(); ++iter)
     {
+	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (item.isPluginAnywhere())
+	if (isPluginAnywhere(item_name))
 	{
-	    std::string const& item_name = (*iter).first;
 	    verbose("loading interface for plugin " + item_name);
 	    if (! createPluginInterface(item_name, item))
 	    {

@@ -160,6 +160,8 @@ $ENV{'ABUILD_WTEST_DIR'} = windir($abuild_top);
 my $runtime_var = ($in_windows ? 'PATH' : 'LD_LIBRARY_PATH');
 my $old_value = $ENV{$runtime_var} || "";
 
+# TESTS START HERE
+
 die if -f "Abuild.conf";
 $td->runtest("abuild --version with no Abuild.conf",
 	     {$td->COMMAND => "abuild --version"},
@@ -1003,7 +1005,10 @@ if (! $in_windows)
 # This is the remainder of the test suite.
 
 # Test 1 tests normal cases of a simple build tree without any backing
-# areas or externals.  It also exercises the ccxx rules.
+# areas or externals.  It also exercises the ccxx rules.  It is also a
+# place where we dump additional random tests, which may include
+# backing areas and externals or any other feature, to exercise
+# previously detected bugs.
 
 setup("test1");
 
@@ -1511,6 +1516,19 @@ $td->runtest("autoconf compiler invocation",
 	     {$td->COMMAND => "abuild -b all",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test1.autoconf.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/f");
+
+# tree1 has "plugin".  tree2 has tree1 as an external and declares
+# "plugin" as a plugin.  tree3 has both tree1 and tree2 in that order
+# as externals and does not declare "plugin" as a plugin.  abuild 1.0
+# had a bug that caused plugin's interface to not get created.
+$td->runtest("plugin-anywhere",
+	     {$td->COMMAND => "abuild -C tree3",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.plugin-anywhere.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -2737,7 +2755,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(264 +
+$td->report(265 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 18 : 0) +
 	    ($test_junit ? 3 : 0) +
