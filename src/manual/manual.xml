@@ -13353,6 +13353,21 @@ Y = $(X)
          build platforms.
         </para>
        </listitem>
+       <listitem>
+        <para>
+         Bug fix: if tree <filename>A</filename> contained a plugin
+         but did not use it, tree <filename>B</filename> had
+         <filename>A</filename> as an external and used the plugin,
+         and tree <filename>C</filename> had <filename>A</filename>
+         and <filename>B</filename> in that order as externals and did
+         not use the plugin, <filename>C</filename> would have not
+         realize that the plugin was a plugin in any tree.  This would
+         cause a segmentation fault when loading the interface.  This
+         problem has been corrected because &abuild; now has a more
+         robust way of keeping track of whether a given build item is
+         ever a plugin.
+        </para>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
