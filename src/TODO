@@ -1,5 +1,5 @@
-General
-=======
+Version 1.0.1
+=============
 
  * Add executable jar support.
 
@@ -13,12 +13,6 @@ General
    code/reference/lh3/tps/abuild_library/boost/tps-boost_base/autoconf
    for sample boost autoconf code.
 
- * Ant launcher: consider having a Java-based ant launcher that abuild
-   communicates with via some kind of IPC to make launching ant more
-   efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
-   23536 in abuild, 4/3/2008, subject "preliminary ant launcher
-   experiment".
-
  * MSVC .NET 2005: see if anything is required for handling manifest
    files.  Matt Nassr says: "I was curious if you could suggest a best
    way to embed manifest files into C/C++ executables generated with
@@ -29,8 +23,149 @@ General
    for deployment."  Let Matt Nassr know when a solution is found.
 
 
+Version 1.1
+===========
+
+Rethink Status of Build Trees
+-----------------------------
+
+It has become clear that build trees deserve to be named entities.  It
+seems that we are using externals for things for lots of purposes, and
+maybe we need to rethink.  See "Tree Registry" for one idea of how to
+approach this, though I no longer favor that particular idea.
+
+A fundamental issue is that, the way we are using externals, there is
+an implied relationship among multiple different build trees that
+comprise the overall build of a particular project.
+
+Just like abuild currently forms a mapping between build item names
+and paths, it would be nice if abuild could do something similar for
+build trees.  One idea would be to have some kind of rules that you
+could code or otherwise specify that would help abuild locate build
+trees.  Another option would be to make build trees more flexible so
+that we don't have to split them in all the cases we do now.
+
+Here are some of the problems we need to address:
+
+ * Projects that desire certain parts of their trees to be potentially
+   compile-time independent from other parts have to break things into
+   multiple trees and use externals.  This creates several problems:
+
+    - Plugin declarations have to be duplicated
+
+    - It is impossible to pass information, such as extra compilers or
+      flags, backwards across the external gap, so if you use a
+      collection of common build items (like common-abuild-library),
+      there's no way to get those items to compile using your own
+      compiler.  This applies also to test suite build items that are
+      separate trees nested within the tree that provides the items
+      they are testing.  (tests for boost, xbinder, etc.)
+
+    - Information about relative locations of external build trees are
+      proliferated throughout all the root Abuild.conf files.  This
+      problem is discussed in the tree registry section, though I no
+      longer see tree registries as the right solution.
+
+There are some general problems, such as the fact that an error in an
+unrelated part of the build system can prevent your build from
+working.  These problems are mitigated by using externals, but it
+would be out of control to create every island of dependency-isolated
+build items and put them in an external.  We need different sorts of
+barriers that we can create without having to use externals.
+
+This reminds me of multiple baselines in BCS.  Externals as currently
+implemented kind of point toward the mulitple single points of failure
+problem.  Maybe they need to be eliminated entirely.  Maybe we need
+some kind of opaque parent/child relationship or something.
+
+
+General Infrastructure
+----------------------
+
+ * Inheritable or Global plugins.  It would be nice if we could
+   declare a plugin as automatically inheriting across externals.
+   This might be related to site configuration or rethinking build
+   tree status.
+
+ * Need a better solution for automatically generated files that might
+   be controlled in some cases to work around lack of tool support.
+   Abuild itself could use this for flex/bison files.  We could also
+   use it for cases like xbinder where generating the files requires a
+   special license.  We need a clean way to handle the following:
+
+    - Regeneration of the files if they are out of date and the tools
+      are available.
+
+    - Use of cached files if they are not out of date.
+
+    - Error if the files are out of date and the tools are not
+      available.
+
+   This implies, at least for these cases, some kind of checksum-based
+   method (rather than using modification times) to tell whether files
+   are out of date.  That way, checkouts from the version control
+   system can work without modification time preservation.
+
+
+Java
+----
+
+ * Ant launcher: consider having a Java-based ant launcher that abuild
+   communicates with via some kind of IPC to make launching ant more
+   efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
+   23536 in abuild, 4/3/2008, subject "preliminary ant launcher
+   experiment".
+
+Compiler/Platform Configuration
+-------------------------------
+
+There is a general problem with compiler options, 32-bit and 64-bit
+compilers, project-specific configuration, supporting compilers that
+aren't known in advance, etc.  This is kind of what toolset was
+designed to handle.  The following items are possibly contradictory or
+interdependent and need to be sorted out better.
+
+ * Need a more flexible way of handling compiler options.  It should
+   be possible to create plugins that add compiler options to
+   internally supported compilers, and options should be able to be
+   meaningfully selected in groups.  For example, it should be
+   possible to add {m32, m64} that can't be specified together and
+   {debug, release} that can't be specified together while allowing
+   debug+m32 or release+m64 or other permutations.  This implies the
+   need for a canonical form.
+
+ * We need some way for people to change the toolset portion of the
+   platform string in a global way for a particular collection of
+   build tres.
+
+ * There needs to be some kind of "site" configuration that lives in a
+   build tree that may be at the base of the externals chain.  This
+   should be like a plugin but we need the ability to support some
+   kind of build/configuration.  For example, it should be possible to
+   generate toolsets or change default compiler options based on the
+   output of ./configure or to set things that are specific to which
+   compiler is used.
+
+ * It would be nice to have some way to support libtool and a generic
+   UNIX compiler such that if you could specify it with ./configure,
+   you could build using abuild with it.  This may figure into the
+   site configuration somehow.  Ultimately, it should be possible for
+   a given project to be configured such that its build trees build
+   with a particular compiler and particular options, and this should
+   be possible to do without modifying abuild or requiring every
+   single build tree to take some specific actions.
+
+ * There needs to be better cross-compiler support for things like
+   building 32-bit code on a 64-bit system.  Adding -m32 doesn't
+   really do it because why should have you
+   linux.x86_64.rhel51.gcc.m32 be the same as linux.ix86.rhel51.gcc?
+
+
 Tree Registry
 =============
+
+(I no longer think this is a good idea, but it points to some of the
+issues we're having.)
 
 Consider abuild tree registry.  Abuild root item could say something
 like:
