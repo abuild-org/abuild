@@ -275,7 +275,7 @@ if ($test_java)
 
     $td->runtest("extract manifest",
 		 {$td->COMMAND =>
-		      "jar xf java-program.jar META-INF/MANIFEST.MF"},
+		      [$jar, 'xf', 'java-program.jar', 'META-INF/MANIFEST.MF']},
 		 {$td->REGEXP => ".*", $td->EXIT_STATUS => 0});
 
     $td->runtest("check Main-Class",

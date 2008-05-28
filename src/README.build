@@ -49,9 +49,10 @@ build the ant library and rerun the test suite without the
 ABUILD_NO_JAVA variable set.  The test suite includes some tests of
 JUnit support.  In order for them to run, you must set the
 ABUILD_JUNIT_JAR environment variable to the full path of a junit jar
-file.  JUnit 4.4 is known to be sufficient.  It is likey that other
-JUnit 4 versions will also work.  If this environment variable is not
-set, the test suite will issue a warning and skip the JUnit tests.
+file.  (On Windows, this should be a Windows path, not a Cygwin path.)
+JUnit 4.4 is known to be sufficient.  It is likey that other JUnit 4
+versions will also work.  If this environment variable is not set, the
+test suite will issue a warning and skip the JUnit tests.
 
 If your boost libraries are not installed in the default location, you
 may need to set BOOST_INCLUDES and/or BOOST_LIBDIRS to the locations
