@@ -13,6 +13,11 @@ my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
 
 my $devnull = File::Spec->devnull();
 
+# TEMPORARY: FORCE32
+my $force_32 = (exists $ENV{'ABUILD_FORCE_32BIT'} &&
+		($ENV{'ABUILD_FORCE_32BIT'}) eq '1');
+# END FORCE32
+
 my $windows = 0;
 if ((@ARGV == 1) && ($ARGV[0] eq '--windows') &&
     (($^O eq 'cygwin') || ($^O eq 'MSWin32')))
@@ -59,6 +64,27 @@ sub get_platform_components_unix
     if ($os eq 'linux')
     {
 	$cpu = safe_run("uname -m");
+
+	# TEMPORARY: FORCE32
+	if ($force_32)
+	{
+	    my $try = undef;
+	    if ($cpu eq 'x86_64')
+	    {
+		$try = 'i386';
+	    }
+	    elsif ($cpu eq 'ppc64')
+	    {
+		$try = 'ppc';
+	    }
+	    if ((defined $try) &&
+		(system("setarch $try uname -m >/dev/null 2>&1") == 0))
+	    {
+		$cpu = $try;
+	    }
+	}
+	# END FORCE32
+
 	# Don't distinguish for now between different flavors of ix86.
 	$cpu =~ s/^i.86$/ix86/;
 
