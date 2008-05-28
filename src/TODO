@@ -1,20 +1,3 @@
-FORCE32 HACK
-============
-
-
-Version 1.0.1
-=============
-
- * MSVC .NET 2005: see if anything is required for handling manifest
-   files.  Matt Nassr says: "I was curious if you could suggest a best
-   way to embed manifest files into C/C++ executables generated with
-   msvc on Windows. It seems that this needs to be done after the exe
-   is generated with the manifest tool (mt.exe), and I’m wondering if
-   I can make this a part of the Abuild build process. Otherwise, I
-   have to copy the exe and the manifest file to the binary directory
-   for deployment."  Let Matt Nassr know when a solution is found.
-
-
 Version 1.1
 ===========
 
@@ -332,11 +315,6 @@ See also "Known Limitations" in the documentation.
    commented template files.  Alternatively, could be a command-line
    wizard or something.
 
- * Need a way to get a list of build items that will be skipped
-   because they have no platforms.  There are times when it would be
-   nicer if it were an error to have no platforms available for an
-   item in your local area rather than to just have it be skipped.
-
  * Piping ANSI color stuff through ant on Windows doesn't work.  When
    running qtest from ant on Windows, qtest correctly generates the
    ansi color codes, but they don't get displayed right through ant,
@@ -419,11 +397,6 @@ See also "Known Limitations" in the documentation.
  * It would be nice if we could have a flag that would tell abuild to
    capture and de-interleave the output from multiple backends in
    parallel.  See Abuild::invokeBackend.
-
- * make-binary-distribution probably doesn't work correctly with
-   respect to copying msvc DLLs in .NET 2005.  We might need a better
-   way to do this.  Ideally, we should be using something like
-   nullsoft to create a Windows self-installer.
 
  * Mingw support isn't that complete: see known limitations in the
    documentation and comments in private/list_platforms.  If it is
