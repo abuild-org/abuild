@@ -16,7 +16,7 @@ init:
 -post-compile:
      [echo] This is a post-compile hook from the echoer plugin.
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/plugin/java/code/abuild-java/dist/code.jar
 
 BUILD SUCCESSFUL

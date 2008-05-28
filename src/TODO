@@ -1,17 +1,9 @@
+FORCE32 HACK
+============
+
+
 Version 1.0.1
 =============
-
- * Add executable jar support.
-
- * Consider creating a ./configure that finds boost libraries and
-   deals properly with pthread.  Then consider packaging auto-srcs
-   with abuild sources.  Check on debian to see if this works with the
-   latest flex.  Consider making the re-entrant scanner switch, made
-   possible by controlling the flex and bison files provided that
-   there is an autoconf check for the right versions of flex and
-   bison.  See ~/argon/no-argon-backup/\
-   code/reference/lh3/tps/abuild_library/boost/tps-boost_base/autoconf
-   for sample boost autoconf code.
 
  * MSVC .NET 2005: see if anything is required for handling manifest
    files.  Matt Nassr says: "I was curious if you could suggest a best
@@ -25,6 +17,49 @@ Version 1.0.1
 
 Version 1.1
 ===========
+
+General
+-------
+
+ * Remove temporary ABUILD_FORCE_32BIT hack.  Search for FORCE32 in
+   the code.  The only references are in
+   private/bin/get_native_platform_data and make/toolchains/gcc.mk.
+   For a description, see release notes in the documentation.
+
+ * Inheritable or Global plugins.  It would be nice if we could
+   declare a plugin as automatically inheriting across externals.
+   This might be related to site configuration or rethinking build
+   tree status.
+
+ * Need a better solution for automatically generated files that might
+   be controlled in some cases to work around lack of tool support.
+   Abuild itself could use this for flex/bison files.  We could also
+   use it for cases like xbinder where generating the files requires a
+   special license.  We need a clean way to handle the following:
+
+    - Regeneration of the files if they are out of date and the tools
+      are available.
+
+    - Use of cached files if they are not out of date.
+
+    - Error if the files are out of date and the tools are not
+      available.
+
+   This implies, at least for these cases, some kind of checksum-based
+   method (rather than using modification times) to tell whether files
+   are out of date.  That way, checkouts from the version control
+   system can work without modification time preservation.
+
+ * Consider creating a ./configure that finds boost libraries and
+   deals properly with pthread.  Then consider packaging auto-srcs
+   with abuild sources.  Check on debian to see if this works with the
+   latest flex.  Consider making the re-entrant scanner switch, made
+   possible by controlling the flex and bison files provided that
+   there is an autoconf check for the right versions of flex and
+   bison.  See ~/argon/no-argon-backup/\
+   code/reference/lh3/tps/abuild_library/boost/tps-boost_base/autoconf
+   for sample boost autoconf code.
+
 
 Rethink Status of Build Trees
 -----------------------------
@@ -77,34 +112,6 @@ This reminds me of multiple baselines in BCS.  Externals as currently
 implemented kind of point toward the mulitple single points of failure
 problem.  Maybe they need to be eliminated entirely.  Maybe we need
 some kind of opaque parent/child relationship or something.
-
-
-General Infrastructure
-----------------------
-
- * Inheritable or Global plugins.  It would be nice if we could
-   declare a plugin as automatically inheriting across externals.
-   This might be related to site configuration or rethinking build
-   tree status.
-
- * Need a better solution for automatically generated files that might
-   be controlled in some cases to work around lack of tool support.
-   Abuild itself could use this for flex/bison files.  We could also
-   use it for cases like xbinder where generating the files requires a
-   special license.  We need a clean way to handle the following:
-
-    - Regeneration of the files if they are out of date and the tools
-      are available.
-
-    - Use of cached files if they are not out of date.
-
-    - Error if the files are out of date and the tools are not
-      available.
-
-   This implies, at least for these cases, some kind of checksum-based
-   method (rather than using modification times) to tell whether files
-   are out of date.  That way, checkouts from the version control
-   system can work without modification time preservation.
 
 
 Java
@@ -235,15 +242,6 @@ Java Problems
 We probably need a different approach to Java.  Ant was not designed
 to be used as a framework, and it doesn't work very well when used in
 this way.
-
- * We should add the Main-Class attribute to the manifest of a jar
-   when the abuild.main-class property is set:
-
-     <attribute name="Main-Class" value="${abuild.main-class}"/>
-
-   How do we do this conditionally upon the existence of that
-   property?  There is a comment in abuild.xml and also various
-   remarks in the documentation.  Search for "manifest".
 
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse

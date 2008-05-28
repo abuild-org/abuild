@@ -13,7 +13,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/java/code-generator/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/java/code-generator/abuild-java/dist/CodeGenerator.jar
 
 BUILD SUCCESSFUL
@@ -36,7 +36,7 @@ codegen:
 -do-compile:
     [javac] Compiling 2 source files to --topdir--/java/library/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/java/library/abuild-java/dist/example-library.jar
 
 BUILD SUCCESSFUL
@@ -56,7 +56,7 @@ init:
 -do-compile:
     [javac] Compiling 2 source files to --topdir--/java/executable/abuild-java/classes
 
-jar:
+-jar-with-main-class:
       [jar] Building jar: --topdir--/java/executable/abuild-java/dist/example-executable.jar
 
 -test-qtest:

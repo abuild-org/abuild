@@ -270,6 +270,19 @@ if ($test_java)
 		 {$td->STRING => "Hello.  This is BasicLibrary(10).\n",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/basic/java-program/abuild-java/dist");
+
+    $td->runtest("extract manifest",
+		 {$td->COMMAND =>
+		      "jar xf java-program.jar META-INF/MANIFEST.MF"},
+		 {$td->REGEXP => ".*", $td->EXIT_STATUS => 0});
+
+    $td->runtest("check Main-Class",
+		 {$td->COMMAND => "grep Main-Class META-INF/MANIFEST.MF"},
+		 {$td->STRING =>"Main-Class: com.example.basic.BasicProgram\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
 }
 
 cd("work/general/reference/common");
@@ -2757,7 +2770,7 @@ cleanup();
 
 $td->report(265 +
 	    ($in_windows ? 1 : 7) +
-	    ($test_java ? 18 : 0) +
+	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +
 	    ($have_whole_archive ? 2 : 1));
 

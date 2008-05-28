@@ -13,7 +13,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/archive-types/har/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/archive-types/har/abuild-java/dist/har-example.har
      [copy] Copying 1 file to --topdir--/archive-types/har/abuild-java/dist
 
@@ -34,7 +34,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/archive-types/jar/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/archive-types/jar/abuild-java/dist/jar-example.jar
 
 BUILD SUCCESSFUL
@@ -78,7 +78,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/archive-types/ear/local-jar/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/archive-types/ear/local-jar/abuild-java/dist/ear-code.jar
 
 BUILD SUCCESSFUL

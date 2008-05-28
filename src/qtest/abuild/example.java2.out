@@ -9,7 +9,7 @@ Buildfile: --abuild.xml--
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/java/library/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/java/library/abuild-java/dist/example-library.jar
 
 BUILD SUCCESSFUL

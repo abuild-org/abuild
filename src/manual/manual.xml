@@ -1504,25 +1504,20 @@ C:\cygwin\cygwin.bat
     <title>Building a Java Program</title>
     &javawarning;
     <para>
-     In Java, there is really no distinction between a
+     In Java, there is no deep distinction between a
      &ldquo;library&rdquo; and a &ldquo;program&rdquo; except that a
      JAR file that provides a program must have a
-     <function>main</function> method.
-     <footnote>
-      <para>
-       More accurately, if a JAR file contains a main method, it can
-       be executed, though it can also be used as a library.  A JAR
-       file can also contain a <firstterm>manifest file</firstterm>
-       that identifies a class that contains a
-       <function>main</function> method.  Although &abuild; allows
-       specification of the class containing <function>main</function>
-       in the <varname>abuild.main-class</varname> property of
-       <filename>Abuild-ant.properties</filename>, this does not
-       presently influence the manifest file.  For a discussion, read
-       the comments in <filename>ant/abuild.xml</filename> in the
-       &abuild; distribution.
-      </para>
-     </footnote>
+     <function>main</function> method.  If a JAR file contains a main
+     method, it can be executed, though it can also be used as a
+     library.  A JAR file can also contain a <firstterm>manifest
+     file</firstterm> that identifies a class that contains a
+     <function>main</function> method.  Starting with version 1.0.1,
+     &abuild; adds the <property>Main-Class</property> attribute to
+     the manifest file when the <varname>abuild.main-class</varname>
+     property is set in the
+     <filename>Abuild-ant.properties</filename>.
+    </para>
+    <para>
      Here are the relevant files for the program example:
      <?example basic/java-program/src/java/com/example/basic/BasicProgram.java?>
      <?example basic/java-program/Abuild.conf?>
@@ -7756,16 +7751,11 @@ endif
        <term>abuild.main-class</term>
        <listitem>
         <para>
-         The name of a class, if any, that implements main.  Used when
+         The name of a class, if any, that implements main.  Setting
+         this property causes the <property>Main-Class</property>
+         attribute to be set in the manifest file.  It also influences
+         generation of the wrapper script if
          <varname>abuild.wrapper-name</varname> is set.
-         <footnote>
-          <para>
-           Ideally setting <property>abuild.main-class</property>
-           would also cause the manifest file to contain a
-           <property>Main-Class</property> attribute, but this is not
-           presently done in the ant code.
-          </para>
-         </footnote>
         </para>
        </listitem>
       </varlistentry>
@@ -13366,6 +13356,17 @@ Y = $(X)
          problem has been corrected because &abuild; now has a more
          robust way of keeping track of whether a given build item is
          ever a plugin.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Enhancement: When the <varname>abuild.main-class</varname>
+         property is set in <filename>Abuild.properties</filename>,
+         &abuild; now sets the <property>Main-Class</property>
+         attribute in the JAR file's manifest.  This doesn't solve the
+         problem of adding custom attributes to manifest files in the
+         general case, but it does address the most common situation.
+         Thanks to Craig Pell for providing an implementation.
         </para>
        </listitem>
       </itemizedlist>

@@ -13,7 +13,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/java/abuild-java/classes
 
-jar:
+-jar-with-main-class:
       [jar] Building jar: --topdir--/java/abuild-java/dist/test.jar
 
 BUILD SUCCESSFUL

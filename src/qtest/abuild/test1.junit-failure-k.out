@@ -33,7 +33,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/junit/test/abuild-java/classes
 
-jar:
+-jar-with-main-class:
       [jar] Building jar: --topdir--/junit/test/abuild-java/dist/potato-test.jar
 
 -test-junit:

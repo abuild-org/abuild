@@ -13,7 +13,7 @@ init:
 -do-compile:
     [javac] Compiling 3 source files to --topdir--/mixed-classification/public/consumers/interface/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/public/consumers/interface/abuild-java/dist/consumers-interface.jar
 
 BUILD SUCCESSFUL
@@ -33,7 +33,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/consumers/c1/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/public/consumers/c1/abuild-java/dist/consumers-c1.jar
 
 BUILD SUCCESSFUL
@@ -53,7 +53,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/consumers/c2/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/public/consumers/c2/abuild-java/dist/consumers-c2.jar
 
 BUILD SUCCESSFUL
@@ -73,7 +73,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/consumers/c3/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/sensitive/consumers/c3/abuild-java/dist/consumers-c3.jar
 
 BUILD SUCCESSFUL
@@ -93,7 +93,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/consumers/c4/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/sensitive/consumers/c4/abuild-java/dist/consumers-c4.jar
 
 BUILD SUCCESSFUL
@@ -113,7 +113,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/executable/entry/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/public/executable/entry/abuild-java/dist/executable-entry.jar
 
 BUILD SUCCESSFUL
@@ -133,7 +133,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/processor/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/sensitive/processor/abuild-java/dist/processor.jar
 
 BUILD SUCCESSFUL
@@ -153,7 +153,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/executable/abuild-java/classes
 
-jar:
+-jar-with-main-class:
       [jar] Building jar: --topdir--/mixed-classification/sensitive/executable/abuild-java/dist/executable.jar
 
 -test-qtest:
@@ -196,7 +196,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/processor/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/mixed-classification/public/processor/abuild-java/dist/processor.jar
 
 BUILD SUCCESSFUL
@@ -216,7 +216,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/executable/abuild-java/classes
 
-jar:
+-jar-with-main-class:
       [jar] Building jar: --topdir--/mixed-classification/public/executable/abuild-java/dist/executable.jar
 
 -test-qtest:

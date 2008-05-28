@@ -556,41 +556,74 @@
   <run-hooks name="post-package"/>
  </target>
 
- <target name="jar" depends="compile" if="abuild.jar-name">
-  <pathconvert refid="complete-classpath-jar" dirsep="/" pathsep=" "
-               property="manifest-classpath">
-   <mapper type="flatten"/>
-  </pathconvert>
-  <fail message="abuild.jar-name must have a filename extension"
-        unless="abuild.private.jar-name-has-suffix"/>
-  <jar destfile="${abuild.private.dir.dist}/${abuild.jar-name}">
-   <fileset dir="${abuild.private.dir.classes}">
-    <include name="**/*.class"/>
-   </fileset>
-   <fileset dir="${abuild.private.dir.resources}"/>
-   <fileset dir="${abuild.private.dir.generated-resources}"/>
-   <metainf dir="${abuild.private.dir.conf}"/>
-   <metainf dir="${abuild.private.dir.generated-conf}"/>
-   <manifest>
-    <!--  We should put a Main-Class attribute here if the         -->
-    <!--  abuild.main-class property is set, but there doesn't     -->
-    <!--  seem to be any good way of making the existence of the   -->
-    <!--  attribute conditional upon the value or presence of a    -->
-    <!--  property, and having an empty attribute is different     -->
-    <!--  from not having an attribute.                            -->
-    <attribute name="Class-Path" value="${manifest-classpath}"/>
-   </manifest>
-  </jar>
-  <if>
-   <not>
-    <matches string="${abuild.jar-name}" pattern="\.jar$"/>
-   </not>
-   <then>
-    <copy file="${abuild.private.dir.dist}/${abuild.jar-name}"
-          tofile="${abuild.private.dir.dist}/${abuild.jar-name}.jar"/>
-   </then>
-  </if>
+ <target name="-define-jar-macro">
+  <macrodef name="build-jar-using-manifest-attributes">
+   <element name="manifest-attributes" implicit="true" optional="true"/>
+   <sequential>
+    <pathconvert refid="complete-classpath-jar" dirsep="/" pathsep=" "
+                 property="manifest-classpath">
+     <mapper type="flatten"/>
+    </pathconvert>
+    <fail message="abuild.jar-name must have a filename extension"
+          unless="abuild.private.jar-name-has-suffix"/>
+    <jar destfile="${abuild.private.dir.dist}/${abuild.jar-name}">
+     <fileset dir="${abuild.private.dir.classes}">
+      <include name="**/*.class"/>
+     </fileset>
+     <fileset dir="${abuild.private.dir.resources}"/>
+     <fileset dir="${abuild.private.dir.generated-resources}"/>
+     <metainf dir="${abuild.private.dir.conf}"/>
+     <metainf dir="${abuild.private.dir.generated-conf}"/>
+     <manifest>
+      <attribute name="Class-Path" value="${manifest-classpath}"/>
+      <manifest-attributes/>
+     </manifest>
+    </jar>
+    <if>
+     <not>
+      <matches string="${abuild.jar-name}" pattern="\.jar$"/>
+     </not>
+     <then>
+      <copy file="${abuild.private.dir.dist}/${abuild.jar-name}"
+            tofile="${abuild.private.dir.dist}/${abuild.jar-name}.jar"/>
+     </then>
+    </if>
+   </sequential>
+  </macrodef>
  </target>
+
+ <condition property="abuild.private.jar-with-main-class">
+  <and>
+   <isset property="abuild.jar-name"/>
+   <isset property="abuild.main-class"/>
+  </and>
+ </condition>
+
+ <target name="-jar-with-main-class" if="abuild.private.jar-with-main-class"
+         depends="-define-jar-macro">
+  <build-jar-using-manifest-attributes>
+   <attribute name="Main-Class" value="${abuild.main-class}"/>
+  </build-jar-using-manifest-attributes>
+ </target>
+
+ <condition property="abuild.private.jar-without-main-class">
+  <and>
+   <isset property="abuild.jar-name"/>
+   <not>
+    <isset property="abuild.main-class"/>
+   </not>
+  </and>
+ </condition>
+
+ <target name="-jar-without-main-class"
+         if="abuild.private.jar-without-main-class"
+         depends="-define-jar-macro">
+  <build-jar-using-manifest-attributes/>
+ </target>
+
+ <target name="jar"
+         depends="compile,-jar-with-main-class,-jar-without-main-class"
+         if="abuild.jar-name"/>
 
  <condition property="abuild.private.need-war">
   <and>

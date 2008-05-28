@@ -13,7 +13,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/junit/code/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/junit/code/abuild-java/dist/potato.jar
 
 BUILD SUCCESSFUL
@@ -33,7 +33,7 @@ init:
 -do-compile:
     [javac] Compiling 1 source file to --topdir--/junit/failing/abuild-java/classes
 
-jar:
+-jar-without-main-class:
       [jar] Building jar: --topdir--/junit/failing/abuild-java/dist/failing-test.jar
 
 -test-junit:
