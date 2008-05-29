@@ -335,12 +335,9 @@ else
 safe_mkdir("bin");
 if ($windows)
 {
+    # Abuild embeds the manifest file into the executable, so we don't
+    # have to copy it.
     safe_copy("$abuild.exe", "bin/abuild.exe");
-    # Copy the manifest file if present (MSVC >= .NET 2005).
-    if (-f "$abuild.exe.manifest")
-    {
-	safe_copy("$abuild.exe.manifest", "bin/abuild.exe.manifest");
-    }
 
     # Attempt to copy Windows DLLs required by this program.
 
