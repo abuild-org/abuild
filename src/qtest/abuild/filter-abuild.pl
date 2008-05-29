@@ -45,7 +45,6 @@ while (<>)
     next if (m/^[^\s\/]+\.(c|cc|cpp)\r?$/); # Filter out VC++'s output
     # Skip VC++'s DLL creation output
     next if m/Creating library .*\.lib and object .*\.exp/i;
-    next if (m/LINK\b.*\bperforming full link/);
     # Filter junitreport
     next if m/\[junitreport\]\s/;
     s,--abuild-dir--.*abuild.xml,--abuild.xml--,;
