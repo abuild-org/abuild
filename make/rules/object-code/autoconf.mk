@@ -87,8 +87,7 @@ ifeq ($(words $(AUTOCONFIGH)), 0)
 endif
 
 autoconf.stamp: $(COMMONDEPS) $(AC_IN)
-	cp -f $(SRCDIR)/configure.ac configure.ac
-	for i in $(AUTOFILES); do cp -f $(SRCDIR)/$$i.in .; done
+	for i in $(SRCDIR)/configure.ac $(AC_IN); do cp -f $$i .; done
 	aclocal -I $(SRCDIR) $(if $(AC_M4_DIR),-I $(SRCDIR)/m4)
 	$(AC_SKIP_AUTOHEADER) autoheader -I $(SRCDIR)
 	autoconf -I $(SRCDIR)
