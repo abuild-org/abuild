@@ -70,7 +70,8 @@ define make_lib
 endef
 # Usage: $(call make_bin,linker,compiler-flags,link-flags,objects,libdirs,libs,binary-filename)
 define make_bin
-	$(LINKWRAPPER) $(1) $(2) $(4) /link /OUT:$(call binname,$(7)) \
+	$(LINKWRAPPER) $(1) $(2) $(4) /link /incremental:no \
+		/OUT:$(call binname,$(7)) \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)
 	if [ -f $(call binname,$(7)).manifest ]; then \
@@ -82,7 +83,8 @@ endef
 # Usage: $(call make_shlib,linker,compiler-flags,link-flags,objects,libdirs,libs,binary-filename,major,minor,revision)
 define make_shlib
 	$(RM) $(call shlibname,$(7))
-	$(LINKWRAPPER) $(1) $(2) $(4) /LD /Fe$(call shlibname,$(7)) /link \
+	$(LINKWRAPPER) $(1) $(2) $(4) /LD /Fe$(call shlibname,$(7)) \
+		/link /incremental:no \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)
 	if [ -f $(call shlibname,$(7)).manifest ]; then \
