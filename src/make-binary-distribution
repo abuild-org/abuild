@@ -17,6 +17,15 @@
 #
 # Note that qtest-driver must be in your path to run the test suites.
 
+# To debug certain parts of the creation script, run this from inside
+# a fully built source tree using "." as the source distribution.  In
+# this case, the current source tree is copied to a temporary
+# directory and build and test steps are skipped.  Additional
+# arguments, such as documentation and java distributions, can be
+# given if needed, but they may be given as absolute paths and the
+# versions don't have to match.  The resulting distribution will be
+# written into /tmp and should never be released.
+
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
@@ -415,7 +424,7 @@ sub get_manifest_dirs
 
     my $manifest_file = shift;
 
-    use XML::Parser;
+    require XML::Parser;
     my $sysroot = $ENV{'SYSTEMROOT'} or die "$whoami: can't get \$SYSTEMROOT\n";
     $sysroot =~ s,\\,/,g;
     if ($^O eq 'cygwin')
@@ -529,7 +538,8 @@ Usage: $whoami src-dist [ java-dist | --make-java-dist ]
                [ doc-dist | --make-doc-dist ]
                [ --make-static ]
 
-For debugging, use \"$whoami .\".
+For debugging, use \"$whoami .\", and see comments
+in this script.
 
 src-dist must be of the form abuild-version.tar.bz2
 java-dist, if present, must be of the form abuild-version-java.tar.bz2
