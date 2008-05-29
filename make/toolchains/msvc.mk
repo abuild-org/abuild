@@ -73,6 +73,10 @@ define make_bin
 	$(LINKWRAPPER) $(1) $(2) $(4) /link /OUT:$(call binname,$(7)) \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)
+	if [ -f $(call binname,$(7)).manifest ]; then \
+		mt.exe -nologo -manifest $(call binname,$(7)).manifest \
+			-outputresource:$(call binname,$(7))\;1; \
+	fi
 endef
 
 # Usage: $(call make_shlib,linker,compiler-flags,link-flags,objects,libdirs,libs,binary-filename,major,minor,revision)
@@ -81,6 +85,10 @@ define make_shlib
 	$(LINKWRAPPER) $(1) $(2) $(4) /LD /Fe$(call shlibname,$(7)) /link \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)
+	if [ -f $(call shlibname,$(7)).manifest ]; then \
+		mt.exe -nologo -manifest $(call shlibname,$(7)).manifest \
+			-outputresource:$(call shlibname,$(7))\;2; \
+	fi
 endef
 
 clean::
