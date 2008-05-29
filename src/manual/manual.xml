@@ -6,7 +6,7 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY swversion "1.0.1">
-<!ENTITY lastreleased "May 28, 2008">
+<!ENTITY lastreleased "May 29, 2008">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13367,6 +13367,13 @@ Y = $(X)
          problem of adding custom attributes to manifest files in the
          general case, but it does address the most common situation.
          Thanks to Craig Pell for providing an implementation.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         When building with Visual C++, embed the manifest file, if
+         any, into the executable or dll file.  Thanks to Matt Nassr
+         for the suggestion and pointer to the relevant information.
         </para>
        </listitem>
        <listitem>
