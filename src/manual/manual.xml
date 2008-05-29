@@ -21,7 +21,7 @@ is not backward compatible with the solution in version 1.0.
 ]>
 <!--
 
-Possible fop/stylesheet bugs:
+Possible fop/stylesheet bugs (as of fop 0.94):
 
  * A line break can occur before either of the +'s in "C++" and
    after hyphens in command-line options
@@ -30,6 +30,9 @@ Possible fop/stylesheet bugs:
 
  * footnotes from list items don't seem to work as of fop 0.94.
    Search for comment containing "end footnote".
+
+ * Index terms after a chapter title before the first paragraph of the
+   chapter do not work.  The same is not true in sections.
 
 Possible stylesheet considerations:
 
@@ -2245,10 +2248,10 @@ C:\cygwin\cygwin.bat
   </chapter>
   <chapter id="ref.build-item-dependencies">
    <title>Build Item Dependencies</title>
-   <indexterm>
-    <primary>dependency</primary>
-   </indexterm>
    <para>
+    <indexterm>
+     <primary>dependency</primary>
+    </indexterm>
     Management of dependencies among build items is central to
     &abuild;'s functionality.  We have already gotten a taste of this
     capability in the basic examples included in <xref
@@ -5492,10 +5495,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
   </partintro>
   <chapter id="ref.abuild.conf">
    <title>The <filename>Abuild.conf</filename> File</title>
-   <indexterm>
-    <primary>Abuild.conf</primary>
-   </indexterm>
    <para>
+    <indexterm>
+     <primary>Abuild.conf</primary>
+    </indexterm>
     The <filename>Abuild.conf</filename> file is the fundamental
     configuration file that describes each build item and the
     relationships between build items.  It contains information about
@@ -5786,10 +5789,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
   </chapter>
   <chapter id="ref.abuild-interface-system">
    <title>The &Abuild; Interface System</title>
-   <indexterm>
-    <primary>interface</primary>
-   </indexterm>
    <para>
+    <indexterm>
+     <primary>interface</primary>
+    </indexterm>
     The &abuild; interface system is the mechanism through which
     &abuild; provides encapsulation.  Its purpose is to allow build
     items to provide information about the products they provide to
@@ -6932,10 +6935,10 @@ endif
   </chapter>
   <chapter id="ref.abuild.mk">
    <title>The <filename>Abuild.mk</filename> File</title>
-   <indexterm>
-    <primary>Abuild.mk</primary>
-   </indexterm>
    <para>
+    <indexterm>
+     <primary>Abuild.mk</primary>
+    </indexterm>
     An <filename>Abuild.mk</filename> file must appear in every
     directory in which something is to be built using the
     <application>GNU Make</application> backend.  In this chapter, we
@@ -10982,10 +10985,10 @@ flag private INCLUDES = private-include
   </chapter>
   <chapter id="ref.plugins">
    <title>Enhancing &Abuild; with Plugins</title>
-   <indexterm>
-    <primary>plugin</primary>
-   </indexterm>
    <para>
+    <indexterm>
+     <primary>plugin</primary>
+    </indexterm>
     This chapter is geared toward people who may extend or enhance
     &abuild; by adding additional rules, platforms, or compilers.
     Anyone interested in extending &abuild; in this way should also be
