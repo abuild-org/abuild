@@ -40,8 +40,19 @@ END
 
 usage() unless @ARGV >= 1;
 my $src_dist = shift(@ARGV);
-usage() unless $src_dist =~ m/^abuild-(\d+\.\d+(?:\.(a|b|rc)?\d+)?)\.tar.bz2$/;
-my $version = $1;
+my $version;
+my $test_mkdist = 0;
+if ($src_dist eq '.')
+{
+    $version = 'test';
+    $test_mkdist = 1;
+}
+else
+{
+    usage() unless
+	$src_dist =~ m/^abuild-(\d+\.\d+(?:\.(a|b|rc)?\d+)?)\.tar.bz2$/;
+    $version = $1;
+}
 
 my $java_dist = undef;
 my $make_java_dist = 0;
@@ -75,6 +86,14 @@ foreach my $arg (@ARGV)
     {
 	$save_auto = 1;
     }
+    elsif ($test_mkdist && ($arg =~ m/abuild-.*-java.tar.bz2$/))
+    {
+	$java_dist = $arg;
+    }
+    elsif ($test_mkdist && ($arg =~ m/abuild-.*-doc.tar.bz2$/))
+    {
+	$doc_dist = $arg;
+    }
     else
     {
 	usage();
@@ -83,7 +102,10 @@ foreach my $arg (@ARGV)
 
 run("qtest-driver --version > /dev/null");
 
-$src_dist = normalize_path($src_dist);
+if (! $test_mkdist)
+{
+    $src_dist = normalize_path($src_dist);
+}
 $java_dist = normalize_path($java_dist);
 $doc_dist = normalize_path($doc_dist);
 
@@ -127,7 +149,7 @@ if ($^O eq 'cygwin')
     $windows = 1;
     # We need objdump to determine which DLLs are required.
     run("objdump --version > /dev/null");
-    if (! -d "auto-srcs")
+    if ((! -d "auto-srcs") && (! $test_mkdist))
     {
 	die "$whoami: auto-srcs must exist\n";
     }
@@ -140,13 +162,34 @@ if ($windows && $make_static)
 
 my $now = time;
 $tmpdir = ".abuild-release-$$-$now";
+if ($test_mkdist)
+{
+    $tmpdir = "/tmp/$tmpdir";
+}
 
 safe_mkdir($tmpdir);
 $tmpdir = abs_path($tmpdir);
 
 chdir $tmpdir or die "$whoami: can't cd $tmpdir\n";
 
-run("tar xjf $src_dist");
+if ($test_mkdist)
+{
+    my $srcdir = $cwd;
+    while (! -f "$srcdir/src/Makefile.bootstrap")
+    {
+	$srcdir = dirname($srcdir);
+	if ($srcdir eq '/')
+	{
+	    die "$whoami: unable to find source directory in test mode\n";
+	}
+    }
+    print "$whoami: copying $srcdir to $tmpdir...\n";
+    run("cp -a $srcdir $tmpdir/abuild-$version");
+}
+else
+{
+    run("tar xjf $src_dist");
+}
 safe_chdir("abuild-$version");
 
 # Determination of bin_platform is duplicated in Makefile.bootstrap.
@@ -160,25 +203,33 @@ if ($bin_platform !~ m/^([^\.]+)\.([^\.]+)\.([^\.]+)\.([^\.]+)/)
 }
 my ($os, $cpu, $dist, $compiler) = ($1, $2, $3, $4);
 my $bin_dist = "abuild-$version-$dist-$cpu-bin";
-
+my $abuild_outdir = "abuild-$bin_platform";
 print $bin_dist, "\n";
 
 safe_chdir("src");
 
 if (-d "$cwd/auto-srcs")
 {
-    safe_mkdir("abuild-$bin_platform");
-    run("cp $cwd/auto-srcs/* abuild-$bin_platform");
+    safe_mkdir("$abuild_outdir");
+    run("cp $cwd/auto-srcs/* $abuild_outdir");
 }
 
-run("make -f Makefile.bootstrap");
-my $abuild = getcwd() . "/abuild-$bin_platform/abuild";
+if ($test_mkdist && (-f "$abuild_outdir/abuild" ||
+		     -f "$abuild_outdir/abuild.exe"))
+{
+    print "$whoami: test mode: skipping build\n";
+}
+else
+{
+    run("make -f Makefile.bootstrap");
+}
+my $abuild = getcwd() . "/$abuild_outdir/abuild";
 my $actual_version = `$abuild --version`;
 if ($? != 0)
 {
     die "$whoami: abuild --version failed\n";
 }
-if ($actual_version !~ m/\b$version\b/)
+if ((! $test_mkdist) && ($actual_version !~ m/\b$version\b/))
 {
     die "$whoami: abuild --version reported the wrong version" .
 	" ($actual_version)\n";
@@ -216,7 +267,14 @@ else
 	run("(cd manual; $abuild)");
     }
 }
-run("$abuild check");
+if ($test_mkdist)
+{
+    print "$whoami: test mode: skipping test\n";
+}
+else
+{
+    run("$abuild check");
+}
 
 safe_chdir($tmpdir);
 safe_chdir("abuild-$version");
@@ -291,13 +349,25 @@ if ($windows)
 	}
     }
     close(O);
-    my $sysroot = $ENV{'SYSTEMROOT'} or die "$whoami: can't get \$SYSTEMROOT\n";
-    $sysroot =~ s,\\,/,g;
-    chop($sysroot = `cygpath $sysroot`);
-    die "$whoami: can't get system root" unless $? == 0;
+    my @path = split(':', $ENV{'PATH'});
+
+    if (-f "$abuild.exe.manifest")
+    {
+	unshift(@path, get_manifest_dirs("$abuild.exe.manifest"));
+    }
+
+  dll:
     foreach my $dll (@dlls)
     {
-	safe_copy("$sysroot/System32/$dll", "bin/$dll");
+	foreach my $p (@path)
+	{
+	    if (-f "$p/$dll")
+	    {
+		safe_copy("$p/$dll", "bin/$dll");
+		next dll;
+	    }
+	}
+	die "$whoami: can't find $dll in path\n";
     }
 }
 else
@@ -336,6 +406,58 @@ if (defined $static_dist)
     system("chmod +x abuild-$version/bin/abuild");
     run("tar cjf ../$static_dist.tar.bz2 abuild-$version");
     print "$whoami: created $static_dist.tar.bz2\n";
+}
+
+sub get_manifest_dirs
+{
+    # Find all system directories in which to search for DLLs based on
+    # the contents of a Visual Studio manifest file.
+
+    my $manifest_file = shift;
+
+    use XML::Parser;
+    my $sysroot = $ENV{'SYSTEMROOT'} or die "$whoami: can't get \$SYSTEMROOT\n";
+    $sysroot =~ s,\\,/,g;
+    if ($^O eq 'cygwin')
+    {
+	chop($sysroot = `cygpath $sysroot`);
+	die "$whoami: can't get system root" unless $? == 0;
+    }
+    my $winsxs = "$sysroot/WinSxS";
+    opendir(D, $winsxs) or die "$whoami: can't opendir $winsxs: $!\n";
+    my @entries = readdir(D);
+    closedir(D);
+
+    my @candidates = ();
+
+    my $readAssemblyIdentity = sub
+    {
+	my ($parser, $element, %attrs) = @_;
+	return unless $element eq 'assemblyIdentity';
+	my $type = $attrs{'type'};
+	my $name = $attrs{'name'};
+	my $version = $attrs{'version'};
+	my $processorArchitecture = $attrs{'processorArchitecture'};
+	my $publicKeyToken = $attrs{'publicKeyToken'};
+
+	my $dir_start = join('_',
+			     $processorArchitecture,
+			     $name,
+			     $publicKeyToken,
+			     $version);
+	push(@candidates, $dir_start);
+    };
+
+    my $p = new XML::Parser(Handlers => {'Start' => $readAssemblyIdentity});
+    $p->parsefile($manifest_file);
+
+    my @dirs = ();
+    foreach my $c (@candidates)
+    {
+	push(@dirs, map { "$winsxs/$_" } (grep { m/^\Q$c\E/i } @entries));
+    }
+
+    @dirs;
 }
 
 sub safe_mkdir
@@ -406,6 +528,8 @@ sub usage
 Usage: $whoami src-dist [ java-dist | --make-java-dist ]
                [ doc-dist | --make-doc-dist ]
                [ --make-static ]
+
+For debugging, use \"$whoami .\".
 
 src-dist must be of the form abuild-version.tar.bz2
 java-dist, if present, must be of the form abuild-version-java.tar.bz2
