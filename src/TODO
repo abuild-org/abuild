@@ -80,9 +80,7 @@ Here are some of the problems we need to address:
       they are testing.  (tests for boost, xbinder, etc.)
 
     - Information about relative locations of external build trees are
-      proliferated throughout all the root Abuild.conf files.  This
-      problem is discussed in the tree registry section, though I no
-      longer see tree registries as the right solution.
+      proliferated throughout all the root Abuild.conf files.
 
 There are some general problems, such as the fact that an error in an
 unrelated part of the build system can prevent your build from
@@ -96,6 +94,80 @@ implemented kind of point toward the mulitple single points of failure
 problem.  Maybe they need to be eliminated entirely.  Maybe we need
 some kind of opaque parent/child relationship or something.
 
+Here's a partial solution.
+
+ * Remove parent-dir, child-dirs, and external-dirs.
+
+ * Add a new key "tree" that takes the name of a tree.
+
+ * Add new optional keys "traverse-up" and "traverse-down", if needed.
+   These are legal everywhere except for absolute tree tops
+   (a.k.a. forest roots, at least for now).
+
+Traversal algorithm:
+
+ * Start at current build item and walk up the tree until a build item
+   with a "tree" key is found.  If the parent directory does not have
+   an Abuild.conf, it is an error.  (Possible "traverse-up" key to
+   indicate where upward traversal should continue, but maybe this is
+   a bad idea.)  When a tree: key is encountered, this is a build tree
+   root.
+
+ * Follow the chain of Abuild.backing files until a tree is reached
+   with no backing file.
+
+ * Traverse downward.  When an Abuild.conf is found, check all direct
+   child directories that are not abuild output directories for
+   Abuild.conf files.  This means we have to do an opendir and
+   readdir, but it's still not an unbounded search.  (Possible
+   "traverse-down" to allow skipping directories, but this may be a
+   bad idea.)
+
+ * When traversing downward, additional tree roots may be
+   encountered.  Recursively traverse those.
+
+ * Once tree is traversed, compare the list of known build items with
+   the list of referenced build items (trait referents, dependencies).
+   (Is this only within the tree, or do we somehow look at all known
+   items?  Maybe we only look at the backing chain but not other trees
+   at the same level?  Maybe we only look at items within the same
+   tree in the backing chain?)  The latter probably has to be done at
+   a later stage.)  If the tree is referentially closed, traversal is
+   complete.  Otherwise, unless the "-forest-root" option has been
+   specified after the tree name (need something better than "forest
+   root" or "absolute top"), continue upward traversal again looking
+   for a tree root.  This is tricky because when we traverse downward,
+   we will encounter subtrees.  We'll probably have to do another
+   referential integrity check later after we've traversed everything.
+
+ * Backing areas: when a tree root points to another tree root, we
+   probably want to require that the destination be a tree root of a
+   tree with the same name.  That may clear up some issues.
+
+ * Additional integrity checks: rather than requiring trees to declare
+   other trees that they use, we'll construct a dependency graph of
+   trees.  (Need to think about how this interacts with backing areas.
+   Are tree and tree' one tree or two trees?)  If tree A has an item
+   that depends on an item in tree B, then there is a dependency
+   between tree A and tree B.  This graph must also be acyclic.  This
+   analysis needs to be done with expanded dependencies, in which case
+   it should implement one-way dependency gates.  Open question: what
+   about non-dependency relationships?  I'm thinking no name
+   resolution is allowed to cross back across these gates, making this
+   very much like externals now, except perhaps with regard to global
+   plugins, which we have to define.  The idea of global plugins,
+   including allowing them to disregard the "external" boundaries, may
+   solve problems like adding new compilers for all trees.  However,
+   this interacts poorly with the idea of stopping traversal at the
+   root of a referentially closed tree.  Maybe that's a bad idea.
+   There aren't many advantages to stopping traversal at the root of a
+   closed tree, other than perhaps efficiency gains, particularly if
+   we can disregard errors that don't impact any items in the current
+   build set.
+
+Need to flesh out an example that includes both searchlight and
+lh3-style trees.  Think about external build item library concept,
+whether it's sensible, and how it interacts with global plugins.
 
 Java
 ----
@@ -149,48 +221,6 @@ interdependent and need to be sorted out better.
    building 32-bit code on a 64-bit system.  Adding -m32 doesn't
    really do it because why should have you
    linux.x86_64.rhel51.gcc.m32 be the same as linux.ix86.rhel51.gcc?
-
-
-Tree Registry
-=============
-
-(I no longer think this is a good idea, but it points to some of the
-issues we're having.)
-
-Consider abuild tree registry.  Abuild root item could say something
-like:
-
-  tree-name: tree3
-  tree-registry: ../../../../Abuild-trees
-  external-trees: tree1 tree2
-
-Then Abuild-trees could say
-
-  tree1: a/b/c/one-root
-  tree2: a/b/d/two-root
-
-This kind of thing might make sense if you have a single source tree
-that is separated into a bunch of abuild build trees that are all
-expected to be positioned in the same relative positions with each
-other.  It basically makes it more practical to divide up a source
-tree into multiple, stand-alone build trees without having to
-distribute the knowledge of where all the trees are relative to each
-other.
-
-Notes:
-
- * external-trees and tree-registry can coexist with external-dirs
-
- * The tree registry file can be resolved in a backing area.
-
- * There is no requirement that all trees in the registry be found.
-   However, any tree that is found must have a name that matches the
-   tree-name key in the tree, and any tree that is referenced in an
-   external-trees key must be found.
-
- * Need to figure out exactly how these work with backing areas and
-   externals; i.e., we need to at least detect inconsistencies while
-   still allowing overrides.
 
 
 Platform Conditionals
