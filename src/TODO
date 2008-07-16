@@ -1,3 +1,10 @@
+Next
+====
+
+ * Bug: make_shlib should use $(1), not $(CXX) as linker.  Check all
+   compiler toolchain files.
+
+
 Version 1.1
 ===========
 
