@@ -4,12 +4,20 @@ Next
  * Bug: make_shlib should use $(1), not $(CXX) as linker.  Check all
    compiler toolchain files.
 
-
 Version 1.1
 ===========
 
 General
 -------
+
+ * It would be nice if -p native:skip didn't actually disable native
+   platforms but instead just took them out of the default build list.
+   That way, when doing -p native:skip, if a java or indep build item
+   depends on a native build item, abuild can still build the native
+   item "as needed" just as it would for other platform-specific
+   dependencies.  While we're at it, it should be possible to disable
+   java and indep build items in this same way, and maybe also to
+   specify indep-only or java-only.
 
  * Remove temporary ABUILD_FORCE_32BIT hack.  Search for FORCE32 in
    the code.  The only references are in
