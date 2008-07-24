@@ -54,13 +54,31 @@ General
    latest flex.  Consider making the re-entrant scanner switch, made
    possible by controlling the flex and bison files provided that
    there is an autoconf check for the right versions of flex and
-   bison.  See ~/argon/no-argon-backup/\
-   code/reference/lh3/tps/abuild_library/boost/tps-boost_base/autoconf
+   bison.  See ~/source/work-software/argon/third-party-support/boost
    for sample boost autoconf code.
 
 
 Rethink Status of Build Trees
 -----------------------------
+
+Incorporate:
+
+ * Removing parent-dir and child-dirs is not a good idea.
+
+ * We need some kind of tree location algorithm.  It should still work
+   to have
+
+   A common B
+
+   where A and B are completely independent but both use common
+   without having them all getting combined.  Maybe it would be okay
+   for building A to notice B, but errors in B should not even be
+   reported when building A.
+
+ * See if there is any need for externals at all.  See if there is
+   still a need for absolute path externals or read-only externals.
+
+-----
 
 It has become clear that build trees deserve to be named entities.  It
 seems that we are using externals for things for lots of purposes, and
