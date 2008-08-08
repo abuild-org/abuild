@@ -29,7 +29,12 @@ Reader::apply()
     {
 	while (1)
 	{
-	    std::cout << this->mq.dequeue(this->timeout) << std::endl;
+	    int t = this->mq.dequeue(this->timeout);
+	    if (t == -1)
+	    {
+		break;
+	    }
+	    std::cout << t << std::endl;
 	}
     }
     catch (MessageQueue::TimeOut)
@@ -106,6 +111,8 @@ int main(int argc, char* argv[])
     mq.enqueue(9);
     mq.waitUntilEmpty();
     msleep(100);
+    mq.enqueue(-1);
+    th2.join();
 
     std::cout << "exiting" << std::endl;
     return 0;
