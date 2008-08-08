@@ -80,19 +80,19 @@ unparse_assignment_type(Interface::assign_e assignment_type)
 
 
 static void
-declare(Interface& interface, FileLocation const& location,
+declare(Interface& _interface, FileLocation const& location,
 	std::string const& variable_name,
 	Interface::type_e type, Interface::list_e list_type)
 {
     logger->logInfo("declaring " + variable_name + ": " +
 		    unparse_type(type, list_type));
-    bool status = interface.declareVariable(
+    bool status = _interface.declareVariable(
 	location, variable_name, type, list_type);
     logger->logInfo(status ? "success" : "failure");
 }
 
 static void
-assign(Interface& interface, FileLocation const& location,
+assign(Interface& _interface, FileLocation const& location,
        std::string const& variable_name,
        std::deque<std::string> value,
        Interface::assign_e assignment_type,
@@ -102,17 +102,17 @@ assign(Interface& interface, FileLocation const& location,
     logger->logInfo(unparse_assignment_type(assignment_type) +
 		    flag_info + "assignment to " + variable_name + " =" +
 		    unparse_values(value));
-    bool status = interface.assignVariable(
+    bool status = _interface.assignVariable(
 	location, variable_name, value, assignment_type, flag);
     logger->logInfo(status ? "success" : "failure");
 }
 
 static void
-reset(Interface& interface, FileLocation const& location,
+reset(Interface& _interface, FileLocation const& location,
       std::string const& variable_name)
 {
     logger->logInfo("resetting " + variable_name);
-    bool status = interface.resetVariable(location, variable_name);
+    bool status = _interface.resetVariable(location, variable_name);
     logger->logInfo(status ? "success" : "failure");
 }
 
@@ -133,16 +133,16 @@ make_deque(std::string const& v1, std::string const& v2)
     return result;
 }
 
-static void dump_interface(std::string const& name, Interface const& interface,
+static void dump_interface(std::string const& name, Interface const& _interface,
 			   FlagData const& flag_data)
 {
     logger->logInfo("dumping interface " + name);
-    std::set<std::string> names = interface.getVariableNames();
+    std::set<std::string> names = _interface.getVariableNames();
     for (std::set<std::string>::iterator iter = names.begin();
 	 iter != names.end(); ++iter)
     {
 	Interface::VariableInfo info;
-	bool status = interface.getVariable(*iter, flag_data, info);
+	bool status = _interface.getVariable(*iter, flag_data, info);
 	assert(status);
 	std::string msg = *iter + ": " +
 	    unparse_type(info.type, info.list_type) +

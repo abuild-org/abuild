@@ -58,18 +58,18 @@ unparse_values(std::deque<std::string> const& value)
     return result;
 }
 
-static void dump_interface(std::string const& name, Interface const& interface,
+static void dump_interface(std::string const& name, Interface const& _interface,
 			   std::vector<std::string> const& after_builds)
 {
     FlagData flag_data;
     flag_data.addFlag("p0", "test-interface-parser");
     logger->logInfo("dumping interface " + name);
-    std::set<std::string> names = interface.getVariableNames();
+    std::set<std::string> names = _interface.getVariableNames();
     for (std::set<std::string>::iterator iter = names.begin();
 	 iter != names.end(); ++iter)
     {
 	Interface::VariableInfo info;
-	bool status = interface.getVariable(*iter, flag_data, info);
+	bool status = _interface.getVariable(*iter, flag_data, info);
 	assert(status);
 	std::string msg = "  " + *iter + ": " +
 	    unparse_type(info.type, info.list_type) +
@@ -197,11 +197,11 @@ int main(int argc, char* argv[])
 	    bool status = parser.parse(filename, true);
 	    logger->logInfo(std::string("parse(") + filename + "): " +
 			    (status ? "success" : "failure"));
-	    boost::shared_ptr<Interface> interface = parser.getInterface();
-	    dump_interface(filename, *interface, parser.getAfterBuilds());
+	    boost::shared_ptr<Interface> _interface = parser.getInterface();
+	    dump_interface(filename, *_interface, parser.getAfterBuilds());
 	    if (method == 1)
 	    {
-		interfaces.push_back(interface);
+		interfaces.push_back(_interface);
 	    }
 	}
     }

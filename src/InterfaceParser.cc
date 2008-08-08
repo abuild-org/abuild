@@ -63,7 +63,7 @@ InterfaceParser::InterfaceParser(std::string const& name,
 	    &InterfaceParser::evaluateFunctionContainsmatch;
     }
 
-    this->interface.reset(new Interface(name, error_handler, local_dir));
+    this->_interface.reset(new Interface(name, error_handler, local_dir));
 }
 
 bool
@@ -244,7 +244,7 @@ InterfaceParser::parseFile()
 void
 InterfaceParser::startFile(std::string const& filename)
 {
-    this->interface->setLocalDirectory(
+    this->_interface->setLocalDirectory(
 	Util::dirname(Util::canonicalizePath(filename)));
     this->after_builds.clear();
     if (this->debug_parser)
@@ -283,15 +283,15 @@ InterfaceParser::acceptParseTree(nt_Blocks* blocks)
 }
 
 bool
-InterfaceParser::importInterface(Interface const& interface)
+InterfaceParser::importInterface(Interface const& _interface)
 {
-    return this->interface->importInterface(interface);
+    return this->_interface->importInterface(_interface);
 }
 
 boost::shared_ptr<Interface>
 InterfaceParser::getInterface() const
 {
-    return this->interface;
+    return this->_interface;
 }
 
 std::vector<std::string>
@@ -457,7 +457,7 @@ InterfaceParser::evaluateReset(
 	{
 	    assert(! variable.empty());
 	    Interface::VariableInfo info;
-	    if (this->interface->getVariable(variable, info))
+	    if (this->_interface->getVariable(variable, info))
 	    {
 		QTC::TC("abuild", "InterfaceParser no-reset");
 		this->protected_from_reset.insert(variable);
@@ -475,7 +475,7 @@ InterfaceParser::evaluateReset(
 	    if (variable.empty())
 	    {
 		QTC::TC("abuild", "InterfaceParser reset all");
-		to_reset = this->interface->getVariableNames();
+		to_reset = this->_interface->getVariableNames();
 	    }
 	    else
 	    {
@@ -488,7 +488,7 @@ InterfaceParser::evaluateReset(
 	    {
 		if (this->protected_from_reset.count(*iter) == 0)
 		{
-		    this->interface->resetVariable(
+		    this->_interface->resetVariable(
 			reset->getLocation(), *iter);
 		}
 	    }
@@ -521,7 +521,7 @@ InterfaceParser::evaluateAssignment(
     {
 	nt_Words const* words = assignment->getWords();
 	std::deque<std::string> value = evaluateWords(words);
-	this->interface->assignVariable(
+	this->_interface->assignVariable(
 	    assignment->getLocation(),
 	    assignment->getIdentifier(),
 	    value,
@@ -536,7 +536,7 @@ InterfaceParser::evaluateDeclaration(
 {
     if (evaluating)
     {
-	this->interface->declareVariable(
+	this->_interface->declareVariable(
 	    declaration->getLocation(),
 	    declaration->getVariableName(),
 	    declaration->getType(),
@@ -562,7 +562,7 @@ InterfaceParser::evaluateAfterBuild(
 	if (checkFilenameArgument(&argument, filename))
 	{
 	    this->after_builds.push_back(filename);
-	    this->interface->normalizeFilename(this->after_builds.back());
+	    this->_interface->normalizeFilename(this->after_builds.back());
 	}
     }
 }
@@ -615,7 +615,7 @@ InterfaceParser::evaluateTargetType(
     }
     else if (evaluating)
     {
-	this->interface->setTargetType(TargetType::getID(value));
+	this->_interface->setTargetType(TargetType::getID(value));
     }
 }
 
@@ -866,7 +866,7 @@ InterfaceParser::withVariable(
     bool result = false;
     std::string variable_name = getVariableName(token);
     Interface::VariableInfo info;
-    if (this->interface->getVariable(variable_name, info))
+    if (this->_interface->getVariable(variable_name, info))
     {
 	if (info.initialized)
 	{

@@ -193,7 +193,8 @@ class InterfaceParser: public Parser
     InterfaceLexer lexer;
     nt_Blocks* parse_tree;
     bool allow_after_build;
-    boost::shared_ptr<Interface> interface;
+    // <windows.h> #define's interface to struct sometimes.
+    boost::shared_ptr<Interface> _interface;
     std::set<std::string> supported_flags;
     std::vector<std::string> after_builds;
     std::set<std::string> protected_from_reset;

@@ -4040,23 +4040,23 @@ Abuild::createItemInterface(std::string const& builder_string,
     // because these values may be accessed by the item's local build
     // file well.
 
-    Interface& interface = *(parser.getInterface());
+    Interface& _interface = *(parser.getInterface());
     FileLocation internal("<internal: " + builder_string + ">", 0, 0);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_THIS", build_item.getName(),
 			    Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_TARGET_TYPE",
 			    TargetType::getName(build_item.getTargetType()),
 			    Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM_TYPE",
 			    build_item.getPlatformType(item_platform),
 			    Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM", item_platform,
 			    Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_OUTPUT_DIR",
 			    OUTPUT_DIR_PREFIX + item_platform,
 			    Interface::a_override, status);
@@ -4092,22 +4092,22 @@ Abuild::createItemInterface(std::string const& builder_string,
 	}
     }
 
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM",
 			    item_platform, Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM_OS",
 			    platform_os, Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM_CPU",
 			    platform_cpu, Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM_TOOLSET",
 			    platform_toolset, Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM_COMPILER",
 			    platform_compiler, Interface::a_override, status);
-    assignInterfaceVariable(interface,
+    assignInterfaceVariable(_interface,
 			    internal, "ABUILD_PLATFORM_OPTION",
 			    platform_option, Interface::a_override, status);
 
@@ -4163,14 +4163,14 @@ Abuild::createPluginInterface(std::string const& plugin_name,
 }
 
 void
-Abuild::assignInterfaceVariable(Interface& interface,
+Abuild::assignInterfaceVariable(Interface& _interface,
 				FileLocation const& location,
 				std::string const& variable_name,
 				std::string const& value,
 				Interface::assign_e assignment_type,
 				bool& status)
 {
-    if (! interface.assignVariable(
+    if (! _interface.assignVariable(
 	    location, variable_name, value, assignment_type))
     {
 	status = false;
@@ -4367,9 +4367,9 @@ Abuild::invoke_gmake(std::string const& item_name,
     mk << "\n";
 
     // Output variables based on the item's interface object.
-    Interface const& interface = build_item.getInterface(item_platform);
+    Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
-	interface.getVariablesForTargetType(
+	_interface.getVariablesForTargetType(
 	    build_item.getTargetType(), build_item.getFlagData());
     for (std::map<std::string, Interface::VariableInfo>::iterator iter =
 	     variables.begin();
@@ -4493,9 +4493,9 @@ Abuild::invoke_ant(std::string const& item_name,
 #endif
 
     // Output variables based on the item's interface object.
-    Interface const& interface = build_item.getInterface(item_platform);
+    Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
-        interface.getVariablesForTargetType(
+        _interface.getVariablesForTargetType(
 	    build_item.getTargetType(), build_item.getFlagData());
     for (std::map<std::string, Interface::VariableInfo>::iterator iter =
              variables.begin();
