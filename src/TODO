@@ -4,6 +4,11 @@ Next
  * Bug: make_shlib should use $(1), not $(CXX) as linker.  Check all
    compiler toolchain files.
 
+ * To override OFLAGS, DFLAGS, or WFLAGS globally, it is necessary to
+   prefix the assignment with "override" in Abuild.mk.  This needs to
+   be mentioned in the documentation.
+
+
 Version 1.1
 ===========
 
