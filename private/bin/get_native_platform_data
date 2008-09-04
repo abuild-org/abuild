@@ -108,13 +108,16 @@ sub get_platform_components_unix
 	    }
         }
         elsif (read_dist_file("/etc/redhat-release", \$release) &&
-	       ($release =~ m/Red Hat Enterprise.*release (\S+) /))
+	       ($release =~ m/Red Hat Enterprise.*release (\d+)/))
         {
+	    # For RHEL, only the major version matters.
             $toolset = "rhel$1";
         }
         elsif (read_dist_file("/etc/redhat-release", \$release) &&
-		 ($release =~ m/CentOS release (\S+) /))
+		 ($release =~ m/CentOS release (\d+)/))
         {
+	    # Centos is basically RHEL, so only the major version
+	    # matters.
             $toolset = "centos$1";
         }
         elsif (read_dist_file("/etc/debian_version", \$release))
