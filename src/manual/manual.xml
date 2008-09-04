@@ -13273,6 +13273,23 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>1.0.2: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Abuild no longer includes the minor release of Red Hat
+         Enterprise Linux and Centos releases in the platform string.
+         The minor release number is not necessary as the minor
+         releases are intended to be binary compatible.  This allows a
+         Red Hat Enterprise Linux 5.2 system to use a backing area
+         built by a Red Hat Enterprise Linux 5.1 system, for example.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.0.1: May 28, 2008</term>
      <listitem>
       <itemizedlist>
