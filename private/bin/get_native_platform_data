@@ -131,9 +131,8 @@ sub get_platform_components_unix
         $cpu = safe_run("uname -p");
         $toolset = safe_run("uname -r");
     }
-    elsif ($os eq 'darwin') 
+    elsif ($os eq 'darwin')
     {
-        
         $cpu = safe_run("uname -p");
         $toolset = safe_run("uname -r");
     }
