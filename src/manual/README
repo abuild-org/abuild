@@ -10,5 +10,9 @@ variables must be set:
   DOCBOOK_XSL: the root of the docbook stylesheets
   FOP_HOME: the fop installation directory, unless fop is in the path
 
+fop requires JAVA_HOME to be set.  Simply having a working java in
+your path is not sufficient.  Without this, external image loading
+does not work properly.
+
 In addition, the "dia" program must be available to process the
 figures.
