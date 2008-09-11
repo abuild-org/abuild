@@ -2,6 +2,7 @@
 #include <FileProvider_file.hh>
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
 
 FileProvider::FileProvider() :
     filename(FILE_LOCATION)

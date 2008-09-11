@@ -13286,6 +13286,13 @@ Y = $(X)
          built by a Red Hat Enterprise Linux 5.1 system, for example.
         </para>
        </listitem>
+       <listitem>
+        <para>
+         Minor fixes were made to C++ source files in the test suite
+         and examples so that they would compile properly with gcc
+         4.3.
+        </para>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
