@@ -62,6 +62,13 @@ General
    bison.  See ~/source/work-software/argon/third-party-support/boost
    for sample boost autoconf code.
 
+ * Consider a "renamed-to" or "replaced-by" keyword that would be used
+   to indicate that a build item has been replaced by another build
+   item.  Its semantics would include that BUILD_ITEM_RULES and
+   abuild.hook-build-items would follow the name change.  This is
+   stronger than using deps to make the old name depend on the new
+   name.
+
 
 Rethink Status of Build Trees
 -----------------------------
