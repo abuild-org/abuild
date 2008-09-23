@@ -90,6 +90,10 @@ Incorporate:
  * See if there is any need for externals at all.  See if there is
    still a need for absolute path externals or read-only externals.
 
+ * Read-only externals do have valid use cases.  Consider a
+   command-line flag telling abuild to treat all externals as read
+   only.
+
 -----
 
 It has become clear that build trees deserve to be named entities.  It
