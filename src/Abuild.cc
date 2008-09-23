@@ -4712,12 +4712,15 @@ Abuild::help()
     h("Build/Clean sets:");
     h("");
     h("  all               all buildable/cleanable items in writable build trees");
-    h("  local             all items in local build tree and its externals");
+    h("  local             all items in the local build tree without its externals");
     h("  desc              all items at or below the current directory");
     h("  deps              all expanded dependencies of the current item");
     h("  current           the current item");
     h("  name:name,...     items with the given names");
     h("  pattern:regex     items whose names match the given regular expression");
+    h("");
+    h("  When building (as opposed to cleaning), all build sets automatically");
+    h("  include dependencies that are satisfied in writable build trees.");
     h("");
     h("Platform selectors:");
     h("");
