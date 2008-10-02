@@ -371,13 +371,16 @@ Issues, Enhancement Ideas
 See also "Known Limitations" in the documentation.
 
  * ant with build failure appears not to exit abnormally in Windows.
+   This is a bug in ant.bat and could be worked around by using our
+   own ant launcher.
 
  * gen_deps: rewrite so that it doesn't force a runtime dependency on
    perl.  It should be a fallback for cases when compilers can't
    generate dependency information.  With gcc, use -MD -MF -MP to
    generate proper .dep files.  xlc: "-M -MF a.dep" works, but there
    is no equivalent to -MP, so we'll need to postprocess.  VC:
-   nothing.
+   there seems to be a /showIncludes option that we may be able to
+   exploit.  Not sure what versions of VC++ have this.
 
  * Test qtest coverage from abuild test suite
 
