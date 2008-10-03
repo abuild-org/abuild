@@ -96,6 +96,65 @@ Incorporate:
 
 -----
 
+Incorporate this too:
+
+Traversal: follow parent-dirs up to the build tree root, which
+includes a tree-name key in its Abuild.conf and has no parent-dir key.
+Then walk up the FILE SYSTEM until you get to the build area/forest
+root.  Maybe this is an Abuild.trees file.  Determine relevance by
+opening the file and determining whether there's a reference to the
+tree root by name and path.  If so, it's relevant.  If it's also a
+tree root.  Traverse from there, which includes the same upward search
+for a potentially tested Abuild.trees file.  From there, traverse all
+known trees.
+
+Possible example:
+
+A.
+Abuild.trees:
+  tree1 path/to/one
+  tree2 path/to/two
+  bigroot .
+Abuild.conf:
+  tree-name: bigroot
+
+A/path/to/one
+Abuild.conf:
+  tree-name: tree1
+  external-trees: tree2
+
+Abuild.backing: if an Abuild.backing is found, also traverse from the
+Abuild.backing directory.  Figure out how this impacts shadowed trees.
+If there is an Abuild.trees locally, any local trees potentially
+shadow any backed trees.  If there's no Abuild.trees locally, then
+local tree must have a counterpart in the backing area.  Maybe allow
+Abuild.backing to point to a forest root.  "Backingmost" tree must
+have an Abuild.trees file.
+
+external-trees may or may not be right but probably is.  Possible
+algorithm below would avoid needing to use them, but also makes it
+possible to accidentally depend on things you shouldn't be allowed to
+see.
+
+Things that should be true:
+
+ * Abuild.backing files can point to a wider range of places -- they
+   just need to point somewhere into the backing forest.  Still need
+   to figure out which trees can be shaodwed by which other trees.
+   Traversing from anywhere in a forest should result in the same
+   collection of trees.  It's probably an error if two Abuild.backing
+   files in the same forest end point pointing to two different
+   forests.
+
+ * Only Abuild.trees files know relative paths to build trees
+
+ * No tree should appear in more than one Abuild.trees file
+
+It would help if parent-dir had to point up and child-dirs had to
+point down.
+
+-----
+
 It has become clear that build trees deserve to be named entities.  It
 seems that we are using externals for things for lots of purposes, and
 maybe we need to rethink.  See "Tree Registry" for one idea of how to
