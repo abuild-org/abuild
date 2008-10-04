@@ -15,6 +15,12 @@ Version 1.1
 General
 -------
 
+ * Replace "this" with "item-name".  Give a warning if "this" is
+   encountered unless running in explicit 1.0 compatibility mode.
+
+ * Redo backing areas and externals.  See "Revamped Build Tree
+   Structure" below.
+
  * It would be nice if -p native:skip didn't actually disable native
    platforms but instead just took them out of the default build list.
    That way, when doing -p native:skip, if a java or indep build item
@@ -31,8 +37,7 @@ General
 
  * Inheritable or Global plugins.  It would be nice if we could
    declare a plugin as automatically inheriting across externals.
-   This might be related to site configuration or rethinking build
-   tree status.
+   This should be possible with the revamped build tree structure.
 
  * Need a better solution for automatically generated files that might
    be controlled in some cases to work around lack of tool support.
@@ -70,212 +75,268 @@ General
    name.
 
 
-Rethink Status of Build Trees
+Revamped Build Tree Structure
 -----------------------------
 
-Incorporate:
+A principle failing in abuild 1.0 stems from the use of paths to
+specify the locations of external build trees.  A serious and related
+problem is the interaction between backing areas and externals.
 
- * Removing parent-dir and child-dirs is not a good idea.
+Projects that desire certain parts of their trees to be potentially
+compile-time independent from other parts have to break things into
+multiple trees and use externals.  This sometimes results in build
+areas consisting of many more trees than I envisioned in my original
+design.
 
- * We need some kind of tree location algorithm.  It should still work
-   to have
+Consider first the case of externals without backing areas.  If there
+are multiple build trees with complex "external" relationships between
+them, then there is an implicit build "forest" consisting of multiple
+build trees which must be organized relative to each other in a
+particular way.  Knowledge of this relative organization of trees is
+not represented in any one place but rather is distributed through all
+the root Abuild.conf files.  For example, if A, B, C, and D are build
+trees whose roots are under a common parent, you could have a
+situation in which A declares ../B and ../C as externals and B
+declares ../D as an external.  There is no single place where A, B, C,
+and D are even all mentioned, yet abuild will require them to all be
+in the same directory.  This situation becomes much worse when build
+trees are at different levels -- the same tree may be referred to by
+multiple different relative paths.  This creates great confusion, and
+makes it very to move a tree around or even find who is referencing a
+particular tree.  When backing areas are added to the mix, the problem
+is further compounded.  If a build tree contains other external build
+trees nested inside of it, use of a backing area with the parent tree,
+in practice, requires use of a specific backing area on the child
+tree, especially when externals need to be resolved from a backing
+area.  Consider this arrangement of build trees:
 
-   A common B
+   A       F
+ / | \    /
+B  C  D  G
+|
+E
 
-   where A and B are completely independent but both use common
-   without having them all getting combined.  Maybe it would be okay
-   for building A to notice B, but errors in B should not even be
-   reported when building A.
+with the following external relationships:
 
- * See if there is any need for externals at all.  See if there is
-   still a need for absolute path externals or read-only externals.
+E -> C, D
+D -> G
 
- * Read-only externals do have valid use cases.  Consider a
-   command-line flag telling abuild to treat all externals as read
-   only.
+Suppose you have a backing area forest containing A and F, and a local
+build area containing only A.  In this case, in the local A, it is
+necessary to have backing areas for E, C, and D in, and they all have
+to point to the right locations in A'.
 
------
+It is clear that build trees deserve to be named entities, and that
+just as is true with build items, the location of any given tree must
+appear in only one place within a build area.  It is also clear that
+use of backing areas when multiple trees are involved is too
+cumbersome to be practical.
 
-Incorporate this too:
+A better traversal system is required in order to make abuild aware of
+all the possible build trees and their locations.  The following other
+problems must be addressable by this:
 
-Traversal: follow parent-dirs up to the build tree root, which
-includes a tree-name key in its Abuild.conf and has no parent-dir key.
-Then walk up the FILE SYSTEM until you get to the build area/forest
-root.  Maybe this is an Abuild.trees file.  Determine relevance by
-opening the file and determining whether there's a reference to the
-tree root by name and path.  If so, it's relevant.  If it's also a
-tree root.  Traverse from there, which includes the same upward search
-for a potentially tested Abuild.trees file.  From there, traverse all
-known trees.
+ * When breaking off a part of a tree into an external for isolation,
+   plugin declarations have to be duplicated
 
-Possible example:
+ * It is impossible to pass information, such as extra compilers or
+   flags, backwards across the external gap, so if you use a
+   collection of common build items (like tps-build-items), there's no
+   way to get those items to compile using your own compiler.  This
+   applies also to test suite build items that are separate trees
+   nested within the tree that provides the items they are testing.
+   (tests for boost, xbinder, etc.).  This should be addressed by the
+   global plugin concept.
 
-A.
-Abuild.trees:
-  tree1 path/to/one
-  tree2 path/to/two
-  bigroot .
-Abuild.conf:
-  tree-name: bigroot
+ * If it is desired to build one portion of a build area without
+   having other portions build, there needs to be a mechanism for
+   abuild to treat certain trees as read-only for the duration of the
+   build, but this information should probably not be encoded into the
+   Abuild.conf files.  Consider:
 
-A/path/to/one
-Abuild.conf:
-  tree-name: tree1
-  external-trees: tree2
+         A
+       / | \
+      B  C  D
 
-Abuild.backing: if an Abuild.backing is found, also traverse from the
-Abuild.backing directory.  Figure out how this impacts shadowed trees.
-If there is an Abuild.trees locally, any local trees potentially
-shadow any backed trees.  If there's no Abuild.trees locally, then
-local tree must have a counterpart in the backing area.  Maybe allow
-Abuild.backing to point to a forest root.  "Backingmost" tree must
-have an Abuild.trees file.
+   If B and D both have C as an external and are independent from each
+   other, you might want to build C first and then have both B and D
+   built in parallel while treating C as read only.  Maybe we can
+   specify one or more read-write or read-only roots on the
+   command-line.  If none are specified, all externals are read-write.
+   If read-only roots are specified, all externals are read-write
+   except for those explicitly listed as read-only.  If any read-write
+   roots are specified, all externals are read-only except those
+   specified as read-write.  It is an error to specify both.
 
-external-trees may or may not be right but probably is.  Possible
-algorithm below would avoid needing to use them, but also makes it
-possible to accidentally depend on things you shouldn't be allowed to
-see.
+ * It would be nice to be able to build everything from a single build
+   even if there is no single build item that can see all the build
+   trees.  In the above example, there may be no single place from
+   which B, C, and D are all known, but it would still be nice to be
+   abuild to do a build that includes all the trees, even if B and D
+   have duplicated names in them.
 
-Things that should be true:
+ * Name disambiguation would be nice across build trees.  Named trees
+   allows fully qualified build items of the form tree::name.  If
+   build item A includes X and Y with X -> Y and build tree B shows up
+   with its own Y, a reference to Y from within A should resolve to
+   A's Y.  If there is a desire to reach a Y in tree B, A can refer to
+   B::Y.  Need to think about how this interacts with name-based
+   access control, but it will probably interact fine.
 
- * Abuild.backing files can point to a wider range of places -- they
-   just need to point somewhere into the backing forest.  Still need
-   to figure out which trees can be shaodwed by which other trees.
-   Traversing from anywhere in a forest should result in the same
-   collection of trees.  It's probably an error if two Abuild.backing
-   files in the same forest end point pointing to two different
-   forests.
+ * It would be good if errors in a part of the collection of build
+   trees that are not relevant to you don't impact your build.  For
+   example, a build of B above should not fail or even necessarily
+   tell you if there are errors in D.  Perhaps we can figure out which
+   trees are touched in a build set and disregard errors in untouched
+   trees unless --full-integrity is specified.
 
- * Only Abuild.trees files know relative paths to build trees
+Proposed Solution:
 
- * No tree should appear in more than one Abuild.trees file
+Introduce this file system hierarchy restriction:
 
-It would help if parent-dir had to point up and child-dirs had to
-point down.
+ * All build items in a build tree and all subtrees (defined below)
+   referenced by a build tree must be located physically under the
+   root of the build tree.  Implies that parent-dir is not needed
+   anymore and that child-dirs and subtrees (defined below) may not
+   contain .. in any path component.  Also implies elimination of
+   absolute path externals.
 
------
+Hopefully this isn't too strict, but imposing it simplifies things a
+lot and doesn't actually significantly change the state of practice.
+Splitting builds across disks is already impractical, and with
+junction points and loopback mounts, there are ways around it anyway.
 
-It has become clear that build trees deserve to be named entities.  It
-seems that we are using externals for things for lots of purposes, and
-maybe we need to rethink.  See "Tree Registry" for one idea of how to
-approach this, though I no longer favor that particular idea.
+Introduce the concept of a "build forest", which is a collection of
+build trees that are all found beneath some common ancestor
+directory.
 
-A fundamental issue is that, the way we are using externals, there is
-an implied relationship among multiple different build trees that
-comprise the overall build of a particular project.
+Abuild.backing files may appear only at forest roots.
 
-Just like abuild currently forms a mapping between build item names
-and paths, it would be nice if abuild could do something similar for
-build trees.  One idea would be to have some kind of rules that you
-could code or otherwise specify that would help abuild locate build
-trees.  Another option would be to make build trees more flexible so
-that we don't have to split them in all the cases we do now.
+Require build tree roots to include a "tree-name" key which provides
+the name of the build tree.
 
-Here are some of the problems we need to address:
+Introduce a new key that is allowed in a root Abuild.conf file:
+subtrees.  The subtrees key contains a list of relative paths to build
+tree roots that are physically beneath the current build tree root.
 
- * Projects that desire certain parts of their trees to be potentially
-   compile-time independent from other parts have to break things into
-   multiple trees and use externals.  This creates several problems:
+Replace external-dirs with external-trees which takes a list of tree
+names rather than tree paths.  Eliminate the -ro and -winpath
+arguments.  Read-only externals can be available through some other
+mechanism, such as declaration of one or more read-only or read-write
+root directories outside of which all build trees are to be treated as
+read-only.
 
-    - Plugin declarations have to be duplicated
+NOTE: the relationship between child-dirs and deps is the same as the
+relationship between subtrees and external-trees.  That is, subtrees
+and child-dirs are used only as an aid to traversal.
 
-    - It is impossible to pass information, such as extra compilers or
-      flags, backwards across the external gap, so if you use a
-      collection of common build items (like common-abuild-library),
-      there's no way to get those items to compile using your own
-      compiler.  This applies also to test suite build items that are
-      separate trees nested within the tree that provides the items
-      they are testing.  (tests for boost, xbinder, etc.)
+Detect whether to use the version 1.0 or version 1.1 traversal
+algorithm.  Consider a flag to turn this on or off.  Maybe it should
+be off by default.  Probably want to be able to choose 1.1, 1.0, or
+auto with default being 1.1 or auto.
 
-    - Information about relative locations of external build trees are
-      proliferated throughout all the root Abuild.conf files.
+ * If build item has an item-name key, use 1.1
 
-There are some general problems, such as the fact that an error in an
-unrelated part of the build system can prevent your build from
-working.  These problems are mitigated by using externals, but it
-would be out of control to create every island of dependency-isolated
-build items and put them in an external.  We need different sorts of
-barriers that we can create without having to use externals.
+ * If build item has a parent-dir key, use 1.0
 
-This reminds me of multiple baselines in BCS.  Externals as currently
-implemented kind of point toward the mulitple single points of failure
-problem.  Maybe they need to be eliminated entirely.  Maybe we need
-some kind of opaque parent/child relationship or something.
+ * Else if build item has a tree-name, subtrees, or external-trees
+   key, use 1.1
 
-Here's a partial solution.
+ * Else if build item has any keys that are allowed in build tree
+   roots or has an Abuild.backing file, use 1.0
 
- * Remove parent-dir, child-dirs, and external-dirs.
+ * Else if build item has a child-dirs key and child build item has a
+   parent-dir key, use 1.0
 
- * Add a new key "tree" that takes the name of a tree.
-
- * Add new optional keys "traverse-up" and "traverse-down", if needed.
-   These are legal everywhere except for absolute tree tops
-   (a.k.a. forest roots, at least for now).
+ * Else could be single-build-item 1.0 tree or normal case 1.1 build
+   item.  If parent exists by 1.1 algorithm, use 1.1.  Otherwise, give
+   a warning and proceed to treat as a single build-item 1.0 tree.
 
 Traversal algorithm:
 
- * Start at current build item and walk up the tree until a build item
-   with a "tree" key is found.  If the parent directory does not have
-   an Abuild.conf, it is an error.  (Possible "traverse-up" key to
-   indicate where upward traversal should continue, but maybe this is
-   a bad idea.)  When a tree: key is encountered, this is a build tree
-   root.
+ * Find the root of the current build tree.
 
- * Follow the chain of Abuild.backing files until a tree is reached
-   with no backing file.
+    - Starting at a build item, walk up the file system looking for
+      the next higher Abuild.conf file.  It is an error if that
+      Abuild.conf file does not list the previous one in its
+      child-dirs key.  (See "staggered" test case below.)
 
- * Traverse downward.  When an Abuild.conf is found, check all direct
-   child directories that are not abuild output directories for
-   Abuild.conf files.  This means we have to do an opendir and
-   readdir, but it's still not an unbounded search.  (Possible
-   "traverse-down" to allow skipping directories, but this may be a
-   bad idea.)
+    - If the resulting build item is a tree root, then it is the root
+      of the current tree.  Otherwise, continue traversal to find its
+      parent, etc., until a tree root is found.
 
- * When traversing downward, additional tree roots may be
-   encountered.  Recursively traverse those.
+ * Find the root of the forest.
 
- * Once tree is traversed, compare the list of known build items with
-   the list of referenced build items (trait referents, dependencies).
-   (Is this only within the tree, or do we somehow look at all known
-   items?  Maybe we only look at the backing chain but not other trees
-   at the same level?  Maybe we only look at items within the same
-   tree in the backing chain?)  The latter probably has to be done at
-   a later stage.)  If the tree is referentially closed, traversal is
-   complete.  Otherwise, unless the "-forest-root" option has been
-   specified after the tree name (need something better than "forest
-   root" or "absolute top"), continue upward traversal again looking
-   for a tree root.  This is tricky because when we traverse downward,
-   we will encounter subtrees.  We'll probably have to do another
-   referential integrity check later after we've traversed everything.
+    - Any build tree root, including this one, is a candidate forest
+      root, so set the current build item as a candidate forest root.
 
- * Backing areas: when a tree root points to another tree root, we
-   probably want to require that the destination be a tree root of a
-   tree with the same name.  That may clear up some issues.
+    - Walk up the file system looking for the next higher Abuild.conf
+      that is a tree root.  If it has a subtrees key that points to
+      the previous build tree root, then it becomes the candidate
+      forest root, and the upward search continues.  Otherwise, the
+      traversal stops with the previous tree root.
 
- * Additional integrity checks: rather than requiring trees to declare
-   other trees that they use, we'll construct a dependency graph of
-   trees.  (Need to think about how this interacts with backing areas.
-   Are tree and tree' one tree or two trees?)  If tree A has an item
-   that depends on an item in tree B, then there is a dependency
-   between tree A and tree B.  This graph must also be acyclic.  This
-   analysis needs to be done with expanded dependencies, in which case
-   it should implement one-way dependency gates.  Open question: what
-   about non-dependency relationships?  I'm thinking no name
-   resolution is allowed to cross back across these gates, making this
-   very much like externals now, except perhaps with regard to global
-   plugins, which we have to define.  The idea of global plugins,
-   including allowing them to disregard the "external" boundaries, may
-   solve problems like adding new compilers for all trees.  However,
-   this interacts poorly with the idea of stopping traversal at the
-   root of a referentially closed tree.  Maybe that's a bad idea.
-   There aren't many advantages to stopping traversal at the root of a
-   closed tree, other than perhaps efficiency gains, particularly if
-   we can disregard errors that don't impact any items in the current
-   build set.
+ * If the root of the forest does not contain an Abuild.backing, then
+   this is an unbacked forest.  If it does contain an Abuild.backing
+   file, ensure that it points to a tree root (not necessarily a
+   forest root).  In that case, search for the backing tree's forest
+   root.  Continue until an unbacked forest is found.  Traverse the
+   unbacked forest.
+
+ * Find all tree roots in the forest by recursively traversing
+   downward through the forest root's subtrees.  Verify that no tree
+   root other than the forest root has an Abuild.backing file.  At
+   each tree root, verify that its parent is the previous forest root.
+   (In other words, with A/B/C, if A declares B/C as a subtree, then
+   A/B must not also declare C as a subtree or else C would have found
+   B as its parent instead of A.)
+
+ * Verify the following:
+
+    - Each tree in the forest is uniquely named
+
+    - No tree is referenced as a subtree of more than one tree (should
+      fall out automatically from the verification that a subtree's
+      "parent" is the declaring tree)
+
+ * Copy in data about trees from the backing area, ignoring any trees
+   in the backing area that are resolved locally.  (How do we delete
+   trees?  We need a mechanism like how we deleted backed build items,
+   or we need to not allow direct reference to shadowed build trees
+   not referenced by the local forest.)
+
+ * Topologically sort the "dependency graph" created by the
+   external-trees keys, ensuring that it is an error-free directed
+   acyclic graph.
+
+ * From least dependent to most dependent tree, traverse each tree
+   from the root down.  There are no longer any parent-dirs pointers,
+   so we traverse downward following child-dirs pointers only.  We
+   must verify that no child-dirs pointer ever points to a tree root.
+   After traversal of a tree, copy in build items from all externals
+   and then the backing area tree using the same basic algorithm as we
+   use in abuild 1.0.  The backing area tree for a given tree is the
+   identically named tree in the backing area forest.
+
+(Test case: staggered build items or subtrees: with A/B/C/D/E, have
+A -> B, C; B -> C/D; C -> D/E.  Should generate an error.)
+
+Figure out how to make global plugins work with this and what
+restrictions, if any, should be imposed on them (like maybe they're
+not allowed to have interfaces or rules but are just allowed to be
+platform type or compiler plugins).  Shouldn't be that hard.
 
 Need to flesh out an example that includes both searchlight and
 lh3-style trees.  Think about external build item library concept,
 whether it's sensible, and how it interacts with global plugins.
+
+Think about how this interacts with traits, supported flags, and
+plugins.  I'm not sure whether it would be correct for plugins to
+always flow down through subtrees.  Maybe they should be default, or
+maybe there should be a way to copy this information from the parent
+or explicitly from another tree.  Flags and traits may be different
+too.  This will require some more careful analysis.
+
 
 Java
 ----
