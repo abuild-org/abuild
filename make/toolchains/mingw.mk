@@ -1,9 +1,9 @@
 # Flags that cause gcc to do what gen_deps does
 GDFLAGS = -MD -MF $(value *).$(DEP) -MP
 
-DFLAGS = -g
-OFLAGS = -O2
-WFLAGS = -Wall
+DFLAGS ?= -g
+OFLAGS ?= -O2
+WFLAGS ?= -Wall
 
 CC = gcc -mno-cygwin $(GDFLAGS)
 CCPP = gcc -mno-cygwin -E

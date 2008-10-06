@@ -18,11 +18,11 @@ $(1).dll
 endef
 
 # /Zi enables all debugging information.
-DFLAGS = /Zi
-OFLAGS = /O2
+DFLAGS ?= /Zi
+OFLAGS ?= /O2
 # /Wall is impractical with msvc because too many system headers
 # generate warnings.
-WFLAGS =
+WFLAGS ?=
 
 ifeq ($(ABUILD_PLATFORM_OPTION), debug)
 OFLAGS =

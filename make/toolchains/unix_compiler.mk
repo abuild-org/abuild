@@ -98,7 +98,7 @@ endef
 # Usage: $(call make_shlib,linker,compiler-flags,link-flags,objects,libdirs,libs,shlib-base,major,minor,revision
 define make_shlib
 	$(RM) $(call shlibname,$(7)) $(call shlibname,$(7)).*
-	$(LINKWRAPPER) $(CXX) -o $(call shlibname,$(7),$(8),$(9),$(10)) $(2) $(4) \
+	$(LINKWRAPPER) $(1) -o $(call shlibname,$(7),$(8),$(9),$(10)) $(2) $(4) \
 		$(SHARED_FLAGS) $(call soname_args,$(call shlibname,$(7),$(8))) \
 		$(foreach L,$(5),-L$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)

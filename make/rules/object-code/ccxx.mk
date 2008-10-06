@@ -248,7 +248,7 @@ endef
 LANGNAME_c := C
 LANGNAME_cxx := C++
 CCXX_GEN_DEPS ?= $(GEN_DEPS)
-CCXX_LINKER = $(if $(LINK_AS_C),$(LINK_c),$(LINK_cxx))
+CCCXX_LINKER = $(if $(LINK_AS_C),$(LINK_c),$(LINK_cxx))
 # Usage: $(call ccxx_compile,language): language = { c | cxx }
 define ccxx_compile
 	@: $(call QTC.TC,abuild,ccxx.mk ccxx_compile,0)
@@ -282,7 +282,7 @@ endef
 define ccxx_make_shared_lib
 	@: $(call QTC.TC,abuild,ccxx.mk ccxx_make_shared_lib,0)
 	@$(PRINT) "Creating $(1) shared library"
-	$(call make_shlib,$(CCXX_LINKER),$(XCFLAGS) $(XCXXFLAGS) $(DFLAGS) $(OFLAGS) $(WFLAGS),$(XLINKFLAGS),$(OBJS_lib_$(1)),$(LIBDIRS),$(if $(LINK_SHLIBS),$(filter-out $(_TARGETS_shared_lib),$(LIBS))),$(1),$(word 1,$(SHLIB_$(1))),$(word 2,$(SHLIB_$(1))),$(word 3,$(SHLIB_$(1))))
+	$(call make_shlib,$(CCCXX_LINKER),$(XCFLAGS) $(XCXXFLAGS) $(DFLAGS) $(OFLAGS) $(WFLAGS),$(XLINKFLAGS),$(OBJS_lib_$(1)),$(LIBDIRS),$(if $(LINK_SHLIBS),$(filter-out $(_TARGETS_shared_lib),$(LIBS))),$(1),$(word 1,$(SHLIB_$(1))),$(word 2,$(SHLIB_$(1))),$(word 3,$(SHLIB_$(1))))
 endef
 
 # Usage: $(call ccxx_make_bin,executable-base)
@@ -290,7 +290,7 @@ define ccxx_make_bin
 	@: $(call QTC.TC,abuild,ccxx.mk ccxx_make_bin,0)
 	-$(RM) $(call binname,$(1))
 	@$(PRINT) "Creating $(1) executable"
-	$(call make_bin,$(CCXX_LINKER),$(XCFLAGS) $(XCXXFLAGS) $(DFLAGS) $(OFLAGS) $(WFLAGS),$(XLINKFLAGS),$(OBJS_bin_$(1)),$(LIBDIRS),$(LIBS),$(1))
+	$(call make_bin,$(CCCXX_LINKER),$(XCFLAGS) $(XCXXFLAGS) $(DFLAGS) $(OFLAGS) $(WFLAGS),$(XLINKFLAGS),$(OBJS_bin_$(1)),$(LIBDIRS),$(LIBS),$(1))
 endef
 
 c_to_o = $(call ccxx_compile,c)
