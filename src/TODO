@@ -1,3 +1,38 @@
+
+BEFORE RELEASE
+==============
+
+ * Have manual makefile detect if JAVA_HOME is not set and fail
+
+ * Incorporate release checklist somewhere
+
+ * Fix newlines in Abuild.cc
+
+
+Abuild release checklist
+========================
+
+ * Update version numbers in Abuild.cc and manual.xml
+
+ * Update release date at top of manual.xml and also in the release
+   notes section for the current release
+
+ * Make sure JAVA_HOME is set and $JAVA_HOME/bin is first in path when
+   building manual; check images in PDF
+
+ * On Solaris, make sure LD_LIBRARY_PATH contains /opt/tps/lib and the
+   BOOST variables in Abuild.mk are set properly.
+
+ * On Windows, make sure qtest-driver --version works; add something
+   before /opt/tps/bin/qtest-driver if needed
+
+ * When building Java, make sure ABUILD_JUNIT_JAR is set.  On Windows,
+   it's a Windows path, not a cygwin path.
+
+ * Make a snapshot in subversion
+
+
+
 Version 1.1
 ===========
 
@@ -300,12 +335,15 @@ Traversal algorithm:
 
  * From least dependent to most dependent tree, traverse each tree
    from the root down.  There are no longer any parent-dirs pointers,
-   so we traverse downward following child-dirs pointers only.  We
-   must verify that no child-dirs pointer ever points to a tree root.
-   After traversal of a tree, copy in build items from all externals
-   and then the backing area tree using the same basic algorithm as we
-   use in abuild 1.0.  The backing area tree for a given tree is the
-   identically named tree in the backing area forest.
+   so we traverse downward following child-dirs pointers only, making
+   sure no intermediate Abuild.conf files point to the same child (as
+   with subtrees).  [The same code should be used for child-dirs and
+   subtrees.]  We must verify that no child-dirs pointer ever points
+   to a tree root.  After traversal of a tree, copy in build items
+   from all externals and then the backing area tree using the same
+   basic algorithm as we use in abuild 1.0.  The backing area tree for
+   a given tree is the identically named tree in the backing area
+   forest.
 
 (Test case: staggered build items or subtrees: with A/B/C/D/E, have
 A -> B, C; B -> C/D; C -> D/E.  Should generate an error.)
