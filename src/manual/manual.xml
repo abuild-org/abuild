@@ -13293,6 +13293,28 @@ Y = $(X)
          4.3.
         </para>
        </listitem>
+       <listitem>
+        <para>
+         In some cases, shared libraries would be linked with the C++
+         compiler even when <varname>LINK_AS_C</varname> was set.
+         This has been corrected.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Setting <varname>OFLAGS</varname>, <varname>DFLAGS</varname>,
+         and <varname>WFLAGS</varname> in
+         <filename>Abuild.mk</filename> files had no effect because of
+         the way these variables were assigned in toolchain support
+         files.  &Abuild;'s built-in toolchains have been fixed to
+         initialize these with <literal>?=</literal> instead of
+         <literal>=</literal>.  This should make it possible to
+         override these variables globally at least for &abuild;'s
+         built-in toolchains.  Overriding these variables globally is
+         generally not a good idea in any case, however.  Thanks to
+         Ben Muzal for reporting the problem.
+        </para>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>

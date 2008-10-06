@@ -9,9 +9,9 @@ COMPILE_cxx = echo COMPILE_cxx
 LINK_c = echo LINK_c
 LINK_cxx = echo LINK_cxx
 
-DFLAGS = -dflags-
-OFLAGS = -oflags-
-WFLAGS = -wflags-
+DFLAGS ?= -dflags-
+OFLAGS ?= -oflags-
+WFLAGS ?= -wflags-
 
 ifeq ($(ABUILD_PLATFORM_OPTION), debug)
 OFLAGS =

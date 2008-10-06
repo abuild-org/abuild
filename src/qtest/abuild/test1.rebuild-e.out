@@ -127,6 +127,7 @@ contents of bin-bin:
 ** end of bin bin **
 end contents of bin-bin
 make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+abuild: e.global (abuild-os.cpu.toolset.echo): all
 abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
 make: Entering directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
 Creating shlib1 shared library

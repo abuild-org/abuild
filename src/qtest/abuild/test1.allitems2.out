@@ -13,6 +13,7 @@ abuild: cc (abuild-indep): all
 abuild: e.lib (abuild-os.cpu.toolset.echo): all
 abuild: e.shlib (abuild-os.cpu.toolset.echo): all
 abuild: e.bin (abuild-os.cpu.toolset.echo): all
+abuild: e.global (abuild-os.cpu.toolset.echo): all
 abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
 abuild: ext (abuild-<native>): all
 make: Entering directory `--topdir--/ext/abuild-<native>'

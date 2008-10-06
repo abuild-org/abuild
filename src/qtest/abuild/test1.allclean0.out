@@ -11,6 +11,7 @@ abuild: cleaning ca in ../ca
 abuild: cleaning cb in .
 abuild: cleaning cc in ../cc
 abuild: cleaning e.bin in ../../e/bin
+abuild: cleaning e.global in ../../e/global-overrides
 abuild: cleaning e.lib in ../../e/lib
 abuild: cleaning e.shlib in ../../e/shlib
 abuild: cleaning e.shlib2 in ../../e/shlib2
