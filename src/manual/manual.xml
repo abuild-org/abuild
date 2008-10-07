@@ -6,7 +6,7 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY swversion "1.0.2">
-<!ENTITY lastreleased "October 6, 2008">
+<!ENTITY lastreleased "October 7, 2008">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13273,7 +13273,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.0.2: October 6, 2008</term>
+     <term>1.0.2: October 7, 2008</term>
      <listitem>
       <itemizedlist>
        <listitem>
