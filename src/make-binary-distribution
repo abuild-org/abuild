@@ -169,6 +169,16 @@ if ($windows && $make_static)
     die "$whoami: --static not supported in Windows\n";
 }
 
+if ($build_java && (! exists $ENV{'ABUILD_JUNIT_JAR'}))
+{
+    die "$whoami: set ABUILD_JUNIT_JAR to run junit tests\n";
+}
+if ($build_doc && (! ((exists $ENV{'JAVA_HOME'}) &&
+		      (-d $ENV{'JAVA_HOME'} . "/lib"))))
+{
+    die "$whoami: JAVA_HOME must be set properly to build documentation\n";
+}
+
 my $now = time;
 $tmpdir = ".abuild-release-$$-$now";
 if ($test_mkdist)

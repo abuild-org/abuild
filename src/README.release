@@ -1,0 +1,30 @@
+
+Abuild release checklist
+========================
+
+ * Update version numbers in Abuild.cc and manual.xml
+
+ * Update release date at top of manual.xml and also in the release
+   notes section for the current release
+
+ * On Solaris, make sure LD_LIBRARY_PATH contains /opt/tps/lib and the
+   BOOST variables in Abuild.mk are set properly.
+
+ * On Windows, make sure qtest-driver --version works; add something
+   before /opt/tps/bin/qtest-driver if needed
+
+ * When building Java, make sure ABUILD_JUNIT_JAR is set.  On Windows,
+   it's a Windows path, not a cygwin path.
+
+ * Make sure JAVA_HOME is set and $JAVA_HOME/bin/java is the first
+   java in path when building manual
+
+
+After release is built
+======================
+
+ * Check images in PDF
+
+ * Make a snapshot in subversion
+
+ * Update documentation on website

@@ -32,6 +32,10 @@ validate: $(MAIN_DOC).xml
 	touch validate
 
 $(MAIN_DOC_OUTPUT_PREFIX)%.pdf: %.fo
+	if [ "x$$JAVA_HOME" == "x" -o ! -d $$JAVA_HOME/lib ]; then \
+	   echo ""; echo JAVA_HOME is not set to a valid java home; echo ""; \
+	   false; \
+	fi
 	@$(PRINT) Generating $@ from $<
 	$(FOP) $< -pdf $@
 
