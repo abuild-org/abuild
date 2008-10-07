@@ -19,6 +19,8 @@ Abuild release checklist
  * Make sure JAVA_HOME is set and $JAVA_HOME/bin/java is the first
    java in path when building manual
 
+ * Follow source and binary release instructions in README.build
+
 
 After release is built
 ======================
