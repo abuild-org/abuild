@@ -321,7 +321,9 @@ platform type or compiler plugins).  Shouldn't be that hard.
 
 Need to flesh out an example that includes both searchlight and
 lh3-style trees.  Think about external build item library concept,
-whether it's sensible, and how it interacts with global plugins.
+whether it's sensible, and how it interacts with global plugins.  Also
+consider the case of nested build trees with externals that point up
+such as in the test suites of some of the plugins.
 
 Think about how this interacts with traits, supported flags, and
 plugins.  I'm not sure whether it would be correct for plugins to
