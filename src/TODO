@@ -182,6 +182,32 @@ problems must be addressable by this:
 
 Proposed Solution:
 
+---------------------
+
+Incorporate:
+
+ * Maybe we shouldn't have a subtrees keyword at all and should just
+   let subtrees get hooked in with child-dirs.  Let the existence of
+   the tree-name keyword be the only thing that indicates a tree root.
+   Then other tree root things would be allowed.  This means when we
+   see child-dirs: x/y/z, we just have to make sure that there are no
+   intervening Abuild.conf files.  Then child-dirs becomes the ONLY
+   keyword used to hook build items into the trees.
+
+ * Maybe we can think about the various aspects of what being an
+   external means and create additional keywords to turn on the
+   functionality.  For example, having a one-way dependency gate is
+   one thing, and blocking inheritence of plugins may be something
+   else.
+
+ * Think about whether it would be possible to allow an lh1-like model
+   in which you could check out a single component and hook it into
+   the overall system with a backing area without having to have all
+   the parents.  Then Abuild.backing would be allowed at any level in
+   which no parent could be found.
+
+---------------------
+
 Introduce this file system hierarchy restriction:
 
  * All build items in a build tree and all subtrees (defined below)
