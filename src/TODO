@@ -204,7 +204,15 @@ Incorporate:
    in which you could check out a single component and hook it into
    the overall system with a backing area without having to have all
    the parents.  Then Abuild.backing would be allowed at any level in
-   which no parent could be found.
+   which no parent could be found.  Perhaps, in this case, the
+   Abuild.backing file must point to a build item with the same name,
+   or maybe the Abuild.backing file can contain the name of the
+   containing tree.  Probably instead it's better to just say the root
+   of the tree has to be there and to use a subtree for each
+   component.  This actually has the advantage of blocking circular
+   dependencies at the component level.  On the other hand, maybe we
+   don't need to enforce that there are no cycles in the externals
+   relationship.  But we probably should.  Think more about this.
 
 ---------------------
 
