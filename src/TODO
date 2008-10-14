@@ -64,13 +64,21 @@ General
    stronger than using deps to make the old name depend on the new
    name.
 
+ * When topologically sorting build items based on dependency, instead
+   of starting with a straight alphabetical list of build items, first
+   group build items together by tree using a topologically sorted
+   alphabetical list of trees.  This should result in build items from
+   the same tree being built together (in a single-threaded build).
+
 
 Revamped Build Tree Structure
 -----------------------------
 
-A principle failing in abuild 1.0 stems from the use of paths to
-specify the locations of external build trees.  A serious and related
-problem is the interaction between backing areas and externals.
+A principal failing in abuild 1.0 stems from the use of paths to
+specify the locations of external build trees -- "external-dirs" is
+used to convey both dependency and location information.  A serious
+and related problem is the interaction between backing areas and
+externals.
 
 Projects that desire certain parts of their trees to be potentially
 compile-time independent from other parts have to break things into
@@ -182,168 +190,194 @@ problems must be addressable by this:
 
 Proposed Solution:
 
----------------------
-
-Incorporate:
-
- * Maybe we shouldn't have a subtrees keyword at all and should just
-   let subtrees get hooked in with child-dirs.  Let the existence of
-   the tree-name keyword be the only thing that indicates a tree root.
-   Then other tree root things would be allowed.  This means when we
-   see child-dirs: x/y/z, we just have to make sure that there are no
-   intervening Abuild.conf files.  Then child-dirs becomes the ONLY
-   keyword used to hook build items into the trees.
-
- * Maybe we can think about the various aspects of what being an
-   external means and create additional keywords to turn on the
-   functionality.  For example, having a one-way dependency gate is
-   one thing, and blocking inheritence of plugins may be something
-   else.
-
- * Think about whether it would be possible to allow an lh1-like model
-   in which you could check out a single component and hook it into
-   the overall system with a backing area without having to have all
-   the parents.  Then Abuild.backing would be allowed at any level in
-   which no parent could be found.  Perhaps, in this case, the
-   Abuild.backing file must point to a build item with the same name,
-   or maybe the Abuild.backing file can contain the name of the
-   containing tree.  Probably instead it's better to just say the root
-   of the tree has to be there and to use a subtree for each
-   component.  This actually has the advantage of blocking circular
-   dependencies at the component level.  On the other hand, maybe we
-   don't need to enforce that there are no cycles in the externals
-   relationship.  But we probably should.  Think more about this.
-
----------------------
-
 Introduce this file system hierarchy restriction:
 
- * All build items in a build tree and all subtrees (defined below)
-   referenced by a build tree must be located physically under the
-   root of the build tree.  Implies that parent-dir is not needed
-   anymore and that child-dirs and subtrees (defined below) may not
-   contain .. in any path component.  Also implies elimination of
-   absolute path externals.
+ * All build items in a local collection of build trees must be
+   located physically under the root of the topmost build tree.
 
+Imposing this restriction makes it possible to eliminate the
+parent-dir key.  Enforcing this restriction involves verifying that
+child-dirs may not contain .. in any path element, and that there are
+no intervening Abuild.conf files between a parent and child
+Abuild.conf.
+
+This also implies elimination of absolute path externals, and makes it
+impossible to have multiple roots without a common parent directory.
 Hopefully this isn't too strict, but imposing it simplifies things a
 lot and doesn't actually significantly change the state of practice.
 Splitting builds across disks is already impractical, and with
 junction points and loopback mounts, there are ways around it anyway.
 
-Introduce the concept of a "build forest", which is a collection of
-build trees that are all found beneath some common ancestor
+Introduce the concept of a "build forest", which is a local collection
+of build trees that are all found beneath some common ancestor
 directory.
 
 Abuild.backing files may appear only at forest roots.
 
 Require build tree roots to include a "tree-name" key which provides
-the name of the build tree.
+the name of the build tree.  Any Abuild.conf file may contain a
+tree-name key.  This makes it the root of a subtree, which functions
+very much as externals do in abuild 1.0.
 
-Introduce a new key that is allowed in a root Abuild.conf file:
-subtrees.  The subtrees key contains a list of relative paths to build
-tree roots that are physically beneath the current build tree root.
+Replace "external-dirs" with "trees-used" which takes a list of tree
+names rather than tree paths.  Since we have no longer have the
+concept of externals, we no longer have the concept of read-only
+externals.  To support the pattern of building a tree without building
+any of the other subtrees that it uses, we add another mechanism such
+as declaration of one or more read-only or read-write root directories
+outside of which all build trees are to be treated as read-only.
 
-Replace external-dirs with external-trees which takes a list of tree
-names rather than tree paths.  Eliminate the -ro and -winpath
-arguments.  Read-only externals can be available through some other
-mechanism, such as declaration of one or more read-only or read-write
-root directories outside of which all build trees are to be treated as
-read-only.
+Consider changes to Abuild.backing:
 
-NOTE: the relationship between child-dirs and deps is the same as the
-relationship between subtrees and external-trees.  That is, subtrees
-and child-dirs are used only as an aid to traversal.
+  path: /path/to/backing/area
+  deleted-trees: trees not to shadow
+  deleted-items: items not to shadow (fully qualified as tree-name::item-name)
 
-Detect whether to use the version 1.0 or version 1.1 traversal
-algorithm.  Consider a flag to turn this on or off.  Maybe it should
-be off by default.  Probably want to be able to choose 1.1, 1.0, or
-auto with default being 1.1 or auto.
+Consider removing deleted-items from Abuild.conf.
 
- * If build item has an item-name key, use 1.1
 
- * If build item has a parent-dir key, use 1.0
+Example:
 
- * Else if build item has a tree-name, subtrees, or external-trees
-   key, use 1.1
+  OLD:
 
- * Else if build item has any keys that are allowed in build tree
-   roots or has an Abuild.backing file, use 1.0
+   Top-level Abuild.conf files in each leaf below; no way to know of
+   all build trees or their relative positions without visiting each
+   root.
 
- * Else if build item has a child-dirs key and child build item has a
-   parent-dir key, use 1.0
+   /-- common
+   |
+   |-- proj1
+   |   |
+   |   |-- interface
+   |   |   |
+   |   |   |-- comp1    external-dirs: ../../../common
+   |   |   |
+   |   |   `-- comp2    external-dirs: ../../../common
+   |   |
+   |   `-- private
+   |       |
+   |       |-- comp1    external-dirs: ../../interface/comp1
+   |       |
+   |       `-- comp2    external-dirs: ../../interface/comp2 ../comp1
+   |
+   `-- proj2
+       |
+       |-- common       external-dirs: ../../common
+       |
+       |-- comp1        external-dirs: ../common
+       |
+       `-- comp2        external-dirs: ../comp1
 
- * Else could be single-build-item 1.0 tree or normal case 1.1 build
-   item.  If parent exists by 1.1 algorithm, use 1.1.  Otherwise, give
-   a warning and proceed to treat as a single build-item 1.0 tree.
+  NEW:
+
+   Top-level Abuild.conf file in top directory; subtrees are hooked in
+   with child-dirs just like any other subdirectory.
+
+   /-- common           tree-name: common
+   |
+   |-- proj1
+   |   |
+   |   |-- interface
+   |   |   |
+   |   |   |-- comp1    tree-name: proj1-comp1; trees-used: common
+   |   |   |
+   |   |   `-- comp2    tree-name: proj1-comp2; trees-used: common
+   |   |
+   |   `-- private
+   |       |
+   |       |-- comp1    tree-name: proj1-comp1-impl; trees-used: proj1-comp1
+   |       |
+   |       `-- comp2    tree-name: proj1-comp2-impl;
+   |                    trees-used: proj1-comp2 proj1-comp1
+   `-- proj2
+       |
+       |-- common       tree-name: proj2-common; trees-used: common
+       |
+       |-- comp1        tree-name: proj2-comp1; trees-used: proj2-common
+       |
+       `-- comp2        tree-name: proj2-comp2; trees-used: proj2-comp1
+
+
 
 Traversal algorithm:
 
- * Find the root of the current build tree.
+ * Find the root of the current build forest.
 
-    - Starting at a build item, walk up the file system looking for
-      the next higher Abuild.conf file.  It is an error if that
-      Abuild.conf file does not list the previous one in its
-      child-dirs key.  (See "staggered" test case below.)
+   cur_build_item = this directory
+   forest_top = nil
 
-    - If the resulting build item is a tree root, then it is the root
-      of the current tree.  Otherwise, continue traversal to find its
-      parent, etc., until a tree root is found.
+   do until no more Abuild.conf files
+     if cur_build_item's Abuild.conf contains tree-name key
+        forest_top = cur_build_item
+     parent_build_item = next higher Abuild.conf
+     if parent_build_item exists and has child pointing to cur_build_item
+        cur_build_item = parent_build_item
+     else
+        if forest_top == cur_build_item
+           okay; found
+        else
+           forest_top = nil
+           error: unable to find top of build forest
 
- * Find the root of the forest.
-
-    - Any build tree root, including this one, is a candidate forest
-      root, so set the current build item as a candidate forest root.
-
-    - Walk up the file system looking for the next higher Abuild.conf
-      that is a tree root.  If it has a subtrees key that points to
-      the previous build tree root, then it becomes the candidate
-      forest root, and the upward search continues.  Otherwise, the
-      traversal stops with the previous tree root.
+   Note that if a parent Abuild.conf is found but it doesn't have a
+   child-dirs key that points to the child build item and if the child
+   build item is a build tree root, the search stops, and there is no
+   error or warning reported.  This is a normal case of a separate,
+   independent tree nested inside another tree.  Examples of when you
+   might have this would include test suites that create build trees
+   (such as abuild's own test suite) or instances in which abuild may
+   be used to build third-party software distributions nested within
+   something that contains Abuild.conf files.  If this tree was
+   supposed to be connected into higher trees and was not, there will
+   probably be unresolved trees-used or deps values.
 
  * If the root of the forest does not contain an Abuild.backing, then
    this is an unbacked forest.  If it does contain an Abuild.backing
    file, ensure that it points to a tree root (not necessarily a
    forest root).  In that case, search for the backing tree's forest
    root.  Continue until an unbacked forest is found.  Traverse the
-   unbacked forest.
+   unbacked forest (as described below).
 
- * Find all tree roots in the forest by recursively traversing
-   downward through the forest root's subtrees.  Verify that no tree
-   root other than the forest root has an Abuild.backing file.  At
-   each tree root, verify that its parent is the previous forest root.
-   (In other words, with A/B/C, if A declares B/C as a subtree, then
-   A/B must not also declare C as a subtree or else C would have found
-   B as its parent instead of A.)
+   Note that we impose no restrictions on whether the backing area
+   points to the same tree or even to a backing forest that contains
+   the same tree.  This makes it possible to add an entirely new
+   subtree in a work area that backs to some other area, and then to
+   have the backing area later get included inside of a higher-level
+   tree without impacting the work area.
 
- * Verify the following:
+ * Traverse the build forest.
 
-    - Each tree in the forest is uniquely named
+     traverse:
 
-    - No tree is referenced as a subtree of more than one tree (should
-      fall out automatically from the verification that a subtree's
-      "parent" is the declaring tree)
+     if current item has a tree-name key
+        set cur_tree to name of tree
+     store current build item in cur_tree
+     for each dir in child-dirs
+        ensure that dir has no path elements equal to ".."
+        if dir has more than one path element
+           ensure that no intermediate directories have Abuild.conf
+        traverse recursively from dir
 
- * Copy in data about trees from the backing area, ignoring any trees
-   in the backing area that are resolved locally.  (How do we delete
-   trees?  We need a mechanism like how we deleted backed build items,
-   or we need to not allow direct reference to shadowed build trees
-   not referenced by the local forest.)
+ * Deeply copy build trees from the backing area forest that are
+   absent from the local forest except those listed as deleted in the
+   Abuild.backing file.  From copies of trees, delete any build items
+   listed as deleted in the Abuild.backing file.
 
- * Topologically sort the "dependency graph" created by the
-   external-trees keys, ensuring that it is an error-free directed
-   acyclic graph.
+ * Verify that each tree in the forest is uniquely named
 
- * From least dependent to most dependent tree, traverse each tree
-   from the root down.  There are no longer any parent-dirs pointers,
-   so we traverse downward following child-dirs pointers only, making
-   sure no intermediate Abuild.conf files point to the same child (as
-   with subtrees).  [The same code should be used for child-dirs and
-   subtrees.]  We must verify that no child-dirs pointer ever points
-   to a tree root.  After traversal of a tree, copy in build items
-   from all externals and then the backing area tree using the same
-   basic algorithm as we use in abuild 1.0.  The backing area tree for
-   a given tree is the identically named tree in the backing area
-   forest.
+ * Make sure that the graph implied by the trees-used key is an
+   error-free directed acyclic graph.  Do not do checks to ensure that
+   is bipartite with respect to backing area traversal; save this
+   check for the build item level.  This makes it possible to sparsely
+   shadow a build tree for the purpose of adding items to it.
+
+ * Check dependencies and build item references for the whole forest
+   rather than doing it separately for each build item and copying
+   build items around.  (We only copy build items from backing areas,
+   not subtrees.)  Just disallow resolution of any build item name in
+   a tree not declared as used.  This makes it possible to issue error
+   messages akin to "A is not allowed to depend on B since A-tree has
+   not declared B-tree as in its tree-used key."
 
 (Test case: staggered build items or subtrees: with A/B/C/D/E, have
 A -> B, C; B -> C/D; C -> D/E.  Should generate an error.)
@@ -365,6 +399,29 @@ always flow down through subtrees.  Maybe they should be default, or
 maybe there should be a way to copy this information from the parent
 or explicitly from another tree.  Flags and traits may be different
 too.  This will require some more careful analysis.
+
+
+Detect whether to use the version 1.0 or version 1.1 traversal
+algorithm.  Consider a flag to turn this on or off.  Maybe it should
+be off by default.  Probably want to be able to choose 1.1, 1.0, or
+auto with default being 1.1 or auto.
+
+ * If build item has an item-name key, use 1.1
+
+ * If build item has a parent-dir key, use 1.0
+
+ * Else if build item has a tree-name or trees-used key, use 1.1
+
+ * Else if build item has any keys that are allowed in build tree
+   roots or has an Abuild.backing file, use 1.0
+
+ * Else if build item has a child-dirs key and child build item has a
+   parent-dir key, use 1.0
+
+ * Else could be single-build-item 1.0 tree or normal case 1.1 build
+   item.  If parent exists by 1.1 algorithm, use 1.1.  Otherwise, give
+   a warning and proceed to treat as a single build-item 1.0 tree.
+
 
 
 Java
