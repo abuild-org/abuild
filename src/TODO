@@ -227,6 +227,15 @@ any of the other subtrees that it uses, we add another mechanism such
 as declaration of one or more read-only or read-write root directories
 outside of which all build trees are to be treated as read-only.
 
+Traits and supported flags inherit through trees-used just as they did
+through externals in 1.0.  Plugins do not inherit through trees-used
+just as they did not inherit through externals in 1.0.  Plugins do
+interact with subtrees though.  By default, if a subtree does not
+specify any plugin information, it inherits plugins from its parent.
+A subtree may replace plugins from its parents by having its own
+plugins keyword.  It may also add to plugins with plugins-add or
+remove from plugins with plugins-remove.
+
 Consider changes to Abuild.backing:
 
   path: /path/to/backing/area
@@ -242,7 +251,8 @@ Example:
 
    Top-level Abuild.conf files in each leaf below; no way to know of
    all build trees or their relative positions without visiting each
-   root.
+   root.  No way to get list of build tree roots other than exhaustive
+   search.
 
    /-- common
    |
@@ -358,12 +368,12 @@ Traversal algorithm:
            ensure that no intermediate directories have Abuild.conf
         traverse recursively from dir
 
- * Deeply copy build trees from the backing area forest that are
-   absent from the local forest except those listed as deleted in the
-   Abuild.backing file.  From copies of trees, delete any build items
-   listed as deleted in the Abuild.backing file.
-
  * Verify that each tree in the forest is uniquely named
+
+ * Copy build items from the backing area forest that are absent from
+   the local forest into the local list.  Exclude build items that are
+   listed as deleted or that belong to trees that are listed as
+   deleted in the Abuild.backing file.
 
  * Make sure that the graph implied by the trees-used key is an
    error-free directed acyclic graph.  Do not do checks to ensure that
@@ -392,13 +402,6 @@ lh3-style trees.  Think about external build item library concept,
 whether it's sensible, and how it interacts with global plugins.  Also
 consider the case of nested build trees with externals that point up
 such as in the test suites of some of the plugins.
-
-Think about how this interacts with traits, supported flags, and
-plugins.  I'm not sure whether it would be correct for plugins to
-always flow down through subtrees.  Maybe they should be default, or
-maybe there should be a way to copy this information from the parent
-or explicitly from another tree.  Flags and traits may be different
-too.  This will require some more careful analysis.
 
 
 Detect whether to use the version 1.0 or version 1.1 traversal
