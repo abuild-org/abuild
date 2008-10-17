@@ -1,39 +1,133 @@
 
-Version 1.1
-===========
+=== Changes Targeted for Version 1.1 ===
 
-General
--------
+Core Changes
+============
+
+ * Implement some kind of compatibility framework that allows
+   specification of minimum compatibility level.  It should be
+   possible to make some code conditional (at runtime) on the minimum
+   compatibility level and issue deprecation warnings.  See
+   "Compatibility" below.
 
  * Replace "this" with "item-name".  Give a warning if "this" is
    encountered unless running in explicit 1.0 compatibility mode.
 
- * Redo backing areas and externals.  See "Revamped Build Tree
-   Structure" below.
+ * Require trees to be named.  Replace externals with subtrees.
+   Simplify Backing Areas. See "Revamped Build Tree Structure" below
+   for details.
+
+ * It should be possible to declare a plugin as global.  Global
+   plugins are loaded before non-global plugins.  Appropriate caveats
+   should apply -- this is not appropriate for most kinds of plugins.
+   The most likely use case would be for plugins that provide new
+   platform information.  Another use case may be for plugins that
+   check for compliance to internal policy.
+
+ * Consider a "renamed-to" or "replaced-by" keyword that would be used
+   to indicate that a build item has been replaced by another build
+   item.  Its semantics would include that BUILD_ITEM_RULES and
+   abuild.hook-build-items would follow the name change.  This is
+   stronger than using deps to make the old name depend on the new
+   name.  Maybe this would be implemented by having a root Abuild.conf
+   provide the information.  Then abuild could make one item an alias
+   for another.  That way, things like ABUILD_DIR_ITEM-NAME would
+   contain the right information.
+
+ * When topologically sorting build items based on dependency, instead
+   of starting with a straight alphabetical list of build items, first
+   group build items together by tree using a topologically sorted
+   alphabetical list of trees.  This should result in build items from
+   the same tree being built together (in a single-threaded build).
+
+ * It would be nice if plugins could build stuff.  For example, this
+   would make it possible to implement a compiler plugin that uses
+   autoconf to figure out the correct compiler invocation so that it
+   would be possible to support a generic unix compiler or libtool
+   from a plugin.  It would also be possible for a plugin to do some
+   kind of startup check, which in turn could make it possible to
+   implement some kind of forest/site-wide configuration.  One could
+   conceive of a generic UNIX compiler plugin that would force you to
+   manually run ./configure with certain arguments before being able
+   to do a build.
+
+   Making plugins buildable implies that abuild has to have build
+   plugins before anyone might use them.  Since plugins are loaded in
+   declaration order in each tree, this results in declaration order
+   implying some kind of dependency-like relationship.  To determine
+   build order, make a dependency graph among buildable plugins where
+   a dependency is created from each plugin to its immediate
+   predecessor in the build order.  This is done for global plugins
+   and for each tree.  If there are any cycles (caused by buildable
+   plugins being loaded in different orders across different trees),
+   it is an error.  If not, the first phase of the build is to build
+   plugins.  We should probably require that buildable plugins have
+   platform type indep.  In this case, it's probably also okay for
+   plugin.interface files to have after-build files as well.
+
+   Since plugins are loaded in declaration order in each tree, this
+   approach guarantees that buildable plugins are built before other
+   plugins that may reference them.  One could argue that such logic
+   should be applied to all plugins since it is possible for plugins
+   to interact, but I would argue that this would create unnecessary
+   constraints.  If one plugin really requires another plugin, one
+   should first rethink whether the plugins are being used sensibly,
+   and if they really are, then the plugin should just check for the
+   existence of a variable/property defined by the other plugin.  The
+   case of buildable plugins is a little different because a plugin
+   may not even work before it is build.
+
+ * Provide arguments for querying abuild's state, such as locating
+   build items (perhaps with pattern matching), listing all trees with
+   locations and dependencies, summarizing the state of all plugin
+   information (which items are plugins in any tree, which tree
+   provides the plugin, and which trees use the plugin), etc.
+
+
+Abuild Contrib
+==============
+
+ * Make sure any compiler plugins included with abuild contrib have
+   the 1.0.2 fixes integrated into them.
+
+ * Include a generic UNIX compiler buildable plugin
+
+ * Consider including a libtool buildable plugin
+
+
+Platform Issues
+===============
+
+ * Pass information about the native os, cpu, and toolset to
+   list_platforms.  See comment in Abuild::loadPlatformData before
+   invocation of list_platforms.
 
  * It would be nice if -p native:skip didn't actually disable native
    platforms but instead just took them out of the default build list.
    That way, when doing -p native:skip, if a java or indep build item
    depends on a native build item, abuild can still build the native
    item "as needed" just as it would for other platform-specific
-   dependencies.  While we're at it, it should be possible to disable
-   java and indep build items in this same way, and maybe also to
-   specify indep-only or java-only.
+   dependencies.
 
- * Remove temporary ABUILD_FORCE_32BIT hack.  Search for FORCE32 in
-   the code.  The only references are in
+ * There should be a way to tell abuild to skip java or indep build
+   items.  Maybe support -p java:skip and -p indep:skip with the same
+   semantic as -p native:skip (prevent from building by default, but
+   still build to satisfy dependencies).
+
+ * Remove temporary ABUILD_FORCE_32BIT hack or make it permanent.
+   Search for FORCE32 in the code.  The only references are in
    private/bin/get_native_platform_data and make/toolchains/gcc.mk.
    For a description, see release notes in the documentation.
 
- * Inheritable or Global plugins.  It would be nice if we could
-   declare a plugin as automatically inheriting across externals.
-   This should be possible with the revamped build tree structure.
 
- * Need a better solution for automatically generated files that might
-   be controlled in some cases to work around lack of tool support.
-   Abuild itself could use this for flex/bison files.  We could also
-   use it for cases like xbinder where generating the files requires a
-   special license.  We need a clean way to handle the following:
+Make Changes
+============
+
+ * Need a better solution for files that are automatically generated
+   by optional tools.  Abuild itself could use this for flex/bison
+   files.  We could also use it for cases like xbinder where
+   generating the files requires a special license.  We need a clean
+   way to handle the following:
 
     - Regeneration of the files if they are out of date and the tools
       are available.
@@ -48,6 +142,15 @@ General
    are out of date.  That way, checkouts from the version control
    system can work without modification time preservation.
 
+ * We really need a way to be able to use autoconf to find out
+   information about a specific compiler.  This would be especially
+   useful for figuring out what flags to use for PIC when building
+   shared libraries.  This should be possible with buildable plugins.
+
+
+Building Abuild
+===============
+
  * Consider creating a ./configure that finds boost libraries and
    deals properly with pthread.  Then consider packaging auto-srcs
    with abuild sources.  Check on debian to see if this works with the
@@ -57,22 +160,44 @@ General
    bison.  See ~/source/work-software/argon/third-party-support/boost
    for sample boost autoconf code.
 
- * Consider a "renamed-to" or "replaced-by" keyword that would be used
-   to indicate that a build item has been replaced by another build
-   item.  Its semantics would include that BUILD_ITEM_RULES and
-   abuild.hook-build-items would follow the name change.  This is
-   stronger than using deps to make the old name depend on the new
-   name.
+   It might be possible to make this work properly when abuild is
+   self-hosting by having a buildable plugin that checks to make sure
+   configure has been run.
 
- * When topologically sorting build items based on dependency, instead
-   of starting with a straight alphabetical list of build items, first
-   group build items together by tree using a topologically sorted
-   alphabetical list of trees.  This should result in build items from
-   the same tree being built together (in a single-threaded build).
+
+Platform Conditionals
+=====================
+
+People want conditional dependencies, but mainly for platform issues.
+Consider one or both of the following ideas:
+
+ * Platform restrictions per build item.  If a build item has a
+   platform restriction, it will be excluded from the initial build
+   set construction.  Then what happens if it get pulled in to satisfy
+   a dependency?  This should be an error, but that causes problems in
+   some cases.  See next idea for a possible solution.
+
+ * Sometimes we use dependencies just to force something to build, as
+   in the case of the "compile-all" item in searchlight or some
+   "top-level" builds.  We really need the concept of a "build-also"
+   keyword that specifies build items that should be built if this one
+   is built.  It effectively just adds them to the build set.  The
+   build-also keyword doesn't have any restrictions about cycles -- it
+   is just used during initial build set construction.  As such, it
+   can have platform-based conditionals.  Build items that use this
+   feature are probably not allowed to have deps or to build anything
+   themselves.
+
+Using these two features together, it should be possible to achieve
+the goal of supporting platform-based conditional dependencies in a
+safe manner.
 
 
 Revamped Build Tree Structure
------------------------------
+=============================
+
+Problem Statement
+-----------------
 
 A principal failing in abuild 1.0 stems from the use of paths to
 specify the locations of external build trees -- "external-dirs" is
@@ -134,9 +259,6 @@ A better traversal system is required in order to make abuild aware of
 all the possible build trees and their locations.  The following other
 problems must be addressable by this:
 
- * When breaking off a part of a tree into an external for isolation,
-   plugin declarations have to be duplicated
-
  * It is impossible to pass information, such as extra compilers or
    flags, backwards across the external gap, so if you use a
    collection of common build items (like tps-build-items), there's no
@@ -159,12 +281,12 @@ problems must be addressable by this:
    If B and D both have C as an external and are independent from each
    other, you might want to build C first and then have both B and D
    built in parallel while treating C as read only.  Maybe we can
-   specify one or more read-write or read-only roots on the
-   command-line.  If none are specified, all externals are read-write.
-   If read-only roots are specified, all externals are read-write
-   except for those explicitly listed as read-only.  If any read-write
+   specify one or more read/write or read-only roots on the
+   command-line.  If none are specified, all externals are read/write.
+   If read-only roots are specified, all externals are read/write
+   except for those explicitly listed as read-only.  If any read/write
    roots are specified, all externals are read-only except those
-   specified as read-write.  It is an error to specify both.
+   specified as read/write.  It is an error to specify both.
 
  * It would be nice to be able to build everything from a single build
    even if there is no single build item that can see all the build
@@ -188,12 +310,17 @@ problems must be addressable by this:
    trees are touched in a build set and disregard errors in untouched
    trees unless --full-integrity is specified.
 
-Proposed Solution:
+ * There is no way to find all build tree roots without doing an
+   exhaustive search of all Abuild.conf files.
+
+Solution
+--------
 
 Introduce this file system hierarchy restriction:
 
- * All build items in a local collection of build trees must be
-   located physically under the root of the topmost build tree.
+ * All build items in a local collection of build trees, called a
+   forest, must be located physically under the root of the topmost
+   build tree.
 
 Imposing this restriction makes it possible to eliminate the
 parent-dir key.  Enforcing this restriction involves verifying that
@@ -224,25 +351,27 @@ names rather than tree paths.  Since we have no longer have the
 concept of externals, we no longer have the concept of read-only
 externals.  To support the pattern of building a tree without building
 any of the other subtrees that it uses, we add another mechanism such
-as declaration of one or more read-only or read-write root directories
-outside of which all build trees are to be treated as read-only.
+as declaration of one or more read-only or read/write root directories
+outside of which all build trees are to be treated as read-only, or
+perhaps explicit specification of read-only or read/write build trees,
+though it's less clear in that case how to handle nested subtrees.
 
-Traits and supported flags inherit through trees-used just as they did
-through externals in 1.0.  Plugins do not inherit through trees-used
-just as they did not inherit through externals in 1.0.  Plugins do
-interact with subtrees though.  By default, if a subtree does not
-specify any plugin information, it inherits plugins from its parent.
-A subtree may replace plugins from its parents by having its own
-plugins keyword.  It may also add to plugins with plugins-add or
-remove from plugins with plugins-remove.
+Traits, supported flags, and plugins behave with respect to subtrees
+in 1.1 just as they behaved with respect to externals in 1.0.  This
+means that it is still possible to repeat plugin declaration lists
+for each subtree.  Global plugins apply to all subtrees and inherit
+through backing areas.
 
-Consider changes to Abuild.backing:
+New Abuild.backing format:
 
-  path: /path/to/backing/area
+  backing-area: /path/to/backing/area
   deleted-trees: trees not to shadow
   deleted-items: items not to shadow (fully qualified as tree-name::item-name)
 
-Consider removing deleted-items from Abuild.conf.
+Remove deleted-items from Abuild.conf.
+
+For compatibility, continue to accept Abuild.backing files that are
+just paths with nothing else, but give a deprecation warning.
 
 
 Example:
@@ -404,46 +533,81 @@ consider the case of nested build trees with externals that point up
 such as in the test suites of some of the plugins.
 
 
-Detect whether to use the version 1.0 or version 1.1 traversal
-algorithm.  Consider a flag to turn this on or off.  Maybe it should
-be off by default.  Probably want to be able to choose 1.1, 1.0, or
-auto with default being 1.1 or auto.
+Compatibility
+=============
 
- * If build item has an item-name key, use 1.1
+When abuild starts up, a version compatibility flag may be provided.
+We should probably support this from the command line or from the
+environment.  If no flag is specified, abuild should attempt to
+automatically determine whether to run in 1.0 compatibility mode.
+Abuild must store the reason why it chose a particular version so it
+can report that in error messages as needed.  By default, abuild will
+give deprecation warnings for 1.0 constructs.  These can optionally be
+made into errors, but they cannot be suppressed.
 
- * If build item has a parent-dir key, use 1.0
+Think about whether it is possible to support some kind of hybrid
+mode where some build trees are 1.0 and some are 1.1.
 
- * Else if build item has a tree-name or trees-used key, use 1.1
+ * If build item has a parent-dir or external-dirs key, use 1.0
+
+ * Else if the local build item has an item-name key or any other key
+   that was introduced in version 1.1, use 1.1
 
  * Else if build item has any keys that are allowed in build tree
-   roots or has an Abuild.backing file, use 1.0
+   roots or has an Abuild.backing file, use 1.0 (since if it had a
+   tree-name key, we would have already chosen 1.1)
 
  * Else if build item has a child-dirs key and child build item has a
    parent-dir key, use 1.0
 
  * Else could be single-build-item 1.0 tree or normal case 1.1 build
-   item.  If parent exists by 1.1 algorithm, use 1.1.  Otherwise, give
-   a warning and proceed to treat as a single build-item 1.0 tree.
+   item.  If the next higher Abuild.conf refers to this as a child,
+   use 1.1.  Otherwise, give a warning and proceed to treat as a
+   single build-item 1.0 tree.
 
+----------------------------------------------------------------------
 
+=== Things with no Specific Release Target ===
 
-Java
-----
+Windows Issues
+==============
 
- * Ant launcher: consider having a Java-based ant launcher that abuild
-   communicates with via some kind of IPC to make launching ant more
-   efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
-   23536 in abuild, 4/3/2008, subject "preliminary ant launcher
-   experiment".
+ * There are some Windows path issues.  You can't use absolute paths
+   in Windows as long as cygwin is in use because cygwin gnu make will
+   not interpret absolute paths in the same way that Windows will for
+   purposes of dependencies in .dep files, library dependencies, etc.
+   Relative paths should work, but they don't always work because
+   Windows seems to have limits on the number of times .. may appear
+   in a path (among possibly other things), and besides, there is no
+   way to construct a relative path to a file under another drive
+   letter.  Ideally, we should be using something like msys and/or
+   gnuwin32 rather than cygwin, along with supporting ActivePerl, but
+   this has major implications since qtest doesn't currently work
+   without cygwin, not to mention the fact that the test suite makes
+   free use of unix constructs.
+
+ * gen_deps: rewrite in C++ so that it doesn't force a runtime
+   dependency on perl.  It should be a fallback for cases when
+   compilers can't generate dependency information.  With gcc, use -MD
+   -MF -MP to generate proper .dep files.  xlc: "-M -MF a.dep" works,
+   but there is no equivalent to -MP, so we'll need to postprocess.
+   VC: there seems to be a /showIncludes option that we may be able to
+   exploit.  Not sure what versions of VC++ have this.  This will be
+   worth doing if we can remove a runtime dependency on Cygwin for
+   Windows/C++.  For non-Windows systems, requiring perl is not a big
+   deal.
+
 
 Compiler/Platform Configuration
--------------------------------
+===============================
 
 There is a general problem with compiler options, 32-bit and 64-bit
 compilers, project-specific configuration, supporting compilers that
 aren't known in advance, etc.  This is kind of what toolset was
 designed to handle.  The following items are possibly contradictory or
-interdependent and need to be sorted out better.
+interdependent and need to be sorted out better.  These items all
+imply certain things that may need to be done very early in abuild's
+life even before private/bin/get_native_platform_data is called.
 
  * Need a more flexible way of handling compiler options.  It should
    be possible to create plugins that add compiler options to
@@ -456,55 +620,12 @@ interdependent and need to be sorted out better.
 
  * We need some way for people to change the toolset portion of the
    platform string in a global way for a particular collection of
-   build tres.
-
- * There needs to be some kind of "site" configuration that lives in a
-   build tree that may be at the base of the externals chain.  This
-   should be like a plugin but we need the ability to support some
-   kind of build/configuration.  For example, it should be possible to
-   generate toolsets or change default compiler options based on the
-   output of ./configure or to set things that are specific to which
-   compiler is used.
-
- * It would be nice to have some way to support libtool and a generic
-   UNIX compiler such that if you could specify it with ./configure,
-   you could build using abuild with it.  This may figure into the
-   site configuration somehow.  Ultimately, it should be possible for
-   a given project to be configured such that its build trees build
-   with a particular compiler and particular options, and this should
-   be possible to do without modifying abuild or requiring every
-   single build tree to take some specific actions.
+   build trees.
 
  * There needs to be better cross-compiler support for things like
    building 32-bit code on a 64-bit system.  Adding -m32 doesn't
    really do it because why should have you
    linux.x86_64.rhel51.gcc.m32 be the same as linux.ix86.rhel51.gcc?
-
-
-Platform Conditionals
-=====================
-
-People want conditional dependencies, but mainly for platform issues.
-Consider one or both of the following ideas:
-
- * Platform restrictions per build item.  If a build item has a
-   platform restriction, it will be excluded from the initial build
-   set construction.  Then what happens if it get pulled in to satisfy
-   a dependency?  This should be an error, but that causes problems in
-   some cases.  See next idea for a possible solution.
-
- * Sometimes we use dependencies just to force something to build, as
-   in the case of the "compile-all" item in searchlight or some
-   "top-level" builds.  We really need the concept of a "build-also"
-   keyword that specifies build items that should be built if this one
-   is built.  It effectively just adds them to the build set.  The
-   build-also keyword doesn't have any restrictions about cycles -- it
-   is just used during inital build set construction.  As such, it can
-   have platform-based conditionals.
-
-Using these two features together, it should be possible to achieve
-the goal of supporting platform-based conditional dependencies in a
-safe manner.
 
 
 Java Problems
@@ -517,6 +638,16 @@ this way.
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse
    of abuild.classpath.
+
+ * Ant launcher: consider having a Java-based ant launcher that abuild
+   communicates with via some kind of IPC to make launching ant more
+   efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
+   23536 in abuild, 4/3/2008, subject "preliminary ant launcher
+   experiment".
+
+ * ant with build failure appears not to exit abnormally in Windows.
+   This is a bug in ant.bat and could be worked around by using our
+   own ant launcher.
 
  * We don't detect when inaccessible build items are referenced in
    abuild.hook-build-items
@@ -548,7 +679,12 @@ this way.
  * Ant seems to not complain when populating an ear file from a
    classpath that contains non-existent items.  In general, there may
    be an issue with not getting any notification of non-existent
-   classpath items.
+   classpath items.  Note that, sometimes, you want to try to create
+   an ear even of some of its contents aren't there, so this may not
+   really be a problem worth fixing.  If we can fix it, we should be
+   able to control on a per-build-item basis whether it is an error
+   condition or just a warning, probably having "error" be the
+   default.
 
  * We use the privately set "debug" and "deprecation" properties in
    abuild.xml to set debug and deprecation.  These should really be set
@@ -570,8 +706,14 @@ this way.
    implementations.  The only way to get this behavior right now is to
    use hooks.
 
- * You have to duplicate the archive name (abuild.jar-name, etc.) in
-   the Abuild.interface file.
+
+Known Bugs
+==========
+
+ * Piping ANSI color stuff through ant on Windows doesn't work.  When
+   running qtest from ant on Windows, qtest correctly generates the
+   ansi color codes, but they don't get displayed right through ant,
+   at least in cygwin.
 
 
 Issues, Enhancement Ideas
@@ -579,19 +721,11 @@ Issues, Enhancement Ideas
 
 See also "Known Limitations" in the documentation.
 
- * ant with build failure appears not to exit abnormally in Windows.
-   This is a bug in ant.bat and could be worked around by using our
-   own ant launcher.
-
- * gen_deps: rewrite so that it doesn't force a runtime dependency on
-   perl.  It should be a fallback for cases when compilers can't
-   generate dependency information.  With gcc, use -MD -MF -MP to
-   generate proper .dep files.  xlc: "-M -MF a.dep" works, but there
-   is no equivalent to -MP, so we'll need to postprocess.  VC:
-   there seems to be a /showIncludes option that we may be able to
-   exploit.  Not sure what versions of VC++ have this.
-
- * Test qtest coverage from abuild test suite
+ * Test qtest coverage from abuild test suite.  Relatively low
+   priority since abuild's test suite itself uses coverage, so
+   abuild's qtest coverage support is exercised every time the abuild
+   test suite is run.  (It's just that you might not notice if it
+   weren't there.)
 
  * Think about implementing a dependency analyzer that would look at
    first-level includes to figure out what the correct list of direct
@@ -606,11 +740,6 @@ See also "Known Limitations" in the documentation.
    commented template files.  Alternatively, could be a command-line
    wizard or something.
 
- * Piping ANSI color stuff through ant on Windows doesn't work.  When
-   running qtest from ant on Windows, qtest correctly generates the
-   ansi color codes, but they don't get displayed right through ant,
-   at least in cygwin.
-
  * To check for all Abuild.mk files that define local targets:
    pcregrep '^\s*\S+\s*:(\Z|[^=])' **/Abuild.mk
 
@@ -622,18 +751,16 @@ See also "Known Limitations" in the documentation.
    to know who uses it, or I see some variable in someone's
    Abuild-ant.properties or Abuild.mk and want to know who defines it.
 
- * Consider useing re-entrant scanners instead of C++ scanners.  This
+ * Consider using re-entrant scanners instead of C++ scanners.  This
    requires flex >= 2.5.33.  Have abuild's own build process detect
    whether or not a new enough version of flex is available.  If so,
    it should generate the parsers and attempt to update a cached copy
    of the automatically generated files if they have changed.
    Otherwise, it should use the cached files by adding them to SRCS in
    place of the automatically generated ones.  We also need to disable
-   warnings for the flex-generated code.  Use %option nounistd.
-
- * Test, at least informally, backing areas on different drive letters
-   on Windows.  Not sure whether it's worth putting this in the test
-   suite.
+   warnings for the flex-generated code.  Use %option nounistd.  (This
+   suggestion may be simplified if better support for files generated
+   by optional tools is added.)
 
  * It would be nice if there were a mechanism for providing
    documentation on traits so that --list-traits could tell the user
@@ -648,7 +775,8 @@ See also "Known Limitations" in the documentation.
    http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
    There is also some kind of Win32 Job API used by the perl
    Win32::Job classes (CreateJobObject).  This may provide a better
-   solution than our current CTRL-C handling.
+   solution than our current CTRL-C handling.  See if boost provides
+   anything that could do this.
 
  * Clean up ~/source/examples/java/native/abuild and use as JNI
    example
@@ -661,14 +789,9 @@ See also "Known Limitations" in the documentation.
    validation (which attributes are allowed in which contexts).
    Search for DTD in the documentation and test suite.
 
- * It would be nice if we could use higher resolution figures for the
-   PDF than for the HTML.  There is plenty of material in the
-   sagehill.net DocBook XSL guide about this.
-
- * We really need a way to be able to use autoconf to find out
-   information about a specific compiler.  This would be especially
-   useful for figuring out what flags to use for PIC when building
-   shared libraries.
+ * In the manual, it would be nice if we could use higher resolution
+   figures for the PDF than for the HTML.  There is plenty of material
+   in the sagehill.net DocBook XSL guide about this.
 
  * Orphan target detection won't find orphan targets in
    subdirectories.  This is very hard to fix in general.  We could
@@ -676,18 +799,14 @@ See also "Known Limitations" in the documentation.
    wouldn't help if we removed the last file from a subdirectory.  For
    now, we'll just not handle this case.
 
- * There are some Windows path issues.  Find out the real story behind
-   Windows paths.  See whether using absolute paths is better than
-   relative paths for Windows.  If so, this has implications as there
-   is a mixture of Windows native and cygwin tools in use.
-
- * Right now, list_platforms has no way to get native os, cpu, or
-   toolset data.  See comment in Abuild::loadPlatformData before
-   invocation of list_platforms.
-
- * It would be nice if we could have a flag that would tell abuild to
-   capture and de-interleave the output from multiple backends in
-   parallel.  See Abuild::invokeBackend.
+ * Scott Lemke points out that abuild has a lot of knowledge about
+   things that are not relevant to any particular build.  One thing to
+   consider would be having abuild analyze error conditions to
+   determine which ones are not relevant to the local build.  This
+   might enable abuild, in some cases, to build a local group of items
+   even when there are integrity errors in other parts of the build
+   tree.  This may or may not be a desirable feature.  If we support
+   this, it should be done only when -k is specified.
 
  * Mingw support isn't that complete: see known limitations in the
    documentation and comments in private/list_platforms.  If it is
@@ -704,16 +823,9 @@ See also "Known Limitations" in the documentation.
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
 
- * Scott Lemke points out that abuild has a lot of knowledge about
-   things that are not relevant to any particular build.  One thing to
-   consider would be having abuild analyze error conditions to
-   determine which ones are not relevant to the local build.  This
-   might enable abuild, in some cases, to build a local group of items
-   even when there are integrity errors in other parts of the build
-   tree.  This may or may not be a desirable feature.
-
- * It would be nice if plugins could have type indep and could build
-   stuff.  It would be nice, for example, to be able to implement a
-   compiler plugin that uses autoconf to figure out the correct
-   compiler invocation so that it would be possible to support a
-   generic unix compiler or libtool from a plugin.
+ * Abuild.interface files necessarily duplicate information from
+   Abuild-ant.properties or Abuild.mk such as jar names or library
+   names.  This is probably okay as you can always avoid it by setting
+   "local" variables (i.e., variables named in such a way to not
+   conflict with anything) that are referenced in the Abuild.mk or
+   Abuild-ant.propertiesd. files.
