@@ -650,7 +650,9 @@ this way.
    communicates with via some kind of IPC to make launching ant more
    efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
    23536 in abuild, 4/3/2008, subject "preliminary ant launcher
-   experiment".
+   experiment".  For communication between abuild and the ant
+   launcher, see
+   ~/source/examples/portability/socket-java-c++-workers/README
 
  * ant with build failure appears not to exit abnormally in Windows.
    This is a bug in ant.bat and could be worked around by using our
