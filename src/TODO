@@ -22,7 +22,8 @@ Core Changes
    should apply -- this is not appropriate for most kinds of plugins.
    The most likely use case would be for plugins that provide new
    platform information.  Another use case may be for plugins that
-   check for compliance to internal policy.
+   check for compliance to internal policy.  Global plugins can also
+   be used to support some form of project-wide configuration.
 
  * Consider a "renamed-to" or "replaced-by" keyword that would be used
    to indicate that a build item has been replaced by another build
@@ -32,13 +33,16 @@ Core Changes
    name.  Maybe this would be implemented by having a root Abuild.conf
    provide the information.  Then abuild could make one item an alias
    for another.  That way, things like ABUILD_DIR_ITEM-NAME would
-   contain the right information.
+   contain the right information.  This approach would also eliminate
+   the need to create backward compatibility build items that just
+   depend on their replacements.
 
- * When topologically sorting build items based on dependency, instead
-   of starting with a straight alphabetical list of build items, first
-   group build items together by tree using a topologically sorted
-   alphabetical list of trees.  This should result in build items from
-   the same tree being built together (in a single-threaded build).
+ * Cosmetic change: when topologically sorting build items based on
+   dependency, instead of starting with a straight alphabetical list
+   of build items, first group build items together by tree using a
+   topologically sorted alphabetical list of trees.  This should
+   result in build items from the same tree being built together (in a
+   single-threaded build).
 
  * It would be nice if plugins could build stuff.  For example, this
    would make it possible to implement a compiler plugin that uses
@@ -119,6 +123,8 @@ Platform Issues
    private/bin/get_native_platform_data and make/toolchains/gcc.mk.
    For a description, see release notes in the documentation.
 
+ * Implement platform conditionals, described below.
+
 
 Make Changes
 ============
@@ -161,8 +167,9 @@ Building Abuild
    for sample boost autoconf code.
 
    It might be possible to make this work properly when abuild is
-   self-hosting by having a buildable plugin that checks to make sure
-   configure has been run.
+   building itself by having a buildable plugin that checks to make
+   sure configure has been run.  Bootstrapping makefile can fail if
+   configure hasn't been run.
 
 
 Platform Conditionals
