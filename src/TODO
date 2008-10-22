@@ -4,18 +4,73 @@
 Core Changes
 ============
 
- * Implement some kind of compatibility framework that allows
-   specification of minimum compatibility level.  It should be
-   possible to make some code conditional (at runtime) on the minimum
-   compatibility level and issue deprecation warnings.  See
-   "Compatibility" below.
+ * Implement compatibility framework that allows specification of
+   minimum compatibility level.  At the user level, this should be as
+   simple as specifying minimum supported compatibility level from the
+   command line or environment.  Internally, it should be possible to
+   make some code conditional (at runtime) on the minimum
+   compatibility level and issue deprecation warnings, and it should
+   be easy to isolate backward compatibility code so that deprecated
+   features can be removed.  See also "Compatibility" below.
 
- * Replace "this" with "item-name".  Give a warning if "this" is
-   encountered unless running in explicit 1.0 compatibility mode.
+ * Replace "this" with "item-name".  Make use of "this" deprecated.
 
  * Require trees to be named.  Replace externals with subtrees.
+   Eliminate absolute path and read-only externals, but provide an
+   alternative to read-only externals for the desired functionality.
    Simplify Backing Areas. See "Revamped Build Tree Structure" below
    for details.
+
+ * Consider a "renamed-to" or "replaced-by" keyword that would be used
+   to indicate that a build item has been replaced by another build
+   item.  It would be allowed only in root Abuild.conf files.  Its
+   semantics would include that BUILD_ITEM_RULES and
+   abuild.hook-build-items would follow the name change.  This is
+   stronger than using deps to make the old name depend on the new
+   name and also eliminates the need to create build items whose only
+   purpose is to depend on their replacements.  Internally, abuild
+   would make the new name an alias for the old name.  That way,
+   things like abDIR_OLD-ITEM-NAME would contain the path to the new
+   item.
+
+ * Move "deleted-items" key from root Abuild.conf to Abuild.backing.
+   Also add a "deleted-trees" key.  New Abuild.backing format:
+
+     backing-area: /path/to/backing/area
+     deleted-trees: trees not to shadow
+     deleted-items: items not to shadow (fully qualified as tree-name::item-name)
+
+   In 1.0 compatibility mode, continue to accept Abuild.backing files
+   that are just paths with nothing else, but give a deprecation
+   warning.
+
+
+Usability Improvements
+======================
+
+ * Provide arguments for querying abuild's state, such as locating
+   build items (perhaps with pattern matching), listing all trees with
+   locations and dependencies, summarizing the state of all plugin
+   information (which items are plugins in any tree, which tree
+   provides the plugin, and which trees use the plugin), etc.  The
+   --dump-data option will always be available for providing full
+   information, but providing a more human-readable format for
+   commonly needed information will help.
+
+ * Abuild 1.0's build ordering is created by doing a stable
+   topological sort on an alphabetical list of build items.  Instead
+   of starting with a straight alphabetical list, have the starting
+   list group build items by build tree.  To create the starting list,
+   first topologically sort the alphabetical list of trees, and then
+   alphabetically sort build items within each tree.  When this list
+   is topologically sorted, it should result in build items from the
+   same tree being built together (in a single-threaded build), and
+   will generally result in items with higher visibility being built
+   earlier in the process.
+
+
+Plugins
+=======
 
  * It should be possible to declare a plugin as global.  Global
    plugins are loaded before non-global plugins.  Appropriate caveats
@@ -25,71 +80,14 @@ Core Changes
    check for compliance to internal policy.  Global plugins can also
    be used to support some form of project-wide configuration.
 
- * Consider a "renamed-to" or "replaced-by" keyword that would be used
-   to indicate that a build item has been replaced by another build
-   item.  Its semantics would include that BUILD_ITEM_RULES and
-   abuild.hook-build-items would follow the name change.  This is
-   stronger than using deps to make the old name depend on the new
-   name.  Maybe this would be implemented by having a root Abuild.conf
-   provide the information.  Then abuild could make one item an alias
-   for another.  That way, things like ABUILD_DIR_ITEM-NAME would
-   contain the right information.  This approach would also eliminate
-   the need to create backward compatibility build items that just
-   depend on their replacements.
-
- * Cosmetic change: when topologically sorting build items based on
-   dependency, instead of starting with a straight alphabetical list
-   of build items, first group build items together by tree using a
-   topologically sorted alphabetical list of trees.  This should
-   result in build items from the same tree being built together (in a
-   single-threaded build).
-
- * It would be nice if plugins could build stuff.  For example, this
-   would make it possible to implement a compiler plugin that uses
-   autoconf to figure out the correct compiler invocation so that it
-   would be possible to support a generic unix compiler or libtool
-   from a plugin.  It would also be possible for a plugin to do some
-   kind of startup check, which in turn could make it possible to
-   implement some kind of forest/site-wide configuration.  One could
-   conceive of a generic UNIX compiler plugin that would force you to
-   manually run ./configure with certain arguments before being able
-   to do a build.
-
-   Making plugins buildable implies that abuild has to have build
-   plugins before anyone might use them.  Since plugins are loaded in
-   declaration order in each tree, this results in declaration order
-   implying some kind of dependency-like relationship.  To determine
-   build order, make a dependency graph among buildable plugins where
-   a dependency is created from each plugin to its immediate
-   predecessor in the build order.  This is done for global plugins
-   and for each tree.  If there are any cycles (caused by buildable
-   plugins being loaded in different orders across different trees),
-   it is an error.  If not, the first phase of the build is to build
-   plugins.  We should probably require that buildable plugins have
-   platform type indep.  In this case, it's probably also okay for
-   plugin.interface files to have after-build files as well.
-
-   Since plugins are loaded in declaration order in each tree, this
-   approach guarantees that buildable plugins are built before other
-   plugins that may reference them.  One could argue that such logic
-   should be applied to all plugins since it is possible for plugins
-   to interact, but I would argue that this would create unnecessary
-   constraints.  If one plugin really requires another plugin, one
-   should first rethink whether the plugins are being used sensibly,
-   and if they really are, then the plugin should just check for the
-   existence of a variable/property defined by the other plugin.  The
-   case of buildable plugins is a little different because a plugin
-   may not even work before it is build.
-
- * Provide arguments for querying abuild's state, such as locating
-   build items (perhaps with pattern matching), listing all trees with
-   locations and dependencies, summarizing the state of all plugin
-   information (which items are plugins in any tree, which tree
-   provides the plugin, and which trees use the plugin), etc.
+ * Support buildable plugins with platform type "indep".  See
+   "Buildable Plugins" below.
 
 
 Abuild Contrib
 ==============
+
+ * Upgrade all contributed build items to use abuild 1.1 files.
 
  * Make sure any compiler plugins included with abuild contrib have
    the 1.0.2 fixes integrated into them.
@@ -118,16 +116,17 @@ Platform Issues
    semantic as -p native:skip (prevent from building by default, but
    still build to satisfy dependencies).
 
- * Remove temporary ABUILD_FORCE_32BIT hack or make it permanent.
-   Search for FORCE32 in the code.  The only references are in
-   private/bin/get_native_platform_data and make/toolchains/gcc.mk.
-   For a description, see release notes in the documentation.
+ * If possible, remove the temporary ABUILD_FORCE_32BIT hack or make
+   it permanent.  Search for FORCE32 in the code.  The only references
+   are in private/bin/get_native_platform_data and
+   make/toolchains/gcc.mk.  For a description, see release notes in
+   the documentation.
 
  * Implement platform conditionals, described below.
 
 
-Make Changes
-============
+Changes to "make" Code
+======================
 
  * Need a better solution for files that are automatically generated
    by optional tools.  Abuild itself could use this for flex/bison
@@ -146,12 +145,98 @@ Make Changes
    This implies, at least for these cases, some kind of checksum-based
    method (rather than using modification times) to tell whether files
    are out of date.  That way, checkouts from the version control
-   system can work without modification time preservation.
+   system can work even when the CM system does not preserve
+   modification times.
 
- * We really need a way to be able to use autoconf to find out
-   information about a specific compiler.  This would be especially
-   useful for figuring out what flags to use for PIC when building
-   shared libraries.  This should be possible with buildable plugins.
+
+Platform Conditionals
+=====================
+
+(This item is low-priority for 1.1.)
+
+People want conditional dependencies, but mainly for platform issues.
+Consider one or both of the following ideas:
+
+ * Platform restrictions per build item.  If a build item has a
+   platform restriction, it will be excluded from the initial build
+   set construction.  Then what happens if it get pulled in to satisfy
+   a dependency?  This should be an error, but that causes problems in
+   some cases.  See next idea for a possible solution.
+
+ * Sometimes we use dependencies just to force something to build, as
+   in the case of the "compile-all" item in searchlight or some
+   "top-level" builds.  For cases in which all we want to do is
+   effectively define static build sets, we need something more like a
+   "build-also" keyword that specifies build items that should be
+   built if this one is built.  It effectively just adds them to the
+   build set.  The build-also keyword doesn't have any restrictions
+   about cycles -- it is just used during initial build set
+   construction.  As such, it can have platform-based conditionals.
+   Build items that use this feature are probably not allowed to have
+   deps or to build anything themselves.
+
+Using these two features together, it should be possible to achieve
+the goal of supporting platform-based conditional dependencies in a
+safe manner.
+
+Reminder: there is fundamental reason that conditional dependencies
+are not supported: abuild requires the shape of the dependency graph
+to be identical for all possible builds.  Otherwise, there may be
+cycles or other dependency-related problems that only surface in some
+situations.  This is the same kind of problem that can occur with
+conditional compilation -- you can quickly degenerate into a situation
+in which code gets stale because of not having been built for a long
+time.
+
+
+Buildable Plugins
+=================
+
+There are a number of potential uses for plugins that can't presently
+be realized because plugins have to be completely static.  For
+example, it would be useful to be able to create a generic UNIX
+compiler plugin that must be configured using autoconf by the user
+before starting to build or that would use autoconf or libtool to
+figure out certain flags, such as the proper flags to create shared
+libraries.  Buildable plugins could also be used to force certain
+steps to be performed early in a build, such as checking for proper
+environment variable settings or making architectural checks on
+dependency rules that go beyond what can be enforced through abuild's
+internal mechanisms.  It may also be possible to use global, buildable
+plugins to implement some kind of project-wide configuration
+mechanism.
+
+Making plugins buildable implies that abuild has to have build plugins
+before anyone might use them.  Since plugins are loaded in declaration
+order in each tree, this results in declaration order implying some
+kind of dependency-like relationship.  To determine build order, make
+a dependency graph among buildable plugins where a dependency is
+created from each plugin to its immediate predecessor in the build
+order.  This is done for global plugins and for each tree.  If there
+are any cycles (caused by buildable plugins being loaded in different
+orders across different trees), it is an error.  If not, the first
+phase of the build is to build plugins.
+
+Since plugins are loaded in declaration order in each tree, this
+approach guarantees that buildable plugins are built before other
+plugins that may reference them.  One could argue that such logic
+should be applied to all plugins since it is possible for plugins
+to interact, but I would argue that this would create unnecessary
+constraints.  If one plugin really requires another plugin, one
+should first rethink whether the plugins are being used sensibly,
+and if they really are, then the plugin should just check for the
+existence of a variable/property defined by the other plugin.  The
+case of buildable plugins is a little different because a plugin
+may not even work before it is build.
+
+If we require buildable plugins to have platform type "indep", then
+it's probably also okay for plugin.interface files to have after-build
+files, something that is currently disallowed since plugins are
+instantiated for each possible platform.
+
+In order to make it possible for the outcome of a plugin's build step
+to influence what platforms it provides, it will be necessary for
+abuild to build a plugin before executing its list_platforms file.
 
 
 Building Abuild
@@ -172,34 +257,6 @@ Building Abuild
    configure hasn't been run.
 
 
-Platform Conditionals
-=====================
-
-People want conditional dependencies, but mainly for platform issues.
-Consider one or both of the following ideas:
-
- * Platform restrictions per build item.  If a build item has a
-   platform restriction, it will be excluded from the initial build
-   set construction.  Then what happens if it get pulled in to satisfy
-   a dependency?  This should be an error, but that causes problems in
-   some cases.  See next idea for a possible solution.
-
- * Sometimes we use dependencies just to force something to build, as
-   in the case of the "compile-all" item in searchlight or some
-   "top-level" builds.  We really need the concept of a "build-also"
-   keyword that specifies build items that should be built if this one
-   is built.  It effectively just adds them to the build set.  The
-   build-also keyword doesn't have any restrictions about cycles -- it
-   is just used during initial build set construction.  As such, it
-   can have platform-based conditionals.  Build items that use this
-   feature are probably not allowed to have deps or to build anything
-   themselves.
-
-Using these two features together, it should be possible to achieve
-the goal of supporting platform-based conditional dependencies in a
-safe manner.
-
-
 Revamped Build Tree Structure
 =============================
 
@@ -208,15 +265,20 @@ Problem Statement
 
 A principal failing in abuild 1.0 stems from the use of paths to
 specify the locations of external build trees -- "external-dirs" is
-used to convey both dependency and location information.  A serious
-and related problem is the interaction between backing areas and
-externals.
+used to convey both dependency and location information.  This is
+against a fundamental design principle of abuild and must be
+corrected.  Another serious problem is the interaction between backing
+areas and externals: setting up backing areas for trees with lots of
+externals is complex to the point of being impractical.
 
 Projects that desire certain parts of their trees to be potentially
 compile-time independent from other parts have to break things into
 multiple trees and use externals.  This sometimes results in build
 areas consisting of many more trees than I envisioned in my original
-design.
+design.  (I had originally envisioned externals as being a rarely-used
+feature, primarily intended for supporting builds at multiple
+classification levels or supporting central libraries of reusable
+build items.)
 
 Consider first the case of externals without backing areas.  If there
 are multiple build trees with complex "external" relationships between
@@ -224,21 +286,25 @@ them, then there is an implicit build "forest" consisting of multiple
 build trees which must be organized relative to each other in a
 particular way.  Knowledge of this relative organization of trees is
 not represented in any one place but rather is distributed through all
-the root Abuild.conf files.  For example, if A, B, C, and D are build
-trees whose roots are under a common parent, you could have a
-situation in which A declares ../B and ../C as externals and B
+the root Abuild.conf files, usually with considerable but non-obvious
+duplication of knowledge (exactly the situation abuild's name-based
+organization was designed to avoid).  For example, if A, B, C, and D
+are build trees whose roots are under a common parent, you could have
+a situation in which A declares ../B and ../C as externals and B
 declares ../D as an external.  There is no single place where A, B, C,
 and D are even all mentioned, yet abuild will require them to all be
 in the same directory.  This situation becomes much worse when build
 trees are at different levels -- the same tree may be referred to by
 multiple different relative paths.  This creates great confusion, and
 makes it very to move a tree around or even find who is referencing a
-particular tree.  When backing areas are added to the mix, the problem
-is further compounded.  If a build tree contains other external build
-trees nested inside of it, use of a backing area with the parent tree,
-in practice, requires use of a specific backing area on the child
-tree, especially when externals need to be resolved from a backing
-area.  Consider this arrangement of build trees:
+particular tree.
+
+When backing areas are added to the mix, the problem is further
+compounded.  If a build tree contains other external build trees
+nested inside of it, use of a backing area with the parent tree, in
+practice, requires use of a specific backing area on the child tree,
+especially when externals need to be resolved from a backing area.
+Consider this arrangement of build trees:
 
    A       F
  / | \    /
@@ -254,7 +320,20 @@ D -> G
 Suppose you have a backing area forest containing A and F, and a local
 build area containing only A.  In this case, in the local A, it is
 necessary to have backing areas for E, C, and D in, and they all have
-to point to the right locations in A'.
+to point to the right locations under A's backing area.  In addition
+to that, people remain generally in the dark about how externals are
+resolved through backing areas.  It's (understandably) hard for people
+to understand the idea that a relative path expressed in an
+Abuild.conf file may be resolve relative to another directory that is
+listed in an Abuild.backing file.
+
+In defense of the original design, when abuild was a simple perl
+script that used "make" to do most of its work, this made the initial
+implementation very easy -- abuild just replaced the tree top path
+with the backing area path and re-invoked itself.  However, given the
+current state of abuild's evolution and an understanding of how these
+features are actually used, it is obvious that the current
+implementation is no longer tenable.
 
 It is clear that build trees deserve to be named entities, and that
 just as is true with build items, the location of any given tree must
@@ -272,8 +351,8 @@ problems must be addressable by this:
    way to get those items to compile using your own compiler.  This
    applies also to test suite build items that are separate trees
    nested within the tree that provides the items they are testing.
-   (tests for boost, xbinder, etc.).  This should be addressed by the
-   global plugin concept.
+   (tests for boost, xbinder, etc.).  This problem is addressed by the
+   support of global plugins.
 
  * If it is desired to build one portion of a build area without
    having other portions build, there needs to be a mechanism for
@@ -308,7 +387,9 @@ problems must be addressable by this:
    with its own Y, a reference to Y from within A should resolve to
    A's Y.  If there is a desire to reach a Y in tree B, A can refer to
    B::Y.  Need to think about how this interacts with name-based
-   access control, but it will probably interact fine.
+   access control, but it will probably interact fine.  Since colon is
+   not currently a valid character in a build item name, there is no
+   issue with backward compatibility.
 
  * It would be good if errors in a part of the collection of build
    trees that are not relevant to you don't impact your build.  For
@@ -323,11 +404,9 @@ problems must be addressable by this:
 Solution
 --------
 
-Introduce this file system hierarchy restriction:
-
- * All build items in a local collection of build trees, called a
-   forest, must be located physically under the root of the topmost
-   build tree.
+Introduce this file system hierarchy restriction: all build items in a
+local collection of build trees, called a "build forest", must be
+located physically under the root of the topmost build tree.
 
 Imposing this restriction makes it possible to eliminate the
 parent-dir key.  Enforcing this restriction involves verifying that
@@ -337,60 +416,59 @@ Abuild.conf.
 
 This also implies elimination of absolute path externals, and makes it
 impossible to have multiple roots without a common parent directory.
-Hopefully this isn't too strict, but imposing it simplifies things a
-lot and doesn't actually significantly change the state of practice.
-Splitting builds across disks is already impractical, and with
-junction points and loopback mounts, there are ways around it anyway.
+Although this is strictly a loss of functionality, it eliminates
+something that's not really a good practice anyway.  In particular,
+having multiple roots to the collection of build trees creates
+confusion and makes it hard to know what you're dealing with.  This
+makes it harder to split builds across physical disks, but doing so is
+already impractical with parent and child pointers, and using junction
+points (Windows) or bind/loopback mounts (UNIX) can provide a viable
+alternative.
 
-Introduce the concept of a "build forest", which is a local collection
-of build trees that are all found beneath some common ancestor
-directory.
+Allow Abuild.backing files only at forest roots.  This makes it
+impractical to have one subtree back to something different from the
+rest of the build forest, but I've never seen anyone attempt to do
+such a thing anyway, and even if they did, it would probably only work
+if that backing area itself backed to the common one used by the other
+subtrees.
 
-Abuild.backing files may appear only at forest roots.
+Require build tree root Abuild.conf files to include a "tree-name" key
+which provides the name of the build tree.  Any Abuild.conf file may
+contain a tree-name key.  This makes it the root of a subtree, which
+functions very much as externals do in abuild 1.0.
 
-Require build tree roots to include a "tree-name" key which provides
-the name of the build tree.  Any Abuild.conf file may contain a
-tree-name key.  This makes it the root of a subtree, which functions
-very much as externals do in abuild 1.0.
-
-Replace "external-dirs" with "trees-used" which takes a list of tree
-names rather than tree paths.  Since we have no longer have the
-concept of externals, we no longer have the concept of read-only
-externals.  To support the pattern of building a tree without building
-any of the other subtrees that it uses, we add another mechanism such
-as declaration of one or more read-only or read/write root directories
-outside of which all build trees are to be treated as read-only, or
-perhaps explicit specification of read-only or read/write build trees,
-though it's less clear in that case how to handle nested subtrees.
+Replace "external-dirs" with "trees-used" (looking for a better name
+for that) which takes a list of tree names rather than tree paths.
+Since we have no longer have the concept of externals, we no longer
+have the concept of read-only externals.  To support the pattern of
+building a tree without building any of the other subtrees that it
+uses, we add another mechanism such as declaration of one or more
+read-only or read/write root directories outside of which all build
+trees are to be treated as read-only, or perhaps explicit
+specification of read-only or read/write build trees, though it's less
+clear in that case how to handle nested subtrees.
 
 Traits, supported flags, and plugins behave with respect to subtrees
 in 1.1 just as they behaved with respect to externals in 1.0.  This
-means that it is still possible to repeat plugin declaration lists
-for each subtree.  Global plugins apply to all subtrees and inherit
-through backing areas.
-
-New Abuild.backing format:
-
-  backing-area: /path/to/backing/area
-  deleted-trees: trees not to shadow
-  deleted-items: items not to shadow (fully qualified as tree-name::item-name)
-
-Remove deleted-items from Abuild.conf.
-
-For compatibility, continue to accept Abuild.backing files that are
-just paths with nothing else, but give a deprecation warning.
-
+means that it is still necessary to repeat plugin declaration lists
+for each subtree.  Although this is somewhat unfortunate, it makes it
+possible to have reasonable semantics when building an isolated
+subtree outside of the context of a backing area.  (That said, a
+build's behavior could still potentially be changed by global plugins
+that would inherit through the backing area.)
 
 Example:
 
   OLD:
 
-   Top-level Abuild.conf files in each leaf below; no way to know of
+   Top-level Abuild.conf files in each leaf below.  No way to know of
    all build trees or their relative positions without visiting each
    root.  No way to get list of build tree roots other than exhaustive
    search.
 
-   /-- common
+   top                  (no Abuild.conf)
+   |
+   |-- common           root Abuild.conf; no externals
    |
    |-- proj1
    |   |
@@ -414,12 +492,19 @@ Example:
        |
        `-- comp2        external-dirs: ../comp1
 
+  Note that ../../common from proj2/common is the same as
+  ../../../common from proj1/interface/comp1 and different from
+  ../common in proj2/comp1.
+
+
   NEW:
 
    Top-level Abuild.conf file in top directory; subtrees are hooked in
    with child-dirs just like any other subdirectory.
 
-   /-- common           tree-name: common
+   top                  tree-name: top
+   |
+   |-- common           tree-name: common
    |
    |-- proj1
    |   |
@@ -452,7 +537,7 @@ Traversal algorithm:
    cur_build_item = this directory
    forest_top = nil
 
-   do until no more Abuild.conf files
+   do until end search
      if cur_build_item's Abuild.conf contains tree-name key
         forest_top = cur_build_item
      parent_build_item = next higher Abuild.conf
@@ -460,7 +545,8 @@ Traversal algorithm:
         cur_build_item = parent_build_item
      else
         if forest_top == cur_build_item
-           okay; found
+           this is found forest root
+	   end search
         else
            forest_top = nil
            error: unable to find top of build forest
@@ -517,16 +603,18 @@ Traversal algorithm:
    check for the build item level.  This makes it possible to sparsely
    shadow a build tree for the purpose of adding items to it.
 
- * Check dependencies and build item references for the whole forest
-   rather than doing it separately for each build item and copying
-   build items around.  (We only copy build items from backing areas,
-   not subtrees.)  Just disallow resolution of any build item name in
-   a tree not declared as used.  This makes it possible to issue error
-   messages akin to "A is not allowed to depend on B since A-tree has
-   not declared B-tree as in its tree-used key."
+ * Check dependencies and build item references (but do not report
+   errors) for the whole forest rather than doing it separately for
+   each build item and copying build items around.  (We only copy
+   build items from backing areas, not subtrees.)  Just disallow
+   resolution of any build item name in a tree not declared as used.
+   This makes it possible to issue error messages akin to "A is not
+   allowed to depend on B since A-tree has not declared B-tree as in
+   its tree-used key."
 
-(Test case: staggered build items or subtrees: with A/B/C/D/E, have
-A -> B, C; B -> C/D; C -> D/E.  Should generate an error.)
+ * If in full integrity mode, report all dependency and integrity
+   errors.  Otherwise, report errors only for subtrees relevant to the
+   current build.
 
 Figure out how to make global plugins work with this and what
 restrictions, if any, should be imposed on them (like maybe they're
@@ -537,7 +625,12 @@ Need to flesh out an example that includes both searchlight and
 lh3-style trees.  Think about external build item library concept,
 whether it's sensible, and how it interacts with global plugins.  Also
 consider the case of nested build trees with externals that point up
-such as in the test suites of some of the plugins.
+such as in the test suites of some of the plugins.  How should the be
+handled for --build=all?  We probably need a new build set that does
+what 1.0's --build=all does (in other words, build all trees that are
+referenced from the current build item) and save --build=all to build
+the whole forest.  (I bet lots of people think this is what it does
+now anyway.)
 
 
 Compatibility
@@ -552,8 +645,9 @@ can report that in error messages as needed.  By default, abuild will
 give deprecation warnings for 1.0 constructs.  These can optionally be
 made into errors, but they cannot be suppressed.
 
-Think about whether it is possible to support some kind of hybrid
-mode where some build trees are 1.0 and some are 1.1.
+Think about whether it is possible to support some kind of hybrid mode
+where some build trees are 1.0 and some are 1.1.  That might make
+migration easier.
 
  * If build item has a parent-dir or external-dirs key, use 1.0
 
