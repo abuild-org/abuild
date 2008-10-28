@@ -416,13 +416,13 @@ define flex_to_c
 endef
 
 %.fl.cc: %.fl
-	$(lex_to_c)
+	$(flex_to_c)
 
 %.fl.cpp: %.fl
-	$(lex_to_c)
+	$(flex_to_c)
 
 %.fl.c: %.l
-	$(lex_to_c)
+	$(flex_to_c)
 
 FlexLexer.%.cc: %.fl
 	@$(PRINT) "Generating $@ from $<"
