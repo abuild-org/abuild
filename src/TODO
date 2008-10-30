@@ -1,6 +1,22 @@
 
 === Changes Targeted for Version 1.1 ===
 
+Name Changes
+============
+
+ * Add "down" and "descending" as synonyms for build set "desc"
+
+ * From earlier notes, trees-used is now tree-deps.  Another option
+   might be trees-needed.
+
+ * Need two new build sets: one for all tree dependencies without the
+   current tree and one for the current tree and all its tree
+   dependencies.  The second of these is what "all" does in 1.0.
+   "all" in 1.1 would continue to be defined as all items in all known
+   trees, but it would be wider than in 1.0 because abuild will know
+   about more trees.
+
+
 Core Changes
 ============
 
@@ -15,11 +31,35 @@ Core Changes
 
  * Replace "this" with "item-name".  Make use of "this" deprecated.
 
+ * When abuild is run with no arguments, it should build build set
+   "desc" instead of not doing a dependency-based build.  Alternative:
+   if the current build item has a build file, abuild with no
+   arguments should build "--with-deps".  Otherwise, it should build
+   "desc".  A new flag "--no-deps" can be used for the case in which
+   one should build just the item with no dependencies.  (In explicit
+   1.0 compatibility mode, the old behavior is selected.)
+
  * Require trees to be named.  Replace externals with subtrees.
    Eliminate absolute path and read-only externals, but provide an
    alternative to read-only externals for the desired functionality.
    Simplify Backing Areas. See "Revamped Build Tree Structure" below
    for details.
+
+ * Implement two forms of conditional dependencies:
+
+    - deps: item -optional
+    - tree-deps: tree-name -optional
+
+   In the first case, abuild will not complain if a given dependency
+   is not found.  Some mechanism will be provided that will enable a
+   build item to test in its Abuild.interface file (and therefore in
+   its Abuild.mk or Abuild-ant.properties file) whether an optional
+   dependency is satisfied.
+
+   In the second case, abuild will not complain if a given tree is not
+   found.  Furthermore, any fully qualified regular item dependency of
+   the form tree::item for optional tree "tree" will be treated as an
+   optional dependency.
 
  * Consider a "renamed-to" or "replaced-by" keyword that would be used
    to indicate that a build item has been replaced by another build
@@ -43,6 +83,19 @@ Core Changes
    In 1.0 compatibility mode, continue to accept Abuild.backing files
    that are just paths with nothing else, but give a deprecation
    warning.
+
+ * Consider adding a new special-case target "help" that would provide
+   help in a manner that does not require invoking a back end.  This
+   should remove the serious problems with rules-help and
+   interface-help, and should get around the problem of trying to echo
+   help information from a build file.  This would work by having
+   abuild automatically display certain internal help files and build
+   item-provided help files.  Most likely, abuild would just display
+   all the help files provided by other build items that impact your
+   build (dependents, plugins, rule/hook build items, etc.) as well as
+   internal help files.  Help files, including internal ones, should
+   provide a list of variables that can be set or read, what they
+   mean, and how to use them.
 
 
 Usability Improvements
@@ -437,16 +490,15 @@ which provides the name of the build tree.  Any Abuild.conf file may
 contain a tree-name key.  This makes it the root of a subtree, which
 functions very much as externals do in abuild 1.0.
 
-Replace "external-dirs" with "trees-used" (looking for a better name
-for that) which takes a list of tree names rather than tree paths.
-Since we have no longer have the concept of externals, we no longer
-have the concept of read-only externals.  To support the pattern of
-building a tree without building any of the other subtrees that it
-uses, we add another mechanism such as declaration of one or more
-read-only or read/write root directories outside of which all build
-trees are to be treated as read-only, or perhaps explicit
-specification of read-only or read/write build trees, though it's less
-clear in that case how to handle nested subtrees.
+Replace "external-dirs" with "tree-deps" which takes a list of tree
+names rather than tree paths.  Since we have no longer have the
+concept of externals, we no longer have the concept of read-only
+externals.  To support the pattern of building a tree without building
+any of the other subtrees that it uses, we add another mechanism such
+as declaration of one or more read-only or read/write root directories
+outside of which all build trees are to be treated as read-only, or
+perhaps explicit specification of read-only or read/write build trees,
+though it's less clear in that case how to handle nested subtrees.
 
 Traits, supported flags, and plugins behave with respect to subtrees
 in 1.1 just as they behaved with respect to externals in 1.0.  This
@@ -510,23 +562,23 @@ Example:
    |   |
    |   |-- interface
    |   |   |
-   |   |   |-- comp1    tree-name: proj1-comp1; trees-used: common
+   |   |   |-- comp1    tree-name: proj1-comp1; tree-deps: common
    |   |   |
-   |   |   `-- comp2    tree-name: proj1-comp2; trees-used: common
+   |   |   `-- comp2    tree-name: proj1-comp2; tree-deps: common
    |   |
    |   `-- private
    |       |
-   |       |-- comp1    tree-name: proj1-comp1-impl; trees-used: proj1-comp1
+   |       |-- comp1    tree-name: proj1-comp1-impl; tree-deps: proj1-comp1
    |       |
    |       `-- comp2    tree-name: proj1-comp2-impl;
-   |                    trees-used: proj1-comp2 proj1-comp1
+   |                    tree-deps: proj1-comp2 proj1-comp1
    `-- proj2
        |
-       |-- common       tree-name: proj2-common; trees-used: common
+       |-- common       tree-name: proj2-common; tree-deps: common
        |
-       |-- comp1        tree-name: proj2-comp1; trees-used: proj2-common
+       |-- comp1        tree-name: proj2-comp1; tree-deps: proj2-common
        |
-       `-- comp2        tree-name: proj2-comp2; trees-used: proj2-comp1
+       `-- comp2        tree-name: proj2-comp2; tree-deps: proj2-comp1
 
 
 
@@ -561,7 +613,7 @@ Traversal algorithm:
    be used to build third-party software distributions nested within
    something that contains Abuild.conf files.  If this tree was
    supposed to be connected into higher trees and was not, there will
-   probably be unresolved trees-used or deps values.
+   probably be unresolved tree-deps or deps values.
 
  * If the root of the forest does not contain an Abuild.backing, then
    this is an unbacked forest.  If it does contain an Abuild.backing
@@ -597,7 +649,7 @@ Traversal algorithm:
    listed as deleted or that belong to trees that are listed as
    deleted in the Abuild.backing file.
 
- * Make sure that the graph implied by the trees-used key is an
+ * Make sure that the graph implied by the tree-deps key is an
    error-free directed acyclic graph.  Do not do checks to ensure that
    is bipartite with respect to backing area traversal; save this
    check for the build item level.  This makes it possible to sparsely
