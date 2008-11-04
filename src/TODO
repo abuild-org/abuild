@@ -6,8 +6,10 @@ Name Changes
 
  * Add "down" and "descending" as synonyms for build set "desc"
 
- * From earlier notes, trees-used is now tree-deps.  Another option
-   might be trees-needed.
+ * From earlier notes, trees-used is now tree-deps.  Other options
+   might include trees-needed, and trees-required.  Consider whether a
+   single key should be used with optional dependencies specified with
+   -optional or whether two keys should be used.
 
  * Need two new build sets: one for all tree dependencies without the
    current tree and one for the current tree and all its tree
@@ -84,18 +86,8 @@ Core Changes
    that are just paths with nothing else, but give a deprecation
    warning.
 
- * Consider adding a new special-case target "help" that would provide
-   help in a manner that does not require invoking a back end.  This
-   should remove the serious problems with rules-help and
-   interface-help, and should get around the problem of trying to echo
-   help information from a build file.  This would work by having
-   abuild automatically display certain internal help files and build
-   item-provided help files.  Most likely, abuild would just display
-   all the help files provided by other build items that impact your
-   build (dependents, plugins, rule/hook build items, etc.) as well as
-   internal help files.  Help files, including internal ones, should
-   provide a list of variables that can be set or read, what they
-   mean, and how to use them.
+ * Provide a mechanism to tell clean to only clean certain platforms
+   or to not clean certain platforms.
 
 
 Usability Improvements
@@ -120,6 +112,25 @@ Usability Improvements
    same tree being built together (in a single-threaded build), and
    will generally result in items with higher visibility being built
    earlier in the process.
+
+ * Consider adding a new special-case target "help" that would provide
+   help in a manner that does not require invoking a back end.  This
+   should remove the serious problems with rules-help and
+   interface-help, and should get around the problem of trying to echo
+   help information from a build file.  This would work by having
+   abuild automatically display certain internal help files and build
+   item-provided help files.  Most likely, abuild would just display
+   all the help files provided by other build items that impact your
+   build (dependents, plugins, rule/hook build items, etc.) as well as
+   internal help files.  Help files, including internal ones, should
+   provide a list of variables that can be set or read, what they
+   mean, and how to use them.
+
+ * Make sure abuild --help references the build/clean set list from
+   the --build and --clean argument description, and make sure there
+   is a reference to the platform selector information from the
+   --platform-selector argument description.  Also divide the output
+   clearly into OPTIONS and TARGETS.
 
 
 Plugins
