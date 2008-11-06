@@ -6,11 +6,6 @@ Name Changes
 
  * Add "down" and "descending" as synonyms for build set "desc"
 
- * From earlier notes, trees-used is now tree-deps.  Other options
-   might include trees-needed, and trees-required.  Consider whether a
-   single key should be used with optional dependencies specified with
-   -optional or whether two keys should be used.
-
  * Need two new build sets: one for all tree dependencies without the
    current tree and one for the current tree and all its tree
    dependencies.  The second of these is what "all" does in 1.0.
@@ -31,15 +26,13 @@ Core Changes
    be easy to isolate backward compatibility code so that deprecated
    features can be removed.  See also "Compatibility" below.
 
- * Replace "this" with "item-name".  Make use of "this" deprecated.
+ * Replace "this" with "name".  Make use of "this" deprecated.
 
- * When abuild is run with no arguments, it should build build set
-   "desc" instead of not doing a dependency-based build.  Alternative:
-   if the current build item has a build file, abuild with no
-   arguments should build "--with-deps".  Otherwise, it should build
-   "desc".  A new flag "--no-deps" can be used for the case in which
-   one should build just the item with no dependencies.  (In explicit
-   1.0 compatibility mode, the old behavior is selected.)
+ * When abuild is run with no arguments, it will build build set
+   "desc" instead of not doing a dependency-based build.  A new flag
+   "--no-deps" can be used for the case in which one should build just
+   the item with no dependencies.  (In explicit 1.0 compatibility
+   mode, the old behavior is selected.)
 
  * Require trees to be named.  Replace externals with subtrees.
    Eliminate absolute path and read-only externals, but provide an
@@ -63,6 +56,11 @@ Core Changes
    the form tree::item for optional tree "tree" will be treated as an
    optional dependency.
 
+   A new boolean interface variable (analogous to abDIR_build-item)
+   will be defined for each build item that exists or that is declared
+   as an optional dependency.  This variable will be true iff the
+   build item exists.
+
  * Consider a "renamed-to" or "replaced-by" keyword that would be used
    to indicate that a build item has been replaced by another build
    item.  It would be allowed only in root Abuild.conf files.  Its
@@ -80,7 +78,7 @@ Core Changes
 
      backing-area: /path/to/backing/area
      deleted-trees: trees not to shadow
-     deleted-items: items not to shadow (fully qualified as tree-name::item-name)
+     deleted-items: items not to shadow (fully qualified as tree-name::item)
 
    In 1.0 compatibility mode, continue to accept Abuild.backing files
    that are just paths with nothing else, but give a deprecation
@@ -446,7 +444,7 @@ problems must be addressable by this:
    have duplicated names in them.
 
  * Name disambiguation would be nice across build trees.  Named trees
-   allows fully qualified build items of the form tree::name.  If
+   allows fully qualified build items of the form tree::item.  If
    build item A includes X and Y with X -> Y and build tree B shows up
    with its own Y, a reference to Y from within A should resolve to
    A's Y.  If there is a desire to reach a Y in tree B, A can refer to
@@ -714,7 +712,7 @@ migration easier.
 
  * If build item has a parent-dir or external-dirs key, use 1.0
 
- * Else if the local build item has an item-name key or any other key
+ * Else if the local build item has an name key or any other key
    that was introduced in version 1.1, use 1.1
 
  * Else if build item has any keys that are allowed in build tree
