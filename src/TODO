@@ -955,7 +955,8 @@ See also "Known Limitations" in the documentation.
 
  * In the manual, it would be nice if we could use higher resolution
    figures for the PDF than for the HTML.  There is plenty of material
-   in the sagehill.net DocBook XSL guide about this.
+   in the sagehill.net DocBook XSL guide about this.  The best
+   solution would be to convert the figures to SVG.
 
  * Orphan target detection won't find orphan targets in
    subdirectories.  This is very hard to fix in general.  We could
