@@ -1,6 +1,16 @@
 
 === Changes Targeted for Version 1.1 ===
 
+Bugs
+====
+
+ * It's probably a bug that LINK_SHLIBS isn't on by default.  (See
+   also LINK_SHLIBS below.)  I was originally thinking only in terms
+   of linking shared libraries with static libraries, but linking
+   shared libraries with shared libraries is also important.  The
+   behavior should be changed, and the documentation should be updated
+   to make this clear.
+
 Name Changes
 ============
 
@@ -209,6 +219,13 @@ Changes to "make" Code
    are out of date.  That way, checkouts from the version control
    system can work even when the CM system does not preserve
    modification times.
+
+ * Need something better than LINK_SHLIBS to handle shared library
+   linking.  Consider either making LINK_SHLIBS mandatory or
+   deprecating it and providing another mechanism to control whether
+   shared libraries are linked.  Describe this in the C/C++ rules
+   section of the documentation in addition to the shared library
+   section.
 
 
 Platform Conditionals
