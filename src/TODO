@@ -140,6 +140,12 @@ Usability Improvements
    --platform-selector argument description.  Also divide the output
    clearly into OPTIONS and TARGETS.
 
+ * Provide an argument that tells abuild to just print the names of
+   the output directories it would run the command on, but not
+   actually build.  This could be useful for many purposes, including
+   providing a selective clean capability or being used by outside
+   tools that want to access recently created targets.
+
 
 Plugins
 =======
