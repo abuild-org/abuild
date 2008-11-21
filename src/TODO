@@ -267,6 +267,10 @@ Changes to "make" Code
    section of the documentation in addition to the shared library
    section.
 
+ * [DONE, not in relnotes] Create empty rules/java/_base.mk to make it
+   possible to use Abuild.mk with java without having to write a
+   plugin.
+
 
 Platform Conditionals
 =====================
