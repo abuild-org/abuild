@@ -146,6 +146,28 @@ Usability Improvements
    providing a selective clean capability or being used by outside
    tools that want to access recently created targets.
 
+ * Incorporate as much of abuild-lint as possible or otherwise include
+   abuild-lint in the distribution.
+
+ * Provide a way to get --dump-data's into a relational database.
+   Ideally, we shouldn't have to link with sqlite.  Maybe have an
+   option that causes --dump-data to generate a script file that can
+   be used with sqlite3 rather than generating XML data.
+   Alternatively, we can create xsl/perl code that loads directly into
+   a sqlite database or that creates the input file.  It's probably
+   okay if we create the SQL such that an erroneous dumpdata won't
+   load.  For example, the SQL can enforce uniqueness and referential
+   integrity constraints even though they may not be satisfied when
+   there are errors.
+
+ * Provide an option that delays generation of dump data output to
+   include the build graph and the build architecture list.
+
+ * Provide a means to dump a build item's interface in a format that
+   shows all internally known information so that it is possible to
+   discover the origin of everything known in the interface.  To make
+   this as useful as possible, we should also store a reset history.
+
 
 Plugins
 =======
