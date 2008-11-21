@@ -38,6 +38,13 @@ Core Changes
 
  * Replace "this" with "name".  Make use of "this" deprecated.
 
+ * Consider moving hook selection into Abuild.conf and removing
+   BUILD_ITEM_RULES and abuild.hook-build-items.  This way, abuild can
+   automatically create the dependency, accessing checking can be
+   handled properly, the rename functionality can be implemented, we
+   might be able to remove the ABUILD_DIR stuff, and we can use this
+   information for the built-in help system.
+
  * When abuild is run with no arguments, it will build build set
    "desc" instead of not doing a dependency-based build.  A new flag
    "--no-deps" can be used for the case in which one should build just
@@ -100,6 +107,11 @@ Core Changes
 
 Usability Improvements
 ======================
+
+ * When abuild exits abnormally, it should say so right before it
+   actually exits.  This way, if abuild -jn fails because one of the
+   jobs failed, the last line of output will indicate the failure.
+   Otherwise, the failed build item may be buried somewhere.
 
  * Provide arguments for querying abuild's state, such as locating
    build items (perhaps with pattern matching), listing all trees with
@@ -842,6 +854,9 @@ We probably need a different approach to Java.  Ant was not designed
 to be used as a framework, and it doesn't work very well when used in
 this way.
 
+ * abuild.use-local-hooks should be on by default.  Actually, just
+   always use local hooks.  Don't even make it an option.
+
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse
    of abuild.classpath.
@@ -914,6 +929,10 @@ this way.
    project.target, and there's no way to run all of the
    implementations.  The only way to get this behavior right now is to
    use hooks.
+
+ * The classpath in the manifest for a jar should only include
+   first-level dependencies.  Transitive dependencies are satisfied
+   automatically.
 
 
 Known Bugs
