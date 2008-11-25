@@ -38,12 +38,20 @@ Core Changes
 
  * Replace "this" with "name".  Make use of "this" deprecated.
 
+ * Document places where code relies on certain characters being
+   illegal in build item names.  Known examples: format of build
+   item/platform pairs for build graph construction, creation of
+   temporary files when processing ant hooks with xsl (uses comma) and
+   use of comma as a separator in lists of build items in ant code
+   (with abuild:foreach and ant-contrib's foreach).
+
  * Consider moving hook selection into Abuild.conf and removing
    BUILD_ITEM_RULES and abuild.hook-build-items.  This way, abuild can
    automatically create the dependency, accessing checking can be
    handled properly, the rename functionality can be implemented, we
    might be able to remove the ABUILD_DIR stuff, and we can use this
-   information for the built-in help system.
+   information for the built-in help system.  We can probably also
+   remove ACCESSIBLE_BUILD_ITEMS (or whatever it's called).
 
  * When abuild is run with no arguments, it will build build set
    "desc" instead of not doing a dependency-based build.  A new flag
@@ -270,6 +278,80 @@ Changes to "make" Code
  * [DONE, not in relnotes] Create empty rules/java/_base.mk to make it
    possible to use Abuild.mk with java without having to write a
    plugin.
+
+
+Changes to "ant" Code
+=====================
+
+ * Conventions on properties:
+
+    - abuild.property can be set by a user in Abuild-ant.properties.
+      These are documented in end user documentation.
+
+    - abuild.protected.property can be safely accessed by hook authors
+      or by local build files.  These are documented in hook author
+      documentation.
+
+    - abuild.private.property is intended for use within abuild's own
+      ant framework and should not be accessed by users.  These
+      properties are subject to change at any time.  These are not
+      documented unless by comments in the code.
+
+ * Incorporate xsl processing as in ../../misc/ant-xsl.  We'll need to
+   create predictably-named temporary files.  With named trees, we can
+   use , as a separator instead of :: between tree name and item name
+   since : is not allowed in a path on Windows.  This implies , cannot
+   become a valid build item name character, but that's already true
+   for other reasons in the ant code (like using it as a delimiter in
+   foreach).
+
+   We'll want to separate abuild.xml into two things: the core
+   internal code that is responsible for loading properties, hooks,
+   and so forth, and a separate file that can be processed though xslt
+   that is responsible for compilation, jar creation, etc.  This will
+   enable us to use optional attribute support in our own internal
+   code.  But our own code still needs to be able to run hooks.
+
+   In abuild 1.0, there is no mechanism for adding a new build target
+   that is visible to all build items (as one can do with plugin.mk in
+   make-based builds).  The main reason for this is that adding new
+   targets requires use of <import> from the top level (or else the
+   new target will not be defined when ant tries to invoke it), and
+   there appears to be no way to run import from the top level on a
+   list of files as specified in a property.  (The antcontrib foreach
+   task uses antcall internally, and antcall is not allowed outside a
+   target.)  This is also rectified by using xsl to generate a file
+   that imports all the files to be loaded.  This in turn makes it
+   possible for plugins or hook build items to actually add new
+   targets, which means we can throw away "other" and "deploy".  We'll
+   have to remind people in the documentation that ant will do what
+   ant does if you create the same target in multiple places (whoever
+   gets loaded first wins, but everyone's version can be accessed as
+   projectname.targetname).  Best practice should be to add a target
+   that just calls hooks by the same name.  Everyone can call
+   <run-hooks> from their own tasks.  Since hooks are implemented as
+   private targets, the name clash problem doesn't happen.  If
+   everyone defines their new targets by calling hooks, then if two
+   people define new targets with the same names, it won't matter that
+   much.  There's still the question of dependencies (in the ant
+   sense), but this is no different from what would happen if we had a
+   library of ant code that people imported on their own.
+
+ * abuild.use-local-hooks should be on by default.  Actually, just
+   always use local hooks.  Don't even make it an option.
+
+ * We use the privately set "debug" and "deprecation" properties in
+   abuild.xml to set debug and deprecation.  These should really be set
+   using documented abuild properties, and we should figure out what
+   other similar properties we might want to set in this way.
+
+ * Strongly consider removing support for higher-level archives from
+   abuild's ant framework.
+
+ * Provide a way for a user to specify an externally created manifest
+   file.  Users can do this cleanly with a <manifest> task in their
+   own ant code, and we can hook it in using abuild's own jar creation
+   task.
 
 
 Platform Conditionals
@@ -858,9 +940,6 @@ We probably need a different approach to Java.  Ant was not designed
 to be used as a framework, and it doesn't work very well when used in
 this way.
 
- * abuild.use-local-hooks should be on by default.  Actually, just
-   always use local hooks.  Don't even make it an option.
-
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse
    of abuild.classpath.
@@ -878,19 +957,17 @@ this way.
    own ant launcher.
 
  * We don't detect when inaccessible build items are referenced in
-   abuild.hook-build-items
+   abuild.hook-build-items.  This won't matter anymore if we move hook
+   specification to Abuild.conf.
 
  * Abuild has no real way to support a difference between compile-time
    classpaths and run-time classpaths.
 
- * NOTE: It was necessary to create /usr/{share,lib}/java-1.6.0 in
-   order for build-classpath from jpackage to do the right thing when
-   launching ant 1.7.0 in fedora core 5.  Not sure how general of a
-   problem this is.
-
  * Reconsider using depends task for compile in abuild.xml.
 
- * Signed jar support will eventually be required.
+ * Signed jar support will eventually be required.  See whether this
+   should be provided by default.  Most likely it should not as it can
+   be provided easily with a hook.
 
  * Our default java compile rule doesn't notice if a .java file was
    removed.  Maybe we want to force full recompilation if the list of
@@ -913,26 +990,6 @@ this way.
    able to control on a per-build-item basis whether it is an error
    condition or just a warning, probably having "error" be the
    default.
-
- * We use the privately set "debug" and "deprecation" properties in
-   abuild.xml to set debug and deprecation.  These should really be set
-   using documented abuild properties, and we should figure out what
-   other similar properties we might want to set in this way.
-
- * There is presently no mechanism for adding a new build target that
-   is visible to all build items (as one can do with plugin.mk in
-   make-based builds).  Figure out again why we can't add a custom
-   target in ant code that is loaded as a plugin or hook build item.
-   Was there a reason we didn't use import?
-
-   I think the reason is this: with make, if two different build items
-   define the same target, if at least one uses a : target instead of
-   a :: target, it's an error.  Otherwise, all the variants of the
-   target get run.  With ant, there is no such facility.  All but one
-   of the definitions of the target will get mangled to
-   project.target, and there's no way to run all of the
-   implementations.  The only way to get this behavior right now is to
-   use hooks.
 
  * The classpath in the manifest for a jar should only include
    first-level dependencies.  Transitive dependencies are satisfied
