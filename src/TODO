@@ -112,6 +112,35 @@ Core Changes
  * Provide a mechanism to tell clean to only clean certain platforms
    or to not clean certain platforms.
 
+ * Sometimes we use dependencies just to force something to build, as
+   in the case of the "compile-all" item in searchlight or some
+   "top-level" builds.  For cases in which all we want to do is
+   effectively define static build sets, we need something more like a
+   "build-also" keyword that specifies build items that should be
+   built if this one is built.  It effectively just adds them to the
+   build set.  The build-also keyword doesn't have any restrictions
+   about cycles -- it is just used during initial build set
+   construction.  This avoids the need to use platform-specific
+   dependencies in this case.
+
+
+Documentation
+=============
+
+ * Describe somewhere why we don't provide information about platforms
+   in the interface files for java and indep.  Basically, it would be
+   a bug to have an interface variable have a different value in
+   different contexts when it might influence a build that could be
+   used on multiple platforms.  For example, an indep build item could
+   write out some value based on a platform variable and then that
+   information could be wrong when the results of the build were used
+   on a different platform.  If you really need to know what platform
+   you are on for something indep or java, you can always get the
+   information using a cross-platform dependency, which at least makes
+   it visible.  But remember that text files containing
+   platform-dependent values (like pathnames, etc.) are in fact
+   platform-dependent.
+
 
 Usability Improvements
 ======================
@@ -357,41 +386,68 @@ Changes to "ant" Code
 Platform Conditionals
 =====================
 
-(This item is low-priority for 1.1.)
+(This item is low priority for 1.1.)
 
-People want conditional dependencies, but mainly for platform issues.
-Consider one or both of the following ideas:
+The goal is to support some kind of platform-based conditional
+dependency while preserving the fundamental design goal of having a
+static build graph.  We will support this only for build items of type
+native.  Here's how it would work:
 
- * Platform restrictions per build item.  If a build item has a
-   platform restriction, it will be excluded from the initial build
-   set construction.  Then what happens if it get pulled in to satisfy
-   a dependency?  This should be an error, but that causes problems in
-   some cases.  See next idea for a possible solution.
+ * Native build items can specify some kind of platform-based
+   inclusion/exclusion rules in Abuild.conf.  Maybe we'll add keywords
+   build-if-platform-matches and build-unless-platform-matches, each
+   of which takes arguments of the form a.b.c.d.  Each field can be a
+   fixed string or * and is matched against the corresponding field of
+   the platform identifier.  If both keywords appear, platform strings
+   have to satisfy both.  For example,
 
- * Sometimes we use dependencies just to force something to build, as
-   in the case of the "compile-all" item in searchlight or some
-   "top-level" builds.  For cases in which all we want to do is
-   effectively define static build sets, we need something more like a
-   "build-also" keyword that specifies build items that should be
-   built if this one is built.  It effectively just adds them to the
-   build set.  The build-also keyword doesn't have any restrictions
-   about cycles -- it is just used during initial build set
-   construction.  As such, it can have platform-based conditionals.
-   Build items that use this feature are probably not allowed to have
-   deps or to build anything themselves.
+   build-if-platform-matches: linux.*.*.gcc *.*.*.xlc
+   build-unless-platform-matches: windows.*.*.*
 
-Using these two features together, it should be possible to achieve
-the goal of supporting platform-based conditional dependencies in a
-safe manner.
+   would mean to build on linux with gcc and everywhere except windows
+   on xlc.
 
-Reminder: there is fundamental reason that conditional dependencies
-are not supported: abuild requires the shape of the dependency graph
-to be identical for all possible builds.  Otherwise, there may be
-cycles or other dependency-related problems that only surface in some
-situations.  This is the same kind of problem that can occur with
-conditional compilation -- you can quickly degenerate into a situation
-in which code gets stale because of not having been built for a long
-time.
+ * Abuild will first construct and validate the build graph
+   disregarding platform restrictions.  This ensures that the build
+   graph can't be invalid for some combination of available platforms
+   and not for others.
+
+ * Once the build graph is validated, abuild will traverse the build
+   graph again and prune the graph at each node whose platform doesn't
+   satisfy the platform restrictions.
+
+There are several possible implications to think through.  What
+happens with build items that get built "as needed" to satisfy
+platform constraints but then are no longer needed after pruning?  It
+may be that we have to create two build graphs, one that disregards
+platform restrictions and one that doesn't.  The second build graph
+should always be a proper subset of the first one, so there should be
+no possibility of errors existing in the second one.
+
+But actually, it's worse than that.  What about items that get added
+to the build set just to satisfy dependencies that are no longer
+required?  Do we want those?  It's like we have to mark build items as
+explicit or implicit and then prune any unreferenced implicit items
+after paying attention to platform restrictions.
+
+Consider native build items:
+
+a: b c
+b: d
+
+b is 'windows only'
+
+When doing abuild -d from a on a non-windows platform, we only want to
+build a and c, but when doing abuild -b all on a non-windows platform,
+we want a, c, and d.  In the first case, d is an implicit member of
+the build set, and in the second case, d is an explicit member.  For
+the build graph, we can mark things as explicit if they are explicit
+items on selected platforms.  Explicit items on as-needed platforms
+are implicit.  To detect unreferenced implicit members, we could
+traverse the pruned build graph starting from each explicit node and
+mark things as seen when we encounter them.  Then, anything that's not
+seen can be removed.  We'll need to test cases with platform-specific
+dependencies to make sure the logic is sound.
 
 
 Buildable Plugins
