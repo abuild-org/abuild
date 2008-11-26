@@ -123,6 +123,29 @@ Core Changes
    construction.  This avoids the need to use platform-specific
    dependencies in this case.
 
+ * If abuild is run with -k (and definitely not otherwise), it should
+   continue running if there are dependency graph errors that don't
+   impact anything in the build set.  For example:
+
+   a: b
+   b: c d
+   d
+   e: f
+   f: e
+
+   abuild -d from "a" should be able to run to completion even though
+   there is a cycle in "e" and "f".  Need to think about how this can
+   actually be implemented.  One idea would be to clear all the
+   dependency data from such build items and mark them as initially
+   failed in the dependency graph.  One indication of this working
+   properly is if it does the right thing with --no-dep-failures.  For
+   example, if in the above, you add
+
+   d: e
+
+   and you run with -k only, only c would build, but if you ran with
+   --no-dep-failures, then a, b, c, and d would all build.
+
 
 Documentation
 =============
@@ -209,13 +232,27 @@ Usability Improvements
    integrity constraints even though they may not be satisfied when
    there are errors.
 
- * Provide an option that delays generation of dump data output to
-   include the build graph and the build architecture list.
-
  * Provide a means to dump a build item's interface in a format that
    shows all internally known information so that it is possible to
    discover the origin of everything known in the interface.  To make
    this as useful as possible, we should also store a reset history.
+   Example uses: I see some interface variable in a build item's
+   Abuild.interface file and want to know who uses it, I see some
+   variable in someone's Abuild-ant.properties or Abuild.mk and want
+   to know who defines it, or I see some variable in an .ab-dyanmic*
+   file and I want to know who put xyz into its value.  Most likely,
+   we get this information by having abuild dump the interface state
+   before and after the build to files in the output directory when a
+   given flag is present on the command line.  Abuild should probably
+   indicate with a message to stdout that it is creating the file.
+   Need to figure out what to do about interface only items.  Perhaps
+   we provide a way for that information to be output to stdout
+   somehow.
+
+ * Provide an option to be used with --dump-data that delays
+   generation of dump data output to include the build graph and the
+   build architecture list.
+
 
 
 Plugins
@@ -1088,14 +1125,6 @@ See also "Known Limitations" in the documentation.
  * To check for all Abuild.mk files that define local targets:
    pcregrep '^\s*\S+\s*:(\Z|[^=])' **/Abuild.mk
 
- * It might be useful to have the ability to find all references to a
-   particular interface variable and/or to find the origin and
-   variable history for a specific variable.  This comes back to the
-   interface tracing mode or dump mode.  Examples: I see some
-   interface variable in a build item's Abuild.interface file and want
-   to know who uses it, or I see some variable in someone's
-   Abuild-ant.properties or Abuild.mk and want to know who defines it.
-
  * Consider using re-entrant scanners instead of C++ scanners.  This
    requires flex >= 2.5.33.  Have abuild's own build process detect
    whether or not a new enough version of flex is available.  If so,
@@ -1112,7 +1141,8 @@ See also "Known Limitations" in the documentation.
    how each trait was intended to be used.
 
  * Consider capturing the output of the backend so that we can
-   de-interleave output when running parallel builds, separate error
+   de-interleave output when running parallel builds (or mark each
+   line of output with the build item/platform data), separate error
    from informational output, etc.  It is possible to create pipe-like
    handles with CreatePipe in Windows and to use them to initialize
    hStdInput, hStdOutput, and hStdError fields of the startupinfo
@@ -1132,7 +1162,8 @@ See also "Known Limitations" in the documentation.
 
  * Consider converting abuild_data.dtd to a schema for tighter
    validation (which attributes are allowed in which contexts).
-   Search for DTD in the documentation and test suite.
+   Search for DTD in the documentation and test suite.  Probably don't
+   really want to do this.
 
  * In the manual, it would be nice if we could use higher resolution
    figures for the PDF than for the HTML.  There is plenty of material
@@ -1144,15 +1175,6 @@ See also "Known Limitations" in the documentation.
    search directories represented in the source lists, but that
    wouldn't help if we removed the last file from a subdirectory.  For
    now, we'll just not handle this case.
-
- * Scott Lemke points out that abuild has a lot of knowledge about
-   things that are not relevant to any particular build.  One thing to
-   consider would be having abuild analyze error conditions to
-   determine which ones are not relevant to the local build.  This
-   might enable abuild, in some cases, to build a local group of items
-   even when there are integrity errors in other parts of the build
-   tree.  This may or may not be a desirable feature.  If we support
-   this, it should be done only when -k is specified.
 
  * Mingw support isn't that complete: see known limitations in the
    documentation and comments in private/list_platforms.  If it is
@@ -1171,7 +1193,7 @@ See also "Known Limitations" in the documentation.
 
  * Abuild.interface files necessarily duplicate information from
    Abuild-ant.properties or Abuild.mk such as jar names or library
-   names.  This is probably okay as you can always avoid it by setting
-   "local" variables (i.e., variables named in such a way to not
-   conflict with anything) that are referenced in the Abuild.mk or
-   Abuild-ant.propertiesd. files.
+   names.  This is probably okay as you can always avoid it by having
+   a convention of setting "local" variables (i.e., variables named in
+   such a way to not conflict with anything) that are referenced in
+   the Abuild.mk or Abuild-ant.propertiesd. files.
