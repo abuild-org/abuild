@@ -59,6 +59,16 @@ Core Changes
    the item with no dependencies.  (In explicit 1.0 compatibility
    mode, the old behavior is selected.)
 
+ * Support the explicit concept of internal targets, which are targets
+   handled by abuild that don't involve invocation of the backend.  In
+   version 1.0, there are only two: clean and no-op.  In version 1.1,
+   clean and no-op will be supported for backward-compatibility.
+   Those and additional internal targets will be invoked with "abuild
+   --internal-target target".  The -i flag will be an abbreviation for
+   --internal-target.  For example, "abuild -i print-build-platforms"
+   will cause abuild to just print the names of the build platforms
+   for each build item in the build set.  See "internal targets".
+
  * Require trees to be named.  Replace externals with subtrees.
    Eliminate absolute path and read-only externals, but provide an
    alternative to read-only externals for the desired functionality.
@@ -145,6 +155,21 @@ Core Changes
 
    and you run with -k only, only c would build, but if you ran with
    --no-dep-failures, then a, b, c, and d would all build.
+
+ * Make cross-platform dependencies obey platform selectors.  The
+   rationale for not doing this was that the command-line and
+   environment should not affect the shape of the build graph, but
+   this is a myth anyway.  People can always run with DFLAGS=-g or
+   NO_XLC=1.  If a specific compiler or option is required, it can be
+   specified explicitly with the platform-specifier in the
+   dependency.  This implies additional requirements:
+
+    - Make sure "-platform native:option=" works to specify no option
+
+    - Make sure it is possible to express "I want the version of X
+      build with compiler A on platform P but the default compiler
+      everywhere else."  This can probably be done with a combination
+      of platform-specific dependencies and platform conditionals.
 
 
 Documentation
@@ -253,6 +278,35 @@ Usability Improvements
    generation of dump data output to include the build graph and the
    build architecture list.
 
+
+Internal Targets
+================
+
+Internal targets are invoked with
+
+abuild --internal-target target-name
+
+or
+
+abuild -i target-name
+
+They are mutually exclusive with explicitly stated targets, and only
+one can be specified in a given invocation.  Internal targets do not
+cause invocation of the backend or processing of interface files.  The
+following internal targets will be supported:
+
+ * clean: equivalent to "clean" in 1.0
+
+ * no-op: equivalent to "no-op" in 1.0
+
+ * print-build-platforms: prints the name of each platform on which
+   the build item is to be built
+
+ * print-build-directory-names: prints the last path element of the
+   name of each output directory that would be built
+
+ * print-build-directory-paths: prints the full path of each output
+   directory that would be built
 
 
 Plugins
