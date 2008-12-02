@@ -1,20 +1,172 @@
 
-=== Changes Targeted for Version 1.1 ===
+=== Changes Targeted for Version 1.0.3 ===
 
-Bugs
+These are changes originally targeted for 1.1 and that don't add any
+backward compatibility issues to any configuration files or
+command-line arguments.  New syntax may be added as long as old syntax
+continues to work.
+
+Bug Fixes
+=========
+
+ * Version 1.0.3 will ignore the value of LINK_SHLIBS and pass the
+   list of libraries to the shared library creation command by
+   default.  This is because the decision about whether or not to link
+   shared libraries is really more a function of the underlying system
+   than something the developer should control.  Some systems require
+   shared libraries to be linked while others don't support it at all.
+
+   Version 1.0.3 will link shared libraries unconditionally and
+   silently ignore LINK_SHLIBS with a value of 1.  Any other value of
+   LINK_SHLIBS will cause an error that will tell the user to use
+   "override LIBS :=" if they really want to suppress linking of
+   shared libraries.  Version 1.1 will give a deprecation warning for
+   LINK_SHLIBS.
+
+ * Add failonerror="true" to the exec that invokes qtest from ant so
+   that the build fails if the test suite fails.  Add failing qtest
+   with ant and make to test suite.
+
+Core
 ====
 
- * It's probably a bug that LINK_SHLIBS isn't on by default.  (See
-   also LINK_SHLIBS below.)  I was originally thinking only in terms
-   of linking shared libraries with static libraries, but linking
-   shared libraries with shared libraries is also important.  The
-   behavior should be changed, and the documentation should be updated
-   to make this clear.
+ * Support the explicit concept of internal targets, which are targets
+   handled by abuild that don't involve invocation of the backend.
+   This is just a command-line argument parsing change.  See "internal
+   targets" below.
+
+ * Provide a mechanism to tell clean to only clean certain platforms
+   or to not clean certain platforms.
+
+ * Sometimes we use dependencies just to force something to build, as
+   in the case of the "compile-all" item in searchlight or some
+   "top-level" builds.  For cases in which all we want to do is
+   effectively define static build sets, we need something more like a
+   "build-also" keyword that specifies build items that should be
+   built if this one is built.  It effectively just adds them to the
+   build set.  The build-also keyword doesn't have any restrictions
+   about cycles -- it is just used during initial build set
+   construction.  This avoids the need to use platform-specific
+   dependencies in this case.
+
+ * Specifying -p platform-type:skip shouldn't remove platforms from
+   that platform type but should instead just take them out of the
+   default build list.  That way, when doing -p native:skip, if a java
+   or indep build item depends on a native build item, abuild can
+   still build the native item "as needed" just as it would for other
+   platform-specific dependencies.
+
+ * Support -p java:skip and -p indep:skip with the same semantic as -p
+   native:skip (prevent from building by default, but still build to
+   satisfy dependencies).
+
+ * (Maybe) Add -ro-path and -rw-path options to tell abuild to treat
+   some or all build items as read only based on path.  This should
+   provide a more robust approach than using read-only externals for
+   preventing cross-tree builds when they are not desired.  Details
+   still to be fully worked out, but the basic idea is that if you run
+   "abuild --build=desc -rw-path .", abuild will treat all build items
+   outside the current tree as read-only.  If you run "abuild
+   --build=desc -ro-path ../tps-build-items", then abuild will treat
+   everything as read/write except anything under ../tps-build-items,
+   which will be read only.  I'll come up with sensible semantics for
+   mixing -ro-path and -rw-path and for having multiple occurrences of
+   them.
+
+Documentation
+=============
+
+ * Clarify compatibility policy to be explicit that new syntax (file
+   and command-line) may be added within a minor version.  In other
+   words, we guarantee that anything that worked with 1.x.y will work
+   the same way with 1.x.y+1, but we don't preclude adding some new
+   functionality in 1.x.y+1 that isn't supported in 1.x.y.  This
+   enables releases within a minor version to help with easing in new
+   features without breaking compatibility.
+
+Debugging
+=========
+
+ * Provide a means to dump a build item's interface in a format that
+   shows all internally known information so that it is possible to
+   discover the origin of everything known in the interface.  To make
+   this as useful as possible, we should also store a reset history.
+   Example uses: I see some interface variable in a build item's
+   Abuild.interface file and want to know who uses it, I see some
+   variable in someone's Abuild-ant.properties or Abuild.mk and want
+   to know who defines it, or I see some variable in an .ab-dyanmic*
+   file and I want to know who put xyz into its value.  Most likely,
+   we get this information by having abuild dump the interface state
+   before and after the build to files in the output directory when a
+   given flag is present on the command line.  Abuild should probably
+   indicate with a message to stdout that it is creating the file.
+   Need to figure out what to do about interface only items.  Perhaps
+   we provide a way for that information to be output to stdout
+   somehow.
+
+ * Provide an option to be used with --dump-data that delays
+   generation of dump data output to include the build graph and the
+   build architecture list.
+
+Usability
+=========
+
+ * Add "down" and "descending" as synonyms for build set "desc"
+
+ * When abuild exits abnormally, it should say so right before it
+   actually exits.  This way, if abuild -jn fails because one of the
+   jobs failed, the last line of output will indicate the failure.
+   Otherwise, the failed build item may be buried somewhere.
+
+Non-user-visible
+================
+
+ * Document places where code relies on certain characters being
+   illegal in build item names.  Known examples: format of build
+   item/platform pairs for build graph construction, creation of
+   temporary files when processing ant hooks with xsl (uses comma) and
+   use of comma as a separator in lists of build items in ant code
+   (with abuild:foreach and ant-contrib's foreach).
+
+ * [DONE, not in relnotes] Create empty rules/java/_base.mk to make it
+   possible to use Abuild.mk with java without having to write a
+   plugin.  There are no rules for doing this, so this doesn't
+   actually add any functionality.
+
+Internal Targets
+================
+
+Internal targets are invoked with
+
+abuild --internal-target target-name
+
+or
+
+abuild -i target-name
+
+They are mutually exclusive with explicitly stated targets, and only
+one can be specified in a given invocation.  Internal targets do not
+cause invocation of the backend or processing of interface files.  The
+following internal targets will be supported:
+
+ * clean: equivalent to special-case "clean" target
+
+ * no-op: equivalent to special-case "no-op" target
+
+ * print-build-platforms: prints the name of each platform on which
+   the build item is to be built
+
+ * print-build-directory-names: prints the last path element of the
+   name of each output directory that would be built
+
+ * print-build-directory-paths: prints the full path of each output
+   directory that would be built
+
+
+=== Changes Targeted for Version 1.1 ===
 
 Name Changes
 ============
-
- * Add "down" and "descending" as synonyms for build set "desc"
 
  * Need two new build sets: one for all tree dependencies without the
    current tree and one for the current tree and all its tree
@@ -38,13 +190,6 @@ Core Changes
 
  * Replace "this" with "name".  Make use of "this" deprecated.
 
- * Document places where code relies on certain characters being
-   illegal in build item names.  Known examples: format of build
-   item/platform pairs for build graph construction, creation of
-   temporary files when processing ant hooks with xsl (uses comma) and
-   use of comma as a separator in lists of build items in ant code
-   (with abuild:foreach and ant-contrib's foreach).
-
  * Consider moving hook selection into Abuild.conf and removing
    BUILD_ITEM_RULES and abuild.hook-build-items.  This way, abuild can
    automatically create the dependency, accessing checking can be
@@ -58,16 +203,6 @@ Core Changes
    "--no-deps" can be used for the case in which one should build just
    the item with no dependencies.  (In explicit 1.0 compatibility
    mode, the old behavior is selected.)
-
- * Support the explicit concept of internal targets, which are targets
-   handled by abuild that don't involve invocation of the backend.  In
-   version 1.0, there are only two: clean and no-op.  In version 1.1,
-   clean and no-op will be supported for backward-compatibility.
-   Those and additional internal targets will be invoked with "abuild
-   --internal-target target".  The -i flag will be an abbreviation for
-   --internal-target.  For example, "abuild -i print-build-platforms"
-   will cause abuild to just print the names of the build platforms
-   for each build item in the build set.  See "internal targets".
 
  * Require trees to be named.  Replace externals with subtrees.
    Eliminate absolute path and read-only externals, but provide an
@@ -118,20 +253,6 @@ Core Changes
    In 1.0 compatibility mode, continue to accept Abuild.backing files
    that are just paths with nothing else, but give a deprecation
    warning.
-
- * Provide a mechanism to tell clean to only clean certain platforms
-   or to not clean certain platforms.
-
- * Sometimes we use dependencies just to force something to build, as
-   in the case of the "compile-all" item in searchlight or some
-   "top-level" builds.  For cases in which all we want to do is
-   effectively define static build sets, we need something more like a
-   "build-also" keyword that specifies build items that should be
-   built if this one is built.  It effectively just adds them to the
-   build set.  The build-also keyword doesn't have any restrictions
-   about cycles -- it is just used during initial build set
-   construction.  This avoids the need to use platform-specific
-   dependencies in this case.
 
  * If abuild is run with -k (and definitely not otherwise), it should
    continue running if there are dependency graph errors that don't
@@ -193,11 +314,6 @@ Documentation
 Usability Improvements
 ======================
 
- * When abuild exits abnormally, it should say so right before it
-   actually exits.  This way, if abuild -jn fails because one of the
-   jobs failed, the last line of output will indicate the failure.
-   Otherwise, the failed build item may be buried somewhere.
-
  * Provide arguments for querying abuild's state, such as locating
    build items (perhaps with pattern matching), listing all trees with
    locations and dependencies, summarizing the state of all plugin
@@ -237,12 +353,6 @@ Usability Improvements
    --platform-selector argument description.  Also divide the output
    clearly into OPTIONS and TARGETS.
 
- * Provide an argument that tells abuild to just print the names of
-   the output directories it would run the command on, but not
-   actually build.  This could be useful for many purposes, including
-   providing a selective clean capability or being used by outside
-   tools that want to access recently created targets.
-
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
 
@@ -256,57 +366,6 @@ Usability Improvements
    load.  For example, the SQL can enforce uniqueness and referential
    integrity constraints even though they may not be satisfied when
    there are errors.
-
- * Provide a means to dump a build item's interface in a format that
-   shows all internally known information so that it is possible to
-   discover the origin of everything known in the interface.  To make
-   this as useful as possible, we should also store a reset history.
-   Example uses: I see some interface variable in a build item's
-   Abuild.interface file and want to know who uses it, I see some
-   variable in someone's Abuild-ant.properties or Abuild.mk and want
-   to know who defines it, or I see some variable in an .ab-dyanmic*
-   file and I want to know who put xyz into its value.  Most likely,
-   we get this information by having abuild dump the interface state
-   before and after the build to files in the output directory when a
-   given flag is present on the command line.  Abuild should probably
-   indicate with a message to stdout that it is creating the file.
-   Need to figure out what to do about interface only items.  Perhaps
-   we provide a way for that information to be output to stdout
-   somehow.
-
- * Provide an option to be used with --dump-data that delays
-   generation of dump data output to include the build graph and the
-   build architecture list.
-
-
-Internal Targets
-================
-
-Internal targets are invoked with
-
-abuild --internal-target target-name
-
-or
-
-abuild -i target-name
-
-They are mutually exclusive with explicitly stated targets, and only
-one can be specified in a given invocation.  Internal targets do not
-cause invocation of the backend or processing of interface files.  The
-following internal targets will be supported:
-
- * clean: equivalent to "clean" in 1.0
-
- * no-op: equivalent to "no-op" in 1.0
-
- * print-build-platforms: prints the name of each platform on which
-   the build item is to be built
-
- * print-build-directory-names: prints the last path element of the
-   name of each output directory that would be built
-
- * print-build-directory-paths: prints the full path of each output
-   directory that would be built
 
 
 Plugins
@@ -344,18 +403,6 @@ Platform Issues
    list_platforms.  See comment in Abuild::loadPlatformData before
    invocation of list_platforms.
 
- * It would be nice if -p native:skip didn't actually disable native
-   platforms but instead just took them out of the default build list.
-   That way, when doing -p native:skip, if a java or indep build item
-   depends on a native build item, abuild can still build the native
-   item "as needed" just as it would for other platform-specific
-   dependencies.
-
- * There should be a way to tell abuild to skip java or indep build
-   items.  Maybe support -p java:skip and -p indep:skip with the same
-   semantic as -p native:skip (prevent from building by default, but
-   still build to satisfy dependencies).
-
  * If possible, remove the temporary ABUILD_FORCE_32BIT hack or make
    it permanent.  Search for FORCE32 in the code.  The only references
    are in private/bin/get_native_platform_data and
@@ -388,16 +435,14 @@ Changes to "make" Code
    system can work even when the CM system does not preserve
    modification times.
 
- * Need something better than LINK_SHLIBS to handle shared library
-   linking.  Consider either making LINK_SHLIBS mandatory or
-   deprecating it and providing another mechanism to control whether
-   shared libraries are linked.  Describe this in the C/C++ rules
-   section of the documentation in addition to the shared library
-   section.
+ * Deprecate LINK_SHLIBS.  Either find some more robust way of dealing
+   with shared libraries that does the right thing on more platforms
+   (like figuring out a way of using libtool), or go with the 1.0.3
+   solution but give a deprecation warning for any use of LINK_SHLIBS.
 
- * [DONE, not in relnotes] Create empty rules/java/_base.mk to make it
-   possible to use Abuild.mk with java without having to write a
-   plugin.
+   Document in the shared libraries section that people who need to
+   suppress linking of shared libraries for some reason on a system
+   that supports this can always use "override LIBS :=".
 
 
 Changes to "ant" Code
