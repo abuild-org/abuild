@@ -823,7 +823,7 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
   <!--  with the cygwin perl from a native Windows environment,    -->
   <!--  pass explicitly relative paths for -datadir, -bindirs,     -->
   <!--  and -covdir rather than using properties.                  -->
-  <exec executable="perl" dir=".">
+  <exec failonerror="true" executable="perl" dir=".">
    <env key="QTEST_EXTRA_MARGIN" value="${abuild.private.qtest_extra_margin}"/>
    <arg value="-S"/>
    <arg value="qtest-driver"/>
