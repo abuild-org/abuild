@@ -512,7 +512,8 @@ Changes to "ant" Code
    library of ant code that people imported on their own.
 
  * Maybe: consider supporting gant/groovy as an alternative to or
-   addition to ant.  If we do this, we probably don't need 
+   addition to ant.  If we do this, we probably don't need to
+   implement the ant+xsl changes.
 
  * abuild.use-local-hooks should be on by default.  Actually, just
    always use local hooks.  Don't even make it an option.
