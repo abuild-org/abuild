@@ -1,4 +1,19 @@
 
+BUGS
+====
+
+ * ../../misc/bug-same-interface-two-platforms/
+
+   If A depends on B multiple times with different platforms, the
+   import of the second B's interface into A will not take affect
+   because the assignments and declarations will all have the same
+   FileLocation.  Although the declarations should not be treated as
+   separate, the assignments should.  This means we need to mark
+   assignments in the interface with a file location and a build
+   item/platform pair.  Maybe this means we need to check the
+   interface name and use the full build item/platform pair rather
+   than just the item name as the interface name.
+
 === Changes Targeted for Version 1.0.3 ===
 
 These are changes originally targeted for 1.1 and that don't add any
