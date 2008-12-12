@@ -170,10 +170,8 @@ Non-user-visible
 
  * Document places where code relies on certain characters being
    illegal in build item names.  Known examples: format of build
-   item/platform pairs for build graph construction, creation of
-   temporary files when processing ant hooks with xsl (uses comma) and
-   use of comma as a separator in lists of build items in ant code
-   (with abuild:foreach and ant-contrib's foreach).
+   item/platform pairs for build graph construction, and use of comma
+   as a separator in lists of build items in ant code.
 
  * [DONE, not in relnotes] Create empty rules/java/_base.mk to make it
    possible to use Abuild.mk with java without having to write a
@@ -472,6 +470,11 @@ Changes to "make" Code
 Changes to "ant" Code
 =====================
 
+ * Strongly consider distributing junit, groovy, and, if needed,
+   ant-contrib in abuild's lib directory.  If we do the ant launcher,
+   we might be able to get away from invoking ant at all, in which
+   case we might want to embed ant as well.
+
  * Conventions on properties:
 
     - abuild.property can be set by a user in Abuild-ant.properties.
@@ -486,36 +489,24 @@ Changes to "ant" Code
       properties are subject to change at any time.  These are not
       documented unless by comments in the code.
 
- * Maybe: Incorporate xsl processing as in ../../misc/ant-xsl.  We'll
-   need to create predictably-named temporary files.  With named
-   trees, we can use , as a separator instead of :: between tree name
-   and item name since : is not allowed in a path on Windows.  This
-   implies , cannot become a valid build item name character, but
-   that's already true for other reasons in the ant code (like using
-   it as a delimiter in foreach).
-
-   We'll want to separate abuild.xml into two things: the core
-   internal code that is responsible for loading properties, hooks,
-   and so forth, and a separate file that can be processed though xslt
-   that is responsible for compilation, jar creation, etc.  This will
-   enable us to use optional attribute support in our own internal
-   code.  But our own code still needs to be able to run hooks.
-
-   In abuild 1.0, there is no mechanism for adding a new build target
-   that is visible to all build items (as one can do with plugin.mk in
-   make-based builds).  The main reason for this is that adding new
-   targets requires use of <import> from the top level (or else the
-   new target will not be defined when ant tries to invoke it), and
-   there appears to be no way to run import from the top level on a
-   list of files as specified in a property.  (The antcontrib foreach
-   task uses antcall internally, and antcall is not allowed outside a
-   target.)  This is also rectified by using xsl to generate a file
-   that imports all the files to be loaded.  This in turn makes it
-   possible for plugins or hook build items to actually add new
-   targets, which means we can throw away "other" and "deploy".  We'll
-   have to remind people in the documentation that ant will do what
-   ant does if you create the same target in multiple places (whoever
-   gets loaded first wins, but everyone's version can be accessed as
+ * Incorporate misc/abuild-groovy.  Load the groovy task and make it
+   available for others to use.  In abuild 1.0, there is no mechanism
+   for adding a new build target that is visible to all build items
+   (as one can do with plugin.mk in make-based builds).  The main
+   reason for this is that adding new targets requires use of <import>
+   from the top level (or else the new target will not be defined when
+   ant tries to invoke it), and there is no way to run import inside a
+   target or top-level task.  To get around this, use groovy to
+   generate an xml file that imports all the hook files and then
+   import that automatically generated xml file as in the
+   misc/abuild-groovy example.  Consider folding the logic of
+   checkForTarget into run-hooks.  Rethink whether we want to call
+   this ant-hooks.xml or something else.  They are now imported, so
+   they can contain more than just hooks, but best practices should
+   still dictate their use primarily for hooks.  We'll have to remind
+   people in the documentation that ant will do what ant does if you
+   create the same target in multiple places (whoever gets loaded
+   first wins, but everyone's version can be accessed as
    projectname.targetname).  Best practice should be to add a target
    that just calls hooks by the same name.  Everyone can call
    <run-hooks> from their own tasks.  Since hooks are implemented as
@@ -526,12 +517,12 @@ Changes to "ant" Code
    sense), but this is no different from what would happen if we had a
    library of ant code that people imported on their own.
 
- * Maybe: consider supporting gant/groovy as an alternative to or
-   addition to ant.  If we do this, we probably don't need to
-   implement the ant+xsl changes.
+ * Remove/deprecate abuild.use-local-hooks and have this behavior
+   enabled by default.  Any declared local build file should ben
+   imported and searched for hooks.
 
- * abuild.use-local-hooks should be on by default.  Actually, just
-   always use local hooks.  Don't even make it an option.
+ * With groovy support, make sure any place we iterate over
+   comma-separated lists behaves properly with respect to whitespace.
 
  * We use the privately set "debug" and "deprecation" properties in
    abuild.xml to set debug and deprecation.  These should really be set
@@ -545,6 +536,11 @@ Changes to "ant" Code
    file.  Users can do this cleanly with a <manifest> task in their
    own ant code, and we can hook it in using abuild's own jar creation
    task.
+
+ * With the ability to add new targets, remove the "deploy" and
+   "other" targets.  The other ones are probably okay (except
+   interface-help, rules-help, and properties-help, which should be
+   replaced by the new help system).
 
 
 Platform Conditionals
