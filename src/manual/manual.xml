@@ -251,7 +251,7 @@ following checks:
     <listitem>
      <para>
       Andrew Hayden, who spent many hours reviewing and critiquing
-      this entire document and who was the visionary behind Xenon, the
+      this entire document and who was the visionary behind an early
       &abuild; Eclipse plugin
      </para>
     </listitem>
@@ -12335,11 +12335,8 @@ native-compiler qcc
     mode, it is possible to present information to the user that
     reveals considerable detail about &abuild;'s progress during the
     course of a build.  Monitored mode was introduced into &abuild; to
-    support <application>Xenon</application>, an
-    <application>Eclipse</application> plugin for &abuild;, but it
-    could be useful for other purposes as well.  For information about
-    <application>Xenon</application>, please see the links on <ulink
-    url="http://www.abuild.org">&abuild;'s web site</ulink>.
+    support development of graphical front ends or IDE plugins for
+    &abuild;, but it could be useful for other purposes as well.
    </para>
    <para>
     All additional information in monitored mode is either prefixed by
