@@ -57,15 +57,27 @@ class Interface
     // directory from which local paths are to be resolved.  Local
     // paths are resolved at the time at which they are added to an
     // Interface object, so this value has no impact on items imported
-    // from other Interface objects.  The name of an interface object
-    // is attached to every assignment that happens for that interface
-    // object.  Interface flags are associated with interface names to
-    // delimit their scope.  There is no requirement that all
-    // Interface objects in the system have unique names.  The
-    // intended mode of operation is that the name of the interface is
-    // the name of the build item responsible for its creation.
-    Interface(std::string const& name, Error&,
-	      std::string const& local_directory);
+    // from other Interface objects.  The item_name and instance_name
+    // of an interface object are attached to every assignment that
+    // happens for that interface object.  Interface flags are
+    // associated with item names to delimit their scope.  There is no
+    // requirement or expectation that all Interface objects in the
+    // system have unique item names since an item's interface may be
+    // instantiated for multiple platforms.  The intended mode of
+    // operation is that the item name of the interface is the name of
+    // the build item responsible for its creation.  Instance names
+    // should be unique throughout the system.  Ordinarily, when the
+    // interface system encounters the same assignment statement more
+    // than once for one Interface object, all but the first
+    // occurrence are ignored.  However, there are some cases in which
+    // one item may have more than one instance of another item's
+    // interface in its dependency chain at a time.  In this case, we
+    // want to evaluate the assignment once for each instance.  To
+    // this end, assignments are uniquely identified using a
+    // combination of instance name and assignment location.
+    Interface(std::string const& item_name,
+	      std::string const& instance_name,
+	      Error&, std::string const& local_directory);
 
     // Reset the local directory.  This has no impact on already
     // established values; it affects only future assignments.
@@ -159,7 +171,7 @@ class Interface
 			std::deque<std::string> const& values,
 			assign_e assignment_type,
 			std::string const& flag,
-			std::string const& interface_name);
+			std::string const& interface_item_name);
 
     class Assignment
     {
@@ -167,12 +179,12 @@ class Interface
 	Assignment(FileLocation const& location,
 		   assign_e assignment_type,
 		   std::string const& flag,
-		   std::string const& interface_name,
+		   std::string const& interface_item_name,
 		   std::deque<std::string> const& value) :
 	    location(location),
 	    assignment_type(assignment_type),
 	    flag(flag),
-	    interface_name(interface_name),
+	    interface_item_name(interface_item_name),
 	    value(value)
 	{
 	}
@@ -180,7 +192,7 @@ class Interface
 	FileLocation location;
 	assign_e assignment_type;
 	std::string flag;
-	std::string interface_name;
+	std::string interface_item_name;
 	std::deque<std::string> value;
     };
 
@@ -225,7 +237,8 @@ class Interface
 			 type_e type, list_e list_type);
 
     Error& error;
-    std::string name;
+    std::string item_name;
+    std::string instance_name;
     std::map<std::string, Variable> symbol_table;
     std::string local_directory;
     TargetType::target_type_e target_type;

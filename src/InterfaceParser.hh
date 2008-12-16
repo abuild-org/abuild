@@ -37,9 +37,11 @@ extern "C"
 class InterfaceParser: public Parser
 {
   public:
-    // The name parameter becomes the name of the Interface created by
-    // this parser.
-    InterfaceParser(std::string const& name, std::string const& local_dir);
+    // The item_name and instance_name parameters are passed through
+    // to the Interface created by this parser.
+    InterfaceParser(std::string const& item_name,
+		    std::string const& instance_name,
+		    std::string const& local_dir);
     virtual ~InterfaceParser();
 
     // Parse a file.  Returns true if there were no errors.

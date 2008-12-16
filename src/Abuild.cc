@@ -3465,7 +3465,7 @@ Abuild::buildBuildset()
 
     // Load base interface.  Use a name that can't possibly conflict
     // with any build item name.
-    InterfaceParser base_parser(":base", this->abuild_top);
+    InterfaceParser base_parser(":base", ":base", this->abuild_top);
     if (! base_parser.parse(
 	    this->abuild_top + "/private/base.interface", false))
     {
@@ -3921,7 +3921,7 @@ Abuild::itemBuilder(
     bool no_op = (this->special_target == s_NO_OP);
 
     std::string const& abs_path = build_item.getAbsolutePath();
-    InterfaceParser parser(item_name, abs_path);
+    InterfaceParser parser(item_name, builder_string, abs_path);
     parser.setSupportedFlags(build_item.getSupportedFlags());
     bool status = true;
 
@@ -4144,7 +4144,8 @@ Abuild::createPluginInterface(std::string const& plugin_name,
     // Initialize this item's interface.  We store this in the special
     // "platform" PLUGIN_PLATFORM which is initialized to a value that
     // can never match a real platform name.
-    InterfaceParser parser(plugin_name, dir);
+    InterfaceParser parser(
+	plugin_name, plugin_name + ":" + PLUGIN_PLATFORM, dir);
     build_item.setInterface(PLUGIN_PLATFORM, parser.getInterface());
     bool status = parser.importInterface(*(this->base_interface));
 

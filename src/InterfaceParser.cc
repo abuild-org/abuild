@@ -30,7 +30,8 @@ InterfaceParser::~InterfaceParser()
 {
 }
 
-InterfaceParser::InterfaceParser(std::string const& name,
+InterfaceParser::InterfaceParser(std::string const& item_name,
+				 std::string const& instance_name,
 				 std::string const& local_dir) :
     Parser(lexer, tok_EOF),
     lexer(this),
@@ -63,7 +64,8 @@ InterfaceParser::InterfaceParser(std::string const& name,
 	    &InterfaceParser::evaluateFunctionContainsmatch;
     }
 
-    this->_interface.reset(new Interface(name, error_handler, local_dir));
+    this->_interface.reset(new Interface(item_name, instance_name,
+					 error_handler, local_dir));
 }
 
 bool

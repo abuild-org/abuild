@@ -6,10 +6,12 @@
 #include <QTC.hh>
 #include <FlagData.hh>
 
-Interface::Interface(std::string const& name, Error& error,
-		     std::string const& local_dir) :
+Interface::Interface(std::string const& item_name,
+		     std::string const& instance_name,
+		     Error& error, std::string const& local_dir) :
     error(error),
-    name(name),
+    item_name(item_name),
+    instance_name(instance_name),
     target_type(TargetType::tt_all)
 {
     setLocalDirectory(local_dir);
@@ -46,7 +48,7 @@ Interface::importInterface(Interface const& other)
 					   var.name, assignment.value,
 					   assignment.assignment_type,
 					   assignment.flag,
-					   assignment.interface_name))
+					   assignment.interface_item_name))
 		{
 		    status = false;
 		}
@@ -124,7 +126,7 @@ Interface::assignVariable(FileLocation const& location,
     std::deque<std::string> values;
     values.push_back(value);
     return assignVariable(location, variable_name, values,
-			  assignment_type, "", this->name);
+			  assignment_type, "", this->item_name);
 }
 
 bool
@@ -135,7 +137,7 @@ Interface::assignVariable(FileLocation const& location,
 			  std::string const& flag)
 {
     return assignVariable(location, variable_name, values,
-			  assignment_type, flag, this->name);
+			  assignment_type, flag, this->item_name);
 }
 
 
@@ -145,7 +147,7 @@ Interface::assignVariable(FileLocation const& location,
 			  std::deque<std::string> const& ovalues,
 			  assign_e assignment_type,
 			  std::string const& flag,
-			  std::string const& interface_name)
+			  std::string const& interface_item_name)
 {
     bool status = true;
     Assignment const* old_assignment = 0;
@@ -239,7 +241,7 @@ Interface::assignVariable(FileLocation const& location,
 	}
 
 	Assignment assignment(location, assignment_type, flag,
-			      interface_name, values);
+			      interface_item_name, values);
 
 	if (old_assignment)
 	{
@@ -394,7 +396,8 @@ Interface::getVariable(std::string const& variable_name,
 	{
 	    Assignment const& assignment = *iter;
 	    if (assignment.flag.empty() ||
-		flag_data.isSet(assignment.interface_name, assignment.flag))
+		flag_data.isSet(
+		    assignment.interface_item_name, assignment.flag))
 	    {
 		assignment_history.push_back(assignment);
 	    }
