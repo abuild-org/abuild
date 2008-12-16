@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
 
     // Simulate item4 -> item3, item2; item3 -> item1; item2 -> item1.
 
-    Interface item1("item1", "item1", error, current_directory + "/item1");
+    Interface item1("item1", "indep", error, current_directory + "/item1");
     item1.setTargetType(TargetType::tt_object_code);
 
     item1.importInterface(base);
@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
 
     // Create items 2 and 3 that import item1
 
-    Interface item2("item2", "item2", error, current_directory + "/item2");
+    Interface item2("item2", "indep", error, current_directory + "/item2");
     item2.setTargetType(TargetType::tt_object_code);
 
     item2.importInterface(item1);
@@ -256,7 +256,7 @@ int main(int argc, char* argv[])
 
     dump_interface("item2", item2, empty_flag_data);
 
-    Interface item3("item3", "item3", error, current_directory + "/item3");
+    Interface item3("item3", "indep", error, current_directory + "/item3");
     item3.setTargetType(TargetType::tt_object_code);
 
     item3.importInterface(item1);
@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
 
     // Create item 4 that imports items 2 and 3.
 
-    Interface item4("item4", "item4", error, current_directory + "/item4");
+    Interface item4("item4", "indep", error, current_directory + "/item4");
     item4.setTargetType(TargetType::tt_object_code);
 
     item4.importInterface(item2);
@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
     // Create item5 that creates a conflict with item1.  This is okay
     // until something imports both.
 
-    Interface item5("item5", "item5", error, current_directory + "/item5");
+    Interface item5("item5", "indep", error, current_directory + "/item5");
     item5.setTargetType(TargetType::tt_object_code);
 
     item5.importInterface(base);
@@ -305,7 +305,7 @@ int main(int argc, char* argv[])
 
     // Create a bunch of errors including the conflict between item1
     // and item5.
-    Interface bad1("bad1", "bad1", error, current_directory + "/bad1");
+    Interface bad1("bad1", "indep", error, current_directory + "/bad1");
 
     bad1.importInterface(item1);
     logger->logInfo("importing item5 with conflicts");
@@ -344,7 +344,7 @@ int main(int argc, char* argv[])
     // Create item6 that loads item2 and reset some things that were
     // imported from item1 and some things that were created in item2.
     // It also includes some flag-based assignments.
-    Interface item6("item6", "item6", error, current_directory + "/item6");
+    Interface item6("item6", "indep", error, current_directory + "/item6");
     item6.setTargetType(TargetType::tt_object_code);
 
     item6.importInterface(item1);
@@ -377,7 +377,7 @@ int main(int argc, char* argv[])
     // Create item7 that loads item1 and item6 to illustrate that we
     // see the things in item1 that were reset in item6 but not the
     // things in item2 that were reset by item6.
-    Interface item7("item7", "item7", error, current_directory + "/item7");
+    Interface item7("item7", "indep", error, current_directory + "/item7");
 
     item7.importInterface(item1);
     item7.importInterface(item6);
@@ -394,7 +394,7 @@ int main(int argc, char* argv[])
     dump_interface("item7", item7, flag_data);
 
     // Exercise fallback/override logic more thoroughly
-    Interface item8("item8", "item8", error, current_directory + "/item8");
+    Interface item8("item8", "indep", error, current_directory + "/item8");
     declare(item8, FileLocation("item8", 1, 1),
 	    "A", Interface::t_string, Interface::l_scalar);
     assign(item8, FileLocation("item8", 2, 1),

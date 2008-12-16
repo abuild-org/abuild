@@ -7,11 +7,11 @@
 #include <FlagData.hh>
 
 Interface::Interface(std::string const& item_name,
-		     std::string const& instance_name,
+		     std::string const& item_platform,
 		     Error& error, std::string const& local_dir) :
     error(error),
     item_name(item_name),
-    instance_name(instance_name),
+    item_platform(item_platform),
     target_type(TargetType::tt_all)
 {
     setLocalDirectory(local_dir);
@@ -48,7 +48,8 @@ Interface::importInterface(Interface const& other)
 					   var.name, assignment.value,
 					   assignment.assignment_type,
 					   assignment.flag,
-					   assignment.interface_item_name))
+					   assignment.item_name,
+					   assignment.item_platform))
 		{
 		    status = false;
 		}
@@ -126,7 +127,8 @@ Interface::assignVariable(FileLocation const& location,
     std::deque<std::string> values;
     values.push_back(value);
     return assignVariable(location, variable_name, values,
-			  assignment_type, "", this->item_name);
+			  assignment_type, "",
+			  this->item_name, this->item_platform);
 }
 
 bool
@@ -137,7 +139,8 @@ Interface::assignVariable(FileLocation const& location,
 			  std::string const& flag)
 {
     return assignVariable(location, variable_name, values,
-			  assignment_type, flag, this->item_name);
+			  assignment_type, flag,
+			  this->item_name, this->item_platform);
 }
 
 
@@ -147,7 +150,8 @@ Interface::assignVariable(FileLocation const& location,
 			  std::deque<std::string> const& ovalues,
 			  assign_e assignment_type,
 			  std::string const& flag,
-			  std::string const& interface_item_name)
+			  std::string const& interface_item_name,
+			  std::string const& interface_item_platform)
 {
     bool status = true;
     Assignment const* old_assignment = 0;
@@ -160,12 +164,17 @@ Interface::assignVariable(FileLocation const& location,
 		 var.assignment_history.begin();
 	     iter != var.assignment_history.end(); ++iter)
 	{
-	    // XXX KNOWN BUG: This is not a strong enough check.  See
-	    // TODO.
 	    if ((*iter).location == location)
 	    {
-		old_assignment = &(*iter);
-		break;
+		if ((*iter).item_platform == interface_item_platform)
+		{
+		    old_assignment = &(*iter);
+		    break;
+		}
+		else
+		{
+		    QTC::TC("abuild", "Interface same location, not instance");
+		}
 	    }
 	}
 
@@ -241,7 +250,8 @@ Interface::assignVariable(FileLocation const& location,
 	}
 
 	Assignment assignment(location, assignment_type, flag,
-			      interface_item_name, values);
+			      interface_item_name, interface_item_platform,
+			      values);
 
 	if (old_assignment)
 	{
@@ -274,6 +284,7 @@ Interface::assignVariable(FileLocation const& location,
 	    {
 		bool any_normal_assignments = false;
 		FileLocation last_assign_location;
+		std::string last_platform;
 		for (std::list<Assignment>::const_iterator aiter =
 			 var.assignment_history.begin();
 		     aiter != var.assignment_history.end(); ++aiter)
@@ -282,6 +293,7 @@ Interface::assignVariable(FileLocation const& location,
 		    {
 			any_normal_assignments = true;
 			last_assign_location = (*aiter).location;
+			last_platform = (*aiter).item_platform;
 		    }
 		    break;
 		}
@@ -289,11 +301,24 @@ Interface::assignVariable(FileLocation const& location,
 		if (any_normal_assignments)
 		{
 		    status = false;
-		    QTC::TC("abuild", "Interface ERR variable already assigned");
 		    error.error(location, "variable " + variable_name +
 				" already has a value");
-		    error.error(last_assign_location,
-				"here is the previous assignment");
+		    if (location == last_assign_location)
+		    {
+			QTC::TC("abuild", "Interface ERR variable assigned by other instance");
+			error.error(location,
+				    "previous assignment was also here but "
+				    "was made for a different instance of "
+				    "this interface on a different "
+				    "platform: " + last_platform);
+
+		    }
+		    else
+		    {
+			QTC::TC("abuild", "Interface ERR variable assigned elsewhere");
+			error.error(last_assign_location,
+				    "here is the previous assignment");
+		    }
 		}
 	    }
 	}
@@ -397,7 +422,7 @@ Interface::getVariable(std::string const& variable_name,
 	    Assignment const& assignment = *iter;
 	    if (assignment.flag.empty() ||
 		flag_data.isSet(
-		    assignment.interface_item_name, assignment.flag))
+		    assignment.item_name, assignment.flag))
 	    {
 		assignment_history.push_back(assignment);
 	    }

@@ -13270,6 +13270,37 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>1.0.3: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Bug fix: if a build item has instances of another build item
+         in its dependency chain for more than one platform, &abuild;
+         previously ignored all but the first instance of the second
+         item's interface.  (Recall that &abuild; creates a separate
+         instance of each item's interface for every platform on which
+         that item builds.)  &Abuild; now properly treats each
+         instance of the interface separately for purposes of
+         importing interfaces into a dependent item's build.  This bug
+         could only be exercised by creating multiple build items that
+         depend on a common build item using different
+         platform-specific dependencies.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         A minor change was made to make it easier for users to create
+         plugins that would enable use of GNU Make to build Java
+         code.  This could make it easier to create prototypes of
+         different back-end build approaches for Java without having
+         to modify &abuild;'s internals.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.0.2: October 7, 2008</term>
      <listitem>
       <itemizedlist>

@@ -1,21 +1,4 @@
 
-BUGS
-====
-
- * ../../misc/bug-same-interface-two-platforms/
-
-   Search for "XXX KNOWN BUG" in Interface.cc.
-
-   If A depends on B multiple times with different platforms, the
-   import of the second B's interface into A will not take affect
-   because the assignments and declarations will all have the same
-   FileLocation.  Although the declarations should not be treated as
-   separate, the assignments should.  This means we need to mark
-   assignments in the interface with a file location and a build
-   item/platform pair.  Maybe this means we need to check the
-   interface name and use the full build item/platform pair rather
-   than just the item name as the interface name.
-
 === Changes Targeted for Version 1.0.3 ===
 
 These are changes originally targeted for 1.1 and that don't add any
@@ -159,7 +142,8 @@ Debugging
    indicate with a message to stdout that it is creating the file.
    Need to figure out what to do about interface only items.  Perhaps
    we provide a way for that information to be output to stdout
-   somehow.
+   somehow.  Also, make sure we include instance name information in
+   the output.
 
  * Provide an option to be used with --dump-data that delays
    generation of dump data output to include the build graph and the
@@ -182,11 +166,6 @@ Non-user-visible
    illegal in build item names.  Known examples: format of build
    item/platform pairs for build graph construction, and use of comma
    as a separator in lists of build items in ant code.
-
- * [DONE, not in relnotes] Create empty rules/java/_base.mk to make it
-   possible to use Abuild.mk with java without having to write a
-   plugin.  There are no rules for doing this, so this doesn't
-   actually add any functionality.
 
 Internal Targets
 ================

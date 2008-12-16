@@ -2,7 +2,7 @@ Interface repeat declaration 0
 Interface ERR conflicting declaration 0
 Interface ERR bad boolean value 0
 Interface ERR bad list assignment type 0
-Interface ERR variable already assigned 0
+Interface ERR variable assigned elsewhere 0
 Interface update list 0
 Interface update scalar 2
 Interface ERR empty filename 0
@@ -220,3 +220,5 @@ ItemConfig read-only external 0
 ItemConfig winpath 0
 Abuild some native items skipped 0
 Abuild some items skipped 0
+Interface same location, not instance 0
+Interface ERR variable assigned by other instance 0

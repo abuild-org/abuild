@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
 	// set for method 0 and not for method 1.
 
 	// Reused InterfaceParser object for method 0
-	InterfaceParser p0("p0", "p0_instance", Util::getCurrentDirectory());
+	InterfaceParser p0("p0", "indep", Util::getCurrentDirectory());
 	p0.setSupportedFlags(supported_flags);
 	bool debug = false;
 	if (Util::getEnv("DEBUG_INTERFACE_PARSER"))
@@ -177,7 +177,7 @@ int main(int argc, char* argv[])
 
 	    // Per-file InterfaceParser for method 1
 	    std::string name = "p1-" + Util::basename(filename);
-	    InterfaceParser p1(name, name + "_instance", dir);
+	    InterfaceParser p1(name, "indep", dir);
 	    p1.setSupportedFlags(supported_flags);
 	    if (debug)
 	    {

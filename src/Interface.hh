@@ -57,7 +57,7 @@ class Interface
     // directory from which local paths are to be resolved.  Local
     // paths are resolved at the time at which they are added to an
     // Interface object, so this value has no impact on items imported
-    // from other Interface objects.  The item_name and instance_name
+    // from other Interface objects.  The item_name and item_platform
     // of an interface object are attached to every assignment that
     // happens for that interface object.  Interface flags are
     // associated with item names to delimit their scope.  There is no
@@ -65,18 +65,18 @@ class Interface
     // system have unique item names since an item's interface may be
     // instantiated for multiple platforms.  The intended mode of
     // operation is that the item name of the interface is the name of
-    // the build item responsible for its creation.  Instance names
-    // should be unique throughout the system.  Ordinarily, when the
-    // interface system encounters the same assignment statement more
-    // than once for one Interface object, all but the first
-    // occurrence are ignored.  However, there are some cases in which
-    // one item may have more than one instance of another item's
-    // interface in its dependency chain at a time.  In this case, we
-    // want to evaluate the assignment once for each instance.  To
-    // this end, assignments are uniquely identified using a
-    // combination of instance name and assignment location.
+    // the build item responsible for its creation.  Ordinarily, when
+    // the interface system encounters the same assignment statement
+    // more than once for one Interface object, all but the first
+    // occurrence are ignored.  This happens when the same build item
+    // appears more than once in a build item's dependency chain.
+    // However, there are some cases in which one item may have more
+    // than one platform instance of another item's interface in its
+    // dependency chain at a time.  (This can only happen with
+    // platform-specific dependencies.)  In this case, we want to
+    // evaluate the assignment once for each platform.
     Interface(std::string const& item_name,
-	      std::string const& instance_name,
+	      std::string const& item_platform,
 	      Error&, std::string const& local_directory);
 
     // Reset the local directory.  This has no impact on already
@@ -171,7 +171,8 @@ class Interface
 			std::deque<std::string> const& values,
 			assign_e assignment_type,
 			std::string const& flag,
-			std::string const& interface_item_name);
+			std::string const& interface_item_name,
+			std::string const& interface_item_platform);
 
     class Assignment
     {
@@ -179,12 +180,14 @@ class Interface
 	Assignment(FileLocation const& location,
 		   assign_e assignment_type,
 		   std::string const& flag,
-		   std::string const& interface_item_name,
+		   std::string const& item_name,
+		   std::string const& item_platform,
 		   std::deque<std::string> const& value) :
 	    location(location),
 	    assignment_type(assignment_type),
 	    flag(flag),
-	    interface_item_name(interface_item_name),
+	    item_name(item_name),
+	    item_platform(item_platform),
 	    value(value)
 	{
 	}
@@ -192,7 +195,8 @@ class Interface
 	FileLocation location;
 	assign_e assignment_type;
 	std::string flag;
-	std::string interface_item_name;
+	std::string item_name;
+	std::string item_platform;
 	std::deque<std::string> value;
     };
 
@@ -238,7 +242,7 @@ class Interface
 
     Error& error;
     std::string item_name;
-    std::string instance_name;
+    std::string item_platform;
     std::map<std::string, Variable> symbol_table;
     std::string local_directory;
     TargetType::target_type_e target_type;
