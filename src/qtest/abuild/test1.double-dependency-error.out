@@ -1,0 +1,4 @@
+abuild: b (abuild-<native>): all
+abuild: b (abuild-p1.any.any.abc): all
+--topdir--/g/bad/b/Abuild.interface:2:1: ERROR: variable X already has a value
+--topdir--/g/bad/b/Abuild.interface:2:1: ERROR: previous assignment was made by this build item's instance on platform <native>; this can only cause a conflict when platform-specific dependencies are used

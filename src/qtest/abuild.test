@@ -160,7 +160,9 @@ $ENV{'ABUILD_WTEST_DIR'} = windir($abuild_top);
 my $runtime_var = ($in_windows ? 'PATH' : 'LD_LIBRARY_PATH');
 my $old_value = $ENV{$runtime_var} || "";
 
-# TESTS START HERE
+# TESTS START HERE.  Goto statements may be added temporarily run
+# selective parts of the test suite.  Goto targets should jump to
+# right before a setup() call.
 
 die if -f "Abuild.conf";
 $td->runtest("abuild --version with no Abuild.conf",
@@ -1545,6 +1547,27 @@ $td->runtest("plugin-anywhere",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+# Dependency on multiple instances of an interface.  "a" depends on
+# two different instances of "b".
+
+cd("work/g/good");
+
+$td->runtest("double dependency on an item",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.double-dependency.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/g/bad");
+
+$td->runtest("double dependency error",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.double-dependency-error.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/junit");
 
 if ($test_junit)
@@ -2768,7 +2791,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(265 +
+$td->report(267 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +

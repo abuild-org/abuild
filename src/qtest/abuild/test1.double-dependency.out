@@ -1,0 +1,6 @@
+abuild: b (abuild-<native>): all
+abuild: b (abuild-p1.any.any.abc): all
+abuild: a (abuild-indep): all
+make: Entering directory `--topdir--/g/good/a/abuild-indep'
+../../b/abuild-<native> ../../b/abuild-p1.any.any.abc
+make: Leaving directory `--topdir--/g/good/a/abuild-indep'

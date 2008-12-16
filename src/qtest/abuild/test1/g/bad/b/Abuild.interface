@@ -1,2 +1,2 @@
-declare X list filename append
+declare X string
 X = $(ABUILD_OUTPUT_DIR)
