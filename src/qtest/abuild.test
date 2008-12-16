@@ -1606,7 +1606,7 @@ else
 
 # test2 and test3 test various abuild error conditions
 
-setup("test2");
+setup("test2", "test1.not-accessed.out");
 
 $td->runtest("abuild errors",
 	     {$td->COMMAND => "abuild --build=all",
