@@ -1,1 +1,2 @@
-RULES := empty
+LOCAL_RULES := local.mk
+
