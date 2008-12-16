@@ -307,10 +307,11 @@ Interface::assignVariable(FileLocation const& location,
 		    {
 			QTC::TC("abuild", "Interface ERR variable assigned by other instance");
 			error.error(location,
-				    "previous assignment was also here but "
-				    "was made for a different instance of "
-				    "this interface on a different "
-				    "platform: " + last_platform);
+				    "previous assignment was made by this "
+				    "build item's instance on platform " +
+				    last_platform + "; this can only cause "
+				    "a conflict when platform-specific "
+				    "dependencies are used");
 
 		    }
 		    else
