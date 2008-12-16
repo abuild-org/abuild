@@ -4,6 +4,8 @@ BUGS
 
  * ../../misc/bug-same-interface-two-platforms/
 
+   Search for "XXX KNOWN BUG" in Interface.cc.
+
    If A depends on B multiple times with different platforms, the
    import of the second B's interface into A will not take affect
    because the assignments and declarations will all have the same

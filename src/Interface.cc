@@ -148,6 +148,7 @@ Interface::assignVariable(FileLocation const& location,
 			  std::string const& interface_name)
 {
     bool status = true;
+    Assignment const* old_assignment = 0;
 
     if (this->symbol_table.count(variable_name))
     {
@@ -157,11 +158,12 @@ Interface::assignVariable(FileLocation const& location,
 		 var.assignment_history.begin();
 	     iter != var.assignment_history.end(); ++iter)
 	{
+	    // XXX KNOWN BUG: This is not a strong enough check.  See
+	    // TODO.
 	    if ((*iter).location == location)
 	    {
-		// Okay -- this is a duplicate of an existing assignment.
-		QTC::TC("abuild", "Interface repeat assignment");
-		return true;
+		old_assignment = &(*iter);
+		break;
 	    }
 	}
 
@@ -188,7 +190,6 @@ Interface::assignVariable(FileLocation const& location,
 		}
 	    }
 	}
-
 
 	// Check and, if needed, adjust each value based on the type.
 	for (std::deque<std::string>::iterator iter = values.begin();
@@ -237,7 +238,24 @@ Interface::assignVariable(FileLocation const& location,
 	    }
 	}
 
-	bool do_assignment = true;
+	Assignment assignment(location, assignment_type, flag,
+			      interface_name, values);
+
+	if (old_assignment)
+	{
+	    // If this assertion fails, it means we thought we were
+	    // looking at an assignment statement that we had seen
+	    // before, but for some reason, the value is different
+	    // this time.  This used to be able to happen when two
+	    // "instances" of the same interface, "instantiated" for
+	    // different platforms, were imported into the same
+	    // interface object.
+	    assert(old_assignment->value == values);
+
+	    // Okay -- this is a duplicate of an existing assignment.
+	    QTC::TC("abuild", "Interface repeat assignment");
+	    return true;
+	}
 
 	// For lists, assignment_history contains all list
 	// assignments, and all values are used when retrieving the
@@ -288,34 +306,28 @@ Interface::assignVariable(FileLocation const& location,
 	    }
 	}
 
-	if (do_assignment)
+	// No default for switch statement so gcc will warn for
+	// missing case tags
+	if (var.list_type == l_scalar)
 	{
-	    Assignment assignment(location, assignment_type, flag,
-				  interface_name, values);
-
-	    // No default for switch statement so gcc will warn for
-	    // missing case tags
-	    if (var.list_type == l_scalar)
+	    QTC::TC("abuild", "Interface update scalar",
+		    (assignment_type == a_fallback) ? 0
+		    : (assignment_type == a_normal) ? 1
+		    : (assignment_type == a_override) ? 2
+		    : 999);	// can't happen
+	    if (assignment_type == a_fallback)
 	    {
-		QTC::TC("abuild", "Interface update scalar",
-			(assignment_type == a_fallback) ? 0
-			: (assignment_type == a_normal) ? 1
-			: (assignment_type == a_override) ? 2
-			: 999);	// can't happen
-		if (assignment_type == a_fallback)
-		{
-		    var.assignment_history.push_front(assignment);
-		}
-		else
-		{
-		    var.assignment_history.push_back(assignment);
-		}
+		var.assignment_history.push_front(assignment);
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Interface update list");
 		var.assignment_history.push_back(assignment);
 	    }
+	}
+	else
+	{
+	    QTC::TC("abuild", "Interface update list");
+	    var.assignment_history.push_back(assignment);
 	}
     }
     else
