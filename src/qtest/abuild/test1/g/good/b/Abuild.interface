@@ -1,0 +1,2 @@
+declare X list filename append
+X = $(ABUILD_OUTPUT_DIR)

@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+print "platform p1.any.any.abc -type p1\n"
