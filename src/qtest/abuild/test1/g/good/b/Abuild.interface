@@ -1,2 +1,6 @@
 declare X list filename append
 X = $(ABUILD_OUTPUT_DIR)
+declare Y string
+Y = static-value
+declare Z string
+Z = $(ABUILD_PLATFORM)

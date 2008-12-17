@@ -116,6 +116,50 @@ Core
 Documentation
 =============
 
+ * Write subsection of "Cross-Platform Dependencies" entitled
+   "Interface Errors" to discuss the duplicate assignment of an
+   interface variable across multiple platform instances of a build
+   item's interface.  Put a comment above the title of the subsection
+   that the title is included in an error message in Interface.cc.
+   (Search for Interface.cc in manual.xml to see another such
+   comment.) Cover the following:
+
+   This happens under the following very specific circumstances:
+
+    - A depends (directly or indirectly) on two different build items,
+      each of which declares a dependency on B
+
+    - At least one of the dependencies on B is platform-specific
+
+    - The two build items depend on B with different platforms
+
+    - B's Abuild.interface makes a "normal" assignment to a non-list
+      interface variable with a value that differs on the two
+      platforms
+
+   There are several possible remedies.
+
+    - If you want both values and doing this won't hurt other build
+      items, use a list variable instead of a non-list variable.  In
+      this case, abuild will give you both (all) values.
+
+    - If you don't care which value you get, and doing so doesn't
+      cause other problems for other build items, use a fallback or
+      override assignment instead of a regular assignment.  Then
+      you'll get the first (in the case of fallback) or last (in the
+      case of override) assignment that is processed.
+
+    - If you can't change B's interface and A doesn't care about the
+      value of the value, you can do a reset on the offending variable
+      from the one or more of the items that A depends on and that
+      depend on different instances of B.
+
+    - You can rethink why you are trying to depend simultaneously on
+      multiple platforms of the same build item and come up with a
+      different strategy.  If you are just trying to force multiple
+      platforms to build, you can probably replace your dependencies
+      with a build-also keyword.
+
  * Clarify compatibility policy to be explicit that new syntax (file
    and command-line) may be added within a minor version.  In other
    words, we guarantee that anything that worked with 1.x.y will work

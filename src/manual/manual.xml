@@ -9842,6 +9842,8 @@ flag private INCLUDES = private-include
     </para>
    </sect1>
    <sect1 id="ref.cross-platform-dependencies">
+    <!-- The title of this section is included in an error message in
+         Interface.cc. -->
     <title>Cross-Platform Dependencies</title>
     <indexterm>
      <primary>dependency</primary>

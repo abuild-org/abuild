@@ -222,3 +222,4 @@ Abuild some native items skipped 0
 Abuild some items skipped 0
 Interface same location, not instance 0
 Interface ERR variable assigned by other instance 0
+Interface duplicate assignment different platform same value 0

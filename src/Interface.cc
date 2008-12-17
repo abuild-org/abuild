@@ -94,7 +94,11 @@ Interface::declareVariable(FileLocation const& location,
 	{
 	    // Okay -- this is a duplicate of an existing declaration,
 	    // which is a normal case when the same interface file is
-	    // loaded through more than one dependency path.
+	    // loaded through more than one dependency path.  We don't
+	    // care about duplicate declarations from multiple
+	    // platform instances of an interface since the affect of
+	    // a declaration, unlike that of an assignment, can never
+	    // be influenced by the platform.
 	    QTC::TC("abuild", "Interface repeat declaration");
 	}
 	else
@@ -282,43 +286,55 @@ Interface::assignVariable(FileLocation const& location,
 	{
 	    if (assignment_type == a_normal)
 	    {
-		bool any_normal_assignments = false;
-		FileLocation last_assign_location;
-		std::string last_platform;
+		Assignment const* previous_normal_assignment = 0;
 		for (std::list<Assignment>::const_iterator aiter =
 			 var.assignment_history.begin();
 		     aiter != var.assignment_history.end(); ++aiter)
 		{
 		    if ((*aiter).assignment_type == a_normal)
 		    {
-			any_normal_assignments = true;
-			last_assign_location = (*aiter).location;
-			last_platform = (*aiter).item_platform;
+			previous_normal_assignment = &(*aiter);
 		    }
 		    break;
 		}
 
-		if (any_normal_assignments)
+		if (previous_normal_assignment)
 		{
-		    status = false;
-		    error.error(location, "variable " + variable_name +
-				" already has a value");
-		    if (location == last_assign_location)
+		    bool same_location =
+			previous_normal_assignment->location == location;
+		    if (same_location &&
+			(values == previous_normal_assignment->value))
 		    {
-			QTC::TC("abuild", "Interface ERR variable assigned by other instance");
-			error.error(location,
-				    "previous assignment was made by this "
-				    "build item's instance on platform " +
-				    last_platform + "; this can only cause "
-				    "a conflict when platform-specific "
-				    "dependencies are used");
-
+			QTC::TC("abuild", "Interface duplicate assignment different platform same value");
+			// Ignore duplicate normal assignment coming
+			// from a different instance of the same
+			// interface as long as the values are the
+			// same.
 		    }
 		    else
 		    {
-			QTC::TC("abuild", "Interface ERR variable assigned elsewhere");
-			error.error(last_assign_location,
-				    "here is the previous assignment");
+			status = false;
+			error.error(location, "variable " + variable_name +
+				    " already has a value");
+			if (same_location)
+			{
+			    QTC::TC("abuild", "Interface ERR variable assigned by other instance");
+			    error.error(
+				location,
+				"conflicting assignment was made by this "
+				"build item's instance on platform " +
+				previous_normal_assignment->item_platform +
+				"; see \"Interface Errors\" subsection of the "
+				"\"Cross-Platform Dependencies\" section "
+				"of the manual for an explanation and list "
+				"of remedies");
+			}
+			else
+			{
+			    QTC::TC("abuild", "Interface ERR variable assigned elsewhere");
+			    error.error(previous_normal_assignment->location,
+					"here is the previous assignment");
+			}
 		    }
 		}
 	    }
