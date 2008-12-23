@@ -1200,8 +1200,7 @@ this way.
    efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
    23536 in abuild, 4/3/2008, subject "preliminary ant launcher
    experiment".  For communication between abuild and the ant
-   launcher, see
-   ~/source/examples/portability/socket-java-c++-workers/README
+   launcher, see ~/source/examples/portability/socket-java-c++-workers.
 
  * ant with build failure appears not to exit abnormally in Windows.
    This is a bug in ant.bat and could be worked around by using our
