@@ -240,6 +240,12 @@ following internal targets will be supported:
  * print-build-directory-paths: prints the full path of each output
    directory that would be built
 
+Java Stuff
+==========
+
+ * Time permitting, consider implementing the ant launcher, groovy
+   support, and distribution of junit, ant, and groovy.
+
 
 === Changes Targeted for Version 1.1 ===
 
@@ -503,7 +509,7 @@ Changes to "make" Code
 Changes to "ant" Code
 =====================
 
- * Strongly consider distributing junit, groovy, and, if needed,
+ * Strongly consider distributing junit, groovy, and if needed,
    ant-contrib in abuild's lib directory.  If we do the ant launcher,
    we might be able to get away from invoking ant at all, in which
    case we might want to embed ant as well.
