@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('failure');
+
+$td->runtest("failing test",
+	     {$td->STRING => "this string is not blank\n"},
+	     {$td->STRING => "neither is this one\n"});
+
+$td->report(1);

@@ -13282,6 +13282,12 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
+           A failing qtest test suite when invoked from ant now causes
+           the build of that item to fail.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
            If a build item has instances of another build item in its
            dependency chain for more than one platform, &abuild;
            previously ignored all but the first instance of the second

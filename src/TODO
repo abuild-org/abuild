@@ -23,10 +23,6 @@ Bug Fixes
    shared libraries.  Version 1.1 will give a deprecation warning for
    LINK_SHLIBS.
 
- * Add failonerror="true" to the exec that invokes qtest from ant so
-   that the build fails if the test suite fails.  Add failing qtest
-   with ant and make to test suite.
-
 Core
 ====
 

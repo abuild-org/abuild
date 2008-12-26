@@ -1,0 +1,43 @@
+abuild: java-item (abuild-java): check
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/empty
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/classes
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/dist
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/ant-qtest/abuild-java/src/conf
+
+-test-qtest:
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running ../qtest/fail.test
+     [exec] failure  1 (failing test)                          ... FAILED
+     [exec] 
+     [exec] Overall test suite                                 ... FAILED
+     [exec] 
+     [exec] Failure summary may be found in qtest.log
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 1
+     [exec] Passes: 0
+     [exec] Failures: 1
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 
+
+BUILD FAILED
+--abuild.xml--:nn: exec returned: 2
+
+Total time: <time>
+abuild: java-item (abuild-java): build failed
+abuild: ERROR: at least one build failure occurred
