@@ -73,38 +73,6 @@ Core
    mixing -ro-path and -rw-path and for having multiple occurrences of
    them.
 
- * If abuild is run with -k (and definitely not otherwise), it should
-   continue running if there are dependency graph errors that don't
-   impact anything in the build set.  For example:
-
-   a: b
-   b: c d
-   d
-   e: f
-   f: e
-
-   abuild -d from "a" should be able to run to completion even though
-   there is a cycle in "e" and "f".  Need to think about how this can
-   actually be implemented.  One idea would be to break the cycle at
-   an arbitrary point (presumably the point at which it was detected)
-   and replace the cyclic dependency with a dependency on a fake build
-   item that has an initial state of failed.  The failure of this
-   build item should be handled in a manner that causes propagation of
-   the failure through the build graph just as any other failure
-   would.  One way to do this would be to have this build item "get
-   built" but fail.  This would require a very small modification to
-   Abuild::itemBuilder.  One indication of this working properly is if
-   it does the right thing with --no-dep-failures.  Another would be
-   if there is proper pruning in the platform-specific dependency
-   case.  (We might need to mark the failed build item as explicit.)
-   For example, if in the above, you add
-
-   d: e
-
-   and you run with -k only, only c would build, but if you ran with
-   --no-dep-failures, then all the build items would build as if there
-   were no dependency from f to e.
-
 
 Documentation
 =============
@@ -1349,3 +1317,65 @@ See also "Known Limitations" in the documentation.
    a convention of setting "local" variables (i.e., variables named in
    such a way to not conflict with anything) that are referenced in
    the Abuild.mk or Abuild-ant.propertiesd. files.
+
+ * It might be useful to have abuild recognize certain error
+   conditions currently reported as global as instead being specific
+   to a given build item, but this would be a high-risk change that
+   has some of its own disadvantages.
+
+   The idea would be to detect errors currently reported as global
+   and, instead of having them prevent any builds from happening, have
+   them just block builds of the specific items they pertain to.  This
+   would make it possible, for example, to have a --build=desc work
+   properly if there are dependency errors, cycles, or other similar
+   types of errors on build items that are not related to the portion
+   of the tree being built.
+
+   Exmaple error conditions that could be handled in this way include
+   depending on an unknown item, participating in a dependency cycle,
+   referencing an unknown item in a trait, referencing an unknown flag
+   for another item, having an invalid platform-specific dependency,
+   etc.  An implementation strategy for doing this would be to have a
+   buildError method that takes an item name and platform string, with
+   an empty platform string indicating an error that would apply to
+   all platform instantiations for the item.  Abuild would report the
+   error but not increment the global error count, thus preventing
+   exitIfErrors from exiting.  It would also store fact that an error
+   was associated with the specific build item and/or build
+   item/platform pair.  During the build of the item, if any
+   non-platform-specific errors or if an error for the specific
+   item/platform had been issued, the build for that item would be
+   skipped.
+
+   The above change, as described, would be straightforward to
+   implement, but there are two siginificant issues:
+
+    - This change would allow certain error conditions that really do
+      have to get fixed from being purposely ignored or even
+      accidentally overlooked for a longer period of time.  This goes
+      against the idea of abuild trying to force early detection and
+      correction of errors.
+
+    - The code as currently implemented performs numerous validations.
+      Once call to exitIfErrors has been made, subsequent code assumes
+      all previous validations have succeeded.  For any current error
+      condition that would be changed to a buildError, the rest of the
+      code would have to be carefully inspected to ensure that prior
+      assumptions have not become invalid.  This would be a shame
+      since the early validation of certain error conditions helps to
+      reduce the complexity of the abuild code.
+
+   Consider the implications, especially of the second point.  Build
+   graph construction code assumes that all platform information and
+   dependency information stored in a build item is valid, and that
+   information is accessed in a read-only fashion from the build
+   item's config data.  This means that we either have to add checks
+   throughout the code to make sure any dependency we retrieve is
+   valid or else we need to remove a dependency from the list of
+   dependencies.  The former would complicate the code and make it
+   more fragile, not to mention the fact that the test suite doesn't
+   cover any such cases now since they are prevented from happening.
+   The latter would also have disadvantages.  For example, it would no
+   longer be possible to use --dump-data to locate build items that
+   depend on a particular unknown build item or otherwise to help
+   clean up errors of this type.
