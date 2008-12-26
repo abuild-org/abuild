@@ -8157,28 +8157,48 @@ endif
      same effect.
     </para>
     <para>
-     By default, when a shared library depends on a static library,
-     &abuild; will not link the static library into the shared
-     library.  On some systems, you <emphasis>must</emphasis> link
-     static libraries into shared libraries in order for the build to
-     succeed, and on other systems, it is optional.  When mixing
+     When &abuild; builds shared libraries, it links them with any
+     libraries in the <varname>LIBS</varname> variable.  Although this
+     is generally the correct behavior for systems that support
+     linking of shared libraries, it can cause unpleasant side effects
+     if you mix shared libraries with static libraries.  When mixing
      shared libraries and static libraries, you should make sure that
      you don't include two copies of the same symbols in more than one
      place (two shared libraries or a shared library and an
      executable).  Some systems handle this case acceptably, and
      others don't.  Even in the best case, doing this is wasteful and
-     potentially confusing.  In order to tell &abuild; to link a
-     static library into a shared library, set the variable
-     <varname>LINK_SHLIBS</varname> to <literal>1</literal> in your
-     <filename>Abuild.mk</filename>.  This applies to all shared
-     libraries built in a build item.
+     potentially confusing.  If you need to prevent &abuild; from
+     linking certain static libraries into shared libraries, you may
+     manually manipulate the contents of the <varname>LIBS</varname>
+     variable in your <filename>Abuild.mk</filename> file.  However,
+     if you find that you need to do this, you should probably rethink
+     how you have your build configured.  If you have static libraries
+     that are intended to be linked into shared libraries and then not
+     used again for other purposes, you should reset the value of
+     <varname>LIBS</varname> in an after-build file that is included
+     by your shared library build item's
+     <filename>Abuild.interface</filename> file.  This is discussed in
+     <xref linkend="ref.example.shared-library"/>.
+     <footnote>
+      <para>
+       Versions of &abuild; prior to 1.0.3 behaved somewhat
+       differently with respect to linking of shared libraries.  See
+       the changes for version 1.0.3 in the release notes for details.
+      </para>
+     </footnote>
     </para>
     <para>
      &Abuild; allows you to mix executables, shared libraries, and
      static libraries in the same build item.  If you do this, all
      executable targets will link with all shared and all static
-     library targets.  If <varname>LINK_SHLIBS</varname> is set, then
-     all shared libraries will also link with all static libraries.
+     library targets, and all shared library targets will link with
+     all static library targets.  The shared library targets will not
+     link with each other.  There are few, if any, good reasons to mix
+     shared and static library targets in the same build item, as
+     doing so can only lead to confusion.  When they are mixed, it is
+     probably appropriate to avoid adding the static libraries to
+     <varname>LIBS</varname> in the
+     <filename>Abuild.interface</filename> file.
     </para>
     <para>
      In order to allow static libraries to be linked into shared
@@ -8355,14 +8375,14 @@ endif
      You will notice in this case that this build item depends on a
      static library that its private to its own build item name scope.
      This static library provides additional functions that are used
-     <emphasis>within</emphasis> the shared library.  In order to tell
-     &abuild; to link that static library into the shared library, we
-     set the variable <varname>LINK_SHLIBS</varname>.  Also, we want
-     to avoid having the static library appear on the link statement
-     for executables that link with this shared library.  To do that,
-     we have to do some extra work in our
-     <filename>Abuild.interface</filename> file.  Here are that file
-     and the <function>after-build</function> file that it loads:
+     <emphasis>within</emphasis> the shared library.  Since the static
+     library is linked into the shared library and is not intended to
+     provide any public interfaces, we want to avoid having the static
+     library appear on the link statement for executables that link
+     with this shared library.  To do that, we have to do some extra
+     work in our <filename>Abuild.interface</filename> file.  Here are
+     that file and the <function>after-build</function> file that it
+     loads:
      <?example shared-library/shared/impl2/Abuild.interface?>
      <?example shared-library/shared/impl2/after.interface?>
      Notice that we reset the <varname>LIBS</varname> variable and add
@@ -13275,6 +13295,47 @@ Y = $(X)
      <term>1.0.3: XXX</term>
      <listitem>
       <itemizedlist>
+       <listitem>
+        <para>
+         <emphasis role="bold">NON-COMPATIBLE CHANGE</emphasis>:
+         removal of <varname>LINK_SHLIBS</varname>
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Although care is taken to avoid introducing non-compatible
+           changes within a minor release, it was necessary to change
+           how shared libraries are linked as the old behavior caused
+           too many problems.  Specifically, prior to &abuild; 1.0.3,
+           shared libraries were not linked unless the
+           <varname>LINK_SHLIBS</varname> variable was set.  Starting
+           with version 1.0.3, this variable has been removed, and
+           builds are conducted as if the variable were set: shared
+           libraries are always linked.  This is almost always the
+           correct behavior for systems that support linking of shared
+           libraries.  Without this, it is very easy to end up in a
+           situation where replacing one version of a shared library
+           with another one results in undefined or multiply-defined
+           symbols at runtime.  One possible consequence of this
+           change is that, in some cases involving mixing of shared
+           and static libraries, a single shared library may be linked
+           into multiple shared libraries.  This is usually (but not
+           always) harmless, but it is also usually wasteful.  If you
+           encounter this situation, the best option would be to
+           rework your build to avoid whatever arrangement is causing
+           this.  Alternatively, you can manipulate the value of the
+           <varname>LIBS</varname> variable in your shared library
+           build item's <filename>Abuild.mk</filename> file.  The old
+           behavior was based on an incomplete analysis of usage of
+           shared libraries.  It optimized for the unusual case of
+           mixing shared libraries with static libraries rather than
+           the more normal case of being able to replace earlier
+           versions of shared libraries with later versions that may
+           have different dependencies.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
        <listitem>
         <para>
          Bug Fixes

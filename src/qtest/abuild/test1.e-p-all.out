@@ -184,13 +184,21 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
 ** shlib shlib1 **
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 end contents of shlib-shlib1.1.2.3
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags-  -wflags- -lib-xcppflags-  ../shlib2.cc shlib2.lo shlib2.dep
@@ -209,11 +217,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 end contents of shlib-shlib2.4.5
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags-  -wflags- -lib-xcppflags-  ../shlib3.cc shlib3.lo shlib3.dep
@@ -232,11 +248,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 end contents of shlib-shlib3.6
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags-  -wflags- -lib-xcppflags-  ../shlib4.cc shlib4.lo shlib4.dep
@@ -255,11 +279,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
 make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.debug'
@@ -290,15 +322,47 @@ contents of bin-bin:
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 ** lib lib1 **
 ** file: lib1-src1.c **
@@ -494,13 +558,21 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
 ** shlib shlib1 **
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 end contents of shlib-shlib1.1.2.3
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib2.cc shlib2.lo shlib2.dep
@@ -519,11 +591,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 end contents of shlib-shlib2.4.5
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib3.cc shlib3.lo shlib3.dep
@@ -542,11 +622,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 end contents of shlib-shlib3.6
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib4.cc shlib4.lo shlib4.dep
@@ -565,11 +653,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
 make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.lowpri'
@@ -600,15 +696,47 @@ contents of bin-bin:
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 ** lib lib1 **
 ** file: lib1-src1.c **
@@ -804,13 +932,21 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
 ** shlib shlib1 **
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 end contents of shlib-shlib1.1.2.3
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../shlib2.cc shlib2.lo shlib2.dep
@@ -829,11 +965,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 end contents of shlib-shlib2.4.5
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../shlib3.cc shlib3.lo shlib3.dep
@@ -852,11 +996,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 end contents of shlib-shlib3.6
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../shlib4.cc shlib4.lo shlib4.dep
@@ -875,11 +1027,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
 make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.release'
@@ -910,15 +1070,47 @@ contents of bin-bin:
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 ** lib lib1 **
 ** file: lib1-src1.c **

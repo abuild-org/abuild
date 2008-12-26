@@ -190,9 +190,19 @@ XCPPFLAGS ?=
 XCFLAGS ?=
 XCXXFLAGS ?=
 XLINKFLAGS ?=
-LINK_SHLIBS ?=
 LINKWRAPPER ?=
 LINK_AS_C ?=
+
+ifneq ($(origin LINK_SHLIBS), undefined)
+ # In Abuild 1.1, we will generate a deprecation warning.  For now,
+ # ignore a non-empty value (since we behave now as we would have with
+ # a non-empty value of LINK_SHLIBS), and given an error for an empty
+ # value.
+ ifeq (-$(strip $(LINK_SHLIBS))-,--)
+  $(error setting LINK_SHLIBS to an empty value no longer works; override LIBS instead)
+ else
+ endif
+endif
 
 # These functions expand to the complete list of debug, optimization
 # and warning flags that apply to a specific file.  In this case,
@@ -282,7 +292,7 @@ endef
 define ccxx_make_shared_lib
 	@: $(call QTC.TC,abuild,ccxx.mk ccxx_make_shared_lib,0)
 	@$(PRINT) "Creating $(1) shared library"
-	$(call make_shlib,$(CCCXX_LINKER),$(XCFLAGS) $(XCXXFLAGS) $(DFLAGS) $(OFLAGS) $(WFLAGS),$(XLINKFLAGS),$(OBJS_lib_$(1)),$(LIBDIRS),$(if $(LINK_SHLIBS),$(filter-out $(_TARGETS_shared_lib),$(LIBS))),$(1),$(word 1,$(SHLIB_$(1))),$(word 2,$(SHLIB_$(1))),$(word 3,$(SHLIB_$(1))))
+	$(call make_shlib,$(CCCXX_LINKER),$(XCFLAGS) $(XCXXFLAGS) $(DFLAGS) $(OFLAGS) $(WFLAGS),$(XLINKFLAGS),$(OBJS_lib_$(1)),$(LIBDIRS),$(filter-out $(_TARGETS_shared_lib),$(LIBS)),$(1),$(word 1,$(SHLIB_$(1))),$(word 2,$(SHLIB_$(1))),$(word 3,$(SHLIB_$(1))))
 endef
 
 # Usage: $(call ccxx_make_bin,executable-base)

@@ -6,23 +6,6 @@ backward compatibility issues to any configuration files or
 command-line arguments.  New syntax may be added as long as old syntax
 continues to work.
 
-Bug Fixes
-=========
-
- * Version 1.0.3 will ignore the value of LINK_SHLIBS and pass the
-   list of libraries to the shared library creation command by
-   default.  This is because the decision about whether or not to link
-   shared libraries is really more a function of the underlying system
-   than something the developer should control.  Some systems require
-   shared libraries to be linked while others don't support it at all.
-
-   Version 1.0.3 will link shared libraries unconditionally and
-   silently ignore LINK_SHLIBS with a value of 1.  Any other value of
-   LINK_SHLIBS will cause an error that will tell the user to use
-   "override LIBS :=" if they really want to suppress linking of
-   shared libraries.  Version 1.1 will give a deprecation warning for
-   LINK_SHLIBS.
-
 Core
 ====
 
@@ -448,14 +431,9 @@ Changes to "make" Code
    system can work even when the CM system does not preserve
    modification times.
 
- * Deprecate LINK_SHLIBS.  Either find some more robust way of dealing
-   with shared libraries that does the right thing on more platforms
-   (like figuring out a way of using libtool), or go with the 1.0.3
-   solution but give a deprecation warning for any use of LINK_SHLIBS.
-
-   Document in the shared libraries section that people who need to
-   suppress linking of shared libraries for some reason on a system
-   that supports this can always use "override LIBS :=".
+ * Deprecate LINK_SHLIBS.  Give a deprecation warning of $(origin
+   LINK_SHLIBS) is not 'undefined'.  A stub for this already exists in
+   ccxx.mk.
 
 
 Changes to "ant" Code

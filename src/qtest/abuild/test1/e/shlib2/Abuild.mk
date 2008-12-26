@@ -6,7 +6,6 @@ SRCS_lib_static := static.c
 SRCS_bin_bin := bin.c
 SHLIB_shlib1 := 0 0 0
 SHLIB_shlib2 := 0 0 0
-LINK_SHLIBS := 1
 OFLAGS_shlib1.c :=
 WFLAGS_shlib2.c :=
 DFLAGS_static.c :=

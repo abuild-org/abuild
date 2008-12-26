@@ -40,13 +40,21 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
 ** shlib shlib1 **
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 end contents of shlib-shlib1.1.2.3
 Creating shlib2 shared library
@@ -55,11 +63,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 end contents of shlib-shlib2.4.5
 Creating shlib3 shared library
@@ -68,11 +84,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 end contents of shlib-shlib3.6
 Creating shlib4 shared library
@@ -81,11 +105,19 @@ make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wfl
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
 make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
-make-shlib: libs:
+make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
 make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
@@ -106,15 +138,47 @@ contents of bin-bin:
 ** file: shlib1-src1.c **
 ** file: shlib1-src2.cc **
 ** file: shlib1-src3.cpp **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib1 **
 ** shlib shlib2 **
 ** file: shlib2.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib2 **
 ** shlib shlib3 **
 ** file: shlib3.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib3 **
 ** shlib shlib4 **
 ** file: shlib4.cc **
+** lib lib1 **
+** file: lib1-src1.c **
+** file: lib1-src2.cc **
+** file: lib1-src3.cpp **
+** end of lib lib1 **
+** lib lib2 **
+** file: lib2.cc **
+** end of lib lib2 **
 ** end of shlib shlib4 **
 ** lib lib1 **
 ** file: lib1-src1.c **

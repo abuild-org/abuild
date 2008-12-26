@@ -82,10 +82,6 @@ your intention is to build a versionless shared library object file
 (such as one to be used as a dynamically loadable module), set
 SHLIB_libname to the empty string.
 
-By default, abuild will not link shared libraries with static
-libraries.  To enable this, set LINK_SHLIBS to a non-empty value.
-This applies to all shared libraries declared in the Abuild.mk file.
-
 By default, all shared libaries and executable targets will be linked
 using the C++ compiler.  To force a program or shared library to be
 linked as a C program, set the variable LINK_AS_C to a non-empty

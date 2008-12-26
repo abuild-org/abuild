@@ -2446,20 +2446,21 @@ $td->runtest("clean all",
 # from a file at compile time.
 
 # shared1: a shared library that depends on static and has the option
-# of being built either with or without LINK_SHLIBS.  After build, it
-# resets LIBS and adds itself so that depending on shared1 doesn't put
-# static into the library list.
+# of being built either with or without linking against the static
+# library.  After build, it resets LIBS and adds itself so that
+# depending on shared1 doesn't put static into the library list.
 
 # prog1: depends on shared1 but not on static; can only link if static
 # is linked into shared1.
 
 # shared1-alt: identical interface to shared1 enabling it to replace
-# shared1 at runtime; depends on static and always links with
-# LINK_SHLIBS.  Also uses an after-build file to remove static from
-# the library list.
+# shared1 at runtime; depends on static and links with its library.
+# Also uses an after-build file to remove static from the library
+# list.
 
 # shared2: different interface; also depends privately on static, and
-# also has the option of being build without LINK_SHLIBS.
+# also has the option of being build without linking the static
+# library.
 
 # prog2: like prog1 but links with shared2
 
