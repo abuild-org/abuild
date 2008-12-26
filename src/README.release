@@ -2,6 +2,9 @@
 Abuild release checklist
 ========================
 
+ * Update copyright years in all files that contain a copyright if
+   this is the first release of the calendar year.
+
  * Update version numbers in Abuild.cc and manual.xml
 
  * Update release date at top of manual.xml and also in the release
