@@ -105,13 +105,6 @@ Core
    --no-dep-failures, then all the build items would build as if there
    were no dependency from f to e.
 
- * When a build failure causes propagation of failure status to other
-   build items, this fact should be reported...something like
-
-   build item X failed
-   build item Y will not be built because it depends on X
-   build item Z will not be built because it depends on X
-
 
 Documentation
 =============
@@ -197,11 +190,6 @@ Usability
 =========
 
  * Add "down" and "descending" as synonyms for build set "desc"
-
- * When abuild exits abnormally, it should say so right before it
-   actually exits.  This way, if abuild -jn fails because one of the
-   jobs failed, the last line of output will indicate the failure.
-   Otherwise, the failed build item may be buried somewhere.
 
 Non-user-visible
 ================

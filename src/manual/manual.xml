@@ -1342,7 +1342,7 @@ C:\cygwin\cygwin.bat
      <filename>basic/cxx-library</filename> directory.  &Abuild; would
      create an output directory whose name would start with
      <filename>abuild-</filename> and be based on the platform or
-     platforms on which abuild was building this item.  This is the
+     platforms on which &abuild; was building this item.  This is the
      directory to which the variable
      <varname>$(ABUILD_OUTPUT_DIR)</varname> refers in the
      <filename>Abuild.interface</filename> file.
@@ -7090,7 +7090,7 @@ endif
       than one target.  Additionally, &Abuild; will automatically
       include any library targets at the beginning of the library list
       when linking any binary targets in the build item.  All targets
-      are created directly in the abuild output directory.
+      are created directly in the &abuild; output directory.
      </para>
      <para>
       In addition to the standard targets, the
@@ -13277,27 +13277,67 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
-         Bug fix: if a build item has instances of another build item
-         in its dependency chain for more than one platform, &abuild;
-         previously ignored all but the first instance of the second
-         item's interface.  (Recall that &abuild; creates a separate
-         instance of each item's interface for every platform on which
-         that item builds.)  &Abuild; now properly treats each
-         instance of the interface separately for purposes of
-         importing interfaces into a dependent item's build.  This bug
-         could only be exercised by creating multiple build items that
-         depend on a common build item using different
-         platform-specific dependencies.
+         Bug Fixes
         </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           If a build item has instances of another build item in its
+           dependency chain for more than one platform, &abuild;
+           previously ignored all but the first instance of the second
+           item's interface.  (Recall that &abuild; creates a separate
+           instance of each item's interface for every platform on
+           which that item builds.)  &Abuild; now properly treats each
+           instance of the interface separately for purposes of
+           importing interfaces into a dependent item's build.  This
+           bug could only be exercised by creating multiple build
+           items that depend on a common build item using different
+           platform-specific dependencies.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
        <listitem>
         <para>
-         A minor change was made to make it easier for users to create
-         plugins that would enable use of GNU Make to build Java
-         code.  This could make it easier to create prototypes of
-         different back-end build approaches for Java without having
-         to modify &abuild;'s internals.
+         Usability Improvements
         </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           If any build failures occur in a given &abuild; run,
+           &abuild; now issues an error message indicating this at the
+           end of its output just before exiting.  This makes it
+           easier to recognize a failed build by looking at the end of
+           &abuild;'s output.  This is especially helpful when for
+           parallel builds or builds with <option>-k</option> since,
+           in those cases, the output of the failed builds may not be
+           at the end of the output.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; is clearer about reporting when a build item
+           fails.  Additionally, if a build failure of one item causes
+           other items to be skipped, this is now reported as well.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Internal Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           A minor change was made to make it easier for users to
+           create plugins that would enable use of GNU Make to build
+           Java code.  This could make it easier to create prototypes
+           of different back-end build approaches for Java without
+           having to modify &abuild;'s internals.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
       </itemizedlist>
      </listitem>
@@ -13308,7 +13348,7 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
-         Abuild no longer includes the minor release of Red Hat
+         &Abuild; no longer includes the minor release of Red Hat
          Enterprise Linux and Centos releases in the platform string.
          The minor release number is not necessary as the minor
          releases are intended to be binary compatible.  This allows a

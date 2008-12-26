@@ -38,6 +38,8 @@ class Abuild
 
     typedef BuildTree::BuildItem_ptr BuildItem_ptr;
     typedef BuildTree::BuildItem_map BuildItem_map;
+    typedef boost::function<bool(std::string const&, std::string const&)>
+            item_filter_t;
 
     bool runInternal();
     void getThisPlatform();
@@ -116,14 +118,14 @@ class Abuild
 				std::string const& platform);
     bool isThisItem(std::string const& name, std::string const& platform);
     bool isAnyItem(std::string const& name, std::string const& platform);
-    bool itemBuilder(
-	std::string builder_string,
-	boost::function<bool(std::string const&, std::string const&)> filter);
+    bool itemBuilder(std::string builder_string, item_filter_t filter,
+		     bool is_dep_failure);
     bool buildItem(std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item);
     void stateChangeCallback(std::string const& builder_string,
-			     DependencyEvaluator::ItemState state);
+			     DependencyEvaluator::ItemState state,
+			     item_filter_t filter);
     bool createItemInterface(std::string const& builder_string,
 			     std::string const& item_name,
 			     std::string const& item_platform,

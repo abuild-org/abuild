@@ -117,3 +117,6 @@ abuild-monitor: error --topdir--/a/af/1.interface:1:13: ERROR: after-build files
 abuild-monitor: error --topdir--/a/af/Abuild.interface: ERROR: after-build file 2.interface does not exist
 abuild-monitor: state-change af indep failed
 abuild-monitor: state-change af-rdep indep dependency-failed
+abuild: af-rdep (abuild-indep) will not be built because of failure of a dependency
+abuild: ERROR: at least one build failure occurred
+abuild-monitor: error abuild: ERROR: at least one build failure occurred

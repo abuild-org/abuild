@@ -1,1 +1,3 @@
 --topdir--/a/aa/aai/aaib/Abuild.interface: ERROR: interfaces for items with no build files may not load after-build files
+abuild: aaia (abuild-indep) will not be built because of failure of a dependency
+abuild: ERROR: at least one build failure occurred

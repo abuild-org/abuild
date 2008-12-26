@@ -18,6 +18,7 @@ BUILD FAILED
 --abuild.xml--:nn: Test com.example.FailingTest failed
 
 Total time: <time>
+abuild: failing (abuild-java): build failed
 abuild: test (abuild-java): test
 Buildfile: --abuild.xml--
 
@@ -67,3 +68,4 @@ init:
 
 BUILD SUCCESSFUL
 Total time: <time>
+abuild: ERROR: at least one build failure occurred

@@ -14,7 +14,7 @@
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
-std::string const Abuild::ABUILD_VERSION = "1.0.2";
+std::string const Abuild::ABUILD_VERSION = "1.0.3-pre";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
@@ -194,6 +194,11 @@ Abuild::runInternal()
     else
     {
         okay = buildBuildset();
+    }
+
+    if (! okay)
+    {
+	error("at least one build failure occurred");
     }
 
     return okay;
@@ -3503,12 +3508,10 @@ Abuild::buildBuildset()
 
     // Build appropriate items in dependency order.
     DependencyRunner r(this->build_graph, this->max_workers,
-		       boost::bind(&Abuild::itemBuilder, this, _1, filter));
-    if (this->monitored)
-    {
-	r.setChangeCallback(boost::bind(&Abuild::stateChangeCallback,
-					this, _1, _2), true);
-    }
+		       boost::bind(&Abuild::itemBuilder, this,
+				   _1, filter, false));
+    r.setChangeCallback(boost::bind(&Abuild::stateChangeCallback,
+				    this, _1, _2, filter), true);
     verbose("starting build");
     this->logger.flushLog();
     bool stop_on_error = true;
@@ -3897,9 +3900,8 @@ Abuild::isAnyItem(std::string const&, std::string const&)
 }
 
 bool
-Abuild::itemBuilder(
-    std::string builder_string,
-    boost::function<bool(std::string const&, std::string const&)> filter)
+Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
+		    bool is_dep_failure)
 {
     boost::smatch match;
     boost::regex builder_re(BUILDER_RE);
@@ -3919,13 +3921,14 @@ Abuild::itemBuilder(
     assert(! build_item.hasShadowedReferences());
 
     bool no_op = (this->special_target == s_NO_OP);
+    bool use_interfaces = (! (no_op || is_dep_failure));
 
     std::string const& abs_path = build_item.getAbsolutePath();
     InterfaceParser parser(item_name, item_platform, abs_path);
     parser.setSupportedFlags(build_item.getSupportedFlags());
     bool status = true;
 
-    if (! no_op)
+    if (use_interfaces)
     {
 	status = createItemInterface(
 	    builder_string, item_name, item_platform, build_item, parser);
@@ -3937,12 +3940,21 @@ Abuild::itemBuilder(
 	// built.
 	if (status && filter(item_name, item_platform))
 	{
-	    status = buildItem(item_name, item_platform, build_item);
+	    if (is_dep_failure)
+	    {
+		info(item_name +
+		     " (" + OUTPUT_DIR_PREFIX + item_platform +
+		     ") will not be built because of failure of a dependency");
+	    }
+	    else
+	    {
+		status = buildItem(item_name, item_platform, build_item);
+	    }
 	}
 
 	// If all is well, read any after-build files.  Disallow them
 	// from declaring their own after-build files.
-	if (status && (! no_op))
+	if (status && use_interfaces)
 	{
 	    status = readAfterBuilds(
 		item_platform, item_platform, build_item, parser);
@@ -3972,7 +3984,8 @@ Abuild::itemBuilder(
 
 void
 Abuild::stateChangeCallback(std::string const& builder_string,
-			    DependencyEvaluator::ItemState state)
+			    DependencyEvaluator::ItemState state,
+			    item_filter_t filter)
 {
     boost::smatch match;
     boost::regex builder_re(BUILDER_RE);
@@ -3982,6 +3995,10 @@ Abuild::stateChangeCallback(std::string const& builder_string,
     std::string item_state = DependencyEvaluator::unparseState(state);
     monitorOutput("state-change " +
 		  item_name + " " + item_platform + " " + item_state);
+    if (state == DependencyEvaluator::i_depfailed)
+    {
+	itemBuilder(builder_string, filter, true);
+    }
 }
 
 bool
@@ -4299,6 +4316,11 @@ Abuild::buildItem(std::string const& item_name,
       default:
 	fatal("unknown backend type for build item " + item_name);
 	break;
+    }
+
+    if (! result)
+    {
+        info(item_name + " (" + output_dir + "): build failed");
     }
 
     return result;

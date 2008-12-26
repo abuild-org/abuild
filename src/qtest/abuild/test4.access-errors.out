@@ -5,3 +5,5 @@ abuild: bad2 (abuild-<native>): all
 make: Entering directory `--topdir--/bad/2/abuild-<native>'
 --abuild-dir--/make/abuild.mk:nn: *** These build items from BUILD_ITEM_RULES inaccessible: util.src.  Stop.
 make: Leaving directory `--topdir--/bad/2/abuild-<native>'
+abuild: bad2 (abuild-<native>): build failed
+abuild: ERROR: at least one build failure occurred
