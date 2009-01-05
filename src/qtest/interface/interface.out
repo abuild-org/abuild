@@ -1,23 +1,23 @@
-declaring STRING1: string scalar
+declaring STRING1: string
 success
 normal assignment to STRING1 = potato
 success
-declaring BOOL1: boolean scalar
+declaring BOOL1: boolean
 success
 normal assignment to BOOL1 = true
 success
-declaring INCLUDES: filename prependlist
+declaring INCLUDES: list filename prepend
 success
-declaring LIBS: string prependlist
+declaring LIBS: list string prepend
 success
-declaring THINGS: string appendlist
+declaring THINGS: list string append
 success
 dumping interface base
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code: uninitialized
-LIBS: string prependlist, target type object-code: uninitialized
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent: uninitialized
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code: uninitialized
+LIBS: list string prepend, target type object-code: uninitialized
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent: uninitialized
 end of interface base
 normal assignment to INCLUDES = . include
 success
@@ -25,7 +25,7 @@ normal assignment to LIBS = l1-1 l1-2
 success
 normal assignment to THINGS = th1-1 th1-2
 success
-declaring MOO: string scalar
+declaring MOO: string
 success
 normal assignment to MOO = baaa
 success
@@ -36,19 +36,19 @@ success
 normal flag=private assignment to THINGS = th1-private
 success
 dumping interface base
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code: uninitialized
-LIBS: string prependlist, target type object-code: uninitialized
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent: uninitialized
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code: uninitialized
+LIBS: list string prepend, target type object-code: uninitialized
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent: uninitialized
 end of interface base
 dumping interface item1
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code = --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l1-1 l1-2
-MOO: string scalar, target type object-code = oink
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code = --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l1-1 l1-2
+MOO: string, target type object-code = oink
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2
 end of interface item1
 normal assignment to INCLUDES = . include
 success
@@ -57,12 +57,12 @@ success
 normal assignment to THINGS = th2-1 th2-2
 success
 dumping interface item2
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l2-1 l2-2 l1-1 l1-2
-MOO: string scalar, target type object-code = oink
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2 th2-1 th2-2
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
+MOO: string, target type object-code = oink
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1 th2-2
 end of interface item2
 normal assignment to INCLUDES = .
 success
@@ -71,12 +71,12 @@ success
 normal assignment to THINGS = th3-1
 success
 dumping interface item3
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code = --CWD--/item3 --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l3-1 l1-1 l1-2
-MOO: string scalar, target type object-code = oink
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2 th3-1
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code = --CWD--/item3 --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l3-1 l1-1 l1-2
+MOO: string, target type object-code = oink
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2 th3-1
 end of interface item3
 normal assignment to INCLUDES = .
 success
@@ -86,28 +86,28 @@ normal assignment to THINGS = th4-1
 success
 override assignment to MOO = cluq
 success
-declaring QUACK: string scalar
+declaring QUACK: string
 success
 dumping interface item4
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code = --CWD--/item4 --CWD--/item3 --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l4-1 l3-1 l2-1 l2-2 l1-1 l1-2
-MOO: string scalar, target type object-code = cluq
-QUACK: string scalar, target type object-code: uninitialized
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2 th2-1 th2-2 th3-1 th4-1
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code = --CWD--/item4 --CWD--/item3 --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l4-1 l3-1 l2-1 l2-2 l1-1 l1-2
+MOO: string, target type object-code = cluq
+QUACK: string, target type object-code: uninitialized
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1 th2-2 th3-1 th4-1
 end of interface item4
-declaring MOO: string scalar
+declaring MOO: string
 success
 fallback assignment to MOO = baaa
 success
 dumping interface item5
-BOOL1: boolean scalar, target type all = 1
-INCLUDES: filename prependlist, target type object-code: uninitialized
-LIBS: string prependlist, target type object-code: uninitialized
-MOO: string scalar, target type object-code = baaa
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent: uninitialized
+BOOL1: boolean, target type all = 1
+INCLUDES: list filename prepend, target type object-code: uninitialized
+LIBS: list string prepend, target type object-code: uninitialized
+MOO: string, target type object-code = baaa
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent: uninitialized
 end of interface item5
 importing item5 with conflicts
 item5:1:1: ERROR: variable MOO has already been declared
@@ -121,7 +121,7 @@ failure
 override assignment to BOOL1 = potato
 bad1:3:1: ERROR: value potato is invalid for boolean variable BOOL1
 failure
-declaring FILE: filename scalar
+declaring FILE: filename
 success
 normal assignment to FILE = 
 bad1:5:1: ERROR: the empty string may not be used as a value for filename variable FILE
@@ -139,67 +139,67 @@ success
 resetting UNKNOWN_VARIABLE
 item6:3:1: ERROR: resetting unknown variable UNKNOWN_VARIABLE
 failure
-declaring FLAG1: string scalar
+declaring FLAG1: string
 success
 normal flag=funny-looking assignment to FLAG1 = Lesotho
 success
-declaring FLAG2: string scalar
+declaring FLAG2: string
 success
 normal assignment to FLAG2 = Japan
 success
 override flag=plain assignment to FLAG2 = Libya
 success
-declaring FLAG3: string scalar
+declaring FLAG3: string
 success
 normal flag=letter assignment to FLAG3 = Rwanda
 success
 fallback assignment to FLAG3 = Canada
 success
 dumping interface item6
-BOOL1: boolean scalar, target type all = 1
-FLAG1: string scalar, target type object-code: uninitialized
-FLAG2: string scalar, target type object-code = Japan
-FLAG3: string scalar, target type object-code = Canada
-INCLUDES: filename prependlist, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l2-1 l2-2 l1-1 l1-2
-MOO: string scalar, target type object-code: uninitialized
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent: uninitialized
+BOOL1: boolean, target type all = 1
+FLAG1: string, target type object-code: uninitialized
+FLAG2: string, target type object-code = Japan
+FLAG3: string, target type object-code = Canada
+INCLUDES: list filename prepend, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
+MOO: string, target type object-code: uninitialized
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent: uninitialized
 end of interface item6
 dumping interface item7
-BOOL1: boolean scalar, target type all = 1
-FLAG1: string scalar, target type object-code: uninitialized
-FLAG2: string scalar, target type object-code = Japan
-FLAG3: string scalar, target type object-code = Canada
-INCLUDES: filename prependlist, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l2-1 l2-2 l1-1 l1-2
-MOO: string scalar, target type object-code = oink
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2
+BOOL1: boolean, target type all = 1
+FLAG1: string, target type object-code: uninitialized
+FLAG2: string, target type object-code = Japan
+FLAG3: string, target type object-code = Canada
+INCLUDES: list filename prepend, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
+MOO: string, target type object-code = oink
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2
 end of interface item7
 dumping interface item7
-BOOL1: boolean scalar, target type all = 1
-FLAG1: string scalar, target type object-code = Lesotho
-FLAG2: string scalar, target type object-code = Japan
-FLAG3: string scalar, target type object-code = Canada
-INCLUDES: filename prependlist, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l2-1 l2-2 l1-1 l1-2
-MOO: string scalar, target type object-code = oink
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2 th1-private
+BOOL1: boolean, target type all = 1
+FLAG1: string, target type object-code = Lesotho
+FLAG2: string, target type object-code = Japan
+FLAG3: string, target type object-code = Canada
+INCLUDES: list filename prepend, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
+MOO: string, target type object-code = oink
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2 th1-private
 end of interface item7
 dumping interface item7
-BOOL1: boolean scalar, target type all = 1
-FLAG1: string scalar, target type object-code = Lesotho
-FLAG2: string scalar, target type object-code = Libya
-FLAG3: string scalar, target type object-code = Rwanda
-INCLUDES: filename prependlist, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
-LIBS: string prependlist, target type object-code = l2-1 l2-2 l1-1 l1-2
-MOO: string scalar, target type object-code = oink
-STRING1: string scalar, target type all = potato
-THINGS: string appendlist, target type platform-independent = th1-1 th1-2 th1-private
+BOOL1: boolean, target type all = 1
+FLAG1: string, target type object-code = Lesotho
+FLAG2: string, target type object-code = Libya
+FLAG3: string, target type object-code = Rwanda
+INCLUDES: list filename prepend, target type object-code = --CWD--/item2 --CWD--/item2/include --CWD--/item1 --CWD--/item1/include
+LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
+MOO: string, target type object-code = oink
+STRING1: string, target type all = potato
+THINGS: list string append, target type platform-independent = th1-1 th1-2 th1-private
 end of interface item7
-declaring A: string scalar
+declaring A: string
 success
 normal flag=F1 assignment to A = F1
 success
@@ -213,25 +213,25 @@ fallback flag=F5 assignment to A = F5
 success
 item8, no flags
 dumping interface item8
-A: string scalar, target type all: uninitialized
+A: string, target type all: uninitialized
 end of interface item8
 add flag F5
 dumping interface item8
-A: string scalar, target type all = F5
+A: string, target type all = F5
 end of interface item8
 add flag F4
 dumping interface item8
-A: string scalar, target type all = F4
+A: string, target type all = F4
 end of interface item8
 add flag F1
 dumping interface item8
-A: string scalar, target type all = F1
+A: string, target type all = F1
 end of interface item8
 add flag F2
 dumping interface item8
-A: string scalar, target type all = F2
+A: string, target type all = F2
 end of interface item8
 add flag F3
 dumping interface item8
-A: string scalar, target type all = F3
+A: string, target type all = F3
 end of interface item8
