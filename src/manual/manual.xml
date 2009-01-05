@@ -3085,6 +3085,39 @@ C:\cygwin\cygwin.bat
      items using a clean set (described below) is very fast.
     </para>
     <para>
+     Note
+     that, starting with version 1.0.3, &abuild; cleans
+     <emphasis>all</emphasis> build items, not just those with build
+     files.  There are several reasons for this:
+     <itemizedlist>
+      <listitem>
+       <para>
+        In certain debugging modes, such as interface debugging mode,
+        &abuild; may create output directories for items that don't
+        build anything.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        You might change a build item from an item that builds
+        something to an interface-only build item.  In this case, you
+        will want a subsequent clean to remove the no-longer-needed
+        output directories.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Although it is not necessarily recommended, there are some use
+        cases in which build items may &ldquo;push&rdquo; files into
+        the output directory of an interface-only build item.  Some
+        people may choose to implement installers that work this way.
+        Having &abuild; clean interface-only build items makes it
+        easier to clean up in those cases.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
      The <command>no-op</command> target is used primarily for
      debugging build tree problems.  When &abuild; is invoked with the
      <command>no-op</command> target, it goes through all the motions
@@ -3978,7 +4011,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
        <listitem>
         <para>
-         Only build items that contain build files are visited.
+         Even build items that don't contain build files are visited.
         </para>
        </listitem>
        <listitem>
@@ -13332,6 +13365,23 @@ Y = $(X)
            the more normal case of being able to replace earlier
            versions of shared libraries with later versions that may
            have different dependencies.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Enhancements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           When <option>--clean</option> is used to clean a build set,
+           &abuild; now attempts to clean <emphasis>all</emphasis>
+           build items, not just items with build files.  This means
+           &abuild; will attempt to clean interface-only items,
+           plugins, and other items that it previously would not have
+           attempted to clean.
           </para>
          </listitem>
         </itemizedlist>

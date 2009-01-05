@@ -1,7 +1,12 @@
+abuild: cleaning common-lib1 in ../common/lib1
 abuild: cleaning common-lib1.src in ../common/lib1/src
 abuild: cleaning common-lib1.test in ../common/lib1/test
+abuild: cleaning derived-code-generator in code-generator
+abuild: cleaning derived-main in main
 abuild: cleaning derived-main.src in main/src
+abuild: cleaning project-lib in ../project/lib
 abuild: cleaning project-lib.src in ../project/lib/src
 abuild: cleaning project-lib.test in ../project/lib/test
+abuild: cleaning world-peace in world-peace
 abuild: cleaning world-peace.autoconf in world-peace/autoconf
 abuild: cleaning world-peace.stub in world-peace/stub

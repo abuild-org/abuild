@@ -1,2 +1,4 @@
 abuild: cleaning aa in ../a/aa
 abuild: cleaning cb in ../c/cb
+abuild: cleaning plugin.echo in ../plugins/echo
+abuild: cleaning plugin.qrwx in ../plugins/qrwx

@@ -1,4 +1,8 @@
 abuild: cleaning bin in bin
+abuild: cleaning indep-a in indep/a
 abuild: cleaning indep-b in indep/b
 abuild: cleaning java-main in ../java/code
 abuild: cleaning lib in lib
+abuild: cleaning plugin.counter in ../plugins/counter
+abuild: cleaning plugin.echoer in ../plugins/echoer
+abuild: cleaning plugin.printer in ../plugins/printer

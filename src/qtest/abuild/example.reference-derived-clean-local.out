@@ -1,1 +1,2 @@
+abuild: cleaning derived-main in main
 abuild: cleaning derived-main.src in main/src

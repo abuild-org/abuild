@@ -4615,7 +4615,7 @@ Abuild::cleanBuildset()
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (item.isWritable() && item.hasBuildFile())
+	if (item.isWritable())
 	{
 	    cleanPath(item_name, item.getAbsolutePath());
 	}

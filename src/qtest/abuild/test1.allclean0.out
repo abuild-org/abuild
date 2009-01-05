@@ -10,9 +10,17 @@ abuild: cleaning bc in ../../b/bc
 abuild: cleaning ca in ../ca
 abuild: cleaning cb in .
 abuild: cleaning cc in ../cc
+abuild: cleaning d in ../../d
+abuild: cleaning d.a in ../../d/a
+abuild: cleaning d.a.a in ../../d/a/a
+abuild: cleaning d.b in ../../d/b
+abuild: cleaning d.b.a in ../../d/b/a
+abuild: cleaning d.b.a.a in ../../d/b/a/a
 abuild: cleaning e.bin in ../../e/bin
 abuild: cleaning e.global in ../../e/global-overrides
 abuild: cleaning e.lib in ../../e/lib
 abuild: cleaning e.shlib in ../../e/shlib
 abuild: cleaning e.shlib2 in ../../e/shlib2
+abuild: cleaning plugin.echo in ../../plugins/echo
+abuild: cleaning plugin.qrwx in ../../plugins/qrwx
 abuild: cleaning root in ../..

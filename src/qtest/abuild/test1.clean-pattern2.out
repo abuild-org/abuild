@@ -4,3 +4,8 @@ abuild: cleaning ac in ../a/ac
 abuild: cleaning ad in ../a/ad
 abuild: cleaning bb in ../b/bb
 abuild: cleaning ca in ../c/ca
+abuild: cleaning d.a in ../d/a
+abuild: cleaning d.a.a in ../d/a/a
+abuild: cleaning d.b.a in ../d/b/a
+abuild: cleaning plugin.echo in ../plugins/echo
+abuild: cleaning plugin.qrwx in ../plugins/qrwx

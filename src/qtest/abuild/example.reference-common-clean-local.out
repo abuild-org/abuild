@@ -1,6 +1,9 @@
+abuild: cleaning common-lib1 in lib1
 abuild: cleaning common-lib1.src in lib1/src
 abuild: cleaning common-lib1.test in lib1/test
+abuild: cleaning common-lib2 in lib2
 abuild: cleaning common-lib2.src in lib2/src
 abuild: cleaning common-lib2.test in lib2/test
+abuild: cleaning common-lib3 in lib3
 abuild: cleaning common-lib3.src in lib3/src
 abuild: cleaning common-lib3.test in lib3/test
