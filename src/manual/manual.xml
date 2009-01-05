@@ -13343,8 +13343,10 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           A failing qtest test suite when invoked from ant now causes
-           the build of that item to fail.
+           A failing qtest test suite when invoked from ant now
+           properly causes the build of that item with the
+           <command>check</command> or <command>test</command> targets
+           to fail.
           </para>
          </listitem>
          <listitem>
