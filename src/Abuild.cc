@@ -19,6 +19,7 @@ std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
+std::string const Abuild::FILE_INTERFACE_DUMP = ".ab-interface-dump";
 std::string const Abuild::b_ALL = "all";
 std::string const Abuild::b_LOCAL = "local";
 std::string const Abuild::b_DESC = "desc";
@@ -28,7 +29,7 @@ std::set<std::string> Abuild::valid_buildsets;
 std::string const Abuild::s_CLEAN = "clean";
 std::string const Abuild::s_NO_OP = "no-op";
 // PLUGIN_PLATFORM can't match a real platform name.
-std::string const Abuild::PLUGIN_PLATFORM = "[plugin]";
+std::string const Abuild::PLUGIN_PLATFORM = "plugin";
 std::string const Abuild::FILE_PLUGIN_INTERFACE = "plugin.interface";
 std::string const Abuild::BUILDER_RE = "([^:]+):([^:]+)";
 std::set<std::string> Abuild::special_targets;
@@ -55,6 +56,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     silent(false),
     monitored(false),
     use_abuild_logger(true),
+    dump_interfaces(false),
     apply_targets_to_deps(false),
     local_build(false),
     error_handler(whoami),
@@ -419,6 +421,10 @@ Abuild::parseArgv()
 	else if (arg == "--monitored")
 	{
 	    this->monitored = true;
+	}
+	else if (arg == "--dump-interfaces")
+	{
+	    this->dump_interfaces = true;
 	}
 	else if ((! arg.empty()) && (arg[0] == '-'))
 	{
@@ -3488,7 +3494,11 @@ Abuild::buildBuildset()
 	if (isPluginAnywhere(item_name))
 	{
 	    verbose("loading interface for plugin " + item_name);
-	    if (! createPluginInterface(item_name, item))
+	    if (createPluginInterface(item_name, item))
+	    {
+		dumpInterface(PLUGIN_PLATFORM, item);
+	    }
+	    else
 	    {
 		plugin_interface_errors = true;
 	    }
@@ -3500,7 +3510,7 @@ Abuild::buildBuildset()
     }
 
     // Set variables whose values are global for all items.
-    FileLocation internal("<global-initialization>", 0, 0);
+    FileLocation internal("[global-initialization]", 0, 0);
     assert(this->base_interface->assignVariable(
 	       internal, "ABUILD_STDOUT_IS_TTY",
 	       (this->stdout_is_tty ? "1" : "0"),
@@ -3936,6 +3946,11 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 
     if (build_item.hasBuildFile())
     {
+	if (status && use_interfaces)
+	{
+	    dumpInterface(item_platform, build_item, ".before-build");
+	}
+
 	// Build the item if we are supposed to.  Otherwise, assume it is
 	// built.
 	if (status && filter(item_name, item_platform))
@@ -3959,9 +3974,18 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    status = readAfterBuilds(
 		item_platform, item_platform, build_item, parser);
 	}
+	if (status && use_interfaces)
+	{
+	    dumpInterface(item_platform, build_item, ".after-build");
+	}
     }
     else
     {
+	if (status && use_interfaces)
+	{
+	    dumpInterface(item_platform, build_item);
+	}
+
 	if (! parser.getAfterBuilds().empty())
 	{
 	    QTC::TC("abuild", "Abuild ERR after-build with no build file");
@@ -4058,7 +4082,7 @@ Abuild::createItemInterface(std::string const& builder_string,
     // file well.
 
     Interface& _interface = *(parser.getInterface());
-    FileLocation internal("<internal: " + builder_string + ">", 0, 0);
+    FileLocation internal("[internal: " + builder_string + "]", 0, 0);
     assignInterfaceVariable(_interface,
 			    internal, "ABUILD_THIS", build_item.getName(),
 			    Interface::a_override, status);
@@ -4180,6 +4204,40 @@ Abuild::createPluginInterface(std::string const& plugin_name,
 }
 
 void
+Abuild::dumpInterface(std::string const& item_platform,
+		      BuildItem& build_item,
+		      std::string const& suffix)
+{
+    if (! this->dump_interfaces)
+    {
+	return;
+    }
+
+    if (! build_item.isWritable())
+    {
+	QTC::TC("abuild", "Abuild dumpInterface ignoring read-only build item");
+	return;
+    }
+
+    std::string output_dir = createOutputDirectory(item_platform, build_item);
+    std::string dumpfile =
+	output_dir + "/" + FILE_INTERFACE_DUMP + suffix + ".xml";
+    std::ofstream of(dumpfile.c_str(),
+		     std::ios_base::out |
+		     std::ios_base::trunc |
+		     std::ios_base::binary);
+    if (! of.is_open())
+    {
+	throw QEXC::System("create " + dumpfile, errno);
+    }
+
+    Interface const& _interface = build_item.getInterface(item_platform);
+    _interface.dump(of);
+
+    of.close();
+}
+
+void
 Abuild::assignInterfaceVariable(Interface& _interface,
 				FileLocation const& location,
 				std::string const& variable_name,
@@ -4263,8 +4321,8 @@ Abuild::buildItem(std::string const& item_name,
 	return true;
     }
 
-    std::string path = build_item.getAbsolutePath();
-    std::string abs_output_dir = path + "/" + output_dir;
+    std::string abs_output_dir =
+	createOutputDirectory(item_platform, build_item);
     std::string rel_output_dir = Util::absToRel(abs_output_dir);
 
     std::list<std::string>& backend_targets =
@@ -4280,23 +4338,6 @@ Abuild::buildItem(std::string const& item_name,
         info(item_name + " (" + output_dir + "): " +
 	     Util::join(" ", backend_targets) +
 	     (this->verbose_mode ? " in " + rel_output_dir : ""));
-    }
-
-    // The .abuild file tells abuild that this is its directory.
-    // cleanPath verifies its existence before deleting a directory.
-    std::string dot_abuild = abs_output_dir + "/.abuild";
-    if (! Util::isFile(dot_abuild))
-    {
-	Util::makeDirectory(abs_output_dir);
-	std::ofstream of(dot_abuild.c_str(),
-			 std::ios_base::out |
-			 std::ios_base::trunc |
-			 std::ios_base::binary);
-	if (! of.is_open())
-	{
-	    throw QEXC::System("create " + dot_abuild, errno);
-	}
-	of.close();
     }
 
     bool result = false;
@@ -4324,6 +4365,36 @@ Abuild::buildItem(std::string const& item_name,
     }
 
     return result;
+}
+
+std::string
+Abuild::createOutputDirectory(std::string const& item_platform,
+			      BuildItem& build_item)
+{
+    // If it doesn't already exist, create the output directory and
+    // put an empty .abuild file in it.  The .abuild file tells abuild
+    // that this is its directory.  cleanPath verifies its existence
+    // before deleting a directory.  Knowledge of the name of the
+    // output directory is duplicated in several places.
+
+    std::string output_dir =
+	build_item.getAbsolutePath() + "/" + OUTPUT_DIR_PREFIX + item_platform;
+    std::string dot_abuild = output_dir + "/.abuild";
+    if (! Util::isFile(dot_abuild))
+    {
+	Util::makeDirectory(output_dir);
+	std::ofstream of(dot_abuild.c_str(),
+			 std::ios_base::out |
+			 std::ios_base::trunc |
+			 std::ios_base::binary);
+	if (! of.is_open())
+	{
+	    throw QEXC::System("create " + dot_abuild, errno);
+	}
+	of.close();
+    }
+
+    return output_dir;
 }
 
 bool
@@ -4697,6 +4768,8 @@ Abuild::help()
     h("    -c set");
     h("  --dump-build-graph  dump abuild's internal build graph");
     h("  --dump-data       dump abuild's data to stdout and build no targets");
+    h("  --dump-interfaces   write details about items' interfaces to files");
+    h("                    in the output directory");
     h("  -e | --emacs      pass the -e flags to ant and also set a property");
     h("                    telling our ant build file that we are running in");
     h("                    emacs mode.");

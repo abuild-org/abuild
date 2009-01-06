@@ -395,6 +395,8 @@ Interface::resetVariable(FileLocation const& location,
     {
 	Variable& var = this->symbol_table[variable_name];
 	var.assignment_history.clear();
+	var.reset_history.push_back(
+	    Reset(location, this->item_name, this->item_platform));
     }
     else
     {
@@ -518,6 +520,66 @@ Interface::getVariable(std::string const& variable_name,
     return status;
 }
 
+std::string
+Interface::unparse_type(type_e type, list_e list_type)
+{
+    std::string result;
+    if (list_type != Interface::l_scalar)
+    {
+	result += "list ";
+    }
+    switch (type)
+    {
+      case Interface::t_string:
+	result += "string";
+	break;
+
+      case Interface::t_boolean:
+	result += "boolean";
+	break;
+
+      case Interface::t_filename:
+	result += "filename";
+	break;
+    }
+    switch (list_type)
+    {
+      case Interface::l_scalar:
+	break;
+
+      case Interface::l_append:
+	result += " append";
+	break;
+
+      case Interface::l_prepend:
+	result += " prepend";
+	break;
+    }
+
+    return result;
+}
+
+std::string
+Interface::unparse_assignment_type(assign_e assignment_type)
+{
+    std::string result;
+    switch (assignment_type)
+    {
+      case Interface::a_normal:
+	result += "normal";
+	break;
+
+      case Interface::a_override:
+	result += "override";
+	break;
+
+      case Interface::a_fallback:
+	result += "fallback";
+	break;
+    }
+    return result;
+}
+
 std::map<std::string, Interface::VariableInfo>
 Interface::getVariablesForTargetType(
     TargetType::target_type_e target_type,
@@ -553,6 +615,89 @@ Interface::getVariableNames() const
 	result.insert((*iter).first);
     }
     return result;
+}
+
+void
+Interface::dump(std::ostream& out) const
+{
+    out << "<?xml version=\"1.0\"?>" << std::endl;
+    out << "<interface version=\"1\" item-name=\""
+	<< Util::XMLify(this->item_name, true) << "\" item-platform=\""
+	<< Util::XMLify(this->item_platform, true) << "\">" << std::endl;
+    for (std::map<std::string, Variable>::const_iterator iter =
+	     this->symbol_table.begin();
+	 iter != this->symbol_table.end(); ++iter)
+    {
+	std::string const& variable_name = (*iter).first;
+	Variable const& var = (*iter).second;
+
+	out << " <variable name=\"" << Util::XMLify(variable_name, true)
+	    << "\" type=\"" << unparse_type(var.type, var.list_type)
+	    << "\" target-type=\"" << TargetType::getName(var.target_type)
+	    << "\" declaration-location=\""
+	    << Util::XMLify(var.declare_location, true)
+	    << "\">" << std::endl;
+	if (! var.reset_history.empty())
+	{
+	    QTC::TC("abuild", "Interface dump reset history");
+	    out << "  <reset-history>" << std::endl;
+	    for (std::list<Reset>::const_iterator iter =
+		     var.reset_history.begin();
+		 iter != var.reset_history.end(); ++iter)
+	    {
+		Reset const& r = *iter;
+		out << "   <reset item-name=\""
+		    << Util::XMLify(r.item_name, true)
+		    << "\" item-platform=\""
+		    << Util::XMLify(r.item_platform, true)
+		    << "\" location=\""
+		    << Util::XMLify(r.location, true) << "/>" << std::endl;
+	    }
+	    out << "  </reset-history>" << std::endl;
+	}
+	if (var.assignment_history.empty())
+	{
+	    QTC::TC("abuild", "Interface dump unassigned");
+	}
+	else
+	{
+	    out << "  <assignment-history>" << std::endl;
+	    for (std::list<Assignment>::const_iterator iter =
+		     var.assignment_history.begin();
+		 iter != var.assignment_history.end(); ++iter)
+	    {
+		Assignment const& assignment = *iter;
+		out << "   <assignment assignment-type=\""
+		    << unparse_assignment_type(assignment.assignment_type)
+		    << "\" item-name=\""
+		    << Util::XMLify(assignment.item_name, true)
+		    << "\" item-platform=\""
+		    << Util::XMLify(assignment.item_platform, true)
+		    << "\" location=\""
+		    << Util::XMLify(assignment.location, true)
+		    << "\"";
+		if (! assignment.flag.empty())
+		{
+		    QTC::TC("abuild", "Interface dump flag");
+		    out << " flag=\""
+			<< Util::XMLify(assignment.flag, true)
+			<< "\"";
+		}
+		out << ">" << std::endl;
+		for (std::deque<std::string>::const_iterator viter =
+			 assignment.value.begin();
+		     viter != assignment.value.end(); ++viter)
+		{
+		    out << "    <value value=\""
+			<< Util::XMLify(*viter, true) << "\"/>" << std::endl;
+		}
+		out << "   </assignment>" << std::endl;
+	    }
+	    out << "  </assignment-history>" << std::endl;
+	}
+	out << " </variable>" << std::endl;
+    }
+    out << "</interface>" << std::endl;
 }
 
 void

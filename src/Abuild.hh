@@ -123,6 +123,8 @@ class Abuild
     bool buildItem(std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item);
+    std::string createOutputDirectory(std::string const& item_platform,
+				      BuildItem& build_item);
     void stateChangeCallback(std::string const& builder_string,
 			     DependencyEvaluator::ItemState state,
 			     item_filter_t filter);
@@ -133,6 +135,9 @@ class Abuild
 			     InterfaceParser& parser);
     bool createPluginInterface(std::string const& plugin_name,
 			       BuildItem& build_item);
+    void dumpInterface(std::string const& item_platform,
+		       BuildItem& build_item,
+		       std::string const& suffix = "");
     void assignInterfaceVariable(Interface&, FileLocation const&,
 				 std::string const& variable_name,
 				 std::string const& value,
@@ -175,6 +180,7 @@ class Abuild
     static std::string const FILE_BACKING;
     static std::string const FILE_DYNAMIC_MK;
     static std::string const FILE_DYNAMIC_ANT;
+    static std::string const FILE_INTERFACE_DUMP;
     static std::string const b_ALL;
     static std::string const b_LOCAL;
     static std::string const b_DESC;
@@ -217,6 +223,7 @@ class Abuild
     bool silent;
     bool monitored;
     bool use_abuild_logger;
+    bool dump_interfaces;
     std::string special_target;
     std::list<std::string> targets;
     bool apply_targets_to_deps;

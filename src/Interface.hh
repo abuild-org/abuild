@@ -13,6 +13,7 @@
 #include <set>
 #include <map>
 #include <list>
+#include <iostream>
 #include <TargetType.hh>
 #include <FileLocation.hh>
 
@@ -147,6 +148,10 @@ class Interface
     bool getVariable(std::string const& variable_name,
 		     FlagData const&, VariableInfo& info) const;
 
+    // Describe the type of a variable -- for debugging
+    static std::string unparse_type(type_e type, list_e list_type);
+    static std::string unparse_assignment_type(assign_e assignment_type);
+
     // Return a map of variable name to value for each variable
     // declared with target type all or with the given target type.
     // Uninitialized variables are returned as well as initialized
@@ -157,6 +162,9 @@ class Interface
 
     // Return a set of the names of all known variables.
     std::set<std::string> getVariableNames() const;
+
+    // Dump full debugging data to a given output stream
+    void dump(std::ostream& out) const;
 
     // Normalize path separator characters in a filename.  If the file
     // is local, prepend the local directory.
@@ -200,6 +208,23 @@ class Interface
 	std::deque<std::string> value;
     };
 
+    class Reset
+    {
+      public:
+	Reset(FileLocation const& location,
+	      std::string const& item_name,
+	      std::string const& item_platform) :
+	    location(location),
+	    item_name(item_name),
+	    item_platform(item_platform)
+	{
+	}
+
+	FileLocation location;
+	std::string item_name;
+	std::string item_platform;
+    };
+
     class Variable
     {
       public:
@@ -229,6 +254,7 @@ class Interface
 	TargetType::target_type_e target_type;
 	type_e type;
 	list_e list_type;
+	std::list<Reset> reset_history;
 	// See comments in assignVariable for how assignment_history
 	// is used.
 	std::list<Assignment> assignment_history;

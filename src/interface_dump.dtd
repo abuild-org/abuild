@@ -1,0 +1,75 @@
+<!--  This DTD describes the format of the output of the files     -->
+<!--  created by abuild dump-interfaces.  Inline comments explain  -->
+<!--  the details.  The reader is assumed to have advanced         -->
+<!--  familiarity with the interface system as described in the    -->
+<!--  documentation.                                               -->
+
+<!--  The version attribute is always "1".  We will only           -->
+<!--  increment this if there is a change to the output such that  -->
+<!--  previously valid data is either no longer valid or is valid  -->
+<!--  but has different semantics.  Adding new attributes with     -->
+<!--  default values, optional attributes, or optional elements    -->
+<!--  will not cause the version number to be increased.  Code     -->
+<!--  that reads this output should be prepared to accept and      -->
+<!--  ignore unknown attributes or elements.  The item-name and    -->
+<!--  item-platform attributes describe the name and platform of   -->
+<!--  the item whose interface this is.                            -->
+<!ELEMENT interface (variable*)>
+<!ATTLIST interface
+  version         CDATA     #REQUIRED
+  item-name       CDATA     #REQUIRED
+  item-platform   CDATA     #REQUIRED
+>
+
+<!--  One variable element exists for each variable that has been  -->
+<!--  declared.  The attributes' values are self-explanatory.      -->
+<!ELEMENT variable (reset-history?, assignment-history?)>
+<!ATTLIST variable
+  name                  CDATA     #REQUIRED
+  type                  CDATA     #REQUIRED
+  target-type           CDATA     #REQUIRED
+  declaration-location  CDATA     #REQUIRED
+>
+
+<!--  Each time a variable is reset, an entry is recorded in the   -->
+<!--  reset history.  No assignments prior to the most recent      -->
+<!--  reset will be output, so the reset history can be used to    -->
+<!--  find earlier information about a variable.                   -->
+<!ELEMENT reset-history (reset+)>
+
+<!--  The attributes of the reset element refer to the build item  -->
+<!--  whose interface performed the reset operation.               -->
+<!ELEMENT reset EMPTY>
+<!ATTLIST reset
+  item-name        CDATA     #REQUIRED
+  item-platform    CDATA     #REQUIRED
+  location         CDATA     #REQUIRED
+>
+
+<!--  Each time an assignment is made to a variable, there is an   -->
+<!--  entry in the assignment history.  All assignments to a       -->
+<!--  variable are shown, including those that do not contribute   -->
+<!--  to the value of a variable.  Remember that, for scalar       -->
+<!--  variables, only the last assignment affects the value of     -->
+<!--  the variable; and that for list variables, each assignment   -->
+<!--  is appended or prepended to prior ones as determined by the  -->
+<!--  list type.  Also, variable assignments are filtered at       -->
+<!--  runtime based on flags.                                      -->
+<!ELEMENT assignment-history (assignment+)>
+
+<!--  The item-name, item-platform, and location attributes of     -->
+<!--  the assignment element refer to the build item whose         -->
+<!--  interface performed the assignment.  Remaining attributes    -->
+<!--  apply to the assignment and are self-explanatory.            -->
+<!ELEMENT assignment (value*)>
+<!ATTLIST assignment
+  assignment-type  CDATA     #REQUIRED
+  flag             CDATA     #IMPLIED
+  item-name        CDATA     #REQUIRED
+  item-platform    CDATA     #REQUIRED
+  location         CDATA     #REQUIRED
+>
+<!ELEMENT value EMPTY>
+<!ATTLIST value
+  value            CDATA     #REQUIRED
+>

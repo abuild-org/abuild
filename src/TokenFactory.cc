@@ -16,7 +16,7 @@ TokenFactory::createToken(std::string val)
     heap.insert(boost::shared_ptr<Token>(t));
     if (this->debug)
     {
-	std::cerr << "[" << this->last_location << "*" << val << "*] ";
+	std::cerr << "[" << this->last_location << ": *" << val << "*] ";
     }
 
     for (std::string::iterator iter = val.begin(); iter != val.end(); ++iter)

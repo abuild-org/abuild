@@ -1,4 +1,5 @@
 #include <FileLocation.hh>
+#include <sstream>
 
 FileLocation::FileLocation() :
     lineno(0),
@@ -32,32 +33,34 @@ FileLocation::getColno() const
     return this->colno;
 }
 
+FileLocation::operator std::string() const
+{
+    std::ostringstream s;
+    bool wrote = false;
+    if (! this->filename.empty())
+    {
+	wrote = true;
+	s << this->filename;
+    }
+    if (this->lineno != 0)
+    {
+	if (wrote)
+	{
+	    s << ":";
+	}
+	s << this->lineno;
+	if (this->colno != 0)
+	{
+	    s << ":" << this->colno;
+	}
+    }
+    return s.str();
+}
+
 std::ostream&
 operator<<(std::ostream& s, FileLocation const& fl)
 {
-    int lineno = fl.getLineno();
-    int colno = fl.getColno();
-    std::string filename = fl.getFilename();
-
-    bool wrote = false;
-    if (! filename.empty())
-    {
-	wrote = true;
-	s << filename << ":";
-    }
-    if (lineno != 0)
-    {
-	wrote = true;
-	s << lineno << ":";
-	if (colno != 0)
-	{
-	    s << colno << ":";
-	}
-    }
-    if (wrote)
-    {
-	s << " ";
-    }
+    s << std::string(fl);
     return s;
 }
 

@@ -129,6 +129,32 @@ Debugging
    somehow.  Also, make sure we include instance name information in
    the output.
 
+   Document:
+
+     --dump-interfaces command-line argument
+     file names for output
+       .ab-interface-dump.xml
+       .ab-interface-dump.before-build.xml
+       .ab-interface-dump.after-build.xml
+     xml output format
+       interface_dump.dtd
+     mention this in the interfaces section
+     update release notes
+
+   Release:
+
+    copy interface_dump.dtd to doc (same as abuild_data.dtd)
+
+   Test:
+
+     valid xml output
+     test on some build tree.  Ideas:
+       rule-checker (has fallback assignment)
+       cross-platform
+       opaque-wrapper
+       shared-library
+       some special tree created for this purpose
+
  * Provide an option to be used with --dump-data that delays
    generation of dump data output to include the build graph and the
    build architecture list.

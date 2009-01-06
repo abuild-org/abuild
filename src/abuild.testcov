@@ -223,3 +223,7 @@ Abuild some items skipped 0
 Interface same location, not instance 0
 Interface ERR variable assigned by other instance 0
 Interface duplicate assignment different platform same value 0
+Abuild dumpInterface ignoring read-only build item 0
+Interface dump reset history 0
+Interface dump unassigned 0
+Interface dump flag 0

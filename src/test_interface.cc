@@ -2,47 +2,12 @@
 #include <Error.hh>
 #include <Logger.hh>
 #include <FlagData.hh>
+#include <sstream>
 #include <string.h>
 #include <assert.h>
 
 static Logger* logger = 0;
 static char const* whoami = 0;
-
-static std::string
-unparse_type(Interface::type_e type, Interface::list_e list_type)
-{
-    std::string result;
-    switch (type)
-    {
-      case Interface::t_string:
-	result += "string";
-	break;
-
-      case Interface::t_boolean:
-	result += "boolean";
-	break;
-
-      case Interface::t_filename:
-	result += "filename";
-	break;
-    }
-    switch (list_type)
-    {
-      case Interface::l_scalar:
-	result += " scalar";
-	break;
-
-      case Interface::l_append:
-	result += " appendlist";
-	break;
-
-      case Interface::l_prepend:
-	result += " prependlist";
-	break;
-    }
-
-    return result;
-}
 
 static std::string
 unparse_values(std::deque<std::string> const& value)
@@ -56,36 +21,13 @@ unparse_values(std::deque<std::string> const& value)
     return result;
 }
 
-static std::string
-unparse_assignment_type(Interface::assign_e assignment_type)
-{
-    std::string result;
-    switch (assignment_type)
-    {
-      case Interface::a_normal:
-	result += "normal";
-	break;
-
-      case Interface::a_override:
-	result += "override";
-	break;
-
-      case Interface::a_fallback:
-	result += "fallback";
-	break;
-    }
-    result += " ";
-    return result;
-}
-
-
 static void
 declare(Interface& _interface, FileLocation const& location,
 	std::string const& variable_name,
 	Interface::type_e type, Interface::list_e list_type)
 {
     logger->logInfo("declaring " + variable_name + ": " +
-		    unparse_type(type, list_type));
+		    Interface::unparse_type(type, list_type));
     bool status = _interface.declareVariable(
 	location, variable_name, type, list_type);
     logger->logInfo(status ? "success" : "failure");
@@ -99,9 +41,9 @@ assign(Interface& _interface, FileLocation const& location,
        std::string const& flag = "")
 {
     std::string flag_info = (flag.empty() ? "" : "flag=" + flag + " ");
-    logger->logInfo(unparse_assignment_type(assignment_type) +
-		    flag_info + "assignment to " + variable_name + " =" +
-		    unparse_values(value));
+    logger->logInfo(Interface::unparse_assignment_type(assignment_type) +
+		    " " + flag_info + "assignment to " + variable_name +
+		    " =" + unparse_values(value));
     bool status = _interface.assignVariable(
 	location, variable_name, value, assignment_type, flag);
     logger->logInfo(status ? "success" : "failure");
@@ -134,18 +76,19 @@ make_deque(std::string const& v1, std::string const& v2)
 }
 
 static void dump_interface(std::string const& name, Interface const& _interface,
-			   FlagData const& flag_data)
+			   FlagData const& flag_data, bool dump = true)
 {
     logger->logInfo("dumping interface " + name);
     std::set<std::string> names = _interface.getVariableNames();
     for (std::set<std::string>::iterator iter = names.begin();
 	 iter != names.end(); ++iter)
     {
+	std::string const& variable_name = *iter;
 	Interface::VariableInfo info;
-	bool status = _interface.getVariable(*iter, flag_data, info);
+	bool status = _interface.getVariable(variable_name, flag_data, info);
 	assert(status);
-	std::string msg = *iter + ": " +
-	    unparse_type(info.type, info.list_type) +
+	std::string msg = variable_name + ": " +
+	    Interface::unparse_type(info.type, info.list_type) +
 	    ", target type " + TargetType::getName(info.target_type);
 	if (info.initialized)
 	{
@@ -156,6 +99,12 @@ static void dump_interface(std::string const& name, Interface const& _interface,
 	    msg += ": uninitialized";
 	}
 	logger->logInfo(msg);
+    }
+    if (dump)
+    {
+	std::ostringstream s;
+	_interface.dump(s);
+	logger->logInfo(s.str());
     }
     logger->logInfo("end of interface " + name);
 }
@@ -191,13 +140,13 @@ int main(int argc, char* argv[])
     base.setTargetType(TargetType::tt_all);
 
     // Simulate some internal variable definitions.
-    declare(base, FileLocation("<internal>", 0, 0),
+    declare(base, FileLocation("[internal]", 0, 0),
 	    "STRING1", Interface::t_string, Interface::l_scalar);
-    assign(base, FileLocation("<internal>", 0, 0),
+    assign(base, FileLocation("[internal]", 0, 0),
 	   "STRING1", make_deque("potato"), Interface::a_normal);
-    declare(base, FileLocation("<internal>", 0, 0),
+    declare(base, FileLocation("[internal]", 0, 0),
 	    "BOOL1", Interface::t_boolean, Interface::l_scalar);
-    assign(base, FileLocation("<internal>", 0, 0),
+    assign(base, FileLocation("[internal]", 0, 0),
 	   "BOOL1", make_deque("true"), Interface::a_normal);
 
     // Simulate some base definitions loaded from some files.
@@ -388,10 +337,10 @@ int main(int argc, char* argv[])
     FlagData flag_data;
     flag_data.addFlag("item1", "private");
     flag_data.addFlag("item6", "funny-looking");
-    dump_interface("item7", item7, flag_data);
+    dump_interface("item7", item7, flag_data, false);
     flag_data.addFlag("item6", "plain");
     flag_data.addFlag("item6", "letter");
-    dump_interface("item7", item7, flag_data);
+    dump_interface("item7", item7, flag_data, false);
 
     // Exercise fallback/override logic more thoroughly
     Interface item8("item8", "indep", error, current_directory + "/item8");
@@ -414,23 +363,23 @@ int main(int argc, char* argv[])
 
     logger->logInfo("add flag F5");
     flag_data.addFlag("item8", "F5");
-    dump_interface("item8", item8, flag_data);
+    dump_interface("item8", item8, flag_data, false);
 
     logger->logInfo("add flag F4");
     flag_data.addFlag("item8", "F4");
-    dump_interface("item8", item8, flag_data);
+    dump_interface("item8", item8, flag_data, false);
 
     logger->logInfo("add flag F1");
     flag_data.addFlag("item8", "F1");
-    dump_interface("item8", item8, flag_data);
+    dump_interface("item8", item8, flag_data, false);
 
     logger->logInfo("add flag F2");
     flag_data.addFlag("item8", "F2");
-    dump_interface("item8", item8, flag_data);
+    dump_interface("item8", item8, flag_data, false);
 
     logger->logInfo("add flag F3");
     flag_data.addFlag("item8", "F3");
-    dump_interface("item8", item8, flag_data);
+    dump_interface("item8", item8, flag_data, false);
 
     // Stop logger
     Logger::stopLogger();

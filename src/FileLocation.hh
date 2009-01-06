@@ -14,9 +14,12 @@ class FileLocation
     int getLineno() const;
     int getColno() const;
 
-    // Writes "filename:lineno:colno: " with sensible handling for
+    // Generates "filename:lineno:colno" with sensible handling for
     // when lineno and/or colno are zero.  Does nothing for a
     // FileLocation constructed with the default constructor.
+    operator std::string() const;
+
+    // Writes std::string(*this)
     friend std::ostream& operator<<(std::ostream&, FileLocation const&);
 
     // A sensible ordering is defined so that FileLocation objects can

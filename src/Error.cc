@@ -40,7 +40,7 @@ Error::getText(FileLocation const& location, std::string const& msg)
     }
     else
     {
-	fullmsg << location;
+	fullmsg << location << ": ";
     }
     fullmsg << msg;
     return fullmsg.str();

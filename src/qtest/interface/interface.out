@@ -18,6 +18,30 @@ INCLUDES: list filename prepend, target type object-code: uninitialized
 LIBS: list string prepend, target type object-code: uninitialized
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
+<?xml version="1.0"?>
+<interface version="1" item-name="base" item-platform="base">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+ </variable>
+</interface>
+
 end of interface base
 normal assignment to INCLUDES = . include
 success
@@ -41,6 +65,30 @@ INCLUDES: list filename prepend, target type object-code: uninitialized
 LIBS: list string prepend, target type object-code: uninitialized
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
+<?xml version="1.0"?>
+<interface version="1" item-name="base" item-platform="base">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+ </variable>
+</interface>
+
 end of interface base
 dumping interface item1
 BOOL1: boolean, target type all = 1
@@ -49,6 +97,64 @@ LIBS: list string prepend, target type object-code = l1-1 l1-2
 MOO: string, target type object-code = oink
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2
+<?xml version="1.0"?>
+<interface version="1" item-name="item1" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:1:1">
+    <value value="--CWD--/item1"/>
+    <value value="--CWD--/item1/include"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:2:1">
+    <value value="l1-1"/>
+    <value value="l1-2"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item1:4:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item1" item-platform="indep" location="item1:7:1">
+    <value value="quack"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:5:1">
+    <value value="baaa"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item1" item-platform="indep" location="item1:6:1">
+    <value value="oink"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:3:1">
+    <value value="th1-1"/>
+    <value value="th1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:8:1" flag="private">
+    <value value="th1-private"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
 end of interface item1
 normal assignment to INCLUDES = . include
 success
@@ -63,6 +169,76 @@ LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
 MOO: string, target type object-code = oink
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1 th2-2
+<?xml version="1.0"?>
+<interface version="1" item-name="item2" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:1:1">
+    <value value="--CWD--/item1"/>
+    <value value="--CWD--/item1/include"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:1:1">
+    <value value="--CWD--/item2"/>
+    <value value="--CWD--/item2/include"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:2:1">
+    <value value="l1-1"/>
+    <value value="l1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:2:1">
+    <value value="l2-1"/>
+    <value value="l2-2"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item1:4:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item1" item-platform="indep" location="item1:7:1">
+    <value value="quack"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:5:1">
+    <value value="baaa"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item1" item-platform="indep" location="item1:6:1">
+    <value value="oink"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:3:1">
+    <value value="th1-1"/>
+    <value value="th1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:8:1" flag="private">
+    <value value="th1-private"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:3:1">
+    <value value="th2-1"/>
+    <value value="th2-2"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
 end of interface item2
 normal assignment to INCLUDES = .
 success
@@ -77,6 +253,73 @@ LIBS: list string prepend, target type object-code = l3-1 l1-1 l1-2
 MOO: string, target type object-code = oink
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th3-1
+<?xml version="1.0"?>
+<interface version="1" item-name="item3" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:1:1">
+    <value value="--CWD--/item1"/>
+    <value value="--CWD--/item1/include"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item3" item-platform="indep" location="item3:1:1">
+    <value value="--CWD--/item3"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:2:1">
+    <value value="l1-1"/>
+    <value value="l1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item3" item-platform="indep" location="item3:2:1">
+    <value value="l3-1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item1:4:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item1" item-platform="indep" location="item1:7:1">
+    <value value="quack"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:5:1">
+    <value value="baaa"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item1" item-platform="indep" location="item1:6:1">
+    <value value="oink"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:3:1">
+    <value value="th1-1"/>
+    <value value="th1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:8:1" flag="private">
+    <value value="th1-private"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item3" item-platform="indep" location="item3:3:1">
+    <value value="th3-1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
 end of interface item3
 normal assignment to INCLUDES = .
 success
@@ -96,6 +339,99 @@ MOO: string, target type object-code = cluq
 QUACK: string, target type object-code: uninitialized
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1 th2-2 th3-1 th4-1
+<?xml version="1.0"?>
+<interface version="1" item-name="item4" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:1:1">
+    <value value="--CWD--/item1"/>
+    <value value="--CWD--/item1/include"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:1:1">
+    <value value="--CWD--/item2"/>
+    <value value="--CWD--/item2/include"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item3" item-platform="indep" location="item3:1:1">
+    <value value="--CWD--/item3"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item4" item-platform="indep" location="item4:1:1">
+    <value value="--CWD--/item4"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:2:1">
+    <value value="l1-1"/>
+    <value value="l1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:2:1">
+    <value value="l2-1"/>
+    <value value="l2-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item3" item-platform="indep" location="item3:2:1">
+    <value value="l3-1"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item4" item-platform="indep" location="item4:2:1">
+    <value value="l4-1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item1:4:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item1" item-platform="indep" location="item1:7:1">
+    <value value="quack"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:5:1">
+    <value value="baaa"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item1" item-platform="indep" location="item1:6:1">
+    <value value="oink"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item4" item-platform="indep" location="item4:4:1">
+    <value value="cluq"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="QUACK" type="string" target-type="object-code" declaration-location="item4:5:1">
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:3:1">
+    <value value="th1-1"/>
+    <value value="th1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:8:1" flag="private">
+    <value value="th1-private"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:3:1">
+    <value value="th2-1"/>
+    <value value="th2-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item3" item-platform="indep" location="item3:3:1">
+    <value value="th3-1"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item4" item-platform="indep" location="item4:3:1">
+    <value value="th4-1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
 end of interface item4
 declaring MOO: string
 success
@@ -108,6 +444,37 @@ LIBS: list string prepend, target type object-code: uninitialized
 MOO: string, target type object-code = baaa
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
+<?xml version="1.0"?>
+<interface version="1" item-name="item5" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item5:1:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item5" item-platform="indep" location="item5:2:1">
+    <value value="baaa"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+ </variable>
+</interface>
+
 end of interface item5
 importing item5 with conflicts
 item5:1:1: ERROR: variable MOO has already been declared
@@ -128,7 +495,7 @@ bad1:5:1: ERROR: the empty string may not be used as a value for filename variab
 failure
 normal assignment to STRING1 = spackle
 bad1:6:1: ERROR: variable STRING1 already has a value
-<internal>: ERROR: here is the previous assignment
+[internal]: ERROR: here is the previous assignment
 failure
 getting value for unknown variable
 getVariable(FARBAGE): failure
@@ -165,6 +532,85 @@ LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
 MOO: string, target type object-code: uninitialized
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
+<?xml version="1.0"?>
+<interface version="1" item-name="item6" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="FLAG1" type="string" target-type="object-code" declaration-location="item6:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item6" item-platform="indep" location="item6:5:1" flag="funny-looking">
+    <value value="Lesotho"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="FLAG2" type="string" target-type="object-code" declaration-location="item6:6:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item6" item-platform="indep" location="item6:7:1">
+    <value value="Japan"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item6" item-platform="indep" location="item6:8:1" flag="plain">
+    <value value="Libya"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="FLAG3" type="string" target-type="object-code" declaration-location="item6:9:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item6" item-platform="indep" location="item6:11:1">
+    <value value="Canada"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item6" item-platform="indep" location="item6:10:1" flag="letter">
+    <value value="Rwanda"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:1:1">
+    <value value="--CWD--/item1"/>
+    <value value="--CWD--/item1/include"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:1:1">
+    <value value="--CWD--/item2"/>
+    <value value="--CWD--/item2/include"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:2:1">
+    <value value="l1-1"/>
+    <value value="l1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:2:1">
+    <value value="l2-1"/>
+    <value value="l2-2"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item1:4:1">
+  <reset-history>
+   <reset item-name="item6" item-platform="indep" location="item6:1:1/>
+  </reset-history>
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+  <reset-history>
+   <reset item-name="item6" item-platform="indep" location="item6:2:1/>
+  </reset-history>
+ </variable>
+</interface>
+
 end of interface item6
 dumping interface item7
 BOOL1: boolean, target type all = 1
@@ -176,6 +622,99 @@ LIBS: list string prepend, target type object-code = l2-1 l2-2 l1-1 l1-2
 MOO: string, target type object-code = oink
 STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2
+<?xml version="1.0"?>
+<interface version="1" item-name="item7" item-platform="indep">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="FLAG1" type="string" target-type="object-code" declaration-location="item6:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item6" item-platform="indep" location="item6:5:1" flag="funny-looking">
+    <value value="Lesotho"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="FLAG2" type="string" target-type="object-code" declaration-location="item6:6:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item6" item-platform="indep" location="item6:7:1">
+    <value value="Japan"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item6" item-platform="indep" location="item6:8:1" flag="plain">
+    <value value="Libya"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="FLAG3" type="string" target-type="object-code" declaration-location="item6:9:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item6" item-platform="indep" location="item6:11:1">
+    <value value="Canada"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item6" item-platform="indep" location="item6:10:1" flag="letter">
+    <value value="Rwanda"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="INCLUDES" type="list filename prepend" target-type="object-code" declaration-location="base:1:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:1:1">
+    <value value="--CWD--/item1"/>
+    <value value="--CWD--/item1/include"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:1:1">
+    <value value="--CWD--/item2"/>
+    <value value="--CWD--/item2/include"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:2:1">
+    <value value="l1-1"/>
+    <value value="l1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item2" item-platform="indep" location="item2:2:1">
+    <value value="l2-1"/>
+    <value value="l2-2"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="MOO" type="string" target-type="object-code" declaration-location="item1:4:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item1" item-platform="indep" location="item1:7:1">
+    <value value="quack"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:5:1">
+    <value value="baaa"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item1" item-platform="indep" location="item1:6:1">
+    <value value="oink"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="THINGS" type="list string append" target-type="platform-independent" declaration-location="base:4:1">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:3:1">
+    <value value="th1-1"/>
+    <value value="th1-2"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item1" item-platform="indep" location="item1:8:1" flag="private">
+    <value value="th1-private"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
 end of interface item7
 dumping interface item7
 BOOL1: boolean, target type all = 1
@@ -214,6 +753,29 @@ success
 item8, no flags
 dumping interface item8
 A: string, target type all: uninitialized
+<?xml version="1.0"?>
+<interface version="1" item-name="item8" item-platform="indep">
+ <variable name="A" type="string" target-type="all" declaration-location="item8:1:1">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="item8" item-platform="indep" location="item8:6:1" flag="F5">
+    <value value="F5"/>
+   </assignment>
+   <assignment assignment-type="fallback" item-name="item8" item-platform="indep" location="item8:5:1" flag="F4">
+    <value value="F4"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="item8" item-platform="indep" location="item8:2:1" flag="F1">
+    <value value="F1"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item8" item-platform="indep" location="item8:3:1" flag="F2">
+    <value value="F2"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="item8" item-platform="indep" location="item8:4:1" flag="F3">
+    <value value="F3"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
 end of interface item8
 add flag F5
 dumping interface item8
