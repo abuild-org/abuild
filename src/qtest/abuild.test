@@ -1106,12 +1106,17 @@ if ($test_java)
 {
     # Test failing qtest test suite from ant
 
+    # In Windows, ant.bat does not return with an abnormal exit status
+    # when the build fails.  This makes it impossible to tell whether
+    # a build failed or not.
+    my $xflag = $in_windows ? $td->EXPECT_FAILURE : 0;
+
     $td->runtest("failing qtest from ant",
 		 {$td->COMMAND => "abuild check",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
 		 {$td->FILE => "$top/test1.ant-qtest-failure.out",
 		  $td->EXIT_STATUS => 2},
-		 $td->NORMALIZE_NEWLINES);
+		 $td->NORMALIZE_NEWLINES | $xflag);
 }
 else
 {
