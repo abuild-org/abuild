@@ -1,0 +1,7 @@
+abuild: cleaning everything in all
+abuild: cleaning indep1 in platforms/1/indep
+abuild: cleaning indep2 in platforms/2/indep
+abuild: cleaning java1 in platforms/1/java
+abuild: cleaning java2 in platforms/2/java
+abuild: cleaning native1 in platforms/1/native
+abuild: cleaning native2 in platforms/2/native

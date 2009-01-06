@@ -28,17 +28,6 @@ Core
    construction.  This avoids the need to use platform-specific
    dependencies in this case.
 
- * Specifying -p platform-type:skip shouldn't remove platforms from
-   that platform type but should instead just take them out of the
-   default build list.  That way, when doing -p native:skip, if a java
-   or indep build item depends on a native build item, abuild can
-   still build the native item "as needed" just as it would for other
-   platform-specific dependencies.
-
- * Support -p java:skip and -p indep:skip with the same semantic as -p
-   native:skip (prevent from building by default, but still build to
-   satisfy dependencies).
-
  * (Maybe) Add -ro-path and -rw-path options to tell abuild to treat
    some or all build items as read only based on path.  This should
    provide a more robust approach than using read-only externals for

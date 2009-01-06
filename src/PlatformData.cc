@@ -148,29 +148,26 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 	std::string const& platform_type = (*iter).first;
 	TargetType::target_type_e target_type = (*iter).second;
 	PlatformSelector const* ps = 0;
-	if (target_type == TargetType::tt_object_code)
+	if (selectors.count(platform_type) != 0)
 	{
-	    if (selectors.count(platform_type) != 0)
-	    {
-		ps = &((*(selectors.find(platform_type))).second);
-	    }
-	    else if (selectors.count(PlatformSelector::ANY))
-	    {
-		ps = &((*(selectors.find(PlatformSelector::ANY))).second);
-	    }
+	    ps = &((*(selectors.find(platform_type))).second);
+	}
+	else if ((target_type == TargetType::tt_object_code) &&
+		 selectors.count(PlatformSelector::ANY))
+	{
+	    ps = &((*(selectors.find(PlatformSelector::ANY))).second);
+	}
+	if (ps && (! ps->isSkip()) &&
+	    (target_type != TargetType::tt_object_code))
+	{
+	    QTC::TC("abuild", "PlatformData bad non-object-code selector");
+	    throw QEXC::General(
+		"platform selectors for non-object-code platform types"
+		" may only specify skip");
 	}
 
 	selected_platforms_t& platforms =
 	    this->platforms_by_type[platform_type];
-
-	if (ps && ps->isSkip())
-	{
-	    // Ignore all platforms in this platform type.  Do this
-	    // after the above assignment since it has the side effect
-	    // of instantiating the platform type.
-	    QTC::TC("abuild", "PlatformData skipping platform type");
-	    continue;
-	}
 
 	std::list<std::string> deps =
 	    this->platform_graph.getSortedDependencies(
@@ -194,30 +191,41 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 		      boost::bind(&PlatformData::declarationOrder,
 				  this, _1, _2));
 
-	    bool any_selected = false;
-	    if (ps)
+	    if (ps && ps->isSkip())
 	    {
-		// If we have selection criteria, mark each matching
-		// platform.  We must do this after the initial sort
-		// because we need to know what would have been the
-		// highest priority platform to initialize the
-		// matcher.
-		PlatformSelector::Matcher m(platforms[0].first, *ps);
-		for (selected_platforms_t::iterator iter = platforms.begin();
-		     iter != platforms.end(); ++iter)
+		// Ignore all platforms in this platform type.  Do this
+		// after the above assignment since it has the side effect
+		// of instantiating the platform type.
+		QTC::TC("abuild", "PlatformData skipping platform type");
+	    }
+	    else
+	    {
+		bool any_selected = false;
+		if (ps)
 		{
-		    (*iter).second = m.matches((*iter).first);
-		    if ((*iter).second)
+		    // If we have selection criteria, mark each
+		    // matching platform.  We must do this after the
+		    // initial sort because we need to know what would
+		    // have been the highest priority platform to
+		    // initialize the matcher.
+		    PlatformSelector::Matcher m(platforms[0].first, *ps);
+		    for (selected_platforms_t::iterator iter =
+			     platforms.begin();
+			 iter != platforms.end(); ++iter)
 		    {
-			any_selected = true;
+			(*iter).second = m.matches((*iter).first);
+			if ((*iter).second)
+			{
+			    any_selected = true;
+			}
 		    }
 		}
-	    }
 
-	    // Make sure at least one platform is selected
-	    if (! any_selected)
-	    {
-		platforms[0].second = true;
+		// Make sure at least one platform is selected
+		if (! any_selected)
+		{
+		    platforms[0].second = true;
+		}
 	    }
 	}
     }

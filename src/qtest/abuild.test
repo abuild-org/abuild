@@ -1334,6 +1334,57 @@ $td->runtest("no object-code platform types",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/h");
+
+$td->runtest("cross-platform dependencies",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.allitems.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping native with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p native:skip",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.no-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping indep with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p indep:skip",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.no-indep.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping java with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p java:skip",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.no-java.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping java and native",
+	     {$td->COMMAND => "abuild -b all -p native:skip -p java:skip",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.no-java-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("invalid non-object-code selector",
+	     {$td->COMMAND => "abuild -b all -p indep:all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.bad-selector.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild -c all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/ext");
 
 $td->runtest("all items from external",
@@ -2847,7 +2898,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(270 +
+$td->report(277 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +

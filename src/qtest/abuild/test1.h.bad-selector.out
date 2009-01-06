@@ -1,0 +1,2 @@
+abuild: ERROR: errors detected loading platforms:
+platform selectors for non-object-code platform types may only specify skip

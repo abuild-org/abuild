@@ -1,0 +1,4 @@
+abuild: java1 (abuild-java): all
+abuild: java2 (abuild-java): all
+abuild: native1 (abuild-<native>): all
+abuild: native2 (abuild-<native>): all
