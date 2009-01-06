@@ -490,12 +490,45 @@ $td->runtest("buildset all user branch",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("check user branch",
-	     {$td->COMMAND => "abuild --build=all check",
+$td->runtest("check user branch and dump interfaces",
+	     {$td->COMMAND => "abuild --build=all check --dump-interfaces",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/example.user-derived-all-check.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+cd("work/general");
+
+$td->runtest("check .ab-interface-dump* files",
+	     {$td->COMMAND =>
+		  "find . -type f -name .ab-interface\\* -print" .
+		  " | LANG=C sort",
+		  $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/example.interface-dump-files.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+if ($have_xmllint)
+{
+    $td->runtest("validate .ab-interface-dump* files",
+		 {$td->COMMAND =>
+		      "find . -type f -name .ab-interface\\* -exec" .
+		      " xmllint --noout --dtdvalid" .
+		      " $top/../../interface_dump.dtd {} \\;"},
+		 {$td->STRING => "",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    $td->runtest("skip validating .ab-interface-dump* files",
+		 {$td->COMMAND =>
+		      "find . -type f -name .ab-interface\\* -exec" .
+		      " cat {} \\; > /dev/null"},
+		 {$td->STRING => "",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
 
 cd("work/auto-from-variable/program");
 
@@ -2814,7 +2847,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(268 +
+$td->report(270 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +

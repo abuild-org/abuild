@@ -344,6 +344,13 @@ int main(int argc, char* argv[])
     flag_data.addFlag("item6", "letter");
     dump_interface("item7", item7, flag_data, false);
 
+    // Do another reset/assign and re-export, similar to what might
+    // happen when using an after-build file.
+    reset(item7, FileLocation("item7-after", 1, 1), "THINGS");
+    assign(item7, FileLocation("item7-after", 2, 1),
+	   "THINGS", make_deque("th7-1"), Interface::a_normal);
+    dump_interface("item7", item7, empty_flag_data);
+
     // Exercise fallback/override logic more thoroughly
     Interface item8("item8", "indep", error, current_directory + "/item8");
     declare(item8, FileLocation("item8", 1, 1),

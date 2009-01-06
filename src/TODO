@@ -143,19 +143,7 @@ Debugging
 
    Release:
 
-    copy interface_dump.dtd to doc (same as abuild_data.dtd)
-
-   Test:
-
-     valid xml output
-     test on some build tree.  Ideas:
-       rule-checker (has fallback assignment)
-       cross-platform
-       opaque-wrapper
-       shared-library
-       some special tree created for this purpose
-     reset -> assign -> reset -> assign
-
+     copy interface_dump.dtd to doc (same as abuild_data.dtd)
 
  * Provide an option to be used with --dump-data that delays
    generation of dump data output to include the build graph and the
