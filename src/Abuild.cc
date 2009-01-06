@@ -1572,6 +1572,7 @@ Abuild::checkPlugins(BuildTree& tree_data,
 		      "item \"" + item_name + "\" is declared as a plugin,"
 		      " but it has dependencies");
 	    }
+	    // XXX also prevent build-also
 
 	    // checkPlatformTypes() must have already been called.
 	    // Require all plguins to be build items of target type
@@ -3154,13 +3155,11 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 	}
     }
 
-    // We always add dependencies of any items initiallyh in the build
+    // We always add dependencies of any items initially in the build
     // set to the build set if we are building.  If we are cleaning,
     // we only do this when the --apply-targets-to-deps option is
     // specified.
     bool add_dependencies = (! cleaning) || this->apply_targets_to_deps;
-    bool expanding = (add_dependencies || (! this->related_by_traits.empty()));
-    bool expanded_by_traits = false;
 
     // Expand the build set to include dependencies of all items in
     // the build set.  If we are also expanding because of expand
@@ -3175,8 +3174,10 @@ Abuild::computeBuildset(BuildItem_map& builditems)
     // A-testers depends on X, then A, A-tester, and X all get
     // added.  If X is tested by X-tester, X-tester does not get
     // added.)
+    bool expanding = true;
     while (expanding)
     {
+	expanding = false;
 	if (add_dependencies)
 	{
 	    std::set<std::string> to_add;
@@ -3196,15 +3197,15 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 	    for (std::set<std::string>::iterator iter = to_add.begin();
 		 iter != to_add.end(); ++iter)
 	    {
-		this->buildset[*iter] = builditems[*iter];
+		if (this->buildset.count(*iter) == 0)
+		{
+		    expanding = true;
+		    this->buildset[*iter] = builditems[*iter];
+		}
 	    }
 	}
 
-	if (expanded_by_traits || this->related_by_traits.empty())
-	{
-	    expanding = false;
-	}
-	else
+	if (! this->related_by_traits.empty())
 	{
 	    QTC::TC("abuild", "Abuild expand by trait", cleaning ? 1 : 0);
 
@@ -3270,14 +3271,20 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 		// Add the item to the build set, and also add it to
 		// the list of items that are built with explicit
 		// targets.
-		this->buildset[*iter] = builditems[*iter];
+		if (this->buildset.count(*iter) == 0)
+		{
+		    expanding = true;
+		    this->buildset[*iter] = builditems[*iter];
+		}
 		if (! this->apply_targets_to_deps)
 		{
 		    this->explicit_target_items.insert(*iter);
 		}
 	    }
-	    expanded_by_traits = true;
 	}
+
+	// XXX expand based on build-also, making added items explicit
+	// if the original item was explicit.
     }
 
     // Expand the build set to include all plugins of all items in the

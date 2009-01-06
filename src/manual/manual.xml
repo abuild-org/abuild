@@ -13000,9 +13000,9 @@ native-compiler qcc
      the dependencies of all items that are in the build set.
     </para>
     <para>
-     Note that we do not take a second pass at expanding the build set
-     based on traits specified with
-     <option>--related-by-traits</option>.  Usually this won't matter,
+     Note that expanding the build set based on traits specified with
+     <option>--related-by-traits</option> is performed repeatedly
+     until there are no more expansions.  Usually this won't matter,
      but there are some cases in which it does actually make a
      difference.  For example, suppose the original build set contains
      <classname>A</classname> and <classname>B</classname>, and that
@@ -13016,10 +13016,11 @@ native-compiler qcc
      <classname>C</classname> will also be added to the build set.
      Now if there is another build item called
      <classname>C-test</classname> that tests
-     <classname>C</classname>, it will <emphasis>not</emphasis> be
-     added to the build set because the item that it tests was not an
-     original member of the build set.  This situation is reproduced
-     in &abuild;'s test suite.
+     <classname>C</classname>, it will also added to the build set
+     even though it tests an item that wasn't an original member of
+     the build set.  This situation is reproduced in &abuild;'s test
+     suite.  Prior to version 1.0.3, &abuild; did not repeat this
+     expansion.
     </para>
    </sect1>
    <sect1 id="ref.construction-of-build-graph">
@@ -13507,6 +13508,13 @@ Y = $(X)
            specified as a platform selector, no builds for the given
            platform type will be performed unless needed to satisfy a
            dependency.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When expanding the build set with
+           <option>--related-by-traits</option>, &abuild; now repeats
+           the expansion until no more items are added.
           </para>
          </listitem>
         </itemizedlist>

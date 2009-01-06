@@ -6,3 +6,4 @@ abuild: painter (abuild-indep): all
 abuild: A-eater-painter (abuild-indep): eat
 abuild: B (abuild-indep): all
 abuild: AB-eater (abuild-indep): eat
+abuild: B-eater (abuild-indep): eat
