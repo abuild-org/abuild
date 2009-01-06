@@ -42,6 +42,10 @@ while (<IN>)
     {
 	generate_dump_data();
     }
+    elsif (m/<\?interface-dump\?>/)
+    {
+	generate_interface_dump();
+    }
     elsif (m/<\?ccxx-mk\?>/)
     {
 	generate_ccxx_mk();
@@ -110,6 +114,19 @@ sub generate_dump_data
     print OUT "<programlisting><![CDATA[";
     open(F, "<../../abuild_data.dtd") or
 	die "$whoami: can't open abuild_data.dtd: $!\n";
+    while (<F>)
+    {
+	print OUT process_line($_);
+    }
+    close(F);
+    print OUT "]]></programlisting>\n";
+}
+
+sub generate_interface_dump
+{
+    print OUT "<programlisting><![CDATA[";
+    open(F, "<../../interface_dump.dtd") or
+	die "$whoami: can't open interface_dump.dtd: $!\n";
     while (<F>)
     {
 	print OUT process_line($_);

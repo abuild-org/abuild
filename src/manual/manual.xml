@@ -5109,6 +5109,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>--dump-interfaces</term>
+      <listitem>
+       <para>
+        Cause &abuild; to create interface dump files in the output
+        directories of every writable build item, including those that
+        don't build anything.  This option can be useful for tracking
+        down problems with interface variables.  For more
+        information, see <xref linkend="ref.interface-debugging"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>--only-with-traits trait[,trait,...]</term>
       <listitem>
        <para>
@@ -6964,6 +6976,65 @@ endif
       </variablelist>
      </para>
     </sect2>
+   </sect1>
+   <sect1 id="ref.interface-debugging">
+    <title>Debugging Interface Issues</title>
+    <para>
+     Although most <filename>Abuild.interface</filename> files are
+     reasonably simple and have easily understandable consequences,
+     there will inevitably be situations in which some interface
+     variable has a value that you don't understand.  For example, you
+     might see an assignment in one
+     <filename>Abuild.interface</filename> file that appears to have
+     no effect, or you may wonder which of a very long list of
+     dependencies was responsible for a particular variable assignment
+     or declaration.
+    </para>
+    <para>
+     Starting with &abuild; version 1.0.3, you can have &abuild; dump
+     everything it knows about a build item's interface variables into
+     an XML file.  Do this by passing the
+     <option>--dump-interfaces</option> flag to any &abuild; command
+     that builds something.  Doing so will cause &abuild; to create
+     interface dump files for every build item including those that
+     don't build anything and even those that have no
+     <filename>Abuild.interface</filename> files themselves.
+    </para>
+    <para>
+     For build items that do not have build files, &abuild; creates a
+     file called <filename>.ab-interface-dump.xml</filename> in the
+     output directory for every platform on which that build item
+     exists.  This file contains information about all interface
+     variables that are known to that item.  For build items that have
+     build files, &abuild; creates two files:
+     <filename>.ab-interface-dump.before-build.xml</filename> and
+     <filename>.ab-interface-dump.after-build.xml</filename>.  If a
+     build has no <filename>Abuild.interface</filename> or the item's
+     <filename>Abuild.interface</filename> has no after-build files,
+     the two files are identical and are analogous to
+     <filename>.ab-interface-dump.xml</filename> files of build items
+     that don't have build files.  Otherwise, the
+     <filename>.ab-interface-dump.before-build.xml</filename> file
+     reflects the interface as seen by the build item itself (before
+     any after-build files are loaded), and the
+     <filename>.ab-interface-dump.after-build.xml</filename> shows
+     what interface this build item provides to items that depend on
+     it.
+    </para>
+    <para>
+     Note that the interface dump files contain not just a list of
+     variables with their values but a complete list of everything
+     &abuild; knows about each variable.  This includes its type,
+     where it was declared, every assignment that was made to it,
+     every reset of every variable, etc.  When you reference an
+     interface variable, &abuild; computes the value on the fly,
+     sometimes influenced by interface flags that may be in effect.
+     To get maximum benefit from the information in the interface dump
+     files, you must understand how this works.  For those details,
+     please refer to <xref linkend="ref.interface-implementation"/>.
+     The format of the interface dump file is described in <xref
+     linkend="ref.interface-dump"/>.
+    </para>
    </sect1>
   </chapter>
   <chapter id="ref.abuild.mk">
@@ -13384,6 +13455,15 @@ Y = $(X)
            attempted to clean.
           </para>
          </listitem>
+         <listitem>
+          <para>
+           A new option, <option>--dump-interfaces</option>, has been
+           added.  Using this option during a build causes &abuild; to
+           write an XML dump file of the full state of the interface
+           system for every writable build item.  For details, see
+           <xref linkend="ref.interface-debugging"/>.
+          </para>
+         </listitem>
         </itemizedlist>
        </listitem>
        <listitem>
@@ -15628,6 +15708,23 @@ Y = $(X)
     The contents of the <filename>abuild_data.dtd</filename> file are
     included here for reference.
     <?dump-data?>
+   </para>
+  </appendix>
+  <appendix id="ref.interface-dump">
+   <title><option>--dump-interfaces</option> Format</title>
+   <para>
+    The <option>--dump-interface</option> option causes &abuild; to
+    create various XML output files exposing everything &abuild; knows
+    about the interface system before and after processing each build
+    item.  For details, please refer to <xref
+    linkend="ref.interface-debugging"/>.  The format of those files
+    conforms to an XML DTD.  Comments in the DTD describe how to
+    interpret the elements and attributes.  The DTD may be found in
+    <filename>src/interface_dump.dtd</filename> in the &abuild; source
+    distribution or in <filename>doc/interface_dump.dtd</filename> in
+    the binary distribution.  Its contents are included here for
+    reference.
+    <?interface-dump?>
    </para>
   </appendix>
   <appendix id="ref.ccxx.mk">

@@ -108,47 +108,6 @@ Documentation
    enables releases within a minor version to help with easing in new
    features without breaking compatibility.
 
-Debugging
-=========
-
- * Provide a means to dump a build item's interface in a format that
-   shows all internally known information so that it is possible to
-   discover the origin of everything known in the interface.  To make
-   this as useful as possible, we should also store a reset history.
-   Example uses: I see some interface variable in a build item's
-   Abuild.interface file and want to know who uses it, I see some
-   variable in someone's Abuild-ant.properties or Abuild.mk and want
-   to know who defines it, or I see some variable in an .ab-dyanmic*
-   file and I want to know who put xyz into its value.  Most likely,
-   we get this information by having abuild dump the interface state
-   before and after the build to files in the output directory when a
-   given flag is present on the command line.  Abuild should probably
-   indicate with a message to stdout that it is creating the file.
-   Need to figure out what to do about interface only items.  Perhaps
-   we provide a way for that information to be output to stdout
-   somehow.  Also, make sure we include instance name information in
-   the output.
-
-   Document:
-
-     --dump-interfaces command-line argument
-     file names for output
-       .ab-interface-dump.xml
-       .ab-interface-dump.before-build.xml
-       .ab-interface-dump.after-build.xml
-     xml output format
-       interface_dump.dtd
-     mention this in the interfaces section
-     update release notes
-
-   Release:
-
-     copy interface_dump.dtd to doc (same as abuild_data.dtd)
-
- * Provide an option to be used with --dump-data that delays
-   generation of dump data output to include the build graph and the
-   build architecture list.
-
 Usability
 =========
 
