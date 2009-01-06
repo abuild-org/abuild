@@ -59,6 +59,12 @@ BuildItem::getExternals() const
 }
 
 std::list<std::string> const&
+BuildItem::getBuildAlso() const
+{
+    return this->config->getBuildAlso();
+}
+
+std::list<std::string> const&
 BuildItem::getDeps() const
 {
     return this->config->getDeps();

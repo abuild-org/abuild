@@ -120,6 +120,9 @@
     is-plugin="0"
     is-plugin-anywhere="0"
    >
+    <build-also-items>
+     <build-also name="does-not-exist"/>
+    </build-also-items>
     <declared-dependencies>
      <dependency name="b.private" platform-type="other:skip">
       <flag name="quack"/>

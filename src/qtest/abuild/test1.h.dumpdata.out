@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--/h"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="indep1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/platforms/1/indep"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="java1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/platforms/1/java"
+    backing-depth="0"
+    external-depth="0"
+    target-type="java"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="java"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="java"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="native1"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/platforms/1/native"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="everything"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/all"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="indep1"/>
+     <dependency name="java1" platform-type="java"/>
+     <dependency name="native1" platform-type="native"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="indep1"/>
+     <dependency name="java1"/>
+     <dependency name="native1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="indep2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/platforms/2/indep"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <build-also-items>
+     <build-also name="java1"/>
+    </build-also-items>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="java2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/platforms/2/java"
+    backing-depth="0"
+    external-depth="0"
+    target-type="java"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="java"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="java"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="native2"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/platforms/2/native"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="top-level"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/build-also"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <build-also-items>
+     <build-also name="indep2"/>
+     <build-also name="java2"/>
+     <build-also name="native2"/>
+    </build-also-items>
+   </build-item>
+  </build-tree>
+ </build-trees>
+</abuild-data>

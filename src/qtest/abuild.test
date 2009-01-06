@@ -1371,6 +1371,13 @@ $td->runtest("skipping java and native",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("build-also",
+	     {$td->COMMAND => "abuild -d -C build-also",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.build-also.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("invalid non-object-code selector",
 	     {$td->COMMAND => "abuild -b all -p indep:all",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
@@ -1384,6 +1391,15 @@ $td->runtest("clean",
 	     {$td->FILE => "$top/test1.h.clean.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+validate_dump_data();
 
 cd("work/ext");
 
@@ -2898,7 +2914,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(277 +
+$td->report(280 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +

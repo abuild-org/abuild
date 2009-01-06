@@ -20,6 +20,7 @@ std::string const ItemConfig::k_PARENT = "parent-dir";
 std::string const ItemConfig::k_CHILDREN = "child-dirs";
 std::string const ItemConfig::k_EXTERNAL = "external-dirs";
 std::string const ItemConfig::k_VISIBLE_TO = "visible-to";
+std::string const ItemConfig::k_BUILD_ALSO = "build-also";
 std::string const ItemConfig::k_DEPS = "deps";
 std::string const ItemConfig::k_PLATFORM = "platform-types";
 std::string const ItemConfig::k_SUPPORTED_FLAGS = "supported-flags";
@@ -62,6 +63,7 @@ bool ItemConfig::initializeStatics()
     valid_keys[k_PARENT] = "";
     valid_keys[k_CHILDREN] = "";
     valid_keys[k_EXTERNAL] = "";
+    valid_keys[k_BUILD_ALSO] = "";
     valid_keys[k_DEPS] = "";
     valid_keys[k_VISIBLE_TO] = "";
     valid_keys[k_PLATFORM] = "";
@@ -120,6 +122,7 @@ ItemConfig::validate()
     }
 
     checkChildren();
+    checkBuildAlso();
     checkDeps();
     checkVisibleTo();
     checkBuildfile();
@@ -140,6 +143,10 @@ ItemConfig::checkUnnamed()
 {
     std::string msg = "is not permitted for unnamed build items";
 
+    if (checkEmptyKey(k_BUILD_ALSO, msg))
+    {
+	QTC::TC("abuild", "ItemConfig ERR build-also without this");
+    }
     if (checkEmptyKey(k_DEPS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR deps without this");
@@ -208,6 +215,31 @@ ItemConfig::checkChildren()
     if (checkRelativePaths(this->children, k_CHILDREN + " entries"))
     {
 	QTC::TC("abuild", "ItemConfig ERR absolute child");
+    }
+}
+
+void
+ItemConfig::checkBuildAlso()
+{
+    boost::regex item_name_re(ITEM_NAME_RE);
+    boost::smatch match;
+
+    this->build_also = Util::splitBySpace(this->kv.getVal(k_BUILD_ALSO));
+
+    std::list<std::string>::iterator iter = this->build_also.begin();
+    while (iter != this->build_also.end())
+    {
+	std::list<std::string>::iterator next = iter;
+	++next;
+	if (! boost::regex_match(*iter, match, item_name_re))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR bad build-also");
+	    this->error.error(this->location,
+			      "invalid " + k_BUILD_ALSO +
+			      " build item name " + *iter);
+	    this->build_also.erase(iter, next);
+	}
+	iter = next;
     }
 }
 
@@ -740,6 +772,12 @@ std::list<ExternalData> const&
 ItemConfig::getExternals() const
 {
     return this->externals;
+}
+
+std::list<std::string> const&
+ItemConfig::getBuildAlso() const
+{
+    return this->build_also;
 }
 
 std::list<std::string> const&

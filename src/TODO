@@ -17,17 +17,6 @@ Core
  * Provide a mechanism to tell clean to only clean certain platforms
    or to not clean certain platforms.
 
- * Sometimes we use dependencies just to force something to build, as
-   in the case of the "compile-all" item in searchlight or some
-   "top-level" builds.  For cases in which all we want to do is
-   effectively define static build sets, we need something more like a
-   "build-also" keyword that specifies build items that should be
-   built if this one is built.  It effectively just adds them to the
-   build set.  The build-also keyword doesn't have any restrictions
-   about cycles -- it is just used during initial build set
-   construction.  This avoids the need to use platform-specific
-   dependencies in this case.
-
  * (Maybe) Add -ro-path and -rw-path options to tell abuild to treat
    some or all build items as read only based on path.  This should
    provide a more robust approach than using read-only externals for

@@ -356,6 +356,9 @@
     is-plugin="0"
     is-plugin-anywhere="0"
    >
+    <build-also-items>
+     <build-also name="product-common"/>
+    </build-also-items>
     <declared-dependencies>
      <dependency name="product-common"/>
      <dependency name="common-lib1"/>

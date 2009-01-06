@@ -74,6 +74,8 @@ class Abuild
     bool accessibleFrom(BuildItem_map& builditems,
 			std::string const& accessor,
 			std::string const& accessee);
+    void checkBuildAlso(BuildItem_map& builditems,
+			std::string const& top_path);
     void checkDependencies(BuildTree& tree_data,
 			   BuildItem_map& builditems,
 			   std::string const& top_path);

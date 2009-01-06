@@ -44,6 +44,7 @@ class ItemConfig
     static std::string const k_PARENT;
     static std::string const k_CHILDREN;
     static std::string const k_EXTERNAL;
+    static std::string const k_BUILD_ALSO;
     static std::string const k_DEPS;
     static std::string const k_VISIBLE_TO;
     static std::string const k_PLATFORM;
@@ -60,6 +61,7 @@ class ItemConfig
     std::string const& getParent() const;
     std::list<std::string> const& getChildren() const;
     std::list<ExternalData> const& getExternals() const;
+    std::list<std::string> const& getBuildAlso() const;
     std::list<std::string> const& getDeps() const;
     std::string const& getDepPlatformType(std::string const& dep,
 					  PlatformSelector const*& ps) const;
@@ -95,6 +97,7 @@ class ItemConfig
     void checkName();
     void checkParent();
     void checkChildren();
+    void checkBuildAlso();
     void checkDeps();
     void checkVisibleTo();
     void checkBuildfile();
@@ -138,6 +141,7 @@ class ItemConfig
     std::string name;
     std::string parent;
     std::list<std::string> children;
+    std::list<std::string> build_also;
     std::list<std::string> deps;
     FlagData flag_data;
     std::string visible_to;

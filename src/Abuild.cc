@@ -1246,6 +1246,7 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
     checkPlatformTypes(tree_data, builditems, top_path);
     checkPlugins(tree_data, builditems, top_path);
     checkItemNames(builditems, top_path);
+    checkBuildAlso(builditems, top_path);
     checkDependencies(tree_data, builditems, top_path);
     updatePlatformTypes(tree_data, builditems, top_path);
     checkDependencyPlatformTypes(builditems);
@@ -1572,7 +1573,14 @@ Abuild::checkPlugins(BuildTree& tree_data,
 		      "item \"" + item_name + "\" is declared as a plugin,"
 		      " but it has dependencies");
 	    }
-	    // XXX also prevent build-also
+	    if (! item.getBuildAlso().empty())
+	    {
+		QTC::TC("abuild", "Abuild ERR plugin with build-also");
+		item_error = true;
+		error(top_location,
+		      "item \"" + item_name + "\" is declared as a plugin,"
+		      " but it specifies other items to build");
+	    }
 
 	    // checkPlatformTypes() must have already been called.
 	    // Require all plguins to be build items of target type
@@ -1760,6 +1768,33 @@ Abuild::checkItemNames(BuildItem_map& builditems,
 		error(item_location,
 		      item_name + " may not depend on " + dep +
 		      " because it is private to another scope");
+	    }
+	}
+    }
+}
+
+void
+Abuild::checkBuildAlso(BuildItem_map& builditems,
+		       std::string const& top_path)
+{
+    for (BuildItem_map::iterator iter = builditems.begin();
+	 iter != builditems.end(); ++iter)
+    {
+	BuildItem const& item = *((*iter).second);
+	std::string const& item_name = (*iter).first;
+	FileLocation const& item_location = item.getLocation();
+	std::list<std::string> const& build_also = item.getBuildAlso();
+	for (std::list<std::string>::const_iterator biter =
+		 build_also.begin();
+	     biter != build_also.end(); ++biter)
+	{
+	    std::string const& item = *biter;
+	    if (builditems.count(item) == 0)
+	    {
+		QTC::TC("abuild", "Abuild ERR invalid build also");
+		error(item_location,
+		      item_name + " requests building of unknown build item " +
+		      item);
 	    }
 	}
     }
@@ -2861,6 +2896,8 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 
     std::string description = Util::XMLify(item.getDescription(), true);
     std::string visible_to = item.getVisibleTo();
+    std::list<std::string> const& build_also =
+	item.getBuildAlso();
     std::list<std::string> const& declared_dependencies =
 	item.getDeps();
     std::list<std::string> const& expanded_dependencies =
@@ -2874,7 +2911,8 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     TraitData::trait_data_t const& traits =
 	item.getTraitData().getTraitData();
     bool any_subelements =
-	(! (declared_dependencies.empty() &&
+	(! (build_also.empty() &&
+	    declared_dependencies.empty() &&
 	    expanded_dependencies.empty() &&
 	    platform_types.empty() &&
 	    buildable_platforms.empty() &&
@@ -2915,6 +2953,18 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     {
 	FlagData const& flag_data = item.getFlagData();
 	o << "   >" << std::endl;
+	if (! build_also.empty())
+	{
+	    o << "    <build-also-items>" << std::endl;
+	    for (std::list<std::string>::const_iterator biter =
+		     build_also.begin();
+		 biter != build_also.end(); ++biter)
+	    {
+		o << "     <build-also name=\"" << *biter << "\"/>"
+		  << std::endl;
+	    }
+	    o << "    </build-also-items>" << std::endl;
+	}
 	if (! declared_dependencies.empty())
 	{
 	    o << "    <declared-dependencies>" << std::endl;
@@ -3199,6 +3249,7 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 	    {
 		if (this->buildset.count(*iter) == 0)
 		{
+		    QTC::TC("abuild", "Abuild non-trivial dep expansion");
 		    expanding = true;
 		    this->buildset[*iter] = builditems[*iter];
 		}
@@ -3273,6 +3324,7 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 		// targets.
 		if (this->buildset.count(*iter) == 0)
 		{
+		    QTC::TC("abuild", "Abuild non-trivial trait expansion");
 		    expanding = true;
 		    this->buildset[*iter] = builditems[*iter];
 		}
@@ -3283,8 +3335,42 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 	    }
 	}
 
-	// XXX expand based on build-also, making added items explicit
-	// if the original item was explicit.
+	// For every item in the build set, if that item specifies any
+	// other items to build, add them as well.
+	{ // private scope
+	    std::set<std::string> to_add;
+	    for (BuildItem_map::iterator iter = this->buildset.begin();
+		 iter != this->buildset.end(); ++iter)
+	    {
+		std::string const& item_name = (*iter).first;
+		BuildItem& item = *((*iter).second);
+		bool is_explicit =
+		    this->explicit_target_items.count(item_name);
+		std::list<std::string> const& build_also = item.getBuildAlso();
+		for (std::list<std::string>::const_iterator biter =
+			 build_also.begin();
+		     biter != build_also.end(); ++biter)
+		{
+		    to_add.insert(*biter);
+		    QTC::TC("abuild", "Abuild expand with build-also",
+			    is_explicit ? 0 : 1);
+		    if (is_explicit)
+		    {
+			this->explicit_target_items.insert(*biter);
+		    }
+		}
+	    }
+	    for (std::set<std::string>::iterator iter = to_add.begin();
+		 iter != to_add.end(); ++iter)
+	    {
+		if (this->buildset.count(*iter) == 0)
+		{
+		    QTC::TC("abuild", "Abuild non-trivial build-also");
+		    expanding = true;
+		    this->buildset[*iter] = builditems[*iter];
+		}
+	    }
+	}
     }
 
     // Expand the build set to include all plugins of all items in the

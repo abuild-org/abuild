@@ -5,3 +5,4 @@ abuild: cleaning java1 in platforms/1/java
 abuild: cleaning java2 in platforms/2/java
 abuild: cleaning native1 in platforms/1/native
 abuild: cleaning native2 in platforms/2/native
+abuild: cleaning top-level in build-also

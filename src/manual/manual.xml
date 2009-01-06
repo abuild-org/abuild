@@ -3414,6 +3414,54 @@ C:\cygwin\cygwin.bat
      </variablelist>
     </sect2>
    </sect1>
+   <sect1 id="ref.build-also">
+    <title>Using <property>build-also</property> for Top-level Builds</title>
+    <para>
+     Starting with &abuild; version 1.0.3, it is possible to list
+     other build items in the <property>build-also</property> key of
+     any named build item's <filename>Abuild.conf</filename> file.
+     When &abuild; adds any build item to the build set, if that build
+     item has a <property>build-also</property> key, then any build
+     items listed there are also added to the build set.  The
+     principal intended use of this feature is to aid with setting up
+     virtual &ldquo;top-level&rdquo; build items.  For example, if
+     your system consisted of multiple, independent subsystems and you
+     wanted to build all of them, you could create a build item that
+     lists the main items for each subsystem in a
+     <property>build-also</property> key.  In older versions of
+     &abuild; it was necessary to use dependencies for this purpose,
+     but this had several disadvantages, including the following:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Adding unnecessary dependencies puts needless constraints on
+        build ordering and parallelism.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Using dependencies for this purpose is clumsy if there are
+        multiple target types involved.  It would require you to use a
+        platform-specific dependency, which in turn could interfere
+        with proper use of platform selectors.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Otherwise harmless interface variable name clashes or
+        assignment issues could cause problems as a result of having
+        two interfaces that were supposed to be independent being
+        loaded together.
+       </para>
+      </listitem>
+     </itemizedlist>
+     Whenever you want building of one build item to result in
+     building of another build item, but the first item need to use
+     anything from the ones whose builds it triggers, it is
+     appropriate to use <property>build-also</property> instead of a
+     dependency.
+    </para>
+   </sect1>
    <sect1 id="ref.traits">
     <title>Traits</title>
     <indexterm>
@@ -5619,6 +5667,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <primary>traits</primary>
     </indexterm>
     <indexterm>
+     <primary>build-also</primary>
+    </indexterm>
+    <indexterm>
      <primary>deleted</primary>
     </indexterm>
     <para>
@@ -5820,6 +5871,20 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <option>-item=<replaceable>build-item</replaceable></option>
          option.  For more information about traits, see <xref
          linkend="ref.traits"/>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>build-also</property></term>
+       <listitem>
+        <para>
+         This key contains a list of whitespace-separated build items.
+         Whenever &abuild; adds a given item to a build set, it also
+         adds any items listed in its <property>build-also</property>
+         key to the build set.  No dependency relationship or any
+         other relationship is implied.  This is useful for creating
+         pseudo-top-level build items that serve as starting points
+         for multiple builds.
         </para>
        </listitem>
       </varlistentry>
@@ -12994,10 +13059,11 @@ native-compiler qcc
      traits listed in the <option>--related-by-traits</option> option
      and that declare at least one of those traits referent to one of
      the build items in the build set so far.  As it finds them, it
-     adds them to the build set.  Once that process has completed, if
-     we are building or <option>--apply-targets-to-deps</option> was
-     specified, &abuild; once again expands the build set to include
-     the dependencies of all items that are in the build set.
+     adds them to the build set.  Then, if any build item in the build
+     set specified other build items in its
+     <property>build-also</property> key, those items are added to the
+     build set.  This process is repeated until an expansion pass
+     completes in which no more items were added the build set.
     </para>
     <para>
      Note that expanding the build set based on traits specified with
@@ -13464,6 +13530,19 @@ Y = $(X)
          Enhancements
         </para>
         <itemizedlist>
+         <listitem>
+          <para>
+           A new key, <property>build-also</property>, is now
+           supported in <filename>Abuild.conf</filename>.  This key's
+           value is a space-separated list of build items that should
+           be automatically built if the original build item is added
+           to a build set.  No dependency relationship is implied.
+           This provides a more robust method than dependencies of
+           creating virtual &ldquo;top-level&rdquo; build items.  A
+           corresponding element has been added to the dump data
+           output as well.
+          </para>
+         </listitem>
          <listitem>
           <para>
            When <option>--clean</option> is used to clean a build set,
@@ -15749,9 +15828,12 @@ Y = $(X)
    </para>
    <para>
     When there are no errors, the <option>--dump-data</option> output
-    always presents build trees and build items such that no reference
-    is ever made to an item that has not already been seen.  When there
-    are errors, the <varname>errors</varname> attribute to the
+    always presents build trees and build items such that no
+    dependency reference is ever made to an item that has not already
+    been seen.  (This does not apply to items referenced by
+    <property>build-also</property> since no dependency relationship
+    is implied in that case.)  When there are errors, the
+    <varname>errors</varname> attribute to the
     <varname>abuild-data</varname> element will be present and will
     have the value <varname>1</varname>.  In this case, this guarantee
     does not apply as the output may contain circular dependencies,

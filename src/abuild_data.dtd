@@ -135,10 +135,13 @@
 
 <!--  One build-item element appears for each build-item.          -->
 <!--  build-items are output in dependency order such that no      -->
-<!--  build item will refer to another build item that has not     -->
+<!--  build item will depend on another build item that has not    -->
 <!--  already been output.  Readers may rely on this behavior if   -->
 <!--  it is helpful, unless the errors attribute of the top level  -->
-<!--  element is set.                                              -->
+<!--  element is set.  Note that there is no expectation of        -->
+<!--  dependency ordering for the build-also-items element since   -->
+<!--  the build-also key in Abuild.conf implies no dependency      -->
+<!--  relationship.                                                -->
 
 <!--  The attributes have the following meanings:                  -->
 
@@ -174,7 +177,8 @@
 <!--  is-plugin-anywhere: true if the item is a plugin in this     -->
 <!--  tree or any tree known to this tree                          -->
 
-<!ELEMENT build-item (declared-dependencies?, expanded-dependencies?,
+<!ELEMENT build-item (build-also-items?, declared-dependencies?,
+                      expanded-dependencies?,
                       platform-types?, buildable-platforms?,
                       supported-flags?, traits?)>
 <!ATTLIST build-item
@@ -189,6 +193,16 @@
   target-type             %target-type;  #REQUIRED
   is-plugin               %boolean; #REQUIRED
   is-plugin-anywhere      %boolean; #REQUIRED
+>
+
+<!--  build-also-items contains the list of build items named in   -->
+<!--  the build-also key.  Each item appears in a nested           -->
+<!--  build-also element.  There is no guarantee that the build    -->
+<!--  item has appeared.                                           -->
+<!ELEMENT build-also-items (build-also+)>
+<!ELEMENT build-also EMPTY>
+<!ATTLIST build-also
+   name                   CDATA     #REQUIRED
 >
 
 <!--  declared-dependencies contains the list of direct            -->
