@@ -113,14 +113,6 @@ Usability
 
  * Add "down" and "descending" as synonyms for build set "desc"
 
-Non-user-visible
-================
-
- * Document places where code relies on certain characters being
-   illegal in build item names.  Known examples: format of build
-   item/platform pairs for build graph construction, and use of comma
-   as a separator in lists of build items in ant code.
-
 Internal Targets
 ================
 
