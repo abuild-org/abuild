@@ -27,8 +27,29 @@ std::string const ItemConfig::k_SUPPORTED_TRAITS = "supported-traits";
 std::string const ItemConfig::k_TRAITS = "traits";
 std::string const ItemConfig::k_DELETED = "deleted";
 std::string const ItemConfig::k_PLUGINS = "plugins";
+
+// The following characters may never appear in build item names:
+//
+//  * Comma: various places in the code, including ant properties
+//    files and name-based build set specification, use
+//    comma-separated lists of build item names.
+//
+//  * Space: make code and Abuild.conf parsing use space-separated
+//    lists of build items
+//
+//  * Colon: a single colon is used to separate the build item from
+//    the platform in the build graph nodes, and a double colon is
+//    used (starting in abuild 1.1) to separate the tree name from the
+//    item name in a fully qualified build item name
+//
+// Carefully consider the implications of adding new legal characters
+// to the names of build items.  As currently specified, build item
+// names are always valid file names and can always be specified on
+// the command line without any special quoting.  These are compelling
+// features.
 std::string const ItemConfig::ITEM_NAME_RE =
     "[a-zA-Z0-9_-]+(?:\\.[a-zA-Z0-9_-]+)*";
+
 std::map<std::string, std::string> ItemConfig::valid_keys;
 
 // Initialize this after all other status
