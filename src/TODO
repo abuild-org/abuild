@@ -129,11 +129,6 @@ Debugging
    somehow.  Also, make sure we include instance name information in
    the output.
 
-   Fix:
-
-     import reset
-     hand-generate output for interface test
-
    Document:
 
      --dump-interfaces command-line argument
@@ -145,7 +140,6 @@ Debugging
        interface_dump.dtd
      mention this in the interfaces section
      update release notes
-     format of location attribute
 
    Release:
 

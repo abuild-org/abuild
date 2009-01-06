@@ -39,6 +39,12 @@ Interface::importInterface(Interface const& other)
 	if (this->declareVariable(var.declare_location, var.target_type,
 				  var.name, var.type, var.list_type))
 	{
+	    // Import reset history without the affect of the reset
+	    // operation.  Although the reset is "local" (so its
+	    // affect shouldn't be imported), it is useful for
+	    // debugging purposes to see the reset history of a
+	    // variable when reconstructing how that variable got its
+	    // value.
 	    for (std::list<Reset>::const_iterator riter =
 		     var.reset_history.begin();
 		 riter != var.reset_history.end(); ++riter)

@@ -100,7 +100,7 @@ static void dump_interface(std::string const& name, Interface const& _interface,
 	}
 	logger->logInfo(msg);
     }
-    if (false && dump)
+    if (dump)
     {
 	std::ostringstream s;
 	_interface.dump(s);

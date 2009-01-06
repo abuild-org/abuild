@@ -4,6 +4,12 @@
 <!--  familiarity with the interface system as described in the    -->
 <!--  documentation.                                               -->
 
+<!--  All location attributes have values of the form              -->
+<!--  filename:lineno:colno.  Some operations are performed        -->
+<!--  internally by abuild.  In those cases, location will         -->
+<!--  something including the word "internal" inside square        -->
+<!--  brackets.                                                    -->
+
 <!--  The version attribute is always "1".  We will only           -->
 <!--  increment this if there is a change to the output such that  -->
 <!--  previously valid data is either no longer valid or is valid  -->
