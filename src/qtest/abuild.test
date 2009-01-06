@@ -310,14 +310,14 @@ $td->runtest("no-op with release",
 $td->runtest("no-op with release again",
 	     {$td->COMMAND =>
 		  "ABUILD_PLATFORM_SELECTORS='platform=*.*.*.*.release'" .
-		  " abuild -b desc no-op",
+		  " abuild -b descending no-op",
 		  $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/example.reference-common-no-op-release.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("no-op with all options",
-	     {$td->COMMAND => "abuild --build=desc no-op -p native:option='*'",
+	     {$td->COMMAND => "abuild --build=down no-op -p native:option='*'",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/example.reference-common-no-op-all-options.out",
 	      $td->EXIT_STATUS => 0},

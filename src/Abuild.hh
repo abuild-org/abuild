@@ -45,7 +45,7 @@ class Abuild
     void getThisPlatform();
     void parseArgv();
     std::string findConf();
-    void checkBuildsetName(std::string const& kind, std::string const& name);
+    void checkBuildsetName(std::string const& kind, std::string& name);
     void initializePlatforms();
     void initializeJavaPlatforms();
     void loadPlatformData(PlatformData&, std::string const& dir);
@@ -187,6 +187,7 @@ class Abuild
     static std::string const b_DEPS;
     static std::string const b_CURRENT;
     static std::set<std::string> valid_buildsets;
+    static std::map<std::string, std::string> buildset_aliases;
     static std::string const s_CLEAN;
     static std::string const s_NO_OP;
     static std::string const PLUGIN_PLATFORM;

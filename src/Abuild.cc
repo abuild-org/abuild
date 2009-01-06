@@ -26,6 +26,7 @@ std::string const Abuild::b_DESC = "desc";
 std::string const Abuild::b_DEPS = "deps";
 std::string const Abuild::b_CURRENT = "current";
 std::set<std::string> Abuild::valid_buildsets;
+std::map<std::string, std::string> Abuild::buildset_aliases;
 std::string const Abuild::s_CLEAN = "clean";
 std::string const Abuild::s_NO_OP = "no-op";
 // PLUGIN_PLATFORM can't match a real platform name.
@@ -83,6 +84,9 @@ Abuild::initializeStatics()
     valid_buildsets.insert(b_DESC);
     valid_buildsets.insert(b_DEPS);
     valid_buildsets.insert(b_CURRENT);
+
+    buildset_aliases["down"] = b_DESC;
+    buildset_aliases["descending"] = b_DESC;
 
     special_targets.insert(s_CLEAN);
     special_targets.insert(s_NO_OP);
@@ -575,7 +579,7 @@ Abuild::parseArgv()
 }
 
 void
-Abuild::checkBuildsetName(std::string const& kind, std::string const& name)
+Abuild::checkBuildsetName(std::string const& kind, std::string& name)
 {
     boost::regex name_re("name:(\\S+)");
     boost::regex pattern_re("pattern:(\\S+)");
@@ -599,6 +603,11 @@ Abuild::checkBuildsetName(std::string const& kind, std::string const& name)
 	    QTC::TC("abuild", "Abuild ERR bad buildset pattern");
 	    usage("invalid regular expression " + pattern);
 	}
+    }
+    else if (buildset_aliases.count(name) != 0)
+    {
+	QTC::TC("abuild", "Abuild replace build set alias");
+	name = buildset_aliases[name];
     }
     else if (valid_buildsets.count(name) == 0)
     {
@@ -4809,6 +4818,8 @@ Abuild::help()
     h("  all               all buildable/cleanable items in writable build trees");
     h("  local             all items in the local build tree without its externals");
     h("  desc              all items at or below the current directory");
+    h("  descending        alias for desc");
+    h("  down              alias for desc");
     h("  deps              all expanded dependencies of the current item");
     h("  current           the current item");
     h("  name:name,...     items with the given names");

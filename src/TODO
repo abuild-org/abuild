@@ -108,11 +108,6 @@ Documentation
    enables releases within a minor version to help with easing in new
    features without breaking compatibility.
 
-Usability
-=========
-
- * Add "down" and "descending" as synonyms for build set "desc"
-
 Internal Targets
 ================
 

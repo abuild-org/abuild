@@ -3240,6 +3240,22 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term><option>descending</option></term>
+       <listitem>
+        <para>
+         alias for <option>desc</option>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><option>down</option></term>
+       <listitem>
+        <para>
+         alias for <option>desc</option>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term><option>local</option></term>
        <listitem>
         <para>
@@ -13462,6 +13478,13 @@ Y = $(X)
            write an XML dump file of the full state of the interface
            system for every writable build item.  For details, see
            <xref linkend="ref.interface-debugging"/>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Build sets <option>down</option> and
+           <option>descending</option> have been added as aliases for
+           <option>desc</option>.
           </para>
          </listitem>
         </itemizedlist>
