@@ -129,6 +129,11 @@ Debugging
    somehow.  Also, make sure we include instance name information in
    the output.
 
+   Fix:
+
+     import reset
+     hand-generate output for interface test
+
    Document:
 
      --dump-interfaces command-line argument
@@ -140,6 +145,7 @@ Debugging
        interface_dump.dtd
      mention this in the interfaces section
      update release notes
+     format of location attribute
 
    Release:
 
@@ -154,6 +160,8 @@ Debugging
        opaque-wrapper
        shared-library
        some special tree created for this purpose
+     reset -> assign -> reset -> assign
+
 
  * Provide an option to be used with --dump-data that delays
    generation of dump data output to include the build graph and the

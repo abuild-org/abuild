@@ -100,7 +100,7 @@ static void dump_interface(std::string const& name, Interface const& _interface,
 	}
 	logger->logInfo(msg);
     }
-    if (dump)
+    if (false && dump)
     {
 	std::ostringstream s;
 	_interface.dump(s);
@@ -320,6 +320,8 @@ int main(int argc, char* argv[])
 	   "letter");
     assign(item6, FileLocation("item6", 11, 1),
 	   "FLAG3", make_deque("Canada"), Interface::a_fallback);
+    assign(item6, FileLocation("item6", 12, 1),
+	   "THINGS", make_deque("th6-1"), Interface::a_normal);
 
     dump_interface("item6", item6, empty_flag_data);
 

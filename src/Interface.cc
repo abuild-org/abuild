@@ -39,11 +39,23 @@ Interface::importInterface(Interface const& other)
 	if (this->declareVariable(var.declare_location, var.target_type,
 				  var.name, var.type, var.list_type))
 	{
+	    for (std::list<Reset>::const_iterator riter =
+		     var.reset_history.begin();
+		 riter != var.reset_history.end(); ++riter)
+	    {
+		Reset const& reset = *riter;
+		if (! this->resetVariable(
+			reset.location, var.name,
+			reset.item_name, reset.item_platform, false))
+		{
+		    status = false;
+		}
+	    }
 	    for (std::list<Assignment>::const_iterator aiter =
 		     var.assignment_history.begin();
 		 aiter != var.assignment_history.end(); ++aiter)
 	    {
-		Assignment const& assignment = (*aiter);
+		Assignment const& assignment = *aiter;
 		if (! this->assignVariable(assignment.location,
 					   var.name, assignment.value,
 					   assignment.assignment_type,
@@ -389,14 +401,44 @@ bool
 Interface::resetVariable(FileLocation const& location,
 			 std::string const& variable_name)
 {
+    return resetVariable(location, variable_name,
+			 this->item_name, this->item_platform, true);
+}
+
+bool
+Interface::resetVariable(FileLocation const& location,
+			 std::string const& variable_name,
+			 std::string const& interface_item_name,
+			 std::string const& interface_item_platform,
+			 bool clear_assignment_history)
+{
     bool status = true;
 
     if (this->symbol_table.count(variable_name))
     {
 	Variable& var = this->symbol_table[variable_name];
-	var.assignment_history.clear();
-	var.reset_history.push_back(
-	    Reset(location, this->item_name, this->item_platform));
+	if (clear_assignment_history)
+	{
+	    var.assignment_history.clear();
+	}
+	bool found = false;
+	for (std::list<Reset>::const_iterator iter = var.reset_history.begin();
+	     iter != var.reset_history.end(); ++iter)
+	{
+	    Reset const& r = *iter;
+	    if ((r.location == location) &&
+		(r.item_name == interface_item_name) &&
+		(r.item_platform == interface_item_platform))
+	    {
+		found = true;
+		break;
+	    }
+	}
+	if (! found)
+	{
+	    var.reset_history.push_back(
+		Reset(location, interface_item_name, interface_item_platform));
+	}
     }
     else
     {

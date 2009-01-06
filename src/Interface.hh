@@ -265,6 +265,12 @@ class Interface
 			 TargetType::target_type_e target_type,
 			 std::string const& variable_name,
 			 type_e type, list_e list_type);
+    // The real resetVariable
+    bool resetVariable(FileLocation const&,
+		       std::string const& variable_name,
+		       std::string const& item_name,
+		       std::string const& item_platform,
+		       bool clear_assignment_history);
 
     Error& error;
     std::string item_name;
