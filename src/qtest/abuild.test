@@ -2429,7 +2429,7 @@ $td->runtest("dump build graph",
 #
 #  * When we create a build set starting with A and expand it with the
 #    eater trait, this pulls in AB-eater which in turn depends upon B.
-#    However, we do not get B-eater.
+#    This subsequently pulls in B-eater.
 #
 #  * A and B are related to other build items that depend upon them
 #    and that they therefore do not depend upon.  This exercises the
