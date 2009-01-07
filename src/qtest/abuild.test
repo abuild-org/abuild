@@ -1377,9 +1377,16 @@ $td->runtest("skipping java and native",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build-also",
-	     {$td->COMMAND => "abuild -d -C build-also",
+	     {$td->COMMAND => "abuild -d -C build-also check",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test1.h.build-also.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also default target",
+	     {$td->COMMAND => "abuild -d -C dep-build-also check",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.dep-build-also.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -2919,7 +2926,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(280 +
+$td->report(281 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +

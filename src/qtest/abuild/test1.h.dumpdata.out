@@ -183,6 +183,32 @@
      <build-also name="native2"/>
     </build-also-items>
    </build-item>
+   <build-item
+    name="top-level-dep"
+    home-tree="bt-1"
+    absolute-path="--topdir--/h/dep-build-also"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <build-also-items>
+     <build-also name="indep1"/>
+    </build-also-items>
+    <declared-dependencies>
+     <dependency name="indep2"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="indep2"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
   </build-tree>
  </build-trees>
 </abuild-data>
