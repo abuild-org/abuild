@@ -9,11 +9,6 @@ continues to work.
 Core
 ====
 
- * Support the explicit concept of internal targets, which are targets
-   handled by abuild that don't involve invocation of the backend.
-   This is just a command-line argument parsing change.  See "internal
-   targets" below.
-
  * (Maybe) Add -ro-path and -rw-path options to tell abuild to treat
    some or all build items as read only based on path.  This should
    provide a more robust approach than using read-only externals for
@@ -82,35 +77,6 @@ Documentation
    functionality in 1.x.y+1 that isn't supported in 1.x.y.  This
    enables releases within a minor version to help with easing in new
    features without breaking compatibility.
-
-Internal Targets
-================
-
-Internal targets are invoked with
-
-abuild --internal-target target-name
-
-or
-
-abuild -i target-name
-
-They are mutually exclusive with explicitly stated targets, and only
-one can be specified in a given invocation.  Internal targets do not
-cause invocation of the backend or processing of interface files.  The
-following internal targets will be supported:
-
- * clean: equivalent to special-case "clean" target
-
- * no-op: equivalent to special-case "no-op" target
-
- * print-build-platforms: prints the name of each platform on which
-   the build item is to be built
-
- * print-build-directory-names: prints the last path element of the
-   name of each output directory that would be built
-
- * print-build-directory-paths: prints the full path of each output
-   directory that would be built
 
 Java Stuff
 ==========
