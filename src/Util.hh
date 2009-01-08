@@ -188,6 +188,11 @@ namespace Util
     // If the "attribute" argument is true, also make it safe to
     // include in an XML attribute.
     std::string XMLify(std::string const& str, bool attribute);
+
+    // Return a regular expression (as a string) that matches the same
+    // strings matched by the given file glob.  Throws an exception if
+    // the glob is invalid.
+    std::string globToRegex(std::string const& glob);
 };
 
 #endif // __UTIL_HH__

@@ -235,6 +235,7 @@ class Abuild
     std::list<std::string> only_with_traits;
     std::list<std::string> related_by_traits;
     std::map<std::string, PlatformSelector> platform_selectors;
+    std::set<std::string> clean_platforms;
     bool local_build;
 
     // Other data

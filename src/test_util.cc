@@ -12,6 +12,20 @@ static void test_str(std::string const& s1, std::string const& s2)
 }
 
 
+static void test_glob_to_regex(char const* glob)
+{
+    try
+    {
+	std::string regex = Util::globToRegex(glob);
+	std::cout << glob << " -> " << regex << std::endl;
+    }
+    catch (std::exception& e)
+    {
+	std::cout << "glob " << glob << " threw exception: " << e.what()
+		  << std::endl;
+    }
+}
+
 int main()
 {
     std::cout << Util::intToString(5) << " "
@@ -97,6 +111,20 @@ int main()
     test_str("123x", "123X");
     test_str("ORANGE", "apple");
     test_str("APPLE", "orange");
+
+    // glob to regex
+    test_glob_to_regex("*");
+    test_glob_to_regex("*.*");
+    test_glob_to_regex("a.b.c");
+    test_glob_to_regex("a.{b,c}.d");
+    test_glob_to_regex("a[bcdef]g");
+    test_glob_to_regex("a.{b,[bcdef],g}h?j*");
+    test_glob_to_regex("a^b[^c]^d");
+    test_glob_to_regex("a[\\[\\]],{()+$\\{,\\}}\\\\");
+    test_glob_to_regex("a\\");
+    test_glob_to_regex("a[");
+    test_glob_to_regex("a{");
+    test_glob_to_regex("a{{");
 
     return 0;
 }

@@ -25,6 +25,7 @@
 #include <sstream>
 #include <fstream>
 #include <boost/thread/mutex.hpp>
+#include <boost/regex.hpp>
 #include "QTC.hh"
 #include "QEXC.hh"
 
@@ -1221,5 +1222,132 @@ Util::XMLify(std::string const& str, bool attribute)
 	    break;
 	}
     }
+    return result;
+}
+
+std::string
+Util::globToRegex(std::string const& glob)
+{
+    enum { st_top, st_in_brace, st_in_bracket } state = st_top;
+    bool literal = false;
+    std::string result;
+    for (std::string::const_iterator iter = glob.begin();
+	 iter != glob.end(); ++iter)
+    {
+	char ch = *iter;
+	if (literal)
+	{
+	    literal = false;
+	    result.append(1, ch);
+	}
+	else if (ch == '\\')
+	{
+	    literal = true;
+	    result.append(1, ch);
+	}
+	else
+	{
+	    if (state == st_in_brace)
+	    {
+		if (ch == '{')
+		{
+		}
+	    }
+
+	    std::string to_append;
+	    to_append.append(1, ch);
+
+	    switch (ch)
+	    {
+	      case '{':
+		if (state == st_in_brace)
+		{
+		    throw QEXC::General("nested { characters are not"
+					" allowed in a filename pattern");
+		}
+		else if (state == st_top)
+		{
+		    to_append = "(?:";
+		    state = st_in_brace;
+		}
+		break;
+
+	      case '}':
+		if (state == st_in_brace)
+		{
+		    to_append = ")";
+		    state = st_top;
+		}
+		break;
+
+	      case '[':
+		if (state == st_top)
+		{
+		    state = st_in_bracket;
+		}
+		break;
+
+	      case ']':
+		if (state == st_in_bracket)
+		{
+		    state = st_top;
+		}
+		break;
+
+	      case ',':
+		if (state == st_in_brace)
+		{
+		    to_append = "|";
+		}
+		break;
+
+	      case '^':
+		if (state != st_in_bracket)
+		{
+		    to_append = "\\^";
+		}
+		break;
+
+	      case '.':
+	      case '+':
+	      case '(':
+	      case ')':
+	      case '$':
+		to_append = "\\";
+		to_append.append(1, ch);
+		break;
+
+	      case '*':
+		to_append = "[^/]*";
+		break;
+
+	      case '?':
+		to_append = "[^/]";
+		break;
+
+	      default:
+		// to_append is just the character
+		break;
+	    }
+	    result += to_append;
+	}
+    }
+    if (literal || (state != st_top))
+    {
+	throw QEXC::General("filename pattern " + glob +
+			    " terminated prematurely");
+    }
+
+    try
+    {
+	boost::regex r(result);
+    }
+    catch (boost::bad_pattern const& e)
+    {
+	throw QEXC::General("converted " + glob +
+			    " to an invalid regular expression \"" +
+			    result + "\": " + e.what());
+    }
+
     return result;
 }

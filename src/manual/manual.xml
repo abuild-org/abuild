@@ -3371,6 +3371,18 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term><command>abuild --clean=all --clean-platform java
+       --clean-platform '*.ix86.*'</command></term>
+       <listitem>
+        <para>
+         for all build items, removes all
+         <filename>abuild-java</filename> output directories and all
+         output directories for platforms containing the string
+         &ldquo;<filename>.ix86.</filename>&rdquo;.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term><command>abuild --clean=current --apply-targets-to-deps</command></term>
        <listitem>
         <para>
@@ -4954,6 +4966,23 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>--clean-platforms pattern</term>
+      <listitem>
+       <para>
+        Specify a pattern that restricts which platform directories
+        are removed by any &abuild; clean operation.  This argument
+        may be repeated any number of times.  The
+        <replaceable>pattern</replaceable> given can be any valid
+        shell-style wild-card expression.  Any output directory
+        belonging to any pattern that matches any of the given clean
+        patterns will be removed.  All other output directories will
+        be left alone.  This can be useful for removing only output
+        directories for platforms we no longer care about or for other
+        selective cleanup operations.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>-e | --emacs</term>
       <listitem>
        <para>
@@ -5174,7 +5203,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         specified in conjunction with this option.  For additional
         details including a list of valid values for
         <replaceable>set</replaceable>, see <xref
-        linkend="ref.what-to-build"/>.
+        linkend="ref.what-to-build"/>.  See also the description of
+        the <option>--clean-platforms</option> (in <xref
+        linkend="ref.command-line.control"/>) to learn about
+        restricting which platform directories are removed.
        </para>
       </listitem>
      </varlistentry>
@@ -5281,7 +5313,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         linkend="ref.output-directories"/>.)  Well-behaved &abuild;
         rules, including all the rules that are a standard part of
         &abuild;, won't create any files or directories outside of
-        these locations.
+        these locations.  See also the description of the
+        <option>--clean-platforms</option> (in <xref
+        linkend="ref.command-line.control"/>) to learn about
+        restricting which platform directories are removed.
        </para>
       </listitem>
      </varlistentry>
@@ -13548,6 +13583,12 @@ Y = $(X)
         </para>
         <itemizedlist>
          <listitem>
+          <para>
+           A new command line option,
+           <property>--clean-platforms</property>, can be used to
+           restrict which platforms' directories are removed by any
+           &abuild; clean operation.
+          </para>
           <para>
            A new key, <property>build-also</property>, is now
            supported in <filename>Abuild.conf</filename>.  This key's

@@ -14,9 +14,6 @@ Core
    This is just a command-line argument parsing change.  See "internal
    targets" below.
 
- * Provide a mechanism to tell clean to only clean certain platforms
-   or to not clean certain platforms.
-
  * (Maybe) Add -ro-path and -rw-path options to tell abuild to treat
    some or all build items as read only based on path.  This should
    provide a more robust approach than using read-only externals for

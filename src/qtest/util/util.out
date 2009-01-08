@@ -31,3 +31,15 @@ qwer cmp QWERTY = -1
 123x cmp 123X = 0
 ORANGE cmp apple = 1
 APPLE cmp orange = -1
+* -> [^/]*
+*.* -> [^/]*\.[^/]*
+a.b.c -> a\.b\.c
+a.{b,c}.d -> a\.(?:b|c)\.d
+a[bcdef]g -> a[bcdef]g
+a.{b,[bcdef],g}h?j* -> a\.(?:b|[bcdef]|g)h[^/]j[^/]*
+a^b[^c]^d -> a\^b[^c]\^d
+a[\[\]],{()+$\{,\}}\\ -> a[\[\]],(?:\(\)\+\$\{|\})\\
+glob a\ threw exception: filename pattern a\ terminated prematurely
+glob a[ threw exception: filename pattern a[ terminated prematurely
+glob a{ threw exception: filename pattern a{ terminated prematurely
+glob a{{ threw exception: nested { characters are not allowed in a filename pattern

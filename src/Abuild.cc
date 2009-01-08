@@ -237,6 +237,7 @@ Abuild::parseArgv()
     boost::smatch match;
 
     std::list<std::string> platform_selector_strings;
+    std::list<std::string> clean_platform_strings;
     std::string platform_selector_env;
     if (Util::getEnv("ABUILD_PLATFORM_SELECTORS", &platform_selector_env))
     {
@@ -379,6 +380,14 @@ Abuild::parseArgv()
 		usage("--platform-selector requires an argument");
 	    }
 	    platform_selector_strings.push_back(*argp++);
+	}
+	else if (arg == "--clean-platforms")
+	{
+	    if (! *argp)
+	    {
+		usage("--clean-platforms requires an argument");
+	    }
+	    clean_platform_strings.push_back(*argp++);
 	}
 	else if ((arg == "--with-deps") || (arg == "-d"))
 	{
@@ -552,23 +561,40 @@ Abuild::parseArgv()
 	     platform_selector_strings.begin();
 	 iter != platform_selector_strings.end(); ++iter)
     {
-	std::string ptype;
 	PlatformSelector p;
 	if (p.initialize(*iter))
 	{
-	    // Don't validate ptype or any of the fields themselves.
-	    // It's not incorrect to reference non-existent platforms
-	    // or platform types here.  That way, people can set the
-	    // ABUILD_PLATFORM_SELECTORS environment variable based on
-	    // some build tree they work in and not worry about it if
-	    // they build in a different tree that doesn't have all
-	    // the same platforms and platform types.
+	    // Don't validate the platform type or any of the fields
+	    // themselves.  It's not incorrect to reference
+	    // non-existent platforms or platform types here.  That
+	    // way, people can set the ABUILD_PLATFORM_SELECTORS
+	    // environment variable based on some build tree they work
+	    // in and not worry about it if they build in a different
+	    // tree that doesn't have all the same platforms and
+	    // platform types.
 	    this->platform_selectors[p.getPlatformType()] = p;
 	}
 	else
 	{
 	    QTC::TC("abuild", "Abuild ERR invalid platform selector");
 	    error("invalid platform selector " + *iter);
+	}
+    }
+
+    // store clean platforms
+    for (std::list<std::string>::iterator iter =
+	     clean_platform_strings.begin();
+	 iter != clean_platform_strings.end(); ++iter)
+    {
+	try
+	{
+	    std::string regex = Util::globToRegex(*iter);
+	    this->clean_platforms.insert(regex);
+	}
+	catch (QEXC::General& e)
+	{
+	    QTC::TC("abuild", "Abuild ERR bad clean platform");
+	    error("invalid clean platform selector " + *iter + ": " + e.what());
 	}
     }
 
@@ -4830,7 +4856,10 @@ Abuild::cleanPath(std::string const& item_name, std::string const& dir)
         }
     }
 
+    boost::smatch match;
+
     std::list<std::string> entries = Util::getDirEntries(dir);
+    std::set<std::string> to_remove;
     for (std::list<std::string>::iterator iter = entries.begin();
 	 iter != entries.end(); ++iter)
     {
@@ -4839,14 +4868,53 @@ Abuild::cleanPath(std::string const& item_name, std::string const& dir)
 	if ((entry.substr(0, OUTPUT_DIR_PREFIX.length()) == OUTPUT_DIR_PREFIX) &&
 	    (Util::isFile(fullpath + "/.abuild")))
 	{
-	    try
+	    bool remove = false;
+	    if (this->clean_platforms.empty())
 	    {
-		Util::removeFileRecursively(fullpath);
+		remove = true;
 	    }
-	    catch(QEXC::General& e)
+	    else
 	    {
-		error(e.what());
+		std::string platform = entry.substr(OUTPUT_DIR_PREFIX.length());
+		// Remove this platform if it matches one of the clean
+		// platforms.
+		for (std::set<std::string>::iterator iter =
+			 this->clean_platforms.begin();
+		     iter != this->clean_platforms.end(); ++iter)
+		{
+		    boost::regex re(*iter);
+		    if (boost::regex_match(platform, match, re))
+		    {
+			remove = true;
+			break;
+		    }
+		}
+		if (remove)
+		{
+		    info("  removing " + entry);
+		}
+		else
+		{
+		    info("  not removing " + entry);
+		}
 	    }
+	    if (remove)
+	    {
+		to_remove.insert(fullpath);
+	    }
+	}
+    }
+
+    for (std::set<std::string>::iterator iter = to_remove.begin();
+	 iter != to_remove.end(); ++iter)
+    {
+	try
+	{
+	    Util::removeFileRecursively(*iter);
+	}
+	catch(QEXC::General& e)
+	{
+	    error(e.what());
 	}
     }
 }
@@ -4887,6 +4955,8 @@ Abuild::help()
     h("  -C start-dir      change directories to start-dir before running");
     h("  --clean=set |     specify a clean set");
     h("    -c set");
+    h("  --clean-platforms pattern   when cleaning, only remove platforms that");
+    h("                    match the given shell-style filename pattern");
     h("  --dump-build-graph  dump abuild's internal build graph");
     h("  --dump-data       dump abuild's data to stdout and build no targets");
     h("  --dump-interfaces   write details about items' interfaces to files");

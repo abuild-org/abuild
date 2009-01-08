@@ -1,0 +1,2 @@
+abuild: ERROR: invalid clean platform selector *{: filename pattern *{ terminated prematurely
+abuild: ERROR: errors detected; exiting

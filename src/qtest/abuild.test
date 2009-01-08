@@ -163,7 +163,6 @@ my $old_value = $ENV{$runtime_var} || "";
 # TESTS START HERE.  Goto statements may be added temporarily run
 # selective parts of the test suite.  Goto targets should jump to
 # right before a setup() call.
-goto XXX0;
 
 die if -f "Abuild.conf";
 $td->runtest("abuild --version with no Abuild.conf",
@@ -1059,7 +1058,6 @@ if (! $in_windows)
 # backing areas and externals or any other feature, to exercise
 # previously detected bugs.
 
-XXX0:
 setup("test1");
 
 cd("work/java");
@@ -1512,6 +1510,27 @@ $td->runtest("check moo nonexistence",
 
 cd("work/e/multi");
 
+$td->runtest("invalid clean platforms",
+	     {$td->COMMAND => "abuild -c current --clean-platforms '*{'",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.bad-clean-platforms.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean platforms 1",
+	     {$td->COMMAND => "abuild -c current --clean-platforms '*.cpu.*'",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.clean-platforms-1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean platforms 2",
+	     {$td->COMMAND => "abuild clean --clean-platforms '*.release'",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.clean-platforms-2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("clean e.multi",
 	     {$td->COMMAND => "abuild -c current",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
@@ -1793,7 +1812,6 @@ else
 # test2 and test3 test various abuild error conditions
 
 setup("test2", "test1.not-accessed.out");
-goto XXX1;
 
 $td->runtest("abuild errors",
 	     {$td->COMMAND => "abuild --build=all",
@@ -2976,8 +2994,7 @@ check_work_accessed();
 
 cleanup();
 
-XXX1:
-$td->report(288 +
+$td->report(291 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 19 : 0) +
 	    ($test_junit ? 3 : 0) +
