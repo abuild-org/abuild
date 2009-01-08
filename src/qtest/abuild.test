@@ -2436,15 +2436,12 @@ $td->runtest("dump data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-if ($test_java)
-{
-    $td->runtest("oc/java -> all -> all -> oc/java/indep",
-		 {$td->COMMAND => "abuild -b desc no-op",
-		  $td->FILTER => "perl $top/filter-abuild.pl"},
-		 {$td->FILE => "$top/test8.case2.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-}
+$td->runtest("oc/java -> all -> all -> oc/java/indep",
+	     {$td->COMMAND => "abuild -b desc no-op",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test8.case2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("dump build graph",
 	     {$td->COMMAND => "abuild -b desc --dump-build-graph",
@@ -2958,9 +2955,9 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(285 +
+$td->report(286 +
 	    ($in_windows ? 1 : 7) +
-	    ($test_java ? 20 : 0) +
+	    ($test_java ? 19 : 0) +
 	    ($test_junit ? 3 : 0) +
 	    ($have_whole_archive ? 2 : 1));
 
