@@ -6,23 +6,6 @@ backward compatibility issues to any configuration files or
 command-line arguments.  New syntax may be added as long as old syntax
 continues to work.
 
-Core
-====
-
- * (Maybe) Add -ro-path and -rw-path options to tell abuild to treat
-   some or all build items as read only based on path.  This should
-   provide a more robust approach than using read-only externals for
-   preventing cross-tree builds when they are not desired.  Details
-   still to be fully worked out, but the basic idea is that if you run
-   "abuild --build=desc -rw-path .", abuild will treat all build items
-   outside the current tree as read-only.  If you run "abuild
-   --build=desc -ro-path ../tps-build-items", then abuild will treat
-   everything as read/write except anything under ../tps-build-items,
-   which will be read only.  I'll come up with sensible semantics for
-   mixing -ro-path and -rw-path and for having multiple occurrences of
-   them.
-
-
 Documentation
 =============
 
@@ -131,6 +114,20 @@ Core Changes
    alternative to read-only externals for the desired functionality.
    Simplify Backing Areas. See "Revamped Build Tree Structure" below
    for details.
+
+ * Add -ro-path and -rw-path options to tell abuild to treat some or
+   all build items as read only based on path.  This should provide a
+   more robust approach than using read-only externals for preventing
+   cross-tree builds when they are not desired.  Details still to be
+   fully worked out, but the basic idea is that if you run "abuild
+   --build=desc -rw-path .", abuild will treat all build items outside
+   the current tree as read-only.  If you run "abuild --build=desc
+   -ro-path ../tps-build-items", then abuild will treat everything as
+   read/write except anything under ../tps-build-items, which will be
+   read only.  I'll come up with sensible semantics for mixing
+   -ro-path and -rw-path and for having multiple occurrences of them.
+   Need to think about whether it would be better to have, instead of
+   or in addition to this, -rw-trees and -ro-trees.
 
  * Implement two forms of conditional dependencies:
 
