@@ -577,6 +577,10 @@ In order to make it possible for the outcome of a plugin's build step
 to influence what platforms it provides, it will be necessary for
 abuild to build a plugin before executing its list_platforms file.
 
+Consider carefully how explicit targets should apply to plugins.  As
+currently coded, --apply-targets-to-deps will result in explicit
+targets being applied to plugins.
+
 
 Building Abuild
 ===============
