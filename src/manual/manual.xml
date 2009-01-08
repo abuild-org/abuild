@@ -498,9 +498,14 @@ following checks:
      </para>
      <para>
       The <replaceable>patch-or-pre</replaceable> field can indicate
-      either a patch release or a prerelease.  A patch release is a
-      bug-fix only release.  A prerelease is an alpha or beta release
-      or a release candidate that precedes a regular release.
+      either a patch release or a prerelease.  A patch release is may
+      contain bug fixes or new features as long as no non-compatible
+      changes are made to existing functionality.  A prerelease is an
+      alpha or beta release or a release candidate that precedes a
+      regular release.  Allowing new non-breaking features to be
+      introduced in a patch release makes it possible to add features
+      to &abuild; incrementally while still guaranteeing as much
+      compatibility as possible.
      </para>
      <para>
       Before a regular major or minor release, there may be a series
@@ -586,7 +591,14 @@ following checks:
       worked in version <literal>1.4</literal> would still have to
       work, though a deprecation warning would be issued.  The old
       version <literal>1.4</literal> way of doing things could stop
-      working altogether in version <literal>1.6.a1</literal>.
+      working altogether in version <literal>1.6.a1</literal>.  It is
+      also okay to add a new feature <emphasis>within</emphasis> a
+      minor release.  For example, it's okay if 1.0.3 adds some
+      feature that wasn't there in 1.0.2 as long as everything that
+      worked in 1.0.2 works the same way in 1.0.3.  In other words,
+      although everything that worked in 1.0.2 must work in 1.0.3,
+      there's no expectation that everything that works in 1.0.3 must
+      have worked in 1.0.2.
      </para>
     </sect2>
    </sect1>
@@ -10218,6 +10230,130 @@ flag private INCLUDES = private-include
      one build item that builds for multiple platform types, you can't
      have a single build item that builds for multiple languages.
     </para>
+    <sect2 id="ref.cross-platform-interface-errors">
+     <!-- The title of this section is included in an error message in
+          Interface.cc. -->
+     <title>Interface Errors</title>
+     <para>
+      Under a very specific set of circumstances, it is possible to
+      have a subtle and hard-to-understand error condition involving
+      interface variables with cross-platform dependencies.  You
+      should feel free to skip this section unless you are either
+      determined to understand the deepest subtleties of how &abuild;
+      works or you have been directed here by an error message issued
+      by &abuild;.  To understand the material in this section, it
+      will help to understand <xref
+      linkend="ref.construction-of-build-graph"/> and <xref
+      linkend="ref.interface-implementation"/>.
+     </para>
+     <para>
+      Internally, when &abuild; builds a build item, it loads the
+      interfaces of all the other build items that the item depends
+      on.  If item <classname>A</classname> depends on item
+      <classname>B</classname> in two different ways (say directly and
+      indirectly or indirectly through two different dependency
+      paths), &abuild; will effectively still load
+      <classname>B</classname>'s interface file only one time because
+      of the way the interface system keeps track of things.  At least
+      this is what happens under normal circumstances.  If, however,
+      the two different instances of <classname>B</classname> in
+      <classname>A</classname>'s dependency chain are from different
+      platforms, problems can arise.
+     </para>
+     <para>
+      We should note that this can happen only under the following
+      conditions:
+      <itemizedlist>
+       <listitem>
+        <para>
+         Build item <classname>A</classname> depends (directly or
+         indirectly) on two items, which we'll call
+         <classname>X1</classname> and <classname>X2</classname>.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Both <classname>X1</classname> and <classname>X2</classname>
+         depend on <classname>B</classname>.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         At least one of <classname>X1</classname> and
+         <classname>X2</classname> depends on <classname>B</classname>
+         with a platform-specific dependency.  If both do, they do so
+         with different platform specifications.
+        </para>
+       </listitem>
+      </itemizedlist>
+      When all of the above conditions have been met,
+      <classname>A</classname> will have two different instances of
+      <classname>B</classname> in its dependency chain.
+     </para>
+     <para>
+      Once this situation has occurred, it becomes possible for there
+      two be conflicting assignments to a variable, both of which
+      originate from the same line of the same interface file.  For
+      example, if <classname>B</classname>'s
+      <filename>Abuild.interface</filename> file assigns the value of
+      <varname>$(ABUILD_OUTPUT_DIR)</varname> to a scalar interface
+      variable, the effect of that assignment will differ across the
+      two different instances of <classname>B</classname>.  &Abuild;
+      will detect this case and issue an error message.  (That error
+      message will direct you here to this section of the manual!)  If
+      <classname>B</classname> assigns this to a list variable,
+      there's no problem&mdash;&abuild; will honor both assignments.
+      It's also no problem if the assignment doesn't have different
+      meanings on the different platforms.  It's only when the same
+      assignment causes a conflict that &abuild; will complain.
+     </para>
+     <para>
+      If you should run into this situation, there are several
+      possible remedies you should consider.
+      <itemizedlist>
+       <listitem>
+        <para>
+         Rethink why you are using cross-platform dependencies in this
+         way.  If you're just trying to make sure that some other
+         build item gets built, consider whether you can use
+         <property>build-also</property> instead of platform-specific
+         dependencies to meet your needs.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         If you want both values and doing this won't hurt other build
+         items, use a list variable instead of a non-list variable.
+         In this case, abuild will give you both (all) values.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         If you don't care which value you get, and doing so doesn't
+         cause other problems for other build items, use a fallback or
+         override assignment instead of a regular assignment.  Then
+         you'll get the first (in the case of fallback) or last (in
+         the case of override) assignment that is processed.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         If you can't change <classname>B</classname>'s interface and
+         <classname>A</classname> doesn't care about the value of the
+         value, you can do a reset on the offending variable from the
+         one or more of the items that <classname>A</classname>
+         depends on and that depend on different instances of
+         <classname>B</classname>.  For example,
+         <classname>X1</classname> could have an after-build file that
+         resets the offending variable.  Then when
+         <classname>A</classname> imports <classname>X1</classname>'s
+         interface, it will no longer include the conflicting
+         assignment from <classname>B</classname>'s interface.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+    </sect2>
    </sect1>
    <sect1 id="ref.example.cross-platform-dependency">
     <title>Cross-Platform Dependency Example</title>
