@@ -233,7 +233,7 @@ Abuild ERR invalid build also 0
 ItemConfig ERR bad build-also 0
 ItemConfig ERR build-also without this 0
 Abuild ERR plugin with build-also 0
-Abuild expand with build-also 1
-Abuild non-trivial build-also 0
 Abuild non-trivial trait expansion 0
 Abuild non-trivial dep expansion 0
+Abuild additional build-also expansion 0
+Abuild non-trivial build-also 0

@@ -3189,6 +3189,11 @@ Abuild::computeBuildset(BuildItem_map& builditems)
         this->buildset[this_name] = this_builditem;
     }
 
+    if (addBuildAlsoToBuildset(builditems))
+    {
+	QTC::TC("abuild", "Abuild non-trivial build-also");
+    }
+
     if ((! this->apply_targets_to_deps) &&
 	(this->related_by_traits.empty()))
     {
@@ -3334,42 +3339,10 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 		}
 	    }
 	}
-
-	// For every item in the build set, if that item specifies any
-	// other items to build, add them as well.
-	{ // private scope
-	    std::set<std::string> to_add;
-	    for (BuildItem_map::iterator iter = this->buildset.begin();
-		 iter != this->buildset.end(); ++iter)
-	    {
-		std::string const& item_name = (*iter).first;
-		BuildItem& item = *((*iter).second);
-		bool is_explicit =
-		    this->explicit_target_items.count(item_name);
-		std::list<std::string> const& build_also = item.getBuildAlso();
-		for (std::list<std::string>::const_iterator biter =
-			 build_also.begin();
-		     biter != build_also.end(); ++biter)
-		{
-		    to_add.insert(*biter);
-		    QTC::TC("abuild", "Abuild expand with build-also",
-			    is_explicit ? 0 : 1);
-		    if (is_explicit)
-		    {
-			this->explicit_target_items.insert(*biter);
-		    }
-		}
-	    }
-	    for (std::set<std::string>::iterator iter = to_add.begin();
-		 iter != to_add.end(); ++iter)
-	    {
-		if (this->buildset.count(*iter) == 0)
-		{
-		    QTC::TC("abuild", "Abuild non-trivial build-also");
-		    expanding = true;
-		    this->buildset[*iter] = builditems[*iter];
-		}
-	    }
+	if (addBuildAlsoToBuildset(builditems))
+	{
+	    QTC::TC("abuild", "Abuild additional build-also expansion");
+	    expanding = true;
 	}
     }
 
@@ -3426,6 +3399,48 @@ Abuild::populateBuildset(BuildItem_map& builditems,
 	    this->buildset[item_name] = item_ptr;
 	}
     }
+}
+
+bool
+Abuild::addBuildAlsoToBuildset(BuildItem_map& builditems)
+{
+    // For every item in the build set, if that item specifies any
+    // other items to build, add them as well.
+    bool adding = true;
+    bool added_any = false;
+    while (adding)
+    {
+	adding = false;
+	std::set<std::string> to_add;
+	for (BuildItem_map::iterator iter = this->buildset.begin();
+	     iter != this->buildset.end(); ++iter)
+	{
+	    std::string const& item_name = (*iter).first;
+	    BuildItem& item = *((*iter).second);
+	    std::list<std::string> const& build_also = item.getBuildAlso();
+	    for (std::list<std::string>::const_iterator biter =
+		     build_also.begin();
+		 biter != build_also.end(); ++biter)
+	    {
+		to_add.insert(*biter);
+	    }
+	}
+	for (std::set<std::string>::iterator iter = to_add.begin();
+	     iter != to_add.end(); ++iter)
+	{
+	    if ((this->buildset.count(*iter) == 0) &&
+		builditems[*iter]->hasTraits(this->only_with_traits))
+	    {
+		adding = true;
+		this->buildset[*iter] = builditems[*iter];
+	    }
+	}
+	if (adding)
+	{
+	    added_any = true;
+	}
+    }
+    return added_any;
 }
 
 bool

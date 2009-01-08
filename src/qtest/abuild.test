@@ -1411,6 +1411,38 @@ $td->runtest("dump data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/h/multipass/a");
+
+$td->runtest("multipass build-also explicit targets",
+	     {$td->COMMAND => "abuild -d check",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.multipass.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also and related-by-traits",
+	     {$td->COMMAND => "abuild -d check --related-by-traits trait",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.build-also-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/h/multipass");
+
+$td->runtest("build-also and only-with-traits",
+	     {$td->COMMAND => "abuild -b all check --only-with-traits trait",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.only-with-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild -c all",
+	      $td->FILTER => "perl $top/filter-abuild.pl"},
+	     {$td->FILE => "$top/test1.h.multipass-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 validate_dump_data();
 
 cd("work/ext");
@@ -2926,7 +2958,7 @@ check_work_accessed();
 
 cleanup();
 
-$td->report(281 +
+$td->report(285 +
 	    ($in_windows ? 1 : 7) +
 	    ($test_java ? 20 : 0) +
 	    ($test_junit ? 3 : 0) +

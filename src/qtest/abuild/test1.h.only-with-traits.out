@@ -1,0 +1,3 @@
+abuild: e (abuild-indep): all
+abuild: d (abuild-indep): all
+abuild: c (abuild-indep): check

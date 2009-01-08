@@ -3423,11 +3423,14 @@ C:\cygwin\cygwin.bat
      When &abuild; adds any build item to the build set, if that build
      item has a <property>build-also</property> key, then any build
      items listed there are also added to the build set.  The
-     principal intended use of this feature is to aid with setting up
-     virtual &ldquo;top-level&rdquo; build items.  For example, if
-     your system consisted of multiple, independent subsystems and you
-     wanted to build all of them, you could create a build item that
-     lists the main items for each subsystem in a
+     operation of expanding initial build set membership using the
+     <property>build-also</property> key is applied iteratively until
+     no more build items are added.  The principal intended use of
+     this feature is to aid with setting up virtual
+     &ldquo;top-level&rdquo; build items.  For example, if your system
+     consisted of multiple, independent subsystems and you wanted to
+     build all of them, you could create a build item that lists the
+     main items for each subsystem in a
      <property>build-also</property> key.  In older versions of
      &abuild; it was necessary to use dependencies for this purpose,
      but this had several disadvantages, including the following:
@@ -3713,80 +3716,84 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </varlistentry>
      </variablelist>
     </sect2>
-    <sect2 id="ref.target-selection">
-     <title>Target Selection</title>
-     <para>
-      Although we have described how various options affect which
-      build items are built with which targets, we summarize that
-      information here so that it all appears in one place.  Put
-      simply, the default behavior is that &abuild; applies any
-      explicitly named targets to all build items that directly match
-      the criteria for belonging to the named build set.  Any build
-      items that &abuild; is building just to satisfy dependencies are
-      built with the <command>all</command> target.  This behavior is
-      overridden by specifying
-      <option>--apply-targets-to-deps</option>, which causes &abuild;
-      to build all build items with the explicit targets.  The exact
-      rules are described in the list below.  These rules apply only
-      when a build set is specified with <option>--build</option> or
-      <option>-b</option>.  There are several mutually exclusive
-      cases:
-      <orderedlist>
-       <listitem>
-        <para>
-         The <option>--apply-targets-to-deps</option> option was
-         specified or the explicit target is <command>no-op</command>.
-         In this case, any explicitly named targets are applied to all
-         items in the build set.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The <option>--apply-targets-to-deps</option> option was not
-         specified, the target is not <option>no-op</option>, and no
-         trait arguments were specified.  In this case, all items that
-         were initially added to the build set are built with any
-         explicitly specified targets.  Any build items added to the
-         build set to satisfy dependencies are built with the
-         <command>all</command> target.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The <option>--apply-targets-to-deps</option> option was not
-         specified, the target is not <option>no-op</option>,
-         <option>--only-with-traits</option> <emphasis>was</emphasis>
-         specified, and <option>--related-by-traits</option>
-         <emphasis>was not</emphasis> specified.  In this case, all
-         items belonging to the original build set and having all of
-         the named traits are built with the explicit targets.  Other
-         items (dependencies of build items with the named traits but
-         that do not have the named traits themselves) are built with
-         the <command>all</command> target.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         The <option>--apply-targets-to-deps</option> option was not
-         specified, the target is not <option>no-op</option>, and
-         <option>--related-by-traits</option> <emphasis>was</emphasis>
-         specified.  In this case, the build set is first constructed
-         normally and then restricted to any items that have all the
-         traits specified in the <option>--only-with-traits</option>
-         option, if any.  Then it is expanded to include any build
-         item related to one of the original build set members by all
-         the traits named in <option>--related-by-traits</option>.
-         These related items are built with the explicit targets.
-         Other items, including additional dependencies of related
-         items, are built with the <command>all</command> target.
-        </para>
-       </listitem>
-      </orderedlist>
-      For more detailed information on how the build set is
-      constructed, please see <xref
-      linkend="ref.construction-of-build-sets"/>.
-     </para>
-    </sect2>
+   </sect1>
+   <sect1 id="ref.target-selection">
+    <title>Target Selection</title>
+    <para>
+     Although we have described how various options affect which
+     build items are built with which targets, we summarize that
+     information here so that it all appears in one place.  Put
+     simply, the default behavior is that &abuild; applies any
+     explicitly named targets to all build items that directly match
+     the criteria for belonging to the named build set.  Any build
+     items that &abuild; is building just to satisfy dependencies are
+     built with the <command>all</command> target.  This behavior is
+     overridden by specifying
+     <option>--apply-targets-to-deps</option>, which causes &abuild;
+     to build all build items with the explicit targets.  The exact
+     rules are described in the list below.  These rules apply only
+     when a build set is specified with <option>--build</option> or
+     <option>-b</option>.  There are several mutually exclusive
+     cases:
+     <orderedlist>
+      <listitem>
+       <para>
+        The <option>--apply-targets-to-deps</option> option was
+        specified or the explicit target is <command>no-op</command>.
+        In this case, any explicitly named targets are applied to all
+        items in the build set.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <option>--apply-targets-to-deps</option> option was not
+        specified, the target is not <option>no-op</option>, and no
+        trait arguments were specified.  In this case, all items that
+        were initially added to the build set, along with any build
+        items specified by any of their
+        <property>build-also</property> keys (with the
+        <property>build-also</property> relationship applied
+        recursively) are built with any explicitly specified targets.
+        Any other build items added to the build set to satisfy
+        dependencies are built with the <command>all</command> target.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <option>--apply-targets-to-deps</option> option was not
+        specified, the target is not <option>no-op</option>,
+        <option>--only-with-traits</option> <emphasis>was</emphasis>
+        specified, and <option>--related-by-traits</option>
+        <emphasis>was not</emphasis> specified.  In this case, all
+        items belonging to the original build set (including
+        <property>build-also</property> expansion) and having all of
+        the named traits are built with the explicit targets.  Other
+        items (dependencies of build items with the named traits but
+        that do not have the named traits themselves) are built with
+        the <command>all</command> target.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <option>--apply-targets-to-deps</option> option was not
+        specified, the target is not <option>no-op</option>, and
+        <option>--related-by-traits</option> <emphasis>was</emphasis>
+        specified.  In this case, the build set is first constructed
+        normally and then restricted to any items that have all the
+        traits specified in the <option>--only-with-traits</option>
+        option, if any.  Then it is expanded to include any build
+        item related to one of the original build set members by all
+        the traits named in <option>--related-by-traits</option>.
+        These related items are built with the explicit targets.
+        Other items, including additional dependencies of related
+        items, are built with the <command>all</command> target.
+       </para>
+      </listitem>
+     </orderedlist>
+     For more detailed information on how the build set is
+     constructed, please see <xref
+     linkend="ref.construction-of-build-sets"/>.
+    </para>
    </sect1>
    <sect1 id="ref.general-build-examples">
     <title>Build Set and Trait Examples</title>
@@ -13047,7 +13054,16 @@ native-compiler qcc
      items that directly match the criteria of the specified build
      set.  If <option>--only-with-traits</option> was specified, only
      build items that match the build set criteria and have all of the
-     named traits are included.
+     named traits are included.  Then it expands that set by
+     iteratively including all build items mentioned in the
+     <property>build-also</property> key of any build item in the set,
+     repeating the process until no new build items are added.  This
+     expansion also restricts based on
+     <option>--only-with-traits</option>.  This is considered the
+     explicit build set.  In the absence of
+     <option>--related-by-traits</option> or
+     <option>--apply-target-to-deps</option>, this is the set of build
+     items that will be built with any explicitly specified target.
     </para>
     <para>
      Next, if we are building (as opposed to cleaning) or if the
@@ -13059,29 +13075,30 @@ native-compiler qcc
      traits listed in the <option>--related-by-traits</option> option
      and that declare at least one of those traits referent to one of
      the build items in the build set so far.  As it finds them, it
-     adds them to the build set.  Then, if any build item in the build
-     set specified other build items in its
-     <property>build-also</property> key, those items are added to the
-     build set.  This process is repeated until an expansion pass
-     completes in which no more items were added the build set.
+     adds them to the build set.  Then, another pass is taken to
+     expand the build set by adding any
+     <property>build-also</property> items requested by any of the
+     newly added items, restricting as always the
+     <property>build-also</property> items to those that conform to
+     any <option>--only-with-traits</option> traits specified.  This
+     process is repeated until a pass completes in which no new items
+     are added to the build set.
     </para>
     <para>
-     Note that expanding the build set based on traits specified with
-     <option>--related-by-traits</option> is performed repeatedly
-     until there are no more expansions.  Usually this won't matter,
-     but there are some cases in which it does actually make a
-     difference.  For example, suppose the original build set contains
-     <classname>A</classname> and <classname>B</classname>, and that
-     <classname>AC-test</classname> is declared as a tester of item
-     <classname>A</classname>, which is in the build set, and also of
-     item <classname>C</classname> which is not in the build set.  If
-     we are adding items related by the <property>tester</property>
-     trait, the <classname>AC-test</classname> build item will be
-     added to the build set.  Assuming <classname>AC-test</classname>
-     depends on <classname>C</classname>, then
-     <classname>C</classname> will also be added to the build set.
-     Now if there is another build item called
-     <classname>C-test</classname> that tests
+     Usually, the fact that the expansion process is repeated until
+     stable doesn't matter, but there are some cases in which it does
+     actually make a difference.  For example, suppose the original
+     build set contains <classname>A</classname> and
+     <classname>B</classname>, and that <classname>AC-test</classname>
+     is declared as a tester of item <classname>A</classname>, which
+     is in the build set, and also of item <classname>C</classname>
+     which is not in the build set.  If we are adding items related by
+     the <property>tester</property> trait, the
+     <classname>AC-test</classname> build item will be added to the
+     build set.  Assuming <classname>AC-test</classname> depends on
+     <classname>C</classname>, then <classname>C</classname> will also
+     be added to the build set.  Now if there is another build item
+     called <classname>C-test</classname> that tests
      <classname>C</classname>, it will also added to the build set
      even though it tests an item that wasn't an original member of
      the build set.  This situation is reproduced in &abuild;'s test

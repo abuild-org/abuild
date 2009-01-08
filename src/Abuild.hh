@@ -112,6 +112,7 @@ class Abuild
     void computeBuildset(BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);
+    bool addBuildAlsoToBuildset(BuildItem_map& builditems);
     bool buildBuildset();
     bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);
     void findGnuMakeInPath();
