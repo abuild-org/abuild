@@ -2,5 +2,3 @@ abuild: cleaning aa in ../a/aa
 abuild: cleaning ab in ../a/ab
 abuild: cleaning ac in ../a/ac
 abuild: cleaning ad in ../a/ad
-abuild: cleaning plugin.echo in ../plugins/echo
-abuild: cleaning plugin.qrwx in ../plugins/qrwx

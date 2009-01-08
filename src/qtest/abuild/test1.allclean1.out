@@ -19,6 +19,7 @@ abuild: cleaning d.b.a.a in ../d/b/a/a
 abuild: cleaning e.bin in ../e/bin
 abuild: cleaning e.global in ../e/global-overrides
 abuild: cleaning e.lib in ../e/lib
+abuild: cleaning e.multi in ../e/multi
 abuild: cleaning e.shlib in ../e/shlib
 abuild: cleaning e.shlib2 in ../e/shlib2
 abuild: cleaning ext in .

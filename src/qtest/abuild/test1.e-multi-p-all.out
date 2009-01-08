@@ -1,0 +1,108 @@
+abuild: e.multi (abuild-<native>): all
+abuild: e.multi (abuild-<native>.debug): all
+make: Entering directory `--topdir--/e/multi/abuild-<native>.debug'
+Compiling ../bin.c as C
+Creating bin executable
+make: Leaving directory `--topdir--/e/multi/abuild-<native>.debug'
+abuild: e.multi (abuild-<native>.release): all
+make: Entering directory `--topdir--/e/multi/abuild-<native>.release'
+Compiling ../bin.c as C
+Creating bin executable
+make: Leaving directory `--topdir--/e/multi/abuild-<native>.release'
+abuild: e.multi (abuild-os.cpu.toolset.echo): all
+abuild: e.multi (abuild-os.cpu.toolset.echo.debug): all
+make: Entering directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo.debug'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags-  -wflags-   ../bin.c bin.o bin.dep
+Compiling ../bin.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -wflags-
+make-obj src: ../bin.c
+make-obj obj: bin.o
+contents of bin.o:
+int main()
+{
+    return 0;
+}
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -dflags- -wflags-
+make-bin: link-flags:
+make-bin: objects: bin.o
+make-bin: lib-dirs:
+make-bin: libs:
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+int main()
+{
+    return 0;
+}
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo.debug'
+abuild: e.multi (abuild-os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo.lowpri'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-   ../bin.c bin.o bin.dep
+Compiling ../bin.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags-
+make-obj src: ../bin.c
+make-obj obj: bin.o
+contents of bin.o:
+int main()
+{
+    return 0;
+}
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -dflags- -oflags- -wflags-
+make-bin: link-flags:
+make-bin: objects: bin.o
+make-bin: lib-dirs:
+make-bin: libs:
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+int main()
+{
+    return 0;
+}
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo.lowpri'
+abuild: e.multi (abuild-os.cpu.toolset.echo.release): all
+make: Entering directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo.release'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- .  -oflags- -wflags-   ../bin.c bin.o bin.dep
+Compiling ../bin.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -oflags- -wflags-
+make-obj src: ../bin.c
+make-obj obj: bin.o
+contents of bin.o:
+int main()
+{
+    return 0;
+}
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -oflags- -wflags-
+make-bin: link-flags:
+make-bin: objects: bin.o
+make-bin: lib-dirs:
+make-bin: libs:
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+int main()
+{
+    return 0;
+}
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo.release'

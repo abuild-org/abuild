@@ -10,4 +10,5 @@ abuild: ba (abuild-indep): all
 abuild: bc (abuild-indep): all
 abuild: cb (abuild-<native>): all
 abuild: cc (abuild-indep): all
+abuild: e.multi (abuild-<native>): all
 abuild: root (abuild-indep): all

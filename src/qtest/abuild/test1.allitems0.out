@@ -451,6 +451,30 @@ abuild-monitor: begin-dump-data
     </buildable-platforms>
    </build-item>
    <build-item
+    name="e.multi"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/multi"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="echo"/>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.lowpri"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
     name="e.shlib2"
     home-tree="bt-1"
     absolute-path="--topdir--/e/shlib2"
@@ -535,6 +559,8 @@ abuild-monitor: state-change d.b.a indep ready
 abuild-monitor: state-change e.bin os.cpu.toolset.echo waiting
 abuild-monitor: state-change e.global os.cpu.toolset.echo ready
 abuild-monitor: state-change e.lib os.cpu.toolset.echo ready
+abuild-monitor: state-change e.multi <native> ready
+abuild-monitor: state-change e.multi os.cpu.toolset.echo ready
 abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo waiting
 abuild-monitor: state-change e.shlib os.cpu.toolset.echo waiting
 abuild-monitor: state-change root indep ready
@@ -1092,6 +1118,49 @@ contents of bin-bin1:
 end contents of bin-bin1
 make: Leaving directory `--topdir--/e/global-overrides/abuild-os.cpu.toolset.echo'
 abuild-monitor: state-change e.global os.cpu.toolset.echo completed
+abuild-monitor: state-change e.multi <native> running
+abuild-monitor: targets e.multi <native> all
+abuild: e.multi (abuild-<native>): all
+make: Entering directory `--topdir--/e/multi/abuild-<native>'
+Compiling ../bin.c as C
+Creating bin executable
+make: Leaving directory `--topdir--/e/multi/abuild-<native>'
+abuild-monitor: state-change e.multi <native> completed
+abuild-monitor: state-change e.multi os.cpu.toolset.echo running
+abuild-monitor: targets e.multi os.cpu.toolset.echo all
+abuild: e.multi (abuild-os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo'
+CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-   ../bin.c bin.o bin.dep
+Compiling ../bin.c as C
+make-obj compiler: echo COMPILE_c
+make-obj pic:
+make-obj flags: -include- .. -include- . -dflags- -oflags- -wflags-
+make-obj src: ../bin.c
+make-obj obj: bin.o
+contents of bin.o:
+int main()
+{
+    return 0;
+}
+end contents of bin.o
+Creating bin executable
+make-bin: linker: echo LINK_c
+make-bin: compiler-flags: -dflags- -oflags- -wflags-
+make-bin: link-flags:
+make-bin: objects: bin.o
+make-bin: lib-dirs:
+make-bin: libs:
+make-bin: bin: bin-bin
+contents of bin-bin:
+** bin bin **
+int main()
+{
+    return 0;
+}
+** end of bin bin **
+end contents of bin-bin
+make: Leaving directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.multi os.cpu.toolset.echo completed
 abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo running
 abuild-monitor: targets e.shlib2 os.cpu.toolset.echo all
 abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all

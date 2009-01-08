@@ -450,6 +450,30 @@
     </buildable-platforms>
    </build-item>
    <build-item
+    name="e.multi"
+    home-tree="bt-1"
+    absolute-path="--topdir--/e/multi"
+    backing-depth="0"
+    external-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="echo"/>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+     <platform name="os.cpu.toolset.echo"/>
+     <platform name="os.cpu.toolset.echo.debug"/>
+     <platform name="os.cpu.toolset.echo.lowpri"/>
+     <platform name="os.cpu.toolset.echo.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
     name="e.shlib2"
     home-tree="bt-1"
     absolute-path="--topdir--/e/shlib2"

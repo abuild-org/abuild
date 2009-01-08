@@ -3348,22 +3348,26 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 
     // Expand the build set to include all plugins of all items in the
     // buildset.
-    std::set<std::string> to_add;
-    for (BuildItem_map::iterator iter = this->buildset.begin();
-	 iter != this->buildset.end(); ++iter)
+    if (add_dependencies)
     {
-	BuildItem& item = *((*iter).second);
-	std::list<std::string> const& plugins = item.getPlugins();
-	for (std::list<std::string>::const_iterator p_iter = plugins.begin();
-	     p_iter != plugins.end(); ++p_iter)
+	std::set<std::string> to_add;
+	for (BuildItem_map::iterator iter = this->buildset.begin();
+	     iter != this->buildset.end(); ++iter)
 	{
-	    to_add.insert(*p_iter);
+	    BuildItem& item = *((*iter).second);
+	    std::list<std::string> const& plugins = item.getPlugins();
+	    for (std::list<std::string>::const_iterator p_iter =
+		     plugins.begin();
+		 p_iter != plugins.end(); ++p_iter)
+	    {
+		to_add.insert(*p_iter);
+	    }
 	}
-    }
-    for (std::set<std::string>::iterator iter = to_add.begin();
-	 iter != to_add.end(); ++iter)
-    {
-	this->buildset[*iter] = builditems[*iter];
+	for (std::set<std::string>::iterator iter = to_add.begin();
+	     iter != to_add.end(); ++iter)
+	{
+	    this->buildset[*iter] = builditems[*iter];
+	}
     }
 
     if (this->buildset.empty())
