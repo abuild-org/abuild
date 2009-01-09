@@ -1518,7 +1518,8 @@ $td->runtest("invalid clean platforms",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("clean platforms 1",
-	     {$td->COMMAND => "abuild -c current --clean-platforms '*.cpu.*'",
+	     {$td->COMMAND =>
+		  "abuild -c current --clean-platforms '*.echo{,.*}'",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test1.clean-platforms-1.out",
 	      $td->EXIT_STATUS => 0},
