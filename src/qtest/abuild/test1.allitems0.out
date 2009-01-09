@@ -24,10 +24,10 @@ abuild-monitor: begin-dump-data
      <platform name="indep" selected="1"/>
     </platform-type>
     <platform-type name="echo" target-type="object-code">
-     <platform name="os.cpu.toolset.echo" selected="1"/>
-     <platform name="os.cpu.toolset.echo.debug" selected="0"/>
-     <platform name="os.cpu.toolset.echo.release" selected="0"/>
-     <platform name="os.cpu.toolset.echo.lowpri" selected="0"/>
+     <platform name="zz_os.cpu.toolset.echo" selected="1"/>
+     <platform name="zz_os.cpu.toolset.echo.debug" selected="0"/>
+     <platform name="zz_os.cpu.toolset.echo.release" selected="0"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri" selected="0"/>
     </platform-type>
     <platform-type name="native" target-type="object-code">
      <platform name="<native>" selected="1"/>
@@ -370,10 +370,10 @@ abuild-monitor: begin-dump-data
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -396,10 +396,10 @@ abuild-monitor: begin-dump-data
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -424,10 +424,10 @@ abuild-monitor: begin-dump-data
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -444,10 +444,10 @@ abuild-monitor: begin-dump-data
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -468,10 +468,10 @@ abuild-monitor: begin-dump-data
      <platform name="<native>"/>
      <platform name="<native>.debug"/>
      <platform name="<native>.release"/>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -494,10 +494,10 @@ abuild-monitor: begin-dump-data
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -556,13 +556,13 @@ abuild-monitor: state-change cc indep ready
 abuild-monitor: state-change d.a.a indep ready
 abuild-monitor: state-change d.a indep waiting
 abuild-monitor: state-change d.b.a indep ready
-abuild-monitor: state-change e.bin os.cpu.toolset.echo waiting
-abuild-monitor: state-change e.global os.cpu.toolset.echo ready
-abuild-monitor: state-change e.lib os.cpu.toolset.echo ready
+abuild-monitor: state-change e.bin zz_os.cpu.toolset.echo waiting
+abuild-monitor: state-change e.global zz_os.cpu.toolset.echo ready
+abuild-monitor: state-change e.lib zz_os.cpu.toolset.echo ready
 abuild-monitor: state-change e.multi <native> ready
-abuild-monitor: state-change e.multi os.cpu.toolset.echo ready
-abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo waiting
-abuild-monitor: state-change e.shlib os.cpu.toolset.echo waiting
+abuild-monitor: state-change e.multi zz_os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo waiting
+abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo waiting
 abuild-monitor: state-change root indep ready
 abuild-monitor: state-change bb indep running
 abuild-monitor: targets bb indep all
@@ -650,10 +650,10 @@ make: Entering directory `--topdir--/c/cc/abuild-indep'
 Making potato salad
 make: Leaving directory `--topdir--/c/cc/abuild-indep'
 abuild-monitor: state-change cc indep completed
-abuild-monitor: state-change e.lib os.cpu.toolset.echo running
-abuild-monitor: targets e.lib os.cpu.toolset.echo all
-abuild: e.lib (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.lib zz_os.cpu.toolset.echo running
+abuild-monitor: targets e.lib zz_os.cpu.toolset.echo all
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
 Compiling ../lib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -796,14 +796,14 @@ contents of bin-bin2:
 ** end of lib lib2 **
 ** end of bin bin2 **
 end contents of bin-bin2
-make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
-abuild-monitor: state-change e.lib os.cpu.toolset.echo completed
-abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo ready
-abuild-monitor: state-change e.shlib os.cpu.toolset.echo ready
-abuild-monitor: state-change e.shlib os.cpu.toolset.echo running
-abuild-monitor: targets e.shlib os.cpu.toolset.echo all
-abuild: e.shlib (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo'
+abuild-monitor: state-change e.lib zz_os.cpu.toolset.echo completed
+abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo running
+abuild-monitor: targets e.shlib zz_os.cpu.toolset.echo all
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src1.c shlib1-src1.lo shlib1-src1.dep
 Compiling ../shlib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -839,7 +839,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
@@ -872,7 +872,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
@@ -903,7 +903,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
@@ -934,7 +934,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
@@ -950,13 +950,13 @@ contents of shlib-shlib4:
 ** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
-make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
-abuild-monitor: state-change e.shlib os.cpu.toolset.echo completed
-abuild-monitor: state-change e.bin os.cpu.toolset.echo ready
-abuild-monitor: state-change e.bin os.cpu.toolset.echo running
-abuild-monitor: targets e.bin os.cpu.toolset.echo all
-abuild: e.bin (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo'
+abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo completed
+abuild-monitor: state-change e.bin zz_os.cpu.toolset.echo ready
+abuild-monitor: state-change e.bin zz_os.cpu.toolset.echo running
+abuild-monitor: targets e.bin zz_os.cpu.toolset.echo all
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../bin.cc bin.o bin.dep
 Compiling ../bin.cc as C++
 make-obj compiler: echo COMPILE_cxx
@@ -972,7 +972,7 @@ make-bin: linker: echo LINK_c
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo ../../lib/abuild-os.cpu.toolset.echo
+make-bin: lib-dirs: ../../shlib/abuild-zz_os.cpu.toolset.echo ../../lib/abuild-zz_os.cpu.toolset.echo
 make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -1034,12 +1034,12 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
-abuild-monitor: state-change e.bin os.cpu.toolset.echo completed
-abuild-monitor: state-change e.global os.cpu.toolset.echo running
-abuild-monitor: targets e.global os.cpu.toolset.echo all
-abuild: e.global (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/global-overrides/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo'
+abuild-monitor: state-change e.bin zz_os.cpu.toolset.echo completed
+abuild-monitor: state-change e.global zz_os.cpu.toolset.echo running
+abuild-monitor: targets e.global zz_os.cpu.toolset.echo all
+abuild: e.global (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/global-overrides/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -new-dflags- -new-oflags- -new-wflags-   ../lib1.c lib1.lo lib1.dep
 Compiling ../lib1.c as C
 make-obj compiler: echo COMPILE_c
@@ -1116,8 +1116,8 @@ contents of bin-bin1:
 ** end of shlib lib2 **
 ** end of bin bin1 **
 end contents of bin-bin1
-make: Leaving directory `--topdir--/e/global-overrides/abuild-os.cpu.toolset.echo'
-abuild-monitor: state-change e.global os.cpu.toolset.echo completed
+make: Leaving directory `--topdir--/e/global-overrides/abuild-zz_os.cpu.toolset.echo'
+abuild-monitor: state-change e.global zz_os.cpu.toolset.echo completed
 abuild-monitor: state-change e.multi <native> running
 abuild-monitor: targets e.multi <native> all
 abuild: e.multi (abuild-<native>): all
@@ -1126,10 +1126,10 @@ Compiling ../bin.c as C
 Creating bin executable
 make: Leaving directory `--topdir--/e/multi/abuild-<native>'
 abuild-monitor: state-change e.multi <native> completed
-abuild-monitor: state-change e.multi os.cpu.toolset.echo running
-abuild-monitor: targets e.multi os.cpu.toolset.echo all
-abuild: e.multi (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo'
+abuild-monitor: state-change e.multi zz_os.cpu.toolset.echo running
+abuild-monitor: targets e.multi zz_os.cpu.toolset.echo all
+abuild: e.multi (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/multi/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-   ../bin.c bin.o bin.dep
 Compiling ../bin.c as C
 make-obj compiler: echo COMPILE_c
@@ -1159,12 +1159,12 @@ int main()
 }
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/multi/abuild-os.cpu.toolset.echo'
-abuild-monitor: state-change e.multi os.cpu.toolset.echo completed
-abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo running
-abuild-monitor: targets e.shlib2 os.cpu.toolset.echo all
-abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/multi/abuild-zz_os.cpu.toolset.echo'
+abuild-monitor: state-change e.multi zz_os.cpu.toolset.echo completed
+abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo running
+abuild-monitor: targets e.shlib2 zz_os.cpu.toolset.echo all
+abuild: e.shlib2 (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib2/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../static.c static.lo static.dep
 Compiling ../static.c as C
 make-obj compiler: echo COMPILE_c
@@ -1198,7 +1198,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: static lib1 lib2
 make-shlib: shlib: shlib-shlib1.0.0.0
 contents of shlib-shlib1.0.0.0:
@@ -1232,7 +1232,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: static lib1 lib2
 make-shlib: shlib: shlib-shlib2.0.0.0
 contents of shlib-shlib2.0.0.0:
@@ -1266,7 +1266,7 @@ make-bin: linker: echo LINK_cxx
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-bin: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-bin: libs: static shlib1 shlib2 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -1313,8 +1313,8 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
-abuild-monitor: state-change e.shlib2 os.cpu.toolset.echo completed
+make: Leaving directory `--topdir--/e/shlib2/abuild-zz_os.cpu.toolset.echo'
+abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo completed
 abuild-monitor: state-change root indep running
 abuild-monitor: targets root indep all
 abuild: root (abuild-indep): all

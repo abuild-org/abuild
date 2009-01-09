@@ -1,4 +1,4 @@
-abuild: e.lib (abuild-os.cpu.toolset.echo): bin-bin1
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo): bin-bin1
 Creating bin1 executable
 make-bin: linker: echo LINK_cxx
 make-bin: compiler-flags: -xcflags- -xcxxflags- -dflags- -oflags- -wflags-

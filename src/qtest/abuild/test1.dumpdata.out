@@ -23,10 +23,10 @@
      <platform name="indep" selected="1"/>
     </platform-type>
     <platform-type name="echo" target-type="object-code">
-     <platform name="os.cpu.toolset.echo" selected="1"/>
-     <platform name="os.cpu.toolset.echo.debug" selected="0"/>
-     <platform name="os.cpu.toolset.echo.release" selected="0"/>
-     <platform name="os.cpu.toolset.echo.lowpri" selected="0"/>
+     <platform name="zz_os.cpu.toolset.echo" selected="1"/>
+     <platform name="zz_os.cpu.toolset.echo.debug" selected="0"/>
+     <platform name="zz_os.cpu.toolset.echo.release" selected="0"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri" selected="0"/>
     </platform-type>
     <platform-type name="native" target-type="object-code">
      <platform name="<native>" selected="1"/>
@@ -369,10 +369,10 @@
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -395,10 +395,10 @@
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -423,10 +423,10 @@
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -443,10 +443,10 @@
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -467,10 +467,10 @@
      <platform name="<native>"/>
      <platform name="<native>.debug"/>
      <platform name="<native>.release"/>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item
@@ -493,10 +493,10 @@
      <platform-type name="echo"/>
     </platform-types>
     <buildable-platforms>
-     <platform name="os.cpu.toolset.echo"/>
-     <platform name="os.cpu.toolset.echo.debug"/>
-     <platform name="os.cpu.toolset.echo.lowpri"/>
-     <platform name="os.cpu.toolset.echo.release"/>
+     <platform name="zz_os.cpu.toolset.echo"/>
+     <platform name="zz_os.cpu.toolset.echo.debug"/>
+     <platform name="zz_os.cpu.toolset.echo.lowpri"/>
+     <platform name="zz_os.cpu.toolset.echo.release"/>
     </buildable-platforms>
    </build-item>
    <build-item

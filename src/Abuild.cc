@@ -4858,9 +4858,10 @@ Abuild::cleanPath(std::string const& item_name, std::string const& dir)
 
     boost::smatch match;
 
-    std::list<std::string> entries = Util::getDirEntries(dir);
-    std::set<std::string> to_remove;
-    for (std::list<std::string>::iterator iter = entries.begin();
+    std::vector<std::string> entries = Util::getDirEntries(dir);
+    // Sort for consistent output in test suite.
+    std::sort(entries.begin(), entries.end());
+    for (std::vector<std::string>::iterator iter = entries.begin();
 	 iter != entries.end(); ++iter)
     {
 	std::string const& entry = *iter;
@@ -4900,21 +4901,15 @@ Abuild::cleanPath(std::string const& item_name, std::string const& dir)
 	    }
 	    if (remove)
 	    {
-		to_remove.insert(fullpath);
+		try
+		{
+		    Util::removeFileRecursively(fullpath);
+		}
+		catch(QEXC::General& e)
+		{
+		    error(e.what());
+		}
 	    }
-	}
-    }
-
-    for (std::set<std::string>::iterator iter = to_remove.begin();
-	 iter != to_remove.end(); ++iter)
-    {
-	try
-	{
-	    Util::removeFileRecursively(*iter);
-	}
-	catch(QEXC::General& e)
-	{
-	    error(e.what());
 	}
     }
 }

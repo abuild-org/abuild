@@ -1212,7 +1212,7 @@ $td->runtest("check preprocessor",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/e/lib/abuild-os.cpu.toolset.echo");
+cd("work/e/lib/abuild-zz_os.cpu.toolset.echo");
 
 sleep 1;
 open(F, ">>lib-lib1") or die;

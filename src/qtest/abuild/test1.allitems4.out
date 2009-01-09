@@ -7,10 +7,10 @@ abuild: ba (abuild-indep): all
 abuild: bb (abuild-indep): all
 abuild: bc (abuild-indep): all
 abuild: cc (abuild-indep): all
-abuild: e.lib (abuild-os.cpu.toolset.echo): all
-abuild: e.shlib (abuild-os.cpu.toolset.echo): all
-abuild: e.bin (abuild-os.cpu.toolset.echo): all
-abuild: e.global (abuild-os.cpu.toolset.echo): all
-abuild: e.multi (abuild-os.cpu.toolset.echo): all
-abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.global (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.multi (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.shlib2 (abuild-zz_os.cpu.toolset.echo): all
 abuild: root (abuild-indep): all

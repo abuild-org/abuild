@@ -172,7 +172,7 @@ namespace Util
     // includes . and .. and does not prepend the path name.  It
     // throws an exception on any error condition.  The path must be a
     // directory.
-    std::list<std::string> getDirEntries(std::string const& path);
+    std::vector<std::string> getDirEntries(std::string const& path);
 
     // Recursively remove the given path, which may be a file or a
     // directory.  It is not an error if the file doesn't exist.

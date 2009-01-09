@@ -1,5 +1,5 @@
-abuild: e.lib (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags-  -xcppflags- -bin2-xcppflags- ../bin2.cc bin2.o bin2.dep
 Compiling ../bin2.cc as C++
 make-obj compiler: echo COMPILE_cxx
@@ -31,15 +31,15 @@ contents of bin-bin2:
 ** end of lib lib2 **
 ** end of bin bin2 **
 end contents of bin-bin2
-make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo'
-abuild: e.shlib (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo'
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo'
 Creating shlib1 shared library
 make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
@@ -62,7 +62,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
@@ -83,7 +83,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
@@ -104,7 +104,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
@@ -120,15 +120,15 @@ contents of shlib-shlib4:
 ** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
-make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo'
-abuild: e.bin (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo'
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo'
 Creating bin executable
 make-bin: linker: echo LINK_c
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo ../../lib/abuild-os.cpu.toolset.echo
+make-bin: lib-dirs: ../../shlib/abuild-zz_os.cpu.toolset.echo ../../lib/abuild-zz_os.cpu.toolset.echo
 make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -190,18 +190,18 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo'
-abuild: e.global (abuild-os.cpu.toolset.echo): all
+make: Leaving directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo'
+abuild: e.global (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.multi (abuild-<native>): all
-abuild: e.multi (abuild-os.cpu.toolset.echo): all
-abuild: e.shlib2 (abuild-os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
+abuild: e.multi (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.shlib2 (abuild-zz_os.cpu.toolset.echo): all
+make: Entering directory `--topdir--/e/shlib2/abuild-zz_os.cpu.toolset.echo'
 Creating shlib1 shared library
 make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: static lib1 lib2
 make-shlib: shlib: shlib-shlib1.0.0.0
 contents of shlib-shlib1.0.0.0:
@@ -225,7 +225,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-shlib: libs: static lib1 lib2
 make-shlib: shlib: shlib-shlib2.0.0.0
 contents of shlib-shlib2.0.0.0:
@@ -249,7 +249,7 @@ make-bin: linker: echo LINK_cxx
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo
+make-bin: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo
 make-bin: libs: static shlib1 shlib2 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -296,4 +296,4 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/shlib2/abuild-os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/e/shlib2/abuild-zz_os.cpu.toolset.echo'

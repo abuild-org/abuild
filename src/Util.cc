@@ -1071,11 +1071,11 @@ Util::runProgram(std::string const& progname,
     return status;
 }
 
-std::list<std::string>
+std::vector<std::string>
 Util::getDirEntries(std::string const& path)
 {
     // Get list of names in the directory
-    std::list<std::string> entries;
+    std::vector<std::string> entries;
 
 #ifdef _WIN32
     HANDLE fhandle;
@@ -1131,8 +1131,8 @@ Util::removeFileRecursively(std::string const& path)
 {
     if (isDirectory(path))
     {
-	std::list<std::string> entries = getDirEntries(path);
-	for (std::list<std::string>::iterator iter = entries.begin();
+	std::vector<std::string> entries = getDirEntries(path);
+	for (std::vector<std::string>::iterator iter = entries.begin();
 	     iter != entries.end(); ++iter)
 	{
 	    std::string const& name = *iter;

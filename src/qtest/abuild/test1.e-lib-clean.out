@@ -1,1 +1,1 @@
-abuild: e.lib (abuild-os.cpu.toolset.echo): clean
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo): clean

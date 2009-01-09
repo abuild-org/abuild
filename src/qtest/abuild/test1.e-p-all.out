@@ -1,8 +1,8 @@
-abuild: e.lib (abuild-os.cpu.toolset.echo): all
-abuild: e.shlib (abuild-os.cpu.toolset.echo): all
-abuild: e.bin (abuild-os.cpu.toolset.echo): all
-abuild: e.lib (abuild-os.cpu.toolset.echo.debug): all
-make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.debug'
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo): all
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo.debug): all
+make: Entering directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo.debug'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags-  -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
 Compiling ../lib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -145,9 +145,9 @@ contents of bin-bin2:
 ** end of lib lib2 **
 ** end of bin bin2 **
 end contents of bin-bin2
-make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.debug'
-abuild: e.shlib (abuild-os.cpu.toolset.echo.debug): all
-make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.debug'
+make: Leaving directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo.debug'
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo.debug): all
+make: Entering directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo.debug'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags-  -wflags- -lib-xcppflags-  ../shlib1-src1.c shlib1-src1.lo shlib1-src1.dep
 Compiling ../shlib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -183,7 +183,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.debug
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
@@ -216,7 +216,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.debug
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
@@ -247,7 +247,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.debug
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
@@ -278,7 +278,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.debug
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.debug
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
@@ -294,9 +294,9 @@ contents of shlib-shlib4:
 ** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
-make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.debug'
-abuild: e.bin (abuild-os.cpu.toolset.echo.debug): all
-make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.debug'
+make: Leaving directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo.debug'
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo.debug): all
+make: Entering directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.debug'
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags-  -wflags- -lib-xcppflags-  ../bin.cc bin.o bin.dep
 Compiling ../bin.cc as C++
 make-obj compiler: echo COMPILE_cxx
@@ -312,7 +312,7 @@ make-bin: linker: echo LINK_c
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo.debug ../../lib/abuild-os.cpu.toolset.echo.debug
+make-bin: lib-dirs: ../../shlib/abuild-zz_os.cpu.toolset.echo.debug ../../lib/abuild-zz_os.cpu.toolset.echo.debug
 make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -374,9 +374,9 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.debug'
-abuild: e.lib (abuild-os.cpu.toolset.echo.lowpri): all
-make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.lowpri'
+make: Leaving directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.debug'
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo.lowpri'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
 Compiling ../lib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -519,9 +519,9 @@ contents of bin-bin2:
 ** end of lib lib2 **
 ** end of bin bin2 **
 end contents of bin-bin2
-make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.lowpri'
-abuild: e.shlib (abuild-os.cpu.toolset.echo.lowpri): all
-make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.lowpri'
+make: Leaving directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo.lowpri'
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo.lowpri'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../shlib1-src1.c shlib1-src1.lo shlib1-src1.dep
 Compiling ../shlib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -557,7 +557,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.lowpri
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
@@ -590,7 +590,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.lowpri
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
@@ -621,7 +621,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.lowpri
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
@@ -652,7 +652,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.lowpri
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
@@ -668,9 +668,9 @@ contents of shlib-shlib4:
 ** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
-make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.lowpri'
-abuild: e.bin (abuild-os.cpu.toolset.echo.lowpri): all
-make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.lowpri'
+make: Leaving directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo.lowpri'
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo.lowpri): all
+make: Entering directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.lowpri'
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -dflags- -oflags- -wflags- -lib-xcppflags-  ../bin.cc bin.o bin.dep
 Compiling ../bin.cc as C++
 make-obj compiler: echo COMPILE_cxx
@@ -686,7 +686,7 @@ make-bin: linker: echo LINK_c
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -dflags- -oflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo.lowpri ../../lib/abuild-os.cpu.toolset.echo.lowpri
+make-bin: lib-dirs: ../../shlib/abuild-zz_os.cpu.toolset.echo.lowpri ../../lib/abuild-zz_os.cpu.toolset.echo.lowpri
 make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -748,9 +748,9 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.lowpri'
-abuild: e.lib (abuild-os.cpu.toolset.echo.release): all
-make: Entering directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.release'
+make: Leaving directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.lowpri'
+abuild: e.lib (abuild-zz_os.cpu.toolset.echo.release): all
+make: Entering directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo.release'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -lib1-src1-dflags- -oflags- -wflags-  -xcppflags- -lib1-src1-xcppflags- ../lib1-src1.c lib1-src1.lo lib1-src1.dep
 Compiling ../lib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -893,9 +893,9 @@ contents of bin-bin2:
 ** end of lib lib2 **
 ** end of bin bin2 **
 end contents of bin-bin2
-make: Leaving directory `--topdir--/e/lib/abuild-os.cpu.toolset.echo.release'
-abuild: e.shlib (abuild-os.cpu.toolset.echo.release): all
-make: Entering directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.release'
+make: Leaving directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo.release'
+abuild: e.shlib (abuild-zz_os.cpu.toolset.echo.release): all
+make: Entering directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo.release'
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../shlib1-src1.c shlib1-src1.lo shlib1-src1.dep
 Compiling ../shlib1-src1.c as C
 make-obj compiler: echo COMPILE_c
@@ -931,7 +931,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib1-src1.lo shlib1-src2.lo shlib1-src3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.release
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib1.1.2.3
 contents of shlib-shlib1.1.2.3:
@@ -964,7 +964,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib2.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.release
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib2.4.5
 contents of shlib-shlib2.4.5:
@@ -995,7 +995,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib3.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.release
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib3.6
 contents of shlib-shlib3.6:
@@ -1026,7 +1026,7 @@ make-shlib: linker: echo LINK_cxx
 make-shlib: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-shlib: link-flags: -lib-xlinkflags-
 make-shlib: objects: shlib4.lo
-make-shlib: lib-dirs: . ../../lib/abuild-os.cpu.toolset.echo.release
+make-shlib: lib-dirs: . ../../lib/abuild-zz_os.cpu.toolset.echo.release
 make-shlib: libs: lib1 lib2
 make-shlib: shlib: shlib-shlib4
 contents of shlib-shlib4:
@@ -1042,9 +1042,9 @@ contents of shlib-shlib4:
 ** end of lib lib2 **
 ** end of shlib shlib4 **
 end contents of shlib-shlib4
-make: Leaving directory `--topdir--/e/shlib/abuild-os.cpu.toolset.echo.release'
-abuild: e.bin (abuild-os.cpu.toolset.echo.release): all
-make: Entering directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.release'
+make: Leaving directory `--topdir--/e/shlib/abuild-zz_os.cpu.toolset.echo.release'
+abuild: e.bin (abuild-zz_os.cpu.toolset.echo.release): all
+make: Entering directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.release'
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- .  -oflags- -wflags- -lib-xcppflags-  ../bin.cc bin.o bin.dep
 Compiling ../bin.cc as C++
 make-obj compiler: echo COMPILE_cxx
@@ -1060,7 +1060,7 @@ make-bin: linker: echo LINK_c
 make-bin: compiler-flags: -lib-xcflags- -lib-xcxxflags- -oflags- -wflags-
 make-bin: link-flags: -lib-xlinkflags-
 make-bin: objects: bin.o
-make-bin: lib-dirs: ../../shlib/abuild-os.cpu.toolset.echo.release ../../lib/abuild-os.cpu.toolset.echo.release
+make-bin: lib-dirs: ../../shlib/abuild-zz_os.cpu.toolset.echo.release ../../lib/abuild-zz_os.cpu.toolset.echo.release
 make-bin: libs: shlib1 shlib2 shlib3 shlib4 lib1 lib2
 make-bin: bin: bin-bin
 contents of bin-bin:
@@ -1122,4 +1122,4 @@ contents of bin-bin:
 ** end of lib lib2 **
 ** end of bin bin **
 end contents of bin-bin
-make: Leaving directory `--topdir--/e/bin/abuild-os.cpu.toolset.echo.release'
+make: Leaving directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.release'

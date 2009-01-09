@@ -4,8 +4,11 @@ require 5.008;
 BEGIN { $^W = 1; }
 use strict;
 
+# Use zz_os as the os field so that it sorts last no matter what the
+# native platform is.  This is needed for consistent test suite
+# output.
 foreach my $o (".release", ".debug", "")
 {
-    print "platform os.cpu.toolset.echo$o -type echo\n";
+    print "platform zz_os.cpu.toolset.echo$o -type echo\n";
 }
-print "platform -lowpri os.cpu.toolset.echo.lowpri -type echo\n";
+print "platform -lowpri zz_os.cpu.toolset.echo.lowpri -type echo\n";
