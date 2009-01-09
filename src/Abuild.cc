@@ -126,7 +126,7 @@ Abuild::runInternal()
 		boost::bind(&Logger::logInfo, &(this->logger), _1);
 	    l(this->whoami + " version " + ABUILD_VERSION);
 	    l("");
-	    l("Copyright (c) 2007, 2008 Jay Berkenbilt, Argon ST");
+	    l("Copyright (c) 2007-2009 Jay Berkenbilt, Argon ST");
 	    l("This software may be distributed under the terms of version 2 of");
 	    l("the Artistic License which may be found in the source and binary");
 	    l("distributions.  It is provided \"as is\" without express or");
