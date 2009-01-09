@@ -1526,7 +1526,8 @@ $td->runtest("clean platforms 1",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("clean platforms 2",
-	     {$td->COMMAND => "abuild clean --clean-platforms '*.release'",
+	     {$td->COMMAND => "abuild clean" .
+		  " --clean-platforms '*.release' --clean-platforms '*.debug'",
 	      $td->FILTER => "perl $top/filter-abuild.pl"},
 	     {$td->FILE => "$top/test1.clean-platforms-2.out",
 	      $td->EXIT_STATUS => 0},
