@@ -13724,6 +13724,8 @@ Y = $(X)
            restrict which platforms' directories are removed by any
            &abuild; clean operation.
           </para>
+         </listitem>
+         <listitem>
           <para>
            A new key, <property>build-also</property>, is now
            supported in <filename>Abuild.conf</filename>.  This key's
