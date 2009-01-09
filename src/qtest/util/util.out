@@ -39,6 +39,8 @@ a[bcdef]g -> a[bcdef]g
 a.{b,[bcdef],g}h?j* -> a\.(?:b|[bcdef]|g)h[^/]j[^/]*
 a^b[^c]^d -> a\^b[^c]\^d
 a[\[\]],{()+$\{,\}}\\ -> a[\[\]],(?:\(\)\+\$\{|\})\\
+a{,b}{,,b}c{d,}{d,,}e{f,,g}{f,,,g}h{,,i,,,j,,}k -> a(?:b)?(?:b)?c(?:d)?(?:d)?e(?:f|g)?(?:f|g)?h(?:i|j)?k
+glob  threw exception: the empty string is not a valid filename pattern
 glob a\ threw exception: filename pattern a\ terminated prematurely
 glob a[ threw exception: filename pattern a[ terminated prematurely
 glob a{ threw exception: filename pattern a{ terminated prematurely

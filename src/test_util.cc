@@ -121,6 +121,9 @@ int main()
     test_glob_to_regex("a.{b,[bcdef],g}h?j*");
     test_glob_to_regex("a^b[^c]^d");
     test_glob_to_regex("a[\\[\\]],{()+$\\{,\\}}\\\\");
+    test_glob_to_regex("a{,b}{,,b}c{d,}{d,,}e{f,,g}{f,,,g}h{,,i,,,j,,}k");
+
+    test_glob_to_regex("");
     test_glob_to_regex("a\\");
     test_glob_to_regex("a[");
     test_glob_to_regex("a{");

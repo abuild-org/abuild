@@ -1228,8 +1228,15 @@ Util::XMLify(std::string const& str, bool attribute)
 std::string
 Util::globToRegex(std::string const& glob)
 {
+    if (glob.empty())
+    {
+	throw QEXC::General("the empty string is not a valid filename pattern");
+    }
+
     enum { st_top, st_in_brace, st_in_bracket } state = st_top;
     bool literal = false;
+    int brace_expr_length = 0;
+    bool brace_expr_optional = false;
     std::string result;
     for (std::string::const_iterator iter = glob.begin();
 	 iter != glob.end(); ++iter)
@@ -1240,25 +1247,22 @@ Util::globToRegex(std::string const& glob)
 	    literal = false;
 	    result.append(1, ch);
 	}
-	else if (ch == '\\')
-	{
-	    literal = true;
-	    result.append(1, ch);
-	}
 	else
 	{
-	    if (state == st_in_brace)
-	    {
-		if (ch == '{')
-		{
-		}
-	    }
-
 	    std::string to_append;
 	    to_append.append(1, ch);
 
+	    if (state == st_in_brace)
+	    {
+		++brace_expr_length;
+	    }
+
 	    switch (ch)
 	    {
+	      case  '\\':
+		literal = true;
+		break;
+
 	      case '{':
 		if (state == st_in_brace)
 		{
@@ -1269,13 +1273,27 @@ Util::globToRegex(std::string const& glob)
 		{
 		    to_append = "(?:";
 		    state = st_in_brace;
+		    brace_expr_length = 0;
+		    brace_expr_optional = false;
 		}
 		break;
 
 	      case '}':
 		if (state == st_in_brace)
 		{
+		    if (brace_expr_length == 1)
+		    {
+			brace_expr_optional = true;
+			if (*(result.rbegin()) == '|')
+			{
+			    result.erase(result.length() - 1);
+			}
+		    }
 		    to_append = ")";
+		    if (brace_expr_optional)
+		    {
+			to_append += "?";
+		    }
 		    state = st_top;
 		}
 		break;
@@ -1297,7 +1315,16 @@ Util::globToRegex(std::string const& glob)
 	      case ',':
 		if (state == st_in_brace)
 		{
-		    to_append = "|";
+		    if (brace_expr_length == 1)
+		    {
+			brace_expr_optional = true;
+			to_append = "";
+		    }
+		    else
+		    {
+			to_append = "|";
+		    }
+		    brace_expr_length = 0;
 		}
 		break;
 
