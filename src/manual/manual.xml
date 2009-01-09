@@ -475,8 +475,7 @@ following checks:
       &abuild; releases, we use the following version numbering
       convention:
 
-      <programlisting>
-      <replaceable>major</replaceable>.<replaceable>minor</replaceable>[<replaceable>patch-or-pre</replaceable>]
+      <programlisting><replaceable>major</replaceable>.<replaceable>minor</replaceable>[<replaceable>patch-or-pre</replaceable>]
 </programlisting>
      </para>
      <para>
