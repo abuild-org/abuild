@@ -148,6 +148,9 @@ Test Suite
 Usability Improvements
 ======================
 
+ * When abuild says "something failed", it should list which items
+   failed.  Count only full failures, not dep failures.
+
  * Provide arguments for querying abuild's state, such as locating
    build items (perhaps with pattern matching), listing all trees with
    locations and dependencies, summarizing the state of all plugin
