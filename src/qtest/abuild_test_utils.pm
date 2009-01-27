@@ -94,6 +94,7 @@ sub get_native_out
 
 sub cleanup
 {
+    cd();
     system("rm -rf work");
 }
 
@@ -101,15 +102,16 @@ sub cd
 {
     my $dir = shift;
     chdir($top) or die;
-    chdir($dir) or die "can't chdir $dir: $!";
+    if (defined $dir)
+    {
+	chdir($dir) or die "can't chdir $dir: $!";
+    }
 }
 
-sub setup			# XXX public?
+sub setup
 {
-    my ($td, $topdir, $not_accessed) = (@_);
-    cd($top);
-    check_work_accessed($td, $not_accessed);
-    system("rm -rf work");
+    my ($td, $topdir) = (@_);
+    cleanup();
     mkdir 'work', 0777 or die;
     my @dirs = ('.');
     while (@dirs)
@@ -159,9 +161,10 @@ sub setup			# XXX public?
     cd("work");
 }
 
-sub check_work_accessed		# XXX public?
+sub check_work_accessed
 {
     my ($td, $not_accessed) = @_;
+    cd();
     my $output = {$td->EXIT_STATUS => 0};
     if (defined $not_accessed)
     {
@@ -189,6 +192,7 @@ sub check_work_accessed		# XXX public?
 			 {$td->STRING => "skip"});
 	}
     }
+    cleanup();
 }
 
 sub windir			# XXX public?

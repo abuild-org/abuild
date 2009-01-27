@@ -1,0 +1,76 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("compiler-verification") or die;
+
+my $td = new TestDriver("compiler verification");
+test_setup();
+
+my $top = get_top();
+my $abuild_top = get_abuild_top();
+my $filters = get_filters();
+my $platform_native = get_native_platform();
+
+cleanup();
+
+# Test compiler verification program
+mkdir "work", 0777;
+cd("work");
+$td->runtest("compiler verification",
+	     {$td->COMMAND =>
+		  "$abuild_top/misc/compiler-verification/verify-compiler",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/compiler-verification.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+if (in_windows())
+{
+    # Also verify mingw if we can.
+    open(P, "MINGW=1 perl $abuild_top/private/list_platforms --windows|")
+	or die;
+    my $have_mingw = 0;
+    while (<P>)
+    {
+	if (m/mingw/)
+	{
+	    $have_mingw = 1;
+	    last;
+	}
+    }
+    close(P);
+    if ($platform_native =~ m/\.mingw$/)
+    {
+	$td->runtest("mingw is default compiler",
+		     {$td->STRING => "yes"},
+		     {$td->STRING => "yes"});
+    }
+    elsif ($have_mingw)
+    {
+	$td->runtest("mingw compiler verification",
+		     {$td->COMMAND =>
+			  "MINGW=1" .
+			  " $abuild_top/misc/compiler-verification/verify-compiler" .
+			  " --compiler mingw",
+			  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/compiler-verification.mingw.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+	$td->runtest("mingw not available",
+		     {$td->STRING => "no"},
+		     {$td->STRING => "no"});
+    }
+}
+
+cleanup();
+
+$td->report(1 + (in_windows() ? 1 : 0));

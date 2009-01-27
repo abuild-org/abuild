@@ -21,61 +21,6 @@ my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 my $platform_native = get_native_platform();
 my $native_out = get_native_out();
 
-
-cleanup();
-
-# Test compiler verification program
-mkdir "work", 0777;
-cd("work");
-$td->runtest("compiler verification",
-	     {$td->COMMAND =>
-		  "$abuild_top/misc/compiler-verification/verify-compiler",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/compiler-verification.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-if (in_windows())
-{
-    # Also verify mingw if we can.
-    open(P, "MINGW=1 perl $abuild_top/private/list_platforms --windows|")
-	or die;
-    my $have_mingw = 0;
-    while (<P>)
-    {
-	if (m/mingw/)
-	{
-	    $have_mingw = 1;
-	    last;
-	}
-    }
-    close(P);
-    if ($platform_native =~ m/\.mingw$/)
-    {
-	$td->runtest("mingw is default compiler",
-		     {$td->STRING => "yes"},
-		     {$td->STRING => "yes"});
-    }
-    elsif ($have_mingw)
-    {
-	$td->runtest("mingw compiler verification",
-		     {$td->COMMAND =>
-			  "MINGW=1" .
-			  " $abuild_top/misc/compiler-verification/verify-compiler" .
-			  " --compiler mingw",
-			  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		     {$td->FILE => "$top/compiler-verification.mingw.out",
-		      $td->EXIT_STATUS => 0},
-		     $td->NORMALIZE_NEWLINES);
-    }
-    else
-    {
-	$td->runtest("mingw not available",
-		     {$td->STRING => "no"},
-		     {$td->STRING => "no"});
-    }
-}
-
 # Test our example structure from the documentation.  The
 # documentation provides detailed descriptions of what is going on in
 # the examples and often include the output files from these test
@@ -891,6 +836,7 @@ if (! in_windows())
 		 $td->NORMALIZE_NEWLINES);
 }
 
+check_work_accessed($td);
 
 # This is the remainder of the test suite.
 
@@ -1653,9 +1599,11 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
+check_work_accessed($td, "test1.not-accessed.out");
+
 # test2 and test3 test various abuild error conditions
 
-setup($td, "test2", "test1.not-accessed.out");
+setup($td, "test2");
 
 $td->runtest("abuild errors",
 	     {$td->COMMAND => "abuild --build=all",
@@ -1850,7 +1798,9 @@ $td->runtest("build failure: no dep failures",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-setup($td, "test3", "test2.not-accessed.out");
+check_work_accessed($td, "test2.not-accessed.out");
+
+setup($td, "test3");
 
 $td->runtest("abuild dependency errors",
 	     {$td->COMMAND => "abuild --build=all",
@@ -1858,6 +1808,8 @@ $td->runtest("abuild dependency errors",
 	     {$td->FILE => "$top/test3.allitems0.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
 
 # test4 creates a public build item that is divided into private
 # build items.
@@ -1891,6 +1843,8 @@ $td->runtest("BUILD_ITEM_RULES access",
 	     {$td->FILE => "$top/test4.access-errors.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
 
 # In test 5, we exercise with ccxx's dependencies including updating
 # an Abuild.mk to add a new source file and moving a header file
@@ -1980,6 +1934,8 @@ $td->runtest("source file changed",
 	     {$td->FILE => "$top/test5.build5.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
 
 # Test 6 exercises backing areas, traits as they inherit through
 # externals and backing areas (which they do only for trees that are
@@ -2219,6 +2175,8 @@ $td->runtest("bad deletions and plugins",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+check_work_accessed($td, "test6.not-accessed.out");
+
 # Test 7 exercises resolving a circular dependency by separating
 # interfaces and implementations.  This is a dangerous technique
 # frought with pitfalls.  See documentation on separation of
@@ -2227,7 +2185,7 @@ $td->runtest("bad deletions and plugins",
 # the test was left in place to demonstrate that the same problem can
 # be solved in the same way without static dependencies.
 
-setup($td, "test7", "test6.not-accessed.out");
+setup($td, "test7");
 
 cd("work/good/prog");
 
@@ -2266,6 +2224,8 @@ $td->runtest("no more .ab-dyanmic.mk files",
 	     {$td->REGEXP => "\\s*0\\s*",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
 
 # Test 8 exercises various dependency chains that cross platform type
 # boundaries.  Build items are named such that their lexical sorting
@@ -2333,6 +2293,8 @@ $td->runtest("dump build graph",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+check_work_accessed($td, "test8.not-accessed.out");
+
 # Test 9 exercises traits.
 
 # We have three traits: eater, painter, and edible.  A depends upon
@@ -2373,7 +2335,7 @@ $td->runtest("dump build graph",
 # targets so we can always tell the difference between the default
 # target and the explicit target.
 
-setup($td, "test9", "test8.not-accessed.out");
+setup($td, "test9");
 
 cd("work/A");
 
@@ -2456,6 +2418,8 @@ $td->runtest("clean all",
 	     {$td->FILE => "$top/test9.clean-all.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
 
 # Test 10 exercises shared libraries.  Although shared library
 # functionality is exercised in the examples and in other parts of the
@@ -2826,13 +2790,10 @@ $td->runtest("build does nothing",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd($top);
 check_work_accessed($td);
 
-cleanup();
-
-$td->report(289 +
-	    (in_windows() ? 1 : 7) +
+$td->report(288 +
+	    (in_windows() ? 0 : 7) +
 	    ($test_java ? 19 : 0) +
 	    ($test_junit ? 3 : 0) +
 	    ($have_whole_archive ? 2 : 1));
