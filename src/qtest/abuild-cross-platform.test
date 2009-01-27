@@ -15,11 +15,71 @@ test_setup();
 my $top = get_top();
 my $filters = get_filters();
 
-# This test suite is a place where we dump additional random tests,
-# which may include backing areas and externals or any other feature,
-# to exercise previously detected bugs.  XXX
+# This test suite exercises various dependency chains that cross
+# platform type boundaries.  Build items are named such that their
+# lexical sorting is the opposite of their topological sorting so we
+# are sure that just looking at the build order is sufficient.  The
+# special build item "rules" contains rules to just print the name of
+# the build item.  Additional cases are covered in doc/example.
 
 setup($td);
+
+cd("work/bad1");
+
+$td->runtest("dep platform type declaration errors",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad1.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad2");
+
+$td->runtest("dep platform type runtime errors",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad2.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/case1");
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case1.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("object-code -> indep -> object-code",
+	     {$td->COMMAND => "abuild -b desc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/case2");
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case2.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("oc/java -> all -> all -> oc/java/indep",
+	     {$td->COMMAND => "abuild -b desc no-op",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("dump build graph",
+	     {$td->COMMAND => "abuild -b desc --dump-build-graph",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case2.buildgraph.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/case3");
 
@@ -93,6 +153,6 @@ $td->runtest("dump data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-check_work_accessed($td);
+check_work_accessed($td, "not-accessed.out");
 
-$td->report(11);
+$td->report(18);

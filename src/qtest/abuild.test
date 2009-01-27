@@ -644,74 +644,6 @@ $td->runtest("no more .ab-dyanmic.mk files",
 
 check_work_accessed($td);
 
-# Test 8 exercises various dependency chains that cross platform type
-# boundaries.  Build items are named such that their lexical sorting
-# is the opposite of their topological sorting so we are sure that
-# just looking at the build order is sufficient.  The special build
-# item "rules" contains rules to just print the name of the build
-# item.  Additional cases are covered in doc/example.
-
-setup($td, "test8");		# XXX
-
-cd("work/bad1");
-
-$td->runtest("dep platform type declaration errors",
-	     {$td->COMMAND => "abuild --build=all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.bad1.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/bad2");
-
-$td->runtest("dep platform type runtime errors",
-	     {$td->COMMAND => "abuild --build=all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.bad2.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/case1");
-
-$td->runtest("dump data",
-	     {$td->COMMAND => "abuild --dump-data",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.case1.dumpdata.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("object-code -> indep -> object-code",
-	     {$td->COMMAND => "abuild -b desc",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.case1.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/case2");
-
-$td->runtest("dump data",
-	     {$td->COMMAND => "abuild --dump-data",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.case2.dumpdata.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("oc/java -> all -> all -> oc/java/indep",
-	     {$td->COMMAND => "abuild -b desc no-op",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.case2.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("dump build graph",
-	     {$td->COMMAND => "abuild -b desc --dump-build-graph",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test8.case2.buildgraph.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-check_work_accessed($td, "test8.not-accessed.out");
-
 # Test 9 exercises traits.
 
 # We have three traits: eater, painter, and edible.  A depends upon
@@ -1209,4 +1141,4 @@ $td->runtest("build does nothing",
 
 check_work_accessed($td);
 
-$td->report(123 + (in_windows() ? 0 : 6));
+$td->report(115 + (in_windows() ? 0 : 6));
