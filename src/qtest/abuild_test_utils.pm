@@ -111,6 +111,7 @@ sub cd
 sub setup
 {
     my ($td, $topdir) = (@_);
+    $topdir = 'data' unless defined $topdir;
     cleanup();
     mkdir 'work', 0777 or die;
     my @dirs = ('.');

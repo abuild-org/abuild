@@ -1,0 +1,781 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-misc") or die;
+
+my $td = new TestDriver("miscellaneous");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+my $native_out = get_native_out();
+
+# This test suite tests normal cases of a simple build tree without
+# any backing areas or externals.  It also exercises the ccxx rules.
+# It is also a place where we dump additional random tests, which may
+# include backing areas and externals or any other feature, to
+# exercise previously detected bugs.
+
+setup($td);
+
+cd("work/java");
+
+if ($test_java && ($^O eq 'cygwin'))
+{
+    # Test to make sure a java build will work if we don't have perl.
+    my $opath = $ENV{'PATH'};
+    my @path = ();
+    foreach my $p (split(':', $opath))
+    {
+	if ((-e "$p/perl") || (-e "$p/perl.exe") ||
+	    (-e "$p/uname") || (-e "$p/uname.exe"))
+	{
+	    # exclude from path
+	}
+	else
+	{
+	    push(@path, $p);
+	}
+    }
+    $ENV{'PATH'} = join(':', @path);
+    system("abuild --build=all > abuild-java.out 2>&1");
+    $ENV{'PATH'} = $opath;
+    $td->runtest("build java without perl in path",
+		 {$td->FILE => "abuild-java.out",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/java-no-perl.out"},
+		 $td->NORMALIZE_NEWLINES);
+
+    # Access the unused Abuild.mk
+    system("cat native/Abuild.mk > /dev/null");
+}
+else
+{
+    $td->runtest("skipping windows-only Java test",
+		 {$td->STRING => "1"},
+		 {$td->STRING => "1"});
+    # Make sure these files are accessed.
+    system("(tar cf - . | cat > /dev/null)");
+}
+
+cd("work/ant-qtest");
+
+if ($test_java)
+{
+    # Test failing qtest test suite from ant
+
+    # In Windows, ant.bat does not return with an abnormal exit status
+    # when the build fails.  This makes it impossible to tell whether
+    # a build failed or not.
+    my $xflag = in_windows() ? $td->EXPECT_FAILURE : 0;
+
+    $td->runtest("failing qtest from ant",
+		 {$td->COMMAND => "abuild check",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/ant-qtest-failure.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES | $xflag);
+}
+else
+{
+    $td->runtest("skipping ant-qtest test",
+		 {$td->STRING => "1"},
+		 {$td->STRING => "1"});
+    # Make sure these files are accessed.
+    system("(tar cf - . | cat > /dev/null)");
+}
+
+cd("work");
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("list traits",
+	     {$td->COMMAND => "abuild --list-traits"},
+	     {$td->FILE => "$top/list-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("unsupported traits",
+	     {$td->COMMAND => "abuild --build=all --only-with-traits one,two" .
+		  " --related-by-traits three,four"},
+	     {$td->FILE => "$top/bad-traits1.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("unsupported traits",
+	     {$td->COMMAND => "abuild --clean=all --only-with-traits five,six"},
+	     {$td->FILE => "$top/bad-traits2.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("all items",
+	     {$td->COMMAND => "abuild --build=local --monitored",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check ca executable",
+	     {$td->COMMAND => "c/ca/$native_out/ca"},
+	     {$td->STRING => "C1: 1\nC2: 2\nC1: 102\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check cb1 executable",
+	     {$td->COMMAND => "c/cb/$native_out/cb1"},
+	     {$td->STRING => "C1: 3\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check cb2 executable",
+	     {$td->COMMAND => "c/cb/$native_out/cb2"},
+	     {$td->STRING => "C1: 4\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check cb3 executable",
+	     {$td->COMMAND => "c/cb/$native_out/cb3"},
+	     {$td->STRING => "constant: 3\n", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check cb's moo.quack",
+	     {$td->FILE => "c/cb/$native_out/moo.quack"},
+	     {$td->STRING => "oink\n"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check cc's potato salad",
+	     {$td->FILE => "c/cc/abuild-indep/potato"},
+	     {$td->STRING => "salad\n"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check a.x",
+	     {$td->FILE => "a/ad/abuild-indep/a.x"},
+	     {$td->STRING => "This is a w file.\nw -> x\n"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check a.r",
+	     {$td->FILE => "a/aa/$native_out/a.r"},
+	     {$td->STRING => "a\nq -> r\n"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check b.r",
+	     {$td->FILE => "a/aa/$native_out/b.r"},
+	     {$td->STRING => "b\nq -> r\n"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check c.r",
+	     {$td->FILE => "a/aa/$native_out/d1/c.r"},
+	     {$td->STRING => "c\nq -> r\n"},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("check moo",
+	     {$td->FILE => "a/aa/$native_out/moo"},
+	     {$td->STRING => "a\nq -> r\nb\nq -> r\nc\nq -> r\nlink\n"},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/c/cb");
+
+$td->runtest("check preprocessor",
+	     {$td->COMMAND => "abuild CB1.i CB2.i CB3.i",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/preprocess.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/e/lib/abuild-zz_os.cpu.toolset.echo");
+
+sleep 1;
+open(F, ">>lib-lib1") or die;
+print F "--append-to-lib1--\n";
+close(F);
+
+$td->runtest("modify lib and build bin",
+	     {$td->COMMAND => "abuild bin-bin1",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bin-after-lib.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+sleep 1;
+open(F, ">>lib1-src1.lo") or die;
+print F "--append-to-lib1-src1--\n";
+close(F);
+
+$td->runtest("modify lib obj and build bin",
+	     {$td->COMMAND => "abuild bin-bin1",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bin-after-lib-obj.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild clean",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/e-lib-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check files",
+	     {$td->COMMAND => "ls -A"},
+	     {$td->STRING => ".abuild\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build bin1 only",
+	     {$td->COMMAND => "abuild bin-bin1",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bin-after-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build bin1 when up to date",
+	     {$td->COMMAND => "abuild bin-bin1",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bin-up-to-date.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/e");
+
+$td->runtest("rebuild e",
+	     {$td->COMMAND => "abuild --build=desc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/rebuild-e.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/e/bin");
+
+$td->runtest("e.bin with all platforms",
+	     {$td->COMMAND => "abuild --with-deps -p all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/e-p-all.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/e/multi");
+
+$td->runtest("e.multi with all platforms",
+	     {$td->COMMAND => "abuild --with-deps -p all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/e-multi-p-all.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work");
+
+$td->runtest("empty build set",
+	     {$td->COMMAND => "abuild --build=deps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/empty-buildset.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/a/aa");
+
+$td->runtest("all items when up-to-date",
+	     {$td->COMMAND => "abuild --build=local",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("no echo platform type",
+	     {$td->COMMAND => "abuild --build=local -p echo:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems3.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("no native platform type",
+	     {$td->COMMAND => "abuild -b local --platform-selector native:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems4.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("empty with no native",
+	     {$td->COMMAND => "abuild -C ../../c/ca -p native:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl | grep -v cygwin"},
+	     {$td->FILE => "$top/no-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("no object-code platform types",
+	     {$td->COMMAND => "ABUILD_PLATFORM_SELECTORS=echo:skip" .
+		  " abuild -b local --platform-selector native:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems5.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("no object-code platform types",
+	     {$td->COMMAND =>
+		  "ABUILD_PLATFORM_SELECTORS='echo:skip native:skip'" .
+		  " abuild -b local",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems5.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/h");
+
+$td->runtest("cross-platform dependencies",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.allitems.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping native with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p native:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.no-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping indep with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p indep:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.no-indep.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping java with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p java:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.no-java.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping java and native",
+	     {$td->COMMAND => "abuild -b all -p native:skip -p java:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.no-java-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also",
+	     {$td->COMMAND => "abuild -d -C build-also check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.build-also.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also default target",
+	     {$td->COMMAND => "abuild -d -C dep-build-also check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.dep-build-also.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("invalid non-object-code selector",
+	     {$td->COMMAND => "abuild -b all -p indep:all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.bad-selector.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild -c all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/h/multipass/a");
+
+$td->runtest("multipass build-also explicit targets",
+	     {$td->COMMAND => "abuild -d check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.multipass.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also and related-by-traits",
+	     {$td->COMMAND => "abuild -d check --related-by-traits trait",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.build-also-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/h/multipass");
+
+$td->runtest("build-also and only-with-traits",
+	     {$td->COMMAND => "abuild -b all check --only-with-traits trait",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.only-with-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild -c all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/h.multipass-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+validate_dump_data($td);
+
+cd("work/ext");
+
+$td->runtest("all items from external",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("named items",
+	     {$td->COMMAND => "abuild --build=name:aa,cb check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/names-check.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("pattern items",
+	     {$td->COMMAND => "abuild --build=pattern:a. check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/pattern-check.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bad named items",
+	     {$td->COMMAND => "abuild --build=name:aa,quack check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-names.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bad pattern",
+	     {$td->COMMAND => "abuild --build=pattern:C++ check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-pattern.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/a/aa/$native_out");
+
+$td->runtest("check moo existence",
+	     {$td->STRING => (-f "moo" ? "yes" : "no"),},
+	     {$td->STRING => "yes"});
+
+$td->runtest("clean in platform directory",
+	     {$td->COMMAND => "abuild clean",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-backend.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check moo nonexistence",
+	     {$td->STRING => (-f "moo" ? "yes" : "no"),},
+	     {$td->STRING => "no"});
+
+cd("work/e/multi");
+
+$td->runtest("invalid clean platforms",
+	     {$td->COMMAND => "abuild -c current --clean-platforms '*{'",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-clean-platforms.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean platforms 1",
+	     {$td->COMMAND =>
+		  "abuild -c current --clean-platforms '*.echo{,.*}'",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-platforms-1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean platforms 2",
+	     {$td->COMMAND => "abuild clean" .
+		  " --clean-platforms '*.release' --clean-platforms '*.debug'",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-platforms-2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean e.multi",
+	     {$td->COMMAND => "abuild -c current",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/e-multi-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/a/aa");
+
+$td->runtest("clean in platform directory with -C",
+	     {$td->COMMAND => "abuild -C $native_out clean",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-backend.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build set in platform directory with -C",
+	     {$td->COMMAND => "abuild -C $native_out -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/buildset-platform-directory.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check .abuild existence",
+	     {$td->STRING => (-f "$native_out/.abuild" ? "yes" : "no"),},
+	     {$td->STRING => "yes"});
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild clean",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check .abuild nonexistence",
+	     {$td->STRING => (-f "$native_out/.abuild" ? "yes" : "no"),},
+	     {$td->STRING => "no"});
+
+$td->runtest("clean current",
+	     {$td->COMMAND => "abuild --clean=current",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/depclean0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean dependencies",
+	     {$td->COMMAND => "abuild --clean=deps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/depclean1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean current with dependencies",
+	     {$td->COMMAND => "abuild --apply-targets-to-deps --clean=current",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/depclean2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/..");
+
+$td->runtest("again with -C",
+	     {$td->COMMAND => "abuild --apply-targets-to-deps --clean=current" .
+		  " -C work/a/aa",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/depclean2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/c/cb");
+
+$td->runtest("dependencies",
+	     {$td->COMMAND => "abuild --build=deps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/depitems0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("single-build item build",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/all0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("ccxx_debug",
+	     {$td->COMMAND => "abuild ccxx_debug",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ccxx-debug.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean all",
+	     {$td->COMMAND => "abuild --clean=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allclean0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work");
+
+$td->runtest("no more .ab-dyanmic.mk files",
+	     {$td->COMMAND =>
+		  "find . -type f -name .ab-dynamic.mk -print" .
+		  " -o -name ext -prune | wc -l"},
+	     {$td->REGEXP => "\\s*0\\s*",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/c/cb");
+
+$td->runtest("rules help",
+	     {$td->COMMAND => "abuild rules-help"},
+	     {$td->REGEXP => 'Help for users of RULES=ccxx',
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("interface help",
+	     {$td->COMMAND => "abuild interface-help"},
+	     {$td->REGEXP => 'Help for Abuild.interface for C/C\+\+',
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/ext");
+
+mkdir "subdir", 0777 or die;
+cd("work/ext/subdir");
+
+$td->runtest("clean all from ext",
+	     {$td->COMMAND => "abuild --find-conf --clean=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allclean1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/ext");
+
+$td->runtest("clean named",
+	     {$td->COMMAND => "abuild --clean=name:aa,cb",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-names1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean pattern",
+	     {$td->COMMAND => "abuild --clean=pattern:a.",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-pattern1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean named with dependencies",
+	     {$td->COMMAND => "abuild -c name:aa,cb --apply-targets-to-deps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-names2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean pattern with dependencies",
+	     {$td->COMMAND => "abuild -c pattern:a. --apply-targets-to-deps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-pattern2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work");
+
+$td->runtest("no more .ab-dyanmic.mk files",
+	     {$td->COMMAND =>
+		  "find . -type f -name .ab-dynamic.mk -print | wc -l"},
+	     {$td->REGEXP => "\\s*0\\s*",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/a");
+
+$td->runtest("unnamed directory",
+	     {$td->COMMAND => "abuild"},
+	     {$td->STRING =>
+		  "abuild: nothing to build in this directory\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/a/aa");
+
+$td->runtest("clean descendants",
+	     {$td->COMMAND => "abuild --clean=desc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/descclean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("descendants",
+	     {$td->COMMAND => "abuild --build=desc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/descitems.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/autoconf");
+
+$td->runtest("autoconf compiler invocation",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/autoconf.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/f");
+
+# tree1 has "plugin".  tree2 has tree1 as an external and declares
+# "plugin" as a plugin.  tree3 has both tree1 and tree2 in that order
+# as externals and does not declare "plugin" as a plugin.  abuild 1.0
+# had a bug that caused plugin's interface to not get created.
+$td->runtest("plugin-anywhere",
+	     {$td->COMMAND => "abuild -C tree3",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/plugin-anywhere.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Dependency on multiple instances of an interface.  "a" depends on
+# two different instances of "b".
+
+cd("work/g/good");
+
+$td->runtest("double dependency on an item",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/double-dependency.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/g/bad");
+
+$td->runtest("double dependency error",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/double-dependency-error.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/junit");
+
+if ($test_junit)
+{
+    # In Windows, ant.bat does not return with an abnormal exit status
+    # when the build fails.  This makes it impossible to tell whether
+    # a build failed or not.
+    my $xflag = in_windows() ? $td->EXPECT_FAILURE : 0;
+
+    $td->runtest("junit with failure",
+		 {$td->COMMAND => "abuild -b all test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/junit-failure.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES | $xflag);
+
+    $td->runtest("junit with failure and -k",
+		 {$td->COMMAND => "abuild -k -b all test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/junit-failure-k.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES | $xflag);
+
+    $td->runtest("junit with no failures",
+		 {$td->COMMAND => "abuild -d test -C test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/junit-okay.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    # Make sure these files are accessed.
+    system("(tar cf - . | cat > /dev/null)");
+}
+
+check_work_accessed($td, "not-accessed.out");
+
+$td->report(92 + ($test_junit ? 3 : 0));

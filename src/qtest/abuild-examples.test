@@ -13,7 +13,6 @@ my $td = new TestDriver("examples");
 test_setup();
 
 my $top = get_top();
-my $abuild_top = get_abuild_top();
 my $filters = get_filters();
 my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 my $platform_native = get_native_platform();
