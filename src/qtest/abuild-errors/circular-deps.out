@@ -1,0 +1,8 @@
+--topdir--/circular-deps/c/cc/Abuild.conf: ERROR: cc depends on unknown build item spackle
+abuild: ERROR: circular dependency detected: ca -> cc -> cb -> ca
+abuild: ERROR: circular dependency detected: aa -> cb -> ca -> aa
+--topdir--/circular-deps/a/aa/Abuild.conf: ERROR: aa participates in a circular dependency
+--topdir--/circular-deps/c/ca/Abuild.conf: ERROR: ca participates in a circular dependency
+--topdir--/circular-deps/c/cb/Abuild.conf: ERROR: cb participates in a circular dependency
+--topdir--/circular-deps/c/cc/Abuild.conf: ERROR: cc participates in a circular dependency
+abuild: ERROR: errors detected; exiting
