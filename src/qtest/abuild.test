@@ -16,9 +16,6 @@ my $top = get_top();
 my $filters = get_filters();
 
 # XXX only when needed
-my $abuild_top = get_abuild_top();
-my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
-my $platform_native = get_native_platform();
 my $native_out = get_native_out();
 
 # test2 and test3 test various abuild error conditions
