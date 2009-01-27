@@ -1,4 +1,4 @@
 abuild: tree3 (abuild-indep): all
-make: Entering directory `--topdir--/f/tree3/abuild-indep'
+make: Entering directory `--topdir--/plugin-anywhere/tree3/abuild-indep'
 moo
-make: Leaving directory `--topdir--/f/tree3/abuild-indep'
+make: Leaving directory `--topdir--/plugin-anywhere/tree3/abuild-indep'

@@ -15,45 +15,11 @@ test_setup();
 my $top = get_top();
 my $filters = get_filters();
 
-# This test suite is a place where we dump additional random tests,
-# which may include backing areas and externals or any other feature,
-# to exercise previously detected bugs.  XXX
+# This test suite is a place where we dump additional random tests to
+# exercise very specific features or to exercise previously detected
+# bugs.
 
 setup($td);
-
-cd("work/h/multipass/a");
-
-$td->runtest("multipass build-also explicit targets",
-	     {$td->COMMAND => "abuild -d check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.multipass.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("build-also and related-by-traits",
-	     {$td->COMMAND => "abuild -d check --related-by-traits trait",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.build-also-traits.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/h/multipass");
-
-$td->runtest("build-also and only-with-traits",
-	     {$td->COMMAND => "abuild -b all check --only-with-traits trait",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.only-with-traits.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean",
-	     {$td->COMMAND => "abuild -c all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.multipass-clean.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-validate_dump_data($td);
 
 cd("work/autoconf");
 
@@ -64,7 +30,7 @@ $td->runtest("autoconf compiler invocation",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/f");
+cd("work/plugin-anywhere");
 
 # tree1 has "plugin".  tree2 has tree1 as an external and declares
 # "plugin" as a plugin.  tree3 has both tree1 and tree2 in that order
@@ -78,9 +44,9 @@ $td->runtest("plugin-anywhere",
 	     $td->NORMALIZE_NEWLINES);
 
 # Dependency on multiple instances of an interface.  "a" depends on
-# two different instances of "b".
+# two different platforms instances of "b".
 
-cd("work/g/good");
+cd("work/double-dep/good");
 
 $td->runtest("double dependency on an item",
 	     {$td->COMMAND => "abuild -b all",
@@ -89,7 +55,7 @@ $td->runtest("double dependency on an item",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/g/bad");
+cd("work/double-dep/bad");
 
 $td->runtest("double dependency error",
 	     {$td->COMMAND => "abuild -b all",
@@ -97,6 +63,43 @@ $td->runtest("double dependency error",
 	     {$td->FILE => "$top/double-dependency-error.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
+
+# Build set construction cases that require multiple passes of
+# resolving traits, build-also directives, etc.
+
+cd("work/multipass/a");
+
+$td->runtest("multipass build-also explicit targets",
+	     {$td->COMMAND => "abuild -d check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multipass.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also and related-by-traits",
+	     {$td->COMMAND => "abuild -d check --related-by-traits trait",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multipass.build-also-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/multipass");
+
+$td->runtest("build-also and only-with-traits",
+	     {$td->COMMAND => "abuild -b all check --only-with-traits trait",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multipass.only-with-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild -c all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multipass.clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+validate_dump_data($td);
 
 check_work_accessed($td, "not-accessed.out");
 
