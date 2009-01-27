@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-traits") or die;
+
+my $td = new TestDriver("traits");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+
+# We have three traits: eater, painter, and edible.  A depends upon
+# A-dep, is eaten by AB-eater, and is painted by A-painter.
+# Additionally, A-dep is painted by A-dep-painter.  B is also eaten by
+# AB-eater and by B-eater.  A-eater-painter both paints and eats A.
+# Painters and eaters depend upon the things they paint or eat.  A and
+# B are both edible by AB-eater even though the dependency is in the
+# reverse direction.  The directory structure is set up so that A is
+# under its own directory and everything else is together.  This makes
+# it easy to construct build sets that initially contain only A.  We
+# illustrate several things:
+#
+#  * When we create a build set starting with A and expand it with the
+#    eater trait, this pulls in AB-eater which in turn depends upon B.
+#    This subsequently pulls in B-eater.
+#
+#  * A and B are related to other build items that depend upon them
+#    and that they therefore do not depend upon.  This exercises the
+#    lack of connection between the dependency graph and trait
+#    relationships.
+#
+#  * We use the various traits both as only-with traits and as
+#    related-by traits.
+#
+#  * If we create a build set using the painter trait and expand it
+#    using the eater trait, we get A as a dependency of A-painter and
+#    AB-eater as an eater of A.  If we create a build set using the
+#    eater trait and expand it using the painter trait, we also get
+#    B-eater.
+#
+#  * If we build a set using both the eater and the painter traits, we
+#    get only the item that is both along with its dependencies.
+#
+#  * Trait-based clean sets do not follow dependencies.
+#
+# Everything depends upon additional build items that define other
+# targets so we can always tell the difference between the default
+# target and the explicit target.
+
+setup($td);
+
+cd("work/A");
+
+$td->runtest("no traits",
+	     {$td->COMMAND => "abuild --build=desc hello"},
+	     {$td->FILE => "$top/no-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("desc expanded with eater",
+	     {$td->COMMAND => "abuild --build=desc" .
+		  " --related-by-traits eater eat"},
+	     {$td->FILE => "$top/desc-eater.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work");
+
+$td->runtest("build eater painter",
+	     {$td->COMMAND => "abuild --build=all" .
+		  " --only-with-traits eater,painter eat paint"},
+	     {$td->FILE => "$top/build-eater-painter.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build eater expand painter",
+	     {$td->COMMAND => "abuild --build=all --only-with-traits eater" .
+		  " --related-by-traits painter paint"},
+	     {$td->FILE => "$top/build-eater-expand-painter.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build painter expand eater",
+	     {$td->COMMAND => "abuild --build=all --only-with-traits painter" .
+		  " --related-by-traits eater eat"},
+	     {$td->FILE => "$top/build-painter-expand-eater.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/A");
+
+$td->runtest("build edible",
+	     {$td->COMMAND => "abuild --build=all" .
+		  " --only-with-traits edible hello"},
+	     {$td->FILE => "$top/build-edible.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build desc edible",
+	     {$td->COMMAND => "abuild --build=desc" .
+		  " --only-with-traits edible hello"},
+	     {$td->FILE => "$top/build-desc-edible.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work");
+
+$td->runtest("build edible expand eater",
+	     {$td->COMMAND => "abuild --build=all --only-with-traits edible" .
+		  " --related-by-traits eater eat"},
+	     {$td->FILE => "$top/build-edible-expand-eater.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean edible expand eater",
+	     {$td->COMMAND => "abuild --clean=all --only-with-traits edible" .
+		  " --related-by-traits eater"},
+	     {$td->FILE => "$top/clean-edible-expand-eater.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean painter",
+	     {$td->COMMAND => "abuild --clean=all --only-with-traits painter"},
+	     {$td->FILE => "$top/clean-painter.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean all",
+	     {$td->COMMAND => "abuild --clean=all"},
+	     {$td->FILE => "$top/clean-all.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
+
+$td->report(12);
