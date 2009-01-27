@@ -18,38 +18,6 @@ my $filters = get_filters();
 # XXX only when needed
 my $native_out = get_native_out();
 
-setup($td, "test4");		# XXX
-
-$td->runtest("all items",
-	     {$td->COMMAND => "abuild --build=all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test4.allitems0.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("check program 1",
-	     {$td->COMMAND => "main/$native_out/main"},
-	     {$td->STRING => "CUPrivate\nCUPublic\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("check program 2",
-	     {$td->COMMAND => "util/src/$native_out/src2-test"},
-	     {$td->STRING => "src2\n",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/bad");
-
-$td->runtest("BUILD_ITEM_RULES access",
-	     {$td->COMMAND => "abuild --build=desc -k",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test4.access-errors.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-check_work_accessed($td);
-
 # In test 5, we exercise with ccxx's dependencies including updating
 # an Abuild.mk to add a new source file and moving a header file
 # around to force regeneration of automatic dependencies.
@@ -928,4 +896,4 @@ $td->runtest("build does nothing",
 
 check_work_accessed($td);
 
-$td->report(89 + (in_windows() ? 0 : 6));
+$td->report(84 + (in_windows() ? 0 : 6));

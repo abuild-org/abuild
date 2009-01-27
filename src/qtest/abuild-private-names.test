@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-private-names") or die;
+
+my $td = new TestDriver("private names");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my $native_out = get_native_out();
+
+# test4 creates a public build item that is divided into private
+# build items.
+
+setup($td);
+
+$td->runtest("all items",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/allitems0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check program 1",
+	     {$td->COMMAND => "main/$native_out/main"},
+	     {$td->STRING => "CUPrivate\nCUPublic\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check program 2",
+	     {$td->COMMAND => "util/src/$native_out/src2-test"},
+	     {$td->STRING => "src2\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad");
+
+$td->runtest("BUILD_ITEM_RULES access",
+	     {$td->COMMAND => "abuild --build=desc -k",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/access-errors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
+
+$td->report(5);
