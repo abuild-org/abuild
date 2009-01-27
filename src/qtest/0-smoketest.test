@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("0-smoketest") or die;
+
+# This test suite contains only the most basic tests to make sure
+# abuild has compiled and linked properly.  It's called 0-smoketest so
+# that it will run first.
+my $td = new TestDriver("smoke test");
+
+# This is the only test suite in which we print messages from
+# test_setup
+foreach my $msg (test_setup())
+{
+    $td->emphasize($msg);
+}
+
+die if -f "Abuild.conf";
+$td->runtest("abuild --version with no Abuild.conf",
+	     {$td->COMMAND => "abuild --version"},
+	     {$td->REGEXP => "^abuild version ",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# We don't really care what the output is...if this output were wrong,
+# nothing would work.  We just care that it runs successfully and
+# prints a path.
+$td->runtest("print abuild top",
+	     {$td->COMMAND => "abuild --print-abuild-top"},
+	     {$td->REGEXP => ".*/.*", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(2);

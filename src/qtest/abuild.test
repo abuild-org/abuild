@@ -10,11 +10,7 @@ require abuild_test_utils;
 chdir("abuild") or die;
 
 my $td = new TestDriver("abuild");
-# XXX print messages only once but call test_setup every time...
-foreach my $msg (test_setup())
-{
-    $td->emphasize($msg);
-}
+test_setup();
 
 my $top = get_top();
 my $abuild_top = get_abuild_top();
@@ -27,21 +23,6 @@ my $native_out = get_native_out();
 
 
 cleanup();
-
-die if -f "Abuild.conf";
-$td->runtest("abuild --version with no Abuild.conf",
-	     {$td->COMMAND => "abuild --version"},
-	     {$td->REGEXP => "^abuild version ",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-# We don't really care what the output is...if this output were wrong,
-# nothing would work.  We just care that it runs successfully and
-# prints a path.
-$td->runtest("print abuild top",
-	     {$td->COMMAND => "abuild --print-abuild-top"},
-	     {$td->REGEXP => ".*/.*", $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
 
 # Test compiler verification program
 mkdir "work", 0777;
@@ -2850,7 +2831,7 @@ check_work_accessed($td);
 
 cleanup();
 
-$td->report(291 +
+$td->report(289 +
 	    (in_windows() ? 1 : 7) +
 	    ($test_java ? 19 : 0) +
 	    ($test_junit ? 3 : 0) +
