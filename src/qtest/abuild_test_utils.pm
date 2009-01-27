@@ -48,8 +48,6 @@ sub test_setup
     @setup_messages;
 }
 
-# Information functions.  XXX Which are needed?
-
 sub get_top
 {
     $top;
@@ -196,7 +194,7 @@ sub check_work_accessed
     cleanup();
 }
 
-sub windir			# XXX public? test6 only
+sub windir
 {
     my $dir = shift;
     my $windir = $dir;

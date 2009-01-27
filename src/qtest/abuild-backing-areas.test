@@ -1,0 +1,259 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-backing-areas") or die;
+
+my $td = new TestDriver("backing areas");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my $native_out = get_native_out();
+
+# These tests exercise backing areas, traits as they inherit through
+# externals and backing areas (which they do only for trees that are
+# 100% resolved from backing areas), and plugins.
+
+# Dependencies:
+#   product-bin -> product-lib common-lib2 common-lib3
+#   product-lib -> proudct-common common-lib1
+
+# Backing aras
+#   1/product -> other/2 -> shared
+
+# shared/common/libs has no Abuild.conf so shared/common uses
+# multicomponent child-dirs.
+
+setup($td);
+
+# Modify Abuild.conf in multi/product to contain an absolute external
+cd("work/multi/product");
+{
+    open(IN, "<Abuild.conf") or die;
+    my @lines = (<IN>);
+    close(IN);
+    open(OUT, ">Abuild.conf") or die;
+    my $cwd = getcwd();
+    my $newpath = dirname($cwd) . "/b";
+    my $winpath = windir($newpath);
+    for (@lines)
+    {
+	s,(external-dirs:.*?)(\Q../b\E),$1$newpath -winpath=$winpath,;
+	print OUT;
+    }
+    close(OUT);
+}
+
+cd("work/shared/common");
+
+$td->runtest("build backing area",
+	     {$td->COMMAND => "abuild --build=desc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build-backing1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/other/2/product");
+
+$td->runtest("build backing area",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build-backing2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/1/product/bin");
+
+$td->runtest("nested backing areas",
+	     {$td->COMMAND => "abuild --build=current",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/normal1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+validate_dump_data($td);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/dumpdata-backed-external.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check pbin",
+	     {$td->COMMAND => "$native_out/pbin"},
+	     {$td->FILE => "$top/pbin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/shared/product/bin");
+
+$td->runtest("complete build area",
+	     {$td->COMMAND => "abuild --build=current",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/normal2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check pbin",
+	     {$td->COMMAND => "$native_out/pbin"},
+	     {$td->FILE => "$top/pbin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/other/2/product");
+
+$td->runtest("list traits",
+	     {$td->COMMAND => "abuild --list-traits"},
+	     {$td->FILE => "$top/list-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/read-only/product");
+
+validate_dump_data($td);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("read-only build items 1",
+	     {$td->COMMAND => "abuild --build=all no-op",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/read-only.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/multi/product");
+
+validate_dump_data($td);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multi-dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build multi/c",
+	     {$td->COMMAND => "abuild -C ../c",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multi-c.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("multiple external paths",
+	     {$td->COMMAND => "abuild --build=deps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multi.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/1/common");
+
+$td->runtest("backing cycle",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backing-cycle.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/2/common");
+
+$td->runtest("bad backing file",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-backing.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/3/product/bin");
+
+$td->runtest("backing area dependencies",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backing-deps.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/3/product");
+
+$td->runtest("non-local backing area dependencies",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backing-deps-other.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/4/main/product");
+
+$td->runtest("indirect dependency errors",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/indirect-deps.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/5/main");
+
+$td->runtest("missing backing config",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/no-backing-conf.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/6/main/product");
+
+$td->runtest("complex dependency errors",
+	     {$td->COMMAND => "abuild --full-integrity",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/complex-dep-errors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/7/main/product/other");
+
+$td->runtest("full integrity",
+	     {$td->COMMAND => "abuild --full-integrity",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/full-errors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("local integrity",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/local-errors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/7/main/product");
+
+$td->runtest("irrelevant integrity errors",
+	     {$td->COMMAND => "abuild"},
+	     {$td->STRING =>
+		  "abuild: nothing to build in this directory\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/bad/8/product");
+
+$td->runtest("bad deletions and plugins",
+	     {$td->COMMAND => "abuild -b desc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-deletions.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td, "not-accessed.out");
+
+$td->report(28);
