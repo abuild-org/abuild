@@ -138,13 +138,6 @@ Documentation
    platform-dependent.
 
 
-Test Suite
-==========
-
- * Reorganize abuild.test into multiple separate test suites to make
-   it easier to test pieces of abuild in isolation.
-
-
 Usability Improvements
 ======================
 
