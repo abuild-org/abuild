@@ -34,8 +34,8 @@ Core Changes
    information for the built-in help system.  We can probably also
    remove ACCESSIBLE_BUILD_ITEMS (or whatever it's called).
 
- * When abuild is run with no arguments, it will build build set
-   "desc" instead of not doing a dependency-based build.  A new flag
+ * When abuild is run with no arguments, its default behavior will be
+   to act as if --with-deps had been specified.  A new flag
    "--no-deps" can be used for the case in which one should build just
    the item with no dependencies.  (In explicit 1.0 compatibility
    mode, the old behavior is selected.)
