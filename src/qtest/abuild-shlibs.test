@@ -7,21 +7,21 @@ use strict;
 require TestDriver;
 require abuild_test_utils;
 
-chdir("abuild") or die;
+chdir("abuild-shlibs") or die;
 
-my $td = new TestDriver("abuild");
+my $td = new TestDriver("shared libraries");
 test_setup();
 
 my $top = get_top();
 my $filters = get_filters();
 my $native_out = get_native_out();
 
-# Test 10 exercises shared libraries.  Although shared library
-# functionality is exercised in the examples and in other parts of the
-# test suite, test10 goes through several scenarios that cover some of
-# the corner cases and potential pitfalls of using shared libraries.
-# The idea of these test cases is to make sure that doing proper
-# dependency-aware builds successfully mitigates most of the problems.
+# Although shared library functionality is exercised in the examples
+# and in other parts of the test suite, these tests go through several
+# scenarios that cover some of the corner cases and potential pitfalls
+# of using shared libraries.  The idea of these test cases is to make
+# sure that doing proper dependency-aware builds successfully
+# mitigates most of the problems.
 
 # The following build items are used in these test cases:
 
@@ -58,7 +58,7 @@ my $native_out = get_native_out();
 # In addition to the above, we also exercise handling of orphan
 # targets in ccxx here.
 
-setup($td, "test10");		# XXX
+setup($td);
 
 cd("work");
 
@@ -69,7 +69,7 @@ cd("work/static");
 $td->runtest("build static with shared1",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.static-shared1.out",
+	     {$td->FILE => "$top/static-shared1.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -82,7 +82,7 @@ if (! in_windows())
     $td->runtest("build shared1 without static",
 		 {$td->COMMAND => "abuild --make SKIP_LINK=1",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/test10.shared1-build.out",
+		 {$td->FILE => "$top/shared1-build.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
@@ -92,7 +92,7 @@ if (! in_windows())
 		 {$td->COMMAND => "abuild --monitored",
 		  $td->FILTER =>
 		      "perl $filters/filter-abuild.pl | grep '^abuild-monitor: '"},
-		 {$td->FILE => "$top/test10.prog1-link-failure.out",
+		 {$td->FILE => "$top/prog1-link-failure.out",
 		  $td->EXIT_STATUS => 2},
 		 $td->NORMALIZE_NEWLINES);
 
@@ -107,7 +107,7 @@ if (! in_windows())
 $td->runtest("build shared1 with static",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.shared1-build.out",
+	     {$td->FILE => "$top/shared1-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -122,7 +122,7 @@ $td->runtest("clean prog1",
 $td->runtest("link prog1",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.prog1-build.out",
+	     {$td->FILE => "$top/prog1-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -148,7 +148,7 @@ write_static("shared1-alt");
 $td->runtest("build static with shared1-alt",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.static-shared1-alt.out",
+	     {$td->FILE => "$top/static-shared1-alt.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -157,7 +157,7 @@ cd("work/shared1-alt");
 $td->runtest("build shared1-alt",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.shared1-alt-build.out",
+	     {$td->FILE => "$top/shared1-alt-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -194,7 +194,7 @@ write_static("shared2");
 $td->runtest("build static with shared2",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.static-shared2.out",
+	     {$td->FILE => "$top/static-shared2.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -203,7 +203,7 @@ cd("work/shared2");
 $td->runtest("build shared2",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.shared2-build.out",
+	     {$td->FILE => "$top/shared2-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -213,7 +213,7 @@ cd("work/prog2");
 $td->runtest("build prog2",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.prog2-build.out",
+	     {$td->FILE => "$top/prog2-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -231,7 +231,7 @@ cd("work/prog3");
 $td->runtest("build prog3",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.prog3-build.out",
+	     {$td->FILE => "$top/prog3-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -267,7 +267,7 @@ if (! in_windows())
     $td->runtest("build shared2 without static",
 		 {$td->COMMAND => "abuild --make SKIP_LINK=1",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/test10.shared2-build.out",
+		 {$td->FILE => "$top/shared2-build.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
@@ -298,7 +298,7 @@ write_static("prog4");
 $td->runtest("build static with prog4",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.static-prog4.out",
+	     {$td->FILE => "$top/static-prog4.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -307,7 +307,7 @@ cd("work/prog4");
 $td->runtest("build prog4",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.prog4-build.out",
+	     {$td->FILE => "$top/prog4-build.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -328,7 +328,7 @@ cd("work/extra-targets");
 $td->runtest("extra targets: build all",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-targets.out",
+	     {$td->FILE => "$top/extra-targets.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -338,14 +338,14 @@ create_file("$native_out/extra.dep");
 $td->runtest("build with extra dep",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-dep.out",
+	     {$td->FILE => "$top/extra-dep.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build does nothing",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-nothing.out",
+	     {$td->FILE => "$top/extra-nothing.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -356,14 +356,14 @@ create_file("$native_out/extra.$xobj");
 $td->runtest("build with extra object file",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-obj.out",
+	     {$td->FILE => "$top/extra-obj.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build does nothing",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-nothing.out",
+	     {$td->FILE => "$top/extra-nothing.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -374,17 +374,52 @@ create_file("$native_out/$xlib");
 $td->runtest("build with extra library",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-lib.out",
+	     {$td->FILE => "$top/extra-lib.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build does nothing",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test10.extra-nothing.out",
+	     {$td->FILE => "$top/extra-nothing.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 check_work_accessed($td);
 
 $td->report(29 + (in_windows() ? 0 : 6));
+
+sub prepend_runtime_pathvar
+{
+    # Used by shared library tests
+    my ($prepend) = @_;
+
+    # Set variables to be used when adding to our runtime library path for
+    # executing things built with shared libraries.
+    my $runtime_var = (in_windows() ? 'PATH' : 'LD_LIBRARY_PATH');
+    my $old_value = $ENV{$runtime_var} || "";
+
+    my $result =
+	join(':', map { "$top/work/$_/$native_out" } @$prepend);
+    if ($old_value ne '')
+    {
+	$result .= ":" . $old_value;
+    }
+    "$runtime_var=\"$result\" ";
+}
+
+sub write_static
+{
+    # Used by test10
+    sleep 1;
+    open(S, ">$top/work/static/string-value") or die;
+    print S $_[0], "\n";
+    close S;
+}
+
+sub create_file
+{
+    my $file = shift;
+    open(F, ">$file") or die;
+    close(F);
+}

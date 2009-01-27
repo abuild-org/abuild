@@ -236,41 +236,6 @@ sub validate_dump_data
     }
 }
 
-sub prepend_runtime_pathvar	# XXX public? test10 only
-{
-    # Used by shared library tests
-    my ($prepend) = @_;
-
-    # Set variables to be used when adding to our runtime library path for
-    # executing things built with shared libraries.
-    my $runtime_var = ($in_windows ? 'PATH' : 'LD_LIBRARY_PATH');
-    my $old_value = $ENV{$runtime_var} || "";
-
-    my $result =
-	join(':', map { "$top/work/$_/$native_out" } @$prepend);
-    if ($old_value ne '')
-    {
-	$result .= ":" . $old_value;
-    }
-    "$runtime_var=\"$result\" ";
-}
-
-sub write_static		# XXX public? test10 only
-{
-    # Used by test10
-    sleep 1;
-    open(S, ">$top/work/static/string-value") or die;
-    print S $_[0], "\n";
-    close S;
-}
-
-sub create_file			# XXX public? test10 only
-{
-    my $file = shift;
-    open(F, ">$file") or die;
-    close(F);
-}
-
 # Setup functions
 
 sub _sanitize_environment
