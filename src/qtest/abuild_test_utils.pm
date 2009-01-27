@@ -236,6 +236,25 @@ sub validate_dump_data
     }
 }
 
+sub prepend_runtime_pathvar
+{
+    # Used by shared library tests
+    my ($prepend) = @_;
+
+    # Set variables to be used when adding to our runtime library path for
+    # executing things built with shared libraries.
+    my $runtime_var = ($in_windows ? 'PATH' : 'LD_LIBRARY_PATH');
+    my $old_value = $ENV{$runtime_var} || "";
+
+    my $result =
+	join(':', map { "$top/work/$_/$native_out" } @$prepend);
+    if ($old_value ne '')
+    {
+	$result .= ":" . $old_value;
+    }
+    "$runtime_var=\"$result\" ";
+}
+
 # Setup functions
 
 sub _sanitize_environment

@@ -16,7 +16,7 @@ my $top = get_top();
 my $filters = get_filters();
 my $native_out = get_native_out();
 
-# test4 creates a public build item that is divided into private
+# These tests create a public build item that is divided into private
 # build items.
 
 setup($td);
