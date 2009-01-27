@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-cross-platform") or die;
+
+my $td = new TestDriver("cross-platform");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+
+# This test suite is a place where we dump additional random tests,
+# which may include backing areas and externals or any other feature,
+# to exercise previously detected bugs.  XXX
+
+setup($td);
+
+cd("work/case3");
+
+$td->runtest("cross-platform dependencies",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.allitems.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping native with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p native:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.no-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping indep with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p indep:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.no-indep.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping java with as-needed selection",
+	     {$td->COMMAND => "abuild -b all -p java:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.no-java.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("skipping java and native",
+	     {$td->COMMAND => "abuild -b all -p native:skip -p java:skip",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.no-java-native.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also",
+	     {$td->COMMAND => "abuild -d -C build-also check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.build-also.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build-also default target",
+	     {$td->COMMAND => "abuild -d -C dep-build-also check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.dep-build-also.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("invalid non-object-code selector",
+	     {$td->COMMAND => "abuild -b all -p indep:all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.bad-selector.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild -c all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case3.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
+
+$td->report(11);

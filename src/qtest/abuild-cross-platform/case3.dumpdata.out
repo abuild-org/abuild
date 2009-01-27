@@ -16,7 +16,7 @@
  <build-trees>
   <build-tree
    id="bt-1"
-   absolute-path="--topdir--/h"
+   absolute-path="--topdir--/case3"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -34,7 +34,7 @@
    <build-item
     name="indep1"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/platforms/1/indep"
+    absolute-path="--topdir--/case3/platforms/1/indep"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"
@@ -51,7 +51,7 @@
    <build-item
     name="java1"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/platforms/1/java"
+    absolute-path="--topdir--/case3/platforms/1/java"
     backing-depth="0"
     external-depth="0"
     target-type="java"
@@ -68,7 +68,7 @@
    <build-item
     name="native1"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/platforms/1/native"
+    absolute-path="--topdir--/case3/platforms/1/native"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -87,7 +87,7 @@
    <build-item
     name="everything"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/all"
+    absolute-path="--topdir--/case3/all"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"
@@ -114,7 +114,7 @@
    <build-item
     name="indep2"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/platforms/2/indep"
+    absolute-path="--topdir--/case3/platforms/2/indep"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"
@@ -134,7 +134,7 @@
    <build-item
     name="java2"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/platforms/2/java"
+    absolute-path="--topdir--/case3/platforms/2/java"
     backing-depth="0"
     external-depth="0"
     target-type="java"
@@ -151,7 +151,7 @@
    <build-item
     name="native2"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/platforms/2/native"
+    absolute-path="--topdir--/case3/platforms/2/native"
     backing-depth="0"
     external-depth="0"
     target-type="object-code"
@@ -170,7 +170,7 @@
    <build-item
     name="top-level"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/build-also"
+    absolute-path="--topdir--/case3/build-also"
     backing-depth="0"
     external-depth="0"
     target-type="all"
@@ -186,7 +186,7 @@
    <build-item
     name="top-level-dep"
     home-tree="bt-1"
-    absolute-path="--topdir--/h/dep-build-also"
+    absolute-path="--topdir--/case3/dep-build-also"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"

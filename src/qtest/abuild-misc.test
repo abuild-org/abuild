@@ -21,78 +21,6 @@ my $filters = get_filters();
 
 setup($td);
 
-cd("work/h");
-
-$td->runtest("cross-platform dependencies",
-	     {$td->COMMAND => "abuild -b all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.allitems.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("skipping native with as-needed selection",
-	     {$td->COMMAND => "abuild -b all -p native:skip",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.no-native.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("skipping indep with as-needed selection",
-	     {$td->COMMAND => "abuild -b all -p indep:skip",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.no-indep.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("skipping java with as-needed selection",
-	     {$td->COMMAND => "abuild -b all -p java:skip",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.no-java.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("skipping java and native",
-	     {$td->COMMAND => "abuild -b all -p native:skip -p java:skip",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.no-java-native.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("build-also",
-	     {$td->COMMAND => "abuild -d -C build-also check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.build-also.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("build-also default target",
-	     {$td->COMMAND => "abuild -d -C dep-build-also check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.dep-build-also.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("invalid non-object-code selector",
-	     {$td->COMMAND => "abuild -b all -p indep:all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.bad-selector.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean",
-	     {$td->COMMAND => "abuild -c all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.clean.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("dump data",
-	     {$td->COMMAND => "abuild --dump-data",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/h.dumpdata.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
 cd("work/h/multipass/a");
 
 $td->runtest("multipass build-also explicit targets",
@@ -172,4 +100,4 @@ $td->runtest("double dependency error",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(20);
+$td->report(10);
