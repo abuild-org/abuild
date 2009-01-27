@@ -18,97 +18,6 @@ my $filters = get_filters();
 # XXX only when needed
 my $native_out = get_native_out();
 
-# In test 5, we exercise with ccxx's dependencies including updating
-# an Abuild.mk to add a new source file and moving a header file
-# around to force regeneration of automatic dependencies.
-
-setup($td, "test5");		# XXX
-
-cd("work/util");
-
-copy("Abuild.mk.0", "Abuild.mk") or die;
-
-$td->runtest("no targets",
-	     {$td->COMMAND => "abuild",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.util0.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-copy("Abuild.mk.1", "Abuild.mk") or die;
-
-$td->runtest("no sources",
-	     {$td->COMMAND => "abuild",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.util1.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-copy("Abuild.mk.2", "Abuild.mk") or die;
-
-cd("work/main");
-
-$td->runtest("good build",
-	     {$td->COMMAND => "abuild --build=current",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.build0.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-# Delay so mtime of Abuild.mk is definitely different from before
-sleep 1;
-copy("../util/Abuild.mk.3", "../util/Abuild.mk") or die;
-
-$td->runtest("add a file",
-	     {$td->COMMAND => "abuild --build=current",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.build1.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("up to date",
-	     {$td->COMMAND => "abuild --build=current",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.build2.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-rename "../util/include1/File1.hpp", "../util/include2/File1.hpp" or die;
-sleep 1;
-
-$td->runtest("move header",
-	     {$td->COMMAND => "abuild --build=current",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.build3.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-sleep 1;
-my $now = time;
-utime $now, $now, "../util/include2/File1.hpp" or die;
-
-sleep 1;
-$td->runtest("header file changed",
-	     {$td->COMMAND => "abuild --with-deps",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.build4.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-sleep 1;
-$now = time;
-utime $now, $now, "../util/File2.cpp" or die;
-
-sleep 1;
-$td->runtest("source file changed",
-	     {$td->COMMAND => "abuild -d check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/test5.build5.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-check_work_accessed($td);
-
 # Test 6 exercises backing areas, traits as they inherit through
 # externals and backing areas (which they do only for trees that are
 # 100% resolved from backing areas), and plugins.
@@ -896,4 +805,4 @@ $td->runtest("build does nothing",
 
 check_work_accessed($td);
 
-$td->report(84 + (in_windows() ? 0 : 6));
+$td->report(75 + (in_windows() ? 0 : 6));
