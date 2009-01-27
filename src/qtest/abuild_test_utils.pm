@@ -195,7 +195,7 @@ sub check_work_accessed
     cleanup();
 }
 
-sub windir			# XXX public?
+sub windir			# XXX public? test6 only
 {
     my $dir = shift;
     my $windir = $dir;
@@ -207,7 +207,7 @@ sub windir			# XXX public?
     $windir;
 }
 
-sub validate_dump_data		# XXX public?
+sub validate_dump_data
 {
     my ($td, $extract) = @_;
     $extract = 0 unless defined $extract;
@@ -237,7 +237,7 @@ sub validate_dump_data		# XXX public?
     }
 }
 
-sub prepend_runtime_pathvar	# XXX public?
+sub prepend_runtime_pathvar	# XXX public? test10 only
 {
     # Used by shared library tests
     my ($prepend) = @_;
@@ -256,7 +256,7 @@ sub prepend_runtime_pathvar	# XXX public?
     "$runtime_var=\"$result\" ";
 }
 
-sub write_static		# XXX public?
+sub write_static		# XXX public? test10 only
 {
     # Used by test10
     sleep 1;
@@ -265,7 +265,7 @@ sub write_static		# XXX public?
     close S;
 }
 
-sub create_file			# XXX public?
+sub create_file			# XXX public? test10 only
 {
     my $file = shift;
     open(F, ">$file") or die;

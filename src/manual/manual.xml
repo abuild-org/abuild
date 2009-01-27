@@ -1445,7 +1445,7 @@ C:\cygwin\cygwin.bat
      Notice that &abuild; builds
      <classname>cxx-library</classname> first and then
      <classname>cxx-program</classname>:
-     <?qtest example.basic-cxx-program.out?>
+     <?qtest basic-cxx-program.out?>
     </para>
     <para>
      To remove all of the files that &abuild; created in any build
@@ -1550,7 +1550,7 @@ C:\cygwin\cygwin.bat
      the <literal>--topdir--</literal> substitution, we have also
      filtered out time stamps and other strings that could potentially
      differ between platforms:
-     <?qtest example.basic-java-program.out?>
+     <?qtest basic-java-program.out?>
     </para>
    </sect1>
   </chapter>
@@ -3865,7 +3865,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       this command produces the following results (with the native
       platform again replaced by the string
       <literal>&lt;native&gt;</literal>):
-      <?qtest example.reference-common-no-op.out?>
+      <?qtest reference-common-no-op.out?>
       Of particular interest here is the order in which &abuild;
       visited the items.  &Abuild; makes no specific commitments about
       the order in which items will be built except that no item is
@@ -3892,7 +3892,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       would not observe the same ordering of build items since
       &abuild; does not pay any attention to dependencies when it is
       running the clean target, as shown:
-      <?qtest example.reference-common-clean-local.out?>
+      <?qtest reference-common-clean-local.out?>
       Note also that only the build items that have
       <filename>Abuild.mk</filename> files are cleaned.  &Abuild;
       knows that there is nothing to build in items without
@@ -3916,7 +3916,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </footnote>
       This produces the following output, again with some
       system-specific strings replaced with generic values:
-      <?qtest example.reference-common-check.out?>
+      <?qtest reference-common-check.out?>
       This example includes the output of
       <application>qtest</application> test suites.
       <application>QTest</application> is a simple and robust
@@ -3995,14 +3995,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       If we go to <filename>reference/project/main/src</filename> and run
       <command>abuild --build=current no-op</command>, we see the
       following output:
-      <?qtest example.reference-project-main-no-op.out?>
+      <?qtest reference-project-main-no-op.out?>
       Notice here that &abuild; only built the build items whose names
       end with <classname>.src</classname>, and that it built the
       items in dependency order.  We can also run <command>abuild
       --build=current --apply-targets-to-deps check</command> to run
       the <command>check</command> target for each of these build
       items.  This generates the following output:
-      <?qtest example.reference-project-main-check.out?>
+      <?qtest reference-project-main-check.out?>
       The presence of the <option>--apply-target-to-deps</option> flag
       caused the <command>check</command> target will be run for our
       dependencies as well as the current build item.  In this case,
@@ -4046,7 +4046,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       dependencies, and the <command>all</command> target for
       everything else, including any additional dependencies of any of
       those test suites.  That command generates the following output:
-      <?qtest example.reference-project-main-trait-test.out?>
+      <?qtest reference-project-main-trait-test.out?>
       Observe that the previously unbuilt
       <classname>project-lib.test</classname> build item was built
       using the <command>check</command> target by this command, and
@@ -4079,13 +4079,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       current directory.  This again illustrates how &abuild; adds
       additional items to the build set as required to satisfy
       dependencies:
-      <?qtest example.reference-derived-check.out?>
+      <?qtest reference-derived-check.out?>
       We can also observe that we do not see this behavior with the
       special <command>clean</command> target.  Both <command>abuild
       --clean=desc</command> and <command>abuild
       --clean=local</command> produce this output when run from
       <filename>reference/derived</filename>:
-      <?qtest example.reference-derived-clean-local.out?>
+      <?qtest reference-derived-clean-local.out?>
      </para>
      <para>
       As another demonstration of the transitive nature of externals
@@ -4093,7 +4093,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <command>abuild --clean=all</command> from the root of the
       <filename>derived</filename> build tree.  That generates this
       output:
-      <?qtest example.reference-derived-clean.out?>
+      <?qtest reference-derived-clean.out?>
       Here are a few things to notice:
       <itemizedlist>
        <listitem>
@@ -4712,7 +4712,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      Next run <command>abuild --build=all no-op</command> in
      <filename>task/project</filename>.  This generates the following
      output:
-     <?qtest example.task-project-no-op.out?>
+     <?qtest task-project-no-op.out?>
      This includes only items in our task branch.  No items in our
      backing area are included because &abuild; never attempts to
      build or modify build items in backing areas.
@@ -4746,7 +4746,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      linkend="ref.integrity-checks"/>.  This is the output we see when
      running <command>abuild --build=all check</command> from
      <filename>task/project</filename>:
-     <?qtest example.task-project-check.out?>
+     <?qtest task-project-check.out?>
      As with the <command>no-op</command> build, we only see output
      relating to local build items, not to build items in our backing
      areas as they are assumed to be already built.
@@ -8658,10 +8658,10 @@ endif
      <envar>PATH</envar> on Windows.  If you set this variable to
      include the output directory for
      <classname>shared.impl1</classname>, you will see this output:
-     <?qtest example.shared-library-prog-impl1.out?>
+     <?qtest shared-library-prog-impl1.out?>
      If you set it to the <classname>shared.impl2</classname> build
      item's directory, you will see this instead:
-     <?qtest example.shared-library-prog-impl2.out?>
+     <?qtest shared-library-prog-impl2.out?>
      Note that we could have made <classname>shared</classname> depend
      on <classname>shared.impl2</classname> instead of
      <classname>shared.impl1</classname> and gotten the same results.
@@ -10547,7 +10547,7 @@ flag private INCLUDES = private-include
      <classname>prog</classname>'s <varname>INCLUDES</varname>,
      <varname>LIBS</varname>, and <varname>LIBDIRS</varname> variables
      are all empty:
-     <?qtest example.cross-platform-ccxx_debug.out?>
+     <?qtest cross-platform-ccxx_debug.out?>
     </para>
    </sect1>
   </chapter>
@@ -11054,7 +11054,7 @@ flag private INCLUDES = private-include
      <filename>src/resources</filename>, or their automatically
      generated counterparts as appropriate).  Here are the contents of
      the HAR file:
-     <?qtest example.har-contents.out?>
+     <?qtest har-contents.out?>
      Note that the <filename>META-INF</filename> directory and the
      <filename>MANIFEST.MF</filename> file are created automatically
      during the JAR creation process.  Next, look at the JAR example.
@@ -11069,7 +11069,7 @@ flag private INCLUDES = private-include
      because &abuild; is creating a file whose ends with
      <filename>.har.jar</filename> and is adding that to the real
      classpath instead.  Here are the contents of the JAR file:
-     <?qtest example.jar-contents.out?>
+     <?qtest jar-contents.out?>
     </para>
    </sect1>
    <sect1 id="ref.example.war-files">
@@ -11122,13 +11122,13 @@ flag private INCLUDES = private-include
      <?example archive-types/war/Abuild-ant.properties?>
      <?example archive-types/war/Abuild.interface?>
      Here are the contents of this server WAR file:
-     <?qtest example.war-contents.out?>
+     <?qtest war-contents.out?>
      The <classname>client-war</classname> example is identical except
      it creates a client WAR instead:
      <?example archive-types/client-war/Abuild-ant.properties?>
      <?example archive-types/client-war/Abuild.interface?>
      Here are its contents:
-     <?qtest example.client-war-contents.out?>
+     <?qtest client-war-contents.out?>
      In this example, the <classname>war-example</classname> build
      item depends on the <classname>jar-example</classname> build item
      which in turn depends on <classname>har-example</classname>.
@@ -11176,7 +11176,7 @@ flag private INCLUDES = private-include
      products produced by other build items, not their JAR
      counterparts: notice that the HAR and WAR files are directly
      contained in the EAR file:
-     <?qtest example.ear-contents.out?>
+     <?qtest ear-contents.out?>
      Note also that the EAR file contains the WAR file and it also
      directly contains some of its contents, notably the JAR and HAR
      files.  (The HAR file is included in the WAR by a different name;
@@ -11303,7 +11303,7 @@ flag private INCLUDES = private-include
      This means that its static initializer will not be linked in on
      any system.  On a system that supports whole-library linking, the
      main program generates this output:
-     <?qtest example.whole-library.out?>
+     <?qtest whole-library.out?>
      This output includes the static initializer from
      <classname>Thing1</classname> but not from
      <classname>Thing2</classname>.
@@ -11361,7 +11361,7 @@ flag private INCLUDES = private-include
      depends on.  Here is the output of <command>abuild
      ccxx_debug</command> when run from the
      <filename>client</filename> directory:
-     <?qtest example.opaque-wrapper-ccxx_debug.out?>
+     <?qtest opaque-wrapper-ccxx_debug.out?>
      As you can see, there is no reference to the
      <filename>hidden/include</filename> directory even though its
      library and library directory are present in
@@ -11850,7 +11850,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <?example plugin/other/indep/b/Abuild.mk?>
       Here is the output of running <command>abuild count</command>
       from the <filename>plugin/other/b</filename> directory:
-      <?qtest example.count-b.out?>
+      <?qtest count-b.out?>
      </para>
     </sect2>
     <sect2 id="ref.example.plugin.backend-code">
@@ -11889,7 +11889,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <filename>count.mk</filename>, we see the output of the
       <command>count</command> target as well as the output from the
       <classname>plugin.echoer</classname> build item:
-      <?qtest example.echo-b.out?>
+      <?qtest echo-b.out?>
      </para>
     </sect2>
     <sect2 id="ref.example.platforms-and-platform-type-plugins">
@@ -11981,12 +11981,12 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <?example plugin/other/lib/Abuild.conf?>
       <?example plugin/other/bin/Abuild.conf?>
       Here is the build output:
-      <?qtest example.plugin-other-bin.out?>
+      <?qtest plugin-other-bin.out?>
       Here is the <filename>print-program</filename> file.  This file
       contains the concatenation of all the source files used to
       create the executable as well as the &ldquo;libraries&rdquo; it
       &ldquo;links&rdquo; against:
-      <?qtest example.printer-program.out?>
+      <?qtest printer-program.out?>
      </para>
     </sect2>
     <sect2 id="ref.example.plugins-and-externals">
@@ -12014,7 +12014,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       the products of this build tree to be usable by others that do
       not wish to follow the same restrictions.  Here is the output of
       building <classname>prog2</classname> with dependencies:
-      <?qtest example.plugin-outside.out?>
+      <?qtest plugin-outside.out?>
      </para>
     </sect2>
     <sect2 id="ref.example.native-compiler-plugins">
@@ -12098,7 +12098,7 @@ native-compiler qcc
       <filename>qcc</filename> and the default native compiler.  This
       is an example of &abuild;'s ability to add additional build
       platforms as needed based on the dependency graph:
-      <?qtest example.as-needed-platforms.out?>
+      <?qtest as-needed-platforms.out?>
      </para>
     </sect2>
     <sect2 id="ref.example.plugin.rule-checker">
@@ -12183,7 +12183,7 @@ native-compiler qcc
       As you can see, there is no dependency on
       <classname>auto-provider</classname>.  When we try to build this
       item, we get the following error:
-      <?qtest example.rule-checker-item1-error.out?>
+      <?qtest rule-checker-item1-error.out?>
       This is the error that was issued from
       <classname>plugin.auto-checker</classname>'s
       <filename>plugin.mk</filename> above.  The build item
@@ -12191,7 +12191,7 @@ native-compiler qcc
       dependency:
       <?example rule-checker/item2/Abuild.conf?>
       Its build proceeds normally:
-      <?qtest example.rule-checker-item2-build.out?>
+      <?qtest rule-checker-item2-build.out?>
      </para>
      <para>
       This examples shows how little code is required to implement

@@ -18,7 +18,7 @@ open(OUT, ">$out") or die "$whoami: can't create $out: $!\n";
 
 my %dirs =
     ('example' => "../../doc/example",
-     'qtest' => "../qtest/abuild",
+     'qtest' => "../qtest/abuild-examples",
     );
 
 my $last_id = undef;
