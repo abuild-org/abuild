@@ -723,7 +723,8 @@ Example:
 
 
 
-Traversal algorithm:
+Traversal algorithm (approximate since the real algorithm will have
+compatibility stuff in it):
 
  * Find the root of the current build forest.
 
@@ -846,7 +847,87 @@ not apply to the command-line invocation of abuild, but only to
 Abuild.conf and other build files.  There are some corner cases where
 abuild will possibly fail in compatibility mode, such as with
 interleaved build items (parent and child dirs skipping over each
-other).
+other) or backing areas that point to different backing forests.
+
+Algorithm for determining whether a build item is a root build item:
+
+ * If any key that is only allowed in a root build item appears, it is
+   a root
+
+ * Else if there is an Abuild.backing in the same directory, it is a
+   root
+
+ * Else if there is a parent-dir key, it is not a root
+
+ * Else if it has any obsolete 1.0 keys ("this"), it is a root
+
+ * Else if it has any new 1.1 keys, it is not a root
+
+ * Else if any children have parent-dir keys, assume it is a root
+
+ * Else assume it is not a root
+
+Here is the full traversal algorithm, including compatibility support.
+
+  // Find candidate top.  If this is pure 1.1, this will find the
+  // actual top.
+
+  cur_build_item = this directory
+  candidate_top = nil
+
+  do until end search
+    if cur_build_item looks like a root (as determined above) OR
+	  cur_build_item's Abuild.conf contains only child-dirs
+       candidate_top = cur_build_item
+    parent_build_item = next higher Abuild.conf
+    if parent_build_item exists and has child pointing to cur_build_item
+       cur_build_item = parent_build_item
+    else
+       if candidate_top == cur_build_item
+	  end search
+       else
+	  candidate_top = nil
+	  error: unable to find top of build forest
+
+  If no obsolete 1.0 keys were found, done.  Otherwise, proceed.
+
+  // Traverse looking for build items with externals.
+
+  roots (queue) = candidate_top
+
+  while roots
+     candidate_root = shift(roots)
+
+XXX HERE.  We need some rules about when externals can appear.  For
+example, maybe we should disallow anything child-dirs: points to from
+containing external-dirs.  This means you have to convert a build tree
+to 1.1 before you can hook it into a forest with child-dirs.  A
+converted tree could still have an external that points to an
+unconverted tree, and an unconverted tree could have an external that
+points to a converted tree.  This means you don't have to go looking
+through child-dirs for external-dirs.
+
+So child-dirs: -> something with external-dirs: is an error.
+
+Will that work?
+
+We could create a virtual top level that uses external-dirs to point
+into other trees that haven't been converted and child-dirs to point
+to trees that have been converted.
+
+When we are looking for the root, if we end up with a root that has
+external-dirs, we know there's not going to be a higher tree that
+points to it with child-dirs.  We could, in that case, look for a
+higher tree that points to it with external-dirs.  Then THAT would be
+the forest root for the hybrid case.
+
+Maybe it's not necessary.
+
+-----
+
+
+
+
 
 The following mapping is used in compatibility mode.  Unless otherwise
 stated, all statements apply to parsing of Abuild.conf files.  In all
@@ -904,25 +985,19 @@ ignore (with deprecation warning) all Abuild.backing files.  This is
 not strictly compatible behavior either since it breaks cases of lots
 of trees pointing to different backing areas.
 
-To detect whether a build item is a root:
 
- * If any key that is only allowed in a root build item appears, it is
-   a root
+Conversion
+==========
 
- * Else if there is an Abuild.backing in the same directory, it is a
-   root
+XXX
 
- * Else if there is a parent-dir key, it is not a root
+ * find all roots
 
- * Else if it has any obsolete 1.0 keys ("this"), it is a root
+ * explore connections via externals between roots to identify islands
 
- * Else if it has any new 1.1 keys, it is not a root
+ * create virtual top for each island?
 
- * Else if any children have parent-dir keys, assume it is a root
-
- * Else assume it is not a root
-
-
+ * create single virtual top for all islands?
 
 
 
