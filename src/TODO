@@ -8,14 +8,8 @@ Name Changes
 Core Changes
 ============
 
- * Implement compatibility framework that allows specification of
-   minimum compatibility level.  At the user level, this should be as
-   simple as specifying minimum supported compatibility level from the
-   command line or environment.  Internally, it should be possible to
-   make some code conditional (at runtime) on the minimum
-   compatibility level and issue deprecation warnings, and it should
-   be easy to isolate backward compatibility code so that deprecated
-   features can be removed.  See also "Compatibility" below.
+ * Implement an optional 1.0-compatibility mode.  See "Compatibility"
+   below.
 
  * Replace "this" with "name".  Make use of "this" deprecated.
 
@@ -30,8 +24,7 @@ Core Changes
  * When abuild is run with no arguments, its default behavior will be
    to act as if --with-deps had been specified.  A new flag
    "--no-deps" can be used for the case in which one should build just
-   the item with no dependencies.  (In explicit 1.0 compatibility
-   mode, the old behavior is selected.)
+   the item with no dependencies.
 
  * Require trees to be named.  Replace externals with subtrees.
    Eliminate absolute path and read-only externals, but provide an
@@ -116,10 +109,6 @@ Core Changes
      backing-areas: /path/to/backing/area
      deleted-trees: trees not to shadow
      deleted-items: items not to shadow (fully qualified as tree-name::item)
-
-   In 1.0 compatibility mode, continue to accept Abuild.backing files
-   that are just paths with nothing else, but give a deprecation
-   warning.
 
  * It would be good if errors in a part of the collection of build
    trees that are not relevant to you don't impact your build.  For
@@ -743,8 +732,8 @@ Traversal algorithm:
    Keep walking up the file system looking for directories containing
    Abuild.conf.  If you find one such that there is no higher
    Abuild.conf or the next higher one doesn't reference it as a child,
-   and if this Abuild.conf file has a tree-name key, it is the forest
-   root.
+   and if this Abuild.conf file has a tree-name key or contains no
+   keys other than child-dirs, it is the forest root.
 
    Pseudocode:
 
@@ -752,7 +741,8 @@ Traversal algorithm:
    forest_top = nil
 
    do until end search
-     if cur_build_item's Abuild.conf contains tree-name key
+     if cur_build_item's Abuild.conf contains tree-name key OR
+           cur_build_item's Abuild.conf contains only child-dirs
         forest_top = cur_build_item
      parent_build_item = next higher Abuild.conf
      if parent_build_item exists and has child pointing to cur_build_item
@@ -840,40 +830,100 @@ lh3-style trees.
 Compatibility
 =============
 
-When abuild starts up, a version compatibility flag may be provided.
-We should probably support this from the command line or from the
-environment.  If no flag is specified, abuild should attempt to
-automatically determine whether to run in 1.0 compatibility mode.
-Abuild must store the reason why it chose a particular version so it
-can report that in error messages as needed.  By default, abuild will
-give deprecation warnings for 1.0 constructs.  These can optionally be
-made into errors, but they cannot be suppressed.
+By default, abuild 1.1 will recognize all valid 1.0 build trees and
+will issue deprecation warnings with concrete fix suggestions,
+including a reference to the 1.0 to 1.1 conversion tool, whenever it
+sees a deprecated construct.  It will also be possible to run abuild
+in strict 1.1 mode, in which case obsolete 1.0 constructs will not be
+recognized at all.  In compatibility mode, there will be an option for
+suppressing deprecation warnings for backing areas a read-only
+externals only.  There will be no option for suppressing deprecation
+warnings for writable build trees and build items.
 
-Think about whether it is possible to support some kind of hybrid mode
-where some build trees are 1.0 and some are 1.1.  That might make
-migration easier.
+Compatibility mode will work by having abuild map a 1.0 structure into
+the internal representation of a 1.1 structure.  Compatibility does
+not apply to the command-line invocation of abuild, but only to
+Abuild.conf and other build files.  There are some corner cases where
+abuild will possibly fail in compatibility mode, such as with
+interleaved build items (parent and child dirs skipping over each
+other).
 
- * If build item has a parent-dir or external-dirs key, use 1.0
+The following mapping is used in compatibility mode.  Unless otherwise
+stated, all statements apply to parsing of Abuild.conf files.  In all
+cases, a deprecation warning is issued when any mapping rule is
+applied.
 
- * Else if the local build item has an name key or any other key
-   that was introduced in version 1.1, use 1.1
+ * If "this" is seen:
 
- * Else if build item has any keys that are allowed in build tree
-   roots or has an Abuild.backing file, use 1.0 (since if it had a
-   tree-name key, we would have already chosen 1.1)
+    - If "name" is also seen, error
 
- * Else if build item has a child-dirs key and child build item has a
-   parent-dir key, use 1.0
+    - Else treat "this" as name
 
- * Else could be single-build-item 1.0 tree or normal case 1.1 build
-   item.  If the next higher Abuild.conf refers to this as a child,
-   use 1.1.  Otherwise, give a warning and proceed to treat as a
-   single build-item 1.0 tree.
+ * If "parent-dir" is seen:
 
-Compatibility rules for externals:
+    - If there are any Abuild.conf between here and the parent, error
 
-XXX HERE: describe how a 1.0 build forest including read only and
-absolute path externals will map to a 1.1 forest.
+    - Else if parent does not point to us as child, error
+
+    - Else give a warning about parent-dir and ignore
+
+ * If "deleted-items" is seen, give a warning, and treat it as if we
+   had read it out of an Abuild.backing file.
+
+ * If this is a root build item (see below for how we detect this) and
+   there is no "tree-name" key, generate a tree name of the form
+   _tree.<rnd>.<nnn> where <rnd> is a random number (to prevent anyone
+   from referencing these tree names anywhere) and nnn is a sequential
+   number incremented each time we see a new tree.
+
+ * If external-dirs is encountered:
+
+    - If external dir is an absolute path, treat it as a backing area.
+      This is not exactly the same thing, but it's the best we can do.
+
+    - If the external is read-only and no -ro-path or -rw-path flags
+      were given on the command line, act as if its path had been
+      specified with -ro-path.  This is also slightly different since
+      any subtrees would be treated as read-only by -ro-path and not
+      be a read-only external.
+
+    - If the external points to a tree with no name, generate a name
+      for the tree and generate the appropriate tree dependency
+
+ * If an Abuild.backing file is found that contains a path on a line
+   by itself, treat it as if it were a file that contained a single
+   backing area and no deletions.
+
+Make a list of build tree roots that are not accessed as an external
+or child from any other build item.  Assert that if there were no
+errors and we didn't apply any 1.0-compatibility logic, then there is
+only one such root.  If is exactly one such root, allow an
+Abuild.backing file to exist in that location, and ignore (with
+deprecation warning) any other Abuild.backing files.  Otherwise,
+ignore (with deprecation warning) all Abuild.backing files.  This is
+not strictly compatible behavior either since it breaks cases of lots
+of trees pointing to different backing areas.
+
+To detect whether a build item is a root:
+
+ * If any key that is only allowed in a root build item appears, it is
+   a root
+
+ * Else if there is an Abuild.backing in the same directory, it is a
+   root
+
+ * Else if there is a parent-dir key, it is not a root
+
+ * Else if it has any obsolete 1.0 keys ("this"), it is a root
+
+ * Else if it has any new 1.1 keys, it is not a root
+
+ * Else if any children have parent-dir keys, assume it is a root
+
+ * Else assume it is not a root
+
+
+
 
 
 ----------------------------------------------------------------------
