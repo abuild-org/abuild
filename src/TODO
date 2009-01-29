@@ -811,6 +811,9 @@ compatibility stuff in it):
    check for the build item level.  This makes it possible to sparsely
    shadow a build tree for the purpose of adding items to it.
 
+   Implementation note: use DependencyGraph.  when we see a new tree
+   root, add the node.  When we see a tree-deps, add a dependency.
+
  * Check dependencies and build item references (but do not report
    errors) for the whole forest rather than doing it separately for
    each build item and copying build items around.  (We only copy
@@ -834,12 +837,20 @@ Compatibility
 By default, abuild 1.1 will recognize all valid 1.0 build trees and
 will issue deprecation warnings with concrete fix suggestions,
 including a reference to the 1.0 to 1.1 conversion tool, whenever it
-sees a deprecated construct.  It will also be possible to run abuild
-in strict 1.1 mode, in which case obsolete 1.0 constructs will not be
-recognized at all.  In compatibility mode, there will be an option for
-suppressing deprecation warnings for backing areas a read-only
-externals only.  There will be no option for suppressing deprecation
-warnings for writable build trees and build items.
+sees a deprecated construct.  Abuild can be run in a mode in which
+deprecation warnings are treated as errors.  It will also be possible
+to run abuild in strict 1.1 mode, in which case obsolete 1.0
+constructs will not be recognized at all.  In compatibility mode,
+there will be an option for suppressing deprecation warnings for
+backing areas a read-only externals only.  There will be no option for
+suppressing deprecation warnings for writable build trees and build
+items.
+
+Within the code, there will be a smart pointer to a compatibility
+object that is only initialized when not in strict 1.1 mode.  To the
+maximum possible extent, both data and logic will be encapsulated
+there.  In other cases, code devoted to compatibility will be clearly
+marked and maximally isolated.
 
 Compatibility mode will work by having abuild map a 1.0 structure into
 the internal representation of a 1.1 structure.  Compatibility does
@@ -847,92 +858,101 @@ not apply to the command-line invocation of abuild, but only to
 Abuild.conf and other build files.  There are some corner cases where
 abuild will possibly fail in compatibility mode, such as with
 interleaved build items (parent and child dirs skipping over each
-other) or backing areas that point to different backing forests.
+other) or backing areas that point to different backing forests, but
+the goal is for all "normal" abuild 1.0 trees to create the same
+builds with 1.1 as with 1.0.
 
-Algorithm for determining whether a build item is a root build item:
+With pure abuild 1.1, a build item is a build tree root iff it has a
+tree-name key.  In pure abuild 1.0, a build item is a build tree root
+iff it does not have parent-dir key.  In 1.1 with 1.0 compatibility,
+the logic is somewhat more complex.  This algorithm determines a build
+item's root status to be one of not a root, a 1.0 root, or a 1.1 root.
 
- * If any key that is only allowed in a root build item appears, it is
-   a root
+ * If parent-dir appears, return "not a root".
 
- * Else if there is an Abuild.backing in the same directory, it is a
-   root
+ * Else if "tree-name" appears, return "1.1 root"
 
- * Else if there is a parent-dir key, it is not a root
+ * Else if any key that is only allowed in a root build item
+   (excluding tree-name) appears, return "1.0 root"
 
- * Else if it has any obsolete 1.0 keys ("this"), it is a root
+ * Else if there is a 1.0-syntax Abuild.backing in the same directory,
+   return "1.0 root"
 
- * Else if it has any new 1.1 keys, it is not a root
+ * Else if it has any obsolete 1.0 keys ("this"), return "1.0 root"
 
- * Else if any children have parent-dir keys, assume it is a root
+ * Else if it has any new 1.1 keys, return "not root"
 
- * Else assume it is not a root
+ * Else if any children have parent-dir keys, return "1.0 root"
+
+ * Else return "not root"
+
+Note that a build item with only a child-dirs key in its Abuild.conf
+can be a forest root even if it is not a tree root.
 
 Here is the full traversal algorithm, including compatibility support.
 
-  // Find candidate top.  If this is pure 1.1, this will find the
-  // actual top.
+  # Find forest top.
 
-  cur_build_item = this directory
+  forest_top = nil
   candidate_top = nil
+  cur_build_item = this directory
 
   do until end search
-    if cur_build_item looks like a root (as determined above) OR
-	  cur_build_item's Abuild.conf contains only child-dirs
-       candidate_top = cur_build_item
-    parent_build_item = next higher Abuild.conf
-    if parent_build_item exists and has child pointing to cur_build_item
-       cur_build_item = parent_build_item
-    else
-       if candidate_top == cur_build_item
-	  end search
-       else
-	  candidate_top = nil
-	  error: unable to find top of build forest
+     if cur_build_item looks like a root (as determined above) OR
+           cur_build_item's Abuild.conf contains only child-dirs
+        candidate_top = cur_build_item
+     parent_build_item = next higher Abuild.conf
+     if parent_build_item exists and has child pointing to cur_build_item
+        cur_build_item = parent_build_item
+     else
+        if candidate_top == cur_build_item
+           forest_root = candidate_top
+           end search
+        else
+           error: unable to find top of build forest
 
-  If no obsolete 1.0 keys were found, done.  Otherwise, proceed.
+  # Find backing areas
 
-  // Traverse looking for build items with externals.
+  read any Abuild.backing file in the same directory as forest_top
+  if in compatibility mode
+     traverse graph formed by external-dirs pointers to locate all
+        1.0 roots
+     if Abuild.backing file exists, issue deprecation warning, read
+     it, and store in a list
 
-  roots (queue) = candidate_top
+  traverse backing areas in order with forest root backing file first
+     and then other backing areas as discovered
 
-  while roots
-     candidate_root = shift(roots)
+  traverse local items by doing a depth-first traversal following
+     child-dirs pointers and, if in compatibility mode, then following
+     external-dirs pointers
 
-XXX HERE.  We need some rules about when externals can appear.  For
-example, maybe we should disallow anything child-dirs: points to from
-containing external-dirs.  This means you have to convert a build tree
-to 1.1 before you can hook it into a forest with child-dirs.  A
-converted tree could still have an external that points to an
-unconverted tree, and an unconverted tree could have an external that
-points to a converted tree.  This means you don't have to go looking
-through child-dirs for external-dirs.
+The build_tree structure changes a bit.  Rather than having a single
+list for each tree, we'll have a single list for the forest.  This is
+described in the revamped build tree section above.
 
-So child-dirs: -> something with external-dirs: is an error.
+Note that the traversal of a typical 1.0 build tree will happen in a
+slightly different order.  In particular, consider this case:
 
-Will that work?
+  A -ext-> B
+  A -backs-> A'
+  B -backs-> B'
+  A' -ext-> B'
 
-We could create a virtual top level that uses external-dirs to point
-into other trees that haven't been converted and child-dirs to point
-to trees that have been converted.
+In 1.0, traversal would be in the order B', A', B, A.  In 1.1, it will
+be A', B', A, B.
 
-When we are looking for the root, if we end up with a root that has
-external-dirs, we know there's not going to be a higher tree that
-points to it with child-dirs.  We could, in that case, look for a
-higher tree that points to it with external-dirs.  Then THAT would be
-the forest root for the hybrid case.
+During traversal, if we see an Abuild.backing file in any directory
+with an Abuild.conf other than those from which we have already
+processed the file, report an error message.  This means that, in
+compatibility mode, we will not get error messages for Abuild.backing
+files in 1.0 roots, but in all cases, we will get error messages for
+any other rogue Abuild.backing files.
 
-Maybe it's not necessary.
-
------
-
-
-
-
-
-The following mapping is used in compatibility mode.  Unless otherwise
-stated, all statements apply to parsing of Abuild.conf files.  In all
-cases, a deprecation warning is issued when any mapping rule is
-applied.
+During traversal, in compatibility mode, we will need to read 1.0
+Abuild.conf files as if they were 1.0 files.  The following mapping is
+used when reading Abuild.conf files.  In all cases, a deprecation
+warning is issued when any mapping rule is applied.
 
  * If "this" is seen:
 
@@ -951,55 +971,107 @@ applied.
  * If "deleted-items" is seen, give a warning, and treat it as if we
    had read it out of an Abuild.backing file.
 
- * If this is a root build item (see below for how we detect this) and
-   there is no "tree-name" key, generate a tree name of the form
-   _tree.<rnd>.<nnn> where <rnd> is a random number (to prevent anyone
-   from referencing these tree names anywhere) and nnn is a sequential
-   number incremented each time we see a new tree.
+ * If this is a root build item and there is no "tree-name" key,
+   generate a tree name of the form _tree.<rnd>.<nnn> where <rnd> is a
+   random number (to prevent anyone from referencing these tree names
+   anywhere) and nnn is a sequential number incremented each time we
+   see a new tree.
 
  * If external-dirs is encountered:
 
-    - If external dir is an absolute path, treat it as a backing area.
-      This is not exactly the same thing, but it's the best we can do.
-
-    - If the external is read-only and no -ro-path or -rw-path flags
+    - If the external is read-only, if no -ro-path or -rw-path flags
       were given on the command line, act as if its path had been
       specified with -ro-path.  This is also slightly different since
       any subtrees would be treated as read-only by -ro-path and not
-      be a read-only external.
+      be a read-only external.  If any -ro-path or -rw-path arguments
+      were given, indicate that the -ro flag is ignored and that build
+      items' read-only status is being determined by the -ro-path and
+      -rw-path arguments.
 
-    - If the external points to a tree with no name, generate a name
-      for the tree and generate the appropriate tree dependency
+    - Handle the external-dirs as if it were a tree-deps, generating a
+      name for the destination tree if it doesn't already have one
+      (either explicitly or as a result of an earlier name
+      generation).
 
- * If an Abuild.backing file is found that contains a path on a line
-   by itself, treat it as if it were a file that contained a single
-   backing area and no deletions.
+In addition to the above, we can easily recognize a 1.0 Abuild.backing
+file and treat it as if it were a 1.1 file.  We only do this when the
+Abuild.backing file is in a directory that appears to contain a 1.0
+root, which can, in turn, happen only in compatibility mode.
 
-Make a list of build tree roots that are not accessed as an external
-or child from any other build item.  Assert that if there were no
-errors and we didn't apply any 1.0-compatibility logic, then there is
-only one such root.  If is exactly one such root, allow an
-Abuild.backing file to exist in that location, and ignore (with
-deprecation warning) any other Abuild.backing files.  Otherwise,
-ignore (with deprecation warning) all Abuild.backing files.  This is
-not strictly compatible behavior either since it breaks cases of lots
-of trees pointing to different backing areas.
-
-
-Conversion
-==========
-
-XXX
-
- * find all roots
-
- * explore connections via externals between roots to identify islands
-
- * create virtual top for each island?
-
- * create single virtual top for all islands?
+In all of the above, remember that external-dirs can still appear in a
+1.1 root build item if it points to an external tree that has not yet
+been converted, and that 1.0 root can have an external-dirs that
+points to a 1.1 tree.
 
 
+1.0 to 1.1 Conversion Tool
+==========================
+
+Most or all of the conversion tool should be implemented inside of
+abuild proper so that we have the benefit of the real Abuild.conf
+parser (ItemConfig) and the DependencyGraph object.
+
+Usage: abuild --upgrade-trees
+
+If no file "abuild.upgrade-data" exists:
+
+  Find all roots.  (See abuild-lint/find-abuild-trees.)  Do this by
+  finding all Abuild.conf files at or below the current directory that
+  look like roots.
+
+  Use DependencyGraph to create a dependency of all build tree roots.
+  This is to include named and unnamed trees.  This should share as
+  much code as possible with the actual traversal code, except that we
+  will traverse starting from EVERY apparent root build item that has
+  not been visited by an earlier traversal.  This means we will detect
+  nested build trees, private build trees that only point up, etc.
+
+  Analyze the dependency graph to identify islands.  Something like
+  this:
+
+     sort the graph
+     compute the transpose of the graph
+
+     for each node in the sorted graph
+       if the node does not have an island number
+         get the next island number
+         do a depth-first traversal of the transpose graph starting
+              with this node and assign this island number to each node
+
+     create abuild.upgrade-data listing each island and each tree root
+         path with any name that tree might have or a marker
+         indicating that a name must be assigned
+
+     tell the user to edit the abuild.upgrade-data file
+
+     exit
+
+If there is an "abuild.upgrade-data" file:
+
+   Ignore any islands that are marked as ignored.
+
+   Make sure each tree root listed in the file has name.
+
+   Do a traversal from each tree root, verifying we visit every root
+   in the island and no other roots
+
+At the end of this process, we should know the path and name of every
+tree in each forest, with one forest corresponding to each island.  At
+that point, we can rewrite all the Abuild.conf files filling in the
+tree names, replacing external-dirs with tree-deps, and adding any
+missing child-dirs entries as required to connect in all the subtrees.
+(Also replacing "this" with "name", and do other in-place
+transformations.)
+
+We probably want to refuse conversion of anything with a backing area.
+
+The new files should be written out as Abuild.conf.new or something
+along those lines.  Or maybe the old ones should be called
+Abuild.conf.pre-conversion or something and the new ones should be
+called Abuild.conf.
+
+If we really wanted to be paranoid, we could retraverse in strict 1.1
+mode and make sure we get the same results.
 
 ----------------------------------------------------------------------
 
