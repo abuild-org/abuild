@@ -19,11 +19,9 @@ BuildTree::BuildTree(std::string const& backing_area,
 }
 
 void
-BuildTree::setBuildItems(BuildItem_map const& items,
-			 std::map<std::string, std::string> const& paths)
+BuildTree::setBuildItems(BuildItem_map const& items)
 {
     this->build_items = items;
-    this->paths = paths;
 }
 
 void
@@ -66,12 +64,6 @@ BuildTree::BuildItem_map&
 BuildTree::getBuildItems()
 {
     return this->build_items;
-}
-
-std::map<std::string, std::string> const&
-BuildTree::getPaths() const
-{
-    return this->paths;
 }
 
 std::list<std::string> const&

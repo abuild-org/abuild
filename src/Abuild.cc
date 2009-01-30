@@ -1270,10 +1270,9 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 	traverseItems(buildtrees, top_path);
     }
 
-    BuildTree& tree_data = *(buildtrees[top_path]);
-
     resolveItems(buildtrees, top_path);
 
+    BuildTree& tree_data = *(buildtrees[top_path]);
     BuildItem_map& builditems = tree_data.getBuildItems();
 
     // Many of these checks have side effects.  The order of these
@@ -1304,9 +1303,8 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
 		      std::string const& top_path)
 {
     BuildItem_map builditems;
-    std::map<std::string, std::string> paths;
     BuildTree& tree_data = *(buildtrees[top_path]);
-    std::string const& backing_area = tree_data.getBackingArea();
+    bool has_backing_area = (! tree_data.getBackingArea().empty());
 
     std::list<std::string> dirs;
     dirs.push_back(top_path);
@@ -1319,7 +1317,6 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
 	FileLocation location = config->getLocation();
 
 	std::string item_this = config->getName(); // may be empty
-        paths[tree_relative] = item_this;
         if (! item_this.empty())
         {
             if (builditems.count(item_this))
@@ -1391,15 +1388,15 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
             }
             else
             {
-                // See if this directory is in our backing area
-		std::string child_tree_relative =
-		    Util::absToRel(child_dir, top_path);
-                if (checkBuilditemPath(buildtrees, backing_area,
-				       child_tree_relative))
+                if (has_backing_area)
                 {
-                    QTC::TC("abuild", "Abuild child in backing area");
-                    // No need to traverse into children -- traversal
-                    // was already done during initial read.
+                    // Allow sparse trees if we have a backing area.
+                    // No validation is required for the child
+                    // directory.
+                    QTC::TC("abuild", "Abuild sparse tree");
+		    verbose("ignoring non-existence of child dir " +
+			    *iter + " from " + Util::absToRel(dir) +
+			    " in a tree with a backing area");
                 }
                 else
                 {
@@ -1410,7 +1407,7 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
         }
     }
 
-    tree_data.setBuildItems(builditems, paths);
+    tree_data.setBuildItems(builditems);
 }
 
 void
@@ -2590,29 +2587,6 @@ Abuild::haveExternal(BuildTree_map& buildtrees,
     {
 	std::string const& backing_area = tree_data.getBackingArea();
         result = haveExternal(buildtrees, backing_area, external);
-    }
-    return result;
-}
-
-bool
-Abuild::checkBuilditemPath(BuildTree_map& buildtrees,
-			   std::string const& backing_top,
-			   std::string const& tree_relative)
-{
-    if (backing_top.empty())
-    {
-	return false;
-    }
-    BuildTree& tree_data = *(buildtrees[backing_top]);
-    bool result = false;
-    if (tree_data.getPaths().count(tree_relative))
-    {
-	result = true;
-    }
-    else
-    {
-	std::string const& backing_area = tree_data.getBackingArea();
-	result = checkBuilditemPath(buildtrees, backing_area, tree_relative);
     }
     return result;
 }

@@ -23,8 +23,7 @@ class BuildTree
     typedef boost::shared_ptr<BuildItem> BuildItem_ptr;
     typedef std::map<std::string, BuildItem_ptr> BuildItem_map;
 
-    void setBuildItems(BuildItem_map const& items,
-		       std::map<std::string, std::string> const& paths);
+    void setBuildItems(BuildItem_map const& items);
     void setSortedItemNames(std::list<std::string> const& sorted_items);
     void addTraits(std::set<std::string> const& traits);
     // Return writable reference to platform data so it can be modified
@@ -34,7 +33,6 @@ class BuildTree
     std::map<std::string, ExternalData> const& getExternals() const;
     std::map<std::string, ExternalData> const& getBackedExternals() const;
     BuildItem_map& getBuildItems();
-    std::map<std::string, std::string> const& getPaths() const;
     std::list<std::string> const& getSortedItemNames() const;
     std::set<std::string> const& getSupportedTraits() const;
     std::set<std::string> const& getDeletedItems() const;
@@ -49,8 +47,6 @@ class BuildTree
     std::map<std::string, ExternalData> backed_externals;
     // build item name -> BuildItem
     BuildItem_map build_items;
-    // tree-relative path -> item_name || ""
-    std::map<std::string, std::string> paths;
     // sorted list of build item names
     std::list<std::string> sorted_item_names;
     // traits supported by this tree and its externals

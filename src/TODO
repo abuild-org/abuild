@@ -1,6 +1,17 @@
 
 === Changes Targeted for Version 1.1 ===
 
+Changes to document
+===================
+
+These changes have already been made and need to make it into the
+documentation.
+
+ * When traversing a build tree with a backing area, accept
+   non-existent child directories without any additional checking.  We
+   no longer require the path to exist relative to the backing tree.
+
+
 Core Changes
 ============
 
@@ -969,10 +980,11 @@ warning is issued when any mapping rule is applied.
    had read it out of an Abuild.backing file.
 
  * If this is a root build item and there is no "tree-name" key,
-   generate a tree name of the form _tree.<rnd>.<nnn> where <rnd> is a
-   random number (to prevent anyone from referencing these tree names
-   anywhere) and nnn is a sequential number incremented each time we
-   see a new tree.
+   generate a tree name.  If the tree has a backing area, use the name
+   of the backing area tree.  Otherwise, generate a name of the form
+   _tree.<rnd>.<nnn> where <rnd> is a random number (to prevent anyone
+   from referencing these tree names anywhere) and nnn is a sequential
+   number incremented each time we see a new tree.
 
  * If external-dirs is encountered:
 

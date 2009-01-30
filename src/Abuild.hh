@@ -99,9 +99,6 @@ class Abuild
 		     std::string& backing_area);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
 		      ExternalData& external);
-    bool checkBuilditemPath(BuildTree_map& buildtrees,
-			    std::string const& backing_area,
-			    std::string const& child_tree_relative);
     void computeValidTraits(BuildTree_map& buildtrees);
     void listTraits();
     void listPlatforms(BuildTree_map& buildtrees);
