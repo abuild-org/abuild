@@ -56,6 +56,8 @@ class Abuild
 		  std::set<std::string>& visiting,
 		  FileLocation const& referrer,
 		  std::string const& description);
+    void traverseForest(BuildTree_map& buildtrees,
+			std::string const& top_path);
     void traverseItems(BuildTree_map& buildtrees,
 		       std::string const& top_path);
     void resolveItems(BuildTree_map& buildtrees,

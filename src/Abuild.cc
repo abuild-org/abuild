@@ -1262,9 +1262,16 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 		      traits, deleted_items, plugins,
 		      this->internal_platform_data));
 
+    traverseForest(buildtrees, top_path);
+}
+
+void
+Abuild::traverseForest(BuildTree_map& buildtrees, std::string const& top_path)
+{
     // Traverse build items defined locally and then perform a series
     // of analysis and validation.
-    if (config)
+    std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
+    if (Util::isFile(top_conf))
     {
 	verbose("build tree " + top_path + ": processing build items");
 	traverseItems(buildtrees, top_path);
