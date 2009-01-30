@@ -1,9 +1,11 @@
 
+1.0 branch
+
+ * When abuild says "something failed", it should list which items
+   failed.  Count only full failures, not dep failures.
+
+
 === Changes Targeted for Version 1.1 ===
-
-Name Changes
-============
-
 
 Core Changes
 ============
@@ -19,7 +21,12 @@ Core Changes
    handled properly, the rename functionality can be implemented, we
    might be able to remove the ABUILD_DIR stuff, and we can use this
    information for the built-in help system.  We can probably also
-   remove ACCESSIBLE_BUILD_ITEMS (or whatever it's called).
+   remove ACCESSIBLE_BUILD_ITEMS (or whatever it's called).  Keep in
+   mind that this means a build item without a build but with this key
+   would still build.  Most likely way to get rules would be to add an
+   option to the build item in the dependency list, like
+
+   deps: item1 -with-rules item2
 
  * When abuild is run with no arguments, its default behavior will be
    to act as if --with-deps had been specified.  A new flag
@@ -44,7 +51,8 @@ Core Changes
 
  * Add flag --with-rdeps to add to the build set all items anywhere in
    the forest that have items in the initial build set in their
-   expanded dependency chains.
+   expanded dependency chains.  (Note that is recursive by nature: if
+   A depends on X and B depends on A, then B also depends on X.)
 
  * Add -ro-path and -rw-path options to tell abuild to treat some or
    all build items as read only based on path.  This should provide a
@@ -127,7 +135,7 @@ Core Changes
     - Make sure "-platform native:option=" works to specify no option
 
     - Make sure it is possible to express "I want the version of X
-      build with compiler A on platform P but the default compiler
+      built with compiler A on platform P but the default compiler
       everywhere else."  This can probably be done with a combination
       of platform-specific dependencies and platform conditionals.
 
@@ -236,9 +244,6 @@ Documentation
 
 Usability Improvements
 ======================
-
- * When abuild says "something failed", it should list which items
-   failed.  Count only full failures, not dep failures.
 
  * Provide arguments for querying abuild's state, such as locating
    build items (perhaps with pattern matching), listing all trees with
@@ -530,20 +535,18 @@ libraries.  Buildable plugins could also be used to force certain
 steps to be performed early in a build, such as checking for proper
 environment variable settings or making architectural checks on
 dependency rules that go beyond what can be enforced through abuild's
-internal mechanisms.  It may also be possible to use global, buildable
-plugins to implement some kind of project-wide configuration
-mechanism.
+internal mechanisms.
 
-Making plugins buildable implies that abuild has to have build plugins
+Making plugins buildable implies that abuild has to build plugins
 before anyone might use them.  Since plugins are loaded in declaration
 order in each tree, this results in declaration order implying some
 kind of dependency-like relationship.  To determine build order, make
 a dependency graph among buildable plugins where a dependency is
 created from each plugin to its immediate predecessor in the build
-order.  This is done for global plugins and for each tree.  If there
-are any cycles (caused by buildable plugins being loaded in different
-orders across different trees), it is an error.  If not, the first
-phase of the build is to build plugins.
+order.  This is done for each tree.  If there are any cycles (caused
+by buildable plugins being loaded in different orders across different
+trees), it is an error.  If not, the first phase of the build is to
+build plugins.
 
 Since plugins are loaded in declaration order in each tree, this
 approach guarantees that buildable plugins are built before other
@@ -555,7 +558,7 @@ should first rethink whether the plugins are being used sensibly,
 and if they really are, then the plugin should just check for the
 existence of a variable/property defined by the other plugin.  The
 case of buildable plugins is a little different because a plugin
-may not even work before it is build.
+may not even work before it is built.
 
 If we require buildable plugins to have platform type "indep", then
 it's probably also okay for plugin.interface files to have after-build
