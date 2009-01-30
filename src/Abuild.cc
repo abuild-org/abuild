@@ -14,7 +14,7 @@
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
-std::string const Abuild::ABUILD_VERSION = "1.0.3";
+std::string const Abuild::ABUILD_VERSION = "1.0.3+";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
@@ -204,7 +204,19 @@ Abuild::runInternal()
 
     if (! okay)
     {
-	error("at least one build failure occurred");
+	error("at least one build failure occurred; summary follows");
+	boost::regex builder_re(BUILDER_RE);
+	boost::smatch match;
+	assert(! this->failed_builds.empty());
+	for (std::vector<std::string>::iterator iter =
+		 this->failed_builds.begin();
+	     iter != this->failed_builds.end(); ++iter)
+	{
+	    assert(boost::regex_match(*iter, match, builder_re));
+	    std::string item_name = match[1].str();
+	    std::string item_platform = match[2].str();
+	    error("build failure: " + item_name + " on platform " + item_platform);
+	}
     }
 
     return okay;
@@ -4060,6 +4072,9 @@ bool
 Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 		    bool is_dep_failure)
 {
+    // NOTE: This function must not return failure without adding the
+    // failed builder_string to the failed_builds list.
+
     boost::smatch match;
     boost::regex builder_re(BUILDER_RE);
     assert(boost::regex_match(builder_string, match, builder_re));
@@ -4085,6 +4100,8 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     parser.setSupportedFlags(build_item.getSupportedFlags());
     bool status = true;
 
+    std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
+
     if (use_interfaces)
     {
 	status = createItemInterface(
@@ -4105,7 +4122,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    if (is_dep_failure)
 	    {
 		info(item_name +
-		     " (" + OUTPUT_DIR_PREFIX + item_platform +
+		     " (" + output_dir +
 		     ") will not be built because of failure of a dependency");
 	    }
 	    else
@@ -4148,6 +4165,12 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    QTC::TC("abuild", "Abuild not building with no build file",
 		    build_item.getTargetType() == TargetType::tt_all ? 0 : 1);
 	}
+    }
+
+    if (! status)
+    {
+        info(item_name + " (" + output_dir + "): build failed");
+	this->failed_builds.push_back(builder_string);
     }
 
     return status;
@@ -4504,11 +4527,6 @@ Abuild::buildItem(std::string const& item_name,
       default:
 	fatal("unknown backend type for build item " + item_name);
 	break;
-    }
-
-    if (! result)
-    {
-        info(item_name + " (" + output_dir + "): build failed");
     }
 
     return result;

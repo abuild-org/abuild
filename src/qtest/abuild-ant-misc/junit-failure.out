@@ -46,4 +46,5 @@ BUILD FAILED
 
 Total time: <time>
 abuild: failing (abuild-java): build failed
-abuild: ERROR: at least one build failure occurred
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: failing on platform java

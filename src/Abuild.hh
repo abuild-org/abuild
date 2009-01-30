@@ -262,6 +262,7 @@ class Abuild
     DependencyGraph build_graph;
     boost::shared_ptr<Interface> base_interface;
     std::vector<std::string> buildset_reverse_order;
+    std::vector<std::string> failed_builds;
 
     // (tree, other_tree) -> [plugin, ...]
     typedef std::map<std::string,

@@ -40,4 +40,5 @@ BUILD FAILED
 
 Total time: <time>
 abuild: java-item (abuild-java): build failed
-abuild: ERROR: at least one build failure occurred
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: java-item on platform java

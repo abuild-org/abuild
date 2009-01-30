@@ -4,4 +4,5 @@ make: *** [all] Error 1
 make: Leaving directory `--topdir--/g/a/abuild-indep'
 abuild: a (abuild-indep): build failed
 abuild: b (abuild-indep) will not be built because of failure of a dependency
-abuild: ERROR: at least one build failure occurred
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: a on platform indep

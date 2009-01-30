@@ -13668,6 +13668,27 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>XXX next: XXX date</term>
+     <listitem>
+      <para>
+       Usability Improvements
+      </para>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Starting in 1.0.3, if any build failures occur in a given
+         &abuild; run, &abuild; issues an error message indicating
+         this at the end of its output.  Now this error message is
+         followed by a list of which build items failed on which
+         platforms.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <variablelist>
+    <varlistentry>
      <term>1.0.3: January 9, 2009</term>
      <listitem>
       <itemizedlist>

@@ -12,4 +12,5 @@ abuild-monitor: state-change prog1 <native> ready
 abuild-monitor: state-change prog1 <native> running
 abuild-monitor: targets prog1 <native> all
 abuild-monitor: state-change prog1 <native> failed
-abuild-monitor: error abuild: ERROR: at least one build failure occurred
+abuild-monitor: error abuild: ERROR: at least one build failure occurred; summary follows
+abuild-monitor: error abuild: ERROR: build failure: prog1 on platform <native>

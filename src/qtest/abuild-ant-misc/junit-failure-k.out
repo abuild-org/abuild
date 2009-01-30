@@ -68,4 +68,5 @@ init:
 
 BUILD SUCCESSFUL
 Total time: <time>
-abuild: ERROR: at least one build failure occurred
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: failing on platform java
