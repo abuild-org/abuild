@@ -92,12 +92,8 @@ Core Changes
    is not found.  Some mechanism will be provided that will enable a
    build item to test in its Abuild.interface file (and therefore in
    its Abuild.mk or Abuild-ant.properties file) whether an optional
-   dependency is satisfied.
-
-   In the second case, abuild will not complain if a given tree is not
-   found.  Furthermore, any fully qualified regular item dependency of
-   the form tree::item for optional tree "tree" will be treated as an
-   optional dependency.
+   dependency is satisfied.  In the second case, abuild will not
+   complain if a given tree is not found.
 
    A new boolean interface variable (analogous to abDIR_build-item)
    will be defined for each build item that exists or that is declared
@@ -121,7 +117,7 @@ Core Changes
 
      backing-areas: /path/to/backing/area
      deleted-trees: trees not to shadow
-     deleted-items: items not to shadow (fully qualified as tree-name::item)
+     deleted-items: items not to shadow
 
  * It would be good if errors in a part of the collection of build
    trees that are not relevant to you don't impact your build.  For
@@ -626,16 +622,6 @@ tree without building any of the other subtrees that it uses, users
 must specify -ro-path or -rw-path on the command line at build time.
 Absolute path externals also disappear, but they were a bad idea to
 begin with.
-
-Introduce the tree-name::item-name syntax to refer to a
-fully-qualified build item name.  This allows build item names to be
-disambiguated across build trees.  If build tree A includes X and Y
-with X -> Y and build tree B shows up with its own Y, a reference to Y
-from within A should resolve to A's Y.  If there is a desire to reach
-a Y in tree B, A can refer to B::Y.  Since colon is not currently a
-valid character in a build item name, there is no issue with backward
-compatibility.  (Need to think about how this interacts with
-name-based access control, but it will probably interact fine.)
 
 Allow Abuild.backing files only at forest roots, and allow multiple
 backing areas.  Introduce a new Abuild.backing syntax in which one or
