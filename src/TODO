@@ -246,6 +246,13 @@ Documentation
 Usability Improvements
 ======================
 
+ * Have abuild --verbose log detail about which make/ant it is using.
+   Otherwise, it's almost impossible to debug problems that stem from
+   abuild invoking an unexpected copy of make or ant.
+
+ * Abuild should be less picky about ant -version's output if
+   possible.
+
  * Provide arguments for querying abuild's state, such as locating
    build items (perhaps with pattern matching), listing all trees with
    locations and dependencies, summarizing the state of all plugin
