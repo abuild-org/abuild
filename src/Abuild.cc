@@ -1262,11 +1262,11 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 		      traits, deleted_items, plugins,
 		      this->internal_platform_data));
 
-    traverseForest(buildtrees, top_path);
+    traverseTree(buildtrees, top_path);
 }
 
 void
-Abuild::traverseForest(BuildTree_map& buildtrees, std::string const& top_path)
+Abuild::traverseTree(BuildTree_map& buildtrees, std::string const& top_path)
 {
     // Traverse build items defined locally and then perform a series
     // of analysis and validation.
