@@ -94,4 +94,4 @@ define make_shlib
 endef
 
 clean::
-	$(RM) *.pdb *.exe *.ilk
+	$(RM) *.pdb *.exe *.ilk *.manifest
