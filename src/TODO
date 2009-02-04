@@ -1048,14 +1048,18 @@ If no file "abuild.upgrade-data" exists:
 
      exit
 
+  It's possible that we can enhance DependencyGraph to keep track of
+  islands during the traversal or at least add this functionality to
+  DependencyGraph.
+
 If there is an "abuild.upgrade-data" file:
 
-   Ignore any islands that are marked as ignored.
+  Ignore any islands that are marked as ignored.
 
-   Make sure each tree root listed in the file has name.
+  Make sure each tree root listed in the file has name.
 
-   Do a traversal from each tree root, verifying we visit every root
-   in the island and no other roots
+  Do a traversal from each tree root, verifying we visit every root
+  in the island and no other roots
 
 At the end of this process, we should know the path and name of every
 tree in each forest, with one forest corresponding to each island.  At
