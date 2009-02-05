@@ -386,6 +386,20 @@ Changes to "make" Code
 Changes to "ant" Code
 =====================
 
+ * Current thinking on java compilation strategy (not fully reflected
+   below): reduce ant support to basic jar creation only: no hooks,
+   higher level archives, etc.  We can support wrapper, qtest, and
+   junit.  This makes ant support useful for very simple
+   non-enterprise Java applications.  For everything else, use the
+   groovy framework.  We might not be quite so draconian (like
+   continuing to support hooks), or we might drop ant support
+   entirely.  Have to weigh complexity of code against compatibility
+   considerations.  Use a groovy-based framework for everything else,
+   as discussed below.  We may or may not bother with ant launcher.
+   It may be possible to invoke the ant launcher from groovy code
+   instead of java code.  Then the java build manager could handle
+   both ant-based and groovy-based builds.
+
  * Strongly consider distributing junit, groovy, and if needed,
    ant-contrib in abuild's lib directory.  If we do the ant launcher,
    we might be able to get away from invoking ant at all, in which
