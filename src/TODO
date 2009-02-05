@@ -407,6 +407,9 @@ Changes to "ant" Code
       properties are subject to change at any time.  These are not
       documented unless by comments in the code.
 
+ * Consider groovy-based system along the lines of
+   ~/source/examples/groovy/dependency-graph.
+
  * Incorporate misc/abuild-groovy.  Load the groovy task and make it
    available for others to use.  In abuild 1.0, there is no mechanism
    for adding a new build target that is visible to all build items
