@@ -391,6 +391,8 @@ Changes to "ant" Code
    we might be able to get away from invoking ant at all, in which
    case we might want to embed ant as well.
 
+   java -cp launch-ant.jar:$ANT_HOME/lib/ant.jar:$ANT_HOME/lib/ant-launcher.jar org.abuild.AntLauncher
+
  * Strongly consider implementation of ant launcher.
 
  * Conventions on properties:
@@ -422,6 +424,14 @@ Changes to "ant" Code
 
    The example would obviously have to be cleaned up, and we'd want
    everything in an org.abuild.something package.
+
+   Basic strategy would be to launch the groovy builder manager in
+   much the way the ant launcher would work.  For bootstrapping, we
+   can probably use a custom groovy script with an ant builder.
+
+   def ant = new AntBuilder()
+   ant.taskdef('name':'groovyc', 'classname':'org.codehaus.groovy.ant.Groovyc');
+   ant.groovyc('srcdir':'src', 'destdir':'build')
 
  * Incorporate misc/abuild-groovy.  Load the groovy task and make it
    available for others to use.  In abuild 1.0, there is no mechanism
