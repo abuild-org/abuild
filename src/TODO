@@ -410,6 +410,19 @@ Changes to "ant" Code
  * Consider groovy-based system along the lines of
    ~/source/examples/groovy/dependency-graph.
 
+   It is possible to compile this with groovyc, put all the class files
+   into a jar (say, dg.jar), and run it like this:
+
+   java -cp $GROOVY_HOME/embeddable/groovy-all-1.5.7.jar:$GROOVY_HOME/lib/ant-1.7.0.jar:$GROOVY_HOME/lib/ant-launcher-1.7.0.jar:dg.jar main
+
+   If embedding groovy into abuild, consider which other jars, if any, we
+   need.  We probably want ant-junit as well as junit itself.  We
+   probably don't want antcontrib unless we are planning on keeping the
+   old ant-based stuff alive.
+
+   The example would obviously have to be cleaned up, and we'd want
+   everything in an org.abuild.something package.
+
  * Incorporate misc/abuild-groovy.  Load the groovy task and make it
    available for others to use.  In abuild 1.0, there is no mechanism
    for adding a new build target that is visible to all build items
