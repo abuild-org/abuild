@@ -18,6 +18,9 @@ Core Changes
  * Implement an optional 1.0-compatibility mode.  See "Compatibility"
    below.
 
+ * Add -Dvar=val as a real abuild command-line argument that passes
+   the appropriate variable/property override to all backends.
+
  * Replace "this" with "name".  Make use of "this" deprecated.
 
  * Consider moving hook selection into Abuild.conf and removing
