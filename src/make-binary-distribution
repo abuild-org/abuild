@@ -279,7 +279,7 @@ else
 {
     if ($build_java)
     {
-	run("(cd ant-library; $abuild)");
+	run("(cd java-support; $abuild)");
     }
     if ($build_doc)
     {
@@ -329,12 +329,12 @@ else
 if ($build_java)
 {
     safe_mkdir("lib");
-    safe_copy("src/ant-library/abuild-java/dist/abuild-ant-library.jar",
-	      "lib/abuild-ant-library.jar");
+    safe_copy("src/java-support/abuild-java/dist/abuild-java-support.jar",
+	      "lib/abuild-java-support.jar");
     if ($make_java_dist)
     {
 	run("tar cjf $cwd/abuild-$version-java.tar.bz2" .
-	    " lib/abuild-ant-library.jar");
+	    " lib/abuild-java-support.jar");
 	print "$whoami: created abuild-$version-java.tar.bz2\n";
     }
 }

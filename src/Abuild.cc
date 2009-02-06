@@ -4002,7 +4002,7 @@ Abuild::findAnt()
     {
 	std::string candidate =
 	    abuild_dir +
-	    "/../ant-library/abuild-java/dist/abuild-ant-library.jar";
+	    "/../java-support/abuild-java/dist/abuild-java-support.jar";
 	// We're running from the source directory
 	if (Util::isFile(candidate))
 	{
@@ -4010,9 +4010,11 @@ Abuild::findAnt()
 	}
     }
 
+    // XXX check this comment:
+
     // Abuild with ant will fail without ant_library except when
     // bootstrapping because it will try to load a custom ant task.
-    // We handle bootstrapping by setting a property in ant-library's
+    // We handle bootstrapping by setting a property in java-support's
     // Abuild-ant.properties.  When not bootstrapping, it would be
     // nice if we could fail here if abuild-ant-library.jar is not
     // found, but this would require us to actually invoke abuild with
@@ -4021,7 +4023,7 @@ Abuild::findAnt()
     if (this->ant_library.empty())
     {
 	std::string candidate =
-	    this->abuild_top + "/lib/abuild-ant-library.jar";
+	    this->abuild_top + "/lib/abuild-java-support.jar";
 	if (Util::isFile(candidate))
 	{
 	    this->ant_library = candidate;

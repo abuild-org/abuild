@@ -117,7 +117,7 @@ by the abuild output directory, which will start with "abuild-".
 See manual/README for additional requirements for building the
 documentation.  If you don't want to build the documentation but still
 want to build the Java portion of abuild, run "./<output-dir>/abuild
--C ant-library".  Likewise, to build just the manual without building
+-C java-support".  Likewise, to build just the manual without building
 Java support, run "./<output-dir>/abuild -C manual".
 
 
