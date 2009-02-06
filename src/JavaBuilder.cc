@@ -1,17 +1,37 @@
 #include "JavaBuilder.hh"
 
+#include <Util.hh>
+#include <QEXC.hh>
 #include <boost/bind.hpp>
+#include <boost/regex.hpp>
+#include <set>
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
-JavaBuilder::JavaBuilder() :
+JavaBuilder::JavaBuilder(std::string const& java,
+			 std::list<std::string> const& libdirs,
+			 char** envp) :
+    last_request(0),
+    java(java),
+    libdirs(libdirs),
+    envp(envp),
     running(false),
     shutting_down(false)
 {
 }
 
-void
-JavaBuilder::makeRequest(std::string const& request)
+bool
+JavaBuilder::invokeAnt(std::string const& build_file,
+		       std::string const& basedir,
+		       std::list<std::string> const& targets)
+{
+    return makeRequest("ant " + build_file + " " + basedir + " " +
+		       Util::join(" ", targets));
+}
+
+bool
+JavaBuilder::makeRequest(std::string const& message)
 {
     {
 	boost::mutex::scoped_lock lock(this->mutex);
@@ -22,7 +42,9 @@ JavaBuilder::makeRequest(std::string const& request)
     }
     start();
 
+    Request_ptr request(new Request(message));
     this->requests.enqueue(request);
+    return request->response.dequeue();
 }
 
 void
@@ -35,7 +57,8 @@ JavaBuilder::finish()
 	    return;
 	}
     }
-    this->requests.enqueue("shutdown\n");
+    Request_ptr shutdown(new Request());
+    this->requests.enqueue(shutdown);
     this->reader_thread->join();
     boost::mutex::scoped_lock lock(this->mutex);
     this->sock.reset();
@@ -93,6 +116,7 @@ JavaBuilder::reader()
     // Main read loop
     this->running = true;
     this->running_cond.notify_all();
+    std::string accumulated_response;
     while (true)
     {
 	char data[1024];
@@ -107,8 +131,11 @@ JavaBuilder::reader()
 	{
 	    throw boost::system::system_error(error);
 	}
-
-	std::cout << std::string(data, length);
+	else if (! this->shutting_down)
+	{
+	    accumulated_response += std::string(data, length);
+	    handleResponse(accumulated_response);
+	}
     }
 
     handler_thread.join();
@@ -116,17 +143,76 @@ JavaBuilder::reader()
 }
 
 void
+JavaBuilder::handleResponse(std::string& responses)
+{
+    boost::regex response_re("(\\d+) (true|false)\r?");
+    boost::smatch match;
+
+    size_t p;
+    while ((p = responses.find("\n")) != std::string::npos)
+    {
+	std::string response = responses.substr(0, p);
+	responses = responses.substr(p + 1);
+	if (boost::regex_match(response, match, response_re))
+	{
+	    int request_number = std::atoi(match[1].str().c_str());
+	    std::string result_str = match[2].str();
+	    bool result = (result_str == "true");
+	    Request_ptr request;
+	    {
+		boost::mutex::scoped_lock lock(this->mutex);
+		if (! this->pending_requests.count(request_number))
+		{
+		    throw QEXC::General("protocol error: received response "
+					"for unknown request " +
+					Util::intToString(request_number));
+		}
+		request = this->pending_requests[request_number];
+		this->pending_requests.erase(request_number);
+	    }
+	    request->response.enqueue(result);
+	}
+	else
+	{
+	    throw QEXC::General("protocol error: received \"" + response +
+				"\" from java JavaBuilder program");
+	}
+    }
+}
+
+void
 JavaBuilder::handler()
 {
     while (true)
     {
-	std::string request = this->requests.dequeue();
-	boost::asio::write(*sock, boost::asio::buffer(request));
-	if (request == "shutdown\n")
+	Request_ptr request = this->requests.dequeue();
+	if (request->shutdown)
 	{
+	    boost::asio::write(*sock, boost::asio::buffer("shutdown\n"));
 	    boost::mutex::scoped_lock lock(this->mutex);
+	    for (std::map<int, Request_ptr>::iterator iter =
+		     this->pending_requests.begin();
+		 iter != this->pending_requests.end(); ++iter)
+	    {
+		(*iter).second->response.enqueue(false);
+	    }
+	    this->pending_requests.clear();
 	    this->shutting_down = true;
 	    break;
+	}
+	else
+	{
+	    // We're in trouble if we ever have more than 2^31 builds,
+	    // but somehow, I'm not too worried about it.
+	    int request_number = ++this->last_request;
+	    {
+		boost::mutex::scoped_lock lock(this->mutex);
+		this->pending_requests[request_number] = request;
+	    }
+	    boost::asio::write(
+		*sock, boost::asio::buffer(
+		    Util::intToString(request_number) +
+		    " " + request->text + "\n"));
 	}
     }
 }
@@ -134,10 +220,43 @@ JavaBuilder::handler()
 void
 JavaBuilder::run_java(unsigned short port)
 {
-    // XXX
-    std::ostringstream buf;
-    buf << "java -classpath"
-	<< " ../java/abuild-java/dist/request-handler.jar"
-	<< " com.example.handler.JavaBuilder " << port;
-    system(buf.str().c_str());
+    boost::regex jar_re(".*\\.(?i:jar)");
+    boost::smatch match;
+
+    // XXX verbose messages including each dir and each jar?
+    std::set<std::string, Util::StringCaseLess> jars_found;
+    std::list<std::string> jars;
+    for (std::list<std::string>::const_iterator liter = this->libdirs.begin();
+	 liter != this->libdirs.end(); ++liter)
+    {
+	std::string const& dir = *liter;
+	std::vector<std::string> entries = Util::getDirEntries(dir);
+	for (std::vector<std::string>::iterator eiter = entries.begin();
+	     eiter != entries.end(); ++eiter)
+	{
+	    std::string const& base = *eiter;
+	    if (boost::regex_match(base, match, jar_re))
+	    {
+		std::string full = dir + "/" + base;
+		jars.push_back(full);
+		jars_found.insert(base);
+	    }
+	}
+    }
+
+    if (jars_found.count("abuild-java-support.jar") == 0)
+    {
+	// XXX give more information or include libdirs in verbose
+	throw QEXC::General("abuild-java-support.jar not found");
+    }
+
+    std::vector<std::string> args;
+    args.push_back("java");
+    args.push_back("-classpath");
+    args.push_back(Util::join(Util::pathSeparator(), jars));
+    args.push_back("org.abuild.support.JavaBuilder");
+    args.push_back(Util::intToString(port));
+
+    std::map<std::string, std::string> environment;
+    Util::runProgram(this->java, args, environment, this->envp, ".");
 }

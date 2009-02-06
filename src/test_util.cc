@@ -1,4 +1,5 @@
 #include <Util.hh>
+#include <set>
 #include <sstream>
 #include <iostream>
 
@@ -111,6 +112,19 @@ int main()
     test_str("123x", "123X");
     test_str("ORANGE", "apple");
     test_str("APPLE", "orange");
+
+    std::set<std::string, Util::StringCaseLess> strings;
+    strings.insert("apple");
+    strings.insert("ORANGE");
+    for (std::set<std::string>::iterator iter = strings.begin();
+	 iter != strings.end(); ++iter)
+    {
+	std::cout << *iter << std::endl;
+    }
+    if (strings.count("orange"))
+    {
+	std::cout << "orange found" << std::endl;
+    }
 
     // glob to regex
     test_glob_to_regex("*");

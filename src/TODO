@@ -1,4 +1,11 @@
 
+XXX current state:
+
+Implemented basic ant runner.  Still need to resolve several XXX
+comments and to deal with bootstrapping issues.  Currently an old
+version of abulid is required to build abuild-java-support.
+
+
 === Changes Targeted for Version 1.1 ===
 
 Changes to document
@@ -14,6 +21,12 @@ documentation.
    non-existent child directories without any additional checking.  We
    no longer require the path to exist relative to the backing tree.
 
+
+Licensing
+=========
+
+ * Embedding groovy and ant; need to comply with Apache license and
+   create NOTICE.txt file.
 
 Core Changes
 ============

@@ -15,6 +15,7 @@
 #include <Interface.hh>
 #include <PlatformData.hh>
 #include <PlatformSelector.hh>
+#include <JavaBuilder.hh>
 
 class Logger;
 class ItemConfig;
@@ -115,7 +116,7 @@ class Abuild
     bool buildBuildset();
     bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);
     void findGnuMakeInPath();
-    void findAnt();
+    void findJava();
     bool isThisItemThisPlatform(std::string const& name,
 				std::string const& platform);
     bool isThisItem(std::string const& name, std::string const& platform);
@@ -256,8 +257,7 @@ class Abuild
     bool have_perl;
 #endif
     std::string gmake;
-    std::string ant;
-    std::string ant_library;
+    boost::shared_ptr<JavaBuilder> java_builder;
     DependencyGraph build_graph;
     boost::shared_ptr<Interface> base_interface;
     std::vector<std::string> buildset_reverse_order;

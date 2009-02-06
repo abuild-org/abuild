@@ -202,6 +202,11 @@ Abuild::runInternal()
         okay = buildBuildset();
     }
 
+    if (this->java_builder)
+    {
+	this->java_builder->finish();
+    }
+
     if (! okay)
     {
 	error("at least one build failure occurred; summary follows");
@@ -303,7 +308,7 @@ Abuild::parseArgv()
 	}
 	else if (arg == "--no-abuild-logger")
 	{
-	    this->use_abuild_logger = false;
+	    this->use_abuild_logger = false; // XXX
 	}
 	else if (arg == "-C")
 	{
@@ -3591,7 +3596,7 @@ Abuild::buildBuildset()
     }
     if (need_ant)
     {
-	findAnt();
+	findJava();
     }
 
     boost::function<bool(std::string const&, std::string const&)> filter;
@@ -3946,89 +3951,60 @@ Abuild::findGnuMakeInPath()
 }
 
 void
-Abuild::findAnt()
+Abuild::findJava()
 {
-    boost::regex ant_re("Apache Ant version (\\d+)\\.(\\d+).*");
-    boost::smatch match;
-
     std::list<std::string> candidates;
     std::string ant_home;
-    if (Util::getEnv("ANT_HOME", &ant_home))
+    if (Util::getEnv("JAVA_HOME", &ant_home))
     {
-	candidates.push_back(Util::canonicalizePath(ant_home + "/bin/ant"));
+	candidates.push_back(Util::canonicalizePath(ant_home + "/bin/java"));
     }
     else
     {
-	candidates = Util::findProgramInPath("ant");
+	candidates = Util::findProgramInPath("java");
     }
-    for (std::list<std::string>::iterator iter = candidates.begin();
-	 iter != candidates.end(); ++iter)
+    std::string java;
+    if (! candidates.empty())
     {
-	std::string const& candidate = *iter;
-	try
-	{
-	    std::string version_string =
-		Util::getProgramOutput("\"" + candidate + "\" -version");
-	    if (boost::regex_match(version_string, match, ant_re))
-	    {
-		int major_version = atoi(match[1].str().c_str());
-		int minor_version = atoi(match[2].str().c_str());
-		if (((major_version == 1) && (minor_version >= 7)) ||
-		    (major_version > 1))
-		{
-		    this->ant = candidate;
-		    break;
-		}
-	    }
-	}
-	catch (QEXC::General)
-	{
-	    // This isn't Apache Ant; try the next candidate.
-	}
+	java = candidates.front();
     }
-
-    if (this->ant.empty())
+    if (java.empty())
     {
-	fatal("ant >= 1.7 is required");
+	fatal("A java runtime environment (>= 1.5) is required");
+    }
+    else
+    {
+	verbose("found java: " + java);
     }
 
-    // If we found ant, try finding the AbuildLogger.  As a special
-    // case, if we are running out of the source tree, try to find it
-    // in the build directory.  Otherwise, try to find it in lib.
-
+    std::list<std::string> java_libdirs;
     std::string abuild_dir = Util::dirname(this->program_fullpath);
     std::string base = Util::basename(abuild_dir);
     if (base.substr(0, OUTPUT_DIR_PREFIX.length()) == OUTPUT_DIR_PREFIX)
     {
 	std::string candidate =
 	    abuild_dir +
-	    "/../java-support/abuild-java/dist/abuild-java-support.jar";
-	// We're running from the source directory
-	if (Util::isFile(candidate))
+	    "/../java-support/abuild-java/dist";
+	if (Util::isDirectory(candidate))
 	{
-	    this->ant_library = candidate;
+	    // We're running from the source directory
+	    java_libdirs.push_back(
+		Util::canonicalizePath(candidate));
 	}
     }
-
-    // XXX check this comment:
-
-    // Abuild with ant will fail without ant_library except when
-    // bootstrapping because it will try to load a custom ant task.
-    // We handle bootstrapping by setting a property in java-support's
-    // Abuild-ant.properties.  When not bootstrapping, it would be
-    // nice if we could fail here if abuild-ant-library.jar is not
-    // found, but this would require us to actually invoke abuild with
-    // special flags during the bootstrapping process or to otherwise
-    // be able to tell.
-    if (this->ant_library.empty())
+    if (Util::isDirectory(this->abuild_top + "/lib"))
     {
-	std::string candidate =
-	    this->abuild_top + "/lib/abuild-java-support.jar";
-	if (Util::isFile(candidate))
-	{
-	    this->ant_library = candidate;
-	}
+	java_libdirs.push_back(this->abuild_top + "/lib");
     }
+
+    // XXX Probably need JAVA_HOME and ANT_HOME to do this.  Not sure
+    // though...what does groovy's antBuilder do to get the required
+    // jar files?  Anyway, we almost surely need that stuff if we're
+    // going to support straight ant with XML.
+    java_libdirs.push_back("/opt/tps/packages/indep/apache-ant-1.7.0-1/lib");
+    java_libdirs.push_back("/opt/tps/packages/linux.ix86/jdk-1.5.0_11-1/lib");
+
+    this->java_builder.reset(new JavaBuilder(java, java_libdirs, this->envp));
 }
 
 bool
@@ -4726,13 +4702,6 @@ Abuild::invoke_ant(std::string const& item_name,
 	<< Util::join(",", plugin_paths)
 	<< "\n";
 
-    std::string path_element_separator;
-#ifdef _WIN32
-    path_element_separator = ";";
-#else
-    path_element_separator = ":";
-#endif
-
     // Output variables based on the item's interface object.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
@@ -4747,7 +4716,7 @@ Abuild::invoke_ant(std::string const& item_name,
         dyn << name << "=";
 	if (info.type == Interface::t_filename)
 	{
-	    dyn << Util::join(path_element_separator, info.value);
+	    dyn << Util::join(Util::pathSeparator(), info.value);
 	}
 	else
 	{
@@ -4758,38 +4727,29 @@ Abuild::invoke_ant(std::string const& item_name,
 
     dyn.close();
 
-    std::vector<std::string> ant_argv;
-    ant_argv.push_back(this->ant);
-    ant_argv.push_back("-f");
+    std::string build_file;
     if (build_item.hasAntBuild())
     {
-	ant_argv.push_back(build_item.getAbsolutePath() + "/" +
-			   build_item.getBuildFile());
+	build_file = build_item.getAbsolutePath() + "/" +
+	    build_item.getBuildFile();
     }
     else
     {
-	ant_argv.push_back(this->abuild_top + "/ant/abuild.xml");
+	build_file = this->abuild_top + "/ant/abuild.xml";
     }
-    ant_argv.push_back("-Dbasedir=" + dir);
-    ant_argv.insert(ant_argv.end(),
-		    this->ant_args.begin(), this->ant_args.end());
-    if (! this->ant_library.empty())
+
+    if (this->max_workers == 1)
     {
-	ant_argv.push_back("-lib");
-	ant_argv.push_back(Util::dirname(this->ant_library));
-	if (this->use_abuild_logger)
-	{
-	    ant_argv.push_back("-logger");
-	    ant_argv.push_back("org.abuild.ant.AbuildLogger");
-	}
+	// XXX duplicated with invokeBackend
+
+        // If we have only one thread, then only one thread is using
+        // the logger.  Flush the logger before we run the backend to
+        // prevent its output from being interleaved with our own.
+        this->logger.flushLog();
     }
 
-    ant_argv.insert(ant_argv.end(),
-		    targets.begin(), targets.end());
-
-    return invokeBackend(this->ant, ant_argv,
-			 std::map<std::string, std::string>(),
-			 this->envp, dir);
+    // XXX ant_args
+    return this->java_builder->invokeAnt(build_file, dir, targets);
 }
 
 bool

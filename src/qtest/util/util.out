@@ -31,6 +31,9 @@ qwer cmp QWERTY = -1
 123x cmp 123X = 0
 ORANGE cmp apple = 1
 APPLE cmp orange = -1
+apple
+ORANGE
+orange found
 * -> [^/]*
 *.* -> [^/]*\.[^/]*
 a.b.c -> a\.b\.c

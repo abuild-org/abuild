@@ -30,6 +30,18 @@ namespace Util
     // < s2, -1 if s1 > s2, or 0 otherwise.
     int strCaseCmp(std::string const& s1, std::string const& s2);
 
+    // A comparator class suitable for use as the comparator template
+    // argument for map or set to get case-insensitive string
+    // comparison
+    class StringCaseLess
+    {
+      public:
+	bool operator()(std::string const& a, std::string const& b) const
+	{
+	    return (Util::strCaseCmp(a, b) < 0);
+	}
+    };
+
     // Split a string into components using the given separator
     std::list<std::string> split(char sep, std::string input);
 
@@ -193,6 +205,9 @@ namespace Util
     // strings matched by the given file glob.  Throws an exception if
     // the glob is invalid.
     std::string globToRegex(std::string const& glob);
+
+    // Return the Java path separator appropriate for this platform
+    std::string pathSeparator();
 };
 
 #endif // __UTIL_HH__

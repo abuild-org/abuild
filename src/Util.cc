@@ -1378,3 +1378,13 @@ Util::globToRegex(std::string const& glob)
 
     return result;
 }
+
+std::string
+Util::pathSeparator()
+{
+#ifdef _WIN32
+    return ";";
+#else
+    return ":";
+#endif
+}

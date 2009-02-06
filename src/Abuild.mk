@@ -7,7 +7,7 @@ endif
 BOOST_LIB_SUFFIX ?=
 # MSVC doesn't require explicitly naming of boost libraries
 ifneq ($(CCXX_TOOLCHAIN), msvc)
-LIBS += boost_thread$(BOOST_LIB_SUFFIX) boost_regex$(BOOST_LIB_SUFFIX)
+LIBS += $(foreach L,thread regex system,boost_$(L)$(BOOST_LIB_SUFFIX))
 endif
 ifneq ($(ABUILD_PLATFORM_OS),windows)
 ifneq ($(ABUILD_PLATFORM_OS),darwin)
