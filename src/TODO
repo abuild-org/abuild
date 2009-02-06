@@ -7,6 +7,9 @@ Changes to document
 These changes have already been made and need to make it into the
 documentation.
 
+ * boost >= 1.35 is now required to build abuild because it uses the
+   asio library.
+
  * When traversing a build tree with a backing area, accept
    non-existent child directories without any additional checking.  We
    no longer require the path to exist relative to the backing tree.
