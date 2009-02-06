@@ -17,6 +17,8 @@ documentation.
  * boost >= 1.35 is now required to build abuild because it uses the
    asio library.
 
+ * Java >= 1.5 is now required because of thread pools.
+
  * When traversing a build tree with a backing area, accept
    non-existent child directories without any additional checking.  We
    no longer require the path to exist relative to the backing tree.
