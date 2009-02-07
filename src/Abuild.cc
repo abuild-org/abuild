@@ -3954,10 +3954,10 @@ void
 Abuild::findJava()
 {
     std::list<std::string> candidates;
-    std::string ant_home;
-    if (Util::getEnv("JAVA_HOME", &ant_home))
+    std::string java_home;
+    if (Util::getEnv("JAVA_HOME", &java_home))
     {
-	candidates.push_back(Util::canonicalizePath(ant_home + "/bin/java"));
+	candidates.push_back(Util::canonicalizePath(java_home + "/bin/java"));
     }
     else
     {
@@ -3997,12 +3997,22 @@ Abuild::findJava()
 	java_libdirs.push_back(this->abuild_top + "/lib");
     }
 
+    if (! Util::getEnv("JAVA_HOME", &java_home))
+    {
+	fatal("XXX JAVA_HOME must be set");
+    }
+    std::string ant_home;
+    if (! Util::getEnv("ANT_HOME", &ant_home))
+    {
+	fatal("XXX ANT_HOME must be set");
+    }
+
     // XXX Probably need JAVA_HOME and ANT_HOME to do this.  Not sure
     // though...what does groovy's antBuilder do to get the required
     // jar files?  Anyway, we almost surely need that stuff if we're
     // going to support straight ant with XML.
-    java_libdirs.push_back("/opt/tps/packages/indep/apache-ant-1.7.0-1/lib");
-    java_libdirs.push_back("/opt/tps/packages/linux.ix86/jdk-1.5.0_11-1/lib");
+    java_libdirs.push_back(ant_home + "/lib");
+    java_libdirs.push_back(java_home + "/lib");
 
     this->java_builder.reset(new JavaBuilder(java, java_libdirs, this->envp));
 }
@@ -4748,8 +4758,8 @@ Abuild::invoke_ant(std::string const& item_name,
         this->logger.flushLog();
     }
 
-    // XXX ant_args
-    return this->java_builder->invokeAnt(build_file, dir, targets);
+    return this->java_builder->invokeAnt(
+	build_file, dir, targets, this->ant_args);
 }
 
 bool

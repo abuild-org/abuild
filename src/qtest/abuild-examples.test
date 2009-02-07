@@ -455,12 +455,6 @@ if ($test_java)
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
-    $td->runtest("ant -p",
-		 {$td->COMMAND => "abuild --ant -p"},
-		 {$td->REGEXP => ".*Build anything needed.*",
-		  $td->EXIT_STATUS => 0});
-
-
     # Test different Java archive types
 
     cd("work/archive-types");
@@ -837,5 +831,5 @@ check_work_accessed($td);
 
 $td->report(73 +
 	    (in_windows() ? 0 : 1) +
-	    ($test_java ? 19 : 0) +
+	    ($test_java ? 18 : 0) +
 	    ($have_whole_archive ? 2 : 1));

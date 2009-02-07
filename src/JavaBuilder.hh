@@ -18,7 +18,8 @@ class JavaBuilder
 		std::list<std::string> const& libdirs,
 		char* envp[]);
     bool invokeAnt(std::string const& build_file, std::string const& basedir,
-		   std::list<std::string> const& targets);
+		   std::list<std::string> const& targets,
+		   std::list<std::string> const& ant_args);
     void finish();
 
   private:
@@ -27,6 +28,7 @@ class JavaBuilder
 
     bool makeRequest(std::string const& request);
     void start();
+    void cleanup();
     void reader();
     void handler();
     void run_java(unsigned short port);
@@ -38,20 +40,23 @@ class JavaBuilder
     class Request
     {
       public:
-	Request() :
-	    shutdown(true)
+	enum request_type_e { rt_shutdown, rt_break, rt_normal };
+	Request(request_type_e t) :
+	    request_type(t)
 	{
 	}
 	Request(std::string const& text) :
-	    shutdown(false),
+	    request_type(rt_normal),
 	    text(text)
 	{
 	}
-	bool shutdown;
+	request_type_e request_type;
 	std::string text;
 	ThreadSafeQueue<bool> response;
     };
     typedef boost::shared_ptr<Request> Request_ptr;
+
+    enum run_mode_e { rm_idle, rm_running, rm_shutting_down, rm_degraded };
 
     boost::mutex mutex;
     boost::condition running_cond;
@@ -59,8 +64,7 @@ class JavaBuilder
     std::string java;
     std::list<std::string> libdirs;
     char** envp;
-    bool running;
-    bool shutting_down;
+    run_mode_e run_mode;
     boost::asio::io_service io_service;
     socket_ptr sock;
     thread_ptr reader_thread;

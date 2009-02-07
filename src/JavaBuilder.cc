@@ -2,6 +2,7 @@
 
 #include <Util.hh>
 #include <QEXC.hh>
+#include <QTC.hh>
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <set>
@@ -16,18 +17,19 @@ JavaBuilder::JavaBuilder(std::string const& java,
     java(java),
     libdirs(libdirs),
     envp(envp),
-    running(false),
-    shutting_down(false)
+    run_mode(rm_idle)
 {
 }
 
 bool
 JavaBuilder::invokeAnt(std::string const& build_file,
 		       std::string const& basedir,
-		       std::list<std::string> const& targets)
+		       std::list<std::string> const& targets,
+		       std::list<std::string> const& ant_args)
 {
-    return makeRequest("ant " + build_file + " " + basedir + " " +
-		       Util::join(" ", targets));
+    return makeRequest("ant\001" + build_file + "\001" + basedir + "\001" +
+		       Util::join(" ", targets) + "\001" +
+		       Util::join(" ", ant_args) + "\001" + "|");
 }
 
 bool
@@ -35,7 +37,7 @@ JavaBuilder::makeRequest(std::string const& message)
 {
     {
 	boost::mutex::scoped_lock lock(this->mutex);
-	if (this->shutting_down)
+	if (this->run_mode == rm_shutting_down)
 	{
 	    throw std::logic_error("makeRequest called while shutting down");
 	}
@@ -52,19 +54,24 @@ JavaBuilder::finish()
 {
     {
 	boost::mutex::scoped_lock lock(this->mutex);
-	if (! this->running)
+	if (this->run_mode != rm_running)
 	{
 	    return;
 	}
     }
-    Request_ptr shutdown(new Request());
+    Request_ptr shutdown(new Request(Request::rt_shutdown));
     this->requests.enqueue(shutdown);
+    cleanup();
+}
+
+void
+JavaBuilder::cleanup()
+{
     this->reader_thread->join();
     boost::mutex::scoped_lock lock(this->mutex);
     this->sock.reset();
     this->reader_thread.reset();
-    this->shutting_down = false;
-    this->running = false;
+    this->run_mode = rm_idle;
 }
 
 void
@@ -72,14 +79,25 @@ JavaBuilder::start()
 {
     boost::mutex::scoped_lock lock(this->mutex);
 
-    if (this->running)
+    switch (this->run_mode)
     {
+      case rm_running:
 	return;
+
+      case rm_degraded:
+	cleanup();
+	break;
+
+      case rm_shutting_down:
+	throw std::logic_error("makeRequest called while shutting down");
+
+      default:
+	break;
     }
 
     this->reader_thread.reset(
 	new boost::thread(boost::bind(&JavaBuilder::reader, this)));
-    while (! this->running)
+    while (this->run_mode != rm_running)
     {
 	this->running_cond.wait(this->mutex);
     }
@@ -114,7 +132,7 @@ JavaBuilder::reader()
 	boost::bind(&JavaBuilder::handler, this));
 
     // Main read loop
-    this->running = true;
+    this->run_mode = rm_running;
     this->running_cond.notify_all();
     std::string accumulated_response;
     while (true)
@@ -131,11 +149,23 @@ JavaBuilder::reader()
 	{
 	    throw boost::system::system_error(error);
 	}
-	else if (! this->shutting_down)
+	else if (this->run_mode == rm_running)
 	{
 	    accumulated_response += std::string(data, length);
 	    handleResponse(accumulated_response);
 	}
+    }
+
+    {
+	boost::mutex::scoped_lock lock(this->mutex);
+	if (this->run_mode == rm_running)
+	{
+	    // The java side exited unexpectedly
+	    QTC::TC("abuild", "JavaBuilder handle abnormal java exit");
+	    this->run_mode = rm_degraded;
+	}
+	Request_ptr r(new Request(Request::rt_break));
+	this->requests.enqueue(r);
     }
 
     handler_thread.join();
@@ -180,24 +210,29 @@ JavaBuilder::handleResponse(std::string& responses)
     }
 }
 
+static bool
+asio_completion_condition(boost::system::error_code&, std::size_t)
+{
+    return true;
+}
+
 void
 JavaBuilder::handler()
 {
     while (true)
     {
 	Request_ptr request = this->requests.dequeue();
-	if (request->shutdown)
+	if (request->request_type == Request::rt_shutdown)
 	{
-	    boost::asio::write(*sock, boost::asio::buffer("shutdown\n"));
-	    boost::mutex::scoped_lock lock(this->mutex);
-	    for (std::map<int, Request_ptr>::iterator iter =
-		     this->pending_requests.begin();
-		 iter != this->pending_requests.end(); ++iter)
-	    {
-		(*iter).second->response.enqueue(false);
-	    }
-	    this->pending_requests.clear();
-	    this->shutting_down = true;
+	    this->run_mode = rm_shutting_down;
+	    boost::system::error_code error;
+	    boost::asio::write(*sock, boost::asio::buffer("shutdown\n"),
+			       asio_completion_condition, error);
+	    // ignore error condition
+	    break;
+	}
+	else if (request->request_type == Request::rt_break)
+	{
 	    break;
 	}
 	else
@@ -215,6 +250,15 @@ JavaBuilder::handler()
 		    " " + request->text + "\n"));
 	}
     }
+
+    boost::mutex::scoped_lock lock(this->mutex);
+    for (std::map<int, Request_ptr>::iterator iter =
+	     this->pending_requests.begin();
+	 iter != this->pending_requests.end(); ++iter)
+    {
+	(*iter).second->response.enqueue(false);
+    }
+    this->pending_requests.clear();
 }
 
 void

@@ -24,19 +24,46 @@ public class AntRunner
     // See getAntVersion in Main.java as well.
 
     public boolean runAnt(String buildFileName, String dirName,
-			  Vector<String> targets)
+			  Vector<String> targets,
+			  Vector<String> otherArgs)
     {
+	// Parse command line arguments.
+	// XXX Some are ignored.  Do something about it.
+	boolean keepGoing = false;
+	boolean emacsMode = false;
+	for (String arg: otherArgs)
+	{
+	    if (arg.equals("-emacs") || arg.equals("-e"))
+	    {
+                emacsMode = true;
+            }
+	    else if (arg.equals("-k") || arg.equals("-keep-going"))
+	    {
+                keepGoing = true;
+	    }
+	    else if (arg.startsWith("-D"))
+	    {
+		// XXX
+	    }
+	    else
+	    {
+		// XXX otherArgs
+	    }
+	}
+
 	System.out.println("Buildfile: " + buildFileName);
 	File buildFile = new File(buildFileName);
 	File dir = new File(dirName);
 	Project p = new Project();
+	p.setKeepGoingMode(keepGoing);
 	p.setUserProperty(MagicNames.ANT_FILE, buildFile.getAbsolutePath());
 	p.setUserProperty(MagicNames.PROJECT_BASEDIR, dir.getAbsolutePath());
-	DefaultLogger consoleLogger = new AbuildLogger();
-	consoleLogger.setErrorPrintStream(System.err);
-	consoleLogger.setOutputPrintStream(System.out);
-	consoleLogger.setMessageOutputLevel(Project.MSG_INFO);
-	p.addBuildListener(consoleLogger);
+	DefaultLogger logger = new AbuildLogger();
+	logger.setErrorPrintStream(System.err);
+	logger.setOutputPrintStream(System.out);
+	logger.setMessageOutputLevel(Project.MSG_INFO);
+	logger.setEmacsMode(emacsMode);
+	p.addBuildListener(logger);
 	BuildException error = null;
 	try
 	{

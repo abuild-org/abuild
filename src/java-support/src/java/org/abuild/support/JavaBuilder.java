@@ -24,7 +24,7 @@ class JavaBuilder
 	throws IOException
     {
 	SocketFactory factory = SocketFactory.getDefault();
-	this.socket = (Socket) factory.createSocket("127.0.0.1", port);
+	this.socket = factory.createSocket("127.0.0.1", port);
 	this.responseStream = new PrintStream(this.socket.getOutputStream());
     }
 
@@ -126,21 +126,33 @@ class JavaBuilder
     boolean runAnt(String[] args)
     {
 	boolean status = false;
-	if (args.length < 4)
+	if (args.length != 6)
 	{
 	    System.err.println(
-		"JavaBuilder received ant command with fewer than 4 arguments");
+		"JavaBuilder received ant command with other than 6 arguments");
+	    for (String arg: args)
+	    {
+		System.err.println("  " + arg);
+	    }
 	}
 	else
 	{
 	    String build_file = args[1];
 	    String dir = args[2];
+	    String targets_str = args[3];
+	    String other_args_str = args[4];
 	    Vector<String> targets = new Vector<String>();
-	    for (int i = 3; i < args.length; ++i)
+	    Vector<String> other_args = new Vector<String>();
+	    for (String t: targets_str.split(" "))
 	    {
-		targets.add(args[i]);
+		targets.add(t);
 	    }
-	    status = new AntRunner().runAnt(build_file, dir, targets);
+	    for (String t: other_args_str.split(" "))
+	    {
+		other_args.add(t);
+	    }
+	    status = new AntRunner().runAnt(
+		build_file, dir, targets, other_args);
 	}
 
 	return status;
@@ -159,13 +171,21 @@ class JavaBuilder
 
 	public void run()
 	{
-	    // XXX handle command
-	    String[] args = this.command.split(" ");
+	    String[] args = this.command.split("\001");
 	    boolean status = false;
 	    if (args.length == 0)
 	    {
 		System.err.println(
 		    "JavaBuilder protocol error: received empty command");
+	    }
+	    else if (! args[args.length - 1].equals("|"))
+	    {
+		System.err.println(
+		    "JavaBuilder protocol error: command did not end with |");
+		for (String arg: args)
+		{
+		    System.err.println("  " + arg);
+		}
 	    }
 	    else if (args[0].equals("ant"))
 	    {

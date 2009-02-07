@@ -19,6 +19,9 @@ documentation.
 
  * Java >= 1.5 is now required because of thread pools.
 
+ * ant is no longer launched using the ant script.  As such, certain
+   arguments, such as -p, are no longer supported.
+
  * When traversing a build tree with a backing area, accept
    non-existent child directories without any additional checking.  We
    no longer require the path to exist relative to the backing tree.
