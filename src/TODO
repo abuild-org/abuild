@@ -5,6 +5,8 @@ Implemented basic ant runner.  Still need to resolve several XXX
 comments and to deal with bootstrapping issues.  Currently an old
 version of abulid is required to build abuild-java-support.
 
+abuild-old -C java-support --ant -lib ../lib/groovy-all-1.5.7.jar
+
 Also implemented basic groovy support.  Need to resolve XXX comments
 here as well.
 
