@@ -1,0 +1,19 @@
+class ABDynamic extends Script { Object run() {
+
+abuild.ifc['dir.qwer'] = '--topdir--/dynamic'
+abuild.ifc['abuild_top'] = '--abuild-dir--'
+abuild.ifc['plugins'] = []
+abuild.ifc['ABUILD_OUTPUT_DIR'] = '.'
+abuild.ifc['ABUILD_PLATFORM'] = 'indep'
+abuild.ifc['ABUILD_PLATFORM_TYPE'] = 'indep'
+abuild.ifc['ABUILD_STDOUT_IS_TTY'] = false
+abuild.ifc['ABUILD_TARGET_TYPE'] = 'platform-independent'
+abuild.ifc['ABUILD_THIS'] = 'qwer'
+abuild.ifc['moo'] = []
+abuild.ifc['potato'] = ['one', 'two', 'three']
+abuild.ifc['quack'] = ''
+abuild.ifc['spackle'] = 'one two three'
+abuild.ifc['truth1'] = true
+abuild.ifc['truth2'] = [false, true, false]
+
+}}

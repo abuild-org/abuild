@@ -19,6 +19,7 @@ std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
+std::string const Abuild::FILE_DYNAMIC_GROOVY = ".ab-dynamic.groovy";
 std::string const Abuild::FILE_INTERFACE_DUMP = ".ab-interface-dump";
 std::string const Abuild::b_ALL = "all";
 std::string const Abuild::b_LOCAL = "local";
@@ -3494,7 +3495,7 @@ Abuild::buildBuildset()
 
     bool some_native_items_skipped = false;
     bool need_gmake = false;
-    bool need_ant = false;
+    bool need_java = false;
     for (std::vector<std::string>::const_iterator iter =
 	     this->buildset_reverse_order.begin();
 	 iter != this->buildset_reverse_order.end(); ++iter)
@@ -3516,7 +3517,8 @@ Abuild::buildBuildset()
 		break;
 
 	      case ItemConfig::b_ant:
-		need_ant = true;
+	      case ItemConfig::b_groovy:
+		need_java = true;
 		break;
 
 	      case ItemConfig::b_none:
@@ -3538,7 +3540,7 @@ Abuild::buildBuildset()
 	}
     }
 
-    if ((! need_ant) && (! need_gmake) && some_native_items_skipped)
+    if ((! need_java) && (! need_gmake) && some_native_items_skipped)
     {
 	QTC::TC("abuild", "Abuild some native items skipped");
 	info("some native items were skipped because there are"
@@ -3594,7 +3596,7 @@ Abuild::buildBuildset()
     {
 	findGnuMakeInPath();
     }
-    if (need_ant)
+    if (need_java)
     {
 	findJava();
     }
@@ -4014,7 +4016,10 @@ Abuild::findJava()
     java_libdirs.push_back(ant_home + "/lib");
     java_libdirs.push_back(java_home + "/lib");
 
-    this->java_builder.reset(new JavaBuilder(java, java_libdirs, this->envp));
+    this->java_builder.reset(
+	new JavaBuilder(
+	    this->error_handler, this->abuild_top,
+	    java, java_libdirs, this->envp));
 }
 
 bool
@@ -4493,6 +4498,11 @@ Abuild::buildItem(std::string const& item_name,
 			    abs_output_dir, backend_targets);
 	break;
 
+      case ItemConfig::b_groovy:
+	result = invoke_groovy(item_name, item_platform, build_item,
+			       abs_output_dir, backend_targets);
+	break;
+
       default:
 	fatal("unknown backend type for build item " + item_name);
 	break;
@@ -4760,6 +4770,144 @@ Abuild::invoke_ant(std::string const& item_name,
 
     return this->java_builder->invokeAnt(
 	build_file, dir, targets, this->ant_args);
+}
+
+bool
+Abuild::invoke_groovy(std::string const& item_name,
+		      std::string const& item_platform,
+		      BuildItem& build_item,
+		      std::string const& dir,
+		      std::list<std::string> const& targets)
+{
+    // XXX we're not doing anything to protect against groovy syntax
+    // in strings.  Then again, the other backends don't protect their
+    // output either.
+
+    // Create FILE_DYNAMIC_GROOVY
+    std::string dynamic_file = dir + "/" + FILE_DYNAMIC_GROOVY;
+    std::ofstream dyn(dynamic_file.c_str(),
+		      std::ios_base::out |
+		      std::ios_base::trunc);
+    if (! dyn.is_open())
+    {
+        throw QEXC::System("create " + dynamic_file, errno);
+    }
+
+    // We need to create our own script object explicitly so that
+    // groovy won't try to create a java class called ".ab-dynamic",
+    // which is not a legal class name.
+    dyn << "class ABDynamic extends Script { Object run() {"
+	<< std::endl << std::endl;
+
+    // Generate variables that are private to this build and should
+    // not be accessible in and from the item's interface.
+
+    // Generate entries for this item and all its dependencies and
+    // plugins.
+    std::set<std::string> const& references = build_item.getReferences();
+    for (std::set<std::string>::const_iterator iter = references.begin();
+         iter != references.end(); ++iter)
+    {
+        dyn << "abuild.ifc['dir." << *iter << "'] = '"
+	    << this->buildset[*iter]->getAbsolutePath()
+	    << "'" << std::endl;
+    }
+
+    // Generate a property for the top of abuild
+    dyn << "abuild.ifc['abuild_top'] = '"
+	<< this->abuild_top << "'" << std::endl;
+
+    // Generate a list of plugin directories.  We don't provide the
+    // names of plugins because people shouldn't be accessing them,
+    // and this saves us from writing backend code to resolve them
+    // anyway.
+    std::list<std::string> const& plugins = build_item.getPlugins();
+    std::list<std::string> plugin_paths;
+    for (std::list<std::string>::const_iterator iter = plugins.begin();
+	 iter != plugins.end(); ++iter)
+    {
+	plugin_paths.push_back(
+	    Util::absToRel(this->buildset[*iter]->getAbsolutePath(), dir));
+    }
+    dyn << "abuild.ifc['plugins'] = [";
+    if (! plugin_paths.empty())
+    {
+	dyn << "'" << Util::join("', '", plugin_paths)
+	    << "'";
+    }
+    dyn << "]\n";
+
+    // Output variables based on the item's interface object.
+    Interface const& _interface = build_item.getInterface(item_platform);
+    std::map<std::string, Interface::VariableInfo> variables =
+        _interface.getVariablesForTargetType(
+	    build_item.getTargetType(), build_item.getFlagData());
+    for (std::map<std::string, Interface::VariableInfo>::iterator iter =
+             variables.begin();
+         iter != variables.end(); ++iter)
+    {
+        std::string const& name = (*iter).first;
+        Interface::VariableInfo const& info = (*iter).second;
+        dyn << "abuild.ifc['" << name << "'] = ";
+	// Scalars should have at most one value, so we can treat
+	// scalars and lists together.
+	if (info.list_type != Interface::l_scalar)
+	{
+	    dyn << "[";
+	}
+	bool first = true;
+	for (std::deque<std::string>::const_iterator viter = info.value.begin();
+	     viter != info.value.end(); ++viter)
+	{
+	    if (first)
+	    {
+		first = false;
+	    }
+	    else
+	    {
+		dyn << ", ";
+	    }
+	    std::string const& val = *viter;
+	    switch (info.type)
+	    {
+	      case Interface::t_filename:
+		dyn << "'" << Util::absToRel(val, dir) << "'";
+		break;
+
+	      case Interface::t_boolean:
+		dyn << (val == "1" ? "true" : "false");
+		break;
+
+	      default:
+		dyn << "'" << val << "'";
+		break;
+	    }
+	}
+	if (info.list_type != Interface::l_scalar)
+	{
+	    dyn << "]";
+	}
+	dyn << std::endl;
+    }
+
+    dyn << std::endl << "}}" << std::endl;
+
+    dyn.close();
+
+    if (this->max_workers == 1)
+    {
+	// XXX duplicated with invokeBackend
+
+        // If we have only one thread, then only one thread is using
+        // the logger.  Flush the logger before we run the backend to
+        // prevent its output from being interleaved with our own.
+        this->logger.flushLog();
+    }
+
+    // XXX defines
+    std::list<std::string> xxxdefines;
+    return this->java_builder->invokeGroovy(
+	dir, targets, xxxdefines);
 }
 
 bool

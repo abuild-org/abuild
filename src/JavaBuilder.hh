@@ -11,15 +11,21 @@
 #include <map>
 #include "ThreadSafeQueue.hh"
 
+class Error;
+
 class JavaBuilder
 {
   public:
-    JavaBuilder(std::string const& java,
+    JavaBuilder(Error& error, std::string const& abuild_top,
+		std::string const& java,
 		std::list<std::string> const& libdirs,
 		char* envp[]);
     bool invokeAnt(std::string const& build_file, std::string const& basedir,
 		   std::list<std::string> const& targets,
 		   std::list<std::string> const& ant_args);
+    bool invokeGroovy(std::string const& dir,
+		      std::list<std::string> const& targets,
+		      std::list<std::string> const& defines);
     void finish();
 
   private:
@@ -58,9 +64,11 @@ class JavaBuilder
 
     enum run_mode_e { rm_idle, rm_running, rm_shutting_down, rm_degraded };
 
+    Error& error;
     boost::mutex mutex;
     boost::condition running_cond;
     int last_request;
+    std::string abuild_top;
     std::string java;
     std::list<std::string> libdirs;
     char** envp;

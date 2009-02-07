@@ -19,27 +19,30 @@ class JavaBuilder
     private Pattern response_re = Pattern.compile("(\\d+) (.*)");
     private PrintStream responseStream;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
+    private AntRunner antRunner = null;
+    private GroovyRunner groovyRunner = null;
 
-    JavaBuilder(int port)
+    JavaBuilder(String abuildTop, int port)
 	throws IOException
     {
 	SocketFactory factory = SocketFactory.getDefault();
 	this.socket = factory.createSocket("127.0.0.1", port);
 	this.responseStream = new PrintStream(this.socket.getOutputStream());
+	this.antRunner = new AntRunner();
+	this.groovyRunner = new GroovyRunner(
+	    abuildTop + "/groovy/AbuildMain.groovy");
     }
 
     public static void main(String[] args)
     {
-	if (args.length == 0)
-	{
-	    usage();
-	}
 	int port = -1;
-	if (args.length == 1)
+	String abuild_top = null;
+	if (args.length == 2)
 	{
+	    abuild_top = args[0];
 	    try
 	    {
-		port = Integer.parseInt(args[0]);
+		port = Integer.parseInt(args[1]);
 	    }
 	    catch (NumberFormatException e)
 	    {
@@ -52,7 +55,7 @@ class JavaBuilder
 	}
 	try
 	{
-	    new JavaBuilder(port).run();
+	    new JavaBuilder(abuild_top, port).run();
 	}
 	catch (IOException e)
 	{
@@ -63,7 +66,7 @@ class JavaBuilder
 
     private static void usage()
     {
-	System.err.println("Usage: JavaBuilder port");
+	System.err.println("Usage: JavaBuilder abuild_top port");
 	System.exit(2);
     }
 
@@ -151,8 +154,76 @@ class JavaBuilder
 	    {
 		other_args.add(t);
 	    }
-	    status = new AntRunner().runAnt(
+	    status = this.antRunner.runAnt(
 		build_file, dir, targets, other_args);
+	}
+
+	return status;
+    }
+
+    boolean runGroovy(String[] args)
+    {
+	boolean status = false;
+	if (args.length != 5)
+	{
+	    System.err.println(
+		"JavaBuilder received groovy" +
+		" command with other than 5 arguments");
+	    for (String arg: args)
+	    {
+		System.err.println("  " + arg);
+	    }
+	}
+	else
+	{
+	    String dir = args[1];
+	    String targets_str = args[2];
+	    String defines_str = args[3];
+	    Vector<String> targets = new Vector<String>();
+	    Vector<String> defines = new Vector<String>();
+	    for (String t: targets_str.split(" "))
+	    {
+		targets.add(t);
+	    }
+	    for (String t: defines_str.split(" "))
+	    {
+		defines.add(t);
+	    }
+	    status = this.groovyRunner.runGroovy(dir, targets, defines);
+	}
+
+	return status;
+    }
+
+    boolean runCommand(String[] args)
+    {
+	boolean status = false;
+	if (args.length == 0)
+	{
+	    System.err.println(
+		"JavaBuilder protocol error: received empty command");
+	}
+	else if (! args[args.length - 1].equals("|"))
+	{
+	    System.err.println(
+		"JavaBuilder protocol error: command did not end with |");
+	    for (String arg: args)
+	    {
+		System.err.println("  " + arg);
+	    }
+	}
+	else if (args[0].equals("ant"))
+	{
+	    status = runAnt(args);
+	}
+	else if (args[0].equals("groovy"))
+	{
+	    status = runGroovy(args);
+	}
+	else
+	{
+	    System.err.println(
+		"JavaBuilder: unknown command " + args[0]);
 	}
 
 	return status;
@@ -173,30 +244,15 @@ class JavaBuilder
 	{
 	    String[] args = this.command.split("\001");
 	    boolean status = false;
-	    if (args.length == 0)
+	    try
 	    {
-		System.err.println(
-		    "JavaBuilder protocol error: received empty command");
+		status = JavaBuilder.this.runCommand(args);
 	    }
-	    else if (! args[args.length - 1].equals("|"))
+	    catch (Throwable e)
 	    {
-		System.err.println(
-		    "JavaBuilder protocol error: command did not end with |");
-		for (String arg: args)
-		{
-		    System.err.println("  " + arg);
-		}
+		System.err.println("build thread threw exception");
+		e.printStackTrace(System.err);
 	    }
-	    else if (args[0].equals("ant"))
-	    {
-		status = JavaBuilder.this.runAnt(args);
-	    }
-	    else
-	    {
-		System.err.println(
-		    "JavaBuilder: unknown command " + args[0]);
-	    }
-
 	    JavaBuilder.this.sendResponse(number, status);
 	}
     }

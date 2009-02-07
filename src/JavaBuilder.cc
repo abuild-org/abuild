@@ -3,6 +3,8 @@
 #include <Util.hh>
 #include <QEXC.hh>
 #include <QTC.hh>
+#include <Error.hh>
+#include <FileLocation.hh>
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
 #include <set>
@@ -10,10 +12,13 @@
 #include <sstream>
 #include <cstdlib>
 
-JavaBuilder::JavaBuilder(std::string const& java,
+JavaBuilder::JavaBuilder(Error& error, std::string const& abuild_top,
+			 std::string const& java,
 			 std::list<std::string> const& libdirs,
 			 char** envp) :
+    error(error),
     last_request(0),
+    abuild_top(abuild_top),
     java(java),
     libdirs(libdirs),
     envp(envp),
@@ -30,6 +35,16 @@ JavaBuilder::invokeAnt(std::string const& build_file,
     return makeRequest("ant\001" + build_file + "\001" + basedir + "\001" +
 		       Util::join(" ", targets) + "\001" +
 		       Util::join(" ", ant_args) + "\001" + "|");
+}
+
+bool
+JavaBuilder::invokeGroovy(std::string const& dir,
+			  std::list<std::string> const& targets,
+			  std::list<std::string> const& defines)
+{
+    return makeRequest("groovy\001" + dir + "\001" +
+		       Util::join(" ", targets) + "\001" +
+		       Util::join(" ", defines) + "\001" + "|");
 }
 
 bool
@@ -77,24 +92,33 @@ JavaBuilder::cleanup()
 void
 JavaBuilder::start()
 {
-    boost::mutex::scoped_lock lock(this->mutex);
+    bool call_cleanup = false;
 
-    switch (this->run_mode)
     {
-      case rm_running:
-	return;
+	boost::mutex::scoped_lock lock(this->mutex);
+	switch (this->run_mode)
+	{
+	  case rm_running:
+	    return;
 
-      case rm_degraded:
-	cleanup();
-	break;
+	  case rm_degraded:
+	    call_cleanup = true;
+	    break;
 
-      case rm_shutting_down:
-	throw std::logic_error("makeRequest called while shutting down");
+	  case rm_shutting_down:
+	    throw std::logic_error("makeRequest called while shutting down");
 
-      default:
-	break;
+	  default:
+	    break;
+	}
     }
 
+    if (call_cleanup)
+    {
+	cleanup();
+    }
+
+    boost::mutex::scoped_lock lock(this->mutex);
     this->reader_thread.reset(
 	new boost::thread(boost::bind(&JavaBuilder::reader, this)));
     while (this->run_mode != rm_running)
@@ -147,7 +171,11 @@ JavaBuilder::reader()
 	}
 	else if (error)
 	{
-	    throw boost::system::system_error(error);
+	    this->error.error(
+		FileLocation(),
+		"error reading from JavaBuilder: " +
+		error.message() + "; will attempt to recover");
+	    break;
 	}
 	else if (this->run_mode == rm_running)
 	{
@@ -156,16 +184,28 @@ JavaBuilder::reader()
 	}
     }
 
+    bool degraded = false;
     {
 	boost::mutex::scoped_lock lock(this->mutex);
 	if (this->run_mode == rm_running)
 	{
 	    // The java side exited unexpectedly
+	    degraded = true;
 	    QTC::TC("abuild", "JavaBuilder handle abnormal java exit");
 	    this->run_mode = rm_degraded;
 	}
+    }
+    if (degraded)
+    {
 	Request_ptr r(new Request(Request::rt_break));
 	this->requests.enqueue(r);
+	// Degraded mode recovery seems to sometimes cause
+	// segmentation faults within the boost library.  I'm not sure
+	// whether it's my code or theirs.
+	this->error.error(
+	    FileLocation(),
+	    "JavaBuilder exited unexpectedly; will try to recover,"
+	    " but a crash is likely if this is a parallel build");
     }
 
     handler_thread.join();
@@ -222,10 +262,10 @@ JavaBuilder::handler()
     while (true)
     {
 	Request_ptr request = this->requests.dequeue();
+	boost::system::error_code error;
 	if (request->request_type == Request::rt_shutdown)
 	{
 	    this->run_mode = rm_shutting_down;
-	    boost::system::error_code error;
 	    boost::asio::write(*sock, boost::asio::buffer("shutdown\n"),
 			       asio_completion_condition, error);
 	    // ignore error condition
@@ -247,7 +287,18 @@ JavaBuilder::handler()
 	    boost::asio::write(
 		*sock, boost::asio::buffer(
 		    Util::intToString(request_number) +
-		    " " + request->text + "\n"));
+		    " " + request->text + "\n"),
+		asio_completion_condition, error);
+	    if (error)
+	    {
+		this->error.error(
+		    FileLocation(),
+		    "error writing message to JavaBuilder: " +
+		    error.message() + "; will attempt to recover");
+		// Just break....presumably the reader will also get
+		// an error or EOF.
+		break;
+	    }
 	}
     }
 
@@ -299,6 +350,7 @@ JavaBuilder::run_java(unsigned short port)
     args.push_back("-classpath");
     args.push_back(Util::join(Util::pathSeparator(), jars));
     args.push_back("org.abuild.support.JavaBuilder");
+    args.push_back(this->abuild_top);
     args.push_back(Util::intToString(port));
 
     std::map<std::string, std::string> environment;

@@ -160,6 +160,11 @@ class Abuild
 		    BuildItem& build_item,
 		    std::string const& dir,
 		    std::list<std::string> const& targets);
+    bool invoke_groovy(std::string const& item_name,
+		       std::string const& item_platform,
+		       BuildItem& build_item,
+		       std::string const& dir,
+		       std::list<std::string> const& targets);
     bool invokeBackend(std::string const& progname,
 		       std::vector<std::string> const& args,
 		       std::map<std::string, std::string> const& environment,
@@ -183,6 +188,7 @@ class Abuild
     static std::string const FILE_BACKING;
     static std::string const FILE_DYNAMIC_MK;
     static std::string const FILE_DYNAMIC_ANT;
+    static std::string const FILE_DYNAMIC_GROOVY;
     static std::string const FILE_INTERFACE_DUMP;
     static std::string const b_ALL;
     static std::string const b_LOCAL;

@@ -1,0 +1,7 @@
+abuild: a (abuild-indep): all
+This mis-behaved build item is causing abuild's java builder to exit.
+abuild: ERROR: JavaBuilder exited unexpectedly; will try to recover, but a crash is likely if this is a parallel build
+abuild: a (abuild-indep): build failed
+abuild: b (abuild-indep): all
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: a on platform indep

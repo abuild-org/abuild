@@ -27,6 +27,7 @@ class ItemConfig
     {
 	b_none,
 	b_make,
+	b_groovy,
 	b_ant
     };
 
@@ -87,6 +88,7 @@ class ItemConfig
     static std::string const FILE_MK;
     static std::string const FILE_ANT;
     static std::string const FILE_ANT_BUILD;
+    static std::string const FILE_GROOVY;
 
     static bool initializeStatics();
     static bool statics_initialized;

@@ -1,0 +1,11 @@
+declare potato list string append
+potato = one two three
+declare spackle string
+spackle = one\ two\ three
+declare quack string
+quack =
+declare moo list string prepend
+declare truth1 boolean
+declare truth2 list boolean append
+truth1 = true
+truth2 = false 1 0

@@ -12,6 +12,7 @@ std::string const ItemConfig::FILE_CONF = "Abuild.conf";
 std::string const ItemConfig::FILE_MK = "Abuild.mk";
 std::string const ItemConfig::FILE_INTERFACE = "Abuild.interface";
 std::string const ItemConfig::FILE_ANT = "Abuild-ant.properties";
+std::string const ItemConfig::FILE_GROOVY = "Abuild.groovy";
 std::string const ItemConfig::FILE_ANT_BUILD = "Abuild-ant.xml";
 std::map<std::string, ItemConfig::ItemConfig_ptr> ItemConfig::cache;
 std::string const ItemConfig::k_THIS = "this";
@@ -39,9 +40,7 @@ std::string const ItemConfig::k_PLUGINS = "plugins";
 //    lists of build items
 //
 //  * Colon: a single colon is used to separate the build item from
-//    the platform in the build graph nodes, and a double colon is
-//    used (starting in abuild 1.1) to separate the tree name from the
-//    item name in a fully qualified build item name
+//    the platform in the build graph nodes
 //
 // Carefully consider the implications of adding new legal characters
 // to the names of build items.  As currently specified, build item
@@ -407,6 +406,7 @@ ItemConfig::checkBuildfile()
     maybeSetBuildFile(FILE_MK, count);
     maybeSetBuildFile(FILE_ANT, count);
     maybeSetBuildFile(FILE_ANT_BUILD, count);
+    maybeSetBuildFile(FILE_GROOVY, count);
 
     if (count > 1)
     {
@@ -874,6 +874,10 @@ ItemConfig::getBackend() const
 	if (this->buildfile == FILE_MK)
 	{
 	    result = b_make;
+	}
+	else if (this->buildfile == FILE_GROOVY)
+	{
+	    result = b_groovy;
 	}
 	else
 	{

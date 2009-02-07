@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-groovy-basic") or die;
+
+my $td = new TestDriver("basic groovy");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+
+if (! $test_java)
+{
+    $td->notify("skipping groovy tests");
+    $td->report(0);
+    exit 0;
+}
+
+# This test contains basic groovy-specific functionality tests
+
+setup($td);
+
+cd("work/dynamic");
+
+$td->runtest("groovy dynamic file build",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/groovy-dynamic-run.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("groovy dynamic file",
+	     {$td->FILE => "abuild-indep/.ab-dynamic.groovy",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/groovy-dynamic.out"},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/force-exit");
+
+$td->runtest("JavaBuilder exit",
+	     {$td->COMMAND => "abuild -b all -k",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/force-exit.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
+
+$td->report(4);
