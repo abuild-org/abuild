@@ -2,10 +2,7 @@
 XXX current state:
 
 Implemented basic ant runner.  Still need to resolve several XXX
-comments and to deal with bootstrapping issues.  Currently an old
-version of abulid is required to build abuild-java-support.
-
-abuild-old -C java-support --ant -lib ../lib/groovy-all-1.5.7.jar
+comments and to deal with bootstrapping issues.
 
 Also implemented basic groovy support.  Need to resolve XXX comments
 here as well.
@@ -30,6 +27,7 @@ documentation.
    non-existent child directories without any additional checking.  We
    no longer require the path to exist relative to the backing tree.
 
+ * ./BootstrapJava.groovy to bootstrap java code
 
 Licensing
 =========
