@@ -15,6 +15,12 @@ test_setup();
 my $top = get_top();
 my $filters = get_filters();
 my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+if (! $test_java)
+{
+    $td->notify("skipping ant tests");
+    $td->report(0);
+    exit 0;
+}
 
 # This test contains miscellaneous ant tests.
 
@@ -22,7 +28,8 @@ setup($td);
 
 cd("work/java");
 
-my $java_cygwin = ($test_java && ($^O eq 'cygwin')) ? 1 : 0;
+my $java_cygwin = ($^O eq 'cygwin');
+
 if ($java_cygwin)
 {
     # Test to make sure a java build will work if we don't have perl.
@@ -60,50 +67,32 @@ else
 
 cd("work/ant-qtest");
 
-if ($test_java)
-{
-    # Test failing qtest test suite from ant
+# Test failing qtest test suite from ant
 
-    # In Windows, ant.bat does not return with an abnormal exit status
-    # when the build fails.  This makes it impossible to tell whether
-    # a build failed or not.
-    my $xflag = in_windows() ? $td->EXPECT_FAILURE : 0;
-
-    $td->runtest("failing qtest from ant",
-		 {$td->COMMAND => "abuild check",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/ant-qtest-failure.out",
-		  $td->EXIT_STATUS => 2},
-		 $td->NORMALIZE_NEWLINES | $xflag);
-}
-else
-{
-    # Make sure these files are accessed.
-    system("(tar cf - . | cat > /dev/null)");
-}
+$td->runtest("failing qtest from ant",
+	     {$td->COMMAND => "abuild check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ant-qtest-failure.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/junit");
 
 if ($test_junit)
 {
-    # In Windows, ant.bat does not return with an abnormal exit status
-    # when the build fails.  This makes it impossible to tell whether
-    # a build failed or not.
-    my $xflag = in_windows() ? $td->EXPECT_FAILURE : 0;
-
     $td->runtest("junit with failure",
 		 {$td->COMMAND => "abuild -b all test",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/junit-failure.out",
 		  $td->EXIT_STATUS => 2},
-		 $td->NORMALIZE_NEWLINES | $xflag);
+		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("junit with failure and -k",
 		 {$td->COMMAND => "abuild -k -b all test",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/junit-failure-k.out",
 		  $td->EXIT_STATUS => 2},
-		 $td->NORMALIZE_NEWLINES | $xflag);
+		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("junit with no failures",
 		 {$td->COMMAND => "abuild -d test -C test",
@@ -118,9 +107,24 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
+cd("work/defines");
+
+$td->runtest("command-line property definition",
+	     {$td->COMMAND => ['abuild', 'potato.salad=one two three'],
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/defines.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("no-op",
+	     {$td->COMMAND => "abuild -n",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/no-op.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(1 +
+$td->report(4 +
 	    ($java_cygwin ? 1 : 0) +
-	    ($test_java ? 1 : 0) +
 	    ($test_junit ? 3 : 0));

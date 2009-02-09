@@ -27,24 +27,34 @@ JavaBuilder::JavaBuilder(Error& error, std::string const& abuild_top,
 }
 
 bool
-JavaBuilder::invokeAnt(std::string const& build_file,
-		       std::string const& basedir,
-		       std::list<std::string> const& targets,
-		       std::list<std::string> const& ant_args)
+JavaBuilder::invoke(std::string const& backend,
+		    std::string const& build_file,
+		    std::string const& dir,
+		    std::list<std::string> const& targets,
+		    std::list<std::string> const& other_args,
+		    std::map<std::string, std::string> const& defines)
 {
-    return makeRequest("ant\001" + build_file + "\001" + basedir + "\001" +
+    return makeRequest(backend + "\001" +
+		       build_file + "\001" +
+		       dir + "\001" +
 		       Util::join(" ", targets) + "\001" +
-		       Util::join(" ", ant_args) + "\001" + "|");
+		       Util::join(" ", other_args) + "\001" +
+		       writeDefines(defines) + "\001|");
 }
 
-bool
-JavaBuilder::invokeGroovy(std::string const& dir,
-			  std::list<std::string> const& targets,
-			  std::list<std::string> const& defines)
+std::string
+JavaBuilder::writeDefines(std::map<std::string, std::string> const& defines)
 {
-    return makeRequest("groovy\001" + dir + "\001" +
-		       Util::join(" ", targets) + "\001" +
-		       Util::join(" ", defines) + "\001" + "|");
+    std::ostringstream buf;
+    for (std::map<std::string, std::string>::const_iterator iter =
+	     defines.begin();
+	 iter != defines.end(); ++iter)
+    {
+	std::string const& key = (*iter).first;
+	std::string const& val = (*iter).second;
+	buf << key.length() << " " << key << val.length() << " " << val;
+    }
+    return buf.str();
 }
 
 bool

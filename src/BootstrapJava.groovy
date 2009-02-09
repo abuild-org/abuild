@@ -7,10 +7,9 @@ if (! srcDir.isDirectory())
     System.exit(2)
 }
 File buildDir = new File("java-support/abuild-java")
-File destDir = new File(buildDir.path + "/dist")
-if (! destDir.isDirectory())
+if (! buildDir.isDirectory())
 {
-    destDir.mkdirs()
+    buildDir.mkdirs()
 }
 // XXX Maybe we should use our embedded version of ant, if any, or
 // maybe it's okay to require this for bootstrapping.
@@ -28,18 +27,24 @@ if (! new File(antJar).isFile())
 }
 
 def ant = new AntBuilder()
-ant.project.setProperty('basedir', buildDir.absolutePath)
+ant.project.setBasedir(buildDir.absolutePath)
 // XXX hard-coded groovy?
 ant.taskdef('name': 'groovyc',
             'classname': 'org.codehaus.groovy.ant.Groovyc',
             'classpath': 'lib/groovy-all-1.5.7.jar')
+
+def distDir = 'dist'
+def classesDir = 'classes'
+ant.mkdir('dir': distDir);
+ant.mkdir('dir': classesDir);
+
 // Not sure why includeantruntime doesn't seem to work here...
 ant.javac('deprecation': 'yes',
-          'destdir': buildDir.path,
+          'destdir': classesDir,
           'classpath': antJar,
-          'srcdir': srcDir.path)
-ant.groovyc('destdir': buildDir.path,
-            'srcdir': srcDir.path)
-ant.jar('destfile': destDir.path + '/abuild-java-support.jar',
-        'basedir': buildDir.path,
+          'srcdir': srcDir.absolutePath)
+ant.groovyc('destdir': classesDir,
+            'srcdir': srcDir.absolutePath)
+ant.jar('destfile': distDir + '/abuild-java-support.jar',
+        'basedir': classesDir,
         'includes': '**/*.class')

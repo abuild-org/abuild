@@ -29,6 +29,14 @@ documentation.
 
  * ./BootstrapJava.groovy to bootstrap java code
 
+ * The --ant and --no-abuild-logger arguments have been removed
+
+ * Args of the form VAR=value are now passed to all backends
+
+ * Removed --just-print, --dry-run, --recon; support -n for all
+   backends
+
+
 Licensing
 =========
 
@@ -165,6 +173,8 @@ Core Changes
       built with compiler A on platform P but the default compiler
       everywhere else."  This can probably be done with a combination
       of platform-specific dependencies and platform conditionals.
+
+ * Drop internal "clean" targets and update documentation.
 
 
 Documentation

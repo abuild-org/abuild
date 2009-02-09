@@ -20,12 +20,12 @@ class JavaBuilder
 		std::string const& java,
 		std::list<std::string> const& libdirs,
 		char* envp[]);
-    bool invokeAnt(std::string const& build_file, std::string const& basedir,
-		   std::list<std::string> const& targets,
-		   std::list<std::string> const& ant_args);
-    bool invokeGroovy(std::string const& dir,
-		      std::list<std::string> const& targets,
-		      std::list<std::string> const& defines);
+    bool invoke(std::string const& backend,
+		std::string const& build_file,
+		std::string const& dir,
+		std::list<std::string> const& targets,
+		std::list<std::string> const& other_args,
+		std::map<std::string, std::string> const& defines);
     void finish();
 
   private:
@@ -39,6 +39,7 @@ class JavaBuilder
     void handler();
     void run_java(unsigned short port);
     void handleResponse(std::string& responses);
+    std::string writeDefines(std::map<std::string, std::string> const&);
 
     typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
     typedef boost::shared_ptr<boost::thread> thread_ptr;

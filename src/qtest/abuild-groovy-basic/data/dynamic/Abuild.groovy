@@ -1,1 +1,1 @@
-// empty
+println abuild.defines['potato.salad']

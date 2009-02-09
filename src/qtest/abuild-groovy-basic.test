@@ -30,7 +30,7 @@ setup($td);
 cd("work/dynamic");
 
 $td->runtest("groovy dynamic file build",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => ['abuild', 'potato.salad=one two three'],
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/groovy-dynamic-run.out",
 	      $td->EXIT_STATUS => 0},

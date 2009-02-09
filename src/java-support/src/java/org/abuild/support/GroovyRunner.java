@@ -3,6 +3,7 @@ package org.abuild.support;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
+import java.util.Map;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import groovy.lang.GroovyClassLoader;
@@ -20,15 +21,19 @@ public class GroovyRunner
 	}
 	catch (IOException e)
 	{
-	    // XXX
+	    System.err.println(
+		"abuild: unable to load the abuild groovy builder");
+	    e.printStackTrace(System.err);
 	}
     }
 
     public boolean runGroovy(String dirName,
 			     Vector<String> targets,
-			     Vector<String> defines)
+			     Vector<String> groovyArgs,
+			     Map<String, String> defines)
     {
 	boolean result = false;
+	Exception exc = null;
 	try
 	{
 	    Script script = (Script) groovyClass.newInstance();
@@ -36,6 +41,7 @@ public class GroovyRunner
 	    script.setBinding(binding);
 	    binding.setVariable("buildDirectory", new File(dirName));
 	    binding.setVariable("targets", targets);
+	    binding.setVariable("groovyArgs", groovyArgs);
 	    binding.setVariable("defines", defines);
 	    Object[] args = {};
 	    Object resultObject = script.invokeMethod("run", args);
@@ -46,11 +52,17 @@ public class GroovyRunner
 	}
 	catch (InstantiationException e)
 	{
-	    // XXX
+	    exc = e;
 	}
 	catch (IllegalAccessException e)
 	{
-	    // XXX
+	    exc = e;
+	}
+	if (exc != null)
+	{
+	    System.err.println(
+		"abuild: unable to invoke the abuild groovy builder");
+	    exc.printStackTrace(System.err);
 	}
 	return result;
     }

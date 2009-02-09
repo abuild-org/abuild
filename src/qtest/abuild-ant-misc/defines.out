@@ -1,0 +1,17 @@
+abuild: defines (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/defines/abuild-java/empty
+    [mkdir] Created dir: --topdir--/defines/abuild-java/classes
+    [mkdir] Created dir: --topdir--/defines/abuild-java/dist
+    [mkdir] Created dir: --topdir--/defines/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/defines/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/defines/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/defines/abuild-java/src/conf
+
+-pre-compile:
+     [echo] Property = 'one two three'
+
+BUILD SUCCESSFUL
+Total time: <time>

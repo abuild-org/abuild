@@ -1,0 +1,5 @@
+<project name="local">
+ <target name="-pre-compile">
+  <echo message="Property = '${potato.salad}'"/>
+ </target>
+</project>

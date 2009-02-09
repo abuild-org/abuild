@@ -165,11 +165,16 @@ class Abuild
 		       BuildItem& build_item,
 		       std::string const& dir,
 		       std::list<std::string> const& targets);
+    bool invokeJavaBuilder(std::string const& backend,
+			   std::string const& build_file,
+			   std::string const& dir,
+			   std::list<std::string> const& targets);
     bool invokeBackend(std::string const& progname,
 		       std::vector<std::string> const& args,
 		       std::map<std::string, std::string> const& environment,
 		       char* old_env[],
 		       std::string const& dir);
+    void flushLogIfSingleThreaded();
     void cleanBuildset();
     void cleanPath(std::string const& item_name, std::string const& dir);
     void help();
@@ -216,7 +221,8 @@ class Abuild
     bool stdout_is_tty;
     unsigned int max_workers;
     std::list<std::string> make_args;
-    std::list<std::string> ant_args;
+    std::list<std::string> java_builder_args;
+    std::map<std::string, std::string> defines;
     std::string start_dir;
     bool keep_going;
     bool no_dep_failures;
@@ -232,7 +238,6 @@ class Abuild
     bool verbose_mode;
     bool silent;
     bool monitored;
-    bool use_abuild_logger;
     bool dump_interfaces;
     std::string special_target;
     std::list<std::string> targets;

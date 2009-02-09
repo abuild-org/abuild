@@ -57,7 +57,6 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     verbose_mode(false),
     silent(false),
     monitored(false),
-    use_abuild_logger(true),
     dump_interfaces(false),
     apply_targets_to_deps(false),
     local_build(false),
@@ -251,6 +250,7 @@ Abuild::parseArgv()
     boost::regex make_jobs_re("--make-jobs(?:=(\\d+))?");
     boost::regex buildset_re("--build=(\\S+)");
     boost::regex cleanset_re("--clean=(\\S+)");
+    boost::regex define_re("([^-][^=]*)=(.*)");
 
     boost::smatch match;
 
@@ -268,7 +268,11 @@ Abuild::parseArgv()
     while (*argp)
     {
 	std::string arg = *argp++;
-	if (boost::regex_match(arg, match, jobs_re))
+	if (boost::regex_match(arg, match, define_re))
+	{
+	    this->defines[match.str(1)] = match.str(2);
+	}
+	else if (boost::regex_match(arg, match, jobs_re))
 	{
 	    this->max_workers = atoi(match[1].str().c_str());
 	    if (max_workers == 0)
@@ -288,28 +292,22 @@ Abuild::parseArgv()
 	else if ((arg == "-k") || (arg == "--keep-going"))
 	{
 	    this->make_args.push_back("-k");
-	    this->ant_args.push_back("-k");
+	    this->java_builder_args.push_back("-k");
 	    this->keep_going = true;
 	}
 	else if (arg == "--no-dep-failures")
 	{
 	    this->no_dep_failures = true;
 	}
-	else if ((arg == "-n") ||
-		 (arg == "--just-print") ||
-		 (arg == "--dry-run") ||
-		 (arg == "--recon"))
+	else if (arg == "-n")
 	{
+	    this->java_builder_args.push_back("-n");
 	    this->make_args.push_back("-n");
 	}
 	else if ((arg == "-e") || (arg == "--emacs"))
 	{
-	    this->ant_args.push_back("-e");
-	    this->ant_args.push_back("-Dabuild.private.emacs-mode=1");
-	}
-	else if (arg == "--no-abuild-logger")
-	{
-	    this->use_abuild_logger = false; // XXX
+	    this->java_builder_args.push_back("-e");
+	    this->defines["abuild.private.emacs-mode"] = "1";
 	}
 	else if (arg == "-C")
 	{
@@ -328,23 +326,6 @@ Abuild::parseArgv()
 	    while (*argp)
 	    {
 		this->make_args.push_back(*argp++);
-		if (*argp && (strcmp(*argp, "--ant") == 0))
-		{
-		    --argp;
-		    break;
-		}
-	    }
-	}
-	else if (arg == "--ant")
-	{
-	    while (*argp)
-	    {
-		this->ant_args.push_back(*argp++);
-		if (*argp && (strcmp(*argp, "--make") == 0))
-		{
-		    --argp;
-		    break;
-		}
 	    }
 	}
 	else if (boost::regex_match(arg, match, buildset_re))
@@ -437,16 +418,14 @@ Abuild::parseArgv()
 	}
 	else if (arg == "--verbose")
 	{
-	    this->make_args.push_back("ABUILD_VERBOSE=1");
-	    this->ant_args.push_back("-DABUILD_VERBOSE=1");
-	    this->ant_args.push_back("-verbose");
+	    this->defines["ABUILD_VERBOSE"] = "1";
+	    this->java_builder_args.push_back("-v");
 	    this->verbose_mode = true;
 	}
 	else if (arg == "--silent")
 	{
-	    this->make_args.push_back("ABUILD_SILENT=1");
-	    this->ant_args.push_back("-DABUILD_SILENT=1");
-	    this->ant_args.push_back("-quiet");
+	    this->defines["ABUILD_SILENT"] = "1";
+	    this->java_builder_args.push_back("-q");
 	    this->silent = true;
 	}
 	else if (arg == "--monitored")
@@ -4648,6 +4627,12 @@ Abuild::invoke_gmake(std::string const& item_name,
     make_argv.push_back("--warn-undefined-variables");
     make_argv.insert(make_argv.end(),
 		     this->make_args.begin(), this->make_args.end());
+    for (std::map<std::string, std::string>::iterator iter =
+	     this->defines.begin();
+	 iter != this->defines.end(); ++iter)
+    {
+	make_argv.push_back((*iter).first + "=" + (*iter).second);
+    }
     make_argv.push_back("-f");
     make_argv.insert(make_argv.end(),
 		     this->abuild_top + "/make/abuild.mk");
@@ -4758,18 +4743,7 @@ Abuild::invoke_ant(std::string const& item_name,
 	build_file = this->abuild_top + "/ant/abuild.xml";
     }
 
-    if (this->max_workers == 1)
-    {
-	// XXX duplicated with invokeBackend
-
-        // If we have only one thread, then only one thread is using
-        // the logger.  Flush the logger before we run the backend to
-        // prevent its output from being interleaved with our own.
-        this->logger.flushLog();
-    }
-
-    return this->java_builder->invokeAnt(
-	build_file, dir, targets, this->ant_args);
+    return invokeJavaBuilder("ant", build_file, dir, targets);
 }
 
 bool
@@ -4897,20 +4871,48 @@ Abuild::invoke_groovy(std::string const& item_name,
 
     dyn.close();
 
-    if (this->max_workers == 1)
-    {
-	// XXX duplicated with invokeBackend
+    return invokeJavaBuilder("groovy", "", dir, targets);
+}
 
-        // If we have only one thread, then only one thread is using
-        // the logger.  Flush the logger before we run the backend to
-        // prevent its output from being interleaved with our own.
-        this->logger.flushLog();
+bool
+Abuild::invokeJavaBuilder(std::string const& backend,
+			  std::string const& build_file,
+			  std::string const& dir,
+			  std::list<std::string> const& targets)
+{
+    flushLogIfSingleThreaded();
+
+    if (this->verbose_mode)
+    {
+	// Put this in the if statement to avoid the needless cal to
+	// join if not in verbose mode.
+	verbose("running JavaBuilder backend " + backend);
+	if (! build_file.empty())
+	{
+	    verbose("  build file: " + build_file);
+	}
+	verbose("  directory: " + dir);
+	verbose("  targets: " + Util::join(" ", targets));
+	if (! this->java_builder_args.empty())
+	{
+	    verbose("  other arguments: " +
+		    Util::join(" ", this->java_builder_args));
+	}
+	if (! this->defines.empty())
+	{
+	    verbose("  variable definitions:");
+	    for (std::map<std::string, std::string>::iterator iter =
+		     this->defines.begin();
+		 iter != this->defines.end(); ++iter)
+	    {
+		verbose("    " + (*iter).first + "=" + (*iter).second);
+	    }
+	}
     }
 
-    // XXX defines
-    std::list<std::string> xxxdefines;
-    return this->java_builder->invokeGroovy(
-	dir, targets, xxxdefines);
+    return this->java_builder->invoke(
+	backend, build_file, dir, targets,
+	this->java_builder_args, this->defines);
 }
 
 bool
@@ -4920,22 +4922,7 @@ Abuild::invokeBackend(std::string const& progname,
 		      char* old_env[],
 		      std::string const& dir)
 {
-    if (this->max_workers == 1)
-    {
-        // If we have only one thread, then only one thread is using
-        // the logger.  Flush the logger before we run the backend to
-        // prevent its output from being interleaved with our own.
-        this->logger.flushLog();
-    }
-    else
-    {
-        // Consider doing something to capture the backend's output so
-        // that it is not arbitrarily interleaved with other things.
-        // We can't call flushLog here because other threads may be
-        // logging.  Ideally, we should capture output, prefix it with
-        // the build item name, and output it line by line or else
-        // de-interleave output from different build items.
-    }
+    flushLogIfSingleThreaded();
 
     if (this->verbose_mode)
     {
@@ -4945,6 +4932,18 @@ Abuild::invokeBackend(std::string const& progname,
     }
 
     return Util::runProgram(progname, args, environment, old_env, dir);
+}
+
+void
+Abuild::flushLogIfSingleThreaded()
+{
+    if (this->max_workers == 1)
+    {
+        // If we have only one thread, then only one thread is using
+        // the logger.  Flush the logger before we run the backend to
+        // prevent its output from being interleaved with our own.
+        this->logger.flushLog();
+    }
 }
 
 void
@@ -5048,13 +5047,18 @@ Abuild::help()
     //12345678901234567890123456789012345678901234567890123456789012345678901234567890
 
     h("");
-    h("Usage: " + whoami + " [options] [targets]");
+    h("Usage: " + whoami + " [options] [defines] [targets]");
     h("");
     h("This help message provides a brief synopsis of supported arguments.");
     h("Please see abuild's documentation for additional details.");
     h("");
     h("Options and targets may appear in any order.  Any argument that starts");
     h("with \"-\" is treated as an option.");
+    h("");
+    h("Any option not starting with - that contains an = is treated as a variable");
+    h("definition, with the variable name being everything prior to the first =.");
+    h("These are passed as variables to make, properties to ant, keys in");
+    h("abuild.defines for groovy.");
     h("");
     h("If no targets are specified, the \"all\" target is built.");
     h("");
@@ -5063,7 +5067,6 @@ Abuild::help()
     h("  -H | --help       print help message and exit");
     h("  -V | --version    print abuild's version number and exit");
     h("");
-    h("  --ant             pass all remaining arguments (up to --make) to ant");
     h("  --apply-targets-to-deps   apply explicit targets to dependencies as well;");
     h("                    when cleaning with a clean set, expand to include");
     h("                    dependencies");
@@ -5091,13 +5094,9 @@ Abuild::help()
     h("  --list-traits     list all known traits");
     h("  --make-jobs[=n]   passes the -j flag to make allowing each make to use");
     h("                    up to n jobs; omit n to let it use as many as it can");
-    h("  --make            pass all remaining arguments (up to --ant) to make");
+    h("  --make            pass all remaining arguments to make");
     h("  --monitored       run in monitored mode");
-    h("  -n |              make only: print what make would do without doing it");
-    h("    --just-print |");
-    h("    --dry-run |");
-    h("    --recon");
-    h("  --no-abuild-logger  ant only: suppress use of AbuildLogger");
+    h("  -n                pass no-op flag to backend");
     h("  --no-dep-failures   when used with -k, attempt to build items even when");
     h("                    one or more of their dependencies have failed");
     h("  --only-with-traits trait[,trait,...]   remove all items from build set");

@@ -10,32 +10,46 @@ class BuildState
     def abuildTop = null
     def pluginPaths = null
 
+    // supplied from abuild
+    def defines = null
+
     File curFile = null
-/*
+
     def g = new DependencyGraph()
     def closures = [:]
 
-    BuildState()
+    BuildState(defines)
     {
-        registerTarget('all')
+        this.defines = defines
+
+        // Create targets that abuild guarantees will exist
+        setTarget('all')
+
+        // XXX People who define test wrappers must ensure that the
+        // same code is set as the body of test-only, test, and check.
+        setTarget('test-only')
+        setTarget('test', 'deps':'all')
+        setTarget('check', 'deps':'all')
+
+        setTarget('doc')
     }
 
-    def registerTarget(String name)
+    def setTarget(String name)
     {
-        registerTarget(null, name, null)
+        setTarget(null, name, null)
     }
 
-    def registerTarget(Map parameters, String name)
+    def setTarget(Map parameters, String name)
     {
-        registerTarget(parameters, name, null)
+        setTarget(parameters, name, null)
     }
 
-    def registerTarget(String name, Closure body)
+    def setTarget(String name, Closure body)
     {
-        registerTarget(null, name, body)
+        setTarget(null, name, body)
     }
 
-    def registerTarget(Map parameters, String name, Closure body)
+    def setTarget(Map parameters, String name, Closure body)
     {
         if (! g.dependencies.containsKey(name))
         {
@@ -57,6 +71,8 @@ class BuildState
 
     def runTargets(List targets)
     {
+        def status = true
+
         if (! g.check())
         {
             // XXX clean up error message, include enough information
@@ -112,8 +128,9 @@ class BuildState
                 }
             }
         }
+
+        status
     }
-*/
 }
 
 
@@ -121,36 +138,66 @@ class Builder
 {
     def loader = new GroovyClassLoader()
     def binding = new Binding()
-    def buildState = new BuildState()
 
-    Builder()
+    def buildState
+    File buildDirectory
+    def targets
+    def groovyArgs
+    def defines
+
+    Builder(File buildDirectory, targets, groovyArgs, defines)
     {
-        binding.abuild = buildState;
-        binding.ant = new AntBuilder()
+        this.buildDirectory = buildDirectory
+        this.targets = targets
+        this.groovyArgs = groovyArgs
+        this.defines = defines
+
+        // XXX groovyArgs can be -n, -k, -e, -v, or -q.
+
+        this.buildState = new BuildState(defines)
+
+        def ant = new AntBuilder()
+        ant.project.setBasedir(buildDirectory.absolutePath)
+
+        binding.abuild = buildState
+        binding.ant = ant
     }
 
-    def loadScripts(files)
+    boolean build()
     {
-        files.each {
-            file ->
-            try
+        def dynamicFile = new File(buildDirectory.path + "/.ab-dynamic.groovy")
+        def buildFile = new File(buildDirectory.parent + "/Abuild.groovy")
+
+        loadScript(dynamicFile)
+        loadScript(buildFile)
+
+        // include qtest support
+        // plugin
+        // rules
+        // local
+
+        this.buildState.runTargets(this.targets)
+    }
+
+    def loadScript(File file)
+    {
+        try
+        {
+            Class groovyClass = loader.parseClass(file)
+            if (groovyClass)
             {
-                Class groovyClass = loader.parseClass(file)
-                if (groovyClass)
-                {
-                    GroovyObject groovyObject = groovyClass.newInstance()
-                    buildState.curFile = file
-                    runScript(file, groovyObject)
-                    buildState.curFile = null
-                }
+                GroovyObject groovyObject = groovyClass.newInstance()
+                buildState.curFile = file
+                runScript(file, groovyObject)
+                buildState.curFile = null
             }
-            catch (CompilationFailedException e)
-            {
-                // XXX FAIL
-                println "file ${file.path} had compilation errors"
-                StackTraceUtils.deepSanitize(e)
-                e.printStackTrace()
-            }
+        }
+        catch (CompilationFailedException e)
+        {
+            // XXX FAIL
+            println "file ${file.path} had compilation errors"
+            StackTraceUtils.deepSanitize(e)
+            e.printStackTrace()
         }
     }
 
@@ -169,27 +216,7 @@ class Builder
             // XXX FAIL
         }
     }
-
-    def runTargets(List targets)
-    {
-        buildState.runTargets(targets)
-    }
 }
 
-// overall status
-def status = false
-
-// Check values passed in from abuild
-//   buildDirectory
-//   targets
-//   defines
-
-def dynamicFile = new File(buildDirectory.path + "/.ab-dynamic.groovy")
-def buildFile = new File(buildDirectory.parent + "/Abuild.groovy")
-def b = new Builder()
-b.loadScripts([dynamicFile, buildFile])
-
-// XXX do build
-status = true
-
-status
+// overall script returns value returned by build()
+new Builder(buildDirectory, targets, groovyArgs, defines).build()

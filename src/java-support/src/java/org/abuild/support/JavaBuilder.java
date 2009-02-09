@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import javax.net.SocketFactory;
 import java.util.Vector;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.Executors;
@@ -17,6 +19,7 @@ class JavaBuilder
 {
     private Socket socket;
     private Pattern response_re = Pattern.compile("(\\d+) (.*)");
+    private Pattern defines_re = Pattern.compile("(\\d+) (.*)");
     private PrintStream responseStream;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     private AntRunner antRunner = null;
@@ -126,82 +129,61 @@ class JavaBuilder
 	}
     }
 
-    boolean runAnt(String[] args)
+    private Map<String, String> parseDefines(String defines_str)
     {
-	boolean status = false;
-	if (args.length != 6)
+	Map<String, String> defines = new HashMap<String, String>();
+
+	String work_str = defines_str;
+	Vector<String> work_vec = new Vector<String>();
+	while (! "".equals(work_str))
 	{
-	    System.err.println(
-		"JavaBuilder received ant command with other than 6 arguments");
-	    for (String arg: args)
+	    Matcher m = defines_re.matcher(work_str);
+	    if (m.matches())
 	    {
-		System.err.println("  " + arg);
+		String len_str = m.group(1);
+		String rest = m.group(2);
+		int len = 0;
+		try
+		{
+		    len = Integer.parseInt(len_str);
+		}
+		catch (NumberFormatException e)
+		{
+		    System.err.println("invalid length in defines string");
+		    return null;
+		}
+		String token = rest.substring(0, len);
+		work_str = rest.substring(len);
+		work_vec.add(token);
 	    }
-	}
-	else
-	{
-	    String build_file = args[1];
-	    String dir = args[2];
-	    String targets_str = args[3];
-	    String other_args_str = args[4];
-	    Vector<String> targets = new Vector<String>();
-	    Vector<String> other_args = new Vector<String>();
-	    for (String t: targets_str.split(" "))
+	    else
 	    {
-		targets.add(t);
+		System.err.println("invalid defines string");
+		return null;
 	    }
-	    for (String t: other_args_str.split(" "))
-	    {
-		other_args.add(t);
-	    }
-	    status = this.antRunner.runAnt(
-		build_file, dir, targets, other_args);
 	}
 
-	return status;
+	if (work_vec.size() % 2 != 0)
+	{
+	    System.err.println("odd number of strings in defines string");
+	    return null;
+	}
+
+	for (int i = 0; i < work_vec.size(); i += 2)
+	{
+	    defines.put(work_vec.get(i), work_vec.get(i + 1));
+	}
+
+	return defines;
     }
 
-    boolean runGroovy(String[] args)
+    private boolean runCommand(String[] args)
     {
 	boolean status = false;
-	if (args.length != 5)
+	if (args.length != 7)
 	{
 	    System.err.println(
-		"JavaBuilder received groovy" +
-		" command with other than 5 arguments");
-	    for (String arg: args)
-	    {
-		System.err.println("  " + arg);
-	    }
-	}
-	else
-	{
-	    String dir = args[1];
-	    String targets_str = args[2];
-	    String defines_str = args[3];
-	    Vector<String> targets = new Vector<String>();
-	    Vector<String> defines = new Vector<String>();
-	    for (String t: targets_str.split(" "))
-	    {
-		targets.add(t);
-	    }
-	    for (String t: defines_str.split(" "))
-	    {
-		defines.add(t);
-	    }
-	    status = this.groovyRunner.runGroovy(dir, targets, defines);
-	}
-
-	return status;
-    }
-
-    boolean runCommand(String[] args)
-    {
-	boolean status = false;
-	if (args.length == 0)
-	{
-	    System.err.println(
-		"JavaBuilder protocol error: received empty command");
+		"JavaBuilder protocol error: received invalid command");
 	}
 	else if (! args[args.length - 1].equals("|"))
 	{
@@ -212,18 +194,46 @@ class JavaBuilder
 		System.err.println("  " + arg);
 	    }
 	}
-	else if (args[0].equals("ant"))
-	{
-	    status = runAnt(args);
-	}
-	else if (args[0].equals("groovy"))
-	{
-	    status = runGroovy(args);
-	}
 	else
 	{
-	    System.err.println(
-		"JavaBuilder: unknown command " + args[0]);
+	    String command = args[0];
+	    String build_file = args[1];
+	    String dir = args[2];
+	    String targets_str = args[3];
+	    String other_args_str = args[4];
+	    String defines_str = args[5];
+	    Vector<String> targets = new Vector<String>();
+	    Vector<String> other_args = new Vector<String>();
+	    for (String t: targets_str.split(" "))
+	    {
+		targets.add(t);
+	    }
+	    if (! "".equals(other_args_str))
+	    {
+		for (String t: other_args_str.split(" "))
+		{
+		    other_args.add(t);
+		}
+	    }
+	    Map<String, String> defines = parseDefines(defines_str);
+	    if (defines != null)
+	    {
+		if ("ant".equals(command))
+		{
+		    status = this.antRunner.runAnt(
+			build_file, dir, targets, other_args, defines);
+		}
+		else if ("groovy".equals(command))
+		{
+		    status = this.groovyRunner.runGroovy(
+			dir, targets, other_args, defines);
+		}
+		else
+		{
+		    System.err.println(
+			"JavaBuilder: unknown command " + command);
+		}
+	    }
 	}
 
 	return status;

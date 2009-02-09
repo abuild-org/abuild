@@ -265,7 +265,7 @@ if (! in_windows())
 		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("build shared2 without static",
-		 {$td->COMMAND => "abuild --make SKIP_LINK=1",
+		 {$td->COMMAND => "abuild SKIP_LINK=1",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/shared2-build.out",
 		  $td->EXIT_STATUS => 0},
