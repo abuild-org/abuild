@@ -11,34 +11,19 @@ if (! buildDir.isDirectory())
 {
     buildDir.mkdirs()
 }
-// XXX Maybe we should use our embedded version of ant, if any, or
-// maybe it's okay to require this for bootstrapping.
-def antHome = System.getenv('ANT_HOME')
-if (antHome == null)
-{
-    System.err.println "ANT_HOME must be set"
-    System.exit(2)
-}
-def antJar = antHome + "/lib/ant.jar"
-if (! new File(antJar).isFile())
-{
-    System.err.println "Can't find ant.jar in ${antJar}"
-    System.exit(2)
-}
 
 def ant = new AntBuilder()
+def antJar = ant.project.getProperty('ant.core.lib')
+
 ant.project.setBasedir(buildDir.absolutePath)
-// XXX hard-coded groovy?
 ant.taskdef('name': 'groovyc',
-            'classname': 'org.codehaus.groovy.ant.Groovyc',
-            'classpath': 'lib/groovy-all-1.5.7.jar')
+            'classname': 'org.codehaus.groovy.ant.Groovyc')
 
 def distDir = 'dist'
 def classesDir = 'classes'
 ant.mkdir('dir': distDir);
 ant.mkdir('dir': classesDir);
 
-// Not sure why includeantruntime doesn't seem to work here...
 ant.javac('deprecation': 'yes',
           'destdir': classesDir,
           'classpath': antJar,
