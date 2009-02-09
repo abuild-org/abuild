@@ -1,0 +1,6 @@
+<!-- This file is used by abuild to find ANT_HOME if not set -->
+<project default="find-ant-home">
+ <target name="find-ant-home">
+  <echo message="${ant.home}"/>
+ </target>
+</project>

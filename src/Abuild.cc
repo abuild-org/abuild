@@ -3937,6 +3937,9 @@ Abuild::findGnuMakeInPath()
 void
 Abuild::findJava()
 {
+    boost::regex ant_home_re("(?s:.*\\[echo\\] (/.*?)\r?\n.*)");
+    boost::smatch match;
+
     verbose("locating abuild-java-support.jar");
     std::string java_support_jar;
     std::string abuild_dir = Util::dirname(this->program_fullpath);
@@ -4008,18 +4011,49 @@ Abuild::findJava()
     java_libs.push_back(java_libdir);
     java_libs.push_back(java_home + "/lib/tools.jar");
 
-    // XXX Can we safely infer ANT_HOME?  Should we embed parts of ant
-    // in abuild?  If so, which parts?  We'll need more to support
-    // straight ant's xml stuff than groovy's ant builder, but the ant
-    // jars that come with groovy may not be sufficient to do all the
-    // ant tasks people might use.
+    verbose("trying to determine ANT_HOME");
     std::string ant_home;
-    if (! Util::getEnv("ANT_HOME", &ant_home))
+    if (Util::getEnv("ANT_HOME", &ant_home))
     {
-	fatal("XXX ANT_HOME must be set");
+	verbose("using ANT_HOME environment variable value: " + ant_home);
+    }
+    else
+    {
+	verbose("attempting to guess ANT_HOME from ant in path");
+	std::list<std::string> candidates;
+	candidates = Util::findProgramInPath("ant");
+	if (candidates.empty())
+	{
+	    fatal("ANT_HOME is not set, and there is no ant"
+		  " program in your path.");
+	}
+	std::string candidate = candidates.front();
+	verbose("running " + candidate + " to find ANT_HOME");
+	try
+	{
+	    std::string output = Util::getProgramOutput(
+		"\"" + candidate + "\" -q -f " +
+		abuild_top + "/ant/find-ant-home.xml");
+	    if (boost::regex_match(output, match, ant_home_re))
+	    {
+		ant_home = match.str(1);
+		verbose("inferred value for ANT_HOME: " + ant_home);
+	    }
+	    else
+	    {
+		verbose("ant output:\n" + output);
+		fatal("unable to determine ANT_HOME output from ant output;"
+		      " run " + this->whoami + " with --verbose for details,"
+		      " or set ANT_HOME explicitly");
+	    }
+	}
+	catch (QEXC::General)
+	{
+	    fatal("unable to determine ANT_HOME; run " + this->whoami +
+		  " with --verbose for details, or set ANT_HOME explicitly");
+	}
     }
     java_libs.push_back(ant_home + "/lib");
-
 
     this->java_builder.reset(
 	new JavaBuilder(

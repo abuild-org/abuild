@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
+import org.codehaus.groovy.control.CompilationFailedException
+
 File srcDir = new File("java-support/src/java")
 if (! srcDir.isDirectory())
 {
@@ -12,6 +14,25 @@ if (! buildDir.isDirectory())
     buildDir.mkdirs()
 }
 
+try
+{
+    Class.forName('new com.sun.tools.javac.Main')
+}
+catch (ClassNotFoundException e)
+{
+    def javaHome = new File(System.getProperty('java.home'))
+    def toolsJar = new File("${javaHome.path}/lib/tools.jar")
+    if ((! toolsJar.isFile()) && (javaHome.name == "jre"))
+    {
+        toolsJar = new File("${javaHome.parent}/lib/tools.jar")
+    }
+    if (toolsJar.isFile())
+    {
+        def loader = this.class.classLoader.rootLoader
+        loader.addURL("file://${toolsJar.absolutePath}".toURI().toURL())
+    }
+}
+
 def ant = new AntBuilder()
 def antJar = ant.project.getProperty('ant.core.lib')
 
@@ -21,8 +42,8 @@ ant.taskdef('name': 'groovyc',
 
 def distDir = 'dist'
 def classesDir = 'classes'
-ant.mkdir('dir': distDir);
-ant.mkdir('dir': classesDir);
+ant.mkdir('dir': distDir)
+ant.mkdir('dir': classesDir)
 
 ant.javac('deprecation': 'yes',
           'destdir': classesDir,
