@@ -116,7 +116,8 @@ int main()
     std::set<std::string, Util::StringCaseLess> strings;
     strings.insert("apple");
     strings.insert("ORANGE");
-    for (std::set<std::string>::iterator iter = strings.begin();
+    for (std::set<std::string, Util::StringCaseLess>::iterator iter =
+	     strings.begin();
 	 iter != strings.end(); ++iter)
     {
 	std::cout << *iter << std::endl;

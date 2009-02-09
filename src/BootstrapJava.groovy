@@ -29,7 +29,13 @@ catch (ClassNotFoundException e)
     if (toolsJar.isFile())
     {
         def loader = this.class.classLoader.rootLoader
-        loader.addURL("file://${toolsJar.absolutePath}".toURI().toURL())
+        def path = "${toolsJar.absolutePath}"
+        if (path =~ /^[^\/]/)
+        {
+            path = "/" + path.replace("\\", "/")
+        }
+        path = URLEncoder.encode(path, "UTF-8")
+        loader.addURL("file://${path}".toURI().toURL())
     }
 }
 

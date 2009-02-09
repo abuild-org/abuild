@@ -1,9 +1,9 @@
 #ifndef __JAVABUILDER_HH__
 #define __JAVABUILDER_HH__
 
+#include <boost/asio.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/mutex.hpp>

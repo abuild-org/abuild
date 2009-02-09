@@ -3937,7 +3937,7 @@ Abuild::findGnuMakeInPath()
 void
 Abuild::findJava()
 {
-    boost::regex ant_home_re("(?s:.*\\[echo\\] (/.*?)\r?\n.*)");
+    boost::regex ant_home_re("(?s:.*\\[echo\\] (.*?)\r?\n.*)");
     boost::smatch match;
 
     verbose("locating abuild-java-support.jar");
@@ -4037,7 +4037,7 @@ Abuild::findJava()
 		abuild_top + "/ant/find-ant-home.xml");
 	    if (boost::regex_match(output, match, ant_home_re))
 	    {
-		ant_home = match.str(1);
+		ant_home = Util::canonicalizePath(match.str(1));
 		QTC::TC("abuild", "Abuild infer ANT_HOME");
 		verbose("inferred value for ANT_HOME: " + ant_home);
 	    }

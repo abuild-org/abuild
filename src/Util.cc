@@ -623,7 +623,6 @@ Util::findProgramInPath(std::string progname)
 {
     std::list<std::string> result;
 
-    appendExe(progname);
     std::string path;
     if (getEnv("PATH", &path))
     {
@@ -642,6 +641,7 @@ Util::findProgramInPath(std::string progname)
 	    std::string file =
 		canonicalizePath(dir + "/" + progname);
 	    bool exists = false;
+	    appendExe(file);
 	    if (isFile(file))
 	    {
 		exists = true;
