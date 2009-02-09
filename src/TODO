@@ -1,6 +1,10 @@
 
 === Changes Targeted for Version 1.1 ===
 
+XXX Windows: innocuous failure on force exit in groovy.  Need to
+filter ERROR: .*JavaBuilder.* error messages intelligently -- make
+sure at least one appears and then ignore.
+
 Changes to document
 ===================
 
@@ -13,13 +17,16 @@ documentation.
  * Java >= 1.5 is now required because of thread pools.
 
  * ant is no longer launched using the ant script.  As such, certain
-   arguments, such as -p, are no longer supported.
+   arguments, such as -p, are no longer supported.  Also, the problem
+   of ant.bat not reporting failure is no longer relevant.
 
  * When traversing a build tree with a backing area, accept
    non-existent child directories without any additional checking.  We
    no longer require the path to exist relative to the backing tree.
 
- * ./BootstrapJava.groovy to bootstrap java code
+ * ./BootstrapJava.groovy to bootstrap java code.  A full groovy
+   installation is needed to build abuild from scratch but not to run
+   it -- abuild embeds groovy.
 
  * The --ant and --no-abuild-logger arguments have been removed
 
@@ -33,6 +40,11 @@ documentation.
    path and run them to determine the proper values for ANT_HOME and
    JAVA_HOME.
 
+ * --verbose gives more information about locating external programs
+   (make, java) at startup.
+
+ * Abuild has a harder requirement on Java 1.5.  It's not just
+   generics anymore.
 
 Licensing
 =========
@@ -45,9 +57,6 @@ Core Changes
 
  * Implement an optional 1.0-compatibility mode.  See "Compatibility"
    below.
-
- * Add -Dvar=val as a real abuild command-line argument that passes
-   the appropriate variable/property override to all backends.
 
  * Replace "this" with "name".  Make use of "this" deprecated.
 
@@ -278,13 +287,6 @@ Documentation
 
 Usability Improvements
 ======================
-
- * Have abuild --verbose log detail about which make/ant it is using.
-   Otherwise, it's almost impossible to debug problems that stem from
-   abuild invoking an unexpected copy of make or ant.
-
- * Abuild should be less picky about ant -version's output if
-   possible.
 
  * Provide arguments for querying abuild's state, such as locating
    build items (perhaps with pattern matching), listing all trees with
