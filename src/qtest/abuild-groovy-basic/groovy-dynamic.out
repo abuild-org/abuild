@@ -1,8 +1,8 @@
 class ABDynamic extends Script { Object run() {
 
-abuild.ifc['dir.qwer'] = '--topdir--/dynamic'
-abuild.ifc['abuild_top'] = '--abuild-dir--'
-abuild.ifc['plugins'] = []
+abuild.itemPaths['qwer'] = '--topdir--/dynamic'
+abuild.abuildTop = '--abuild-dir--'
+abuild.pluginPaths = []
 abuild.ifc['ABUILD_OUTPUT_DIR'] = '.'
 abuild.ifc['ABUILD_PLATFORM'] = 'indep'
 abuild.ifc['ABUILD_PLATFORM_TYPE'] = 'indep'

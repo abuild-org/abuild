@@ -29,11 +29,17 @@ if (! new File(antJar).isFile())
 
 def ant = new AntBuilder()
 ant.project.setProperty('basedir', buildDir.absolutePath)
+// XXX hard-coded groovy?
+ant.taskdef('name': 'groovyc',
+            'classname': 'org.codehaus.groovy.ant.Groovyc',
+            'classpath': 'lib/groovy-all-1.5.7.jar')
 // Not sure why includeantruntime doesn't seem to work here...
 ant.javac('deprecation': 'yes',
           'destdir': buildDir.path,
           'classpath': antJar,
           'srcdir': srcDir.path)
+ant.groovyc('destdir': buildDir.path,
+            'srcdir': srcDir.path)
 ant.jar('destfile': destDir.path + '/abuild-java-support.jar',
         'basedir': buildDir.path,
         'includes': '**/*.class')

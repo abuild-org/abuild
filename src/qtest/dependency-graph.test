@@ -3,11 +3,14 @@ require 5.008;
 BEGIN { $^W = 1; }
 use strict;
 
-chdir("dependency-graph") or die "chdir testdir failed: $!\n";
-
+require abuild_test_utils;
 require TestDriver;
 
+chdir("dependency-graph") or die "chdir testdir failed: $!\n";
+
 my $td = new TestDriver('DependencyGraph');
+test_setup();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 
 $td->runtest("full test",
 	     {$td->COMMAND => "test_dependency_graph"},
@@ -15,4 +18,19 @@ $td->runtest("full test",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->report(1);
+if ($test_java)
+{
+    $td->runtest("test groovy port",
+		 {$td->COMMAND => "abuild -C groovy",
+		  $td->FILTER => "grep -v abuild:"},
+		 {$td->FILE => "dependency-graph.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("clean",
+		 {$td->COMMAND => "abuild -C groovy clean"},
+		 {$td->STRING => "abuild: cleaning in .\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report(1 + ($test_java ? 2 : 0));

@@ -1,10 +1,15 @@
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.runtime.StackTraceUtils
+import org.abuild.support.DependencyGraph
 
 class BuildState
 {
-    // use "ifc" because "interface" is a reserved word
+    // fields supplied by .ab-dynamic.groovy
     def ifc = [:]
+    def itemPaths = [:]
+    def abuildTop = null
+    def pluginPaths = null
+
     File curFile = null
 /*
     def g = new DependencyGraph()
@@ -143,6 +148,8 @@ class Builder
             {
                 // XXX FAIL
                 println "file ${file.path} had compilation errors"
+                StackTraceUtils.deepSanitize(e)
+                e.printStackTrace()
             }
         }
     }

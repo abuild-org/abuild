@@ -4799,22 +4799,24 @@ Abuild::invoke_groovy(std::string const& item_name,
     dyn << "class ABDynamic extends Script { Object run() {"
 	<< std::endl << std::endl;
 
-    // Generate variables that are private to this build and should
-    // not be accessible in and from the item's interface.
+    // Supply information that is private to this build and should not
+    // be accessible in and from the item's interface.  Since this
+    // backend is a full programming language, we can provide this
+    // information separately from the interface.
 
-    // Generate entries for this item and all its dependencies and
+    // Supply paths for this item and all its dependencies and
     // plugins.
     std::set<std::string> const& references = build_item.getReferences();
     for (std::set<std::string>::const_iterator iter = references.begin();
          iter != references.end(); ++iter)
     {
-        dyn << "abuild.ifc['dir." << *iter << "'] = '"
+        dyn << "abuild.itemPaths['" << *iter << "'] = '"
 	    << this->buildset[*iter]->getAbsolutePath()
 	    << "'" << std::endl;
     }
 
     // Generate a property for the top of abuild
-    dyn << "abuild.ifc['abuild_top'] = '"
+    dyn << "abuild.abuildTop = '"
 	<< this->abuild_top << "'" << std::endl;
 
     // Generate a list of plugin directories.  We don't provide the
@@ -4829,7 +4831,7 @@ Abuild::invoke_groovy(std::string const& item_name,
 	plugin_paths.push_back(
 	    Util::absToRel(this->buildset[*iter]->getAbsolutePath(), dir));
     }
-    dyn << "abuild.ifc['plugins'] = [";
+    dyn << "abuild.pluginPaths = [";
     if (! plugin_paths.empty())
     {
 	dyn << "'" << Util::join("', '", plugin_paths)
@@ -4837,7 +4839,8 @@ Abuild::invoke_groovy(std::string const& item_name,
     }
     dyn << "]\n";
 
-    // Output variables based on the item's interface object.
+    // Provide data from the item's interface object.  We use "ifc"
+    // because "interface" is a reserved word in Groovy.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
         _interface.getVariablesForTargetType(
