@@ -33,7 +33,7 @@ public class AntRunner
 	// not from the user.
 	boolean keepGoing = false;
 	boolean emacsMode = false;
-	int msgOutputLevel = Project.MSG_INFO;
+	int messageOutputLevel = Project.MSG_INFO;
 	boolean noOp = false;
 	for (String arg: otherArgs)
 	{
@@ -47,11 +47,11 @@ public class AntRunner
 	    }
 	    else if (arg.equals("-v"))
 	    {
-		msgOutputLevel = Project.MSG_VERBOSE;
+		messageOutputLevel = Project.MSG_VERBOSE;
 	    }
 	    else if (arg.equals("-q"))
 	    {
-                msgOutputLevel = Project.MSG_WARN;
+                messageOutputLevel = Project.MSG_WARN;
 	    }
 	    else if (arg.equals("-n"))
 	    {
@@ -65,7 +65,10 @@ public class AntRunner
 	    }
 	}
 
-	System.out.println("Buildfile: " + buildFileName);
+        if (messageOutputLevel >= Project.MSG_INFO)
+	{
+	    System.out.println("Buildfile: " + buildFileName);
+        }
 	if (noOp)
 	{
 	    System.out.print("would build targets:");
@@ -90,7 +93,7 @@ public class AntRunner
 	DefaultLogger logger = new AbuildLogger();
 	logger.setErrorPrintStream(System.err);
 	logger.setOutputPrintStream(System.out);
-	logger.setMessageOutputLevel(Project.MSG_INFO);
+	logger.setMessageOutputLevel(messageOutputLevel);
 	logger.setEmacsMode(emacsMode);
 	p.addBuildListener(logger);
 	BuildException error = null;
