@@ -3898,6 +3898,7 @@ Abuild::findGnuMakeInPath()
     candidates.insert(candidates.end(),
 		      make_candidates.begin(), make_candidates.end());
 
+    verbose("looking for gnu make");
     for (std::list<std::string>::iterator iter = candidates.begin();
 	 iter != candidates.end(); ++iter)
     {
@@ -3905,6 +3906,7 @@ Abuild::findGnuMakeInPath()
 	std::string version_string;
 	try
 	{
+	    verbose("trying " + candidate);
 	    version_string = Util::getProgramOutput(
 		"\"" + candidate + "\" --version");
 	    if (boost::regex_match(version_string, match, gmake_re))
@@ -3915,6 +3917,7 @@ Abuild::findGnuMakeInPath()
 		    (major_version > 3))
 		{
 		    this->gmake = candidate;
+		    verbose("using " + this->gmake + " for gnu make");
 		    break;
 		}
 	    }
@@ -3934,71 +3937,95 @@ Abuild::findGnuMakeInPath()
 void
 Abuild::findJava()
 {
-    std::list<std::string> candidates;
-    std::string java_home;
-    if (Util::getEnv("JAVA_HOME", &java_home))
-    {
-	candidates.push_back(Util::canonicalizePath(java_home + "/bin/java"));
-    }
-    else
-    {
-	candidates = Util::findProgramInPath("java");
-    }
-    std::string java;
-    if (! candidates.empty())
-    {
-	java = candidates.front();
-    }
-    if (java.empty())
-    {
-	fatal("A java runtime environment (>= 1.5) is required");
-    }
-    else
-    {
-	verbose("found java: " + java);
-    }
-
-    std::list<std::string> java_libdirs;
+    verbose("locating abuild-java-support.jar");
+    std::string java_support_jar;
     std::string abuild_dir = Util::dirname(this->program_fullpath);
     std::string base = Util::basename(abuild_dir);
     if (base.substr(0, OUTPUT_DIR_PREFIX.length()) == OUTPUT_DIR_PREFIX)
     {
 	std::string candidate =
 	    abuild_dir +
-	    "/../java-support/abuild-java/dist";
-	if (Util::isDirectory(candidate))
+	    "/../java-support/abuild-java/dist/abuild-java-support.jar";
+	if (Util::isFile(candidate))
 	{
-	    // We're running from the source directory
-	    java_libdirs.push_back(
-		Util::canonicalizePath(candidate));
+	    java_support_jar = Util::canonicalizePath(candidate);
+	    verbose("found support jar in source directory: " +
+		    java_support_jar);
 	}
     }
-    if (Util::isDirectory(this->abuild_top + "/lib"))
+
+    std::string java_libdir = this->abuild_top + "/lib";
+    if (java_support_jar.empty())
     {
-	java_libdirs.push_back(this->abuild_top + "/lib");
+	java_support_jar = java_libdir + "/abuild-java-support.jar";
+	verbose("using support jar from abuild's lib directory: " +
+		java_support_jar);
     }
 
-    if (! Util::getEnv("JAVA_HOME", &java_home))
+    if (! Util::isFile(java_support_jar))
     {
-	fatal("XXX JAVA_HOME must be set");
+	fatal("unable to locate abuild-java-support.jar; run " + this->whoami +
+	      " with --verbose for details");
     }
+
+    verbose("trying to determine JAVA_HOME");
+    std::string java_home;
+    if (Util::getEnv("JAVA_HOME", &java_home))
+    {
+	verbose("using JAVA_HOME environment variable value: " + java_home);
+    }
+    else
+    {
+	verbose("attempting to guess JAVA_HOME from java in path");
+	std::list<std::string> candidates;
+	candidates = Util::findProgramInPath("java");
+	if (candidates.empty())
+	{
+	    fatal("JAVA_HOME is not set, and there is no java"
+		  " program in your path.");
+	}
+	std::string candidate = candidates.front();
+	verbose("running " + candidate + " to find JAVA_HOME");
+	try
+	{
+	    java_home =  Util::getProgramOutput(
+		"\"" + candidate + "\" -cp " +
+		java_support_jar + " org.abuild.support.PrintJavaHome");
+	    verbose("inferred value for JAVA_HOME: " + java_home);
+	}
+	catch (QEXC::General)
+	{
+	    fatal("unable to determine JAVA_HOME; run " + this->whoami +
+		  " with --verbose for details, or set JAVA_HOME explicitly");
+	}
+    }
+
+    std::string java = java_home + "/bin/java";
+    verbose("using java command " + java);
+
+    std::list<std::string> java_libs; // jars and directories
+    java_libs.push_back(java_support_jar);
+    java_libs.push_back(java_libdir);
+    java_libs.push_back(java_home + "/lib/tools.jar");
+
+    // XXX Can we safely infer ANT_HOME?  Should we embed parts of ant
+    // in abuild?  If so, which parts?  We'll need more to support
+    // straight ant's xml stuff than groovy's ant builder, but the ant
+    // jars that come with groovy may not be sufficient to do all the
+    // ant tasks people might use.
     std::string ant_home;
     if (! Util::getEnv("ANT_HOME", &ant_home))
     {
 	fatal("XXX ANT_HOME must be set");
     }
+    java_libs.push_back(ant_home + "/lib");
 
-    // XXX Probably need JAVA_HOME and ANT_HOME to do this.  Not sure
-    // though...what does groovy's antBuilder do to get the required
-    // jar files?  Anyway, we almost surely need that stuff if we're
-    // going to support straight ant with XML.
-    java_libdirs.push_back(ant_home + "/lib");
-    java_libdirs.push_back(java_home + "/lib");
 
     this->java_builder.reset(
 	new JavaBuilder(
-	    this->error_handler, this->abuild_top,
-	    java, java_libdirs, this->envp));
+	    this->error_handler,
+	    boost::bind(&Abuild::verbose, this, _1),
+	    this->abuild_top, java, java_libs, this->envp));
 }
 
 bool
@@ -4753,8 +4780,8 @@ Abuild::invoke_groovy(std::string const& item_name,
 		      std::string const& dir,
 		      std::list<std::string> const& targets)
 {
-    // XXX we're not doing anything to protect against groovy syntax
-    // in strings.  Then again, the other backends don't protect their
+    // We're not doing anything to protect against groovy syntax in
+    // strings.  Then again, the other backends don't protect their
     // output either.
 
     // Create FILE_DYNAMIC_GROOVY

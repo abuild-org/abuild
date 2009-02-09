@@ -1,12 +1,4 @@
 
-XXX current state:
-
-Implemented basic ant runner.  Still need to resolve several XXX
-comments and to deal with bootstrapping issues.
-
-Also implemented basic groovy support.  Need to resolve XXX comments
-here as well.
-
 === Changes Targeted for Version 1.1 ===
 
 Changes to document
@@ -419,33 +411,37 @@ Changes to "make" Code
    ccxx.mk.
 
 
-Changes to "ant" Code
-=====================
+Java builds
+===========
 
- * Current thinking on java compilation strategy (not fully reflected
-   below): reduce ant support to basic jar creation only: no hooks,
-   higher level archives, etc.  We can support wrapper, qtest, and
-   junit.  This makes ant support useful for very simple
-   non-enterprise Java applications.  For everything else, use the
-   groovy framework.  We might not be quite so draconian (like
-   continuing to support hooks), or we might drop ant support
-   entirely.  Have to weigh complexity of code against compatibility
-   considerations.  Use a groovy-based framework for everything else,
-   as discussed below.  We may or may not bother with ant launcher.
-   It may be possible to invoke the ant launcher from groovy code
-   instead of java code.  Then the java build manager could handle
-   both ant-based and groovy-based builds.
+ * Simplify existing ant framework or remove it entirely.
 
- * Strongly consider distributing junit, groovy, and if needed,
-   ant-contrib in abuild's lib directory.  If we do the ant launcher,
-   we might be able to get away from invoking ant at all, in which
-   case we might want to embed ant as well.
+    - remove deploy, other, war, ear
 
-   java -cp launch-ant.jar:$ANT_HOME/lib/ant.jar:$ANT_HOME/lib/ant-launcher.jar org.abuild.AntLauncher
+    - consider removing hooks
 
- * Strongly consider implementation of ant launcher.
+    - If we keep hooks, remove abuild.use-local-hooks and have this
+      behavior enabled by default.  Any declared local build file
+      should ben imported and searched for hooks.
 
- * Conventions on properties:
+ * Consider dropping support for Abuild-ant.xml.  If so, also remove
+   build_file from the internal JavaBuilder protocol.
+
+ * Distribute junit, groovy, ant-contrib (if needed), and ant jars
+   with abuild.  Probably at least distribute enough jars to run the
+   groovy backend.  We might not want to include all of ANT_HOME if
+   we're still supporting ant.  Instead, we may just require ANT_HOME
+   to be set.  We need at least ant, ant-launcher, groovy-all.  We
+   probably also want ant-junit and junit.  We probably don't want
+   ant-contrib.
+
+
+Changes to "ant" support
+========================
+
+Things to consider if preserving ant support....
+
+ * Document/use these conventions on properties:
 
     - abuild.property can be set by a user in Abuild-ant.properties.
       These are documented in end user documentation.
@@ -458,30 +454,6 @@ Changes to "ant" Code
       ant framework and should not be accessed by users.  These
       properties are subject to change at any time.  These are not
       documented unless by comments in the code.
-
- * Consider groovy-based system along the lines of
-   ~/source/examples/groovy/dependency-graph.
-
-   It is possible to compile this with groovyc, put all the class files
-   into a jar (say, dg.jar), and run it like this:
-
-   java -cp $GROOVY_HOME/embeddable/groovy-all-1.5.7.jar:$GROOVY_HOME/lib/ant-1.7.0.jar:$GROOVY_HOME/lib/ant-launcher-1.7.0.jar:dg.jar main
-
-   If embedding groovy into abuild, consider which other jars, if any, we
-   need.  We probably want ant-junit as well as junit itself.  We
-   probably don't want antcontrib unless we are planning on keeping the
-   old ant-based stuff alive.
-
-   The example would obviously have to be cleaned up, and we'd want
-   everything in an org.abuild.something package.
-
-   Basic strategy would be to launch the groovy builder manager in
-   much the way the ant launcher would work.  For bootstrapping, we
-   can probably use a custom groovy script with an ant builder.
-
-   def ant = new AntBuilder()
-   ant.taskdef('name':'groovyc', 'classname':'org.codehaus.groovy.ant.Groovyc');
-   ant.groovyc('srcdir':'src', 'destdir':'build')
 
  * Incorporate misc/abuild-groovy.  Load the groovy task and make it
    available for others to use.  In abuild 1.0, there is no mechanism
@@ -511,10 +483,6 @@ Changes to "ant" Code
    sense), but this is no different from what would happen if we had a
    library of ant code that people imported on their own.
 
- * Remove/deprecate abuild.use-local-hooks and have this behavior
-   enabled by default.  Any declared local build file should ben
-   imported and searched for hooks.
-
  * With groovy support, make sure any place we iterate over
    comma-separated lists behaves properly with respect to whitespace.
 
@@ -523,18 +491,10 @@ Changes to "ant" Code
    using documented abuild properties, and we should figure out what
    other similar properties we might want to set in this way.
 
- * Strongly consider removing support for higher-level archives from
-   abuild's ant framework.
-
  * Provide a way for a user to specify an externally created manifest
    file.  Users can do this cleanly with a <manifest> task in their
    own ant code, and we can hook it in using abuild's own jar creation
    task.
-
- * With the ability to add new targets, remove the "deploy" and
-   "other" targets.  The other ones are probably okay (except
-   interface-help, rules-help, and properties-help, which should be
-   replaced by the new help system).
 
 
 Platform Conditionals
@@ -1228,17 +1188,6 @@ this way.
  * In order to get wars in ear files, we need to add them to
    abuild.classpath.  Although this is harmless, it's sort of an abuse
    of abuild.classpath.
-
- * Ant launcher: consider having a Java-based ant launcher that abuild
-   communicates with via some kind of IPC to make launching ant more
-   efficient.  See ~/argon/tmp/ant-launcher and email X-ArgonCount:
-   23536 in abuild, 4/3/2008, subject "preliminary ant launcher
-   experiment".  For communication between abuild and the ant
-   launcher, see ~/source/examples/portability/socket-java-c++-workers.
-
- * ant with build failure appears not to exit abnormally in Windows.
-   This is a bug in ant.bat and could be worked around by using our
-   own ant launcher.
 
  * We don't detect when inaccessible build items are referenced in
    abuild.hook-build-items.  This won't matter anymore if we move hook

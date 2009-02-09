@@ -1,6 +1,7 @@
 #ifndef __JAVABUILDER_HH__
 #define __JAVABUILDER_HH__
 
+#include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
@@ -12,13 +13,16 @@
 #include "ThreadSafeQueue.hh"
 
 class Error;
+class Logger;
 
 class JavaBuilder
 {
   public:
-    JavaBuilder(Error& error, std::string const& abuild_top,
+    JavaBuilder(Error& error,
+		boost::function<void(std::string const&)> verbose,
+		std::string const& abuild_top,
 		std::string const& java,
-		std::list<std::string> const& libdirs,
+		std::list<std::string> const& java_libs,
 		char* envp[]);
     bool invoke(std::string const& backend,
 		std::string const& build_file,
@@ -66,12 +70,14 @@ class JavaBuilder
     enum run_mode_e { rm_idle, rm_running, rm_shutting_down, rm_degraded };
 
     Error& error;
+    Logger& logger;
+    boost::function<void(std::string const&)> verbose;
     boost::mutex mutex;
     boost::condition running_cond;
     int last_request;
     std::string abuild_top;
     std::string java;
-    std::list<std::string> libdirs;
+    std::list<std::string> java_libs;
     char** envp;
     run_mode_e run_mode;
     boost::asio::io_service io_service;

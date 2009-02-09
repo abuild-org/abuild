@@ -4,6 +4,7 @@
 #include <QEXC.hh>
 #include <QTC.hh>
 #include <Error.hh>
+#include <Logger.hh>
 #include <FileLocation.hh>
 #include <boost/bind.hpp>
 #include <boost/regex.hpp>
@@ -12,15 +13,19 @@
 #include <sstream>
 #include <cstdlib>
 
-JavaBuilder::JavaBuilder(Error& error, std::string const& abuild_top,
+JavaBuilder::JavaBuilder(Error& error,
+			 boost::function<void(std::string const&)> verbose,
+			 std::string const& abuild_top,
 			 std::string const& java,
-			 std::list<std::string> const& libdirs,
+			 std::list<std::string> const& java_libs,
 			 char** envp) :
     error(error),
+    logger(*(Logger::getInstance())),
+    verbose(verbose),
     last_request(0),
     abuild_top(abuild_top),
     java(java),
-    libdirs(libdirs),
+    java_libs(java_libs),
     envp(envp),
     run_mode(rm_idle)
 {
@@ -328,31 +333,33 @@ JavaBuilder::run_java(unsigned short port)
     boost::regex jar_re(".*\\.(?i:jar)");
     boost::smatch match;
 
-    // XXX verbose messages including each dir and each jar?
-    std::set<std::string, Util::StringCaseLess> jars_found;
+    verbose("setting up classpath for JavaBuilder");
     std::list<std::string> jars;
-    for (std::list<std::string>::const_iterator liter = this->libdirs.begin();
-	 liter != this->libdirs.end(); ++liter)
+    for (std::list<std::string>::const_iterator jiter = this->java_libs.begin();
+	 jiter != this->java_libs.end(); ++jiter)
     {
-	std::string const& dir = *liter;
-	std::vector<std::string> entries = Util::getDirEntries(dir);
-	for (std::vector<std::string>::iterator eiter = entries.begin();
-	     eiter != entries.end(); ++eiter)
+	if (Util::isDirectory(*jiter))
 	{
-	    std::string const& base = *eiter;
-	    if (boost::regex_match(base, match, jar_re))
+	    std::string const& dir = *jiter;
+	    verbose("scanning directory " + dir);
+	    std::vector<std::string> entries = Util::getDirEntries(dir);
+	    for (std::vector<std::string>::iterator eiter = entries.begin();
+		 eiter != entries.end(); ++eiter)
 	    {
-		std::string full = dir + "/" + base;
-		jars.push_back(full);
-		jars_found.insert(base);
+		std::string const& base = *eiter;
+		if (boost::regex_match(base, match, jar_re))
+		{
+		    std::string full = dir + "/" + base;
+		    verbose("adding " + full);
+		    jars.push_back(full);
+		}
 	    }
 	}
-    }
-
-    if (jars_found.count("abuild-java-support.jar") == 0)
-    {
-	// XXX give more information or include libdirs in verbose
-	throw QEXC::General("abuild-java-support.jar not found");
+	else
+	{
+	    verbose("adding non-directory " + *jiter);
+	    jars.push_back(*jiter);
+	}
     }
 
     std::vector<std::string> args;
