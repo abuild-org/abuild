@@ -28,6 +28,11 @@ documentation.
  * Removed --just-print, --dry-run, --recon; support -n for all
    backends
 
+ * Abuild will start up slightly faster if ANT_HOME and JAVA_HOME are
+   set.  If they are not set, abuild will find java and ant in your
+   path and run them to determine the proper values for ANT_HOME and
+   JAVA_HOME.
+
 
 Licensing
 =========

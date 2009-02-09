@@ -1,0 +1,8 @@
+abuild: defines (abuild-java): all
+Buildfile: --abuild.xml--
+
+-pre-compile:
+     [echo] Property = 'four five six'
+
+BUILD SUCCESSFUL
+Total time: <time>

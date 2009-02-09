@@ -239,3 +239,5 @@ Abuild additional build-also expansion 0
 Abuild non-trivial build-also 0
 Abuild ERR bad clean platform 0
 JavaBuilder handle abnormal java exit 0
+Abuild infer ANT_HOME 0
+Abuild infer JAVA_HOME 0

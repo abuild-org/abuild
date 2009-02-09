@@ -123,8 +123,16 @@ $td->runtest("no-op",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("no ANT_HOME or JAVA_HOME",
+	     {$td->COMMAND => "unset ANT_HOME; unset JAVA_HOME;" .
+		  " abuild potato.salad='four five six'",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/defines2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(4 +
+$td->report(5 +
 	    ($java_cygwin ? 1 : 0) +
 	    ($test_junit ? 3 : 0));

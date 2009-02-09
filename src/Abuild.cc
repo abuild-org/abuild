@@ -3994,6 +3994,7 @@ Abuild::findJava()
 	    java_home =  Util::getProgramOutput(
 		"\"" + candidate + "\" -cp " +
 		java_support_jar + " org.abuild.support.PrintJavaHome");
+	    QTC::TC("abuild", "Abuild infer JAVA_HOME");
 	    verbose("inferred value for JAVA_HOME: " + java_home);
 	}
 	catch (QEXC::General)
@@ -4037,6 +4038,7 @@ Abuild::findJava()
 	    if (boost::regex_match(output, match, ant_home_re))
 	    {
 		ant_home = match.str(1);
+		QTC::TC("abuild", "Abuild infer ANT_HOME");
 		verbose("inferred value for ANT_HOME: " + ant_home);
 	    }
 	    else
