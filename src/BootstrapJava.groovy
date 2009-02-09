@@ -7,7 +7,7 @@ if (! srcDir.isDirectory())
     System.exit(2)
 }
 File buildDir = new File("java-support/abuild-java")
-File destDir = new File(buildDir.path + "/dists")
+File destDir = new File(buildDir.path + "/dist")
 if (! destDir.isDirectory())
 {
     destDir.mkdirs()
