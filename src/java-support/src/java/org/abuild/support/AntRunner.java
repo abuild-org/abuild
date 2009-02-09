@@ -29,7 +29,7 @@ public class AntRunner
 			  Vector<String> otherArgs,
 			  Map<String, String> defines)
     {
-	// Parse otherArgs.  These are passed internal from abuild,
+	// Parse otherArgs.  These are passed internally from abuild,
 	// not from the user.
 	boolean keepGoing = false;
 	boolean emacsMode = false;
