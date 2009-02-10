@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('demo');
+
+$td->runtest("demo",
+	     {$td->STRING => "potato"},
+	     {$td->STRING => "potato"});
+
+$td->report(1);

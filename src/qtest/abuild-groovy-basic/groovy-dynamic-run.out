@@ -1,2 +1,23 @@
-abuild: qwer (abuild-indep): all
+abuild: qwer (abuild-indep): check
 one two three
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running --topdir--/dynamic/qtest/a.test
+     [exec] demo  1 (demo)                                     ... PASSED
+     [exec] 
+     [exec] Overall test suite                                 ... PASSED
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 1
+     [exec] Passes: 1
+     [exec] Failures: 0
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 

@@ -307,7 +307,6 @@ Abuild::parseArgv()
 	else if ((arg == "-e") || (arg == "--emacs"))
 	{
 	    this->java_builder_args.push_back("-e");
-	    this->defines["abuild.private.emacs-mode"] = "1";
 	}
 	else if (arg == "-C")
 	{
@@ -418,13 +417,13 @@ Abuild::parseArgv()
 	}
 	else if (arg == "--verbose")
 	{
-	    this->defines["ABUILD_VERBOSE"] = "1";
+	    this->make_args.push_back("ABUILD_VERBOSE=1");
 	    this->java_builder_args.push_back("-v");
 	    this->verbose_mode = true;
 	}
 	else if (arg == "--silent")
 	{
-	    this->defines["ABUILD_SILENT"] = "1";
+	    this->make_args.push_back("ABUILD_SILENT=1");
 	    this->java_builder_args.push_back("-q");
 	    this->silent = true;
 	}

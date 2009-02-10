@@ -29,12 +29,21 @@ setup($td);
 
 cd("work/dynamic");
 
+$td->runtest("no qtest.log",
+	     {$td->STRING => (-f "abuild-indep/qtest.log" ? "yes" : "no")},
+	     {$td->STRING => "no"});
+
 $td->runtest("groovy dynamic file build",
-	     {$td->COMMAND => ['abuild', 'potato.salad=one two three'],
+	     {$td->COMMAND => ['abuild', 'potato.salad=one two three',
+			       'check'],
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/groovy-dynamic-run.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("qtest.log existence",
+	     {$td->STRING => (-f "abuild-indep/qtest.log" ? "yes" : "no")},
+	     {$td->STRING => "yes"});
 
 $td->runtest("groovy dynamic file",
 	     {$td->FILE => "abuild-indep/.ab-dynamic.groovy",
@@ -54,4 +63,4 @@ $td->runtest("JavaBuilder exit",
 
 check_work_accessed($td);
 
-$td->report(4);
+$td->report(6);
