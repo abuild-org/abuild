@@ -12,6 +12,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <assert.h>
 
 JavaBuilder::JavaBuilder(Error& error,
 			 boost::function<void(std::string const&)> verbose,
@@ -22,11 +23,11 @@ JavaBuilder::JavaBuilder(Error& error,
     error(error),
     logger(*(Logger::getInstance())),
     verbose(verbose),
-    last_request(0),
     abuild_top(abuild_top),
     java(java),
     java_libs(java_libs),
     envp(envp),
+    last_request(0),
     run_mode(rm_idle)
 {
 }
@@ -65,197 +66,247 @@ JavaBuilder::writeDefines(std::map<std::string, std::string> const& defines)
 bool
 JavaBuilder::makeRequest(std::string const& message)
 {
-    {
-	boost::mutex::scoped_lock lock(this->mutex);
-	if (this->run_mode == rm_shutting_down)
-	{
-	    throw std::logic_error("makeRequest called while shutting down");
-	}
-    }
     start();
 
-    Request_ptr request(new Request(message));
-    this->requests.enqueue(request);
-    return request->response.dequeue();
+    // Register response queue
+    response_queue_ptr response(new ThreadSafeQueue<bool>());
+    int request_number = 0;
+
+    {
+	boost::mutex::scoped_lock lock(this->mutex);
+	// We're in trouble if we ever have more than 2^31 builds, but
+	// somehow, I'm not too worried about it.
+	request_number = ++this->last_request;
+	this->response_queues[request_number] = response;
+
+	// Send message and wait for response
+	boost::asio::async_write(
+	    *this->sock, boost::asio::buffer(
+		Util::intToString(request_number) +
+		" " + message + "\n"),
+	    boost::bind(
+		&JavaBuilder::handleWrite, this,
+		boost::asio::placeholders::error));
+    }
+
+    return response->dequeue();
 }
 
 void
 JavaBuilder::finish()
 {
+    boost::mutex::scoped_lock lock(this->mutex);
+    if (this->run_mode == rm_running)
     {
-	boost::mutex::scoped_lock lock(this->mutex);
-	if (this->run_mode != rm_running)
-	{
-	    return;
-	}
+	setRunMode(rm_shutting_down);
+	boost::asio::async_write(
+	    *this->sock, boost::asio::buffer("shutdown\n"),
+	    boost::bind(
+		&JavaBuilder::handleWrite, this,
+		boost::asio::placeholders::error));
     }
-    Request_ptr shutdown(new Request(Request::rt_shutdown));
-    this->requests.enqueue(shutdown);
+    waitForRunMode(rm_stopped);
     cleanup();
 }
 
 void
 JavaBuilder::cleanup()
 {
-    this->reader_thread->join();
-    boost::mutex::scoped_lock lock(this->mutex);
+    // Must be called with the mutex locked
+    this->io_thread->join();
+    this->io_thread.reset();
     this->sock.reset();
-    this->reader_thread.reset();
-    this->run_mode = rm_idle;
+    this->io_service.reset();
+    setRunMode(rm_idle);
 }
 
 void
 JavaBuilder::start()
 {
-    bool call_cleanup = false;
+    boost::mutex::scoped_lock lock(this->mutex);
+
+    switch (this->run_mode)
+    {
+      case rm_running:
+	return;
+
+      case rm_starting_up:
+	waitForRunMode(rm_running);
+	return;
+
+      case rm_shutting_down:
+	throw std::logic_error("start() called while shutting down");
+	break;
+
+      case rm_stopped:
+	cleanup();
+	break;
+
+      case rm_idle:
+	break;
+    }
+
+    setRunMode(rm_starting_up);
+    this->io_thread.reset(
+	new boost::thread(boost::bind(&JavaBuilder::runIO, this)));
+
+    waitForRunMode(rm_running);
+}
+
+void
+JavaBuilder::runIO()
+{
+    thread_ptr java_thread;
 
     {
 	boost::mutex::scoped_lock lock(this->mutex);
-	switch (this->run_mode)
+
+	assert(this->run_mode == rm_starting_up);
+
+	// Set up listen socket, and then start the java program to
+	// connect on the port.  Accept one connection and close the
+	// listen socket.
+
+	this->io_service.reset(new boost::asio::io_service());
+
+	boost::asio::ip::tcp::resolver resolver(*this->io_service);
+	boost::asio::ip::tcp::resolver::query query("127.0.0.1", "0");
+	boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
+	boost::asio::ip::tcp::acceptor a(
+	    *this->io_service, boost::asio::ip::tcp::endpoint(*iter));
+	unsigned short port = a.local_endpoint().port();
+	this->sock.reset(new boost::asio::ip::tcp::socket(*this->io_service));
+	java_thread.reset(
+	    new boost::thread(
+		boost::bind(&JavaBuilder::runJava, this, port)));
+	a.accept(*(this->sock));
+
+	// Start accepting requests
+	setRunMode(rm_running);
+	requestRead();
+    }
+
+    this->io_service->run();
+
+    {
+	boost::mutex::scoped_lock lock(this->mutex);
+
+	// Java side has shut down.  Join the thread and fail any
+	// pending requests.  There won't be any if we exited
+	// normally.
+	java_thread->join();
+	for (std::map<int, response_queue_ptr>::iterator iter =
+		 this->response_queues.begin();
+	     iter != this->response_queues.end(); ++iter)
 	{
-	  case rm_running:
-	    return;
-
-	  case rm_degraded:
-	    call_cleanup = true;
-	    break;
-
-	  case rm_shutting_down:
-	    throw std::logic_error("makeRequest called while shutting down");
-
-	  default:
-	    break;
+	    (*iter).second->enqueue(false);
 	}
-    }
-
-    if (call_cleanup)
-    {
-	cleanup();
-    }
-
-    boost::mutex::scoped_lock lock(this->mutex);
-    this->reader_thread.reset(
-	new boost::thread(boost::bind(&JavaBuilder::reader, this)));
-    while (this->run_mode != rm_running)
-    {
-	this->running_cond.wait(this->mutex);
+	this->response_queues.clear();
+	setRunMode(rm_stopped);
     }
 }
 
 void
-JavaBuilder::reader()
+JavaBuilder::requestRead()
 {
-    // Set up listen socket, and then start the java program to
-    // connect on the port.  Accept one connection and close the
-    // listen socket.
+    this->sock->async_read_some(
+	boost::asio::buffer(this->data),
+	boost::bind(
+	    &JavaBuilder::handleRead, this,
+	    boost::asio::placeholders::error,
+	    boost::asio::placeholders::bytes_transferred));
+}
 
-    thread_ptr java_thread;
-
-    { // private scope
-
-	boost::asio::ip::tcp::resolver resolver(this->io_service);
-	boost::asio::ip::tcp::resolver::query query("127.0.0.1", "0");
-	boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
-	boost::asio::ip::tcp::acceptor a(
-	    this->io_service, boost::asio::ip::tcp::endpoint(*iter));
-	unsigned short port = a.local_endpoint().port();
-	this->sock.reset(new boost::asio::ip::tcp::socket(this->io_service));
-	java_thread.reset(
-	    new boost::thread(
-		boost::bind(&JavaBuilder::run_java, this, port)));
-	a.accept(*(this->sock));
-    }
-
-    // Start handler
-    boost::thread handler_thread(
-	boost::bind(&JavaBuilder::handler, this));
-
-    // Main read loop
-    this->run_mode = rm_running;
-    this->running_cond.notify_all();
-    std::string accumulated_response;
-    while (true)
+void
+JavaBuilder::handleRead(boost::system::error_code const& ec, size_t length)
+{
+    boost::mutex::scoped_lock lock(this->mutex);
+    if (ec)
     {
-	char data[1024];
-	boost::system::error_code error;
-	size_t length =
-	    this->sock->read_some(boost::asio::buffer(data), error);
-	if (error == boost::asio::error::eof)
+	bool eof = false;
+	if (ec == boost::asio::error::eof)
 	{
-	    break;
+	    eof = true;
 	}
-	else if (error)
+	else
 	{
 	    this->error.error(
 		FileLocation(),
 		"error reading from JavaBuilder: " +
-		error.message() + "; will attempt to recover");
-	    break;
+		ec.message() + "; will attempt to recover");
 	}
-	else if (this->run_mode == rm_running)
-	{
-	    accumulated_response += std::string(data, length);
-	    handleResponse(accumulated_response);
-	}
-    }
 
-    bool degraded = false;
-    {
-	boost::mutex::scoped_lock lock(this->mutex);
-	if (this->run_mode == rm_running)
+	if ((! eof) || (this->run_mode == rm_running))
 	{
-	    // The java side exited unexpectedly
-	    degraded = true;
+	    // EOF in running mode means the Java side expected
+	    // unexpectedly.
 	    QTC::TC("abuild", "JavaBuilder handle abnormal java exit");
-	    this->run_mode = rm_degraded;
+	    this->error.error(
+		FileLocation(),
+		"JavaBuilder exited unexpectedly; will attempt to recover");
 	}
+	setRunMode(rm_stopped);
     }
-    if (degraded)
+    else if (this->run_mode == rm_running)
     {
-	Request_ptr r(new Request(Request::rt_break));
-	this->requests.enqueue(r);
-	// Degraded mode recovery seems to sometimes cause
-	// segmentation faults within the boost library.  I'm not sure
-	// whether it's my code or theirs.
-	this->error.error(
-	    FileLocation(),
-	    "JavaBuilder exited unexpectedly; will try to recover,"
-	    " but a crash is likely if this is a parallel build");
+	this->accumulated_response += std::string(data, length);
+	handleResponse();
+	requestRead();
     }
-
-    handler_thread.join();
-    java_thread->join();
+    else
+    {
+	// Ignore any input we get when not in running mode; we're
+	// already failing any pending requests.
+    }
 }
 
 void
-JavaBuilder::handleResponse(std::string& responses)
+JavaBuilder::handleWrite(boost::system::error_code const& ec)
+{
+    if (ec)
+    {
+	boost::mutex::scoped_lock lock(this->mutex);
+
+	// No other action required -- presumably we will get a read
+	// error or EOF as well.
+	if (this->run_mode == rm_running)
+	{
+	    this->error.error(
+		FileLocation(),
+		"error writing message to JavaBuilder: " +
+		ec.message() + "; will attempt to recover");
+	}
+    }
+}
+
+void
+JavaBuilder::handleResponse()
 {
     boost::regex response_re("(\\d+) (true|false)\r?");
     boost::smatch match;
 
     size_t p;
-    while ((p = responses.find("\n")) != std::string::npos)
+    while ((p = this->accumulated_response.find("\n")) != std::string::npos)
     {
-	std::string response = responses.substr(0, p);
-	responses = responses.substr(p + 1);
+	std::string response = this->accumulated_response.substr(0, p);
+	this->accumulated_response = this->accumulated_response.substr(p + 1);
 	if (boost::regex_match(response, match, response_re))
 	{
 	    int request_number = std::atoi(match[1].str().c_str());
 	    std::string result_str = match[2].str();
 	    bool result = (result_str == "true");
-	    Request_ptr request;
+	    response_queue_ptr response_queue;
 	    {
-		boost::mutex::scoped_lock lock(this->mutex);
-		if (! this->pending_requests.count(request_number))
+		if (! this->response_queues.count(request_number))
 		{
 		    throw QEXC::General("protocol error: received response "
 					"for unknown request " +
 					Util::intToString(request_number));
 		}
-		request = this->pending_requests[request_number];
-		this->pending_requests.erase(request_number);
+		response_queue = this->response_queues[request_number];
+		this->response_queues.erase(request_number);
 	    }
-	    request->response.enqueue(result);
+	    response_queue->enqueue(result);
 	}
 	else
 	{
@@ -265,70 +316,26 @@ JavaBuilder::handleResponse(std::string& responses)
     }
 }
 
-static bool
-asio_completion_condition(boost::system::error_code&, std::size_t)
+void
+JavaBuilder::waitForRunMode(run_mode_e mode)
 {
-    return true;
+    // Must be called with mutex locked
+    while (this->run_mode != mode)
+    {
+	this->running_cond.wait(this->mutex);
+    }
 }
 
 void
-JavaBuilder::handler()
+JavaBuilder::setRunMode(run_mode_e mode)
 {
-    while (true)
-    {
-	Request_ptr request = this->requests.dequeue();
-	boost::system::error_code error;
-	if (request->request_type == Request::rt_shutdown)
-	{
-	    this->run_mode = rm_shutting_down;
-	    boost::asio::write(*sock, boost::asio::buffer("shutdown\n"),
-			       asio_completion_condition, error);
-	    // ignore error condition
-	    break;
-	}
-	else if (request->request_type == Request::rt_break)
-	{
-	    break;
-	}
-	else
-	{
-	    // We're in trouble if we ever have more than 2^31 builds,
-	    // but somehow, I'm not too worried about it.
-	    int request_number = ++this->last_request;
-	    {
-		boost::mutex::scoped_lock lock(this->mutex);
-		this->pending_requests[request_number] = request;
-	    }
-	    boost::asio::write(
-		*sock, boost::asio::buffer(
-		    Util::intToString(request_number) +
-		    " " + request->text + "\n"),
-		asio_completion_condition, error);
-	    if (error)
-	    {
-		this->error.error(
-		    FileLocation(),
-		    "error writing message to JavaBuilder: " +
-		    error.message() + "; will attempt to recover");
-		// Just break....presumably the reader will also get
-		// an error or EOF.
-		break;
-	    }
-	}
-    }
-
-    boost::mutex::scoped_lock lock(this->mutex);
-    for (std::map<int, Request_ptr>::iterator iter =
-	     this->pending_requests.begin();
-	 iter != this->pending_requests.end(); ++iter)
-    {
-	(*iter).second->response.enqueue(false);
-    }
-    this->pending_requests.clear();
+    // Must be called with mutex locked
+    this->run_mode = mode;
+    this->running_cond.notify_all();
 }
 
 void
-JavaBuilder::run_java(unsigned short port)
+JavaBuilder::runJava(unsigned short port)
 {
     boost::regex jar_re(".*\\.(?i:jar)");
     boost::smatch match;

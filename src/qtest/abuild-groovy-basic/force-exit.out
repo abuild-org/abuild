@@ -2,6 +2,9 @@ abuild: a (abuild-indep): all
 This mis-behaved build item is causing abuild's java builder to exit.
 abuild: a (abuild-indep): build failed
 abuild: b (abuild-indep): all
+abuild: c (abuild-indep): all
+abuild: d (abuild-indep): all
+abuild: e (abuild-indep): all
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: a on platform indep
 --found JavaBuilder errors--
