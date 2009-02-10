@@ -45,8 +45,8 @@ documentation.
 Licensing
 =========
 
- * Embedding groovy and ant; need to comply with Apache license and
-   create NOTICE.txt file.
+ * Embedding groovy; need to comply with Apache license and create
+   NOTICE.txt file.
 
 Core Changes
 ============
@@ -429,14 +429,6 @@ Java builds
 
  * Consider dropping support for Abuild-ant.xml.  If so, also remove
    build_file from the internal JavaBuilder protocol.
-
- * Distribute junit, groovy, ant-contrib (if needed), and ant jars
-   with abuild.  Probably at least distribute enough jars to run the
-   groovy backend.  We might not want to include all of ANT_HOME if
-   we're still supporting ant.  Instead, we may just require ANT_HOME
-   to be set.  We need at least ant, ant-launcher, groovy-all.  We
-   probably also want ant-junit and junit.  We probably don't want
-   ant-contrib.
 
 
 Changes to "ant" support
