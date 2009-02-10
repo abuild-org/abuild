@@ -3423,7 +3423,6 @@ Abuild::addBuildAlsoToBuildset(BuildItem_map& builditems)
 	for (BuildItem_map::iterator iter = this->buildset.begin();
 	     iter != this->buildset.end(); ++iter)
 	{
-	    std::string const& item_name = (*iter).first;
 	    BuildItem& item = *((*iter).second);
 	    std::list<std::string> const& build_also = item.getBuildAlso();
 	    for (std::list<std::string>::const_iterator biter =
