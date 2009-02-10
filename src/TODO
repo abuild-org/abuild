@@ -1,10 +1,6 @@
 
 === Changes Targeted for Version 1.1 ===
 
-XXX Windows: innocuous failure on force exit in groovy.  Need to
-filter ERROR: .*JavaBuilder.* error messages intelligently -- make
-sure at least one appears and then ignore.
-
 Changes to document
 ===================
 

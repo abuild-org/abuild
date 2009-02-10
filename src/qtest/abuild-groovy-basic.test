@@ -46,7 +46,8 @@ cd("work/force-exit");
 
 $td->runtest("JavaBuilder exit",
 	     {$td->COMMAND => "abuild -b all -k",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	      $td->FILTER =>
+		  "perl $top/filter-exit.pl | perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/force-exit.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
