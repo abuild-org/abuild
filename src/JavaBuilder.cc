@@ -244,8 +244,8 @@ JavaBuilder::handleRead(boost::system::error_code const& ec, size_t length)
 	    this->error.error(
 		FileLocation(),
 		"JavaBuilder exited unexpectedly; will attempt to recover");
+	    setRunMode(rm_stopped);
 	}
-	setRunMode(rm_stopped);
     }
     else if (this->run_mode == rm_running)
     {
