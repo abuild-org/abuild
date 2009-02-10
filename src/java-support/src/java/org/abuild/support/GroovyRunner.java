@@ -7,6 +7,7 @@ import java.util.Map;
 import groovy.lang.Binding;
 import groovy.lang.Script;
 import groovy.lang.GroovyClassLoader;
+import org.apache.tools.ant.Project;
 
 public class GroovyRunner
 {
@@ -32,6 +33,8 @@ public class GroovyRunner
 			     Vector<String> groovyArgs,
 			     Map<String, String> defines)
     {
+	Project project = AntRunner.createAntProject(
+	    dirName, groovyArgs, defines);
 	boolean result = false;
 	Exception exc = null;
 	try
@@ -43,6 +46,7 @@ public class GroovyRunner
 	    binding.setVariable("targets", targets);
 	    binding.setVariable("groovyArgs", groovyArgs);
 	    binding.setVariable("defines", defines);
+	    binding.setVariable("antProject", project);
 	    Object[] args = {};
 	    Object resultObject = script.invokeMethod("run", args);
 	    if (resultObject instanceof Boolean)

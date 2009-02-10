@@ -12,29 +12,17 @@ import org.abuild.ant.AbuildLogger;
 
 public class AntRunner
 {
-    // Abuild invocation of ant:
-    //   buildfile is either Abuilt-ant.xml or TOP/ant/abuild.xml
-    //   basedir is abuild-java
-    //   logger is org.abuild.ant.AbuildLogger (unless turned off)
-    //   targets
-
-    // May have other args (-k, -v, etc.) -- see ant_args in
-    // Abuild.cc and processArgs(String[] args) in
-    // org/apache/tools/ant/Main.java
-
-    // See getAntVersion in Main.java as well.
-
-    public boolean runAnt(String buildFileName, String dirName,
-			  Vector<String> targets,
-			  Vector<String> otherArgs,
-			  Map<String, String> defines)
+    public static Project createAntProject(
+	String dirName,
+	Vector<String> otherArgs,
+	Map<String, String> defines)
     {
 	// Parse otherArgs.  These are passed internally from abuild,
 	// not from the user.
 	boolean keepGoing = false;
 	boolean emacsMode = false;
-	int messageOutputLevel = Project.MSG_INFO;
-	boolean noOp = false;
+	Integer messageOutputLevel = Project.MSG_INFO;
+	Boolean noOp = false;
 	for (String arg: otherArgs)
 	{
 	    if (arg.equals("-e"))
@@ -61,14 +49,58 @@ public class AntRunner
 	    {
 		System.err.println(
 		    "abuild: invalid arguments passed to runAnt: " + arg);
-		return false;
+		return null;
 	    }
 	}
+
+	File dir = new File(dirName);
+	Project p = new Project();
+	p.setKeepGoingMode(keepGoing);
+	p.setUserProperty(MagicNames.PROJECT_BASEDIR, dir.getAbsolutePath());
+	for (Map.Entry<String, String> e: defines.entrySet())
+	{
+	    p.setUserProperty(e.getKey(), e.getValue());
+	}
+	DefaultLogger logger = new AbuildLogger();
+	logger.setErrorPrintStream(System.err);
+	logger.setOutputPrintStream(System.out);
+	logger.setMessageOutputLevel(messageOutputLevel);
+	logger.setEmacsMode(emacsMode);
+	if (emacsMode)
+	{
+	    p.setUserProperty("abuild.private.emacs-mode", "1");
+	}
+	p.addBuildListener(logger);
+	BuildException error = null;
+
+	p.init();
+	ProjectHelper helper = ProjectHelper.getProjectHelper();
+	p.addReference(ProjectHelper.PROJECTHELPER_REFERENCE, helper);
+	p.addReference("abuild.ant.noOp", noOp);
+	p.addReference("abuild.ant.messageOutputLevel", messageOutputLevel);
+
+	return p;
+    }
+
+    public boolean runAnt(String buildFileName, String dirName,
+			  Vector<String> targets,
+			  Vector<String> otherArgs,
+			  Map<String, String> defines)
+    {
+	Project p = createAntProject(dirName, otherArgs, defines);
+	if (p == null)
+	{
+	    return false;
+	}
+
+	Integer messageOutputLevel =
+	    (Integer) p.getReference("abuild.ant.messageOutputLevel");
 
         if (messageOutputLevel >= Project.MSG_INFO)
 	{
 	    System.out.println("Buildfile: " + buildFileName);
         }
+	Boolean noOp = (Boolean) p.getReference("abuild.ant.noOp");
 	if (noOp)
 	{
 	    System.out.print("would build targets:");
@@ -81,28 +113,14 @@ public class AntRunner
 	}
 
 	File buildFile = new File(buildFileName);
-	File dir = new File(dirName);
-	Project p = new Project();
-	p.setKeepGoingMode(keepGoing);
 	p.setUserProperty(MagicNames.ANT_FILE, buildFile.getAbsolutePath());
-	p.setUserProperty(MagicNames.PROJECT_BASEDIR, dir.getAbsolutePath());
-	for (Map.Entry<String, String> e: defines.entrySet())
-	{
-	    p.setUserProperty(e.getKey(), e.getValue());
-	}
-	DefaultLogger logger = new AbuildLogger();
-	logger.setErrorPrintStream(System.err);
-	logger.setOutputPrintStream(System.out);
-	logger.setMessageOutputLevel(messageOutputLevel);
-	logger.setEmacsMode(emacsMode);
-	p.addBuildListener(logger);
 	BuildException error = null;
 	try
 	{
 	    p.fireBuildStarted();
-	    p.init();
-	    ProjectHelper helper = ProjectHelper.getProjectHelper();
-	    p.addReference("ant.projectHelper", helper);
+	    ProjectHelper helper =
+		(ProjectHelper) p.getReference(
+		    ProjectHelper.PROJECTHELPER_REFERENCE);
 	    helper.parse(p, buildFile);
 	    p.executeTargets(targets);
 	}
