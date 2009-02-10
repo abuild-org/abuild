@@ -12,8 +12,8 @@ static def runQTest = {
         def build = abuild.buildDirectory.path
         def tty = abuild.ifc['ABUILD_STDOUT_IS_TTY'] ? "1" : "0"
         def command = 'qtest-driver';
-        def args = ['-datadir', "${qtest.path}",
-            '-bindirs', "${src}:${build}", '-covdir', "${src}",
+        def args = ['-datadir', '../qtest',
+            '-bindirs', '..:.', '-covdir', '..',
             "-stdout-tty=${tty}"]
         if (System.getProperty('os.name') =~ /(?i:windows).*/)
         {
@@ -21,7 +21,7 @@ static def runQTest = {
             args = ['-S', 'qtest-driver', *args]
         }
 
-        ant.exec('failonerror':'true', 'executable':'qtest-driver',
+        ant.exec('failonerror':'true', 'executable': command,
                  'dir': build)
         {
             if (! abuild.emacsMode)

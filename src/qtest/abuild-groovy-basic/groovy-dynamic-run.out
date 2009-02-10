@@ -6,7 +6,7 @@ one two three
      [exec] *********************************
      [exec] 
      [exec] 
-     [exec] Running --topdir--/dynamic/qtest/a.test
+     [exec] Running ../qtest/a.test
      [exec] demo  1 (demo)                                     ... PASSED
      [exec] 
      [exec] Overall test suite                                 ... PASSED
