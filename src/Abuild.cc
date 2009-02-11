@@ -4761,8 +4761,7 @@ Abuild::invoke_ant(std::string const& item_name,
     for (std::list<std::string>::const_iterator iter = plugins.begin();
 	 iter != plugins.end(); ++iter)
     {
-	plugin_paths.push_back(
-	    Util::absToRel(this->buildset[*iter]->getAbsolutePath(), dir));
+	plugin_paths.push_back(this->buildset[*iter]->getAbsolutePath());
     }
     dyn << "abuild.plugins="
 	<< Util::join(",", plugin_paths)
@@ -4863,8 +4862,7 @@ Abuild::invoke_groovy(std::string const& item_name,
     for (std::list<std::string>::const_iterator iter = plugins.begin();
 	 iter != plugins.end(); ++iter)
     {
-	plugin_paths.push_back(
-	    Util::absToRel(this->buildset[*iter]->getAbsolutePath(), dir));
+	plugin_paths.push_back(this->buildset[*iter]->getAbsolutePath());
     }
     dyn << "abuild.pluginPaths = [";
     if (! plugin_paths.empty())
@@ -4873,6 +4871,9 @@ Abuild::invoke_groovy(std::string const& item_name,
 	    << "'";
     }
     dyn << "]\n";
+
+    // XXX build item rules
+    dyn << "abuild.buildItemRules = []\n";
 
     // Provide data from the item's interface object.  We use "ifc"
     // because "interface" is a reserved word in Groovy.

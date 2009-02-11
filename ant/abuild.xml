@@ -202,17 +202,16 @@
     def files = []
     // Plugins: load plugin-ant.xml in each path
     properties['abuild.plugins']?.split(/,\s*/).each {
-        files << "${basedir}/${it}/plugin-ant.xml"
+        files << new File("${it}/plugin-ant.xml")
     }
+    // Since plugin-ant.xml files are optional, filter out the ones
+    // that don't exist.
+    files = files.grep { it.isFile() }
+
     // Hook build items: load ant-hooks.xml in each build item
     properties['abuild.hook-build-items']?.split(/,\s*/).each {
-        files << properties["abuild.dir.${it}"] + "/ant-hooks.xml"
+        files << new File(properties["abuild.dir.${it}"] + "/ant-hooks.xml")
     }
-
-    // Convert from strings to File objects, and filter out files that
-    // don't exist.  Do this before adding local build file -- we want
-    // an error if that one doesn't exist.
-    files = files.collect { new File(it) }.grep { it.isFile() }
 
     // Local hooks: load local-buildfile
     if (properties.containsKey('abuild.local-buildfile'))
