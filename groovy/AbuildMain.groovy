@@ -310,6 +310,8 @@ class Builder
 
     boolean build()
     {
+        // The logic here strongly parallels abuild's "make" logic.
+
         def dynamicFile = new File(buildDirectory.path + "/.ab-dynamic.groovy")
         def sourceDirectory = buildDirectory.parentFile
         def buildFile = new File(sourceDirectory.path + "/Abuild.groovy")
@@ -319,8 +321,22 @@ class Builder
 
         loadScript(buildState.abuildTop + "/groovy/QTestSupport.groovy")
 
-        // XXX plugins: Plugin.groovy
-        // XXX build item rules: Rules.groovy
+        // Load plugin code
+
+        // XXX Plugin.groovy for each plugin
+
+        // Load any rules specified in prop['abuild.rules'].  First
+        // search the internal location, and then search in each
+        // plugin directory, returning the first item found.
+
+        // XXX ${it}.groovy
+
+        // Load build item rules
+
+        // XXX load Rules.groovy from each requested build item
+
+        // Load any local rules files, resolving the path relative to
+        // the source directory
 
         if (buildState.prop.containsKey('abuild.local-rules'))
         {
