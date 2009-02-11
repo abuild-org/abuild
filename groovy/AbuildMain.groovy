@@ -232,6 +232,8 @@ class Builder
 
         loadScript(buildState.abuildTop + "/groovy/QTestSupport.groovy")
 
+        // XXX
+
         // plugin
         // rules
         // local
@@ -240,12 +242,12 @@ class Builder
         this.buildState.runTargets(this.targets)
     }
 
-    def loadScript(String filename)
+    private loadScript(String filename)
     {
         loadScript(new File(filename))
     }
 
-    def loadScript(File file)
+    private loadScript(File file)
     {
         try
         {
@@ -265,7 +267,7 @@ class Builder
         }
     }
 
-    def runScript(file, object)
+    private runScript(file, object)
     {
         object.setBinding(binding)
         try
