@@ -253,3 +253,4 @@ groovy ERR other target exception 0
 groovy ERR script compilation errors 0
 groovy ERR script run exception 0
 groovy ERR exception during build 0
+groovy ERR no rules 0

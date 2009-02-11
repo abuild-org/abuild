@@ -1,4 +1,6 @@
 
+XXX Next: dep -with-rules, implement basic "jar" rules
+
 === Changes Targeted for Version 1.1 ===
 
 Changes to document
@@ -454,50 +456,8 @@ Changes to "ant" support
 
 Things to consider if preserving ant support....
 
- * Document/use these conventions on properties:
-
-    - abuild.property can be set by a user in Abuild-ant.properties.
-      These are documented in end user documentation.
-
-    - abuild.protected.property can be safely accessed by hook authors
-      or by local build files.  These are documented in hook author
-      documentation.
-
-    - abuild.private.property is intended for use within abuild's own
-      ant framework and should not be accessed by users.  These
-      properties are subject to change at any time.  These are not
-      documented unless by comments in the code.
-
  * Add example of creating a new target that calls hooks.  See
    qtest/abuild-ant-misc/data/target-from-hook.
-
- * Incorporate misc/abuild-groovy.  Load the groovy task and make it
-   available for others to use.  In abuild 1.0, there is no mechanism
-   for adding a new build target that is visible to all build items
-   (as one can do with plugin.mk in make-based builds).  The main
-   reason for this is that adding new targets requires use of <import>
-   from the top level (or else the new target will not be defined when
-   ant tries to invoke it), and there is no way to run import inside a
-   target or top-level task.  To get around this, use groovy to
-   generate an xml file that imports all the hook files and then
-   import that automatically generated xml file as in the
-   misc/abuild-groovy example.  Consider folding the logic of
-   checkForTarget into run-hooks.  Rethink whether we want to call
-   this ant-hooks.xml or something else.  They are now imported, so
-   they can contain more than just hooks, but best practices should
-   still dictate their use primarily for hooks.  We'll have to remind
-   people in the documentation that ant will do what ant does if you
-   create the same target in multiple places (whoever gets loaded
-   first wins, but everyone's version can be accessed as
-   projectname.targetname).  Best practice should be to add a target
-   that just calls hooks by the same name.  Everyone can call
-   <run-hooks> from their own tasks.  Since hooks are implemented as
-   private targets, the name clash problem doesn't happen.  If
-   everyone defines their new targets by calling hooks, then if two
-   people define new targets with the same names, it won't matter that
-   much.  There's still the question of dependencies (in the ant
-   sense), but this is no different from what would happen if we had a
-   library of ant code that people imported on their own.
 
  * With groovy support, make sure any place we iterate over
    comma-separated lists behaves properly with respect to whitespace.

@@ -21,6 +21,7 @@ class BuildState
     def itemPaths = [:]
     def abuildTop
     def pluginPaths
+    def buildItemRules
 
     // supplied by abuild
     def prop
@@ -296,6 +297,7 @@ class BuildState
 class Builder
 {
     File buildDirectory
+    BuildArgs buildArgs
     def targets
 
     def loader = new GroovyClassLoader()
@@ -308,6 +310,7 @@ class Builder
             targets, defines)
     {
         this.buildDirectory = buildDirectory
+        this.buildArgs = buildArgs
         this.targets = targets
 
         def ant = new AntBuilder(antProject)
@@ -329,27 +332,67 @@ class Builder
         loadScript(dynamicFile)
         loadScript(buildFile)
 
-        loadScript(buildState.abuildTop + "/groovy/QTestSupport.groovy")
+        def groovyTop = buildState.abuildTop + "/groovy"
+        loadScript(groovyTop + "/QTestSupport.groovy")
+        def targetType = buildState.ifc['ABUILD_TARGET_TYPE']
 
-        // Load plugin code
+        def ruleSearchPath = [new File("${groovyTop}/${targetType}")]
 
-        // XXX Plugin.groovy for each plugin
+        // Load plugin code and populate ruleSearchPath
+        buildState.pluginPaths.each {
+            File f = new File("${it}/Plugin.groovy")
+            if (f.isFile())
+            {
+                loadScript(f)
+            }
+            File rulesDir = new File("${it}/rules/${targetType}")
+            if (rulesDir.isDirectory())
+            {
+                ruleSearchPath << rulesDir
+            }
+        }
+
+        if (((! buildState.prop.containsKey('abuild.rules')) ||
+             buildState.prop['abuild.rules'].isEmpty()) &&
+            ((! buildState.prop.containsKey('abuild.local-rules')) ||
+             buildState.prop['abuild.local-rules'].isEmpty()) &&
+            buildState.buildItemRules.isEmpty())
+        {
+            QTC.TC("abuild", "groovy ERR no rules")
+            buildState.error(
+                "no build rules are defined; one of abuild.rules or" +
+                " abuild.local-rules must be defined, or at least one" +
+                " dependency must have been specified with the" +
+                " -with-rules option")
+            return false
+        }
 
         // Load any rules specified in prop['abuild.rules'].  First
         // search the internal location, and then search in each
         // plugin directory, returning the first item found.
-
-        // XXX ${it}.groovy
+        buildState.prop['abuild.rules']?.each {
+            rule ->
+            for (dir in ruleSearchPath)
+            {
+                File f = new File("${dir.path}/${rule}.groovy")
+                if (f.isFile())
+                {
+                    loadScript(f)
+                    break
+                }
+            }
+        }
 
         // Load build item rules
-
-        // XXX load Rules.groovy from each requested build item
+        buildState.buildItemRules.each {
+            item ->
+            loadScript(new File(abuild.itemPaths[item] + '/Rules.groovy'))
+        }
 
         // Load any local rules files, resolving the path relative to
         // the source directory
-
         buildState.prop['abuild.local-rules']?.each {
-            loadScript(new File(sourceDirectory.path + "/" + it))
+            loadScript(new File("${sourceDirectory.path}/${it}.groovy"))
         }
 
         if (! buildState.checkGraph())
@@ -372,6 +415,10 @@ class Builder
 
     private loadScript(File file)
     {
+        if (buildArgs.verbose)
+        {
+            println "--> loading ${file.path}"
+        }
         try
         {
             Class groovyClass = loader.parseClass(file)

@@ -1,1 +1,1 @@
-// empty
+abuild.prop['abuild.rules'] = ['Empty']
