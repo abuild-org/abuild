@@ -131,8 +131,17 @@ $td->runtest("no ANT_HOME or JAVA_HOME",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/target-from-hook/user");
+
+$td->runtest("new target with hook",
+	     {$td->COMMAND => "abuild hookything",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/new-target.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(5 +
+$td->report(6 +
 	    ($java_cygwin ? 1 : 0) +
 	    ($test_junit ? 3 : 0));

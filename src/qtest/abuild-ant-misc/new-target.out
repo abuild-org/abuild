@@ -1,0 +1,14 @@
+abuild: user (abuild-java): hookything
+Buildfile: --abuild.xml--
+
+hookything:
+     [echo] This is a new target.
+
+-hook:
+     [echo] This is a hook hook.
+
+-hook:
+     [echo] This is another hook hook.
+
+BUILD SUCCESSFUL
+Total time: <time>

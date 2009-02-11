@@ -468,6 +468,9 @@ Things to consider if preserving ant support....
       properties are subject to change at any time.  These are not
       documented unless by comments in the code.
 
+ * Add example of creating a new target that calls hooks.  See
+   qtest/abuild-ant-misc/data/target-from-hook.
+
  * Incorporate misc/abuild-groovy.  Load the groovy task and make it
    available for others to use.  In abuild 1.0, there is no mechanism
    for adding a new build target that is visible to all build items
