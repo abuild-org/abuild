@@ -3,10 +3,10 @@ XXX Next: dep -with-rules, implement basic "jar" rules, test build
 item rules in groovy.  For -with-rules, consider using
 abuild.rule-build-items (ant), abuild.ruleBuildItems (groovy), and
 abRULE_BUILD_ITEMS (make).  Detect abuild.hook-build-items and
-BUILD_ITEM_RULES In make, add their contents to the new variables as
-appropriate, and give warnings/errors as needed.  When generating the
-list of build item rules, the order in which the dependencies were
-declared should be preserved.
+BUILD_ITEM_RULES.  If they appear without the new variables, give a
+deprecation warning and use them instead.  Otherwise, give an error.
+When generating the list of build item rules, the order in which the
+dependencies were declared should be preserved.
 
 === Changes Targeted for Version 1.1 ===
 
