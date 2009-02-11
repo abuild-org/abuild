@@ -399,6 +399,9 @@ Platform Issues
 Changes to "make" Code
 ======================
 
+ * Consider changing plugin.mk to Plugin.mk for consistency with
+   Rules.mk
+
  * Need a better solution for files that are automatically generated
    by optional tools.  Abuild itself could use this for flex/bison
    files.  We could also use it for cases like xbinder where
