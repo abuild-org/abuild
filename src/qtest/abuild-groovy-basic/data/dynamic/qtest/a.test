@@ -7,8 +7,9 @@ require TestDriver;
 
 my $td = new TestDriver('demo');
 
-$td->runtest("demo",
-	     {$td->STRING => "potato"},
-	     {$td->STRING => "potato"});
+$td->runtest("environment",
+	     {$td->STRING => $ENV{'VAR1'} . " " . $ENV{'VAR2'} . "\n"},
+	     {$td->STRING => "first value second value\n"},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->report(1);

@@ -1,9 +1,4 @@
 
-// XXX We could easily provide a way for the user to specify
-// environment variables to be passed to qtest once we come up with a
-// decent strategy for passing information from Abuild.groovy to
-// target implementations.
-
 abuild.setTarget('test-only') {
     def src = abuild.sourceDirectory.path
     def qtest = new File("${src}/qtest")
@@ -29,10 +24,16 @@ abuild.setTarget('test-only') {
                 env('key':'QTEST_EXTRA_MARGIN',
                     'value':12)
             }
-            if (abuild.defines.containsKey('TESTS'))
+            if (abuild.prop.containsKey('TESTS'))
             {
                 env('key':'TESTS',
-                    'value': abuild.defines['TESTS'])
+                    'value': abuild.prop['TESTS'])
+            }
+            if (abuild.prop.containsKey('QTest.export'))
+            {
+                abuild.prop['QTest.export'].each {
+                    env('key': it, 'value': abuild.prop[it])
+                }
             }
             args.each {
                 arg('value':it)

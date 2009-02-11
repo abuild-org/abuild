@@ -23,7 +23,7 @@ class BuildState
     def pluginPaths
 
     // supplied by abuild
-    def defines
+    def prop
     File buildDirectory
     BuildArgs buildArgs
 
@@ -48,7 +48,7 @@ class BuildState
         this.ant = ant
         this.buildDirectory = buildDirectory
         this.buildArgs = buildArgs
-        this.defines = defines
+        this.prop = defines
 
         this.sourceDirectory = buildDirectory.parentFile
 
@@ -201,7 +201,7 @@ class BuildState
         {
             QTC.TC("abuild", "groovy ERR dep failure")
             error("not building target \"${target}\" because of" +
-                  " failure of its dependencies");
+                  " failure of its dependencies")
         }
         else
         {
@@ -311,22 +311,27 @@ class Builder
     boolean build()
     {
         def dynamicFile = new File(buildDirectory.path + "/.ab-dynamic.groovy")
-        def buildFile = new File(buildDirectory.parent + "/Abuild.groovy")
+        def sourceDirectory = buildDirectory.parentFile
+        def buildFile = new File(sourceDirectory.path + "/Abuild.groovy")
 
         loadScript(dynamicFile)
         loadScript(buildFile)
 
         loadScript(buildState.abuildTop + "/groovy/QTestSupport.groovy")
 
-        // XXX
+        // XXX plugins: Plugin.groovy
+        // XXX build item rules: Rules.groovy
 
-        // plugin
-        // rules
-        // local
+        if (buildState.prop.containsKey('abuild.local-rules'))
+        {
+            buildState.prop['abuild.local-rules'].each {
+                loadScript(new File(sourceDirectory.path + "/" + it))
+            }
+        }
 
         if (! buildState.checkGraph())
         {
-            return false;
+            return false
         }
 
         boolean status = this.buildState.runTargets(this.targets)

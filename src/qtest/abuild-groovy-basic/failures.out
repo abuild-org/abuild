@@ -13,11 +13,13 @@ abuild-groovy: ERROR: not building target "all" because of failure of its depend
 abuild: b (abuild-indep): build failed
 abuild: c (abuild-indep): all
 abuild-groovy: ERROR: target "three" depends on unknown target "four"
+abuild-groovy: ERROR: target "three" depends on unknown target "five"
 abuild-groovy: ERROR: the following targets are involved in a dependency cycle: "one", "two"
 abuild-groovy: ERROR: dependencies are defined for target "one" in the following files:
 abuild-groovy: ERROR:   --topdir--/failures/c/Abuild.groovy
 abuild-groovy: ERROR: dependencies are defined for target "three" in the following files:
 abuild-groovy: ERROR:   --topdir--/failures/c/Abuild.groovy
+abuild-groovy: ERROR:   --topdir--/failures/c/local1.groovy
 abuild-groovy: ERROR: dependencies are defined for target "two" in the following files:
 abuild-groovy: ERROR:   --topdir--/failures/c/Abuild.groovy
 abuild: c (abuild-indep): build failed

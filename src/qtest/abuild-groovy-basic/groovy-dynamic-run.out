@@ -7,7 +7,7 @@ one two three
      [exec] 
      [exec] 
      [exec] Running ../qtest/a.test
-     [exec] demo  1 (demo)                                     ... PASSED
+     [exec] demo  1 (environment)                              ... PASSED
      [exec] 
      [exec] Overall test suite                                 ... PASSED
      [exec] 

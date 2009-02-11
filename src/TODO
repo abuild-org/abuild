@@ -46,6 +46,10 @@ documentation.
    defining a closure for the 'test-only' target.  Abuild
    automatically calls this from test or check.
 
+ * QTest.export prop for groovy backend; also export of TESTS
+
+ * abuild.local-rules prop
+
 Licensing
 =========
 
