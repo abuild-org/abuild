@@ -9,9 +9,9 @@ my $td = new TestDriver('demo');
 
 my %exp = ('VAR1' => 'first value',
 	   'VAR2' => 'second value',
-	   'potato' => 'one two three',
-	   'spackle' => 'four five six',
-	   'truth1' => '1');
+	   'POTATO' => 'one two three',
+	   'SPACKLE' => 'four five six',
+	   'TRUTH1' => '1');
 
 foreach my $v (sort keys %exp)
 {

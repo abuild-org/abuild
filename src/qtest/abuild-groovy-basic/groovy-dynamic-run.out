@@ -7,11 +7,11 @@ one two three
      [exec] 
      [exec] 
      [exec] Running ../qtest/a.test
-     [exec] demo  1 (VAR1)                                     ... PASSED
-     [exec] demo  2 (VAR2)                                     ... PASSED
-     [exec] demo  3 (potato)                                   ... PASSED
-     [exec] demo  4 (spackle)                                  ... PASSED
-     [exec] demo  5 (truth1)                                   ... PASSED
+     [exec] demo  1 (POTATO)                                   ... PASSED
+     [exec] demo  2 (SPACKLE)                                  ... PASSED
+     [exec] demo  3 (TRUTH1)                                   ... PASSED
+     [exec] demo  4 (VAR1)                                     ... PASSED
+     [exec] demo  5 (VAR2)                                     ... PASSED
      [exec] 
      [exec] Overall test suite                                 ... PASSED
      [exec] 

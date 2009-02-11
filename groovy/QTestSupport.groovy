@@ -31,8 +31,11 @@ abuild.setTarget('test-only') {
             }
             if (abuild.prop.containsKey('QTest.export'))
             {
+                // Windows wants environment variables to be all
+                // upper-case.
                 abuild.prop['QTest.export'].each {
-                    env('key': it, 'value': abuild.getVariable(it))
+                    env('key': it.toUpperCase(),
+                        'value': abuild.getVariable(it))
                 }
             }
             args.each {
