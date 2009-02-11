@@ -1,3 +1,2 @@
 abuild: defines (abuild-java): all
-Buildfile: --abuild.xml--
-would build targets: all
+JavaBuilder: would build targets: all

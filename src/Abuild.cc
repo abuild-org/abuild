@@ -3991,7 +3991,7 @@ Abuild::findJava()
 	{
 	    java_home =  Util::getProgramOutput(
 		"\"" + candidate + "\" -cp " +
-		java_support_jar + " org.abuild.support.PrintJavaHome");
+		java_support_jar + " org.abuild.javabuilder.PrintJavaHome");
 	    QTC::TC("abuild", "Abuild infer JAVA_HOME");
 	    verbose("inferred value for JAVA_HOME: " + java_home);
 	}

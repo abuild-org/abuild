@@ -1,6 +1,7 @@
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.runtime.StackTraceUtils
-import org.abuild.support.DependencyGraph
+import org.abuild.javabuilder.DependencyGraph
+import org.abuild.javabuilder.BuildArgs
 import org.apache.tools.ant.Project
 import org.apache.tools.ant.BuildException
 
@@ -17,39 +18,33 @@ class BuildState
     // fields supplied by .ab-dynamic.groovy
     def ifc = [:]
     def itemPaths = [:]
-    def abuildTop = null
-    def pluginPaths = null
+    def abuildTop
+    def pluginPaths
 
-    // supplied from abuild
-    def defines = null
-    File buildDirectory = null
+    // supplied by abuild
+    def defines
+    File buildDirectory
+    BuildArgs buildArgs
 
     // other accessible fields
     File sourceDirectory = null
-    boolean verbose = false
-    boolean quiet = false
-    boolean emacsMode = false
-    boolean keepGoing = false
 
     // private
-    private AntBuilder ant = null
-    private File curFile = null
+    private AntBuilder ant
+    private File curFile
 
     private g = new DependencyGraph()
     private closures = [:]
 
     BuildState(AntBuilder ant, File buildDirectory,
-               defines, boolean verbose,
-               boolean quiet, boolean emacsMode, boolean keepGoing)
+               BuildArgs buildArgs, defines)
     {
         this.ant = ant
         this.buildDirectory = buildDirectory
-        this.sourceDirectory = buildDirectory.parentFile
+        this.buildArgs = buildArgs
         this.defines = defines
-        this.verbose = verbose
-        this.quiet = quiet
-        this.emacsMode = emacsMode
-        this.keepGoing = keepGoing
+
+        this.sourceDirectory = buildDirectory.parentFile
 
         // Create targets that abuild guarantees will exist
         setTarget('all')
@@ -149,7 +144,7 @@ class BuildState
                     def exc_to_print = null
                     try
                     {
-                        if (verbose)
+                        if (buildArgs.verbose)
                         {
                             println "--> running target ${target} from ${file}"
                         }
@@ -158,7 +153,7 @@ class BuildState
                     catch (AbuildBuildFailure e)
                     {
                         System.err.println "ERROR: build failure: " + e.message
-                        if (verbose)
+                        if (buildArgs.verbose)
                         {
                             exc_to_print = e
                         }
@@ -168,7 +163,7 @@ class BuildState
                     {
                         System.err.println "ERROR: ant build failure: " +
                             e.message
-                        if (verbose)
+                        if (buildArgs.verbose)
                         {
                             exc_to_print = e
                         }
@@ -201,59 +196,27 @@ class BuildState
 
 class Builder
 {
+    File buildDirectory
+    BuildArgs buildArgs
+    def targets
+    def defines
+
     def loader = new GroovyClassLoader()
     def binding = new Binding()
 
     def buildState
-    File buildDirectory
-    def targets
-    def otherArgs
-    def defines
 
-    boolean noOp = false
-
-    Builder(File buildDirectory, project, targets, otherArgs, defines)
+    Builder(File buildDirectory, BuildArgs buildArgs, Project antProject,
+            targets, defines)
     {
         this.buildDirectory = buildDirectory
+        this.buildArgs = buildArgs
         this.targets = targets
-        this.otherArgs = otherArgs
         this.defines = defines
 
-        // otherArgs are passed internally by abuild.  They do not
-        // come from the user.  The Java code already handled some,
-        // but there are some that we need to know as well.
-	boolean emacsMode = false
-        boolean verbose = false
-        boolean quiet = false
-        boolean keepGoing = false
-	for (String arg: otherArgs)
-	{
-	    if (arg.equals("-e"))
-	    {
-                emacsMode = true
-            }
-	    else if (arg.equals("-v"))
-	    {
-                verbose = true
-	    }
-	    else if (arg.equals("-q"))
-	    {
-                quiet = true
-	    }
-	    else if (arg.equals("-n"))
-	    {
-		noOp = true
-	    }
-	    else if (arg.equals("-k"))
-	    {
-		keepGoing = true
-	    }
-        }
-
-        def ant = new AntBuilder(project)
+        def ant = new AntBuilder(antProject)
         this.buildState = new BuildState(
-            ant, buildDirectory, defines,
-            verbose, quiet, emacsMode, keepGoing)
+            ant, buildDirectory, buildArgs, defines)
 
         binding.abuild = buildState
         binding.ant = ant
@@ -261,11 +224,6 @@ class Builder
 
     boolean build()
     {
-        if (noOp)
-        {
-            println "would build targets: " + targets.join(" ")
-            return true
-        }
         def dynamicFile = new File(buildDirectory.path + "/.ab-dynamic.groovy")
         def buildFile = new File(buildDirectory.parent + "/Abuild.groovy")
 
@@ -322,12 +280,13 @@ class Builder
     }
 }
 
-// overall script returns value returned by build()
+// XXX test various failure types
 boolean status = false
 try
 {
-    status = new Builder(buildDirectory, antProject,
-                         targets, groovyArgs, defines).build()
+    // Arguments passed via binding from GroovyRunner.java
+    status = new Builder(buildDirectory, buildArgs, antProject,
+                         targets, defines).build()
 }
 catch (Exception e)
 {
@@ -335,5 +294,5 @@ catch (Exception e)
     StackTraceUtils.deepSanitize(e)
     e.printStackTrace()
 }
-// XXX test various failure types
+// overall script returns value returned by build()
 status

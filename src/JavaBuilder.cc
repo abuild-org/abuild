@@ -373,7 +373,7 @@ JavaBuilder::runJava(unsigned short port)
     args.push_back("java");
     args.push_back("-classpath");
     args.push_back(Util::join(Util::pathSeparator(), jars));
-    args.push_back("org.abuild.support.JavaBuilder");
+    args.push_back("org.abuild.javabuilder.JavaBuilder");
     args.push_back(this->abuild_top);
     args.push_back(Util::intToString(port));
 

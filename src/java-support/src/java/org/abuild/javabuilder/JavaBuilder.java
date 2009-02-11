@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.PrintStream;
+import java.io.File;
 import java.net.Socket;
 import java.net.SocketException;
 import javax.net.SocketFactory;
@@ -14,6 +15,11 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import org.abuild.ant.AbuildLogger;
+import org.apache.tools.ant.MagicNames;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.DefaultLogger;
 
 class JavaBuilder
 {
@@ -39,10 +45,10 @@ class JavaBuilder
     public static void main(String[] args)
     {
 	int port = -1;
-	String abuild_top = null;
+	String abuildTop = null;
 	if (args.length == 2)
 	{
-	    abuild_top = args[0];
+	    abuildTop = args[0];
 	    try
 	    {
 		port = Integer.parseInt(args[1]);
@@ -58,7 +64,7 @@ class JavaBuilder
 	}
 	try
 	{
-	    new JavaBuilder(abuild_top, port).run();
+	    new JavaBuilder(abuildTop, port).run();
 	}
 	catch (IOException e)
 	{
@@ -73,7 +79,7 @@ class JavaBuilder
 	System.exit(2);
     }
 
-    private boolean handle(String line)
+    private boolean handleInput(String line)
 	throws IOException
     {
 	boolean result = false;
@@ -88,7 +94,7 @@ class JavaBuilder
 	    {
 		String number = m.group(1);
 		String command = m.group(2);
-		this.threadPool.execute(new Handler(number, command));
+		this.threadPool.execute(new InputHandler(number, command));
 		result = true;
 	    }
 	    else
@@ -116,7 +122,7 @@ class JavaBuilder
 	{
 	    while ((line = r.readLine()) != null)
 	    {
-		if (! handle(line))
+		if (! handleInput(line))
 		{
 		    break;
 		}
@@ -177,6 +183,88 @@ class JavaBuilder
 	return defines;
     }
 
+    public static Project createAntProject(
+	String dirName, BuildArgs buildArgs, Map<String, String> defines)
+    {
+	int messageOutputLevel = Project.MSG_INFO;
+	if (buildArgs.verbose)
+	{
+	    messageOutputLevel = Project.MSG_VERBOSE;
+	}
+	else if (buildArgs.quiet)
+	{
+	    messageOutputLevel = Project.MSG_WARN;
+	}
+
+	File dir = new File(dirName);
+	Project p = new Project();
+	p.setKeepGoingMode(buildArgs.keepGoing);
+	p.setUserProperty(MagicNames.PROJECT_BASEDIR, dir.getAbsolutePath());
+	for (Map.Entry<String, String> e: defines.entrySet())
+	{
+	    p.setUserProperty(e.getKey(), e.getValue());
+	}
+	DefaultLogger logger = new AbuildLogger();
+	logger.setErrorPrintStream(System.err);
+	logger.setOutputPrintStream(System.out);
+	logger.setMessageOutputLevel(messageOutputLevel);
+	logger.setEmacsMode(buildArgs.emacsMode);
+	if (buildArgs.emacsMode)
+	{
+	    p.setUserProperty("abuild.private.emacs-mode", "1");
+	}
+	p.addBuildListener(logger);
+
+	p.init();
+	ProjectHelper helper = ProjectHelper.getProjectHelper();
+	p.addReference(ProjectHelper.PROJECTHELPER_REFERENCE, helper);
+
+	return p;
+    }
+
+    private boolean callBackend(
+	String backend, String buildFile, String dir,
+	Vector<String> targets, Vector<String> otherArgs,
+	Map<String, String> defines)
+    {
+	BuildArgs buildArgs = new BuildArgs();
+	if (! buildArgs.parseArgs(otherArgs))
+	{
+	    return false;
+	}
+
+	if (buildArgs.noOp)
+	{
+	    System.out.print("JavaBuilder: would build targets:");
+	    for (String t: targets)
+	    {
+		System.out.print(" " + t);
+	    }
+	    System.out.println("");
+	    return true;
+	}
+
+	BuildRunner runner = null;
+	if ("ant".equals(backend))
+	{
+	    runner = this.antRunner;
+	}
+	else if ("groovy".equals(backend))
+	{
+	    runner = this.groovyRunner;
+	}
+	else
+	{
+	    System.err.println(
+		"JavaBuilder: unknown command " + backend);
+	    return false;
+	}
+
+	Project antProject = createAntProject(dir, buildArgs, defines);
+	return runner.invokeBackend(
+	    buildFile, dir, buildArgs, antProject, targets, defines);
+    }
+
     private boolean runCommand(String[] args)
     {
 	boolean status = false;
@@ -196,55 +284,46 @@ class JavaBuilder
 	}
 	else
 	{
-	    String command = args[0];
-	    String build_file = args[1];
+	    String backend = args[0];
+	    String buildFile = args[1];
 	    String dir = args[2];
 	    String targets_str = args[3];
-	    String other_args_str = args[4];
+	    String otherArgs_str = args[4];
 	    String defines_str = args[5];
 	    Vector<String> targets = new Vector<String>();
-	    Vector<String> other_args = new Vector<String>();
+	    Vector<String> otherArgs = new Vector<String>();
 	    for (String t: targets_str.split(" "))
 	    {
 		targets.add(t);
 	    }
-	    if (! "".equals(other_args_str))
+	    if (! "".equals(otherArgs_str))
 	    {
-		for (String t: other_args_str.split(" "))
+		for (String t: otherArgs_str.split(" "))
 		{
-		    other_args.add(t);
+		    otherArgs.add(t);
 		}
 	    }
 	    Map<String, String> defines = parseDefines(defines_str);
-	    if (defines != null)
+	    if (defines == null)
 	    {
-		if ("ant".equals(command))
-		{
-		    status = this.antRunner.runAnt(
-			build_file, dir, targets, other_args, defines);
-		}
-		else if ("groovy".equals(command))
-		{
-		    status = this.groovyRunner.runGroovy(
-			dir, targets, other_args, defines);
-		}
-		else
-		{
-		    System.err.println(
-			"JavaBuilder: unknown command " + command);
-		}
+		// An error message has already been issued
+	    }
+	    else
+	    {
+		status = callBackend(
+		    backend, buildFile, dir, targets, otherArgs, defines);
 	    }
 	}
 
 	return status;
     }
 
-    class Handler implements Runnable
+    class InputHandler implements Runnable
     {
 	String number;
 	String command;
 
-	public Handler(String number, String command)
+	public InputHandler(String number, String command)
 	{
 	    this.number = number;
 	    this.command = command;

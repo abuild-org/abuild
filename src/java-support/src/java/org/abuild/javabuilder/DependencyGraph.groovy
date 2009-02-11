@@ -3,7 +3,7 @@
 // the same test suite as the C++ version.
 //
 
-package org.abuild.support
+package org.abuild.javabuilder
 
 class DependencyGraph
 {

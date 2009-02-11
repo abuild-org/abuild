@@ -9,7 +9,7 @@ import groovy.lang.Script;
 import groovy.lang.GroovyClassLoader;
 import org.apache.tools.ant.Project;
 
-public class GroovyRunner
+public class GroovyRunner implements BuildRunner
 {
     Class groovyClass = null;
 
@@ -28,14 +28,12 @@ public class GroovyRunner
 	}
     }
 
-    public boolean runGroovy(String dirName,
-			     Vector<String> targets,
-			     Vector<String> groovyArgs,
-			     Map<String, String> defines)
+    public boolean invokeBackend(
+	String buildFileName, String dirName,
+	BuildArgs buildArgs, Project antProject,
+	Vector<String> targets, Map<String, String> defines)
     {
-	Project project = AntRunner.createAntProject(
-	    dirName, groovyArgs, defines);
-	boolean result = false;
+	boolean status = false;
 	Exception exc = null;
 	try
 	{
@@ -43,15 +41,15 @@ public class GroovyRunner
 	    Binding binding = new Binding();
 	    script.setBinding(binding);
 	    binding.setVariable("buildDirectory", new File(dirName));
+	    binding.setVariable("buildArgs", buildArgs);
+	    binding.setVariable("antProject", antProject);
 	    binding.setVariable("targets", targets);
-	    binding.setVariable("groovyArgs", groovyArgs);
 	    binding.setVariable("defines", defines);
-	    binding.setVariable("antProject", project);
 	    Object[] args = {};
 	    Object resultObject = script.invokeMethod("run", args);
 	    if (resultObject instanceof Boolean)
 	    {
-		result = (Boolean)resultObject;
+		status = (Boolean)resultObject;
 	    }
 	}
 	catch (InstantiationException e)
@@ -68,6 +66,6 @@ public class GroovyRunner
 		"abuild: unable to invoke the abuild groovy builder");
 	    exc.printStackTrace(System.err);
 	}
-	return result;
+	return status;
     }
 }

@@ -24,7 +24,7 @@ static def runQTest = {
         ant.exec('failonerror':'true', 'executable': command,
                  'dir': build)
         {
-            if (! abuild.emacsMode)
+            if (! abuild.buildArgs.emacsMode)
             {
                 env('key':'QTEST_EXTRA_MARGIN',
                     'value':12)
