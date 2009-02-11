@@ -61,25 +61,11 @@
  avoid the situation of every build file that provides hooks to
  provide a long list of empty targets and, furthermore, to create a
  situation in which adding a new hook to this file causes a ripple
- effect throughout existing build files, we have provided a custom
- task that can set a property if a specific build file contains a
+ effect throughout existing build files, we have provided code that
+ can be used to ask whether a specific build file contains a
  given target.  When we want to invoke a hook named "hook" from a
  specific file, we simply ask that file if it has a target called
  "-hook", and if it does, we execute it.
-
- A note about antcall and running hooks: use of antcall should be
- avoided in favor of dependencies whenever possible.  The reason is
- that if A depends upon B and C and C antcalls something that also
- depends upon B, then B will be invoked twice when A is invoked.
- However, if C depends upon something that depends upon B instead of
- antcalling it, then B will be invoked only once.  In general, using
- antcall to call something with dependencies that are otherwise part
- of the dependency set should be avoided.  We aim to use antcall only
- for calling hooks.  Note that when splitting a target into
- dependencies, the dependencies are run even if the if/unless
- attributes of the main target are not satisfied.  As a matter of
- policy, we run pre- and post- hooks even if the main target is not
- being run.  This is discussed in hooks-help.txt.
 
  In addition, the special target "all" is defined.  The "all" target
  performs all steps required to make a build item usable by things
@@ -94,10 +80,9 @@
 
 <project name="abuild" default="all">
 
- <!--  Load task definitions                                       -->
+ <!-- Load task definitions -->
  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
  <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"/>
- <taskdef name="checkfortarget" classname="org.abuild.ant.CheckForTarget"/>
 
  <!--
 
@@ -204,12 +189,53 @@
 
  <!--  Load Abuild build files                                     -->
  <property file="${abuild.private.dir.item}/Abuild-ant.properties"/>
- <if>
-  <isset property="abuild.local-buildfile"/>
-  <then>
-   <import file="${abuild.private.dir.item}/${abuild.local-buildfile}"/>
-  </then>
- </if>
+
+ <!--
+   Import all hook files including any specified local-buildfile.  We
+   can only import from the top level, so use groovy to generate a
+   load file and then load it.  Also, store a list files from which we
+   should run hooks.
+  -->
+ <groovy><![CDATA[
+    def basedir = properties['basedir']
+    def out = new File("${basedir}/load.xml")
+    def files = []
+    // Plugins: load plugin-ant.xml in each path
+    properties['abuild.plugins']?.split(/,\s*/).each {
+        files << "${basedir}/${it}/plugin-ant.xml"
+    }
+    // Hook build items: load ant-hooks.xml in each build item
+    properties['abuild.hook-build-items']?.split(/,\s*/).each {
+        files << properties["abuild.dir.${it}"] + "/ant-hooks.xml"
+    }
+
+    // Convert from strings to File objects, and filter out files that
+    // don't exist.  Do this before adding local build file -- we want
+    // an error if that one doesn't exist.
+    files = files.collect { new File(it) }.grep { it.isFile() }
+
+    // Local hooks: load local-buildfile
+    if (properties.containsKey('abuild.local-buildfile'))
+    {
+        files << new File(properties['abuild.private.dir.item'] + "/" +
+                          properties['abuild.local-buildfile'])
+    }
+
+    // Create a project to import them
+    out.write('''<?xml version="1.0"?>
+<project name="_load">
+''')
+    files.each {
+        out.append("<import file=\"${it.path}\"/>\n");
+    }
+    out.append("</project>\n");
+
+    // Save the list of hook files and also the ant builder for later
+    project.addReference('abuild.ant.hook-files', files)
+    project.addReference('abuild.ant.AntBuilder', ant)
+  ]]>
+ </groovy>
+ <import file="${basedir}/load.xml"/>
 
  <condition property="ant.build.javac.target"
             value="${abuild.java-target-version}">
@@ -244,87 +270,28 @@
   </and>
  </condition>
 
- <!--
-
-  Provide utility targets.  The user may set abuild.hook-build-items
-  to a comma-separated list of build items from which hooks will be
-  loaded.  The user may also set abuild.use-local-hooks to any value
-  and abuild.local-buildfile to the name of a local file that contains
-  build hooks.
-
- -->
-
- <macrodef name="run-hooks">
-  <attribute name="name"/>
-  <sequential>
-   <antcall target="-run-hooks">
-    <param name="abuild.private.hook-name" value="@{name}"/>
-   </antcall>
-  </sequential>
- </macrodef>
-
- <!--  Requires abuild.private.hook-name be set (typically by      -->
- <!--  <run-hooks> macro).  Since -run-hooks is always called      -->
- <!--  by antcall, any properties set by it or its children        -->
- <!--  disappear when it returns.                                  -->
- <target name="-run-hooks"
-         depends="-run-plugin-hooks,-run-build-item-hooks,-run-local-hooks"/>
-
- <target name="-run-plugin-hooks">
-  <foreach list="${abuild.plugins}"
-           target="-query-plugin-hooks"
-           param="abuild.private.plugin-dir"
-           trim="true"
-           inheritall="true"/>
- </target>
-
- <target name="-query-plugin-hooks">
-  <property name="abuild.private.hook-file"
-            location="${abuild.private.plugin-dir}/plugin-ant.xml"/>
-  <antcall target="-run-external-hook"/>
- </target>
-
- <target name="-run-build-item-hooks" if="abuild.hook-build-items">
-  <foreach list="${abuild.hook-build-items}"
-           target="-query-build-item-hooks"
-           param="abuild.private.hook-item"
-           trim="true"
-           inheritall="true"/>
- </target>
-
- <target name="-query-build-item-hooks">
-  <propertycopy name="abuild.private.item-dir"
-                from="abuild.dir.${abuild.private.hook-item}"/>
-  <property name="abuild.private.hook-file"
-            location="${abuild.private.item-dir}/ant-hooks.xml"/>
-  <antcall target="-run-external-hook"/>
- </target>
-
- <target name="-run-local-hooks" if="abuild.use-local-hooks">
-  <property name="abuild.private.hook-file"
-            location="${abuild.private.dir.item}/${abuild.local-buildfile}"/>
-  <antcall target="-run-external-hook"/>
- </target>
-
- <!--  Must set abuild.private.hook-name and                       -->
- <!--  abuild.private.hook-file                                    -->
- <target name="-run-external-hook" unless="abuild.private.bootstrapping">
-  <if>
-   <available file="${abuild.private.hook-file}"/>
-   <then>
-    <checkfortarget property="has-hook"
-                    antfile="${abuild.private.hook-file}"
-                    target="-${abuild.private.hook-name}"/>
-   </then>
-  </if>
-  <if>
-   <isset property="has-hook"/>
-   <then>
-    <ant antfile="${abuild.private.hook-file}"
-         target="-${abuild.private.hook-name}"/>
-   </then>
-  </if>
- </target>
+ <groovy><![CDATA[
+    import org.abuild.ant.CheckForTarget
+    class HookRunner extends org.apache.tools.ant.Task
+    {
+        String name
+        public void execute ()
+        {
+            AntBuilder ant = project.getReference("abuild.ant.AntBuilder")
+            def hookFiles = project.getReference("abuild.ant.hook-files")
+            def target = "-${name}"
+            hookFiles.each {
+                file ->
+                if (CheckForTarget.hasTarget(project, file, target))
+                {
+                    ant.ant('antfile': file.path, 'target': target)
+                }
+            }
+        }
+    }
+    project.addTaskDefinition('run-hooks', HookRunner)
+  ]]>
+ </groovy>
 
  <!--  Define special "all" target                                 -->
  <target name="all" depends="package"

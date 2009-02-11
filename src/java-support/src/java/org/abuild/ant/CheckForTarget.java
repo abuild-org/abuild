@@ -9,105 +9,71 @@ import java.io.File;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.ProjectHelper;
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.BuildException;
 
 /**
- * Implements an Ant Task that determines whether a particular build
- * file contains a given target.  It does by creating a sub-ant and,
- * rather than calling the target, just checking to see whether it is
- * there.
+ * This code determines whether a particular build file contains a
+ * given target.  It does by creating a sub-ant and, rather than
+ * calling the target, just checking to see whether it is there.
  */
-public class CheckForTarget extends Task
+public class CheckForTarget
 {
     private final static Map<String, Set<String> > targetsByFilename =
 	new HashMap<String, Set<String>>();
 
-    private File antFile = null;
-    public void setAntfile(File antFile)
-    {
-        this.antFile = antFile;
-    }
-
-    private String target = null;
-    public void setTarget(String target)
-    {
-        if ("".equals(target))
-	{
-            throw new BuildException("target attribute must not be empty");
-        }
-        this.target = target;
-    }
-
-    private String property = null;
-    public void setProperty(String property)
-    {
-        if ("".equals(property))
-	{
-            throw new BuildException("property attribute must not be empty");
-        }
-        this.property = property;
-    }
-
     // This method provides a wrapper around the one unavoidable
     // unchecked cast when working with the Ant APIs.
     @SuppressWarnings("unchecked")
-    private Map<String, Target> getProjectTargets(Project project)
+    private static Map<String, Target> getProjectTargets(Project project)
     {
 	return project.getTargets();
     }
 
-    public void execute() throws BuildException
+    public static boolean hasTarget(
+	Project project, File antFile, String target)
     {
-        try
+	boolean result = false;
+	synchronized(targetsByFilename)
 	{
-	    synchronized(targetsByFilename)
+	    Set<String> targets = targetsByFilename.get(
+		antFile.getAbsolutePath());
+	    if (targets == null)
 	    {
-		Set<String> targets = targetsByFilename.get(
-		    this.antFile.getAbsolutePath());
-		if (targets == null)
-		{
-		    // Create a new project and copy all properties
-		    // into it.  Copy user properties first and then
-		    // all other properties.
-		    Project newProject = getProject().createSubProject();
-		    newProject.setJavaVersionProperty();
-		    getProject().copyUserProperties(newProject);
+		// Create a new project and copy all properties
+		// into it.  Copy user properties first and then
+		// all other properties.
+		Project newProject = project.createSubProject();
+		newProject.setJavaVersionProperty();
+		project.copyUserProperties(newProject);
 
-		    @SuppressWarnings("unchecked")
-		    Enumeration e = getProject().getProperties().keys();
-		    while (e.hasMoreElements())
+		@SuppressWarnings("unchecked")
+		    Enumeration e = project.getProperties().keys();
+		while (e.hasMoreElements())
+		{
+		    String key = e.nextElement().toString();
+		    String value =
+			project.getProperties().get(key).toString();
+		    if (newProject.getProperty(key) == null)
 		    {
-			String key = e.nextElement().toString();
-			String value =
-			    getProject().getProperties().get(key).toString();
-			if (newProject.getProperty(key) == null)
-			{
-			    newProject.setNewProperty(key, value);
-			}
+			newProject.setNewProperty(key, value);
 		    }
-
-		    // Load the antFile
-		    ProjectHelper.configureProject(newProject, this.antFile);
-
-		    Map<String, Target> projectTargets =
-			getProjectTargets(newProject);
-		    targets = new HashSet<String>(projectTargets.size());
-		    targets.addAll(projectTargets.keySet());
-		    targetsByFilename.put(
-			this.antFile.getAbsolutePath(), targets);
 		}
 
-		if (targets.contains(this.target))
-		{
-		    getProject().setNewProperty(this.property, "true");
-		}
+		// Load the antFile
+		ProjectHelper.configureProject(newProject, antFile);
+
+		Map<String, Target> projectTargets =
+		    getProjectTargets(newProject);
+		targets = new HashSet<String>(projectTargets.size());
+		targets.addAll(projectTargets.keySet());
+		targetsByFilename.put(
+		    antFile.getAbsolutePath(), targets);
+	    }
+
+	    if (targets.contains(target))
+	    {
+		result = true;
 	    }
 	}
-	catch (BuildException ex)
-	{
-	    throw ProjectHelper.addLocationToBuildException(
-		ex, getLocation());
-        }
+	return result;
     }
 }

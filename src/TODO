@@ -52,6 +52,11 @@ documentation.
 
  * abuild.local-rules prop
 
+ * ant: all hooks and plugin files, as well as any specified local
+   build file, are now imported.  Hooks are now also unconditionally
+   run from any file specified as abuild.local-buildfile.  The
+   property abuild.use-local-hooks is no longer used.
+
 Licensing
 =========
 
