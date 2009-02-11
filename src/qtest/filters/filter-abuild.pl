@@ -14,6 +14,7 @@ $platform_native =~ m/^([^\.]+\.[^\.]+\.[^\.]+)\.([^\.]+)$/
 my ($os_data, $compiler) = ($1, $2);
 
 my $in_autoconf = 0;
+my $in_stacktrace = 0;
 
 while (<>)
 {
@@ -33,6 +34,15 @@ while (<>)
 	    next;
 	}
     }
+    if ($in_stacktrace)
+    {
+	if (m/--end stack trace--/)
+	{
+	    $in_stacktrace = 0;
+	    print "--JAVA STACK TRACE--\n";
+	}
+	next;
+    }
 
     s,\\,/,g;
     # Normalize exit code of make
@@ -51,7 +61,14 @@ while (<>)
     s,(--abuild.xml--):(\d+),$1:nn,;
     s/^(Total time: ).*/$1<time>/;
     s/(\[junit\].*Time elapsed: ).*/$1<time>/;
+    if (m,--begin stack trace--,)
+    {
+	$in_stacktrace = 1;
+	next;
+    }
+
     print;
+
     if (m,Entering directory.*/autoconf/,)
     {
 	$in_autoconf = 1;

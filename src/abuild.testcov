@@ -241,3 +241,15 @@ Abuild ERR bad clean platform 0
 JavaBuilder handle abnormal java exit 0
 Abuild infer ANT_HOME 0
 Abuild infer JAVA_HOME 0
+groovy ERR graph errors 0
+groovy built-in test target 0
+JavaBuilder.java noOp 0
+groovy ERR runTarget during init 0
+groovy ERR unknown target 0
+groovy ERR dep failure 0
+groovy ERR AbuildBuildFailure 0
+groovy ERR ant BuildException 0
+groovy ERR other target exception 0
+groovy ERR script compilation errors 0
+groovy ERR script run exception 0
+groovy ERR exception during build 0

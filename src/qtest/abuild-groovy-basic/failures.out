@@ -1,0 +1,38 @@
+abuild: a (abuild-indep): all
+abuild-groovy: ERROR: unknown target unknown
+     [echo] other all
+abuild-groovy: ERROR: ant build failure: ant failure
+abuild-groovy: ERROR: build failure: abuild failure
+abuild-groovy: ERROR: Caught exception java.lang.Exception while running code for target "all" from --topdir--/failures/a/Abuild.groovy: other failure
+--JAVA STACK TRACE--
+abuild: a (abuild-indep): build failed
+abuild: b (abuild-indep): all
+abuild-groovy: ERROR: build failure: other1 failure
+other2
+abuild-groovy: ERROR: not building target "all" because of failure of its dependencies
+abuild: b (abuild-indep): build failed
+abuild: c (abuild-indep): all
+abuild-groovy: ERROR: target "three" depends on unknown target "four"
+abuild-groovy: ERROR: the following targets are involved in a dependency cycle: "one", "two"
+abuild-groovy: ERROR: dependencies are defined for target "one" in the following files:
+abuild-groovy: ERROR:   --topdir--/failures/c/Abuild.groovy
+abuild-groovy: ERROR: dependencies are defined for target "three" in the following files:
+abuild-groovy: ERROR:   --topdir--/failures/c/Abuild.groovy
+abuild-groovy: ERROR: dependencies are defined for target "two" in the following files:
+abuild-groovy: ERROR:   --topdir--/failures/c/Abuild.groovy
+abuild: c (abuild-indep): build failed
+abuild: d (abuild-indep): all
+abuild-groovy: ERROR: file --topdir--/failures/d/Abuild.groovy had compilation errors
+Exception caught during build: --COMPILATION ERRORS SUPPRESSED--
+--JAVA STACK TRACE--
+abuild: d (abuild-indep): build failed
+abuild: e (abuild-indep): all
+abuild-groovy: ERROR: file --topdir--/failures/e/Abuild.groovy threw exception: runTarget may not be called during initialization
+--JAVA STACK TRACE--
+abuild: e (abuild-indep): build failed
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: a on platform indep
+abuild: ERROR: build failure: b on platform indep
+abuild: ERROR: build failure: c on platform indep
+abuild: ERROR: build failure: d on platform indep
+abuild: ERROR: build failure: e on platform indep

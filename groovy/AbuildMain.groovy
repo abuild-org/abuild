@@ -4,6 +4,7 @@ import org.abuild.javabuilder.DependencyGraph
 import org.abuild.javabuilder.BuildArgs
 import org.apache.tools.ant.Project
 import org.apache.tools.ant.BuildException
+import org.abuild.QTC
 
 class AbuildBuildFailure extends Exception
 {
@@ -29,12 +30,17 @@ class BuildState
     // other accessible fields
     File sourceDirectory = null
 
+    // used internally and by Builder
+    def anyFailures = false
+
     // private
     private AntBuilder ant
     private File curFile
-
     private g = new DependencyGraph()
     private closures = [:]
+    private targetDepOrigins = [:]
+    private targetsRun = [:]
+    private boolean ready = false
 
     BuildState(AntBuilder ant, File buildDirectory,
                BuildArgs buildArgs, defines)
@@ -49,10 +55,12 @@ class BuildState
         // Create targets that abuild guarantees will exist
         setTarget('all')
 
-        // XXX People who define test wrappers must ensure that the
-        // same code is set as the body of test-only and test.
+        // Make test call test-only after building "all".
         setTarget('test-only')
-        setTarget('test', 'deps':'all')
+        setTarget('test', 'deps':'all') {
+            QTC.TC("abuild", "groovy built-in test target")
+            runTarget('test-only')
+        }
 
         // Make check an alias for test
         setTarget('check', 'deps':'test')
@@ -88,10 +96,22 @@ class BuildState
                 dep ->
                 g.addDependency(name, dep)
             }
+            if (curFile)
+            {
+                // Store the fact that this file is an origin for
+                // dependencies being defiled for this target so we
+                // can use this information in error messages.
+                if (! targetDepOrigins.containsKey(name))
+                {
+                    targetDepOrigins[name] = [:]
+                }
+                targetDepOrigins[name][curFile] = 1
+            }
         }
         if (body)
         {
-            closures[name] << [curFile, body]
+            def origin = curFile ?: 'built-in targets'
+            closures[name] << [origin, body]
         }
     }
 
@@ -100,95 +120,164 @@ class BuildState
         throw new AbuildBuildFailure(message)
     }
 
-    private runTargets(List targets)
+    def error(String message)
     {
-        def status = true
+        this.anyFailures = true
+        System.err.println "abuild-groovy: ERROR: ${message}"
+    }
 
+    boolean checkGraph()
+    {
         if (! g.check())
         {
-            // XXX clean up error message, include enough information
-            // at registration time to be able to explain where these
-            // errors were introduced.
-            System.err.println "unknowns:\n" + g.unknowns
-            System.err.println "cycles:\n" + g.cycles
-            status = false
+            QTC.TC("abuild", "groovy ERR graph errors")
+
+            def targetsOfInterest = [:]
+            for (u in g.unknowns.keySet().sort())
+            {
+                targetsOfInterest[u] = 1
+                g.unknowns[u].each {
+                    error("target \"${u}\" depends on unknown target \"${it}\"")
+                }
+            }
+            for (c in g.cycles)
+            {
+                error("the following targets are involved" +
+                      " in a dependency cycle: " +
+                      c.collect { "\"${it}\"" }.join(", "))
+                c.each { targetsOfInterest[it] = 1 }
+            }
+
+            for (t in targetsOfInterest.keySet().sort())
+            {
+                if (targetDepOrigins.containsKey(t))
+                {
+                    error("dependencies are defined for target \"${t}\"" +
+                          " in the following files:")
+                    targetDepOrigins[t].keySet().each {
+                        error("  ${it}")
+                    }
+                }
+            }
+
+            return false
+        }
+        this.ready = true
+        true
+    }
+
+    boolean runTarget(target)
+    {
+        if (! this.ready)
+        {
+            QTC.TC("abuild", "groovy ERR runTarget during init")
+            fail("runTarget may not be called during initialization")
+        }
+
+        if (anyFailures && (! buildArgs.keepGoing))
+        {
+            return false
+        }
+
+        if (targetsRun.containsKey(target))
+        {
+            return targetsRun[target]
+        }
+
+        // DO NOT RETURN BELOW THIS POINT until the end of the
+        // function.
+
+        // Cache result initially as failure to prevent loops while
+        // invoking targets.  We will replace the cache result with
+        // true if the target run succeeds.
+        boolean status = targetsRun[target] = false
+
+        if (! closures.containsKey(target))
+        {
+            QTC.TC("abuild", "groovy ERR unknown target")
+            error("unknown target ${target}")
+        }
+        else if (! runTargets(g.getDirectDependencies(target)))
+        {
+            QTC.TC("abuild", "groovy ERR dep failure")
+            error("not building target \"${target}\" because of" +
+                  " failure of its dependencies");
         }
         else
         {
-            def target_set = [:]
-            targets.each {
-                target ->
-                if (closures.containsKey(target))
+            status = true
+            closures[target].each {
+                d ->
+                def origin = d[0]
+                def cl = d[1]
+                def exc_to_print = null
+                try
                 {
-                    target_set[target] = 1
-                    g.getSortedDependencies(target).each {
-                        dep ->
-                        target_set[dep] = 1
+                    if (buildArgs.verbose)
+                    {
+                        println "--> running target ${target} from ${origin}"
                     }
+                    cl()
                 }
-                else
+                catch (AbuildBuildFailure e)
                 {
-                    // XXX error message formatting?
-                    System.err.println "ERROR: unknown target ${target}"
+                    QTC.TC("abuild", "groovy ERR AbuildBuildFailure")
+                    error("build failure: " + e.message)
+                    if (buildArgs.verbose)
+                    {
+                        exc_to_print = e
+                    }
                     status = false
                 }
-            }
-            // XXX deal with failure propagation and keepGoing mode
-            def to_run = g.sortedGraph.grep { target_set.containsKey(it) }
-            to_run.each {
-                target ->
-                closures[target].each {
-                    d ->
-                    def file = d[0]
-                    def cl = d[1]
-                    def exc_to_print = null
-                    try
+                catch (BuildException e)
+                {
+                    QTC.TC("abuild", "groovy ERR ant BuildException")
+                    error("ant build failure: " + e.message)
+                    if (buildArgs.verbose)
                     {
-                        if (buildArgs.verbose)
-                        {
-                            println "--> running target ${target} from ${file}"
-                        }
-                        cl()
-                    }
-                    catch (AbuildBuildFailure e)
-                    {
-                        System.err.println "ERROR: build failure: " + e.message
-                        if (buildArgs.verbose)
-                        {
-                            exc_to_print = e
-                        }
-                        status = false;
-                    }
-                    catch (BuildException e)
-                    {
-                        System.err.println "ERROR: ant build failure: " +
-                            e.message
-                        if (buildArgs.verbose)
-                        {
-                            exc_to_print = e
-                        }
-                        status = false
-                    }
-                    catch (Exception e)
-                    {
-                        System.err.print "ERROR: Caught exception" +
-                            " ${e.class.name}" +
-                            " while running ${target} code from ${file}: "
-                        // Print exception details unconditionally if
-                        // it was not a standard build failure.
                         exc_to_print = e
-                        status = false
                     }
+                    status = false
+                }
+                catch (Exception e)
+                {
+                    QTC.TC("abuild", "groovy ERR other target exception")
+                    error("Caught exception ${e.class.name}" +
+                          " while running code for target \"${target}\"" +
+                          " from ${origin}: " +
+                          e.message)
+                    // Print exception details unconditionally if
+                    // it was not a standard build failure.
+                    exc_to_print = e
+                    status = false
+                }
 
-                    if (exc_to_print)
-                    {
-                        StackTraceUtils.deepSanitize(exc_to_print)
-                        exc_to_print.printStackTrace(System.err)
-                    }
+                if (exc_to_print)
+                {
+                    Builder.printStackTrace(exc_to_print)
                 }
             }
         }
 
+        if (! status)
+        {
+            anyFailures = true
+        }
+
+        // cache and return
+        targetsRun[target] = status
+    }
+
+    boolean runTargets(List targets)
+    {
+        def status = true
+        targets.each {
+            target ->
+            if (! runTarget(target))
+            {
+                status = false
+            }
+        }
         status
     }
 }
@@ -197,22 +286,19 @@ class BuildState
 class Builder
 {
     File buildDirectory
-    BuildArgs buildArgs
     def targets
-    def defines
 
     def loader = new GroovyClassLoader()
     def binding = new Binding()
 
     def buildState
+    DependencyGraph g
 
     Builder(File buildDirectory, BuildArgs buildArgs, Project antProject,
             targets, defines)
     {
         this.buildDirectory = buildDirectory
-        this.buildArgs = buildArgs
         this.targets = targets
-        this.defines = defines
 
         def ant = new AntBuilder(antProject)
         this.buildState = new BuildState(
@@ -238,8 +324,17 @@ class Builder
         // rules
         // local
 
-        // return value returned by runTargets
-        this.buildState.runTargets(this.targets)
+        if (! buildState.checkGraph())
+        {
+            return false;
+        }
+
+        boolean status = this.buildState.runTargets(this.targets)
+        if (buildState.anyFailures)
+        {
+            status = false
+        }
+        status
     }
 
     private loadScript(String filename)
@@ -262,7 +357,8 @@ class Builder
         }
         catch (CompilationFailedException e)
         {
-            System.err.println "ERROR: file ${file.path} had compilation errors"
+            QTC.TC("abuild", "groovy ERR script compilation errors")
+            buildState.error("file ${file.path} had compilation errors")
             throw e
         }
     }
@@ -276,13 +372,28 @@ class Builder
         }
         catch (Exception e)
         {
-            System.err.println "ERROR: file ${file} threw exception"
+            QTC.TC("abuild", "groovy ERR script run exception")
+            buildState.error("file ${file} threw exception: " + e.message)
             throw e
+        }
+    }
+
+    static printStackTrace(Throwable e)
+    {
+        boolean inTestSuite = (System.getenv("IN_TESTSUITE") != null)
+        if (inTestSuite)
+        {
+            System.err.println("--begin stack trace--")
+        }
+        StackTraceUtils.deepSanitize(e)
+        e.printStackTrace(System.err)
+        if (inTestSuite)
+        {
+            System.err.println("--end stack trace--")
         }
     }
 }
 
-// XXX test various failure types
 boolean status = false
 try
 {
@@ -292,9 +403,15 @@ try
 }
 catch (Exception e)
 {
-    System.err.print "Exception caught during build: " + e
-    StackTraceUtils.deepSanitize(e)
-    e.printStackTrace()
+    QTC.TC("abuild", "groovy ERR exception during build")
+    String message = e.message
+    if ((System.getenv("IN_TESTSUITE") != null) &&
+        (e instanceof CompilationFailedException))
+    {
+        message = "--COMPILATION ERRORS SUPPRESSED--\n"
+    }
+    System.err.print "Exception caught during build: " + message
+    Builder.printStackTrace(e)
 }
 // overall script returns value returned by build()
 status

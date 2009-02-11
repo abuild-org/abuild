@@ -61,6 +61,16 @@ $td->runtest("JavaBuilder exit",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/failures");
+
+$td->runtest("build failures",
+	     {$td->COMMAND => "abuild -b all -k",
+	      $td->FILTER =>
+		  "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/failures.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(6);
+$td->report(7);

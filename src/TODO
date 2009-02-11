@@ -21,8 +21,8 @@ documentation.
    no longer require the path to exist relative to the backing tree.
 
  * ./BootstrapJava.groovy to bootstrap java code.  A full groovy
-   installation is needed to build abuild from scratch but not to run
-   it -- abuild embeds groovy.
+   installation (>= 1.5.7) is needed to build abuild from scratch but
+   not to run it -- abuild embeds groovy.
 
  * The --ant and --no-abuild-logger arguments have been removed
 
@@ -41,6 +41,10 @@ documentation.
 
  * Abuild has a harder requirement on Java 1.5.  It's not just
    generics anymore.
+
+ * For groovy backends, defining a new test procedure requires only
+   defining a closure for the 'test-only' target.  Abuild
+   automatically calls this from test or check.
 
 Licensing
 =========

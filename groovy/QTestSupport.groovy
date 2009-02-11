@@ -4,7 +4,7 @@
 // decent strategy for passing information from Abuild.groovy to
 // target implementations.
 
-static def runQTest = {
+abuild.setTarget('test-only') {
     def src = abuild.sourceDirectory.path
     def qtest = new File("${src}/qtest")
     if (qtest.isDirectory())
@@ -40,6 +40,3 @@ static def runQTest = {
         }
     }
 }
-
-abuild.setTarget('test-only', runQTest)
-abuild.setTarget('test', runQTest)

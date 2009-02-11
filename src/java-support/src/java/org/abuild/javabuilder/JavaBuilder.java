@@ -20,6 +20,7 @@ import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.DefaultLogger;
+import org.abuild.QTC;
 
 class JavaBuilder
 {
@@ -235,6 +236,7 @@ class JavaBuilder
 
 	if (buildArgs.noOp)
 	{
+	    QTC.TC("abuild", "JavaBuilder.java noOp");
 	    System.out.print("JavaBuilder: would build targets:");
 	    for (String t: targets)
 	    {
