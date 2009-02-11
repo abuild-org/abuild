@@ -94,8 +94,10 @@
 
 <project name="abuild" default="all">
 
- <!--  Load antcontrib                                             -->
+ <!--  Load task definitions                                       -->
  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+ <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"/>
+ <taskdef name="checkfortarget" classname="org.abuild.ant.CheckForTarget"/>
 
  <!--
 
@@ -241,17 +243,6 @@
    <matches string="${abuild.jar-name}" pattern="\."/>
   </and>
  </condition>
-
- <if>
-  <not>
-   <isset property="abuild.private.bootstrapping"/>
-  </not>
-  <then>
-  <!--  Load our own checkfortarget task                           -->
-   <taskdef name="checkfortarget"
-            classname="org.abuild.ant.CheckForTarget"/>
-  </then>
- </if>
 
  <!--
 
