@@ -1,6 +1,10 @@
 #ifndef __JAVABUILDER_HH__
 #define __JAVABUILDER_HH__
 
+#ifdef _WIN32
+# define _WIN32_WINNT 0x0501
+#endif
+
 #include <boost/asio.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
@@ -62,7 +66,8 @@ class JavaBuilder
     std::string java;
     std::list<std::string> java_libs;
     char** envp;
-    char data[1024];
+    static unsigned int const max_data_size = 1024;
+    char data[max_data_size];
     std::string accumulated_response;
 
     // These fields must be acceessed with mutex protection.

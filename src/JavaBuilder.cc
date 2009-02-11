@@ -71,6 +71,7 @@ JavaBuilder::makeRequest(std::string const& message)
     // Register response queue
     response_queue_ptr response(new ThreadSafeQueue<bool>());
     int request_number = 0;
+    std::string text;
 
     {
 	boost::mutex::scoped_lock lock(this->mutex);
@@ -80,10 +81,9 @@ JavaBuilder::makeRequest(std::string const& message)
 	this->response_queues[request_number] = response;
 
 	// Send message and wait for response
+	text = Util::intToString(request_number) + " " + message + "\n";
 	boost::asio::async_write(
-	    *this->sock, boost::asio::buffer(
-		Util::intToString(request_number) +
-		" " + message + "\n"),
+	    *this->sock, boost::asio::buffer(text),
 	    boost::bind(
 		&JavaBuilder::handleWrite, this,
 		boost::asio::placeholders::error));
@@ -210,7 +210,7 @@ void
 JavaBuilder::requestRead()
 {
     this->sock->async_read_some(
-	boost::asio::buffer(this->data),
+	boost::asio::buffer(this->data, max_data_size),
 	boost::bind(
 	    &JavaBuilder::handleRead, this,
 	    boost::asio::placeholders::error,
