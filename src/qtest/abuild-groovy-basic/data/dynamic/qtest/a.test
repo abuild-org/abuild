@@ -7,9 +7,18 @@ require TestDriver;
 
 my $td = new TestDriver('demo');
 
-$td->runtest("environment",
-	     {$td->STRING => $ENV{'VAR1'} . " " . $ENV{'VAR2'} . "\n"},
-	     {$td->STRING => "first value second value\n"},
-	     $td->NORMALIZE_NEWLINES);
+my %exp = ('VAR1' => 'first value',
+	   'VAR2' => 'second value',
+	   'potato' => 'one two three',
+	   'spackle' => 'four five six',
+	   'truth1' => '1');
 
-$td->report(1);
+foreach my $v (sort keys %exp)
+{
+    $td->runtest("$v",
+		 {$td->STRING => $ENV{$v} . "\n"},
+		 {$td->STRING => $exp{$v} . "\n"},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+$td->report(5);

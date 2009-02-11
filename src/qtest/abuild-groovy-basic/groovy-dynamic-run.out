@@ -7,14 +7,18 @@ one two three
      [exec] 
      [exec] 
      [exec] Running ../qtest/a.test
-     [exec] demo  1 (environment)                              ... PASSED
+     [exec] demo  1 (VAR1)                                     ... PASSED
+     [exec] demo  2 (VAR2)                                     ... PASSED
+     [exec] demo  3 (potato)                                   ... PASSED
+     [exec] demo  4 (spackle)                                  ... PASSED
+     [exec] demo  5 (truth1)                                   ... PASSED
      [exec] 
      [exec] Overall test suite                                 ... PASSED
      [exec] 
      [exec] TESTS COMPLETE.  Summary:
      [exec] 
-     [exec] Total tests: 1
-     [exec] Passes: 1
+     [exec] Total tests: 5
+     [exec] Passes: 5
      [exec] Failures: 0
      [exec] Unexpected Passes: 0
      [exec] Expected Failures: 0

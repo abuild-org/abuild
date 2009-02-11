@@ -115,6 +115,16 @@ class BuildState
         }
     }
 
+    def getVariable(String name)
+    {
+        def result = prop[name] ?: ifc[name]
+        if (result instanceof List)
+        {
+            result = result.join(' ')
+        }
+        result
+    }
+
     def fail(String message)
     {
         throw new AbuildBuildFailure(message)
@@ -338,11 +348,8 @@ class Builder
         // Load any local rules files, resolving the path relative to
         // the source directory
 
-        if (buildState.prop.containsKey('abuild.local-rules'))
-        {
-            buildState.prop['abuild.local-rules'].each {
-                loadScript(new File(sourceDirectory.path + "/" + it))
-            }
+        buildState.prop['abuild.local-rules']?.each {
+            loadScript(new File(sourceDirectory.path + "/" + it))
         }
 
         if (! buildState.checkGraph())

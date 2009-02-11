@@ -5,7 +5,7 @@ abuild.setTarget('test-only') {
     if (qtest.isDirectory())
     {
         def build = abuild.buildDirectory.path
-        def tty = abuild.ifc['ABUILD_STDOUT_IS_TTY'] ? "1" : "0"
+        def tty = abuild.ifc['ABUILD_STDOUT_IS_TTY']
         def command = 'qtest-driver';
         def args = ['-datadir', '../qtest',
             '-bindirs', '..:.', '-covdir', '..',
@@ -32,7 +32,7 @@ abuild.setTarget('test-only') {
             if (abuild.prop.containsKey('QTest.export'))
             {
                 abuild.prop['QTest.export'].each {
-                    env('key': it, 'value': abuild.prop[it])
+                    env('key': it, 'value': abuild.getVariable(it))
                 }
             }
             args.each {

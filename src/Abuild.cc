@@ -4912,10 +4912,6 @@ Abuild::invoke_groovy(std::string const& item_name,
 		dyn << "'" << Util::absToRel(val, dir) << "'";
 		break;
 
-	      case Interface::t_boolean:
-		dyn << (val == "1" ? "true" : "false");
-		break;
-
 	      default:
 		dyn << "'" << val << "'";
 		break;

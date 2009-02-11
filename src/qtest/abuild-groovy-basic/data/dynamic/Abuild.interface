@@ -1,7 +1,7 @@
 declare potato list string append
 potato = one two three
 declare spackle string
-spackle = one\ two\ three
+spackle = four\ five\ six
 declare quack string
 quack =
 declare moo list string prepend
