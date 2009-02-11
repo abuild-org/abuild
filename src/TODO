@@ -1,5 +1,6 @@
 
-XXX Next: dep -with-rules, implement basic "jar" rules
+XXX Next: dep -with-rules, implement basic "jar" rules, test build
+item rules in groovy
 
 === Changes Targeted for Version 1.1 ===
 
