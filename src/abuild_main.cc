@@ -1,5 +1,5 @@
-#include <Logger.hh>
 #include <Abuild.hh>
+#include <Logger.hh>
 
 int main(int argc, char* argv[], char* envp[])
 {
