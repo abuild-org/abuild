@@ -21,7 +21,7 @@ class BuildState
     def itemPaths = [:]
     def abuildTop
     def pluginPaths
-    def buildItemRules
+    def ruleItems
 
     // supplied by abuild
     def defines
@@ -388,7 +388,7 @@ class Builder
 
         if (! (buildState.param['abuild.rules'] ||
                buildState.param['abuild.local-rules'] ||
-               buildState.buildItemRules))
+               buildState.ruleItems))
         {
             QTC.TC("abuild", "groovy ERR no rules")
             buildState.error(
@@ -422,9 +422,9 @@ class Builder
         }
 
         // Load build item rules
-        buildState.buildItemRules.each {
+        buildState.ruleItems.each {
             item ->
-            loadScript(new File(abuild.itemPaths[item] + '/Rules.groovy'))
+            loadScript(new File(buildState.itemPaths[item] + '/Rules.groovy'))
         }
 
         // Load any local rules files, resolving the path relative to

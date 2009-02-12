@@ -220,7 +220,8 @@ Abuild::runInternal()
 	    assert(boost::regex_match(*iter, match, builder_re));
 	    std::string item_name = match[1].str();
 	    std::string item_platform = match[2].str();
-	    error("build failure: " + item_name + " on platform " + item_platform);
+	    error("build failure: " + item_name + " on platform " +
+		  item_platform);
 	}
     }
 
@@ -2429,7 +2430,8 @@ Abuild::reportIntegrityErrors(BuildTree_map& buildtrees,
 		local_tree + "/" + ItemConfig::FILE_CONF, 0, 0);
 	    FileLocation remote_tree_location(
 		remote_tree + "/" + ItemConfig::FILE_CONF, 0, 0);
-	    BuildItem_map& local_items = buildtrees[local_tree]->getBuildItems();
+	    BuildItem_map& local_items =
+		buildtrees[local_tree]->getBuildItems();
 	    QTC::TC("abuild", "Abuild ERR plugin integrity");
 	    error(remote_tree_location,
 		  "some plugins declared by this tree are shadowed");
@@ -3054,7 +3056,8 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 	if (! traits.empty())
 	{
 	    o << "    <traits>" << std::endl;
-	    for (TraitData::trait_data_t::const_iterator t_iter = traits.begin();
+	    for (TraitData::trait_data_t::const_iterator t_iter =
+		     traits.begin();
 		 t_iter != traits.end(); ++t_iter)
 	    {
 		std::string const& trait = (*t_iter).first;
@@ -4643,6 +4646,17 @@ Abuild::invoke_gmake(std::string const& item_name,
     }
     mk << "\n";
 
+    // Generate the names of rule build items
+    std::list<std::string> const& rule_build_items =
+	build_item.getRuleBuildItems();
+    mk << "ABUILD_RULE_ITEMS :=";
+    for (std::list<std::string>::const_iterator iter = rule_build_items.begin();
+	 iter != rule_build_items.end(); ++iter)
+    {
+	mk << " " << *iter;
+    }
+    mk << "\n";
+
     // Output variables based on the item's interface object.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
@@ -4767,6 +4781,13 @@ Abuild::invoke_ant(std::string const& item_name,
 	<< Util::join(",", plugin_paths)
 	<< "\n";
 
+    // Generate the names of rule build items
+    std::list<std::string> const& rule_build_items =
+	build_item.getRuleBuildItems();
+    dyn << "abuild.private.rule-items="
+	<< Util::join(",", rule_build_items)
+	<< "\n";
+
     // Output variables based on the item's interface object.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
@@ -4867,13 +4888,19 @@ Abuild::invoke_groovy(std::string const& item_name,
     dyn << "abuild.pluginPaths = [";
     if (! plugin_paths.empty())
     {
-	dyn << "'" << Util::join("', '", plugin_paths)
-	    << "'";
+	dyn << "'" << Util::join("', '", plugin_paths) << "'";
     }
     dyn << "]\n";
 
-    // XXX build item rules
-    dyn << "abuild.buildItemRules = []\n";
+    // Generate the names of rule build items
+    std::list<std::string> const& rule_build_items =
+	build_item.getRuleBuildItems();
+    dyn << "abuild.ruleItems = [";
+    if (! rule_build_items.empty())
+    {
+	dyn << "'" << Util::join("', '", rule_build_items) << "'";
+    }
+    dyn << "]\n";
 
     // Provide data from the item's interface object.  We use "ifc"
     // because "interface" is a reserved word in Groovy.
@@ -5035,7 +5062,8 @@ Abuild::cleanPath(std::string const& item_name, std::string const& dir)
     {
 	std::string const& entry = *iter;
 	std::string fullpath = dir + "/" + entry;
-	if ((entry.substr(0, OUTPUT_DIR_PREFIX.length()) == OUTPUT_DIR_PREFIX) &&
+	if ((entry.substr(0, OUTPUT_DIR_PREFIX.length()) ==
+	     OUTPUT_DIR_PREFIX) &&
 	    (Util::isFile(fullpath + "/.abuild")))
 	{
 	    bool remove = false;

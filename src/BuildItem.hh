@@ -27,6 +27,7 @@ class BuildItem
     std::list<std::string> const& getChildren() const;
     std::list<ExternalData> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;
+    std::list<std::string> const& getRuleBuildItems() const;
     std::list<std::string> const& getDeps() const;
     std::string const& getDepPlatformType(std::string const&) const;
     std::string const& getDepPlatformType(

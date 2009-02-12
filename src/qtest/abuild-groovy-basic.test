@@ -79,6 +79,15 @@ $td->runtest("build failures without -k",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/rules/user");
+
+$td->runtest("basic rule loading",
+	     {$td->COMMAND => "abuild -d",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/rules.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(8);
+$td->report(9);

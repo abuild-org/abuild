@@ -1,13 +1,4 @@
 
-XXX Next: dep -with-rules, implement basic "jar" rules, test build
-item rules in groovy.  For -with-rules, consider using
-abuild.rule-build-items (ant), abuild.ruleBuildItems (groovy), and
-abRULE_BUILD_ITEMS (make).  Detect abuild.hook-build-items and
-BUILD_ITEM_RULES.  If they appear without the new variables, give a
-deprecation warning and use them instead.  Otherwise, give an error.
-When generating the list of build item rules, the order in which the
-dependencies were declared should be preserved.
-
 === Changes Targeted for Version 1.1 ===
 
 Changes to document
@@ -68,6 +59,11 @@ documentation.
    run from any file specified as abuild.local-buildfile.  The
    property abuild.use-local-hooks is no longer used.
 
+ * deps: dep -with-rules is implemented for groovy and partially
+   implemented for ant and make.
+
+ * Disallow build item names from starting with -
+
 Licensing
 =========
 
@@ -82,18 +78,13 @@ Core Changes
 
  * Replace "this" with "name".  Make use of "this" deprecated.
 
- * Consider moving hook selection into Abuild.conf and removing
-   BUILD_ITEM_RULES and abuild.hook-build-items.  This way, abuild can
-   automatically create the dependency, accessing checking can be
-   handled properly, the rename functionality can be implemented, we
-   might be able to remove the ABUILD_DIR stuff, and we can use this
-   information for the built-in help system.  We can probably also
-   remove ACCESSIBLE_BUILD_ITEMS (or whatever it's called).  Keep in
-   mind that this means a build item without a build but with this key
-   would still build.  Most likely way to get rules would be to add an
-   option to the build item in the dependency list, like
-
-   deps: item1 -with-rules item2
+ * Implement -with-rules for make and ant backends.  New variables
+   (implemented already) are ABUILD_RULE_ITEMS for make and
+   abuild.private.rule-items for ant.  In each case, if the old
+   variable (BUILD_ITEM_RULES, abuild.hook-build-items) is defined and
+   the new one is not, give a deprecation warning and use the old
+   variable.  If the old and new variables are both defined, give an
+   error.
 
  * When abuild is run with no arguments, its default behavior will be
    to act as if --with-deps had been specified.  A new flag
@@ -165,14 +156,14 @@ Core Changes
  * Consider a "renamed-to" or "replaced-by" keyword that would be used
    to indicate that a build item has been replaced by another build
    item.  It would be allowed only in root Abuild.conf files.  Its
-   semantics would include that BUILD_ITEM_RULES and
-   abuild.hook-build-items would follow the name change.  This is
-   stronger than using deps to make the old name depend on the new
-   name and also eliminates the need to create build items whose only
-   purpose is to depend on their replacements.  Internally, abuild
-   would make the new name an alias for the old name.  That way,
-   things like abDIR_OLD-ITEM-NAME would contain the path to the new
-   item.
+   semantics would include that rule build items would follow the name
+   change (but only if using -with-rules rather than the old
+   variables).  This is stronger than using deps to make the old name
+   depend on the new name and also eliminates the need to create build
+   items whose only purpose is to depend on their replacements.
+   Internally, abuild would make the new name an alias for the old
+   name.  That way, things like abDIR_OLD-ITEM-NAME would contain the
+   path to the new item.
 
  * Move "deleted-items" key from root Abuild.conf to Abuild.backing.
    Also add a "deleted-trees" key.  New Abuild.backing format:

@@ -1,0 +1,5 @@
+abuild: user (abuild-indep): all
+all from plugin top-level
+all from custom
+all from rule
+all from local
