@@ -116,9 +116,19 @@ class BuildState
         }
     }
 
+    def setVariable(String name, value)
+    {
+        prop[name] = value
+    }
+
     def getVariable(String name)
     {
-        def result = prop[name] ?: ifc[name]
+        getVariable(name, null)
+    }
+
+    def getVariable(String name, String defaultValue)
+    {
+        def result = prop[name] ?: ifc[name] ?: defaultValue
         if (result instanceof List)
         {
             result = result.join(' ')
@@ -352,7 +362,7 @@ class Builder
         loadScript(groovyTop + "/QTestSupport.groovy")
         def targetType = buildState.ifc['ABUILD_TARGET_TYPE']
 
-        def ruleSearchPath = [new File("${groovyTop}/${targetType}")]
+        def ruleSearchPath = [new File("${groovyTop}/rules/${targetType}")]
 
         // Load plugin code and populate ruleSearchPath
         buildState.pluginPaths.each {
@@ -386,14 +396,20 @@ class Builder
         // plugin directory, returning the first item found.
         buildState.prop['abuild.rules']?.each {
             rule ->
+            def found = false
             for (dir in ruleSearchPath)
             {
                 File f = new File("${dir.path}/${rule}.groovy")
                 if (f.isFile())
                 {
                     loadScript(f)
+                    found = true
                     break
                 }
+            }
+            if (! found)
+            {
+                buildState.error("unable to find rule \"${rule}\"")
             }
         }
 
