@@ -114,8 +114,11 @@ abuild.setTarget('package-jar', 'deps' : ['compile']) {
         // We could easily control how the manifest is constructed
         // using additional parameters.
         manifest() {
-            attribute('name' : 'Class-Path',
-                      'value' : manifestClassPath.join(pathSep))
+            if (manifestClassPath)
+            {
+                attribute('name' : 'Class-Path',
+                          'value' : manifestClassPath.join(pathSep))
+            }
             if (mainClass)
             {
                 attribute('name' : 'Main-Class', 'value' : mainClass)
