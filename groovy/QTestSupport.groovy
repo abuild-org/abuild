@@ -24,18 +24,18 @@ abuild.setTarget('test-only') {
                 env('key':'QTEST_EXTRA_MARGIN',
                     'value':12)
             }
-            if (abuild.prop.containsKey('TESTS'))
+            def toExport = abuild.getVariable('QTest.export', [])
+            if (abuild.getVariable('TESTS'))
             {
-                env('key':'TESTS',
-                    'value': abuild.prop['TESTS'])
+                toExport << 'TESTS'
             }
-            if (abuild.prop.containsKey('QTest.export'))
+            if (toExport)
             {
                 // Windows wants environment variables to be all
                 // upper-case.
-                abuild.prop['QTest.export'].each {
+                toExport.each {
                     env('key': it.toUpperCase(),
-                        'value': abuild.getVariable(it))
+                        'value': abuild.getVariableAsString(it))
                 }
             }
             args.each {

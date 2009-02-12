@@ -1,1 +1,1 @@
-abuild.prop['abuild.local-rules'] = ['test_dependency_graph']
+abuild.setParameter('abuild.local-rules', ['test_dependency_graph'])

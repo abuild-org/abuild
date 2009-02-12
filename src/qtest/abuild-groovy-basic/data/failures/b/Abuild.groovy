@@ -1,1 +1,1 @@
-abuild.prop['abuild.local-rules'] = ['b_rules']
+abuild.setParameter('abuild.local-rules', ['b_rules'])

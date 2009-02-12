@@ -1,7 +1,8 @@
-println abuild.prop['potato.salad']
+println abuild.getVariable('potato.salad')
 
-abuild.prop['VAR1'] = 'first value'
-abuild.prop['VAR2'] = 'second value'
-abuild.prop['QTest.export'] = ['VAR1', 'VAR2', 'potato', 'spackle', 'truth1']
+abuild.setParameter('VAR1', 'first value')
+abuild.setParameter('VAR2', 'second value')
+abuild.setParameter('QTest.export',
+                    ['VAR1', 'VAR2', 'potato', 'spackle', 'truth1'])
 
-abuild.prop['abuild.rules'] = ['Empty']
+abuild.setParameter('abuild.rules', ['Empty'])

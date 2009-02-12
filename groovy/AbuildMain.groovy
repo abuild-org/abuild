@@ -24,9 +24,12 @@ class BuildState
     def buildItemRules
 
     // supplied by abuild
-    def prop
+    def defines
     File buildDirectory
     BuildArgs buildArgs
+
+    // variables set by the user
+    def param = [:]
 
     // other accessible fields
     File sourceDirectory = null
@@ -49,7 +52,7 @@ class BuildState
         this.ant = ant
         this.buildDirectory = buildDirectory
         this.buildArgs = buildArgs
-        this.prop = defines
+        this.defines = defines
 
         this.sourceDirectory = buildDirectory.parentFile
 
@@ -116,9 +119,9 @@ class BuildState
         }
     }
 
-    def setVariable(String name, value)
+    def setParameter(String name, value)
     {
-        prop[name] = value
+        param[name] = value
     }
 
     def getVariable(String name)
@@ -126,14 +129,19 @@ class BuildState
         getVariable(name, null)
     }
 
-    def getVariable(String name, String defaultValue)
+    def getVariable(String name, defaultValue)
     {
-        def result = prop[name] ?: ifc[name] ?: defaultValue
+        defines[name] ?: param[name] ?: ifc[name] ?: defaultValue
+    }
+
+    def getVariableAsString(String name)
+    {
+        def result = getVariable(name)
         if (result instanceof List)
         {
-            result = result.join(' ')
+            result = result.join(" ")
         }
-        result
+        result.toString()
     }
 
     def fail(String message)
@@ -378,8 +386,8 @@ class Builder
             }
         }
 
-        if (! (buildState.prop['abuild.rules'] ||
-               buildState.prop['abuild.local-rules'] ||
+        if (! (buildState.param['abuild.rules'] ||
+               buildState.param['abuild.local-rules'] ||
                buildState.buildItemRules))
         {
             QTC.TC("abuild", "groovy ERR no rules")
@@ -391,10 +399,10 @@ class Builder
             return false
         }
 
-        // Load any rules specified in prop['abuild.rules'].  First
+        // Load any rules specified in param['abuild.rules'].  First
         // search the internal location, and then search in each
         // plugin directory, returning the first item found.
-        buildState.prop['abuild.rules']?.each {
+        buildState.param['abuild.rules']?.each {
             rule ->
             def found = false
             for (dir in ruleSearchPath)
@@ -421,7 +429,7 @@ class Builder
 
         // Load any local rules files, resolving the path relative to
         // the source directory
-        buildState.prop['abuild.local-rules']?.each {
+        buildState.param['abuild.local-rules']?.each {
             loadScript(new File("${sourceDirectory.path}/${it}.groovy"))
         }
 
