@@ -103,6 +103,8 @@ abuild.setTarget('package-jar', 'deps' : ['compile']) {
         fileset('dir' : classesDir) {
             include('name' : '**/*.class')
         }
+        // We could easily control how the manifest is constructed
+        // using additional parameters.
         manifest() {
             attribute('name' : 'Class-Path', 'value' : compileClassPath.join(pathSep))
             if (mainClass)
