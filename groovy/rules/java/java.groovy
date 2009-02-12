@@ -33,6 +33,9 @@ def jarName
 def mainClass
 def wrapperName
 
+ant.taskdef('name': 'groovyc',
+            'classname': 'org.codehaus.groovy.ant.Groovyc')
+
 abuild.setTarget('all', 'deps' : ['package', 'wrapper'])
 
 abuild.setTarget('package', 'deps' : ['init', 'package-jar'])
@@ -67,7 +70,7 @@ abuild.setTarget('init') {
     generatedConfDir =
         getPathVariable('generated-conf', defaultGeneratedConfDir)
 
-    compileClassPath = abuild.getVariable('abuild.classpath')
+    compileClassPath = abuild.getVariable('abuild.classpath', [])
     jarName = abuild.getVariable('java.jar-name')
     mainClass = abuild.getVariable('java.main-class')
     wrapperName = abuild.getVariable('java.wrapper-name')
@@ -90,7 +93,11 @@ abuild.setTarget('compile', 'deps' : ['generate']) {
         compilerarg('value' : '-Xlint')
         compilerarg('value' : '-Xlint:-path')
     }
-    // XXX groovyc?
+    // Other args to groovyc?
+    ant.groovyc('destdir' : classesDir,
+                'classpath' : compileClassPath.join(pathSep)) {
+        srcDirs.each { dir -> src('path' : dir) }
+    }
 }
 
 abuild.setTarget('package-jar', 'deps' : ['compile']) {
