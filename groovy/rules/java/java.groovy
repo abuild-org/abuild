@@ -1,45 +1,110 @@
-def buildDir = ant.project.properties['basedir']
+import org.apache.tools.ant.taskdefs.condition.Os
+
+// Initialize variables whose values will be available at
+// initialization.  Use the init target to initialize things that we
+// don't want to look at until we are actually building.
+
+def buildDir = abuild.ifc['ABUILD_OUTPUT_DIR']
 def itemDir = new File(buildDir).parentFile.absolutePath
+def pathSep = ant.project.properties['path.separator']
 
-// XXX Figure out what we should allow the user to override.  Then use
-// getVariable with these as default values.
-def srcDir = "${itemDir}/src/java"
-def classesDir = "${buildDir}/classes"
-def distDir = "${buildDir}/dist"
+// These are overridable defaults.
+def defaultDistDir = "${buildDir}/dist"
+def defaultClassesDir = "${buildDir}/classes"
+def defaultSrcDir = "${itemDir}/src/java"
+def defaultGeneratedSrcDir = "${buildDir}/src/java"
+def defaultResourcesDir = "${itemDir}/src/resources"
+def defaultGeneratedResourcesDir = "${buildDir}/src/resources"
+def defaultConfDir = "${itemDir}/src/conf"
+def defaultGeneratedConfDir = "${buildDir}/src/conf"
 
-def srcJavaDir = "${itemDir}/src/java"
+// These are initialized by the init target.
+def distDir
+def classesDir
+def srcDir
+def generatedSrcDir
+def resourcesDir
+def generatedResourcesDir
+def confDir
+def generatedConfDir
 
-abuild.setTarget('all', 'deps' : ['package-jar', 'wrapper'])
+def compileClassPath
+def jarName
+def mainClass
+def wrapperName
 
-abuild.setTarget('generate')
+abuild.setTarget('all', 'deps' : ['package', 'wrapper'])
+
+abuild.setTarget('package', 'deps' : ['init', 'package-jar'])
+
+abuild.setTarget('generate', 'deps' : ['init'])
+
+def getPathVariable(String var, defaultValue)
+{
+    def result = abuild.getVariable("java.dir.${var}", defaultValue)
+    if (! new File(result).isAbsolute())
+    {
+        result = "${itemDir}/${result}"
+    }
+    result
+}
+
+abuild.setTarget('init') {
+    distDir =
+        getPathVariable('dist', defaultDistDir)
+    classesDir =
+        getPathVariable('classes', defaultClassesDir)
+    srcDir =
+        getPathVariable('src', defaultSrcDir)
+    generatedSrcDir =
+        getPathVariable('generated-src', defaultGeneratedSrcDir)
+    resourcesDir =
+        getPathVariable('resources', defaultResourcesDir)
+    generatedResourcesDir =
+        getPathVariable('generated-resource', defaultGeneratedSrcDir)
+    confDir =
+        getPathVariable('conf', defaultConfDir)
+    generatedConfDir =
+        getPathVariable('generated-conf', defaultGeneratedConfDir)
+
+    compileClassPath = abuild.getVariable('abuild.classpath')
+    jarName = abuild.getVariable('java.jar-name')
+    mainClass = abuild.getVariable('java.main-class')
+    wrapperName = abuild.getVariable('java.wrapper-name')
+}
 
 abuild.setTarget('compile', 'deps' : ['generate']) {
-    // XXX debug=..., deprecation=...
-    def classPath = abuild.ifc['abuild.classpath'].join(';')
+    def srcDirs = [srcDir, generatedSrcDir].grep {
+        dir -> new File(dir).isDirectory()
+    }
+    if (! srcDirs)
+    {
+        return
+    }
+    def javacArgs = abuild.getVariable('java.javac-args', [:])
+    javacArgs['destdir'] = classesDir
+    javacArgs['classpath'] = compileClassPath.join(pathSep)
     ant.mkdir('dir' : classesDir)
-    ant.javac('destdir' : classesDir, 'classpath' : classPath) {
-        src('path' : srcDir)
+    ant.javac(javacArgs) {
+        srcDirs.each { dir -> src('path' : dir) }
         compilerarg('value' : '-Xlint')
         compilerarg('value' : '-Xlint:-path')
     }
+    // XXX groovyc?
 }
 
 abuild.setTarget('package-jar', 'deps' : ['compile']) {
-    def jarName = abuild.getVariable('abuild.jar.jar-name')
     if (! jarName)
     {
         return
     }
-    def mainClass = abuild.getVariable('abuild.jar.main-class')
-    def classPath = abuild.ifc['abuild.classpath'].collect {
-        new File(it).name }.join(':')
     ant.mkdir('dir' : distDir)
     ant.jar('destfile' : "${distDir}/${jarName}") {
         fileset('dir' : classesDir) {
             include('name' : '**/*.class')
         }
         manifest() {
-            attribute('name' : 'Class-Path', 'value' : classPath)
+            attribute('name' : 'Class-Path', 'value' : compileClassPath.join(pathSep))
             if (mainClass)
             {
                 attribute('name' : 'Main-Class', 'value' : mainClass)
@@ -48,35 +113,32 @@ abuild.setTarget('package-jar', 'deps' : ['compile']) {
     }
 }
 
-abuild.setTarget('wrapper') {
-    def wrapperName = abuild.getVariable('abuild.jar.wrapper-name')
-    def mainClass = abuild.getVariable('abuild.jar.main-class')
-    def jarName = abuild.getVariable('abuild.jar.jar-name')
+abuild.setTarget('wrapper', 'deps' : ['package-jar']) {
     if (! (wrapperName && mainClass && jarName))
     {
         return
     }
-    // XXX fix path separators everywhere in this file with a top-level def
-    def classPathList = [*abuild.ifc['abuild.classpath'],
-        "${distDir}/${jarName}"]
-    def classPath = classPathList.join(':')
+    def wrapperPath = "${buildDir}/${wrapperName}"
 
-//  <if>
-//   <os family="windows"/>
-//   <then>
-//    <echo file="${abuild.wrapper-name}.bat">@echo off
-//java -classpath ${wrapper.classpath} ${abuild.main-class} %1 %2 %3 %4 %5 %6 %7 %8 %9
-//</echo>
-//    <!-- in case we're in cygwin... -->
-//    <echo file="${abuild.wrapper-name}">#!/bin/sh
-//exec `dirname $0`/`basename $0`.bat ${1+"$@"}
-//</echo>
-//    <chmod file="${abuild.wrapper-name}" perm="a+x"/>
-//   </then>
-//   <else>
-    ant.echo('file' : "${buildDir}/${wrapperName}",
-             """#!/bin/sh
-exec java -classpath ${classPath} ${mainClass} ${1+"\$@"}
+    def wrapperClassPath = [*compileClassPath, "${distDir}/${jarName}"].join(pathSep)
+    if (Os.isFamily('windows'))
+    {
+        ant.echo('file' : "${wrapperPath}.bat", """
+@echo off
+java -classpath ${wrapperClassPath} ${mainClass} %1 %2 %3 %4 %5 %6 %7 %8 %9
 """)
-    ant.chmod('file' : "${buildDir}/${wrapperName}", 'perm' : 'a+x');
+        // In case we're in Cygwin...
+        ant.echo('file' : wrapperPath, '''
+#!/bin/sh
+exec `dirname $0`/`basename $0`.bat ${1+"$@"}
+''')
+    }
+    else
+    {
+        ant.echo('file' : wrapperPath,
+                 """#!/bin/sh
+exec java -classpath ${wrapperClassPath} ${mainClass} ${1+"\$@"}
+""")
+    }
+    ant.chmod('file' : wrapperPath, 'perm' : 'a+x');
 }
