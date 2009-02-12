@@ -105,6 +105,7 @@ abuild.setTarget('package-jar', 'deps' : ['compile']) {
     {
         return
     }
+    def manifestClassPath = compileClassPath.collect { new File(it).name }
     ant.mkdir('dir' : distDir)
     ant.jar('destfile' : "${distDir}/${jarName}") {
         fileset('dir' : classesDir) {
@@ -113,7 +114,8 @@ abuild.setTarget('package-jar', 'deps' : ['compile']) {
         // We could easily control how the manifest is constructed
         // using additional parameters.
         manifest() {
-            attribute('name' : 'Class-Path', 'value' : compileClassPath.join(pathSep))
+            attribute('name' : 'Class-Path',
+                      'value' : manifestClassPath.join(pathSep))
             if (mainClass)
             {
                 attribute('name' : 'Main-Class', 'value' : mainClass)
@@ -132,13 +134,11 @@ abuild.setTarget('wrapper', 'deps' : ['package-jar']) {
     def wrapperClassPath = [*compileClassPath, "${distDir}/${jarName}"].join(pathSep)
     if (Os.isFamily('windows'))
     {
-        ant.echo('file' : "${wrapperPath}.bat", """
-@echo off
+        ant.echo('file' : "${wrapperPath}.bat", """@echo off
 java -classpath ${wrapperClassPath} ${mainClass} %1 %2 %3 %4 %5 %6 %7 %8 %9
 """)
         // In case we're in Cygwin...
-        ant.echo('file' : wrapperPath, '''
-#!/bin/sh
+        ant.echo('file' : wrapperPath, '''#!/bin/sh
 exec `dirname $0`/`basename $0`.bat ${1+"$@"}
 ''')
     }
