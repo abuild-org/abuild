@@ -1,0 +1,5 @@
+abuild: a (abuild-indep): all
+abuild-groovy: ERROR: unknown target unknown
+abuild: a (abuild-indep): build failed
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: a on platform indep

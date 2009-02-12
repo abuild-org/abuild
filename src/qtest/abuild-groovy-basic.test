@@ -71,6 +71,14 @@ $td->runtest("build failures",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("build failures without -k",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER =>
+		  "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/failures-no-k.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(7);
+$td->report(8);

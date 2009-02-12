@@ -35,6 +35,10 @@ abuild: e (abuild-indep): build failed
 abuild: f (abuild-indep): all
 abuild-groovy: ERROR: no build rules are defined; one of abuild.rules or abuild.local-rules must be defined, or at least one dependency must have been specified with the -with-rules option
 abuild: f (abuild-indep): build failed
+abuild: g (abuild-indep): all
+abuild-groovy: ERROR: build failure: target "all" called itself most likely as a result of an explicit runTarget on itself or oneof its reverse dependencies
+abuild-groovy: ERROR: not building target "all" because of failure of its dependencies
+abuild: g (abuild-indep): build failed
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: a on platform indep
 abuild: ERROR: build failure: b on platform indep
@@ -42,3 +46,4 @@ abuild: ERROR: build failure: c on platform indep
 abuild: ERROR: build failure: d on platform indep
 abuild: ERROR: build failure: e on platform indep
 abuild: ERROR: build failure: f on platform indep
+abuild: ERROR: build failure: g on platform indep

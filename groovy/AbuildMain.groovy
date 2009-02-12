@@ -192,16 +192,27 @@ class BuildState
 
         if (targetsRun.containsKey(target))
         {
-            return targetsRun[target]
+            if (targetsRun[target] == null)
+            {
+                QTC.TC("abuild", "groovy ERR re-entrant target")
+                fail("target \"${target}\" called itself most likely as a" +
+                     " result of an explicit runTarget on itself or one" +
+                     "of its reverse dependencies")
+            }
+            else
+            {
+                QTC.TC("abuild", "groovy cached target result")
+                return targetsRun[target]
+            }
         }
 
         // DO NOT RETURN BELOW THIS POINT until the end of the
         // function.
 
-        // Cache result initially as failure to prevent loops while
+        // Cache result initially as null to prevent loops while
         // invoking targets.  We will replace the cache result with
-        // true if the target run succeeds.
-        boolean status = targetsRun[target] = false
+        // an actual boolean after the target run completes.
+        boolean status = targetsRun[target] = null
 
         if (! closures.containsKey(target))
         {
@@ -217,8 +228,8 @@ class BuildState
         else
         {
             status = true
-            closures[target].each {
-                d ->
+            for (d in closures[target])
+            {
                 def origin = d[0]
                 def cl = d[1]
                 def exc_to_print = null
@@ -229,6 +240,11 @@ class BuildState
                         println "--> running target ${target} from ${origin}"
                     }
                     cl()
+                    if (anyFailures && (! buildArgs.keepGoing))
+                    {
+                        QTC.TC("abuild", "groovy stop after closure error")
+                        break
+                    }
                 }
                 catch (AbuildBuildFailure e)
                 {
@@ -352,11 +368,9 @@ class Builder
             }
         }
 
-        if (((! buildState.prop.containsKey('abuild.rules')) ||
-             buildState.prop['abuild.rules'].isEmpty()) &&
-            ((! buildState.prop.containsKey('abuild.local-rules')) ||
-             buildState.prop['abuild.local-rules'].isEmpty()) &&
-            buildState.buildItemRules.isEmpty())
+        if (! (buildState.prop['abuild.rules'] ||
+               buildState.prop['abuild.local-rules'] ||
+               buildState.buildItemRules))
         {
             QTC.TC("abuild", "groovy ERR no rules")
             buildState.error(
