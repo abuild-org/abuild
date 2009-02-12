@@ -4906,17 +4906,7 @@ Abuild::invoke_groovy(std::string const& item_name,
 	    {
 		dyn << ", ";
 	    }
-	    std::string const& val = *viter;
-	    switch (info.type)
-	    {
-	      case Interface::t_filename:
-		dyn << "'" << Util::absToRel(val, dir) << "'";
-		break;
-
-	      default:
-		dyn << "'" << val << "'";
-		break;
-	    }
+	    dyn << "'" << *viter << "'";
 	}
 	if (info.list_type != Interface::l_scalar)
 	{
