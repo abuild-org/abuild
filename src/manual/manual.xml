@@ -5,6 +5,7 @@
 <!ENTITY ldquo "&#x201C;">
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
+<!ENTITY nbsp "&#xA0;">
 <!ENTITY swversion "1.0.3">
 <!ENTITY lastreleased "January 9, 2009">
 <!ENTITY example "../../doc/example">
@@ -163,6 +164,29 @@ following checks:
    </para>
   </legalnotice>
  </bookinfo>
+ <preface id="ref.alpha-release">
+  <title>Preface to 1.1 Alpha Releases</title>
+  <para>
+   The manual has not yet been updated to reflect changes for Version
+   1.1 of &abuild;.  The manual will be updated to describe new
+   functionality prior to the release of the first 1.1 beta release.
+   In the mean time, please see <xref linkend="ref.release-notes"/>
+   for details about the changes that have already been implemented
+   and the <filename>TODO</filename> file in the source for
+   information about changes that are pending.
+  </para>
+  <para>
+   There is one exception to this: there are a few instances in the
+   examples section where the documentation refers to an
+   <filename>Abuild-ant.properties</filename> file but actually shows
+   an <filename>Abuild.groovy</filename> file instead.  These will be
+   fixed when the manual is updated.  These discrepancies exist
+   because the files referenced in the documentation are part of
+   &abuild;'s test suite, and as some of the example files are
+   updated, the documentation has to be changed to refer to existing
+   files.
+  </para>
+ </preface>
  <preface id="ref.how-to-read-this-manual">
   <title>How to Read This Manual</title>
   <para>
@@ -1491,7 +1515,7 @@ C:\cygwin\cygwin.bat
      <property>native</property>.  This is always true for Java build
      items.  Next, we'll look at the
      <filename>Abuild-ant.properties</filename> file:
-     <?example basic/java-library/Abuild-ant.properties?>
+     <?example basic/java-library/Abuild.groovy?>
      Property-driven Java build items have this file instead of
      <filename>Abuild.mk</filename>.  The only thing we have to set
      here is the property <varname>abuild.jar-name</varname>.  For
@@ -1535,7 +1559,7 @@ C:\cygwin\cygwin.bat
      Here are the relevant files for the program example:
      <?example basic/java-program/src/java/com/example/basic/BasicProgram.java?>
      <?example basic/java-program/Abuild.conf?>
-     <?example basic/java-program/Abuild-ant.properties?>
+     <?example basic/java-program/Abuild.groovy?>
      Note the addition of the <varname>abuild.main-class</varname> and
      <varname>abuild.wrapper-name</varname> properties.  If these are
      both set, &abuild; will create a wrapper executable (script file
@@ -13668,20 +13692,302 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>XXX next: XXX date</term>
+     <term>1.1.a1: XXX date</term>
      <listitem>
-      <para>
-       Usability Improvements
-      </para>
       <itemizedlist>
        <listitem>
         <para>
-         Starting in 1.0.3, if any build failures occur in a given
-         &abuild; run, &abuild; issues an error message indicating
-         this at the end of its output.  Now this error message is
-         followed by a list of which build items failed on which
-         platforms.
+         Major Enhancements
         </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           A new <application>Groovy</application>-based backend has
+           been added.  Although, like all backends, it could be used
+           to build build items of any target type, it is primarily
+           intended as a replacement for the <application>Apache
+           Ant</application> backend.  This first alpha release of 1.1
+           includes a rudimentary collection of rules for building
+           Java and Groovy code.  These rules may change in
+           non-compatible ways throughout the 1.1 alpha testing
+           period.  The <application>groovy</application> backend is
+           invoked through Java APIs.  A single instance of the Java
+           Virtual Machine is shared for all groovy-based builds.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The same JVM that is used to run groovy-based builds is now
+           also used to invoke ant-based builds.  As such, &abuild;
+           runs all ant builds from a single JVM and no longer invokes
+           ant from the command line.  This can result in a noticeable
+           performance improvement.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Licensing Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; itself remains under the terms of Version&nbsp;2
+           of the Artistic license.  &Abuild; now also embeds the
+           embeddable JAR from the Groovy distribution.  Groovy is
+           distributed under the terms of the Apache License.  A
+           <filename>NOTICE.txt</filename> file has been included in
+           &abuild;'s source distribution in accordance with that
+           license.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Changes to command-line syntax
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <option>--ant</option> and
+           <option>--no-abuild-logger</option> options are no longer
+           supported since &abuild; now invokes ant through Java
+           APIs.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; now recognizes arguments of the form
+           <option><replaceable>variable</replaceable>=<replaceable>value</replaceable></option>
+           as variable definitions.  Any such variable definitions are
+           automatically passed to all backends.  This, rather than
+           using <option>--make</option> or <option>--ant</option> is
+           now the recommended way of overriding variables.  Any
+           variables defined in this way are made available to the
+           <application>ant</application> backend and to the ant
+           project in the <application>groovy</application> backend as
+           properties, and to the GNU Make backend as variables passed
+           on the command line.  They are also passed to the
+           <application>groovy</application> backend in a manner that
+           causes them to override variable values that are set in
+           other ways, as long as the documented interfaces are used
+           for getting and setting variables.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>--just-print</option>,
+           <option>--dry-run</option>, and <option>--recon</option>
+           options are no longer synonyms for <option>-n</option>.
+           These are accepted as synonyms by GNU Make, which is why
+           they were originally supported by &abuild; as well.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           When declaring dependencies, a new flag
+           <option>-with-rules</option> may be specified.  This causes
+           the build item to load <filename>Rules.mk</filename>
+           (make), <filename>ant-hooks.xml</filename> (ant), or
+           <filename>Rules.groovy</filename> (groovy).  This replaces
+           the now deprecated <varname>BUILD_ITEM_RULES</varname> make
+           variable and <varname>abuild.hook-build-items</varname> ant
+           property.  This change means that there is now a unified
+           mechanism for forcing build item-supplied rules to be run
+           rather than having a separate mechanism for each backend.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When traversing a build tree with a backing area, &abuild;
+           now accepts non-existent child directories without
+           requiring a corresponding directory to exist in the
+           backing area.  This check served no useful purpose, and it
+           was removed in preparation for the upcoming revamping of
+           how backing areas work.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>-n</option> is now supported for all the
+           backends, not just make.  For the ant and groovy backends,
+           &abuild; doesn't actually invoke the backend but instead
+           just prints some information on what targets would be run.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Considerable additional information is output when &abuild;
+           is run with <option>--verbose</option>.  In particular,
+           there is much more information about how &abuild; starts up
+           and invokes backends.  This should make it easier to solve
+           certain types of configuration problems, such as &abuild;
+           picking the wrong version of make.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Although &abuild; still does not require
+           <envar>JAVA_HOME</envar> or <envar>ANT_HOME</envar> to be
+           set, it will start up slightly faster if they are set.  The
+           reason for this is that &abuild; actually invokes
+           <command>java</command> and <command>ant</command> to more
+           reliably infer values for <envar>JAVA_HOME</envar> and
+           <envar>ANT_HOME</envar> if they are not already set.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Build item names are no longer permitted to start with the
+           &ldquo;-&rdquo; character.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Changes to <application>ant</application> framework
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           All files from which hooks may be loaded, including hook
+           build items' <filename>ant-hooks.xml</filename> files,
+           plugins' <filename>plugin-ant.xml</filename> files, and any
+           file specified as <varname>abuild.local-buildfile</varname>
+           are now <emphasis>imported</emphasis>.  Before, plugin and
+           build item-supplied files were used only for loading hooks.
+           This means that it is possible to add new targets in
+           plugins and hook build items.  Some caveats are described
+           in the documentation for this feature.  Most notably, when
+           multiple instances of a new target are imported, only one
+           will actually be used.  The recommended practice is for
+           newly defined targets to do nothing other than call
+           <command>run-hooks</command> to run a hook of the same
+           name.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The property <varname>abuild.use-local-hooks</varname> is
+           no longer used.  Instead, the ant backend always behaves as
+           if it were set, meaning that it always uses the local build
+           file for hooks.  People were in the habit of setting the
+           now deprecated <varname>abuild.hook-build-items</varname>
+           to contain the current build item, which is not a good
+           idea.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; now loads the <command>groovy</command> ant task.
+           Parts of the &abuild; ant framework use this task to embed
+           groovy code.  It is recommended that you switch to the
+           <application>groovy</application> backend rather than using
+           this task, but embedding groovy code in your ant files may
+           help with a transition to the new backend.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <command>other</command> and <command>deploy</command>
+           targets will be removed from the
+           <application>ant</application> framework in a future 1.1
+           alpha release as they are no longer needed now that it is
+           possible for users to add their own new targets.  If you
+           are relying on them, you can code your own in a plugin.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Since &abuild; no longer invokes ant from the command line,
+           the <option>--ant</option> option has been removed.  As
+           such, it is no longer possible to pass arbitrary flags to
+           ant.  The most common use of this was to pass
+           <option>-Dprop-value</option> options to ant.  This can now
+           be accomplished through &abuild;'s new
+           <option>VAR=value</option> argument syntax as described
+           above.  Certain things that used to be possible before,
+           such as running <command>abuild --ant -p</command>, are no
+           longer supported.  A future 1.1 alpha version of abuild
+           will introduce a new help system, so this feature should
+           hopefully not be missed.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Since &abuild; now uses its own ant launcher to start
+           ant-based builds using the ant Java API, the old problem of
+           ant.bat not properly reporting failures on Windows is no
+           longer relevant.  This means that ant-based failures are
+           now properly detected on Windows.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>--no-abuild-logger</option> is no longer
+           supported.  &Abuild; now always uses the abuild logger when
+           running ant.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Building &Abuild;
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; has already required Java 1.5 since its own Java
+           code uses generics.  This requirement is made more firm now
+           since &abuild;'s own Java code now also makes use of some
+           thread pool functionality that was added in version 1.5.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; now requires boost version 1.35 or greater since
+           it uses the asio (Asynchronous I/O) library to communicate
+           with its Java build launcher.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When bootstrapping &abuild;, you must now run the
+           BootstrapJava.groovy script in &abuild;'s
+           <filename>src</filename> directory to build the Java code.
+           A full groovy installation (>= 1.5.7) is needed to build
+           &abuild; from scratch.  A groovy installation is not
+           required run &abuild; as &abuild; embeds groovy.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Usability Improvements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Starting in 1.0.3, if any build failures occur in a given
+           &abuild; run, &abuild; issues an error message indicating
+           this at the end of its output.  Now this error message is
+           followed by a list of which build items failed on which
+           platforms.
+          </para>
+         </listitem>
+        </itemizedlist>
        </listitem>
       </itemizedlist>
      </listitem>
@@ -15871,20 +16177,6 @@ Y = $(X)
     hopefully be addressed over time.
    </para>
    <variablelist>
-    <varlistentry>
-     <term>ant failures not always detected</term>
-     <listitem>
-      <para>
-       In at least some version of ant on at least some versions of
-       Windows, <command>ant.bat</command> does not return an abnormal
-       exit status to the caller when a build fails.  This makes it
-       impossible for &abuild; to detect a failed build.  This could
-       cause extraneous items to be built even when failure is
-       certain, or it could cause an overall &abuild; run to report
-       success in spite of failed build items.
-      </para>
-     </listitem>
-    </varlistentry>
     <varlistentry>
      <term>undefined variable checks</term>
      <listitem>

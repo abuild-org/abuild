@@ -2,7 +2,8 @@ The Abuild software and documentaion are copyright (c) 2007-2009 by
 Jay Berkenbilt, Argon ST.  They may be distributed under the terms of
 version 2 of the Artistic License which may be found in the source and
 binary distributions.  They are provided "as is" without express or
-implied warranty.
+implied warranty.  Parts are also distributed the Apache license.  See
+LICENSE.txt and NOTICE.txt for details.
 
 For build information, see src/README.build.
 

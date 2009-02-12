@@ -6,8 +6,8 @@ use File::stat;
 my $dirname = dirname($0);
 
 my @files = (get_files("$dirname/../../doc/example"),
-	     (grep { $_->[0] =~ m,/example\..*\.out$, }
-	      get_files("$dirname/../qtest/abuild")));
+	     (grep { $_->[0] =~ m,/\.out$, }
+	      get_files("$dirname/../qtest/abuild-examples")));
 open(E, ">example-list.new") or die "open example-list.new: $!";
 for (@files)
 {

@@ -328,7 +328,6 @@ else
 }
 if ($build_java)
 {
-    safe_mkdir("lib");
     safe_copy("src/java-support/abuild-java/dist/abuild-java-support.jar",
 	      "lib/abuild-java-support.jar");
     if ($make_java_dist)

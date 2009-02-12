@@ -1,82 +1,8 @@
 
 === Changes Targeted for Version 1.1 ===
 
-Changes to document
-===================
-
-These changes have already been made and need to make it into the
-documentation.
-
- * boost >= 1.35 is now required to build abuild because it uses the
-   asio library.
-
- * Java >= 1.5 is now required because of thread pools.
-
- * ant is no longer launched using the ant script.  As such, certain
-   arguments, such as -p, are no longer supported.  Also, the problem
-   of ant.bat not reporting failure is no longer relevant.
-
- * When traversing a build tree with a backing area, accept
-   non-existent child directories without any additional checking.  We
-   no longer require the path to exist relative to the backing tree.
-
- * ./BootstrapJava.groovy to bootstrap java code.  A full groovy
-   installation (>= 1.5.7) is needed to build abuild from scratch but
-   not to run it -- abuild embeds groovy.
-
- * The --ant and --no-abuild-logger arguments have been removed
-
- * Args of the form VAR=value are now passed to all backends
-
- * Removed --just-print, --dry-run, --recon; support -n for all
-   backends
-
- * Abuild will start up slightly faster if ANT_HOME and JAVA_HOME are
-   set.  If they are not set, abuild will find java and ant in your
-   path and run them to determine the proper values for ANT_HOME and
-   JAVA_HOME.
-
- * --verbose gives more information about locating external programs
-   (make, java) at startup.
-
- * Abuild has a harder requirement on Java 1.5.  It's not just
-   generics anymore.
-
- * For groovy backends, defining a new test procedure requires only
-   defining a closure for the 'test-only' target.  Abuild
-   automatically calls this from test or check.
-
- * document fields and interface of BuildState ("abuild").  Also
-   describe parameter handling.  setParameter vs. getVariable, which
-   looks at defines, parameters, interface, and default in that order
-
- * QTest.export prop for groovy backend; also export of TESTS
-
- * abuild.local-rules prop
-
- * ant: all hooks and plugin files, as well as any specified local
-   build file, are now imported.  Hooks are now also unconditionally
-   run from any file specified as abuild.local-buildfile.  The
-   property abuild.use-local-hooks is no longer used.
-
- * deps: dep -with-rules is implemented for groovy and partially
-   implemented for ant and make.
-
- * Disallow build item names from starting with -
-
-Licensing
-=========
-
- * Embedding groovy; need to comply with Apache license and create
-   NOTICE.txt file.
-
-Core Changes
-============
-
- * Implement an optional 1.0-compatibility mode.  See "Compatibility"
-   below.
-
- * Replace "this" with "name".  Make use of "this" deprecated.
+1.1.a1
+======
 
  * Implement -with-rules for make and ant backends.  New variables
    (implemented already) are ABUILD_RULE_ITEMS for make and
@@ -85,6 +11,23 @@ Core Changes
    the new one is not, give a deprecation warning and use the old
    variable.  If the old and new variables are both defined, give an
    error.
+
+
+Changes to document
+===================
+
+These changes have already been made and need to make it into the
+documentation.
+
+
+
+Core Changes
+============
+
+ * Implement an optional 1.0-compatibility mode.  See "Compatibility"
+   below.
+
+ * Replace "this" with "name".  Make use of "this" deprecated.
 
  * When abuild is run with no arguments, its default behavior will be
    to act as if --with-deps had been specified.  A new flag
@@ -198,6 +141,25 @@ Core Changes
 
 Documentation
 =============
+
+ * Read through all 1.1 release notes and update the body of the
+   documentation accordingly.  Save this until all the new features
+   are implemented, if possible.
+
+ * Describe groovy framework (obviously).  Specific things to remember:
+
+    - For groovy backends, defining a new test procedure requires only
+      defining a closure for the 'test-only' target.  Abuild
+      automatically calls this from test or check.
+
+    - document fields and interface of BuildState ("abuild").  Also
+      describe parameter handling.  setParameter vs. getVariable, which
+      looks at defines, parameters, interface, and default in that order
+
+    - QTest.export prop for groovy backend; also automatic export of
+      TESTS
+
+    - abuild.local-rules, abuild.rules
 
  * Describe somewhere why we don't provide information about platforms
    in the interface files for java and indep.  Basically, it would be
