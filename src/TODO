@@ -55,7 +55,9 @@ documentation.
    defining a closure for the 'test-only' target.  Abuild
    automatically calls this from test or check.
 
- * abuild.prop for groovy...also document other fields (ifc, etc.)
+ * document fields and interface of BuildState ("abuild").  Also
+   describe parameter handling.  setParameter vs. getVariable, which
+   looks at defines, parameters, interface, and default in that order
 
  * QTest.export prop for groovy backend; also export of TESTS
 
