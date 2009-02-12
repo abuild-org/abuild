@@ -1,2 +1,2 @@
-abuild.setParameter('abuild.rules', ['Empty'])
+abuild.setParameter('abuild.rules', ['empty'])
 abuild.runTarget("all")
