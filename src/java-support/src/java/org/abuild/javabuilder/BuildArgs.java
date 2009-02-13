@@ -9,6 +9,7 @@ public class BuildArgs
     public boolean keepGoing = false;
     public boolean emacsMode = false;
     public boolean noOp = false;
+    public boolean deprecationIsError = false;
 
     public boolean parseArgs(Vector<String> args)
     {
@@ -34,6 +35,10 @@ public class BuildArgs
 	    else if (arg.equals("-n"))
 	    {
 		noOp = true;
+	    }
+	    else if (arg.equals("-de"))
+	    {
+		deprecationIsError = true;
 	    }
 	    else
 	    {

@@ -30,6 +30,13 @@ $td->runtest("build-item-rules",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("build-item-rules deprecation error",
+	     {$td->COMMAND => "abuild -b all -k --deprecation-is-error",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build-item-rules-error.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 if ($test_java)
 {
     cd("work/hook-build-items");
@@ -40,8 +47,15 @@ if ($test_java)
 		 {$td->FILE => "$top/hook-build-items.out",
 		  $td->EXIT_STATUS => 2},
 		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("hook-build-items deprecation error",
+		 {$td->COMMAND => "abuild -b all -k --deprecation-is-error",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/hook-build-items-error.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
 }
 
 check_work_accessed($td);
 
-$td->report(2 + ($test_java ? 1 : 0));
+$td->report(3 + ($test_java ? 2 : 0));

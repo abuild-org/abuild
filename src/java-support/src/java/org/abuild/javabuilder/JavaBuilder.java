@@ -197,6 +197,11 @@ class JavaBuilder
 	{
 	    p.setUserProperty("abuild.private.emacs-mode", "1");
 	}
+	if (buildArgs.deprecationIsError)
+	{
+	    p.setUserProperty("abuild.private.deprecate-is-error", "1");
+	    Deprecate.setDeprecateIsError(true);
+	}
 	p.addBuildListener(logger);
 
 	p.addTaskDefinition("deprecate", Deprecate.class);

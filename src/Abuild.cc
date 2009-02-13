@@ -56,6 +56,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     dump_build_graph(false),
     verbose_mode(false),
     silent(false),
+    deprecate_is_error(false),
     monitored(false),
     dump_interfaces(false),
     apply_targets_to_deps(false),
@@ -407,6 +408,12 @@ Abuild::parseArgv()
 	else if (arg == "--list-platforms")
 	{
 	    this->list_platforms = true;
+	}
+	else if (arg == "--deprecation-is-error")
+	{
+	    this->make_args.push_back("ABUILD_DEPRECATE_IS_ERROR=1");
+	    this->java_builder_args.push_back("-de");
+	    this->deprecate_is_error = true;
 	}
 	else if (arg == "--dump-data")
 	{
@@ -5138,6 +5145,7 @@ Abuild::help()
     h("    -c set");
     h("  --clean-platforms pattern   when cleaning, only remove platforms that");
     h("                    match the given shell-style filename pattern");
+    h("  --deprecation-is-error   treat deprecation warnings as errors");
     h("  --dump-build-graph  dump abuild's internal build graph");
     h("  --dump-data       dump abuild's data to stdout and build no targets");
     h("  --dump-interfaces   write details about items' interfaces to files");

@@ -790,10 +790,6 @@ lh3-style trees.
 Compatibility
 =============
 
-Implementation note: figure out to pass deprecation error mode to
-JavaBuilder.  When set, JavaBuilder must call
-Deprecate.setDeprecateIsError(true).
-
 By default, abuild 1.1 will recognize all valid 1.0 build trees and
 will issue deprecation warnings with concrete fix suggestions,
 including a reference to the 1.0 to 1.1 conversion tool, whenever it

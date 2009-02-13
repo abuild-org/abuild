@@ -1,0 +1,20 @@
+abuild: both (abuild-java): all
+Buildfile: --abuild.xml--
+
+BUILD FAILED
+--abuild.xml--:nn: abuild.hook-build-items may not be used when any -with-rules dependencies have been used
+
+Total time: <time>
+abuild: both (abuild-java): build failed
+abuild: old (abuild-java): all
+Buildfile: --abuild.xml--
+[deprecate] *** DEPRECATION WARNING *** (abuild version 1.1): abuild.use-local-hooks is no longer needed; abuild now always behaves as if this is set
+
+BUILD FAILED
+--abuild.xml--:nn: deprecation error mode; failing
+
+Total time: <time>
+abuild: old (abuild-java): build failed
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: both on platform java
+abuild: ERROR: build failure: old on platform java
