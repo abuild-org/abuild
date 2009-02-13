@@ -24,7 +24,7 @@ abuild.setTarget('test-only') {
                 env('key':'QTEST_EXTRA_MARGIN',
                     'value':12)
             }
-            def toExport = abuild.getVariable('QTest.export', [])
+            def toExport = abuild.getVariable('qtest.export', [])
             if (abuild.getVariable('TESTS'))
             {
                 toExport << 'TESTS'

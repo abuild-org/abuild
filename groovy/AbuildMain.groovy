@@ -16,23 +16,30 @@ class AbuildBuildFailure extends Exception
 
 class BuildState
 {
+    // The word "public" before a field indicates that it is intended
+    // as part of the public interface.  Fields not marked either
+    // "public" or "private" are public in groovy, but they are
+    // intended to be accessed only from the Builder class in this
+    // file.  (As of 1.6, groovy still doesn't honor public, private,
+    // and protected anywa.)
+
     // fields supplied by .ab-dynamic.groovy
-    def ifc = [:]
+    public ifc = [:]
     def itemPaths = [:]
     def abuildTop
     def pluginPaths
     def ruleItems
 
     // supplied by abuild
-    def defines
-    File buildDirectory
+    public defines
+    public buildDirectory
     BuildArgs buildArgs
 
     // variables set by the user
-    def param = [:]
+    public param = [:]
 
     // other accessible fields
-    File sourceDirectory = null
+    public File sourceDirectory = null
 
     // used internally and by Builder
     def anyFailures = false

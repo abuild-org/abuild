@@ -1,11 +1,145 @@
 
-pre 1.1.a1
-
- * Make a list of all names that users have to interact with including
-   interface variables, method names, and any other strings; send out
-   for review
-
 === Changes Targeted for Version 1.1 ===
+
+Groovy Interface
+================
+
+Review before 1.1.a1 and include somewhere in documentation.
+
+ * Interface variables
+
+   Defined by abuild for all backends and all target types:
+
+     ABUILD_OUTPUT_DIR (output directory)
+     ABUILD_PLATFORM (full platform string)
+     ABUILD_PLATFORM_TYPE (platform type, e.g., "java", "native)
+     ABUILD_STDOUT_IS_TTY ("0" or "1", self-explanatory)
+     ABUILD_TARGET_TYPE ("java", "object-code", "platform-independent")
+     ABUILD_THIS (name of current build item)
+
+   Defined by abuild for platform type "java":
+
+     abuild.classpath
+     abuild.classpath.external
+
+ * Abuild.groovy environment
+
+   Binding:
+
+     abuild -- access to abuild's groovy interface
+     ant -- an AntBuilder (gradle and gant also put "ant" in the binding)
+
+   "abuild" object interface:
+
+     Fields:
+
+      - ifc: a map corresponding to the values from Abuild.interface;
+        all values are strings or lists of strings
+
+      - defines: a map of variables defined on the command line; all
+        values are strings
+
+      - param: a map of parameters defined by the user in
+        Abuild.groovy; keys are strings, but values can be any Object
+        or null
+
+      - buildDirectory: a File object containing the build directory
+
+      - sourceDirectory: a File object containing the source directory
+
+     Methods:
+
+      - setTarget('name')
+
+        registers target 'name'; i.e., causes it to exist if it does
+        not already exist
+
+      - setTarget('name', 'deps': ['dep1', 'dep2'])
+
+        registers target 'name' and adds 'dep1' and 'dep2' as
+        dependencies (if they are not already dependencies)
+
+      - setTarget('name') {
+            closureBody()
+	}
+
+	registers target 'name' and adds the closure to its list of
+	closures
+
+      - setTarget('name', 'deps': ['dep1', 'dep2']) {
+            closureBody()
+        }
+
+	does all of the above
+
+      - setParameter('name', value)
+
+        adds or replaces 'name' entry of param
+
+      - getVariable('name', defaultValue)
+
+        If defines['name'] exists, return it
+	else if param['name'] exists, return it
+	else if ifc['name'] exists, return it
+	else return defaultValue
+
+	Effect: defines override everything else, param overrides
+	interface, basically resulting in the same behavior as make an
+	ant
+
+      - getVariable('name')
+
+        calls getVariable('name', null)
+
+      - getVariableAsString('name')
+
+        If getVariable('name') returns a list, join the elements of
+        the list using a single space character as the delimiter.
+        Otherwise, call toString on the result of getVariable('name')
+
+      - fail(String message)
+
+        cause the build to fail immediately by throwing an instance of
+        AbuildBuildFailure
+
+      - error(String message)
+
+        issue an error message and continue to the end of the
+        closure; the build is considered to have failed, so (unless -k
+        has been specified) no additional closures will be called
+
+      - runTarget(target)
+
+        runs target preceded by its full dependency chain; no target
+        is ever run more than once
+
+      - runTargets([target, ...])
+
+        runs each target specified in order (with the order possibly
+        overridden based on the dependency graph)
+
+ * QTest support
+
+    - parameter 'qtest.export' contains a list of "variables".  For
+      each variable listed, an upper-case version of the variable name
+      is exported to the environment with the value returned by
+      getVariableAsString.
+
+    - The value of "TESTS" is automatically exported.  This is used by
+      qtest to restrict the list of test suites to run.
+
+ * Specific parameters that influence the build (set with
+   setParameter):
+
+    - abuild.rules -- a list of rules to be loaded from abuild's
+      internal ruleset or plugins' rules directories; corresponds to
+      RULES in make backend; abuild automatically appends .groovy
+      suffix
+
+    - abuild.local-rules -- a list of files, treated as relative to
+      the source directory, to load for defining local rules; abuild
+      automatically appends .groovy suffix
+
 
 Changes to document
 ===================
@@ -15,6 +149,23 @@ Remember to keep deprecated features list up-to-date.
 These changes have already been made and need to make it into the
 documentation.
 
+
+
+Groovy Framework
+================
+
+When designing new rules for building java code, here are a few design
+principles to keep in mind:
+
+ * All defaults should be overridable through parameter settings.
+
+ * All closures should be triggered by setting a specific parameter or
+   made possible to skip by setting a specific parameter.  This makes
+   it possible to selectively turn on or off any specific closure for
+   maximum flexibility in customizing builds.  Maybe we should even
+   consider having a uniquely named control parameter be a mandatory
+   field when supplying a target closure, though this might be
+   overkill.  Anyway, it's something to think about.
 
 
 Core Changes
@@ -387,38 +538,6 @@ Changes to "make" Code
  * Deprecate LINK_SHLIBS.  Give a deprecation warning of $(origin
    LINK_SHLIBS) is not 'undefined'.  A stub for this already exists in
    ccxx.mk.
-
-
-Java builds
-===========
-
-These changes may needlessly break compatibility, so we might not do
-them.
-
- * Consider removing deploy, other, war, and ear targets; people can
-   add these in plugins if they need them
-
- * Consider dropping support for Abuild-ant.xml.  If so, also remove
-   build_file from the internal JavaBuilder protocol.
-
-
-Changes to "ant" support
-========================
-
-Things to consider if preserving ant support....
-
- * Add example of creating a new target that calls hooks.  See
-   qtest/abuild-ant-misc/data/target-from-hook.
-
- * We use the privately set "debug" and "deprecation" properties in
-   abuild.xml to set debug and deprecation.  These should really be set
-   using documented abuild properties, and we should figure out what
-   other similar properties we might want to set in this way.
-
- * Provide a way for a user to specify an externally created manifest
-   file.  Users can do this cleanly with a <manifest> task in their
-   own ant code, and we can hook it in using abuild's own jar creation
-   task.
 
 
 Platform Conditionals
