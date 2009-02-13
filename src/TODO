@@ -4,6 +4,8 @@
 Changes to document
 ===================
 
+Remember to keep deprecated features list up-to-date.
+
 These changes have already been made and need to make it into the
 documentation.
 
@@ -84,17 +86,14 @@ Core Changes
    as an optional dependency.  This variable will be true iff the
    build item exists.
 
- * Consider a "renamed-to" or "replaced-by" keyword that would be used
-   to indicate that a build item has been replaced by another build
-   item.  It would be allowed only in root Abuild.conf files.  Its
-   semantics would include that rule build items would follow the name
-   change (but only if using -with-rules rather than the old
-   variables).  This is stronger than using deps to make the old name
-   depend on the new name and also eliminates the need to create build
-   items whose only purpose is to depend on their replacements.
-   Internally, abuild would make the new name an alias for the old
-   name.  That way, things like abDIR_OLD-ITEM-NAME would contain the
-   path to the new item.
+ * Create a "replaces" keyword that would be used to indicate that a
+   build item is a replacement for one or more other build items.  Any
+   values for the replaces key would not be allowed to exist on their
+   own.  Any references to them in Abuild.conf files would be treated
+   as references to the new build items.  This is stronger than using
+   deps to make the old name depend on the new name and also
+   eliminates the need to create build items whose only purpose is to
+   depend on their replacements.
 
  * Move "deleted-items" key from root Abuild.conf to Abuild.backing.
    Also add a "deleted-trees" key.  New Abuild.backing format:
