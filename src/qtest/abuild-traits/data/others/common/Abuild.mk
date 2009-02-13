@@ -1,1 +1,1 @@
-BUILD_ITEM_RULES := common
+LOCAL_RULES := Rules.mk

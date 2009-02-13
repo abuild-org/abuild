@@ -103,3 +103,21 @@ define load_plugin
 $(firstword $(wildcard $(foreach D,$(abMK) $(ABUILD_PLUGINS),\
                          $(D)/$(1).mk)) --not-found--/$(1).mk)
 endef
+
+# Usage: $(call deprecate,version,message)
+define _deprecation_warning
+ _DUMMY := $(warning *** DEPRECATION WARNING *** (abuild version $(1)): $(2))
+endef
+# Prints a deprecation warning and also an error if in error mode.  It
+# doesn't seem to be possible to nest an ifdef inside a define, so we
+# have to duplicate the deprecation warning statement...
+ifdef ABUILD_DEPRECATE_IS_ERROR
+ define deprecate
+  $(_deprecation_warning)
+  _DUMMY := $(error deprecation error mode; failing)
+ endef
+else
+ define deprecate
+  $(_deprecation_warning)
+ endef
+endif

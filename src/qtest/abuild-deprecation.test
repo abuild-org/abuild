@@ -21,6 +21,15 @@ my $platform_native = get_native_platform();
 
 setup($td);
 
+cd("work/build-item-rules");
+
+$td->runtest("build-item-rules",
+	     {$td->COMMAND => "abuild -b all -k",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build-item-rules.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 if ($test_java)
 {
     cd("work/hook-build-items");
@@ -35,4 +44,4 @@ if ($test_java)
 
 check_work_accessed($td);
 
-$td->report(1 + ($test_java ? 1 : 0));
+$td->report(2 + ($test_java ? 1 : 0));

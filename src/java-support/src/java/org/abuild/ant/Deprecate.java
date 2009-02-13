@@ -40,7 +40,7 @@ public class Deprecate extends Task
 		getLocation());
 	}
 
-	log("(abuild version " + this.version + "): " + message,
+	log("*** DEPRECATION WARNING *** (abuild version " + this.version + "): " + message,
 	    Project.MSG_WARN);
 	// throw BuildException if we're in deprecation error mode
 	if (deprecationIsError)

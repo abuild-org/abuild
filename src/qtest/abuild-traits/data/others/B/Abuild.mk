@@ -1,1 +1,1 @@
-BUILD_ITEM_RULES := common
+# empty

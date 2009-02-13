@@ -13804,6 +13804,19 @@ Y = $(X)
            property.  This change means that there is now a unified
            mechanism for forcing build item-supplied rules to be run
            rather than having a separate mechanism for each backend.
+           In some rare cases, it may be that a build file
+           <emphasis>only</emphasis> has item-based rules.  In this
+           case, you will have to create an empty build file (or one
+           containing only comments) so that &abuild; will still know
+           which backend to use for building the item.
+          </para>
+          <para>
+           Since you can't declare a dependency on yourself, if you
+           wish to use your own rules, you can specify
+           <filename>Rules.mk</filename> in
+           <varname>LOCAL_RULES</varname> (make) or
+           <filename>ant-hooks.xml</filename> in
+           <varname>abuild.local-buildfile</varname> (ant).
           </para>
          </listitem>
          <listitem>
@@ -13883,8 +13896,16 @@ Y = $(X)
            if it were set, meaning that it always uses the local build
            file for hooks.  People were in the habit of setting the
            now deprecated <varname>abuild.hook-build-items</varname>
-           to contain the current build item, which is not a good
-           idea.
+           to contain the current build item and writing hooks that
+           apply only to the local build item.  This functionality is
+           intended to be offered by local build files, and that
+           mechanism should be used instead.  If you have a build item
+           that offers hooks for others and also wants to use them for
+           itself, it can set
+           <varname>abuild.local-buildfile</varname> to
+           <filename>ant-hooks.xml</filename> or import
+           <filename>ant-hooks.xml</filename> from its existing local
+           build file.
           </para>
          </listitem>
          <listitem>
