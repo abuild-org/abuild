@@ -81,6 +81,10 @@ void
 JavaBuilder::finish()
 {
     boost::mutex::scoped_lock lock(this->mutex);
+    if (this->run_mode == rm_idle)
+    {
+	return;
+    }
     if (this->run_mode == rm_running)
     {
 	setRunMode(rm_shutting_down);

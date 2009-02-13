@@ -3579,13 +3579,16 @@ Abuild::buildBuildset()
 	return true;
     }
 
-    if (need_gmake)
+    if (! (this->special_target == s_NO_OP))
     {
-	findGnuMakeInPath();
-    }
-    if (need_java)
-    {
-	findJava();
+	if (need_gmake)
+	{
+	    findGnuMakeInPath();
+	}
+	if (need_java)
+	{
+	    findJava();
+	}
     }
 
     boost::function<bool(std::string const&, std::string const&)> filter;
