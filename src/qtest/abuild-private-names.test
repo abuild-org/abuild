@@ -40,15 +40,6 @@ $td->runtest("check program 2",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/bad");
-
-$td->runtest("BUILD_ITEM_RULES access",
-	     {$td->COMMAND => "abuild --build=desc -k",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/access-errors.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
 check_work_accessed($td);
 
-$td->report(5);
+$td->report(4);

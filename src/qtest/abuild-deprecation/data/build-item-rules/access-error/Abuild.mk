@@ -1,2 +1,1 @@
-RULES := empty
-BUILD_ITEM_RULES := util.src
+BUILD_ITEM_RULES := rules.private
