@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-deprecation") or die;
+
+my $td = new TestDriver("deprecation");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+my $platform_native = get_native_platform();
+
+# Test various cases of using deprecated features.
+
+setup($td);
+
+cd("work/item-rules");
+
+if ($test_java)
+{
+    $td->runtest("hook-build-items",
+		 {$td->COMMAND => "abuild -b all -k",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/hook-build-items.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+check_work_accessed($td);
+
+$td->report(1 + ($test_java ? 1 : 0));

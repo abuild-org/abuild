@@ -1,0 +1,5 @@
+<project name="hook">
+ <target name="-pre-compile">
+  <echo message="pre-compile hook"/>
+ </target>
+</project>

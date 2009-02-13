@@ -1,0 +1,28 @@
+abuild: both (abuild-java): all
+Buildfile: --abuild.xml--
+
+BUILD FAILED
+--abuild.xml--:nn: abuild.hook-build-items may not be used when any -with-rules dependencies have been used
+
+Total time: <time>
+abuild: both (abuild-java): build failed
+abuild: old (abuild-java): all
+Buildfile: --abuild.xml--
+[deprecate] (abuild version 1.1): abuild.hook-build-items is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead
+
+init:
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/empty
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/classes
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/dist
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/conf
+
+-pre-compile:
+     [echo] pre-compile hook
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: both on platform java

@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import org.abuild.ant.AbuildLogger;
+import org.abuild.ant.Deprecate;
 import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
@@ -215,6 +216,8 @@ class JavaBuilder
 	    p.setUserProperty("abuild.private.emacs-mode", "1");
 	}
 	p.addBuildListener(logger);
+
+	p.addTaskDefinition("deprecate", Deprecate.class);
 
 	p.init();
 	ProjectHelper helper = ProjectHelper.getProjectHelper();

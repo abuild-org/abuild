@@ -4,9 +4,6 @@
 1.1.a1
 ======
 
- * XXX test cases for warnings and errors; have a way to pass
-   deprecate as error....
-
  * Implement -with-rules for make and ant backends.  New variables
    (implemented already) are ABUILD_RULE_ITEMS for make and
    abuild.private.rule-items for ant.  In each case, if the old
@@ -424,9 +421,6 @@ Things to consider if preserving ant support....
  * Add example of creating a new target that calls hooks.  See
    qtest/abuild-ant-misc/data/target-from-hook.
 
- * With groovy support, make sure any place we iterate over
-   comma-separated lists behaves properly with respect to whitespace.
-
  * We use the privately set "debug" and "deprecation" properties in
    abuild.xml to set debug and deprecation.  These should really be set
    using documented abuild properties, and we should figure out what
@@ -811,6 +805,10 @@ lh3-style trees.
 
 Compatibility
 =============
+
+Implementation note: figure out to pass deprecation error mode to
+JavaBuilder.  When set, JavaBuilder must call
+Deprecate.setDeprecateIsError(true).
 
 By default, abuild 1.1 will recognize all valid 1.0 build trees and
 will issue deprecation warnings with concrete fix suggestions,

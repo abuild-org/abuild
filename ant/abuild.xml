@@ -190,35 +190,6 @@
  <!--  Load Abuild build files                                     -->
  <property file="${abuild.private.dir.item}/Abuild-ant.properties"/>
 
- <groovy><![CDATA[
-    import org.apache.tools.ant.Project
-    import org.apache.tools.ant.Task
-    import org.apache.tools.ant.BuildException
-
-    class WarnDeprecate extends Task
-    {
-        String message = ""
-        String version
-        public void addText(String msg)
-        {
-            message += project.replaceProperties(msg);
-        }
-        public void execute ()
-        {
-            log(message, Project.MSG_WARN)
-            // throw BuildException if we're in deprecation error mode
-            // XXX
-            if (false)
-            {
-                throw new BuildException("deprecation error mode; failing",
-                                         location)
-            }
-        }
-    }
-    project.addTaskDefinition('deprecate', WarnDeprecate)
-  ]]>
- </groovy>
-
  <!--
    Import all hook files including any specified local-buildfile.  We
    can only import from the top level, so use groovy to generate a
@@ -241,7 +212,6 @@
    </if>
   </then>
  </if>
-
  <groovy><![CDATA[
     def basedir = properties['basedir']
     def out = new File("${basedir}/load.xml")
@@ -258,7 +228,7 @@
     def ruleBuildItems =
         properties['abuild.private.rule-items'] ?:
         properties['abuild.hook-build-items']
-    ruleBuildItems?.split(/,\s*/).each {
+    ruleBuildItems?.trim()?.split(/,\s*/).each {
         files << new File(properties["abuild.dir.${it}"] + "/ant-hooks.xml")
     }
 
