@@ -25,17 +25,25 @@ import org.abuild.QTC;
 
 class JavaBuilder
 {
+    static private final Pattern response_re =
+	Pattern.compile("(\\d+) (.*)");
+    static private final Pattern defines_re =
+	Pattern.compile("([^-][^=]*)=(.*)");
     private Socket socket;
-    private Pattern response_re = Pattern.compile("(\\d+) (.*)");
-    private Pattern defines_re = Pattern.compile("(\\d+) (.*)");
     private PrintStream responseStream;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     private AntRunner antRunner = null;
     private GroovyRunner groovyRunner = null;
+    private Map<String, String> defines;
+    private BuildArgs buildArgs;
 
-    JavaBuilder(String abuildTop, int port)
+    JavaBuilder(String abuildTop, int port,
+		BuildArgs buildArgs,
+		Map<String, String> defines)
 	throws IOException
     {
+	this.buildArgs = buildArgs;
+	this.defines = defines;
 	SocketFactory factory = SocketFactory.getDefault();
 	this.socket = factory.createSocket("127.0.0.1", port);
 	this.responseStream = new PrintStream(this.socket.getOutputStream());
@@ -48,7 +56,7 @@ class JavaBuilder
     {
 	int port = -1;
 	String abuildTop = null;
-	if (args.length == 2)
+	if (args.length >= 2)
 	{
 	    abuildTop = args[0];
 	    try
@@ -64,9 +72,31 @@ class JavaBuilder
 	{
 	    usage();
 	}
+	Vector<String> otherArgs = new Vector<String>();
+	Map<String, String> defines = new HashMap<String, String>();
+	for (int i = 2; i < args.length; ++i)
+	{
+	    String arg = args[i];
+	    Matcher m = defines_re.matcher(arg);
+	    if (arg.startsWith("-"))
+	    {
+		otherArgs.add(arg);
+	    }
+	    else if (m.matches())
+	    {
+		String key = m.group(1);
+		String val = m.group(2);
+		defines.put(key, val);
+	    }
+	}
+	BuildArgs buildArgs = new BuildArgs();
+	if (! buildArgs.parseArgs(otherArgs))
+	{
+	    usage();
+	}
 	try
 	{
-	    new JavaBuilder(abuildTop, port).run();
+	    new JavaBuilder(abuildTop, port, buildArgs, defines).run();
 	}
 	catch (IOException e)
 	{
@@ -77,7 +107,7 @@ class JavaBuilder
 
     private static void usage()
     {
-	System.err.println("Usage: JavaBuilder abuild_top port");
+	System.err.println("Usage: JavaBuilder abuild_top port args defines");
 	System.exit(2);
     }
 
@@ -137,54 +167,6 @@ class JavaBuilder
 	}
     }
 
-    private Map<String, String> parseDefines(String defines_str)
-    {
-	Map<String, String> defines = new HashMap<String, String>();
-
-	String work_str = defines_str;
-	Vector<String> work_vec = new Vector<String>();
-	while (! "".equals(work_str))
-	{
-	    Matcher m = defines_re.matcher(work_str);
-	    if (m.matches())
-	    {
-		String len_str = m.group(1);
-		String rest = m.group(2);
-		int len = 0;
-		try
-		{
-		    len = Integer.parseInt(len_str);
-		}
-		catch (NumberFormatException e)
-		{
-		    System.err.println("invalid length in defines string");
-		    return null;
-		}
-		String token = rest.substring(0, len);
-		work_str = rest.substring(len);
-		work_vec.add(token);
-	    }
-	    else
-	    {
-		System.err.println("invalid defines string");
-		return null;
-	    }
-	}
-
-	if (work_vec.size() % 2 != 0)
-	{
-	    System.err.println("odd number of strings in defines string");
-	    return null;
-	}
-
-	for (int i = 0; i < work_vec.size(); i += 2)
-	{
-	    defines.put(work_vec.get(i), work_vec.get(i + 1));
-	}
-
-	return defines;
-    }
-
     public static Project createAntProject(
 	String dirName, BuildArgs buildArgs, Map<String, String> defines)
     {
@@ -228,16 +210,9 @@ class JavaBuilder
 
     private boolean callBackend(
 	String backend, String buildFile, String dir,
-	Vector<String> targets, Vector<String> otherArgs,
-	Map<String, String> defines)
+	Vector<String> targets)
     {
-	BuildArgs buildArgs = new BuildArgs();
-	if (! buildArgs.parseArgs(otherArgs))
-	{
-	    return false;
-	}
-
-	if (buildArgs.noOp)
+	if (this.buildArgs.noOp)
 	{
 	    QTC.TC("abuild", "JavaBuilder.java noOp");
 	    System.out.print("JavaBuilder: would build targets:");
@@ -265,15 +240,16 @@ class JavaBuilder
 	    return false;
 	}
 
-	Project antProject = createAntProject(dir, buildArgs, defines);
+	Project antProject =
+	    createAntProject(dir, this.buildArgs, this.defines);
 	return runner.invokeBackend(
-	    buildFile, dir, buildArgs, antProject, targets, defines);
+	    buildFile, dir, this.buildArgs, antProject, targets, this.defines);
     }
 
     private boolean runCommand(String[] args)
     {
 	boolean status = false;
-	if (args.length != 7)
+	if (args.length != 5)
 	{
 	    System.err.println(
 		"JavaBuilder protocol error: received invalid command");
@@ -293,31 +269,12 @@ class JavaBuilder
 	    String buildFile = args[1];
 	    String dir = args[2];
 	    String targets_str = args[3];
-	    String otherArgs_str = args[4];
-	    String defines_str = args[5];
 	    Vector<String> targets = new Vector<String>();
-	    Vector<String> otherArgs = new Vector<String>();
 	    for (String t: targets_str.split(" "))
 	    {
 		targets.add(t);
 	    }
-	    if (! "".equals(otherArgs_str))
-	    {
-		for (String t: otherArgs_str.split(" "))
-		{
-		    otherArgs.add(t);
-		}
-	    }
-	    Map<String, String> defines = parseDefines(defines_str);
-	    if (defines == null)
-	    {
-		// An error message has already been issued
-	    }
-	    else
-	    {
-		status = callBackend(
-		    backend, buildFile, dir, targets, otherArgs, defines);
-	    }
+	    status = callBackend(backend, buildFile, dir, targets);
 	}
 
 	return status;

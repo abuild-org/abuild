@@ -4062,7 +4062,8 @@ Abuild::findJava()
 	new JavaBuilder(
 	    this->error_handler,
 	    boost::bind(&Abuild::verbose, this, _1),
-	    this->abuild_top, java, java_libs, this->envp));
+	    this->abuild_top, java, java_libs, this->envp,
+	    this->java_builder_args, this->defines));
 }
 
 bool
@@ -4968,26 +4969,10 @@ Abuild::invokeJavaBuilder(std::string const& backend,
 	}
 	verbose("  directory: " + dir);
 	verbose("  targets: " + Util::join(" ", targets));
-	if (! this->java_builder_args.empty())
-	{
-	    verbose("  other arguments: " +
-		    Util::join(" ", this->java_builder_args));
-	}
-	if (! this->defines.empty())
-	{
-	    verbose("  variable definitions:");
-	    for (std::map<std::string, std::string>::iterator iter =
-		     this->defines.begin();
-		 iter != this->defines.end(); ++iter)
-	    {
-		verbose("    " + (*iter).first + "=" + (*iter).second);
-	    }
-	}
     }
 
     return this->java_builder->invoke(
-	backend, build_file, dir, targets,
-	this->java_builder_args, this->defines);
+	backend, build_file, dir, targets);
 }
 
 bool

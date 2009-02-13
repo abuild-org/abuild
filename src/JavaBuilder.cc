@@ -19,7 +19,9 @@ JavaBuilder::JavaBuilder(Error& error,
 			 std::string const& abuild_top,
 			 std::string const& java,
 			 std::list<std::string> const& java_libs,
-			 char** envp) :
+			 char** envp,
+			 std::list<std::string> const& build_args,
+			 std::map<std::string, std::string> const& defines) :
     error(error),
     logger(*(Logger::getInstance())),
     verbose(verbose),
@@ -27,6 +29,8 @@ JavaBuilder::JavaBuilder(Error& error,
     java(java),
     java_libs(java_libs),
     envp(envp),
+    build_args(build_args),
+    defines(defines),
     last_request(0),
     run_mode(rm_idle)
 {
@@ -36,31 +40,12 @@ bool
 JavaBuilder::invoke(std::string const& backend,
 		    std::string const& build_file,
 		    std::string const& dir,
-		    std::list<std::string> const& targets,
-		    std::list<std::string> const& other_args,
-		    std::map<std::string, std::string> const& defines)
+		    std::list<std::string> const& targets)
 {
     return makeRequest(backend + "\001" +
 		       build_file + "\001" +
 		       dir + "\001" +
-		       Util::join(" ", targets) + "\001" +
-		       Util::join(" ", other_args) + "\001" +
-		       writeDefines(defines) + "\001|");
-}
-
-std::string
-JavaBuilder::writeDefines(std::map<std::string, std::string> const& defines)
-{
-    std::ostringstream buf;
-    for (std::map<std::string, std::string>::const_iterator iter =
-	     defines.begin();
-	 iter != defines.end(); ++iter)
-    {
-	std::string const& key = (*iter).first;
-	std::string const& val = (*iter).second;
-	buf << key.length() << " " << key << val.length() << " " << val;
-    }
-    return buf.str();
+		       Util::join(" ", targets) + "\001|");
 }
 
 bool
@@ -376,6 +361,20 @@ JavaBuilder::runJava(unsigned short port)
     args.push_back("org.abuild.javabuilder.JavaBuilder");
     args.push_back(this->abuild_top);
     args.push_back(Util::intToString(port));
+    for (std::list<std::string>::const_iterator iter =
+	     this->build_args.begin();
+	 iter != this->build_args.end(); ++iter)
+    {
+	args.push_back(*iter);
+    }
+    for (std::map<std::string, std::string>::const_iterator iter =
+	     this->defines.begin();
+	 iter != this->defines.end(); ++iter)
+    {
+	std::string const& key = (*iter).first;
+	std::string const& val = (*iter).second;
+	args.push_back(key + "=" + val);
+    }
 
     std::map<std::string, std::string> environment;
     Util::runProgram(this->java, args, environment, this->envp, ".");

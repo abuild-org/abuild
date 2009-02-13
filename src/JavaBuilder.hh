@@ -27,13 +27,13 @@ class JavaBuilder
 		std::string const& abuild_top,
 		std::string const& java,
 		std::list<std::string> const& java_libs,
-		char* envp[]);
+		char* envp[],
+		std::list<std::string> const& build_args,
+		std::map<std::string, std::string> const& defines);
     bool invoke(std::string const& backend,
 		std::string const& build_file,
 		std::string const& dir,
-		std::list<std::string> const& targets,
-		std::list<std::string> const& other_args,
-		std::map<std::string, std::string> const& defines);
+		std::list<std::string> const& targets);
     void finish();
 
   private:
@@ -55,7 +55,6 @@ class JavaBuilder
     void handleWrite(boost::system::error_code const&);
     void runJava(unsigned short port);
     void handleResponse();
-    std::string writeDefines(std::map<std::string, std::string> const&);
     void waitForRunMode(run_mode_e);
     void setRunMode(run_mode_e);
 
@@ -66,6 +65,8 @@ class JavaBuilder
     std::string java;
     std::list<std::string> java_libs;
     char** envp;
+    std::list<std::string> build_args;
+    std::map<std::string, std::string> defines;
     static unsigned int const max_data_size = 1024;
     char data[max_data_size];
     std::string accumulated_response;
