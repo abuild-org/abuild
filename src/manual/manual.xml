@@ -13717,9 +13717,13 @@ Y = $(X)
              <para>
               <varname>BUILD_ITEM_RULES</varname>
              </para>
+            </listitem>
+            <listitem>
              <para>
               <varname>abuild.hook-build-items</varname>
              </para>
+            </listitem>
+            <listitem>
              <para>
               <varname>abuild.use-local-hooks</varname>
              </para>
@@ -13783,6 +13787,13 @@ Y = $(X)
          Changes to command-line syntax
         </para>
         <itemizedlist>
+         <listitem>
+          <para>
+           The <option>--deprecation-is-error</option> option has been
+           added.  When specified, deprecation is considered an error
+           rather than a warning.
+          </para>
+         </listitem>
          <listitem>
           <para>
            The <option>--ant</option> and
