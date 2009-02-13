@@ -8,6 +8,7 @@ Total time: <time>
 abuild: both (abuild-java): build failed
 abuild: old (abuild-java): all
 Buildfile: --abuild.xml--
+[deprecate] *** DEPRECATION WARNING *** (abuild version 1.1): abuild.use-local-hooks is no longer needed; abuild now always behaves as if this is set
 [deprecate] *** DEPRECATION WARNING *** (abuild version 1.1): abuild.hook-build-items is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead
 
 init:

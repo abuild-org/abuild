@@ -53,7 +53,7 @@ ifdef BUILD_ITEM_RULES
   ifneq ($(words $(ABUILD_RULE_ITEMS)),0)
     $(error BUILD_ITEM_RULES may not be used when any -with-rules dependencies have been used)
   else
-    $(call deprecate,1.1, BUILD_ITEM_RULES is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead)
+    $(call deprecate,1.1,BUILD_ITEM_RULES is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead)
     _UNDEFINED := $(call undefined_items,BUILD_ITEM_RULES)
     ifneq ($(words $(_UNDEFINED)),0)
       $(error These build items from BUILD_ITEM_RULES in are unknown: $(_UNDEFINED))

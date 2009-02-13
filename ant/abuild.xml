@@ -197,6 +197,12 @@
    should run hooks.
   -->
  <if>
+  <isset property="abuild.use-local-hooks"/>
+  <then>
+   <deprecate version="1.1" message="abuild.use-local-hooks is no longer needed; abuild now always behaves as if this is set"/>
+  </then>
+ </if>
+ <if>
   <isset property="abuild.hook-build-items"/>
   <then>
    <if>

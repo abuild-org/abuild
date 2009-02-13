@@ -62,16 +62,8 @@ Java-based build item:
    relative to the build item's directory, that will be
    imported from the main entry point.  This file can be
    used to define properties that can't be expressed in a
-   properties file, to define resource collections, or to
-   create local targets.  If the variable
-   abuild.use-local-hooks is set, abuild will also attempt
-   to find hooks in this file.
-
- * abuild.use-local-hooks: if set, abuild.local-buildfile
-   must also be set.  In this case, abuild will attempt to
-   resolve hooks from the local build file in addition to
-   importing it.  Please run abuild hooks-help for
-   information on what hooks are available.
+   properties file, to define resource collections, to
+   create local targets, or to create hook targets.
 
  * abuild.junit.testsuite: the class name of the class
    containing junit test suites.  If this is set, the "test"

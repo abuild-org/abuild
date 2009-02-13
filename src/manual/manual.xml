@@ -13697,6 +13697,40 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
+         Deprecated Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Some features have been deprecated.  Deprecated features
+           always result in a warning.  You can pass the
+           <option>--deprecation-is-error</option> to &abuild; to
+           cause it to treat use deprecated features as an error
+           instead.
+          </para>
+          <para>
+           The following features have been deprecated in this
+           version, each of which is discussed elsewhere in these
+           relates notes:
+           <itemizedlist>
+            <listitem>
+             <para>
+              <varname>BUILD_ITEM_RULES</varname>
+             </para>
+             <para>
+              <varname>abuild.hook-build-items</varname>
+             </para>
+             <para>
+              <varname>abuild.use-local-hooks</varname>
+             </para>
+            </listitem>
+           </itemizedlist>
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
          Major Enhancements
         </para>
         <itemizedlist>

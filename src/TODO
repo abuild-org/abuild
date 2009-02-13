@@ -1,18 +1,6 @@
 
 === Changes Targeted for Version 1.1 ===
 
-1.1.a1
-======
-
- * Implement -with-rules for make and ant backends.  New variables
-   (implemented already) are ABUILD_RULE_ITEMS for make and
-   abuild.private.rule-items for ant.  In each case, if the old
-   variable (BUILD_ITEM_RULES, abuild.hook-build-items) is defined and
-   the new one is not, give a deprecation warning and use the old
-   variable.  If the old and new variables are both defined, give an
-   error.
-
-
 Changes to document
 ===================
 
@@ -399,15 +387,11 @@ Changes to "make" Code
 Java builds
 ===========
 
- * Simplify existing ant framework or remove it entirely.
+These changes may needlessly break compatibility, so we might not do
+them.
 
-    - remove deploy, other, war, ear
-
-    - consider removing hooks
-
-    - If we keep hooks, remove abuild.use-local-hooks and have this
-      behavior enabled by default.  Any declared local build file
-      should ben imported and searched for hooks.
+ * Consider removing deploy, other, war, and ear targets; people can
+   add these in plugins if they need them
 
  * Consider dropping support for Abuild-ant.xml.  If so, also remove
    build_file from the internal JavaBuilder protocol.
