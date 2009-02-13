@@ -11,13 +11,13 @@ Buildfile: --abuild.xml--
 [deprecate] (abuild version 1.1): abuild.hook-build-items is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead
 
 init:
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/empty
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/classes
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/dist
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/java
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/resources
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/web
-    [mkdir] Created dir: --topdir--/item-rules/old/abuild-java/src/conf
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/empty
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/classes
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/dist
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/hook-build-items/old/abuild-java/src/conf
 
 -pre-compile:
      [echo] pre-compile hook

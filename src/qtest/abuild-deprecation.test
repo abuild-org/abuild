@@ -21,10 +21,10 @@ my $platform_native = get_native_platform();
 
 setup($td);
 
-cd("work/item-rules");
-
 if ($test_java)
 {
+    cd("work/hook-build-items");
+
     $td->runtest("hook-build-items",
 		 {$td->COMMAND => "abuild -b all -k",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
