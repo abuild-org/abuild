@@ -139,7 +139,7 @@ class BuildState
         def result = getVariable(name)
         if (result instanceof List)
         {
-            result = result.join(" ")
+            result = result.join(' ')
         }
         result.toString()
     }

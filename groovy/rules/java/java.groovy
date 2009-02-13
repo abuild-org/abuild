@@ -4,8 +4,8 @@ import org.apache.tools.ant.taskdefs.condition.Os
 // initialization.  Use the init target to initialize things that we
 // don't want to look at until we are actually building.
 
-def buildDir = abuild.ifc['ABUILD_OUTPUT_DIR']
-def itemDir = new File(buildDir).parentFile.absolutePath
+def buildDir = abuild.buildDirectory.absolutePath
+def itemDir = abuild.sourceDirectory.absolutePath
 def pathSep = ant.project.properties['path.separator']
 
 // These are overridable defaults.
