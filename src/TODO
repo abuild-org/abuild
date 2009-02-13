@@ -1,4 +1,10 @@
 
+pre 1.1.a1
+
+ * Make a list of all names that users have to interact with including
+   interface variables, method names, and any other strings; send out
+   for review
+
 === Changes Targeted for Version 1.1 ===
 
 Changes to document
