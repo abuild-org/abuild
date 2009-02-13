@@ -4,6 +4,9 @@
 1.1.a1
 ======
 
+ * XXX test cases for warnings and errors; have a way to pass
+   deprecate as error....
+
  * Implement -with-rules for make and ant backends.  New variables
    (implemented already) are ABUILD_RULE_ITEMS for make and
    abuild.private.rule-items for ant.  In each case, if the old

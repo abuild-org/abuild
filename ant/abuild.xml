@@ -190,12 +190,58 @@
  <!--  Load Abuild build files                                     -->
  <property file="${abuild.private.dir.item}/Abuild-ant.properties"/>
 
+ <groovy><![CDATA[
+    import org.apache.tools.ant.Project
+    import org.apache.tools.ant.Task
+    import org.apache.tools.ant.BuildException
+
+    class WarnDeprecate extends Task
+    {
+        String message = ""
+        String version
+        public void addText(String msg)
+        {
+            message += project.replaceProperties(msg);
+        }
+        public void execute ()
+        {
+            log(message, Project.MSG_WARN)
+            // throw BuildException if we're in deprecation error mode
+            // XXX
+            if (false)
+            {
+                throw new BuildException("deprecation error mode; failing",
+                                         location)
+            }
+        }
+    }
+    project.addTaskDefinition('deprecate', WarnDeprecate)
+  ]]>
+ </groovy>
+
  <!--
    Import all hook files including any specified local-buildfile.  We
    can only import from the top level, so use groovy to generate a
    load file and then load it.  Also, store a list files from which we
    should run hooks.
   -->
+ <if>
+  <isset property="abuild.hook-build-items"/>
+  <then>
+   <if>
+    <not>
+     <equals arg1="${abuild.private.rule-items}" arg2=""/>
+    </not>
+    <then>
+     <fail message="abuild.hook-build-items may not be used when any -with-rules dependencies have been used"/>
+    </then>
+    <else>
+     <deprecate version="1.1" message="abuild.hook-build-items is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead"/>
+    </else>
+   </if>
+  </then>
+ </if>
+
  <groovy><![CDATA[
     def basedir = properties['basedir']
     def out = new File("${basedir}/load.xml")
@@ -209,7 +255,10 @@
     files = files.grep { it.isFile() }
 
     // Hook build items: load ant-hooks.xml in each build item
-    properties['abuild.hook-build-items']?.split(/,\s*/).each {
+    def ruleBuildItems =
+        properties['abuild.private.rule-items'] ?:
+        properties['abuild.hook-build-items']
+    ruleBuildItems?.split(/,\s*/).each {
         files << new File(properties["abuild.dir.${it}"] + "/ant-hooks.xml")
     }
 
