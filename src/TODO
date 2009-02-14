@@ -539,6 +539,16 @@ Changes to "make" Code
    LINK_SHLIBS) is not 'undefined'.  A stub for this already exists in
    ccxx.mk.
 
+ * According to Microsoft, we should always be using /Zi.  We need to
+   revisit all the arguments passed to msvc to see what they really
+   mean and to figure out which to use in release and debug modes.
+
+ * There is some additional flag to pass to msvc in place of something
+   (/MD or /EHsc?) when using .NET.  Find out about this and make sure
+   that the specification of the compiler command makes it possible to
+   override.  Right now, several flags, like /EHsc, are part of the
+   actual $(CC) command.
+
 
 Platform Conditionals
 =====================
