@@ -36,11 +36,11 @@ def wrapperName
 ant.taskdef('name': 'groovyc',
             'classname': 'org.codehaus.groovy.ant.Groovyc')
 
-abuild.setTarget('all', 'deps' : ['package', 'wrapper'])
+abuild.addTargetDependencies('all', ['package', 'wrapper'])
 
-abuild.setTarget('package', 'deps' : ['init', 'package-jar'])
+abuild.addTargetDependencies('package', ['init', 'package-jar'])
 
-abuild.setTarget('generate', 'deps' : ['init'])
+abuild.addTargetDependencies('generate', ['init'])
 
 def getPathVariable(String var, defaultValue)
 {
@@ -52,7 +52,7 @@ def getPathVariable(String var, defaultValue)
     result
 }
 
-abuild.setTarget('init') {
+abuild.addTargetClosure('init') {
     distDir =
         getPathVariable('dist', defaultDistDir)
     classesDir =
@@ -76,7 +76,7 @@ abuild.setTarget('init') {
     wrapperName = abuild.getVariable('java.wrapper-name')
 }
 
-abuild.setTarget('compile', 'deps' : ['generate']) {
+abuild.configureTarget('compile', 'deps' : ['generate']) {
     def srcDirs = [srcDir, generatedSrcDir].grep {
         dir -> new File(dir).isDirectory()
     }
@@ -100,7 +100,7 @@ abuild.setTarget('compile', 'deps' : ['generate']) {
     }
 }
 
-abuild.setTarget('package-jar', 'deps' : ['compile']) {
+abuild.configureTarget('package-jar', 'deps' : ['compile']) {
     if (! jarName)
     {
         return
@@ -127,7 +127,7 @@ abuild.setTarget('package-jar', 'deps' : ['compile']) {
     }
 }
 
-abuild.setTarget('wrapper', 'deps' : ['package-jar']) {
+abuild.configureTarget('wrapper', 'deps' : ['package-jar']) {
     if (! (wrapperName && mainClass && jarName))
     {
         return

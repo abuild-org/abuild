@@ -1,3 +1,3 @@
-abuild.setTarget('one', 'deps':'two')
-abuild.setTarget('two', 'deps':'one')
-abuild.setTarget('three', 'deps':'four')
+abuild.configureTarget('one', 'deps':'two')
+abuild.configureTarget('two', 'deps':'one')
+abuild.configureTarget('three', 'deps':'four')

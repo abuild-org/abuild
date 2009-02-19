@@ -1,1 +1,1 @@
-abuild.setTarget('three', 'deps':'five')
+abuild.configureTarget('three', 'deps':'five')

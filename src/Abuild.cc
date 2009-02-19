@@ -4913,8 +4913,9 @@ Abuild::invoke_groovy(std::string const& item_name,
     }
     dyn << "]\n";
 
-    // Provide data from the item's interface object.  We use "ifc"
-    // because "interface" is a reserved word in Groovy.
+    // Provide data from the item's interface object.  We use
+    // "interfaceVars" because "interface" is a reserved word in
+    // Groovy.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
         _interface.getVariablesForTargetType(
@@ -4925,7 +4926,7 @@ Abuild::invoke_groovy(std::string const& item_name,
     {
         std::string const& name = (*iter).first;
         Interface::VariableInfo const& info = (*iter).second;
-        dyn << "abuild.ifc['" << name << "'] = ";
+        dyn << "abuild.interfaceVars['" << name << "'] = ";
 	// Scalars should have at most one value, so we can treat
 	// scalars and lists together.
 	if (info.list_type != Interface::l_scalar)

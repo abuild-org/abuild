@@ -1,15 +1,15 @@
-abuild.setTarget("all") {
+abuild.configureTarget("all") {
     abuild.runTarget("unknown")
 }
-abuild.setTarget("all") {
+abuild.configureTarget("all") {
     ant.echo('other all')
 }
-abuild.setTarget("all") {
+abuild.configureTarget("all") {
     ant.fail('ant failure')
 }
-abuild.setTarget("all") {
+abuild.configureTarget("all") {
     abuild.fail('abuild failure')
 }
-abuild.setTarget("all") {
+abuild.configureTarget("all") {
     throw new Exception('other failure')
 }

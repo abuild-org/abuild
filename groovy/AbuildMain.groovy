@@ -24,7 +24,7 @@ class BuildState
     // and protected anywa.)
 
     // fields supplied by .ab-dynamic.groovy
-    public ifc = [:]
+    public interfaceVars = [:]
     def itemPaths = [:]
     def abuildTop
     def pluginPaths
@@ -36,7 +36,7 @@ class BuildState
     BuildArgs buildArgs
 
     // variables set by the user
-    public param = [:]
+    public params = [:]
 
     // other accessible fields
     public File sourceDirectory = null
@@ -64,37 +64,52 @@ class BuildState
         this.sourceDirectory = buildDirectory.parentFile
 
         // Create targets that abuild guarantees will exist
-        setTarget('all')
+        addTarget('all')
 
         // Make test call test-only after building "all".
-        setTarget('test-only')
-        setTarget('test', 'deps':'all') {
+        addTarget('test-only')
+        configureTarget('test', 'deps':'all') {
             QTC.TC("abuild", "groovy built-in test target")
             runTarget('test-only')
         }
 
         // Make check an alias for test
-        setTarget('check', 'deps':'test')
+        addTargetDependencies('check', 'test')
 
-        setTarget('doc')
+        addTarget('doc')
     }
 
-    def setTarget(String name)
+    def addTarget(String name)
     {
-        setTarget(null, name, null)
+        configureTarget(null, name, null)
     }
 
-    def setTarget(Map parameters, String name)
+    def addTargetDependencies(String name, deps)
     {
-        setTarget(parameters, name, null)
+        configureTarget(name, 'deps' : deps, null)
     }
 
-    def setTarget(String name, Closure body)
+    def addTargetClosure(String name, cl)
     {
-        setTarget(null, name, body)
+        configureTarget(null, name, cl)
     }
 
-    def setTarget(Map parameters, String name, Closure body)
+    def configureTarget(String name)
+    {
+        configureTarget(null, name, null)
+    }
+
+    def configureTarget(Map parameters, String name)
+    {
+        configureTarget(parameters, name, null)
+    }
+
+    def configureTarget(String name, Closure body)
+    {
+        configureTarget(null, name, body)
+    }
+
+    def configureTarget(Map parameters, String name, Closure body)
     {
         if (! g.dependencies.containsKey(name))
         {
@@ -128,7 +143,7 @@ class BuildState
 
     def setParameter(String name, value)
     {
-        param[name] = value
+        params[name] = value
     }
 
     def getVariable(String name)
@@ -138,7 +153,7 @@ class BuildState
 
     def getVariable(String name, defaultValue)
     {
-        defines[name] ?: param[name] ?: ifc[name] ?: defaultValue
+        defines[name] ?: params[name] ?: interfaceVars[name] ?: defaultValue
     }
 
     def getVariableAsString(String name)
@@ -375,7 +390,7 @@ class Builder
 
         def groovyTop = buildState.abuildTop + "/groovy"
         loadScript(groovyTop + "/QTestSupport.groovy")
-        def targetType = buildState.ifc['ABUILD_TARGET_TYPE']
+        def targetType = buildState.interfaceVars['ABUILD_TARGET_TYPE']
 
         def ruleSearchPath = [new File("${groovyTop}/rules/${targetType}")]
 
@@ -393,8 +408,8 @@ class Builder
             }
         }
 
-        if (! (buildState.param['abuild.rules'] ||
-               buildState.param['abuild.local-rules'] ||
+        if (! (buildState.params['abuild.rules'] ||
+               buildState.params['abuild.local-rules'] ||
                buildState.ruleItems))
         {
             QTC.TC("abuild", "groovy ERR no rules")
@@ -406,10 +421,10 @@ class Builder
             return false
         }
 
-        // Load any rules specified in param['abuild.rules'].  First
+        // Load any rules specified in params['abuild.rules'].  First
         // search the internal location, and then search in each
         // plugin directory, returning the first item found.
-        buildState.param['abuild.rules']?.each {
+        buildState.params['abuild.rules']?.each {
             rule ->
             def found = false
             for (dir in ruleSearchPath)
@@ -436,7 +451,7 @@ class Builder
 
         // Load any local rules files, resolving the path relative to
         // the source directory
-        buildState.param['abuild.local-rules']?.each {
+        buildState.params['abuild.local-rules']?.each {
             loadScript(new File("${sourceDirectory.path}/${it}.groovy"))
         }
 

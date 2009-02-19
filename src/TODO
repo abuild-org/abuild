@@ -33,13 +33,13 @@ Review before 1.1.a1 and include somewhere in documentation.
 
      Fields:
 
-      - ifc: a map corresponding to the values from Abuild.interface;
-        all values are strings or lists of strings
+      - interfaceVars: a map corresponding to the values from
+        Abuild.interface; all values are strings or lists of strings
 
       - defines: a map of variables defined on the command line; all
         values are strings
 
-      - param: a map of parameters defined by the user in
+      - params: a map of parameters defined by the user in
         Abuild.groovy; keys are strings, but values can be any Object
         or null
 
@@ -49,41 +49,54 @@ Review before 1.1.a1 and include somewhere in documentation.
 
      Methods:
 
-      - setTarget('name')
+      - configureTarget('name')
 
         registers target 'name'; i.e., causes it to exist if it does
         not already exist
 
-      - setTarget('name', 'deps': ['dep1', 'dep2'])
+      - addTarget('name') -- synonym for above form of configureTarget
+
+      - configureTarget('name', 'deps': ['dep1', 'dep2'])
 
         registers target 'name' and adds 'dep1' and 'dep2' as
         dependencies (if they are not already dependencies)
 
-      - setTarget('name') {
+      - addTargetDependencies('name', ['dep1', 'dep2']) -- synonym for
+        above form of configureTarget
+
+      - configureTarget('name') {
             closureBody()
 	}
 
 	registers target 'name' and adds the closure to its list of
 	closures
 
-      - setTarget('name', 'deps': ['dep1', 'dep2']) {
+      - addTargetClosure('name') {
             closureBody()
         }
 
-	does all of the above
+	synonym for above form of configureTarget
+
+      - configureTarget('name', 'deps': ['dep1', 'dep2']) {
+            closureBody()
+        }
+
+	does all of the above.  Note that wherever ['dep1', 'dep2']
+	appears above, either a single dependency as a string or a
+	list of dependencies can be used.
 
       - setParameter('name', value)
 
-        adds or replaces 'name' entry of param
+        adds or replaces 'name' entry of params
 
       - getVariable('name', defaultValue)
 
         If defines['name'] exists, return it
-	else if param['name'] exists, return it
-	else if ifc['name'] exists, return it
+	else if params['name'] exists, return it
+	else if interfaceVars['name'] exists, return it
 	else return defaultValue
 
-	Effect: defines override everything else, param overrides
+	Effect: defines override everything else, params overrides
 	interface, basically resulting in the same behavior as make an
 	ant
 

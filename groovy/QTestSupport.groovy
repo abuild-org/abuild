@@ -1,11 +1,11 @@
 
-abuild.setTarget('test-only') {
+abuild.addTargetClosure('test-only') {
     def src = abuild.sourceDirectory.path
     def qtest = new File("${src}/qtest")
     if (qtest.isDirectory())
     {
         def build = abuild.buildDirectory.path
-        def tty = abuild.ifc['ABUILD_STDOUT_IS_TTY']
+        def tty = abuild.interfaceVars['ABUILD_STDOUT_IS_TTY']
         def command = 'qtest-driver';
         def args = ['-datadir', '../qtest',
             '-bindirs', '..:.', '-covdir', '..',
