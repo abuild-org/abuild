@@ -4,6 +4,38 @@
 Groovy Interface
 ================
 
+release 1.1.a1 as is except rename java rules to java_sample, publish
+information about how to create your own rules plugin
+
+for next week, people should create idealized Abuild.groovy files for
+the build they wish they had.  Then we can design code to make it
+happen.
+
+XXX
+
+prepare some kind of peer review form for the java code...how about a
+wiki page....
+
+new interfaces to replace existing rules...
+
+  replaceTarget
+  removeTargetClosures
+  removeTargetDependencies
+  getTargetDependencies
+
+General coding guidelines
+
+ - "use fences" to protect against silly errors...e.g., make the rules
+   script contain a class and then instantiate and pass binding
+   variables in
+
+ - write target code that is easy to influence?  skip?  basically make
+   it possible to tailor without overriding when possible.
+
+
+-----
+
+
 Review before 1.1.a1 and include somewhere in documentation.
 
  * Interface variables
@@ -1247,20 +1279,14 @@ life even before private/bin/get_native_platform_data is called.
 Java Problems
 =============
 
-We probably need a different approach to Java.  Ant was not designed
-to be used as a framework, and it doesn't work very well when used in
-this way.
+ * abuild.classpath and abuild.classpath.external should probably go
+   away.  We need different mechanisms for specifying different kinds
+   of classpaths.  At a minimum, we need a compile-time classpath and
+   a manifest classpath.  There may be other situations.
 
- * In order to get wars in ear files, we need to add them to
-   abuild.classpath.  Although this is harmless, it's sort of an abuse
-   of abuild.classpath.
-
- * We don't detect when inaccessible build items are referenced in
-   abuild.hook-build-items.  This won't matter anymore if we move hook
-   specification to Abuild.conf.
-
- * Abuild has no real way to support a difference between compile-time
-   classpaths and run-time classpaths.
+ * The classpath in the manifest for a jar should only include
+   first-level dependencies.  Transitive dependencies are satisfied
+   automatically.
 
  * Reconsider using depends task for compile in abuild.xml.
 
@@ -1289,10 +1315,6 @@ this way.
    able to control on a per-build-item basis whether it is an error
    condition or just a warning, probably having "error" be the
    default.
-
- * The classpath in the manifest for a jar should only include
-   first-level dependencies.  Transitive dependencies are satisfied
-   automatically.
 
 
 Known Bugs
