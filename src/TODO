@@ -588,11 +588,11 @@ Changes to "make" Code
    revisit all the arguments passed to msvc to see what they really
    mean and to figure out which to use in release and debug modes.
 
- * There is some additional flag to pass to msvc in place of something
-   (/MD or /EHsc?) when using .NET.  Find out about this and make sure
-   that the specification of the compiler command makes it possible to
-   override.  Right now, several flags, like /EHsc, are part of the
-   actual $(CC) command.
+ * To build for .NET, we need to pass /clr rather than /EHsc to msvc.
+   /EHsc is hard-coded into $(CC) right now.  We need to fix msvc.mk
+   to make it easier to override these flags.  When going back through
+   all flags to see what they do, create variables that can be
+   overridden based on function.
 
 
 Platform Conditionals
