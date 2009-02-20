@@ -1,9 +1,3 @@
-
-=== Changes Targeted for Version 1.1 ===
-
-Groovy Interface
-================
-
 release 1.1.a1 as is except rename java rules to java_sample, publish
 information about how to create your own rules plugin
 
@@ -11,48 +5,61 @@ for next week, people should create idealized Abuild.groovy files for
 the build they wish they had.  Then we can design code to make it
 happen.
 
-XXX
-
 prepare some kind of peer review form for the java code...how about a
 wiki page....
 
-new interfaces to replace existing rules...
 
-  replaceTarget
-  removeTargetClosures
-  removeTargetDependencies
-  getTargetDependencies
+=== Changes Targeted for Version 1.1 ===
 
-General coding guidelines
+Changes to document
+===================
 
- - "use fences" to protect against silly errors...e.g., make the rules
-   script contain a class and then instantiate and pass binding
-   variables in
+Remember to keep deprecated features list up-to-date.
 
- - write target code that is easy to influence?  skip?  basically make
-   it possible to tailor without overriding when possible.
+These changes have already been made and need to make it into the
+documentation.
+
+ * ...
 
 
------
+Groovy Framework
+================
+
+Changes targeted to 1.1.a2
+--------------------------
+
+ * Add new interfaces:
+
+   getTargetDependencies
+   removeTarget
+   removeTargetClosures
+   removeTargetDependencies
+
+ * Have configureTarget check named parameters and report error on
+   unknown keys (currently anything other than 'deps')
 
 
-Review before 1.1.a1 and include somewhere in documentation.
+General Guidelines
+------------------
 
- * Interface variables
+ * Coding style recommendation: all groovy files loaded by abuild are
+   scripts.  The scripts should generally explicitly define a class
+   and then instantiate it.  This provides a "fence" to protect us
+   against certain types of errors, such as mistyping a field name and
+   ending up adding something to the binding instead.
 
-   Defined by abuild for all backends and all target types:
+ * All defaults should be overridable through parameter settings.
+   Don't repeat maven's mistake of locking the user into its own build
+   conventions.
 
-     ABUILD_OUTPUT_DIR (output directory)
-     ABUILD_PLATFORM (full platform string)
-     ABUILD_PLATFORM_TYPE (platform type, e.g., "java", "native)
-     ABUILD_STDOUT_IS_TTY ("0" or "1", self-explanatory)
-     ABUILD_TARGET_TYPE ("java", "object-code", "platform-independent")
-     ABUILD_THIS (name of current build item)
+ * Targets should be written to be configurable to the maximum
+   possible extent, even to the point of having ways of causing them
+   to do nothing.  Although the interface has a way to completely
+   override existing targets, using the capability should be reserved
+   for exteme cases.
 
-   Defined by abuild for platform type "java":
-
-     abuild.classpath
-     abuild.classpath.external
+Abuild Groovy Interface; add to documentation
+---------------------------------------------
 
  * Abuild.groovy environment
 
@@ -185,32 +192,6 @@ Review before 1.1.a1 and include somewhere in documentation.
       the source directory, to load for defining local rules; abuild
       automatically appends .groovy suffix
 
-
-Changes to document
-===================
-
-Remember to keep deprecated features list up-to-date.
-
-These changes have already been made and need to make it into the
-documentation.
-
-
-
-Groovy Framework
-================
-
-When designing new rules for building java code, here are a few design
-principles to keep in mind:
-
- * All defaults should be overridable through parameter settings.
-
- * All closures should be triggered by setting a specific parameter or
-   made possible to skip by setting a specific parameter.  This makes
-   it possible to selectively turn on or off any specific closure for
-   maximum flexibility in customizing builds.  Maybe we should even
-   consider having a uniquely named control parameter be a mandatory
-   field when supplying a target closure, though this might be
-   overkill.  Anyway, it's something to think about.
 
 
 Core Changes

@@ -6,8 +6,8 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "1.0.3">
-<!ENTITY lastreleased "January 9, 2009">
+<!ENTITY swversion "1.1.a1">
+<!ENTITY lastreleased "February 20, 2009">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -44,7 +44,7 @@ Possible stylesheet considerations:
 
 BEFORE EACH RELEASE
 
- * update sversion and lastreleased above
+ * update swversion and lastreleased above
 
  * make sure a real date has been included in the release notes
 
@@ -13692,7 +13692,7 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>1.1.a1: XXX date</term>
+     <term>1.1.a1: February 20, 2009</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -13746,11 +13746,18 @@ Y = $(X)
            intended as a replacement for the <application>Apache
            Ant</application> backend.  This first alpha release of 1.1
            includes a rudimentary collection of rules for building
-           Java and Groovy code.  These rules may change in
+           Java and Groovy code currently called
+           <filename>java_proto</filename>.  These rules may change in
            non-compatible ways throughout the 1.1 alpha testing
            period.  The <application>groovy</application> backend is
            invoked through Java APIs.  A single instance of the Java
            Virtual Machine is shared for all groovy-based builds.
+          </para>
+          <para>
+           For now, documentation on the interface to the groovy
+           framework can be found in <filename>src/TODO</filename> in
+           the abuild distribution.  It will be moved into the manual
+           as it is stabilized.
           </para>
          </listitem>
          <listitem>
