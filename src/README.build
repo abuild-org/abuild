@@ -31,12 +31,21 @@ newer):
 
   * gnu make 3.81
 
+  * boost >= 1.35 thread, regex, and system libraries
+
+  * Java >= 1.5
+
   * apache ant 1.7
 
   * antcontrib (from sourceforge.net) 1.0.b3, installed in ant's lib
     directory
 
-  * boost >= 1.33.1 thread and regex libraries
+To build abuild's Java support, you must also have the following
+
+ * Groovy >= 1.5.7
+
+Note that you do not need a fully groovy installation to run abuild's
+Java support, but you do need one for the bootstrap build.
 
 In addition, you must have a working ant with antcontrib in your path
 or in a location pointed to by ANT_HOME.  NOTE: If you do not have ant
@@ -110,15 +119,19 @@ To build on Windows, perform the following steps:
 COMMON
 ======
 
-If you are building both Java support and documentation, run
-"./<output-dir>/abuild --build=all" where "<output-dir>" is replaced
-by the abuild output directory, which will start with "abuild-".
+If you are buildling Java support, you must run
+
+./BootstrapJava.groovy
+
+In order to run BootstrapJava.groovy, you must have JAVA_HOME set, and
+you must have groovy 1.5.7 or newer in your path.
+
+If you are building documentation, run "./<output-dir>/abuild -C
+manual" where "<output-dir>" is replaced by the abuild output
+directory, which will start with "abuild-".
 
 See manual/README for additional requirements for building the
-documentation.  If you don't want to build the documentation but still
-want to build the Java portion of abuild, run "./<output-dir>/abuild
--C java-support".  Likewise, to build just the manual without building
-Java support, run "./<output-dir>/abuild -C manual".
+documentation.
 
 
 CREATION OF SOURCE RELEASE

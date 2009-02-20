@@ -142,7 +142,24 @@ if ($make_java_dist && (! $build_java))
 	" if not building java support\n";
 }
 
-my $build_all = ($build_doc && $build_java);
+if ($build_doc || $build_java)
+{
+    if (! ((exists $ENV{'JAVA_HOME'}) &&
+	   (-f $ENV{'JAVA_HOME'} . "/lib/tools.jar")))
+    {
+	die "$whoami: JAVA_HOME must be set to a valid jdk to build" .
+	    " documentation or Java support.\n"
+    }
+}
+
+if ($build_java)
+{
+    if (system("groovy -version >/dev/null 2>&1") != 0)
+    {
+	die "$whoami: you must have groovy in your path to build" .
+	    " Java support.\n";
+    }
+}
 
 my $windows = 0;
 
@@ -172,11 +189,6 @@ if ($windows && $make_static)
 if ($build_java && (! exists $ENV{'ABUILD_JUNIT_JAR'}))
 {
     die "$whoami: set ABUILD_JUNIT_JAR to run junit tests\n";
-}
-if ($build_doc && (! ((exists $ENV{'JAVA_HOME'}) &&
-		      (-d $ENV{'JAVA_HOME'} . "/lib"))))
-{
-    die "$whoami: JAVA_HOME must be set properly to build documentation\n";
 }
 
 my $now = time;
@@ -271,20 +283,13 @@ if ($save_auto)
     }
 }
 
-if ($build_all)
+if ($build_java)
 {
-    run("$abuild --build=all");
+    run("groovy BootstrapJava.groovy");
 }
-else
+if ($build_doc)
 {
-    if ($build_java)
-    {
-	run("(cd java-support; $abuild)");
-    }
-    if ($build_doc)
-    {
-	run("(cd manual; $abuild)");
-    }
+    run("$abuild -C manual");
 }
 if ($test_mkdist)
 {
