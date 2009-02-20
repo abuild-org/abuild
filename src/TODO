@@ -1,13 +1,3 @@
-release 1.1.a1 as is except rename java rules to java_sample, publish
-information about how to create your own rules plugin
-
-for next week, people should create idealized Abuild.groovy files for
-the build they wish they had.  Then we can design code to make it
-happen.
-
-prepare some kind of peer review form for the java code...how about a
-wiki page....
-
 
 === Changes Targeted for Version 1.1 ===
 
