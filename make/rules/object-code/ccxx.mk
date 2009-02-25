@@ -194,13 +194,10 @@ LINKWRAPPER ?=
 LINK_AS_C ?=
 
 ifneq ($(origin LINK_SHLIBS), undefined)
- # In Abuild 1.1, we will generate a deprecation warning.  For now,
- # ignore a non-empty value (since we behave now as we would have with
- # a non-empty value of LINK_SHLIBS), and given an error for an empty
- # value.
  ifeq (-$(strip $(LINK_SHLIBS))-,--)
   $(error setting LINK_SHLIBS to an empty value no longer works; override LIBS instead)
  else
+  $(call deprecate,1.1,LINK_SHLIBS is deprecated; as of version 1.0.3$(_comma) abuild always links shared libraries)
  endif
 endif
 

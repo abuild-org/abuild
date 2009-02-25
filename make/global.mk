@@ -46,7 +46,8 @@ FORCE: ;
 # Define some useful utility functions and common variables
 
 # It's hard to get a space in make for substitution, so we define one
-SPACE := $(subst a,,a a)
+_space := $(subst a,,a a)
+_comma := ,
 
 GEN_DEPS := $(abBIN)/gen_deps
 

@@ -56,6 +56,15 @@ if ($test_java)
 		 $td->NORMALIZE_NEWLINES);
 }
 
+cd("work/link-shlibs");
+
+$td->runtest("LINK_SHLIBS",
+	     {$td->COMMAND => "abuild -b all -k",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/link-shlibs.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(3 + ($test_java ? 2 : 0));
+$td->report(4 + ($test_java ? 2 : 0));
