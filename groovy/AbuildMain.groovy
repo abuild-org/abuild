@@ -116,22 +116,34 @@ class BuildState
             g.addItem(name)
             closures[name] = []
         }
-        if (parameters?.containsKey('deps'))
+        for (key in parameters?.keySet()?.sort())
         {
-            [parameters['deps']].flatten().each {
-                dep ->
-                g.addDependency(name, dep)
-            }
-            if (curFile)
+            if (key == 'deps')
             {
-                // Store the fact that this file is an origin for
-                // dependencies being defiled for this target so we
-                // can use this information in error messages.
-                if (! targetDepOrigins.containsKey(name))
-                {
-                    targetDepOrigins[name] = [:]
+                [parameters['deps']].flatten().each {
+                    dep ->
+                    g.addDependency(name, dep)
                 }
-                targetDepOrigins[name][curFile] = 1
+                if (curFile)
+                {
+                    // Store the fact that this file is an origin for
+                    // dependencies being defiled for this target so we
+                    // can use this information in error messages.
+                    if (! targetDepOrigins.containsKey(name))
+                    {
+                        targetDepOrigins[name] = [:]
+                    }
+                    targetDepOrigins[name][curFile] = 1
+                }
+            }
+            else
+            {
+                def message = "configureTarget: unknown parameter ${key}"
+                if (curFile)
+                {
+                    message += " in file ${curFile}"
+                }
+                error(message)
             }
         }
         if (body)

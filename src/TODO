@@ -25,9 +25,6 @@ Changes targeted to 1.1.a2
    removeTargetClosures
    removeTargetDependencies
 
- * Have configureTarget check named parameters and report error on
-   unknown keys (currently anything other than 'deps')
-
 
 General Guidelines
 ------------------

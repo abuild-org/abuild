@@ -39,6 +39,9 @@ abuild: g (abuild-indep): all
 abuild-groovy: ERROR: build failure: target "all" called itself most likely as a result of an explicit runTarget on itself or oneof its reverse dependencies
 abuild-groovy: ERROR: not building target "all" because of failure of its dependencies
 abuild: g (abuild-indep): build failed
+abuild: h (abuild-indep): all
+abuild-groovy: ERROR: configureTarget: unknown parameter moo in file --topdir--/failures/h/h_rules.groovy
+abuild: h (abuild-indep): build failed
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: a on platform indep
 abuild: ERROR: build failure: b on platform indep
@@ -47,3 +50,4 @@ abuild: ERROR: build failure: d on platform indep
 abuild: ERROR: build failure: e on platform indep
 abuild: ERROR: build failure: f on platform indep
 abuild: ERROR: build failure: g on platform indep
+abuild: ERROR: build failure: h on platform indep
