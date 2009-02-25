@@ -7,3 +7,7 @@ abuild.configureTarget("other1") {
 abuild.configureTarget("other2") {
     println "other2"
 }
+abuild.configureTarget("other2") {
+    println "other2 with failure"
+    abuild.configureTarget('other2', 'deps':'other1')
+}

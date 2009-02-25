@@ -9,6 +9,8 @@ abuild: a (abuild-indep): build failed
 abuild: b (abuild-indep): all
 abuild-groovy: ERROR: build failure: other1 failure
 other2
+other2 with failure
+abuild-groovy: ERROR: build failure: configureTarget may not be called after initialization
 abuild-groovy: ERROR: not building target "all" because of failure of its dependencies
 abuild: b (abuild-indep): build failed
 abuild: c (abuild-indep): all

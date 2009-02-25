@@ -111,11 +111,17 @@ class BuildState
 
     def configureTarget(Map parameters, String name, Closure body)
     {
+        if (this.ready)
+        {
+            QTC.TC("abuild", "groovy ERR configureTarget after init")
+            fail("configureTarget may not be called after initialization")
+        }
         if (! g.dependencies.containsKey(name))
         {
             g.addItem(name)
             closures[name] = []
         }
+        boolean replaceClosures = false
         for (key in parameters?.keySet()?.sort())
         {
             if (key == 'deps')
@@ -136,6 +142,10 @@ class BuildState
                     targetDepOrigins[name][curFile] = 1
                 }
             }
+            else if (key == 'replaceClosures')
+            {
+                replaceClosures = parameters['replaceClosures']
+            }
             else
             {
                 def message = "configureTarget: unknown parameter ${key}"
@@ -145,6 +155,10 @@ class BuildState
                 }
                 error(message)
             }
+        }
+        if (replaceClosures)
+        {
+            closures[name] = []
         }
         if (body)
         {

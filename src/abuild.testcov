@@ -259,3 +259,4 @@ groovy stop after closure error 0
 groovy ERR re-entrant target 0
 groovy cached target result 0
 ItemConfig ERR with-rules without dep 0
+groovy ERR configureTarget after init 0

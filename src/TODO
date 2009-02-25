@@ -9,22 +9,13 @@ Remember to keep deprecated features list up-to-date.
 These changes have already been made and need to make it into the
 documentation.
 
- * ...
+ * added replaceClosures named parameter to configureTarget which,
+   when true, causes any previously registered closures for the target
+   to be removed before the new closure body (if any) is appended.
 
 
 Groovy Framework
 ================
-
-Changes targeted to 1.1.a2
---------------------------
-
- * Add new interfaces:
-
-   getTargetDependencies
-   removeTarget
-   removeTargetClosures
-   removeTargetDependencies
-
 
 General Guidelines
 ------------------
@@ -75,41 +66,51 @@ Abuild Groovy Interface; add to documentation
 
      Methods:
 
+      - configureTarget('name', named parameteres) {
+            closureBody()
+        }
+
+	registers target 'name'; i.e., causes it to exist if it does
+	not already exist
+
+	if closure body is not null, adds it to the list of closures
+	for target 'name'
+
+	if 'deps' named parameter is specified, its value must be a
+	string or a list of strings; each dependency is added as a
+	dependency of name
+
+	if 'replaceClosures' named parameter is specified, its value
+	must be a boolean; if true, removes any closures associated
+	with 'name' before (possibly) adding any specified closure
+
+
       - configureTarget('name')
 
-        registers target 'name'; i.e., causes it to exist if it does
-        not already exist
+        calls full configureTarget with no named parameters or closure
+        body
 
       - addTarget('name') -- synonym for above form of configureTarget
 
-      - configureTarget('name', 'deps': ['dep1', 'dep2'])
+      - configureTarget('name', named parameterse)
 
-        registers target 'name' and adds 'dep1' and 'dep2' as
-        dependencies (if they are not already dependencies)
+        calls full configureTarget with no closure body
 
-      - addTargetDependencies('name', ['dep1', 'dep2']) -- synonym for
-        above form of configureTarget
+      - addTargetDependencies('name', ['dep1', 'dep2'])
+
+	calls configureTarget('name', 'deps': ['dep1', 'dep2'])
 
       - configureTarget('name') {
             closureBody()
 	}
 
-	registers target 'name' and adds the closure to its list of
-	closures
+	calls full configureTarget with no named parameters
 
       - addTargetClosure('name') {
             closureBody()
         }
 
 	synonym for above form of configureTarget
-
-      - configureTarget('name', 'deps': ['dep1', 'dep2']) {
-            closureBody()
-        }
-
-	does all of the above.  Note that wherever ['dep1', 'dep2']
-	appears above, either a single dependency as a string or a
-	list of dependencies can be used.
 
       - setParameter('name', value)
 
