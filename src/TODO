@@ -1,4 +1,47 @@
 
+abuild.appendParameter('xjc',
+    [ schema: 'xsd/preferences.xsd',
+      stub: 'com.argonst.results.ciq.preferences',
+      binding: 'xjb/preferences.xjb'])
+abuild.appendParameter('xjc',
+    [ schema: 'xsd/parameters.xsd',
+      stub: 'com.argonst.results.ciq.parameters',
+      binding: 'xjb/parameters.xjb'])
+
+abuild.getVariableAsList()
+
+abuild.getVariable --> abuild.resolveVariable
+abuild.setParameter -> leave alone
+
+-----
+
+abuild.setParameter('a', 1)
+abuild.setParameter('b', 2)
+abuild.setParameter('c', 3)
+
+abuild.setParameters('a': 1, 'b': 2, 'c': 3)
+
+Goal: get rid of setParameter and replace with something groovier.
+
+abuild.jarName = "jar-name.jar"
+
+abuild.parameters {
+   jarName = asdf;
+}
+
+abuild.setParameter('a', 1)
+abuild.appendParameter('a', 2)
+abuild.setParameter('a', 3)
+
+abuild.parameters {
+    a(1)
+    a(2)
+}
+abuild.parameters {
+    a(3)
+}
+
+
 === Changes Targeted for Version 1.1 ===
 
 Idea to think about

@@ -2,7 +2,7 @@ package org.abuild.javabuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.List;
 import java.util.Map;
 import groovy.lang.Binding;
 import groovy.lang.Script;
@@ -31,7 +31,7 @@ public class GroovyRunner implements BuildRunner
     public boolean invokeBackend(
 	String buildFileName, String dirName,
 	BuildArgs buildArgs, Project antProject,
-	Vector<String> targets, Map<String, String> defines)
+	List<String> targets, Map<String, String> defines)
     {
 	boolean status = false;
 	Exception exc = null;

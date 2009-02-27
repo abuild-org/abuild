@@ -8,7 +8,8 @@ import java.io.File;
 import java.net.Socket;
 import java.net.SocketException;
 import javax.net.SocketFactory;
-import java.util.Vector;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.regex.Pattern;
@@ -72,7 +73,7 @@ class JavaBuilder
 	{
 	    usage();
 	}
-	Vector<String> otherArgs = new Vector<String>();
+	List<String> otherArgs = new ArrayList<String>();
 	Map<String, String> defines = new HashMap<String, String>();
 	for (int i = 2; i < args.length; ++i)
 	{
@@ -215,7 +216,7 @@ class JavaBuilder
 
     private boolean callBackend(
 	String backend, String buildFile, String dir,
-	Vector<String> targets)
+	List<String> targets)
     {
 	if (this.buildArgs.noOp)
 	{
@@ -274,7 +275,7 @@ class JavaBuilder
 	    String buildFile = args[1];
 	    String dir = args[2];
 	    String targets_str = args[3];
-	    Vector<String> targets = new Vector<String>();
+	    List<String> targets = new ArrayList<String>();
 	    for (String t: targets_str.split(" "))
 	    {
 		targets.add(t);

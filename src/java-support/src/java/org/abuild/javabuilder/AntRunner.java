@@ -1,6 +1,7 @@
 package org.abuild.javabuilder;
 
 import java.io.File;
+import java.util.List;
 import java.util.Vector;
 import java.util.Map;
 import org.apache.tools.ant.MagicNames;
@@ -13,7 +14,7 @@ public class AntRunner implements BuildRunner
     public boolean invokeBackend(
 	String buildFileName, String dirName,
 	BuildArgs buildArgs, Project antProject,
-	Vector<String> targets, Map<String, String> defines)
+	List<String> targets, Map<String, String> defines)
     {
         if (! buildArgs.quiet)
 	{
@@ -31,7 +32,9 @@ public class AntRunner implements BuildRunner
 		(ProjectHelper) antProject.getReference(
 		    ProjectHelper.PROJECTHELPER_REFERENCE);
 	    helper.parse(antProject, buildFile);
-	    antProject.executeTargets(targets);
+	    Vector<String> antTargets = new Vector<String>();
+	    antTargets.addAll(targets);
+	    antProject.executeTargets(antTargets);
 	}
 	catch (BuildException e)
 	{

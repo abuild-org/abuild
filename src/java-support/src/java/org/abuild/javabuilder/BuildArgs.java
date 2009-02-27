@@ -1,6 +1,6 @@
 package org.abuild.javabuilder;
 
-import java.util.Vector;
+import java.util.List;
 
 public class BuildArgs
 {
@@ -11,7 +11,7 @@ public class BuildArgs
     public boolean noOp = false;
     public boolean deprecationIsError = false;
 
-    public boolean parseArgs(Vector<String> args)
+    public boolean parseArgs(List<String> args)
     {
 	boolean status = true;
 	for (String arg: args)
