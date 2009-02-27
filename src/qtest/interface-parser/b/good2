@@ -17,3 +17,5 @@ after-build other-file
 OTHER_LIST = b
 reset OTHER_LIST
 OTHER_LIST = c
+
+NONREC_LIST = b1 b2

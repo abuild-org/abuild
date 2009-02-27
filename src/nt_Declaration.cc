@@ -8,7 +8,8 @@ nt_Declaration::nt_Declaration(Token const* identifier,
     NonTerminal(identifier->getLocation()),
     variable_name(identifier->getValue()),
     type(typespec->getType()),
-    list_type(typespec->getListType())
+    list_type(typespec->getListType()),
+    recursive(typespec->getRecursive())
 {
 }
 
@@ -32,4 +33,10 @@ Interface::list_e
 nt_Declaration::getListType() const
 {
     return this->list_type;
+}
+
+bool
+nt_Declaration::getRecursive() const
+{
+    return this->recursive;
 }

@@ -11,9 +11,14 @@
 static Logger* logger = 0;
 
 static std::string
-unparse_type(Interface::type_e type, Interface::list_e list_type)
+unparse_type(bool recursive, Interface::type_e type,
+	     Interface::list_e list_type)
 {
     std::string result;
+    if (! recursive)
+    {
+	result += "non-recursive ";
+    }
     switch (type)
     {
       case Interface::t_string:
@@ -72,7 +77,7 @@ static void dump_interface(std::string const& name, Interface const& _interface,
 	bool status = _interface.getVariable(*iter, flag_data, info);
 	assert(status);
 	std::string msg = "  " + *iter + ": " +
-	    unparse_type(info.type, info.list_type) +
+	    unparse_type(info.recursive, info.type, info.list_type) +
 	    ", target type " + TargetType::getName(info.target_type);
 	if (info.initialized)
 	{

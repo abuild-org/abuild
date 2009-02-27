@@ -59,6 +59,7 @@
 %token <token> tok_list
 %token <token> tok_append
 %token <token> tok_prepend
+%token <token> tok_nonrecursive
 %token <token> tok_afterbuild
 %token <token> tok_targettype
 %token <token> tok_identifier
@@ -359,6 +360,11 @@ typespec : tok_boolean
 	| tok_list typespec tok_prepend
 	  {
 	      $2->setListType(Interface::l_prepend);
+	      $$ = $2;
+	  }
+	| tok_nonrecursive typespec
+	  {
+	      $2->setNonRecursive();
 	      $$ = $2;
 	  }
 	;

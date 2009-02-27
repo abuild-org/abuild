@@ -1,0 +1,28 @@
+abuild: c1a (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/c1a/abuild-indep'
+NONRECVAR=c1a-1 c1a-2
+make: Leaving directory `--topdir--/non-recursive/c1a/abuild-indep'
+abuild: c1b (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/c1b/abuild-indep'
+NONRECVAR=
+make: Leaving directory `--topdir--/non-recursive/c1b/abuild-indep'
+abuild: b1 (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/b1/abuild-indep'
+NONRECVAR=c1a-1 c1a-2 c1b-1 c1b-2 b1-1 b1-2
+make: Leaving directory `--topdir--/non-recursive/b1/abuild-indep'
+abuild: c2a (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/c2a/abuild-indep'
+NONRECVAR=c2a-1 c2a-2
+make: Leaving directory `--topdir--/non-recursive/c2a/abuild-indep'
+abuild: c2b (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/c2b/abuild-indep'
+NONRECVAR=
+make: Leaving directory `--topdir--/non-recursive/c2b/abuild-indep'
+abuild: b2 (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/b2/abuild-indep'
+NONRECVAR=c2a-1 c2a-2 c2b-1 c2b-2
+make: Leaving directory `--topdir--/non-recursive/b2/abuild-indep'
+abuild: a (abuild-indep): all
+make: Entering directory `--topdir--/non-recursive/a/abuild-indep'
+NONRECVAR=b1-1 b1-2 b2-1 b2-2 a1 a2
+make: Leaving directory `--topdir--/non-recursive/a/abuild-indep'

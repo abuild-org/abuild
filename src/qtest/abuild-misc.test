@@ -101,6 +101,15 @@ $td->runtest("clean",
 
 validate_dump_data($td);
 
+cd("work/non-recursive");
+
+$td->runtest("non-recursive interface variable",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/non-recursive-interface.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(10);
+$td->report(11);

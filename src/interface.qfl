@@ -71,6 +71,7 @@ tok_filename	[ \t]*filename[ \t]*
 tok_list	[ \t]*list[ \t]*
 tok_append	[ \t]*append[ \t]*
 tok_prepend	[ \t]*prepend[ \t]*
+tok_nonrecursive	[ \t]*non-recursive[ \t]*
 tok_afterbuild	[ \t]*after-build[ \t]*
 tok_targettype	[ \t]*target-type[ \t]*
 

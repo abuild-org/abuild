@@ -23,13 +23,13 @@ unparse_values(std::deque<std::string> const& value)
 
 static void
 declare(Interface& _interface, FileLocation const& location,
-	std::string const& variable_name,
+	std::string const& variable_name, bool recursive,
 	Interface::type_e type, Interface::list_e list_type)
 {
     logger->logInfo("declaring " + variable_name + ": " +
 		    Interface::unparse_type(type, list_type));
     bool status = _interface.declareVariable(
-	location, variable_name, type, list_type);
+	location, variable_name, recursive, type, list_type);
     logger->logInfo(status ? "success" : "failure");
 }
 
@@ -141,23 +141,23 @@ int main(int argc, char* argv[])
 
     // Simulate some internal variable definitions.
     declare(base, FileLocation("[internal]", 0, 0),
-	    "STRING1", Interface::t_string, Interface::l_scalar);
+	    "STRING1", true, Interface::t_string, Interface::l_scalar);
     assign(base, FileLocation("[internal]", 0, 0),
 	   "STRING1", make_deque("potato"), Interface::a_normal);
     declare(base, FileLocation("[internal]", 0, 0),
-	    "BOOL1", Interface::t_boolean, Interface::l_scalar);
+	    "BOOL1", true, Interface::t_boolean, Interface::l_scalar);
     assign(base, FileLocation("[internal]", 0, 0),
 	   "BOOL1", make_deque("true"), Interface::a_normal);
 
     // Simulate some base definitions loaded from some files.
     base.setTargetType(TargetType::tt_object_code);
     declare(base, FileLocation("base", 1, 1),
-	    "INCLUDES", Interface::t_filename, Interface::l_prepend);
+	    "INCLUDES", true, Interface::t_filename, Interface::l_prepend);
     declare(base, FileLocation("base", 2, 1),
-	    "LIBS", Interface::t_string, Interface::l_prepend);
+	    "LIBS", true, Interface::t_string, Interface::l_prepend);
     base.setTargetType(TargetType::tt_platform_independent);
     declare(base, FileLocation("base", 4, 1),
-	    "THINGS", Interface::t_string, Interface::l_append);
+	    "THINGS", true, Interface::t_string, Interface::l_append);
 
     dump_interface("base", base, empty_flag_data);
 
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     assign(item1, FileLocation("item1", 3, 1),
 	   "THINGS", make_deque("th1-1", "th1-2"), Interface::a_normal);
     declare(item1, FileLocation("item1", 4, 1),
-	    "MOO", Interface::t_string, Interface::l_scalar);
+	    "MOO", true, Interface::t_string, Interface::l_scalar);
     assign(item1, FileLocation("item1", 5, 1),
 	   "MOO", make_deque("baaa"), Interface::a_normal);
     assign(item1, FileLocation("item1", 6, 1),
@@ -202,6 +202,14 @@ int main(int argc, char* argv[])
 	   "LIBS", make_deque("l2-1", "l2-2"), Interface::a_normal);
     assign(item2, FileLocation("item2", 3, 1),
 	   "THINGS", make_deque("th2-1", "th2-2"), Interface::a_normal);
+    declare(item2, FileLocation("item2", 4, 1),
+	    "NONRECLIST", false, Interface::t_string, Interface::l_append);
+    declare(item2, FileLocation("item2", 5, 1),
+	    "NONRECSTRING", false, Interface::t_string, Interface::l_scalar);
+    assign(item2, FileLocation("item2", 6, 1),
+	   "NONRECLIST", make_deque("item2-list"), Interface::a_normal);
+    assign(item2, FileLocation("item2", 7, 1),
+	   "NONRECSTRING", make_deque("item2-string"), Interface::a_override);
 
     dump_interface("item2", item2, empty_flag_data);
 
@@ -234,7 +242,11 @@ int main(int argc, char* argv[])
     assign(item4, FileLocation("item4", 4, 1),
 	   "MOO", make_deque("cluq"), Interface::a_override);
     declare(item4, FileLocation("item4", 5, 1),
-	    "QUACK", Interface::t_string, Interface::l_scalar);
+	    "QUACK", true, Interface::t_string, Interface::l_scalar);
+    assign(item4, FileLocation("item4", 6, 1),
+	   "NONRECLIST", make_deque("item4-list"), Interface::a_normal);
+    assign(item4, FileLocation("item4", 7, 1),
+	   "NONRECSTRING", make_deque("item4-string"), Interface::a_override);
 
     dump_interface("item4", item4, empty_flag_data);
 
@@ -246,7 +258,7 @@ int main(int argc, char* argv[])
 
     item5.importInterface(base);
     declare(item5, FileLocation("item5", 1, 1),
-	    "MOO", Interface::t_string, Interface::l_scalar);
+	    "MOO", true, Interface::t_string, Interface::l_scalar);
     assign(item5, FileLocation("item5", 2, 1),
 	   "MOO", make_deque("baaa"), Interface::a_fallback);
 
@@ -275,7 +287,7 @@ int main(int argc, char* argv[])
     assign(bad1, FileLocation("bad1", 3, 1),
 	   "BOOL1", make_deque("potato"), Interface::a_override);
     declare(bad1, FileLocation("bad1", 4, 1),
-	    "FILE", Interface::t_filename, Interface::l_scalar);
+	    "FILE", true, Interface::t_filename, Interface::l_scalar);
     assign(bad1, FileLocation("bad1", 5, 1),
 	   "FILE", make_deque(""), Interface::a_normal);
     assign(bad1, FileLocation("bad1", 6, 1),
@@ -302,19 +314,19 @@ int main(int argc, char* argv[])
     reset(item6, FileLocation("item6", 2, 1), "THINGS");
     reset(item6, FileLocation("item6", 3, 1), "UNKNOWN_VARIABLE");
     declare(item6, FileLocation("item6", 4, 1),
-	    "FLAG1", Interface::t_string, Interface::l_scalar);
+	    "FLAG1", true, Interface::t_string, Interface::l_scalar);
     assign(item6, FileLocation("item6", 5, 1),
 	   "FLAG1", make_deque("Lesotho"), Interface::a_normal,
 	   "funny-looking");
     declare(item6, FileLocation("item6", 6, 1),
-	    "FLAG2", Interface::t_string, Interface::l_scalar);
+	    "FLAG2", true, Interface::t_string, Interface::l_scalar);
     assign(item6, FileLocation("item6", 7, 1),
 	   "FLAG2", make_deque("Japan"), Interface::a_normal);
     assign(item6, FileLocation("item6", 8, 1),
 	   "FLAG2", make_deque("Libya"), Interface::a_override,
 	   "plain");
     declare(item6, FileLocation("item6", 9, 1),
-	    "FLAG3", Interface::t_string, Interface::l_scalar);
+	    "FLAG3", true, Interface::t_string, Interface::l_scalar);
     assign(item6, FileLocation("item6", 10, 1),
 	   "FLAG3", make_deque("Rwanda"), Interface::a_normal,
 	   "letter");
@@ -322,12 +334,18 @@ int main(int argc, char* argv[])
 	   "FLAG3", make_deque("Canada"), Interface::a_fallback);
     assign(item6, FileLocation("item6", 12, 1),
 	   "THINGS", make_deque("th6-1"), Interface::a_normal);
+    assign(item6, FileLocation("item6", 13, 1),
+	   "NONRECLIST", make_deque("item6-list"), Interface::a_normal);
+    assign(item6, FileLocation("item6", 14, 1),
+	   "NONRECSTRING", make_deque("item6-string"), Interface::a_override);
 
     dump_interface("item6", item6, empty_flag_data);
 
     // Create item7 that loads item1 and item6 to illustrate that we
     // see the things in item1 that were reset in item6 but not the
-    // things in item2 that were reset by item6.
+    // things in item2 that were reset by item6.  Also observe that
+    // assignments to non-recursive items in item2 are not visible in
+    // item7, but assignments made from item6 are.
     Interface item7("item7", "indep", error, current_directory + "/item7");
 
     item7.importInterface(item1);
@@ -354,7 +372,7 @@ int main(int argc, char* argv[])
     // Exercise fallback/override logic more thoroughly
     Interface item8("item8", "indep", error, current_directory + "/item8");
     declare(item8, FileLocation("item8", 1, 1),
-	    "A", Interface::t_string, Interface::l_scalar);
+	    "A", true, Interface::t_string, Interface::l_scalar);
     assign(item8, FileLocation("item8", 2, 1),
 	   "A", make_deque("F1"), Interface::a_normal, "F1");
     assign(item8, FileLocation("item8", 3, 1),

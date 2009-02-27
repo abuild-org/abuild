@@ -20,3 +20,5 @@ else
 endif
 
 after-build other-file
+
+NONREC_LIST = c1 c2

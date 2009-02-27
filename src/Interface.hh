@@ -50,6 +50,7 @@ class Interface
 	TargetType::target_type_e target_type;
 	type_e type;
 	list_e list_type;
+	bool recursive;
 	bool initialized;
 	std::deque<std::string> value;
     };
@@ -103,7 +104,7 @@ class Interface
     // declared.  See also private declareVariable.
     bool declareVariable(FileLocation const&,
 			 std::string const& variable_name,
-			 type_e type, list_e list_type);
+			 bool recursive, type_e type, list_e list_type);
 
     // Assign a value to a scalar variable.  Calls the deque form of
     // assignVariable with a single-element deque.
@@ -239,11 +240,13 @@ class Interface
 	Variable(std::string const& name,
 		 FileLocation const& declare_location,
 		 TargetType::target_type_e target_type,
+		 bool recursive,
 		 type_e type,
 		 list_e list_type) :
 	    name(name),
 	    declare_location(declare_location),
 	    target_type(target_type),
+	    recursive(recursive),
 	    type(type),
 	    list_type(list_type)
 	{
@@ -252,6 +255,7 @@ class Interface
 	std::string name;
 	FileLocation declare_location;
 	TargetType::target_type_e target_type;
+	bool recursive;
 	type_e type;
 	list_e list_type;
 	std::list<Reset> reset_history;
@@ -264,7 +268,7 @@ class Interface
     bool declareVariable(FileLocation const&,
 			 TargetType::target_type_e target_type,
 			 std::string const& variable_name,
-			 type_e type, list_e list_type);
+			 bool recursive, type_e type, list_e list_type);
     // The real resetVariable
     bool resetVariable(FileLocation const&,
 		       std::string const& variable_name,

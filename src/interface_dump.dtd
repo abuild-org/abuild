@@ -10,6 +10,11 @@
 <!--  something including the word "internal" inside square        -->
 <!--  brackets.                                                    -->
 
+<!--  By convention, we use "0" or "1" for boolean values.  Some   -->
+<!--  boolean values are optional.  In this case, omitted always   -->
+<!--  means "0".                                                   -->
+<!ENTITY % boolean "(0|1)">
+
 <!--  The version attribute is always "1".  We will only           -->
 <!--  increment this if there is a change to the output such that  -->
 <!--  previously valid data is either no longer valid or is valid  -->
@@ -33,6 +38,7 @@
 <!ATTLIST variable
   name                  CDATA     #REQUIRED
   type                  CDATA     #REQUIRED
+  recursive             %boolean; #REQUIRED
   target-type           CDATA     #REQUIRED
   declaration-location  CDATA     #REQUIRED
 >

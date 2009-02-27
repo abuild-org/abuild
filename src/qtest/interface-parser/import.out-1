@@ -3,6 +3,7 @@ dumping interface a/good1
   INCLUDES: filename prependlist, target type all: uninitialized
   LIBDIRS: string prependlist, target type all: uninitialized
   LIBS: string prependlist, target type all: uninitialized
+  NONREC_LIST: non-recursive string appendlist, target type all = a1 a2
   OTHER_LIST: string appendlist, target type all = a
   PLATFORM: string scalar, target type all: uninitialized
   TARGET-TYPE: string scalar, target type all: uninitialized
@@ -14,6 +15,7 @@ dumping interface b/good2
   INCLUDES: filename prependlist, target type all = --CWD--/b/i1-1 --CWD--/b/i1-2
   LIBDIRS: string prependlist, target type all = d1-1 d1-2
   LIBS: string prependlist, target type all = l1-1 l1-2
+  NONREC_LIST: non-recursive string appendlist, target type all = a1 a2 b1 b2
   OTHER_LIST: string appendlist, target type all = c
   PLATFORM: string scalar, target type all = arch1
   TARGET-TYPE: string scalar, target type all = platform-independent
@@ -26,6 +28,7 @@ dumping interface c/good3
   INCLUDES: filename prependlist, target type all = --CWD--/c/i2-1 --CWD--/c/i2-2 --CWD--/b/i1-1 --CWD--/b/i1-2
   LIBDIRS: string prependlist, target type all = d2-1 d2-2 d1-1 d1-2
   LIBS: string prependlist, target type all = l2-1 l2-2 l1-1 l1-2
+  NONREC_LIST: non-recursive string appendlist, target type all = a1 a2 b1 b2 c1 c2
   OTHER_LIST: string appendlist, target type all = a c
   PLATFORM: string scalar, target type all = arch1
   TARGET-TYPE: string scalar, target type all = object-code

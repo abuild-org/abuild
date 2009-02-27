@@ -1,6 +1,41 @@
 
 === Changes Targeted for Version 1.1 ===
 
+Idea to think about
+===================
+
+It may be possible to have the Interface object be able to request the
+value of a variable ignoring any assignments not made by a specific
+list of build items.  This would make it possible to implement some
+kind of semantic in which we can see only assignments made by directly
+declared dependencies.  This could in turn be useful for manifest
+classpaths, shared library link statements, or other cases in which
+recursive dependencies are managed by the underlying system.
+
+For classpaths, there are definitely times when you need the fully
+expanded version, such as when running a Java SE application from the
+command line, and other cases where you definitely need only direct
+dependencies, such as compile classpaths (verify) or manfiest
+classpaths.
+
+One question would be what mechanism should be provided for
+restricting which assignments take affect.  Here are a few ideas:
+
+ * Have a way to declare a variable as always only containing the
+   value resulting from assignments from directly declared
+   dependencies
+
+ * Have a special way to dereference a variable that results in this
+   value
+
+ * Have a way to declare a variable as an alias for another variable
+   but that provides only these values
+
+Also, note that the semantics of such a variable are similar to always
+doing a reset followed by an assignment in an after-build file, much
+like the shared library examples...
+
+
 Notes for Next Release
 ======================
 
@@ -18,6 +53,28 @@ release notes.
    (if any) is appended.
 
  * Use of LINK_SHLIBS now results in a deprecation warning.
+
+ * (actually made in 1.1.a1) Abuild will now complain about
+   abuild.hook-build-items files that don't exist.  Note that
+   abuild.hook-build-items is deprecated anyway.
+
+ * Added new "non-recursive" modifier for interface variable
+   declarations.  When an interface variable is declared as
+   non-recursive, only assignments from the item itself and its
+   directly declared dependencies are effective.  Specifically, when
+   importing an interface, only assignments from the item that owns
+   the interface imported.  Since abuild imports interfaces of its
+   direct dependencies, this causes the behavior of seeing only
+   assignments in direct dependencies and in the item.  To avoid
+   seeing assignments from the item itself, place those assignments in
+   an after-build file.
+
+   Non-recursive variables can be useful for carrying information for
+   subsystems that handle recursive dependencies on their own.
+   Examples could include manifest classpaths or shared library
+   information.  Syntax:
+
+   declare variable name [non-recursive] type
 
 
 Groovy Framework
