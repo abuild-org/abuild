@@ -1,0 +1,1 @@
+parameters { abuild { localRules('local') } }

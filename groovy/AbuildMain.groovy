@@ -168,65 +168,47 @@ class BuildState
         }
     }
 
-    def resetParameter(String name, value)
-    {
-        params[name] = value
-    }
-
-    def appendParameter(String name, value)
-    {
-        if (params.containsKey(name))
-        {
-            if (! (params[name] instanceof List))
-            {
-                params[name] = [params[name]]
-            }
-        }
-        else
-        {
-            params[name] = []
-        }
-        params[name] << value
-    }
-
-    def resolveVariable(String name)
-    {
-        resolveVariable(name, null)
-    }
-
-    def resolveVariable(String name, defaultValue)
+    Object resolve(String name, defaultValue)
     {
         defines[name] ?: params[name] ?: interfaceVars[name] ?: defaultValue
     }
 
-    def resolveVariableAsString(String name)
+    Object resolve(String name)
     {
-        resolveVariableAsString(name, null)
+        resolve(name, null)
     }
 
-    def resolveVariableAsString(String name, defaultValue)
+    // may return null
+    String resolveAsString(String name, defaultValue)
     {
-        def result = resolveVariable(name, defaultValue)
-        if (result instanceof List)
+        def result = resolve(name, defaultValue)
+        if (! ((result == null) || (result instanceof String)))
         {
-            result = result.join(' ')
+            fail("resolveAsString called on non-string parameter" +
+                 " ${name}, value ${value}")
         }
-        result.toString()
+        result
     }
 
-    def resolveVariableAsList(String name)
+    String resolveAsString(String name)
     {
-        resolveVariableAsList(name, null)
+        resolveAsString(name, null)
     }
 
-    def resolveVariableAsList(String name, defaultValue)
+    // may return null
+    List resolveAsList(String name, defaultValue)
     {
-        def result = resolveVariable(name, defaultValue)
+        def result = resolve(name, defaultValue)
         if ((result != null) && (! (result instanceof List)))
         {
             result = [result]
         }
         result
+    }
+
+    List resolveAsList(String name)
+    {
+        resolveAsList(name, null)
     }
 
     def fail(String message)
@@ -495,7 +477,7 @@ class Builder
         // Load any rules specified in params['abuild.rules'].  First
         // search the internal location, and then search in each
         // plugin directory, returning the first item found.
-        buildState.resolveVariableAsList('abuild.rules')?.each {
+        buildState.resolveAsList('abuild.rules')?.each {
             rule ->
             def found = false
             for (dir in ruleSearchPath)
@@ -522,7 +504,7 @@ class Builder
 
         // Load any local rules files, resolving the path relative to
         // the source directory
-        buildState.resolveVariableAsList('abuild.localRules')?.each {
+        buildState.resolveAsList('abuild.localRules')?.each {
             loadScript(new File("${sourceDirectory.path}/${it}.groovy"))
         }
 

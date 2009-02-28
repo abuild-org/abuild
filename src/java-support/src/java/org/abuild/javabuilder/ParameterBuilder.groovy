@@ -38,38 +38,60 @@ class ParameterBuilder extends BuilderSupport
         {
             key = (key ? "${key}." : "") + name
         }
-        if (! ((value == null) && (attributes == null)))
+
+        if ((value != null) || (attributes != null))
         {
             if (key == '')
             {
                 throw new Exception("attempt to set empty parameter")
             }
-            if ((! parameters.containsKey(key)) && (attributes == null))
+
+            // Desired semantics: when we add exactly one thing, that
+            // one thing should be the value.  Otherwise, the value
+            // should be a list of everything we add.  When we add one
+            // thing and that one thing is a list, treat it as if we
+            // added the members of the list.  This is the only way to
+            // be unambiguous.
+
+            def toAdd
+
+            if (value == null)
             {
-                parameters[key] = value
+                toAdd = [attributes]
             }
             else
             {
-                if (parameters.containsKey(key))
+                if (value instanceof List)
                 {
-                    if (! (parameters[key] instanceof List))
-                    {
-                        parameters[key] = [parameters[key]]
-                    }
+                    toAdd = value
                 }
                 else
                 {
-                    parameters[key] = []
+                    toAdd = [value]
                 }
-
                 if (attributes != null)
                 {
-                    parameters[key] << attributes
+                    toAdd << attributes
                 }
-                if (value != null)
+            }
+
+            assert toAdd instanceof List
+
+            if (parameters.containsKey(key))
+            {
+                if (! (parameters[key] instanceof List))
                 {
-                    parameters[key] << value
+                    parameters[key] = [parameters[key]]
                 }
+                parameters[key].addAll(toAdd)
+            }
+            else if (toAdd.size == 1)
+            {
+                parameters[key] = toAdd[0]
+            }
+            else
+            {
+                parameters[key] = toAdd
             }
         }
 

@@ -1,4 +1,3 @@
-
 parameters {
     abuild {
         rules('empty')
@@ -14,8 +13,7 @@ parameters {
     VAR2('second value')
 }
 
-println abuild.resolveVariable('potato.salad')
-println abuild.resolveVariableAsString('qtest.export')
-println abuild.resolveVariableAsString('VAR1')
-println abuild.resolveVariableAsList('qtest.export').join(',')
-println abuild.resolveVariableAsList('VAR1').join(',')
+println abuild.resolve('potato.salad')
+println abuild.resolveAsString('VAR1')
+println abuild.resolveAsList('qtest.export').join(',')
+println abuild.resolveAsList('VAR1').join(',')

@@ -7,33 +7,33 @@ class JavaRules
     def ant
 
     // Initialized by the constructor
-    def buildDir
-    def itemDir
-    def pathSep
+    String buildDir
+    String itemDir
+    String pathSep
 
-    def defaultDistDir
-    def defaultClassesDir
-    def defaultSrcDir
-    def defaultGeneratedSrcDir
-    def defaultResourcesDir
-    def defaultGeneratedResourcesDir
-    def defaultConfDir
-    def defaultGeneratedConfDir
+    String defaultDistDir
+    String defaultClassesDir
+    String defaultSrcDir
+    String defaultGeneratedSrcDir
+    String defaultResourcesDir
+    String defaultGeneratedResourcesDir
+    String defaultConfDir
+    String defaultGeneratedConfDir
 
     // Initialized by the init target
-    def distDir
-    def classesDir
-    def srcDir
-    def generatedSrcDir
-    def resourcesDir
-    def generatedResourcesDir
-    def confDir
-    def generatedConfDir
+    String distDir
+    String classesDir
+    String srcDir
+    String generatedSrcDir
+    String resourcesDir
+    String generatedResourcesDir
+    String confDir
+    String generatedConfDir
 
-    def compileClassPath
-    def jarName
-    def mainClass
-    def wrapperName
+    List compileClassPath
+    String jarName
+    String mainClass
+    String wrapperName
 
     JavaRules(abuild, ant)
     {
@@ -62,7 +62,7 @@ class JavaRules
 
     def getPathVariable(String var, defaultValue)
     {
-        def result = abuild.resolveVariable("java.dir.${var}", defaultValue)
+        def result = abuild.resolveAsString("java.dir.${var}", defaultValue)
         if (! new File(result).isAbsolute())
         {
             result = "${itemDir}/${result}"
@@ -89,10 +89,10 @@ class JavaRules
         generatedConfDir =
             getPathVariable('generatedConf', defaultGeneratedConfDir)
 
-        compileClassPath = abuild.resolveVariable('abuild.classpath', [])
-        jarName = abuild.resolveVariable('java.jarName')
-        mainClass = abuild.resolveVariable('java.mainClass')
-        wrapperName = abuild.resolveVariable('java.wrapperName')
+        compileClassPath = abuild.resolveAsList('abuild.classpath', [])
+        jarName = abuild.resolveAsString('java.jarName')
+        mainClass = abuild.resolveAsString('java.mainClass')
+        wrapperName = abuild.resolveAsString('java.wrapperName')
     }
 
     def compileTarget()
@@ -104,7 +104,11 @@ class JavaRules
         {
             return
         }
-        def javacArgs = abuild.resolveVariable('java.javacArgs', [:])
+        def javacArgs = abuild.resolve('java.javacArgs', [:])
+        if (! (javacArgs instanceof Map))
+        {
+            fail("java.javacArgs must be a map")
+        }
         javacArgs['destdir'] = classesDir
         javacArgs['classpath'] = compileClassPath.join(pathSep)
         ant.mkdir('dir' : classesDir)

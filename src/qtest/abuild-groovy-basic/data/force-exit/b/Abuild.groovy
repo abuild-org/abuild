@@ -1,1 +1,5 @@
-abuild.resetParameter('abuild.rules', 'empty')
+parameters {
+    abuild {
+        rules(['empty'])
+    }
+}
