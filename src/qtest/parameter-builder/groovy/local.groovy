@@ -26,6 +26,7 @@ builder {
             z('x')
         }
     }
+    j([[1]])
 }
 
 assert [1, 2, 3, 4] == builder.parameters['a']
@@ -41,5 +42,6 @@ assert 1 == builder.parameters['b.x']
 assert ! builder.parameters.containsKey('b.x.y')
 assert [1, 2] == builder.parameters['b.y']
 assert 'x' == builder.parameters['b.y.z']
+assert [1] == builder.parameters['j']
 
 println "all assertions passed"
