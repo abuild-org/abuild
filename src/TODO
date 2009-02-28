@@ -1,4 +1,13 @@
 
+Incorporate this:
+
+~/source/examples/groovy/builder/parameter.groovy
+
+by putting ParameterBuilder in the java-support package and adding a
+parameter builder to the binding while loading at least Abuild.groovy.
+
+-----
+
 abuild.appendParameter('xjc',
     [ schema: 'xsd/preferences.xsd',
       stub: 'com.argonst.results.ciq.preferences',
