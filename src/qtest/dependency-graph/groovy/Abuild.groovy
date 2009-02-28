@@ -1,1 +1,5 @@
-abuild.setParameter('abuild.local-rules', ['test_dependency_graph'])
+parameters {
+    abuild {
+        localRules('test_dependency_graph')
+    }
+}

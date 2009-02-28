@@ -6,6 +6,34 @@ Incorporate this:
 by putting ParameterBuilder in the java-support package and adding a
 parameter builder to the binding while loading at least Abuild.groovy.
 
+Issues:
+
+ * It's confusing when a parameter value ends up as a list and when it
+   doesn't.
+
+   p(val1) -> val1
+   p(val1);p(val2) -> [val1, val2]
+   p([val1]) -> [val1]
+   p([val1])
+   p(val2) -> [val1, val2]
+
+   Basically, when adding the first item, if "value" rather than
+   attributes, it gets added as is.  Then, a subsequent item converts
+   the original one to a list.  This is going to be treacherous.  We
+   need a better way.  May parameters should ALWAYS be lists.
+
+ * Interface changes:
+
+   getVariable* -> resolveVariable
+   setParameter -> appendParameter and resetParameter
+   all parameter names use camelCaps instead of asdf-qwer
+
+   The test suite calls appendParameter and resetParameter but we may
+   not really want both.  Maybe only resetParameter?
+
+ * Look carefully at transaction 976 to see whether the changes are
+   good.
+
 -----
 
 abuild.appendParameter('xjc',

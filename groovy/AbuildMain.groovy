@@ -2,6 +2,7 @@ import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.runtime.StackTraceUtils
 import org.abuild.javabuilder.DependencyGraph
 import org.abuild.javabuilder.BuildArgs
+import org.abuild.javabuilder.ParameterBuilder
 import org.apache.tools.ant.Project
 import org.apache.tools.ant.BuildException
 import org.abuild.QTC
@@ -167,29 +168,65 @@ class BuildState
         }
     }
 
-    def setParameter(String name, value)
+    def resetParameter(String name, value)
     {
         params[name] = value
     }
 
-    def getVariable(String name)
+    def appendParameter(String name, value)
     {
-        getVariable(name, null)
+        if (params.containsKey(name))
+        {
+            if (! (params[name] instanceof List))
+            {
+                params[name] = [params[name]]
+            }
+        }
+        else
+        {
+            params[name] = []
+        }
+        params[name] << value
     }
 
-    def getVariable(String name, defaultValue)
+    def resolveVariable(String name)
+    {
+        resolveVariable(name, null)
+    }
+
+    def resolveVariable(String name, defaultValue)
     {
         defines[name] ?: params[name] ?: interfaceVars[name] ?: defaultValue
     }
 
-    def getVariableAsString(String name)
+    def resolveVariableAsString(String name)
     {
-        def result = getVariable(name)
+        resolveVariableAsString(name, null)
+    }
+
+    def resolveVariableAsString(String name, defaultValue)
+    {
+        def result = resolveVariable(name, defaultValue)
         if (result instanceof List)
         {
             result = result.join(' ')
         }
         result.toString()
+    }
+
+    def resolveVariableAsList(String name)
+    {
+        resolveVariableAsList(name, null)
+    }
+
+    def resolveVariableAsList(String name, defaultValue)
+    {
+        def result = resolveVariable(name, defaultValue)
+        if ((result != null) && (! (result instanceof List)))
+        {
+            result = [result]
+        }
+        result
     }
 
     def fail(String message)
@@ -375,7 +412,6 @@ class BuildState
     }
 }
 
-
 class Builder
 {
     File buildDirectory
@@ -399,8 +435,17 @@ class Builder
         this.buildState = new BuildState(
             ant, buildDirectory, buildArgs, defines)
 
+        def parameters = new ParameterBuilder(parameters : buildState.params)
+
         binding.abuild = buildState
         binding.ant = ant
+
+        // For some reason, when putting "parameters" into the
+        // binding, groovy fails to recognize parameters() as
+        // parameters.call() but instead tries to resolve it as a
+        // method call in the script.  We use an expicit closure
+        // instead.
+        binding.parameters = { parameters(it) }
     }
 
     boolean build()
@@ -435,13 +480,13 @@ class Builder
         }
 
         if (! (buildState.params['abuild.rules'] ||
-               buildState.params['abuild.local-rules'] ||
+               buildState.params['abuild.localRules'] ||
                buildState.ruleItems))
         {
             QTC.TC("abuild", "groovy ERR no rules")
             buildState.error(
                 "no build rules are defined; one of abuild.rules or" +
-                " abuild.local-rules must be defined, or at least one" +
+                " abuild.localRules must be defined, or at least one" +
                 " dependency must have been specified with the" +
                 " -with-rules option")
             return false
@@ -450,7 +495,7 @@ class Builder
         // Load any rules specified in params['abuild.rules'].  First
         // search the internal location, and then search in each
         // plugin directory, returning the first item found.
-        buildState.params['abuild.rules']?.each {
+        buildState.resolveVariableAsList('abuild.rules')?.each {
             rule ->
             def found = false
             for (dir in ruleSearchPath)
@@ -477,7 +522,7 @@ class Builder
 
         // Load any local rules files, resolving the path relative to
         // the source directory
-        buildState.params['abuild.local-rules']?.each {
+        buildState.resolveVariableAsList('abuild.localRules')?.each {
             loadScript(new File("${sourceDirectory.path}/${it}.groovy"))
         }
 

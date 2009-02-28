@@ -1,1 +1,1 @@
-abuild.setParameter('abuild.local-rules', ['h_rules'])
+abuild.appendParameter('abuild.localRules', 'h_rules')

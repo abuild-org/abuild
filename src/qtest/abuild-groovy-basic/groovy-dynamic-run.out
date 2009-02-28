@@ -1,5 +1,9 @@
 abuild: qwer (abuild-indep): check
 one two three
+VAR1 VAR2 potato spackle truth1
+first value
+VAR1,VAR2,potato,spackle,truth1
+first value
      [exec] 
      [exec] *********************************
      [exec] STARTING TESTS on ---timestamp---

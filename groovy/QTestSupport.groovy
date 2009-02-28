@@ -24,8 +24,8 @@ abuild.addTargetClosure('test-only') {
                 env('key':'QTEST_EXTRA_MARGIN',
                     'value':12)
             }
-            def toExport = abuild.getVariable('qtest.export', [])
-            if (abuild.getVariable('TESTS'))
+            def toExport = abuild.resolveVariableAsList('qtest.export', [])
+            if (abuild.resolveVariable('TESTS'))
             {
                 toExport << 'TESTS'
             }
@@ -35,7 +35,7 @@ abuild.addTargetClosure('test-only') {
                 // upper-case.
                 toExport.each {
                     env('key': it.toUpperCase(),
-                        'value': abuild.getVariableAsString(it))
+                        'value': abuild.resolveVariableAsString(it))
                 }
             }
             args.each {

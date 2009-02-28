@@ -62,7 +62,7 @@ class JavaRules
 
     def getPathVariable(String var, defaultValue)
     {
-        def result = abuild.getVariable("java.dir.${var}", defaultValue)
+        def result = abuild.resolveVariable("java.dir.${var}", defaultValue)
         if (! new File(result).isAbsolute())
         {
             result = "${itemDir}/${result}"
@@ -79,20 +79,20 @@ class JavaRules
         srcDir =
             getPathVariable('src', defaultSrcDir)
         generatedSrcDir =
-            getPathVariable('generated-src', defaultGeneratedSrcDir)
+            getPathVariable('generatedSrc', defaultGeneratedSrcDir)
         resourcesDir =
             getPathVariable('resources', defaultResourcesDir)
         generatedResourcesDir =
-            getPathVariable('generated-resource', defaultGeneratedSrcDir)
+            getPathVariable('generatedResource', defaultGeneratedSrcDir)
         confDir =
             getPathVariable('conf', defaultConfDir)
         generatedConfDir =
-            getPathVariable('generated-conf', defaultGeneratedConfDir)
+            getPathVariable('generatedConf', defaultGeneratedConfDir)
 
-        compileClassPath = abuild.getVariable('abuild.classpath', [])
-        jarName = abuild.getVariable('java.jar-name')
-        mainClass = abuild.getVariable('java.main-class')
-        wrapperName = abuild.getVariable('java.wrapper-name')
+        compileClassPath = abuild.resolveVariable('abuild.classpath', [])
+        jarName = abuild.resolveVariable('java.jarName')
+        mainClass = abuild.resolveVariable('java.mainClass')
+        wrapperName = abuild.resolveVariable('java.wrapperName')
     }
 
     def compileTarget()
@@ -104,7 +104,7 @@ class JavaRules
         {
             return
         }
-        def javacArgs = abuild.getVariable('java.javac-args', [:])
+        def javacArgs = abuild.resolveVariable('java.javacArgs', [:])
         javacArgs['destdir'] = classesDir
         javacArgs['classpath'] = compileClassPath.join(pathSep)
         ant.mkdir('dir' : classesDir)

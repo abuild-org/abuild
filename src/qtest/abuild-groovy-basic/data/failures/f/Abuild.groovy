@@ -1,1 +1,3 @@
-abuild.setParameter('no-rules-here', true)
+parameters {
+    'no-rules-here'(true)
+}

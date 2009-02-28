@@ -1,1 +1,5 @@
-abuild.setParameter('abuild.local-rules', ['g_rules'])
+parameters {
+    abuild {
+        localRules('g_rules')
+    }
+}

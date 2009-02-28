@@ -1,4 +1,10 @@
-abuild.setParameter('java.jar-name', 'java-program.jar')
-abuild.setParameter('java.main-class', 'com.example.basic.BasicProgram')
-abuild.setParameter('java.wrapper-name', 'java-program')
-abuild.setParameter('abuild.rules', ['java_proto'])
+parameters {
+    abuild {
+        rules('java_proto')
+    }
+    java {
+        jarName('java-program.jar')
+        mainClass('com.example.basic.BasicProgram')
+        wrapperName('java-program')
+    }
+}

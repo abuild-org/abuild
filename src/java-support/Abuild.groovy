@@ -1,2 +1,8 @@
-abuild.setParameter('java.jar-name', 'abuild-java-support.jar')
-abuild.setParameter('abuild.rules', ['java_proto'])
+parameters {
+    abuild {
+        rules('java_proto')
+    }
+    java {
+        jarName('abuild-java-support.jar')
+    }
+}
