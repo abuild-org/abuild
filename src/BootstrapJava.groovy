@@ -50,12 +50,14 @@ def distDir = 'dist'
 def classesDir = 'classes'
 ant.mkdir('dir': distDir)
 ant.mkdir('dir': classesDir)
+ant.touch('file': '.abuild')
 
 ant.javac('deprecation': 'yes',
           'destdir': classesDir,
           'classpath': antJar,
           'srcdir': srcDir.absolutePath)
 ant.groovyc('destdir': classesDir,
+            'classpath': classesDir,
             'srcdir': srcDir.absolutePath)
 ant.jar('destfile': distDir + '/abuild-java-support.jar',
         'basedir': classesDir,

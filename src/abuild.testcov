@@ -248,7 +248,7 @@ JavaBuilder.java noOp 0
 groovy ERR runTarget during init 0
 groovy ERR unknown target 0
 groovy ERR dep failure 0
-groovy ERR AbuildBuildFailure 0
+groovy ERR abuild BuildFailure 0
 groovy ERR ant BuildException 0
 groovy ERR other target exception 0
 groovy ERR script compilation errors 0
