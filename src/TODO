@@ -1,10 +1,4 @@
 
-XXX Communicate changes to the group; fix Kathleen's rules so far to
-conform, suggest that the xjc parameter be xjc.something or
-something.xjc
-
-Check svn diffs from 975 to 977.
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -115,13 +109,15 @@ Abuild Groovy Interface; add to documentation
 
  * Abuild.groovy environment
 
-   Binding:
+   Binding
+   -------
 
      abuild -- access to abuild's groovy interface
      ant -- an AntBuilder (gradle and gant also put "ant" in the binding)
      parameters -- a ParameterBuilder used to set abuild parameters
 
-   Setting parameters:
+   Setting parameters
+   ------------------
 
      In your Abuild.groovy, you can have the following:
 
@@ -166,7 +162,8 @@ Abuild Groovy Interface; add to documentation
      For an example that exercises all the cases, see
      qtest/parameter-builder/groovy/local.groovy
 
-   "abuild" object interface:
+   "abuild" object interface
+   -------------------------
 
      Fields:
 
@@ -308,8 +305,8 @@ Abuild Groovy Interface; add to documentation
       RULES in make backend; abuild automatically appends .groovy
       suffix
 
-    - abuild.local-rules -- a list of files, treated as relative to
-      the source directory, to load for defining local rules; abuild
+    - abuild.localRules -- a list of files, treated as relative to the
+      source directory, to load for defining local rules; abuild
       automatically appends .groovy suffix
 
 
