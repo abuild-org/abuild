@@ -1,10 +1,10 @@
 package org.abuild.groovy
 
 import org.abuild.groovy.Util
+import org.abuild.groovy.ParameterBuilder
 import org.abuild.javabuilder.GroovyBackend
 import org.codehaus.groovy.control.CompilationFailedException
 import org.abuild.javabuilder.BuildArgs
-import org.abuild.javabuilder.ParameterBuilder
 import org.apache.tools.ant.Project
 import org.abuild.QTC
 

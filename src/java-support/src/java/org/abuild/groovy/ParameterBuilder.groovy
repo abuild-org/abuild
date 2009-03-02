@@ -1,4 +1,4 @@
-package org.abuild.javabuilder
+package org.abuild.groovy
 
 class ParameterBuilder extends BuilderSupport
 {

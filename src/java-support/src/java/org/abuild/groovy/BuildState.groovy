@@ -1,7 +1,7 @@
 package org.abuild.groovy
 
 import org.abuild.groovy.Util
-import org.abuild.javabuilder.DependencyGraph
+import org.abuild.groovy.DependencyGraph
 import org.abuild.javabuilder.BuildArgs
 import org.apache.tools.ant.BuildException
 import org.abuild.QTC

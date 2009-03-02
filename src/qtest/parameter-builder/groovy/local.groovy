@@ -1,5 +1,5 @@
 
-import org.abuild.javabuilder.ParameterBuilder
+import org.abuild.groovy.ParameterBuilder
 
 def builder = new ParameterBuilder()
 builder {

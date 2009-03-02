@@ -3,7 +3,7 @@
 // the same test suite as the C++ version.
 //
 
-package org.abuild.javabuilder
+package org.abuild.groovy
 
 class DependencyGraph
 {

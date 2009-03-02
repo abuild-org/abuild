@@ -1,4 +1,4 @@
-import org.abuild.javabuilder.DependencyGraph
+import org.abuild.groovy.DependencyGraph
 
 def report(DependencyGraph g)
 {
