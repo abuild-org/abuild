@@ -1,6 +1,14 @@
 
 === Changes Targeted for Version 1.1 ===
 
+Groovy Version
+==============
+
+After groovy-1.6.0 receives security approval, upgrade embedded groovy
+to 1.6.0.  From abuild/lib:
+
+  svn cp -r982 svn+q:///abuild/trunk/abuild/lib/groovy-all-1.6.0.jar@982 .
+
 Notes for Next Release
 ======================
 
