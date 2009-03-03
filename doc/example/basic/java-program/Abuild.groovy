@@ -1,10 +1,6 @@
 parameters {
-    abuild {
-        rules('java_proto')
-    }
-    java {
-        jarName('java-program.jar')
-        mainClass('com.example.basic.BasicProgram')
-        wrapperName('java-program')
-    }
+    abuild.rules = 'java_proto'
+    java.jarName = 'java-program.jar'
+    java.mainClass = 'com.example.basic.BasicProgram'
+    java.wrapperName = 'java-program'
 }

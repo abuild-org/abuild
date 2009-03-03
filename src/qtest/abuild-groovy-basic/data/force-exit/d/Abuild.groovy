@@ -1,5 +1,1 @@
-parameters {
-    abuild {
-        rules('empty')
-    }
-}
+abuild.setParameter('abuild.rules', ['empty'])

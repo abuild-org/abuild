@@ -1,6 +1,4 @@
 parameters {
-    abuild {
-        rules('custom')
-        localRules('local')
-    }
+    abuild.rules = 'custom'
+    abuild.localRules = 'local'
 }

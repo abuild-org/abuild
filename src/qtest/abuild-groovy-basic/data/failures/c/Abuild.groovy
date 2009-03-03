@@ -1,6 +1,4 @@
 parameters {
-    abuild {
-        localRules('c_rules')
-        localRules('local1')
-    }
+    abuild.localRules << 'c_rules'
+    abuild.localRules << 'local1'
 }

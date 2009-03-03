@@ -13732,15 +13732,17 @@ Y = $(X)
            summary of changes.
           </para>
           <para>
-           The <function>abuild.setParameter</function> call has been
-           removed.  Instead, parameters are set using a builder,
-           accessible as <function>parameters</function> in
-           <filename>Abuild.groovy</filename>.
+           An improved syntax has been provided for setting
+           parameters.  This takes advantage of Groovy's
+           meta-programming capabilities to allow a closure passed to
+           the <function>parameters</function> method to contain
+           parameter settings that look like normal variable
+           assignments.
           </para>
           <para>
            Parameter names have been changed to use camelCaps instead
            of dashed-components to make the syntax more natural when
-           using the parameters builder.
+           setting parameters from a closure.
           </para>
           <para>
            All <function>getVariable</function> methods have been

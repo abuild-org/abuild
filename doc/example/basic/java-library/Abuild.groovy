@@ -1,8 +1,4 @@
 parameters {
-    abuild {
-        rules('java_proto')
-    }
-    java {
-        jarName('java-library.jar')
-    }
+    abuild.rules = 'java_proto'
+    java.jarName = 'java-library.jar'
 }

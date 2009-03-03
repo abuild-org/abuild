@@ -1,5 +1,3 @@
 parameters {
-    abuild {
-        rules(['empty'])
-    }
+    abuild.rules << 'empty'
 }

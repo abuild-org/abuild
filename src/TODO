@@ -46,7 +46,7 @@ Abuild Groovy Interface; add to documentation
 
      abuild -- access to abuild's groovy interface
      ant -- an AntBuilder (gradle and gant also put "ant" in the binding)
-     parameters -- a ParameterBuilder used to set abuild parameters
+     parameters -- a closure method used to set abuild parameters
 
    Setting parameters
    ------------------
@@ -54,45 +54,39 @@ Abuild Groovy Interface; add to documentation
      In your Abuild.groovy, you can have the following:
 
      parameters {
-         name('value')
-	 prefix {
-	     name('first value')
-	     name('additional value')
-	     single([1])
-	     attrs('a':'b')
-	     other('c':'d', 'e')
-	     other('f':'g', 'h':'i')
-	 }
+         parameter.one = 'value'
+	 parameter.two << 'value-to-append'
+	 parameter.three = parameter.one
      }
 
      The effect would be to set the following parameters:
 
-       name -> 'value'
-       prefix.name -> ['first value', 'second value']
-       prefix.attrs -> ['a' : 'b']
-       prefix.other -> ['e', ['c' : 'd'], ['f' : 'g', 'h' : 'i']]
-       prefix.single -> 1
+       parameter.one -> 'value'
+       parameter.two -> ['value-to-append']
+       parameter.three -> 'value'
 
-     Specifically, any call to a pretend function sets a parameter
-     whose name reflects that function's hierarchy in the builder with
-     the levels separated by dots.  You can pass at most one non-named
-     parameter and any number of named parameters.
+     Specifically, any variable assignment is treated as an assignment
+     to an equivalently named parameter, and any append using the left
+     shift operator appends to any existing value.  Variables on the
+     right hand side of an assignment or left shift are resolved as
+     parameters (or defines or interface variables).  They don't have
+     any special meaning in other contexts, so if you need to use them
+     elsewhere, you'll have to call resolve.
 
-     If both named and unnamed parameters are passed, it is as if the
-     function were called first with the unnamed parameter and then
-     with the named parameters.  If the unnamed parameter is a list,
-     it as if the function were called once for each element of the
-     list.
+     You can also delete parameters within this block:
 
-     If, after the above "unfolding" of calls with multiple or list
-     parameters, the function is called only once, the parameter will
-     have the value passed in that call.  That value could be any type
-     of object.  If the function has been called multiple times, then
-     the parameter's value is a list of the values passed in on each
-     call.
+     parameters {
+          delete some.parameter
+     }
+
+     Accessing variables within this block is just shorthand for
+     calling abuild.setParameter, abuild.appendParameter, and
+     abuild.deleteParameter.  When using a parameter on the right hand
+     side of an assignment or append, the result is equilvalent to
+     having called abuild.resolve on the parameter name.
 
      For an example that exercises all the cases, see
-     qtest/parameter-builder/groovy/local.groovy
+     qtest/parameter-helper/groovy/local.groovy.
 
    "abuild" object interface
    -------------------------
@@ -159,6 +153,22 @@ Abuild Groovy Interface; add to documentation
         }
 
 	synonym for above form of configureTarget
+
+      - setParameter('name', value)
+
+        Sets parameter 'name' to value, replacing any previous value
+        that may have been set.
+
+      - appendParameter('name', value)
+
+        If parameter 'name' has been previously set with setParameter
+        (and not subsequently deleted), this is an error.  Otherwise,
+        makes the value of the parameter a list and appends value to
+        it.
+
+      - deletedParameter('name')
+
+        Removes any previous value for parameter 'name'.
 
       - resolve('name', defaultValue)
 

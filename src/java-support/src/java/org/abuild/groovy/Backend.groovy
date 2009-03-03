@@ -1,7 +1,7 @@
 package org.abuild.groovy
 
 import org.abuild.groovy.Util
-import org.abuild.groovy.ParameterBuilder
+import org.abuild.groovy.ParameterHelper
 import org.abuild.javabuilder.GroovyBackend
 import org.codehaus.groovy.control.CompilationFailedException
 import org.abuild.javabuilder.BuildArgs
@@ -30,8 +30,6 @@ class Backend implements GroovyBackend
         this.buildState = new BuildState(
             ant, buildDirectory, buildArgs, defines)
 
-        def parameters = new ParameterBuilder(parameters : buildState.params)
-
         binding.abuild = buildState
         binding.ant = ant
 
@@ -40,7 +38,17 @@ class Backend implements GroovyBackend
         // parameters.call() but instead tries to resolve it as a
         // method call in the script.  We use an expicit closure
         // instead.
-        binding.parameters = { parameters(it) }
+        binding.parameters = {
+            cl ->
+            def p = new ParameterHelper(this.buildState)
+            def old_d = cl.getDelegate()
+            def old_r = cl.getResolveStrategy()
+            cl.setDelegate(p)
+            cl.setResolveStrategy(Closure.DELEGATE_ONLY)
+            cl()
+            cl.setDelegate(old_d)
+            cl.setResolveStrategy(old_r)
+        }
 
         boolean status = false
         try

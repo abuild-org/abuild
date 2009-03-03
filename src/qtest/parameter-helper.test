@@ -6,15 +6,15 @@ use strict;
 require abuild_test_utils;
 require TestDriver;
 
-chdir("parameter-builder") or die "chdir testdir failed: $!\n";
+chdir("parameter-helper") or die "chdir testdir failed: $!\n";
 
-my $td = new TestDriver('parameter builder');
+my $td = new TestDriver('parameter helper');
 test_setup();
 my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 
 if ($test_java)
 {
-    $td->runtest("parameter builder",
+    $td->runtest("parameter helper",
 		 {$td->COMMAND => "abuild -C groovy",
 		  $td->FILTER => "grep -v abuild:"},
 		 {$td->STRING => "all assertions passed\n",

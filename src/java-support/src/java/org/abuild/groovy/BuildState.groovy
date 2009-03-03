@@ -2,11 +2,12 @@ package org.abuild.groovy
 
 import org.abuild.groovy.Util
 import org.abuild.groovy.DependencyGraph
+import org.abuild.groovy.Parameterized
 import org.abuild.javabuilder.BuildArgs
 import org.apache.tools.ant.BuildException
 import org.abuild.QTC
 
-class BuildState
+class BuildState implements Parameterized
 {
     // The word "public" before a field indicates that it is intended
     // as part of the public interface.  Fields not marked either
@@ -159,9 +160,40 @@ class BuildState
         }
     }
 
+    void setParameter(String name, Object value)
+    {
+        params[name] = ['list': false, 'value': value]
+    }
+
+    void appendParameter(String name, Object value)
+    {
+        if (params.containsKey(name))
+        {
+            if (! params[name].list)
+            {
+                fail("parameter $name has been previously set as non-list")
+            }
+        }
+        else
+        {
+            params[name] = ['list': true, 'value': []]
+        }
+        params[name]['value'] << value
+    }
+
+    void deleteParameter(String name)
+    {
+        params.remove(name)
+    }
+
     Object resolve(String name, defaultValue)
     {
-        defines[name] ?: params[name] ?: interfaceVars[name] ?: defaultValue
+        // Note that we return params[name].value even if null.  For
+        // defines, we can have only string values, and for
+        // interfaceVars, we can have only strings and lists.
+        (defines[name] ?:
+         (params.containsKey(name) ? params[name].value :
+              (interfaceVars[name] ?: defaultValue)))
     }
 
     Object resolve(String name)
