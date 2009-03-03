@@ -13692,6 +13692,122 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>1.1.a2: XXX, 2009</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Deprecated Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The following features have been deprecated in this
+           version, each of which is discussed elsewhere in these
+           relates notes:
+           <itemizedlist>
+            <listitem>
+             <para>
+              <varname>LINK_SHLIBS</varname>.  No functionality
+              changes have been introduced relative to version 1.0.3,
+              but using <varname>LINK_SHLIBS</varname> now results in
+              a deprecation warning.
+             </para>
+            </listitem>
+           </itemizedlist>
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Changes to Groovy Framework
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <filename>src/TODO</filename> file remains the primary
+           location of documentation of the Groovy framework while it
+           is still in flux, so these notes contain only a very brief
+           summary of changes.
+          </para>
+          <para>
+           The <function>abuild.setParameter</function> call has been
+           removed.  Instead, parameters are set using a builder,
+           accessible as <function>parameters</function> in
+           <filename>Abuild.groovy</filename>.
+          </para>
+          <para>
+           Parameter names have been changed to use camelCaps instead
+           of dashed-components to make the syntax more natural when
+           using the parameters builder.
+          </para>
+          <para>
+           All <function>getVariable</function> methods have been
+           replaced with calls to methods whose name start with
+           <function>resolve</function>.
+          </para>
+          <para>
+           There is now a <function>replaceClosures</function> method
+           that allows closures for a target to be replaced rather
+           than appended to.  This practice should generally be
+           avoided.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Changes to <application>ant</application> framework
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           This change was actually introduced in version 1.1.a1.
+           &Abuild; now complains if the
+           <filename>ant-hooks.xml</filename> file for a hook build
+           item does not exist.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The interface system now supports
+           <emphasis>non-recursive</emphasis> variables.  A variable
+           can be declared non-recursive by putting the keyword
+           <type>non-recursive</type> in the declaration after the
+           variable name and before the type.
+          </para>
+          <para>
+           When an interface variable is declared as non-recursive,
+           only assignments from the item itself and its directly
+           declared dependencies are effective.  Specifically, when
+           importing an interface, only assignments from the item that
+           owns the interface imported.  Since abuild imports
+           interfaces of its direct dependencies, this causes the
+           behavior of seeing only assignments in direct dependencies
+           and in the item.  To avoid seeing assignments from the item
+           itself, place those assignments in an after-build file.
+          </para>
+          <para>
+           Non-recursive variables can be useful for carrying
+           information for subsystems that handle recursive
+           dependencies on their own.  Examples could include manifest
+           classpaths or shared library information.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.a1: February 20, 2009</term>
      <listitem>
       <itemizedlist>
@@ -14065,8 +14181,6 @@ Y = $(X)
       </itemizedlist>
      </listitem>
     </varlistentry>
-   </variablelist>
-   <variablelist>
     <varlistentry>
      <term>1.0.3: January 9, 2009</term>
      <listitem>
@@ -14588,8 +14702,6 @@ Y = $(X)
       </itemizedlist>
      </listitem>
     </varlistentry>
-   </variablelist>
-   <variablelist>
     <varlistentry>
      <term>1.0.b2: November 2, 2007</term>
      <listitem>

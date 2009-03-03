@@ -1,94 +1,18 @@
 
 === Changes Targeted for Version 1.1 ===
 
-Groovy Version
-==============
-
-After groovy-1.6.0 receives security approval, upgrade embedded groovy
-to 1.6.0.  From abuild/lib:
-
-  svn cp -r982 svn+q:///abuild/trunk/abuild/lib/groovy-all-1.6.0.jar@982 .
-
 Notes for Next Release
 ======================
 
 Remember to keep deprecated features list up-to-date.  Add the
 following:
 
- * LINK_SHLIBS
+ * ...
 
 These changes have already been made and need to make it into the
 release notes.
 
- * Groovy interface changes:
-
-    - added replaceClosures named parameter to configureTarget which,
-      when true, causes any previously registered closures for the
-      target to be removed before the new closure body (if any) is
-      appended.
-
-    - All built-in parameters use camelCaps and dot-separated components;
-      e.g., abuild.localRules, qtest.export, java.jarName, and
-      java.dir.generatedConf
-
-    - setParameter has been replaced with using a parameter builder.  See
-      documentation below.
-
-    - All getVariable* methods have been replaced.  Several new resolve
-      methods have been added.  See descriptions below.
-
-   -----
-
-   OLD:
-
-   abuild.setParameter('xjc', [
-       [ schema: 'xsd/preferences.xsd',
-	 stub: 'com.argonst.results.ciq.preferences',
-	 binding: 'xjb/preferences.xjb'],
-       [ schema: 'xsd/parameters.xsd',
-	 stub: 'com.argonst.results.ciq.parameters',
-	 binding: 'xjb/parameters.xjb'] ])
-
-   NEW:
-
-   parameters {
-       xjc(schema: 'xsd/preferences.xsd',
-	   stub: 'com.argonst.results.ciq.preferences',
-	   binding: 'xjb/preferences.xjb')
-       xjc(schema: 'xsd/parameters.xsd',
-	   stub: 'com.argonst.results.ciq.parameters',
-	   binding: 'xjb/parameters.xjb')
-   }
-
-   better might be to have xjc be in a "namespace" by having it preceded
-   by some kind of value followed by "."
-
-   -----
-
- * Use of LINK_SHLIBS now results in a deprecation warning.
-
- * (actually made in 1.1.a1) Abuild will now complain about
-   abuild.hook-build-items files that don't exist.  Note that
-   abuild.hook-build-items is deprecated anyway.
-
- * Added new "non-recursive" modifier for interface variable
-   declarations.  When an interface variable is declared as
-   non-recursive, only assignments from the item itself and its
-   directly declared dependencies are effective.  Specifically, when
-   importing an interface, only assignments from the item that owns
-   the interface imported.  Since abuild imports interfaces of its
-   direct dependencies, this causes the behavior of seeing only
-   assignments in direct dependencies and in the item.  To avoid
-   seeing assignments from the item itself, place those assignments in
-   an after-build file.
-
-   Non-recursive variables can be useful for carrying information for
-   subsystems that handle recursive dependencies on their own.
-   Examples could include manifest classpaths or shared library
-   information.  Syntax:
-
-   declare variable name [non-recursive] type
-
+ * ...
 
 Groovy Framework
 ================
@@ -316,6 +240,15 @@ Abuild Groovy Interface; add to documentation
     - abuild.localRules -- a list of files, treated as relative to the
       source directory, to load for defining local rules; abuild
       automatically appends .groovy suffix
+
+
+Update Groovy Version
+=====================
+
+After groovy-1.6.0 receives security approval, upgrade embedded groovy
+to 1.6.0.  From abuild/lib:
+
+  svn cp -r982 svn+q:///abuild/trunk/abuild/lib/groovy-all-1.6.0.jar@982 .
 
 
 Core Changes
