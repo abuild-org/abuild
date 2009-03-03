@@ -15,9 +15,10 @@ class Backend implements GroovyBackend
     def targets
 
     def loader = new GroovyClassLoader()
-    def binding = new Binding()
 
-    def buildState
+    private BuildState buildState
+    private AntBuilder ant
+    private Closure parameters
 
     boolean run(File buildDirectory, BuildArgs buildArgs, Project antProject,
 		List<String> targets, Map<String, String> defines)
@@ -26,19 +27,10 @@ class Backend implements GroovyBackend
         this.buildArgs = buildArgs
         this.targets = targets
 
-        def ant = new AntBuilder(antProject)
+        this.ant = new AntBuilder(antProject)
         this.buildState = new BuildState(
             ant, buildDirectory, buildArgs, defines)
-
-        binding.abuild = buildState
-        binding.ant = ant
-
-        // For some reason, when putting "parameters" into the
-        // binding, groovy fails to recognize parameters() as
-        // parameters.call() but instead tries to resolve it as a
-        // method call in the script.  We use an expicit closure
-        // instead.
-        binding.parameters = {
+        this.parameters = {
             cl ->
             def p = new ParameterHelper(this.buildState)
             def old_d = cl.getDelegate()
@@ -69,6 +61,17 @@ class Backend implements GroovyBackend
         }
 
         status
+    }
+
+    Binding getBinding()
+    {
+        def b = new Binding()
+
+        b.abuild = this.buildState
+        b.ant = this.ant
+        b.parameters = this.parameters
+
+        b
     }
 
     boolean build()

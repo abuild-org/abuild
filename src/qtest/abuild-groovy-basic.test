@@ -95,6 +95,16 @@ $td->runtest("override target",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/clean-binding");
+
+$td->runtest("clean binding",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-binding.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+
 check_work_accessed($td);
 
-$td->report(10);
+$td->report(11);
