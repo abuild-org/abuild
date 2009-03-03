@@ -56,4 +56,14 @@ class ParameterHelper
     {
         _p.deleteParameter(ph._name)
     }
+
+    Object resolve(String name)
+    {
+        _p.resolve(name)
+    }
+
+    Object resolve(ParameterHelper ph)
+    {
+        resolve(ph._name)
+    }
 }

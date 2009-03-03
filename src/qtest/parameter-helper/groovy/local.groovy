@@ -28,6 +28,11 @@ parameters {
     xjc << ['a': 'b']
     xjc << ['c': 'd']
     to.be.deleted = 'can\'t see this'
+    // get interface variable whose name is not a valid groovy variable
+    some.value = resolve('interface-variable-name')
+    // okay to use resolve on a variable too
+    other.value = resolve(a.b.c.d)
+    yet_another_value = other.ifc.variable
 }
 abuild.setParameter('other1', 'other1 value')
 abuild.appendParameter('other2', 'other2 value')
@@ -38,16 +43,19 @@ def results = abuild.params.keySet().sort().collect {
 assert [
     ['a.b.c.d', 'some other value'],
     ['abuild.localRules', 'local'],
+    ['other.value', 'some other value'],
     ['other1', 'other1 value'],
     ['other2', ['other2 value']],
     ['p.q.r', ['some value']],
     ['q', 'r'],
     ['s.t.u', [3, 4]],
     ['scope', 'variable defined outside'],
+    ['some.value', ['one', 'two', 'three']],
     ['something.with-dashes', 13],
     ['w.w.w', null],
     ['x.y.z', [3, 4]],
-    ['xjc', [['a': 'b'], ['c': 'd']]]
+    ['xjc', [['a': 'b'], ['c': 'd']]],
+    ['yet_another_value', 'stringval']
     ] == results
 
 println "all assertions passed"
