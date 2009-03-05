@@ -12,7 +12,7 @@ class BuildState implements Parameterized
     // The word "public" before a field indicates that it is intended
     // as part of the public interface.  Fields not marked either
     // "public" or "private" are public in groovy, but they are
-    // intended to be accessed only from the Builder class in this
+    // intended to be accessed only from the Backend class in this
     // file.  (As of 1.6, groovy still doesn't honor public, private,
     // and protected anywa.)
 
@@ -34,7 +34,7 @@ class BuildState implements Parameterized
     // other accessible fields
     public File sourceDirectory = null
 
-    // used internally and by Builder
+    // used internally and by Backend
     def anyFailures = false
 
     // private
