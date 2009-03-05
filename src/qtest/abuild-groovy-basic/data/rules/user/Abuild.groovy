@@ -1,4 +1,4 @@
 parameters {
-    abuild.rules = 'custom'
+    abuild.rules = ['custom', 'itemRule']
     abuild.localRules = 'local'
 }

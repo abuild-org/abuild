@@ -35,7 +35,7 @@ abuild-groovy: ERROR: file --topdir--/failures/e/Abuild.groovy threw exception: 
 --JAVA STACK TRACE--
 abuild: e (abuild-indep): build failed
 abuild: f (abuild-indep): all
-abuild-groovy: ERROR: no build rules are defined; one of abuild.rules or abuild.localRules must be defined, or at least one dependency must have been specified with the -with-rules option
+abuild-groovy: ERROR: no build rules are defined; one of abuild.rules or abuild.localRules must be defined
 abuild: f (abuild-indep): build failed
 abuild: g (abuild-indep): all
 abuild-groovy: ERROR: build failure: target "all" called itself most likely as a result of an explicit runTarget on itself or oneof its reverse dependencies

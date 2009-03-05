@@ -4,7 +4,6 @@
 --topdir--/a/ab/Abuild.conf: ERROR: invalid build-also build item name !oops!
 --topdir--/a/ab/Abuild.conf: ERROR: flag -flag=moo is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf: ERROR: platform declaration -platform=oink is not preceded by a build item name
---topdir--/a/ab/Abuild.conf: ERROR: -with-rules is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf: ERROR: a platform has already been declared for dependency b.private
 --topdir--/a/ab/Abuild.conf: ERROR: invalid platform selector other:skip
 --topdir--/a/ab/Abuild.conf: ERROR: invalid dependency !heh!

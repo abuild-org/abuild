@@ -49,7 +49,7 @@ while (<>)
     s,(make:.*Error) (\d+)$,$1 1,;
     s/($topdir|(?i:$wtopdir))/--topdir--/g;
     s/($abuild_dir|(?i:$wabuild_dir))/--abuild-dir--/g;
-    s,(--abuild-dir--/make/.*:)\d+,${1}nn,;
+    s,(--abuild-dir--/(?:make|rules)/.*:)\d+,${1}nn,;
     s/$platform_native/<native>/g;
     s/$os_data/<native-os-data>/;
     next if (m/^[^\s\/]+\.(c|cc|cpp)\r?$/); # Filter out VC++'s output

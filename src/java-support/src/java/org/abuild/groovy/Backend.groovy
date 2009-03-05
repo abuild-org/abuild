@@ -79,32 +79,22 @@ class Backend implements GroovyBackend
         loadScript(groovyTop + "/QTestSupport.groovy")
         def targetType = buildState.interfaceVars['ABUILD_TARGET_TYPE']
 
-        def ruleSearchPath = [new File("${groovyTop}/rules/${targetType}")]
-
-        // Load plugin code and populate ruleSearchPath
+        // Load plugin code
         buildState.pluginPaths.each {
             File f = new File("${it}/Plugin.groovy")
             if (f.isFile())
             {
                 loadScript(f)
             }
-            File rulesDir = new File("${it}/rules/${targetType}")
-            if (rulesDir.isDirectory())
-            {
-                ruleSearchPath << rulesDir
-            }
         }
 
         if (! (buildState.params['abuild.rules'] ||
-               buildState.params['abuild.localRules'] ||
-               buildState.ruleItems))
+               buildState.params['abuild.localRules']))
         {
             QTC.TC("abuild", "groovy ERR no rules")
             buildState.error(
                 "no build rules are defined; one of abuild.rules or" +
-                " abuild.localRules must be defined, or at least one" +
-                " dependency must have been specified with the" +
-                " -with-rules option")
+                " abuild.localRules must be defined")
             return false
         }
 
@@ -114,9 +104,9 @@ class Backend implements GroovyBackend
         buildState.resolveAsList('abuild.rules')?.each {
             rule ->
             def found = false
-            for (dir in ruleSearchPath)
+            for (dir in buildState.rulePaths)
             {
-                File f = new File("${dir.path}/${rule}.groovy")
+                File f = new File("${dir}/${rule}.groovy")
                 if (f.isFile())
                 {
                     loadScript(f)
@@ -128,12 +118,6 @@ class Backend implements GroovyBackend
             {
                 buildState.error("unable to find rule \"${rule}\"")
             }
-        }
-
-        // Load build item rules
-        buildState.ruleItems.each {
-            item ->
-            loadScript(new File(buildState.itemPaths[item] + '/Rules.groovy'))
         }
 
         // Load any local rules files, resolving the path relative to

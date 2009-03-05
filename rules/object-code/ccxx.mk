@@ -125,10 +125,10 @@
 # ---------------
 
 rules-help::
-	@cat $(abMK)/rules/object-code/ccxx-rules-help.txt
+	@cat $(ABUILD_TOP)/rules/object-code/ccxx-rules-help.txt
 
 interface-help::
-	@cat $(abMK)/rules/object-code/ccxx-interface-help.txt
+	@cat $(ABUILD_TOP)/rules/object-code/ccxx-interface-help.txt
 
 TARGETS_lib ?=
 TARGETS_bin ?=

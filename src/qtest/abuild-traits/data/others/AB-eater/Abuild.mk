@@ -1,1 +1,1 @@
-# empty
+RULES := eat common

@@ -129,6 +129,7 @@ export QTC_MK_DIR := $(shell qtest-driver --print-path)/QTC/make
 
 export TC_SRCS := \
 	$(wildcard $(SRCDIR)/*.cc) \
+	$(wildcard $(SRCDIR)/../rules/*/*.mk) \
 	$(wildcard $(SRCDIR)/../make/*.mk) \
 	$(wildcard $(SRCDIR)/../make/*/*.mk) \
 	$(wildcard $(SRCDIR)/../make/*/*/*.mk) \

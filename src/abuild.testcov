@@ -99,7 +99,6 @@ ccxx.mk ccxx_debug 0
 ccxx.mk undefined variables 0
 ccxx.mk no targets 0
 abuild.mk BUILD_ITEM_RULES 0
-abuild.mk ABUILD_RULE_ITEMS 0
 abuild.mk LOCAL_RULES 0
 abuild.mk platform-specific clean 0
 Abuild ERR no abuild.conf 0
@@ -258,5 +257,4 @@ groovy ERR no rules 0
 groovy stop after closure error 0
 groovy ERR re-entrant target 0
 groovy cached target result 0
-ItemConfig ERR with-rules without dep 0
 groovy ERR configureTarget after init 0

@@ -1,1 +1,1 @@
-# empty
+RULES := paint common

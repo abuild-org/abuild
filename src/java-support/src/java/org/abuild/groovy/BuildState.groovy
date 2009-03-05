@@ -21,7 +21,7 @@ class BuildState implements Parameterized
     def itemPaths = [:]
     def abuildTop
     def pluginPaths
-    def ruleItems
+    def rulePaths
 
     // supplied by abuild
     public defines

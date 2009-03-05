@@ -138,7 +138,7 @@ sub generate_interface_dump
 sub generate_ccxx_mk
 {
     print OUT "<programlisting><![CDATA[";
-    open(F, "<../../../make/rules/object-code/ccxx.mk") or
+    open(F, "<../../../rules/object-code/ccxx.mk") or
 	die "$whoami: can't open ccxx.mk: $!\n";
     while (<F>)
     {

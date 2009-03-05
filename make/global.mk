@@ -88,20 +88,20 @@ define undefined_items
 $(subst abDIR_,,$(call undefined_vars,$(foreach V,$($(1)),abDIR_$(V))))
 endef
 
-# Usage: $(call inaccessible_items,source_variable)
-# Returns a list of inaccessible items in in $(source_variable).
-# source_variable is the NAME of the user-provided variable that is
-# being checked.
-define inaccessible_items
-$(filter-out $(ABUILD_ACCESSIBLE),$($(1)))
-endef
-
-# Usage: $(call load_plugin_file,path-to-file)
 # Searches abuild's built-in make support location and then each
 # plugin directory in order for path-to-file.mk, returning the first
 # match.
 define load_plugin
 $(firstword $(wildcard $(foreach D,$(abMK) $(ABUILD_PLUGINS),\
+                         $(D)/$(1).mk)) --not-found--/$(1).mk)
+endef
+
+# Usage: $(call load_plugin,path-to-file)
+# Usage: $(call load_rule,rule)
+# Searches abuild's built-in make support location and then each
+# rule path, returning the first match.
+define load_rule
+$(firstword $(wildcard $(foreach D,$(ABUILD_RULE_PATHS),\
                          $(D)/$(1).mk)) --not-found--/$(1).mk)
 endef
 

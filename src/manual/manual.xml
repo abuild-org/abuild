@@ -7597,10 +7597,11 @@ endif
      <para>
       There is a lot more to &abuild;'s C and C++ generation than is
       discussed here.  For a complete understanding of how it works,
-      you are encouraged to read <filename>make/ccxx.mk</filename> in
-      the &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).
-      There you will find copious comments and a lot of pretty hairy
-      <application>GNU Make</application> code.
+      you are encouraged to read
+      <filename>rules/object-code/ccxx.mk</filename> in the &abuild;
+      distribution (<xref linkend="ref.ccxx.mk"/>).  There you will
+      find copious comments and a lot of pretty hairy <application>GNU
+      Make</application> code.
      </para>
     </sect2>
     <sect2 id="ref.autoconf">
@@ -8794,7 +8795,7 @@ endif
      The important part of this is <filename>Rules.mk</filename>, so
      we'll study it carefully.  Here is the
      <filename>Rules.mk</filename> file:
-     <?example general/user/derived/code-generator/Rules.mk?>
+     <?example general/user/derived/code-generator/rules/all/code-generator.mk?>
      The first thing we do here is to define a
      <command>rules-help</command> target that prints some help
      information about using the rules.  By placing the name of this
@@ -10486,7 +10487,7 @@ flag private INCLUDES = private-include
      pass the file named in the <varname>NUMBERS</varname>
      variable to the code generator.  Here are the
      <filename>Rules.mk</filename> file and the code generator:
-     <?example cross-platform/codegen/Rules.mk?>
+     <?example cross-platform/codegen/rules/all/codegen.mk?>
      <?example cross-platform/codegen/gen_code.pl?>
      In order for this to work, the <classname>codegen</classname>
      build item must depend on the <classname>calculate</classname>
@@ -11735,7 +11736,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
      toolchains will be designed to support C and C++ compilation and
      are therefore used by the <filename>ccxx</filename> rules.
      Details on the requirements for such toolchains can be found in
-     <filename>make/rules/object-code/ccxx.mk</filename> in the
+     <filename>rules/object-code/ccxx.mk</filename> in the
      &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).
     </para>
     <para>
@@ -11966,7 +11967,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <filename>toolchains/abc.mk</filename>:
       <?example plugin/plugins/printer/toolchains/abc.mk?>
       To understand this file, you should read through the comments in
-      <filename>make/rules/object-code/ccxx.mk</filename> in the
+      <filename>rules/object-code/ccxx.mk</filename> in the
       &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).  In this
       case, our plugin also creates the compiler itself in
       <filename>bin/abc</filename> and
@@ -12098,7 +12099,7 @@ native-compiler qcc
       providing minimal implementations of all the variables and
       functions that <filename>ccxx.mk</filename> requires.  For
       details, please read the comments in
-      <filename>make/toolchains/ccxx.mk</filename> in the &abuild;
+      <filename>rules/object-code/ccxx.mk</filename> in the &abuild;
       distribution (<xref linkend="ref.ccxx.mk"/>).
      </para>
      <para>
@@ -16561,7 +16562,7 @@ Y = $(X)
    <title>The <filename>ccxx.mk</filename> File</title>
    <para>
     Here we include a complete copy of
-    <filename>make/rules/object-code/ccxx.mk</filename>.
+    <filename>rules/object-code/ccxx.mk</filename>.
    </para>
    <?ccxx-mk?>
   </appendix>

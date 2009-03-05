@@ -27,7 +27,7 @@ $td->runtest("build-item-rules",
 	     {$td->COMMAND => "abuild -b all -k",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-item-rules.out",
-	      $td->EXIT_STATUS => 2},
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build-item-rules deprecation error",
@@ -45,7 +45,7 @@ if ($test_java)
 		 {$td->COMMAND => "abuild -b all -k",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/hook-build-items.out",
-		  $td->EXIT_STATUS => 2},
+		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("hook-build-items deprecation error",

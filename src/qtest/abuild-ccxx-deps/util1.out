@@ -1,6 +1,6 @@
 abuild: util (abuild-<native>): all
 make: Entering directory `--topdir--/util/abuild-<native>'
---abuild-dir--/make/rules/object-code/ccxx.mk:nn: *** The following variables are undefined: SRCS_lib_utility.  Stop.
+--abuild-dir--/rules/object-code/ccxx.mk:nn: *** The following variables are undefined: SRCS_lib_utility.  Stop.
 make: Leaving directory `--topdir--/util/abuild-<native>'
 abuild: util (abuild-<native>): build failed
 abuild: ERROR: at least one build failure occurred; summary follows

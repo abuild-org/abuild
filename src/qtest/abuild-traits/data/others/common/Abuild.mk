@@ -1,1 +1,1 @@
-LOCAL_RULES := Rules.mk
+RULES := common

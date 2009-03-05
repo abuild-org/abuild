@@ -65,12 +65,6 @@ BuildItem::getBuildAlso() const
 }
 
 std::list<std::string> const&
-BuildItem::getRuleBuildItems() const
-{
-    return this->config->getRuleBuildItems();
-}
-
-std::list<std::string> const&
 BuildItem::getDeps() const
 {
     return this->config->getDeps();

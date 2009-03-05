@@ -4595,6 +4595,67 @@ Abuild::createOutputDirectory(std::string const& item_platform,
     return output_dir;
 }
 
+std::list<std::string>
+Abuild::getRulePaths(std::string const& item_name,
+		     BuildItem& build_item,
+		     std::string const& dir,
+		     bool relative)
+{
+
+    // Generate a list of paths from which we should attempt to load
+    // rules.  For every plugin and accessible dependency (in that
+    // order), try the target type directory and the "all" directory.
+
+    std::list<std::string> candidate_paths;
+    std::list<std::string> const& plugins = build_item.getPlugins();
+    for (std::list<std::string>::const_iterator iter = plugins.begin();
+	 iter != plugins.end(); ++iter)
+    {
+	candidate_paths.push_back(this->buildset[*iter]->getAbsolutePath());
+    }
+    std::list<std::string> const& alldeps =
+	build_item.getExpandedDependencies();
+    for (std::list<std::string>::const_iterator iter = alldeps.begin();
+	 iter != alldeps.end(); ++iter)
+    {
+	if (accessibleFrom(this->buildset, item_name, *iter))
+	{
+	    candidate_paths.push_back(this->buildset[*iter]->getAbsolutePath());
+	}
+    }
+    candidate_paths.push_back(build_item.getAbsolutePath());
+
+    std::list<std::string> result;
+    std::string const& target_type =
+	TargetType::getName(build_item.getTargetType());
+
+    // Internal directories are absolute unconditionally.
+    result.push_back(this->abuild_top + "/rules/" + target_type);
+    result.push_back(this->abuild_top + "/rules/all");
+
+    std::string dirs[2];
+
+    for (std::list<std::string>::iterator iter = candidate_paths.begin();
+	 iter != candidate_paths.end(); ++iter)
+    {
+	dirs[0] = *iter + "/rules/" + target_type;
+	dirs[1] = *iter + "/rules/all";
+	for (unsigned int i = 0; i < 2; ++i)
+	{
+	    if (Util::isDirectory(dirs[i]))
+	    {
+		if (relative)
+		{
+		    dirs[i] = Util::absToRel(dirs[i], dir);
+		}
+		result.push_back(dirs[i]);
+	    }
+	}
+    }
+
+    return result;
+}
+
 bool
 Abuild::invoke_gmake(std::string const& item_name,
 		     std::string const& item_platform,
@@ -4629,19 +4690,6 @@ Abuild::invoke_gmake(std::string const& item_name,
         mk << "abDIR_" << *iter << " := " << local_path << "\n";
     }
 
-    // Generate a list of directly accessible build items.
-    mk << "ABUILD_ACCESSIBLE :=";
-    for (BuildItem_map::iterator iter = this->buildset.begin();
-	 iter != this->buildset.end(); ++iter)
-    {
-	std::string const& oitem = (*iter).first;
-	if (accessibleFrom(this->buildset, item_name, oitem))
-	{
-	    mk << " " << oitem;
-	}
-    }
-    mk << "\n";
-
     // Generate a list of plugin directories.  We don't provide the
     // names of plugins because people shouldn't be accessing them,
     // and this saves us from writing backend code to resolve them
@@ -4657,12 +4705,13 @@ Abuild::invoke_gmake(std::string const& item_name,
     }
     mk << "\n";
 
-    // Generate the names of rule build items
-    std::list<std::string> const& rule_build_items =
-	build_item.getRuleBuildItems();
-    mk << "ABUILD_RULE_ITEMS :=";
-    for (std::list<std::string>::const_iterator iter = rule_build_items.begin();
-	 iter != rule_build_items.end(); ++iter)
+    // Generate a list of paths from which we should attempt to load
+    // rules.
+    std::list<std::string> rule_paths =
+	getRulePaths(item_name, build_item, dir, true);
+    mk << "ABUILD_RULE_PATHS :=";
+    for (std::list<std::string>::iterator iter = rule_paths.begin();
+	 iter != rule_paths.end(); ++iter)
     {
 	mk << " " << *iter;
     }
@@ -4792,13 +4841,6 @@ Abuild::invoke_ant(std::string const& item_name,
 	<< Util::join(",", plugin_paths)
 	<< "\n";
 
-    // Generate the names of rule build items
-    std::list<std::string> const& rule_build_items =
-	build_item.getRuleBuildItems();
-    dyn << "abuild.private.rule-items="
-	<< Util::join(",", rule_build_items)
-	<< "\n";
-
     // Output variables based on the item's interface object.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
@@ -4903,15 +4945,11 @@ Abuild::invoke_groovy(std::string const& item_name,
     }
     dyn << "]\n";
 
-    // Generate the names of rule build items
-    std::list<std::string> const& rule_build_items =
-	build_item.getRuleBuildItems();
-    dyn << "abuild.ruleItems = [";
-    if (! rule_build_items.empty())
-    {
-	dyn << "'" << Util::join("', '", rule_build_items) << "'";
-    }
-    dyn << "]\n";
+    // Generate a list of paths from which we should attempt to load
+    // rules.
+    std::list<std::string> rule_paths =
+	getRulePaths(item_name, build_item, dir, false);
+    dyn << "abuild.rulePaths = ['" << Util::join("', '", rule_paths) << "']\n";
 
     // Provide data from the item's interface object.  We use
     // "interfaceVars" because "interface" is a reserved word in

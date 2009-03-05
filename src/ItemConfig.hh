@@ -63,7 +63,6 @@ class ItemConfig
     std::list<std::string> const& getChildren() const;
     std::list<ExternalData> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;
-    std::list<std::string> const& getRuleBuildItems() const;
     std::list<std::string> const& getDeps() const;
     std::string const& getDepPlatformType(std::string const& dep,
 					  PlatformSelector const*& ps) const;
@@ -146,7 +145,6 @@ class ItemConfig
     std::list<std::string> children;
     std::list<std::string> build_also;
     std::list<std::string> deps;
-    std::list<std::string> rule_build_items;
     FlagData flag_data;
     std::string visible_to;
     std::set<std::string> platform_types;

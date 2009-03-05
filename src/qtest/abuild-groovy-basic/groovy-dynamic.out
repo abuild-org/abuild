@@ -3,7 +3,7 @@ class ABDynamic extends Script { Object run() {
 abuild.itemPaths['qwer'] = '--topdir--/dynamic'
 abuild.abuildTop = '--abuild-dir--'
 abuild.pluginPaths = []
-abuild.ruleItems = []
+abuild.rulePaths = ['--abuild-dir--/rules/platform-independent', '--abuild-dir--/rules/all']
 abuild.interfaceVars['ABUILD_OUTPUT_DIR'] = '--topdir--/dynamic/abuild-indep'
 abuild.interfaceVars['ABUILD_PLATFORM'] = 'indep'
 abuild.interfaceVars['ABUILD_PLATFORM_TYPE'] = 'indep'

@@ -319,19 +319,6 @@ ItemConfig::checkDeps()
 		    this->dep_platform_types[last_dep] = dep_platform_type;
 		}
 	    }
-	    else if (*iter == "-with-rules")
-	    {
-		if (last_dep.empty())
-		{
-		    QTC::TC("abuild", "ItemConfig ERR with-rules without dep");
-		    this->error.error(this->location, "-with-rules is not"
-				      " preceded by a build item name");
-		}
-		else
-		{
-		    this->rule_build_items.push_back(last_dep);
-		}
-	    }
 	    else
 	    {
 		QTC::TC("abuild", "ItemConfig ERR bad dep");
@@ -791,12 +778,6 @@ std::list<std::string> const&
 ItemConfig::getBuildAlso() const
 {
     return this->build_also;
-}
-
-std::list<std::string> const&
-ItemConfig::getRuleBuildItems() const
-{
-    return this->rule_build_items;
 }
 
 std::list<std::string> const&

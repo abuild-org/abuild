@@ -1,19 +1,5 @@
-abuild: access-error (abuild-<native>): all
-make: Entering directory `--topdir--/build-item-rules/access-error/abuild-<native>'
---abuild-dir--/make/abuild.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): BUILD_ITEM_RULES is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead
---abuild-dir--/make/abuild.mk:nn: *** These build items from BUILD_ITEM_RULES inaccessible: rules.private.  Stop.
-make: Leaving directory `--topdir--/build-item-rules/access-error/abuild-<native>'
-abuild: access-error (abuild-<native>): build failed
-abuild: both (abuild-indep): all
-make: Entering directory `--topdir--/build-item-rules/both/abuild-indep'
---abuild-dir--/make/abuild.mk:nn: *** BUILD_ITEM_RULES may not be used when any -with-rules dependencies have been used.  Stop.
-make: Leaving directory `--topdir--/build-item-rules/both/abuild-indep'
-abuild: both (abuild-indep): build failed
 abuild: old (abuild-indep): all
 make: Entering directory `--topdir--/build-item-rules/old/abuild-indep'
---abuild-dir--/make/abuild.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): BUILD_ITEM_RULES is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead
+--abuild-dir--/make/abuild.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead
 message from rules
 make: Leaving directory `--topdir--/build-item-rules/old/abuild-indep'
-abuild: ERROR: at least one build failure occurred; summary follows
-abuild: ERROR: build failure: access-error on platform <native>
-abuild: ERROR: build failure: both on platform indep

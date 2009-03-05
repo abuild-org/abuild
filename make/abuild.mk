@@ -48,28 +48,17 @@ SRCDIR := ..
 
 RULES ?=
 LOCAL_RULES ?=
+BUILD_ITEM_RULES ?=
 
 ifdef BUILD_ITEM_RULES
-  ifneq ($(words $(ABUILD_RULE_ITEMS)),0)
-    $(error BUILD_ITEM_RULES may not be used when any -with-rules dependencies have been used)
-  else
-    $(call deprecate,1.1,BUILD_ITEM_RULES is deprecated; use the -with-rules flag on the dependency in Abuild.conf instead)
-    _UNDEFINED := $(call undefined_items,BUILD_ITEM_RULES)
-    ifneq ($(words $(_UNDEFINED)),0)
-      $(error These build items from BUILD_ITEM_RULES in are unknown: $(_UNDEFINED))
-    else
-      _INACCESSIBLE := $(call inaccessible_items,BUILD_ITEM_RULES)
-      ifneq ($(words $(_INACCESSIBLE)),0)
-        $(error These build items from BUILD_ITEM_RULES inaccessible: $(_INACCESSIBLE))
-      else
-        _qtx_dummy := $(call QTC.TC,abuild,abuild.mk BUILD_ITEM_RULES,0)
-        ABUILD_RULE_ITEMS = $(BUILD_ITEM_RULES)
-      endif
-    endif
+  $(call deprecate,1.1,BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead)
+  _UNDEFINED := $(call undefined_items,BUILD_ITEM_RULES)
+  ifneq ($(words $(_UNDEFINED)),0)
+    $(error These build items from BUILD_ITEM_RULES in are unknown: $(_UNDEFINED))
   endif
 endif
 
-ifeq ($(words $(RULES) $(ABUILD_RULE_ITEMS) $(LOCAL_RULES)), 0)
+ifeq ($(words $(RULES) $(BUILD_ITEM_RULES) $(LOCAL_RULES)), 0)
   $(error No rules defined.)
 endif
 
@@ -89,12 +78,12 @@ doc:: all ;
 include $(wildcard $(foreach P,$(ABUILD_PLUGINS),$(P)/plugin.mk))
 
 # Include base rule and user-specified built-in rules
-include $(foreach RULE,_base $(RULES),$(call load_plugin,rules/$(ABUILD_TARGET_TYPE)/$(RULE)))
+include $(foreach RULE,_base $(RULES),$(call load_rule,$(RULE)))
 
 # Include any build-item-specific rules
-ifneq ($(words $(ABUILD_RULE_ITEMS)),0)
-  _qtx_dummy := $(call QTC.TC,abuild,abuild.mk ABUILD_RULE_ITEMS,0)
-  include $(foreach BI,$(ABUILD_RULE_ITEMS),$(abDIR_$(BI))/Rules.mk)
+ifneq ($(words $(BUILD_ITEM_RULES)),0)
+  _qtx_dummy := $(call QTC.TC,abuild,abuild.mk BUILD_ITEM_RULES,0)
+  include $(foreach BI,$(BUILD_ITEM_RULES),$(abDIR_$(BI))/Rules.mk)
 endif
 
 # Finally, include any local rules
