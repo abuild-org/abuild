@@ -32,6 +32,8 @@ release notes.
    over two different methods for supplying rules and also to make it
    easier to support rule-specific help with the new help system.
 
+ * Bring javadoc back into abuild core
+
 Groovy Framework
 ================
 
