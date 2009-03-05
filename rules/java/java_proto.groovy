@@ -1,4 +1,4 @@
-import org.apache.tools.ant.taskdefs.condition.Os
+import org.abuild.groovy.Util
 
 class JavaRules
 {
@@ -13,6 +13,7 @@ class JavaRules
 
     String defaultDistDir
     String defaultClassesDir
+    String defaultDocDir
     String defaultSrcDir
     String defaultGeneratedSrcDir
     String defaultResourcesDir
@@ -23,6 +24,7 @@ class JavaRules
     // Initialized by the init target
     String distDir
     String classesDir
+    String docDir
     String srcDir
     String generatedSrcDir
     String resourcesDir
@@ -32,6 +34,7 @@ class JavaRules
 
     List compileClassPath
     String jarName
+    String javadocTitle
     String mainClass
     String wrapperName
 
@@ -52,6 +55,7 @@ class JavaRules
         // These are overridable defaults.
         this.defaultDistDir = "${buildDir}/dist"
         this.defaultClassesDir = "${buildDir}/classes"
+        this.defaultDocDir = "${buildDir}/doc"
         this.defaultSrcDir = "${itemDir}/src/java"
         this.defaultGeneratedSrcDir = "${buildDir}/src/java"
         this.defaultResourcesDir = "${itemDir}/src/resources"
@@ -76,6 +80,8 @@ class JavaRules
             getPathVariable('dist', defaultDistDir)
         classesDir =
             getPathVariable('classes', defaultClassesDir)
+        docDir =
+            getPathVariable('doc', defaultDocDir)
         srcDir =
             getPathVariable('src', defaultSrcDir)
         generatedSrcDir =
@@ -89,8 +95,12 @@ class JavaRules
         generatedConfDir =
             getPathVariable('generatedConf', defaultGeneratedConfDir)
 
-        compileClassPath = abuild.resolveAsList('abuild.classpath', [])
+        compileClassPath = []
+        ['abuild.classpath', 'abuild.classpath.external'].each {
+            compileClassPath.addAll(abuild.resolveAsList(it, []))
+        }
         jarName = abuild.resolveAsString('java.jarName')
+        javadocTitle = abuild.resolveAsString('java.javadocTitle')
         mainClass = abuild.resolveAsString('java.mainClass')
         wrapperName = abuild.resolveAsString('java.wrapperName')
     }
@@ -115,6 +125,7 @@ class JavaRules
         ant.javac(javacArgs) {
             srcDirs.each { dir -> src('path' : dir) }
             compilerarg('value' : '-Xlint')
+            // Need to find a way to turn path warnings back on
             compilerarg('value' : '-Xlint:-path')
         }
         // Other args to groovyc?
@@ -124,20 +135,82 @@ class JavaRules
         }
     }
 
+    def javadocTarget()
+    {
+        if (! javadocTitle)
+        {
+            return
+        }
+        def srcDirs = [srcDir, generatedSrcDir].grep {
+            dir -> new File(dir).isDirectory()
+        }
+        if (! srcDirs)
+        {
+            return
+        }
+        def sourcePath = srcDirs.join(pathSep)
+        def access = abuild.resolveAsString('javadoc.accessLevel', 'protected')
+        ant.javadoc(['sourcepath' : sourcePath, 'destdir' : docDir,
+                     'access' : access, 'Windowtitle' : javadocTitle,
+                     'Doctitle' : javadocTitle])
+        {
+            constructLinkPaths().each() {
+                linkPath ->
+                link('href' : linkPath)
+            }
+        }
+    }
+
+    private List<String> constructLinkPaths()
+    {
+        def javadocPaths = []
+        abuild.itemPaths.each() {
+            item, path ->
+            File javadocPath = new File("$path/abuild-java/doc")
+            if (javadocPath.isDirectory())
+            {
+                ant.echo("Build item has javadocs:" +
+                         " ($item, ${javadocPath.path})")
+
+                javadocPaths.add(Util.absToRel(destinationDir, javadocPath))
+            }
+            else
+            {
+                ant.echo("Build item has no javadocs:" +
+                         " ($item, $path")
+            }
+        }
+        return javadocPaths
+    }
+
     def packageJarTarget()
     {
         if (! jarName)
         {
             return
         }
-        def manifestClassPath = compileClassPath.collect { new File(it).name }
+        def confDirs = [confDir, generatedConfDir].grep {
+            dir -> new File(dir).isDirectory()
+        }
+
+        def defaultManifestClassPath =
+            compileClassPath.collect { new File(it).name }
+        def manifestClassPath =
+            abuild.resolveAsList('java.manifest.classpath',
+                                 defaultManifestClassPath)
+        def otherManifestAttributes =
+            abuild.resolve('java.manifest.attributes', [:])
         ant.mkdir('dir' : distDir)
         ant.jar('destfile' : "${distDir}/${jarName}") {
-            fileset('dir' : classesDir) {
-                include('name' : '**/*.class')
+            confDirs.each { dir -> metainf('dir' : dir) }
+            if (new File(confDir).isDirectory())
+            {
+                metainf('dir' : confDir)
             }
-            // We could easily control how the manifest is constructed
-            // using additional parameters.
+            if (new File(classesDir).isDirectory())
+            {
+                fileset('dir' : classesDir)
+            }
             manifest() {
                 if (manifestClassPath)
                 {
@@ -147,6 +220,9 @@ class JavaRules
                 if (mainClass)
                 {
                     attribute('name' : 'Main-Class', 'value' : mainClass)
+                }
+                otherManifestAttributes.each() {
+                    key, value -> attribute('name' : key, 'value' : value)
                 }
             }
         }
@@ -162,7 +238,7 @@ class JavaRules
 
         def wrapperClassPath =
             [*compileClassPath, "${distDir}/${jarName}"].join(pathSep)
-        if (Os.isFamily('windows'))
+        if (Util.inWindows)
         {
             ant.echo('file' : "${wrapperPath}.bat", """@echo off
 java -classpath ${wrapperClassPath} ${mainClass} %1 %2 %3 %4 %5 %6 %7 %8 %9
@@ -196,5 +272,8 @@ abuild.configureTarget('compile', 'deps' : ['generate'],
                        java_rules.&compileTarget)
 abuild.configureTarget('package-jar', 'deps' : ['compile'],
                        java_rules.&packageJarTarget)
+abuild.configureTarget('doc', 'deps' : ['javadoc'])
+abuild.configureTarget('javadoc', 'deps' : ['compile'],
+                       java_rules.&javadocTarget)
 abuild.configureTarget('wrapper', 'deps' : ['package-jar'],
                        java_rules.&wrapperTarget)
