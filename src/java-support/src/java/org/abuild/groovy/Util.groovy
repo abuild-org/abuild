@@ -60,9 +60,6 @@ class Util
         // This is a port of Util::absToRel from the C++ code.  It is
         // tested using the same test cases.
 
-        assert path.isAbsolute()
-        assert container.isAbsolute()
-
         if (inWindows)
         {
             if ((path.absolutePath =~ /^.:/) &&
@@ -76,8 +73,13 @@ class Util
             }
         }
 
-        List pitems = path.absolutePath.split(/${File.separator}/)
-        List litems = container.absolutePath.split(/${File.separator}/)
+        def sep = File.separator
+        if (sep == '\\')
+        {
+            sep = '\\\\'
+        }
+        List pitems = path.absolutePath.split(sep)
+        List litems = container.absolutePath.split(sep)
 
         while (pitems && litems && (pathComponentsMatch(pitems[0], litems[0])))
         {

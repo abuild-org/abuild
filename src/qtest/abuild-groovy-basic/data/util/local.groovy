@@ -27,7 +27,7 @@ if (Util.inWindows)
     assert '../../../D/E/F' ==
         Util.absToRel("C:/A/B/C/D/E/F",
                       "c:/a/b/c/q/r/s")
-    assert 'Q:/w/w/w' ==
+    assert 'Q:\\w\\w\\w' ==
         Util.absToRel("Q:/w/w/w",
                       "R:/x/x/x")
 }
