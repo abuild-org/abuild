@@ -76,6 +76,7 @@ class Backend implements GroovyBackend
         loadScript(buildFile)
 
         def groovyTop = buildState.abuildTop + "/groovy"
+        loadScript(groovyTop + "/global.groovy")
         loadScript(groovyTop + "/QTestSupport.groovy")
         def targetType = buildState.interfaceVars['ABUILD_TARGET_TYPE']
 

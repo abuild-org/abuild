@@ -242,7 +242,6 @@ JavaBuilder handle abnormal java exit 0
 Abuild infer ANT_HOME 0
 Abuild infer JAVA_HOME 0
 groovy ERR graph errors 0
-groovy built-in test target 0
 JavaBuilder.java noOp 0
 groovy ERR runTarget during init 0
 groovy ERR unknown target 0

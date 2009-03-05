@@ -53,23 +53,7 @@ class BuildState implements Parameterized
         this.buildDirectory = buildDirectory
         this.buildArgs = buildArgs
         this.defines = defines
-
         this.sourceDirectory = buildDirectory.parentFile
-
-        // Create targets that abuild guarantees will exist
-        addTarget('all')
-
-        // Make test call test-only after building "all".
-        addTarget('test-only')
-        configureTarget('test', 'deps':'all') {
-            QTC.TC("abuild", "groovy built-in test target")
-            runTarget('test-only')
-        }
-
-        // Make check an alias for test
-        addTargetDependencies('check', 'test')
-
-        addTarget('doc')
     }
 
     def addTarget(String name)
