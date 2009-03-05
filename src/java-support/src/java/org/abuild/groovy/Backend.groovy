@@ -30,17 +30,7 @@ class Backend implements GroovyBackend
         this.ant = new AntBuilder(antProject)
         this.buildState = new BuildState(
             ant, buildDirectory, buildArgs, defines)
-        this.parameters = {
-            cl ->
-            def p = new ParameterHelper(this.buildState)
-            def old_d = cl.getDelegate()
-            def old_r = cl.getResolveStrategy()
-            cl.setDelegate(p)
-            cl.setResolveStrategy(Closure.DELEGATE_ONLY)
-            cl()
-            cl.setDelegate(old_d)
-            cl.setResolveStrategy(old_r)
-        }
+        this.parameters = ParameterHelper.createClosure(this.buildState)
 
         boolean status = false
         try

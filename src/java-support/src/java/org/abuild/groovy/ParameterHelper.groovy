@@ -7,7 +7,21 @@ class ParameterHelper
     private Parameterized _p
     private String _name
 
-    public ParameterHelper(Parameterized p)
+    public static createClosure(Parameterized p)
+    {
+        return {
+            cl ->
+            def old_d = cl.getDelegate()
+            def old_r = cl.getResolveStrategy()
+            cl.setDelegate(new ParameterHelper(p))
+            cl.setResolveStrategy(Closure.DELEGATE_ONLY)
+            cl()
+            cl.setDelegate(old_d)
+            cl.setResolveStrategy(old_r)
+        }
+    }
+
+    private ParameterHelper(Parameterized p)
     {
         this._p = p
         this._name = ''
@@ -50,6 +64,11 @@ class ParameterHelper
         {
             _p.appendParameter(_name, value)
         }
+    }
+
+    public void delete(String name)
+    {
+        _p.deleteParameter(name)
     }
 
     public void delete(ParameterHelper ph)
