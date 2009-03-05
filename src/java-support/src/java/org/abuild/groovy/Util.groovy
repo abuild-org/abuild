@@ -85,7 +85,7 @@ class Util
             litems.remove(0)
         }
         def result = new StringBuffer()
-        result << ('../' * litems.size() << pitems.join('/')
+        result << '../' * litems.size() << pitems.join('/')
         if (! result)
         {
             result = '.'
