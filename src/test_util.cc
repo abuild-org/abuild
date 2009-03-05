@@ -43,6 +43,10 @@ int main()
     std::cout << "C:/" << std::endl;
 #endif
 
+    //
+    // NOTE: absToRel tests are duplicated in abuild-groovy-basic test
+    // suite for the groovy version of this function.
+    //
     std::cout << Util::absToRel(
 	"/one/two/three",
 	"/one/two/four/five") << std::endl;

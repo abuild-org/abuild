@@ -1,3 +1,4 @@
+import org.abuild.groovy.Util
 
 abuild.addTargetClosure('test-only') {
     def src = abuild.sourceDirectory.path
@@ -10,7 +11,7 @@ abuild.addTargetClosure('test-only') {
         def args = ['-datadir', '../qtest',
             '-bindirs', '..:.', '-covdir', '..',
             "-stdout-tty=${tty}"]
-        if (System.getProperty('os.name') =~ /(?i:windows).*/)
+        if (Util.inWindows)
         {
             command = 'perl'
             args = ['-S', 'qtest-driver', *args]

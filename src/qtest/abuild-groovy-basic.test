@@ -27,6 +27,16 @@ if (! $test_java)
 
 setup($td);
 
+cd("work/util");
+
+$td->runtest("groovy Util",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->STRING => "abuild: util (abuild-indep): all\n"  .
+		  "assertions passed\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/dynamic");
 
 $td->runtest("no qtest.log",
@@ -104,7 +114,6 @@ $td->runtest("clean binding",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-
 check_work_accessed($td);
 
-$td->report(11);
+$td->report(12);
