@@ -66,19 +66,19 @@ class Backend implements GroovyBackend
 
     boolean build()
     {
-        // The logic here strongly parallels abuild's "make" logic.
+        // The logic here parallels abuild's "make" logic, though the
+        // user's build file is loaded somewhat later in the process
+        // so that it has access to parameters set globally and by
+        // plugins.
 
         def dynamicFile = new File(buildDirectory.path + "/.ab-dynamic.groovy")
-        def sourceDirectory = buildDirectory.parentFile
-        def buildFile = new File(sourceDirectory.path + "/Abuild.groovy")
-
         loadScript(dynamicFile)
-        loadScript(buildFile)
 
         def groovyTop = buildState.abuildTop + "/groovy"
+        def targetType = buildState.interfaceVars['ABUILD_TARGET_TYPE']
         loadScript(groovyTop + "/global.groovy")
         loadScript(groovyTop + "/QTestSupport.groovy")
-        def targetType = buildState.interfaceVars['ABUILD_TARGET_TYPE']
+        loadScript(buildState.abuildTop + "/rules/${targetType}/_base.groovy")
 
         // Load plugin code
         buildState.pluginPaths.each {
@@ -88,6 +88,11 @@ class Backend implements GroovyBackend
                 loadScript(f)
             }
         }
+
+        // Load user's build file
+        def sourceDirectory = buildDirectory.parentFile
+        def buildFile = new File(sourceDirectory.path + "/Abuild.groovy")
+        loadScript(buildFile)
 
         if (! (buildState.params['abuild.rules'] ||
                buildState.params['abuild.localRules']))

@@ -189,10 +189,14 @@ class BuildState implements Parameterized
     String resolveAsString(String name, defaultValue)
     {
         def result = resolve(name, defaultValue)
+        if (result instanceof GString)
+        {
+            result = result as String
+        }
         if (! ((result == null) || (result instanceof String)))
         {
             fail("resolveAsString called on non-string parameter" +
-                 " ${name}, value ${value}")
+                 " ${name}, value ${result}")
         }
         result
     }
@@ -220,7 +224,12 @@ class BuildState implements Parameterized
 
     def runActions(String parameter, Closure defaultAction)
     {
-        resolveAsList(parameter, defaultAction.curry([:])).each {
+        runActions(resolveAsList(parameter, [:]), defaultAction)
+    }
+
+    def runActions(List actions, Closure defaultAction)
+    {
+        actions.each {
             action ->
             switch (action)
             {
@@ -233,7 +242,7 @@ class BuildState implements Parameterized
                 break;
 
               default:
-                fail('expected element of $parameter to be a Closure or Map')
+                fail('expected elements of $parameter to be a Closure or Map')
                 break;
             }
         }

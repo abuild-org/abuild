@@ -27,6 +27,9 @@ run.
 After compilation is finished, the post-compile target is explicitly
 run.
 
+No.  See TODO.
+
+
 (XXX The pre-compile and post-compile targets may feel like a
 re-invention of hooks.  Is this okay?  The idea here is to make it
 easier for things like coberatura or static analyzers to be hooked
@@ -97,6 +100,8 @@ prevent people from adding generated directories to srcDirs, etc.)
   java.srcDirs
   java.resourcesDirs
   java.confDirs
+
+  (read only)
   java.generatedSrcDir
   java.generatedResourcesDir
   java.generatedConfDir

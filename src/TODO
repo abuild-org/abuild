@@ -1,4 +1,90 @@
 
+XXX Talk to CM about lh3-view-tps_build
+
+XXX instead of pre-compile and post-compile, come up with some more
+general way to decorate targets.  Maybe provide some general way to
+register pre-target and post-target closures.
+
+-----------
+
+src/
+  java/
+  resources/
+  definitions/
+    wsdl/
+      item.wsdl
+      itemtypes.xsd
+    nonwsdltypes.xsd
+  conf/
+    metainf/
+    services/
+    application.xml
+    web.xml
+    ejb-jar.xml
+    ra.xml
+    item.jnlp
+web/
+  content/
+docs/
+  overview.html
+
+Generated:
+
+build/
+  generated/
+  classes/
+  item.jar
+  item.jnlp
+
+-----------
+
+"classpaths"
+
+Use prepend for all classpath variables.
+
+ - compile: used as classpath attribute to javac
+
+     abuild.classpath: items you compile with and "probably" package
+
+     abuild.classpath.external: items you compile with and "probably"
+     don't package
+
+     both recursive
+
+     starting point: abuild.classpath + abuild.classpath.external
+
+     No method for overriding default compile-time classpath, though
+     it is possible by using the java.compile parameter
+
+ - manifest: used as Manifest-Classpath attribute in manifest
+
+     starting point: items added to (new, non-recursive)
+     abuild.classpath.manifest interface variable by direct
+     dependencies
+
+     Override with java.manifestClasspath parameter
+
+     Usually need to append to this, sometimes need to replace.  If
+     append, just do
+
+     java.manifestClasspath << abuild.manifestClasspath << 'something-else'
+
+ - packaging (not really classpath) including wrapper scripts
+     higher level archives (ear, war, rar)
+
+     Same mechanism as manifest.  Override with
+     java.packageClasspath.  Starting point is abuild.classpath.
+
+ - runtime
+     wrapper scripts, test drivers
+
+     Same mechanism again.  Override with java.runtimeClasspath.
+     Starting point is abuild.classpath + abuild.classpath.external
+
+Ancillary problem: existing build items are not always set up properly
+for this model.
+
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release

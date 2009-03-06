@@ -22,6 +22,7 @@ parameters {
     def v = 'some other value'
     a.b.c.d = v
     scope = outer
+    list << [1, 2] << x.y.z << [5, [6], q] << 7
     s.t.u = x.y.z
     w.w.w = n.u.l.l
     something.'with-dashes' = f(12)
@@ -43,6 +44,7 @@ def results = abuild.params.keySet().sort().collect {
 assert [
     ['a.b.c.d', 'some other value'],
     ['abuild.localRules', 'local'],
+    ['list', [1, 2, 3, 4, 5, 6, 'r', 7]],
     ['other.value', 'some other value'],
     ['other1', 'other1 value'],
     ['other2', ['other2 value']],

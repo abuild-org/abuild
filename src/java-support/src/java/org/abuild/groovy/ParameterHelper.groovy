@@ -56,9 +56,13 @@ class ParameterHelper
     }
     public ParameterHelper leftShift(Object value)
     {
-        if (value instanceof ParameterHelper)
+        if (value instanceof List)
         {
-            _p.appendParameter(_name, _p.resolve(value._name))
+            value.each { this << it }
+        }
+        else if (value instanceof ParameterHelper)
+        {
+            this << _p.resolve(value._name)
         }
         else
         {
