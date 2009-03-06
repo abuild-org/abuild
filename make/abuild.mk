@@ -40,11 +40,11 @@ ifeq ($(ABUILD_TARGET_TYPE), object-code)
 CCXX_TOOLCHAIN = $(ABUILD_PLATFORM_COMPILER)
 endif
 
-# Include the current directory's build rules, if any, remembering
-# that the source directory is actually this directory's parent.
+# Include the current directory's build rules, remembering that the
+# source directory is actually this directory's parent.
 VPATH := ..
 SRCDIR := ..
--include $(SRCDIR)/Abuild.mk
+include $(SRCDIR)/Abuild.mk
 
 RULES ?=
 LOCAL_RULES ?=
