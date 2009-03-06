@@ -5163,7 +5163,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         when they specify selection criteria for the same platform
         type.  When two selectors refer to different platform types,
         both selectors are used.  Platform selectors may also be given
-        in the <envar>ABUILD_PLATFORM_SELECTION</envar> environment
+        in the <envar>ABUILD_PLATFORM_SELECTORS</envar> environment
         variable.  For details on platform selectors, see <xref
         linkend="ref.platform-selection"/>.
        </para>
