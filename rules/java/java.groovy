@@ -105,7 +105,7 @@ class JavaRules
         wrapperName = abuild.resolveAsString('java.wrapperName')
     }
 
-    def compileTarget()
+    def compile(Map attributes)
     {
         def srcDirs = [srcDir, generatedSrcDir].grep {
             dir -> new File(dir).isDirectory()
@@ -183,7 +183,7 @@ class JavaRules
         return javadocPaths
     }
 
-    def packageJarTarget()
+    def packageJar(Map attributes)
     {
         if (! jarName)
         {
@@ -267,13 +267,19 @@ def java_rules = new JavaRules(abuild, ant)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
 abuild.addTargetDependencies('package', ['init', 'package-jar'])
 abuild.addTargetDependencies('generate', ['init'])
+abuild.addTargetDependencies('doc', ['javadoc'])
 abuild.addTargetClosure('init', java_rules.&initTarget)
-abuild.configureTarget('compile', 'deps' : ['generate'],
-                       java_rules.&compileTarget)
-abuild.configureTarget('package-jar', 'deps' : ['compile'],
-                       java_rules.&packageJarTarget)
-abuild.configureTarget('doc', 'deps' : ['javadoc'])
+
+abuild.configureTarget('compile', 'deps' : ['generate']) {
+    abuild.runActions('java.compile', java_rules.&compile)
+}
+
+abuild.configureTarget('package-jar', 'deps' : ['compile']) {
+    abuild.runActions('java.packageJar', java_rules.&packageJar)
+}
+
 abuild.configureTarget('javadoc', 'deps' : ['compile'],
                        java_rules.&javadocTarget)
+
 abuild.configureTarget('wrapper', 'deps' : ['package-jar'],
                        java_rules.&wrapperTarget)

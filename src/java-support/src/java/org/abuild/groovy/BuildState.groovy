@@ -218,6 +218,27 @@ class BuildState implements Parameterized
         resolveAsList(name, null)
     }
 
+    def runActions(String parameter, Closure defaultAction)
+    {
+        resolveAsList(parameter, defaultAction.curry([:])).each {
+            action ->
+            switch (action)
+            {
+              case Closure:
+                action()
+                break;
+
+              case Map:
+                defaultAction(action)
+                break;
+
+              default:
+                fail('expected element of $parameter to be a Closure or Map')
+                break;
+            }
+        }
+    }
+
     def fail(String message)
     {
         throw new BuildFailure(message)

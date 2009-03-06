@@ -54,7 +54,7 @@ class ParameterHelper
             _p.setParameter(child(property), value)
         }
     }
-    public void leftShift(Object value)
+    public ParameterHelper leftShift(Object value)
     {
         if (value instanceof ParameterHelper)
         {
@@ -64,6 +64,7 @@ class ParameterHelper
         {
             _p.appendParameter(_name, value)
         }
+        return this
     }
 
     public void delete(String name)

@@ -38,5 +38,12 @@ declare XLINKFLAGS list string prepend
 target-type java
 
 # Variables set by the user
+
+# For ANT support
+
 declare abuild.classpath.external list filename prepend
 declare abuild.classpath list filename prepend
+
+# For Groovy support
+
+declare abuild.manifestClasspath non-recursive list filename append
