@@ -1,4 +1,4 @@
 parameters {
-    abuild.rules = 'java_proto'
+    abuild.rules = 'java'
     java.jarName = 'java-library.jar'
 }
