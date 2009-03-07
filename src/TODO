@@ -5,6 +5,26 @@ XXX instead of pre-compile and post-compile, come up with some more
 general way to decorate targets.  Maybe provide some general way to
 register pre-target and post-target closures.
 
+General strategy for rules:
+
+ * Initialize parameters in _base.groovy or plugin.groovy.  These are
+   loaded before Abuild.groovy.
+
+ * Abuild.groovy can manipulate parameters set in initialization as
+   needed.
+
+ * No specific mechanism is provided for pre-initialization for build
+   item-supplied rules.  If code generators really need this facility,
+   they can set interface variables.  This does require a slight
+   difference in operation for groovy since interface variables and
+   parameters are in a different namespace.  Recommend "best practice"
+   of creating a rules plugin and throwing all your extra rules in
+   there.  Either that or provide some kind of mechanism for loading
+   rule initialization code from regular build items.  Maybe we can
+   have rule_init.{mk,groovy} or something.  Maybe it should be used
+   for plugins too.  Most likely it's better to just not provide this
+   for now as it encourages people to make these rules too complex.
+
 -----------
 
 src/
@@ -121,6 +141,13 @@ release notes.
  * Bring javadoc back into abuild core
 
  * XXX document abuild.runActions
+
+ * The order in which files are loaded by the make backend have been
+   changed slightly.  The compiler toolchain support files as well as
+   plugin.mk files are now loaded before Abuild.mk.  This makes it
+   possible for Abuild.mk files to manipulate the values of those
+   variables.
+
 
 Groovy Framework
 ================
@@ -712,9 +739,6 @@ Platform Issues
 
 Changes to "make" Code
 ======================
-
- * Consider changing plugin.mk to Plugin.mk for consistency with
-   Rules.mk
 
  * Need a better solution for files that are automatically generated
    by optional tools.  Abuild itself could use this for flex/bison

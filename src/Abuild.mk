@@ -21,7 +21,7 @@ XLINKFLAGS += -static
 endif
 
 ifeq ($(CCXX_TOOLCHAIN), gcc)
-WFLAGS = -Wall -Werror
+WFLAGS += -Werror
 endif
 
 ifeq ($(CCXX_TOOLCHAIN), msvc)

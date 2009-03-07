@@ -37,20 +37,22 @@ def buildDir = abuild.buildDirectory.absolutePath
 //   item.jnlp
 
 parameters {
-    abuild.default.dir.src = "${itemDir}/src/java"
-    abuild.default.dir.resources = "${itemDir}/src/resources"
-    abuild.default.dir.conf = "${itemDir}/src/conf"
-    abuild.default.dir.metainf = "${itemDir}/src/conf/metainf"
-    abuild.default.dir.web = "${itemDir}/src/web"
-    abuild.default.dir.webcontent = "${itemDir}/src/web/content"
+    // Set defaults for the "java" rules
 
-    abuild.default.dir.dist = "${buildDir}/dist"
-    abuild.default.dir.classes = "${buildDir}/classes"
-    abuild.default.dir.generatedDoc = "${buildDir}/doc"
-    abuild.default.dir.generatedSrc = "${buildDir}/src/java"
-    abuild.default.dir.generatedResources = "${buildDir}/src/resources"
-    abuild.default.dir.generatedConf = "${buildDir}/src/conf"
-    abuild.default.dir.generatedMetainf = "${buildDir}/src/conf/metainf"
-    abuild.default.dir.generatedWeb = "${buildDir}/src/web"
-    abuild.default.dir.generatedWebcontent = "${buildDir}/src/web/content"
+    java.dir.src = "${itemDir}/src/java"
+    java.dir.resources = "${itemDir}/src/resources"
+    java.dir.conf = "${itemDir}/src/conf"
+    java.dir.metainf = "${itemDir}/src/conf/metainf"
+    java.dir.web = "${itemDir}/src/web"
+    java.dir.webcontent = "${itemDir}/src/web/content"
+
+    java.dir.dist = "${buildDir}/dist"
+    java.dir.classes = "${buildDir}/classes"
+    java.dir.generatedDoc = "${buildDir}/doc"
+    java.dir.generatedSrc = "${buildDir}/src/java"
+    java.dir.generatedResources = "${buildDir}/src/resources"
+    java.dir.generatedConf = "${buildDir}/src/conf"
+    java.dir.generatedMetainf = "${buildDir}/src/conf/metainf"
+    java.dir.generatedWeb = "${buildDir}/src/web"
+    java.dir.generatedWebcontent = "${buildDir}/src/web/content"
 }

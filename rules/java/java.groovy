@@ -15,8 +15,7 @@ class JavaRules
 
     def getPathVariable(String var)
     {
-        def defaultValue = abuild.resolveAsString("abuild.default.dir.${var}")
-        def result = abuild.resolveAsString("java.dir.${var}", defaultValue)
+        def result = abuild.resolveAsString("java.dir.${var}")
         if (! new File(result).isAbsolute())
         {
             result = "${itemDir}/${result}"
