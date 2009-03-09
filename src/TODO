@@ -142,6 +142,8 @@ release notes.
 
  * XXX document abuild.runActions
 
+ * XXX document stuff in Util
+
  * The order in which files are loaded by the make backend have been
    changed slightly.  The compiler toolchain support files as well as
    plugin.mk files are now loaded before Abuild.mk.  This makes it

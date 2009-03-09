@@ -1,4 +1,4 @@
 parameters {
-    abuild.rules = 'java'
+    abuild.rules = ['java', 'groovy']
     java.jarName = 'abuild-java-support.jar'
 }

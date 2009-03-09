@@ -135,7 +135,11 @@ class Backend implements GroovyBackend
             return false
         }
 
-        boolean status = this.buildState.runTargets(this.targets)
+        boolean status = true
+        if (! buildState.anyFailures)
+        {
+            status = this.buildState.runTargets(this.targets)
+        }
         if (buildState.anyFailures)
         {
             status = false
@@ -179,6 +183,10 @@ class Backend implements GroovyBackend
         try
         {
             object.run()
+        }
+        catch (BuildFailure e)
+        {
+            buildState.error(e.message)
         }
         catch (Exception e)
         {

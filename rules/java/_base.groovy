@@ -37,7 +37,7 @@ def buildDir = abuild.buildDirectory.absolutePath
 //   item.jnlp
 
 parameters {
-    // Set defaults for the "java" rules
+    // Set defaults for the "java" rules.
 
     java.dir.src = "${itemDir}/src/java"
     java.dir.resources = "${itemDir}/src/resources"
@@ -55,4 +55,12 @@ parameters {
     java.dir.generatedMetainf = "${buildDir}/src/conf/metainf"
     java.dir.generatedWeb = "${buildDir}/src/web"
     java.dir.generatedWebcontent = "${buildDir}/src/web/content"
+
+    // Set defaults for the "groovy" rules.  The groovy rules require
+    // that the java rules are also being used and get most of their
+    // defaults from java parameters.
+
+    // XXX Should we change these to src/groovy?
+    groovy.dir.src = "${itemDir}/src/java"
+    groovy.dir.generatedSrc = "${itemDir}/src/java"
 }

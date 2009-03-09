@@ -22,6 +22,19 @@ class Util
         }
     }
 
+    // Copy to orig any keys in defaults that are not alerady present
+    // in orig
+    static void addDefaults(Map orig, Map defaults)
+    {
+        defaults.each {
+            k, v ->
+            if (! orig.containsKey(k))
+            {
+                orig[k] = v;
+            }
+        }
+    }
+
     static String absToRel(String path, String container)
     {
         absToRel(new File(path), new File(container))

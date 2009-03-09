@@ -6,6 +6,11 @@ class JavaRules
     def ant
     def pathSep
 
+    List<String> defaultCompileClassPath = []
+    List<String> defaultManifestClassPath = []
+    List<String> defaultPackageClassPath = []
+    List<String> defaultWrapperClassPath = []
+
     JavaRules(abuild, ant)
     {
         this.abuild = abuild
@@ -23,19 +28,48 @@ class JavaRules
         result
     }
 
-    def setIfNotPresent(Map attributes, key, value)
+    def initTarget()
     {
-        if (! attributes.containsKey(key))
-        {
-            attributes[key] = value
+        // We have three classpath interface variables that we combine
+        // in various ways to initialize our various classpath
+        // variables here.  See java_help.txt for details.
+
+        defaultCompileClassPath.addAll(
+            abuild.resolve('abuild.classpath') ?: [])
+        defaultCompileClassPath.addAll(
+            abuild.resolve('abuild.classpath.external') ?: [])
+
+        defaultManifestClassPath.addAll(
+            abuild.resolve('abuild.classpath.manifest') ?: [])
+
+        defaultPackageClassPath.addAll(
+            abuild.resolve('abuild.classpath') ?: [])
+
+        defaultWrapperClassPath.addAll(defaultCompileClassPath)
+
+        // Filter out jars built by this build item from the compile
+        // and manifest classpaths.
+        def dist = getPathVariable('dist')
+        defaultCompileClassPath = defaultCompileClassPath.grep {
+            new File(it).parent != dist
+        }
+        defaultManifestClassPath = defaultManifestClassPath.grep {
+            new File(it).parent != dist
         }
     }
 
     def compile(Map attributes)
     {
-        def attr = this.&setIfNotPresent.curry(attributes)
-        attr('srcdirs', [getPathVariable('src')])
-        attributes['srcdirs'] << getPathVariable('generatedSrc')
+        def defaultAttrs = [
+            'srcdirs': ['src', 'generatedSrc'].collect {getPathVariable(it) },
+            'destdir': getPathVariable('classes'),
+            'classpath': this.defaultCompileClassPath,
+            // Would be nice to turn path warnings back on
+            'compilerargs': ['-Xlint', '-Xlint:-path']
+        ]
+
+        Util.addDefaults(attributes, defaultAttrs)
+
         attributes['srcdirs'] = attributes['srcdirs'].grep {
             dir -> new File(dir).isDirectory()
         }
@@ -43,17 +77,6 @@ class JavaRules
         {
             return
         }
-
-        def defaultCompileClasspath = []
-        defaultCompileClasspath.addAll(
-            abuild.resolve('abuild.classpath') ?: [])
-        defaultCompileClasspath.addAll(
-            abuild.resolve('abuild.classpath.external') ?: [])
-
-        attr('destdir', getPathVariable('classes'))
-        attr('classpath', defaultCompileClasspath)
-        // Would be nice to turn path warnings back on
-        attr('compilerargs', ['-Xlint', '-Xlint:-path'])
 
         // Remove attributes that are handled specially
         def compileClassPath = attributes.remove('classpath')
@@ -67,14 +90,9 @@ class JavaRules
         ant.mkdir('dir' : attributes['destdir'])
         ant.javac(javacArgs) {
             srcdirs.each { dir -> src('path' : dir) }
-            compilerargs.each { arg -> compilerarg('value' : arg) }
-        }
-
-        // XXX groovy should be in a separate file
-        // Other args to groovyc?
-        ant.groovyc('destdir' : attributes['destdir'],
-                    'classpath' : compileClassPath.join(pathSep)) {
-            srcdirs.each { dir -> src('path' : dir) }
+            compilerargs?.each { arg -> compilerarg('value' : arg) }
+            includes?.each { include('name' : it) }
+            excludes?.each { exclude('name' : it) }
         }
     }
 
@@ -85,6 +103,12 @@ class JavaRules
 
     def packageJar(Map attributes)
     {
+        def defaultAttrs = [
+            'distdir': getPathVariable('dist')
+        ]
+
+        Util.addDefaults(attributes, defaultAttrs)
+
         // XXX REDO based on new paradigm
         def jarName = attributes.remove('jarname')
         def mainClass = abuild.resolveAsString('java.mainClass')
@@ -93,8 +117,6 @@ class JavaRules
             return
         }
 
-        def attr = this.&setIfNotPresent.curry(attributes)
-        attr('distdir', getPathVariable('dist'))
         def distDir = attributes.remove('distdir')
         def classesDir = getPathVariable('classes')
 
@@ -262,12 +284,9 @@ exec java -classpath ${wrapperClassPath} ${mainClass} ${1+"\$@"}
     }
 }
 
-ant.taskdef('name': 'groovyc',
-            'classname': 'org.codehaus.groovy.ant.Groovyc')
-
 def javaRules = new JavaRules(abuild, ant)
 
-abuild.configureTarget('init')
+abuild.addTargetClosure('init', javaRules.&initTarget)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
 abuild.addTargetDependencies('package', ['init', 'package-jar'])
 abuild.addTargetDependencies('generate', ['init'])
