@@ -27,37 +27,6 @@ General strategy for rules:
 
 -----------
 
-src/
-  java/
-  resources/
-  definitions/
-    wsdl/
-      item.wsdl
-      itemtypes.xsd
-    nonwsdltypes.xsd
-  conf/
-    metainf/
-    services/
-    application.xml
-    web.xml
-    ejb-jar.xml
-    ra.xml
-    item.jnlp
-web/
-  content/
-docs/
-  overview.html
-
-Generated:
-
-build/
-  generated/
-  classes/
-  item.jar
-  item.jnlp
-
------------
-
 "classpaths"
 
 Use prepend for all classpath variables.

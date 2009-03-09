@@ -62,18 +62,22 @@ class JavaRules
     {
         def defaultAttrs = [
             'srcdirs': ['src', 'generatedSrc'].collect {getPathVariable(it) },
+            'extrasrcdirs' : [],
             'destdir': getPathVariable('classes'),
             'classpath': this.defaultCompileClassPath,
             // Would be nice to turn path warnings back on
-            'compilerargs': ['-Xlint', '-Xlint:-path']
+            'compilerargs': ['-Xlint', '-Xlint:-path'],
+            'debug': 'true',
+            'deprecation': 'on'
         ]
 
         Util.addDefaults(attributes, defaultAttrs)
 
-        attributes['srcdirs'] = attributes['srcdirs'].grep {
-            dir -> new File(dir).isDirectory()
-        }
-        if (! attributes['srcdirs'])
+        def srcdirs = attributes.remove('srcdirs')
+        srcdirs.addAll(attributes.remove('extrasrcdirs'))
+
+        srcdirs = srcdirs.grep {dir -> new File(dir).isDirectory()}
+        if (! srcdirs)
         {
             return
         }
@@ -83,7 +87,6 @@ class JavaRules
         def includes = attributes.remove('includes')
         def excludes = attributes.remove('excludes')
         def compilerargs = attributes.remove('compilerargs')
-        def srcdirs = attributes.remove('srcdirs')
 
         def javacArgs = attributes
         javacArgs['classpath'] = compileClassPath.join(pathSep)
@@ -103,61 +106,88 @@ class JavaRules
 
     def packageJar(Map attributes)
     {
-        def defaultAttrs = [
-            'distdir': getPathVariable('dist')
-        ]
-
-        Util.addDefaults(attributes, defaultAttrs)
-
-        // XXX REDO based on new paradigm
-        def jarName = attributes.remove('jarname')
-        def mainClass = abuild.resolveAsString('java.mainClass')
-        if (! jarName)
+        // The packageJarTask method will already have initialized the
+        // jarname attribute based on the java.jarName parameter if
+        // appropriate, so we don't have to check that here.
+        def jarname = attributes.remove('jarname')
+        if (! jarname)
         {
             return
         }
 
-        def distDir = attributes.remove('distdir')
-        def classesDir = getPathVariable('classes')
+        // XXX need a way to associate filesets with directories
 
-        def manifestClassPath =
-            abuild.resolveAsList('abuild.classpath.manifest', [])
-        if (! manifestClassPath)
+        def defaultAttrs = [
+            'distdir': getPathVariable('dist'),
+            'classesdir': getPathVariable('classes'),
+            'resourcesdirs': [getPathVariable('resources'),
+                              getPathVariable('generatedResources')],
+            'extraresourcesdirs' : [],
+            'confdirs': [getPathVariable('conf'),
+                         getPathVariable('generatedConf')],
+            'extraconfdirs' : [],
+            'metainfdirs' : [getPathVariable('metainf'),
+                             getPathVariable('generatedMetainf')],
+            'extrametainfdirs' : [],
+            'mainclass' : abuild.resolveAsString('java.mainClass'),
+            'manifestclasspath' : defaultManifestClassPath,
+            'extramanifestkeys' : [:]
+        ]
+
+        Util.addDefaults(attributes, defaultAttrs)
+
+        // XXX What am I supposed to do with confdirs for a simple jar
+        // task?
+
+        // Remove keys that we will handle expicitly
+        def distdir = attributes.remove('distdir')
+        def classesdir = attributes.remove('classesdir')
+        def resourcesdirs = attributes.remove('resourcesdirs')
+        resourcesdirs.addAll(attributes.remove('extraresourcesdirs'))
+        def confdirs = attributes.remove('confdirs')
+        confdirs.addAll(attributes.remove('extraconfdirs'))
+        def metainfdirs = attributes.remove('metainfdirs')
+        metainfdirs.addAll(attributes.remove('extrametainfdirs'))
+        def mainclass = attributes.remove('mainclass')
+        def manifestClassPath = attributes.remove('manifestclasspath')
+        def extramanifestkeys = attributes.remove('extramanifestkeys')
+
+        if ((! manifestClassPath) && defaultCompileClassPath)
         {
-            // XXX What do we want to do here when
-            // abuild.classpath.manifest is not defined?
-
-            // XXX duplicated
-            manifestClassPath.addAll(
-                abuild.resolve('abuild.classpath') ?: [])
-            // XXX include external?
-            manifestClassPath.addAll(
-                abuild.resolve('abuild.classpath.external') ?: [])
+            ant.echo('level':'warning',
+                     "manifest class path is not set;" +
+                     " using compile classpath as manifest classpath")
+            manifestClassPath.addAll(defaultCompileClassPath)
         }
 
-        ant.mkdir('dir' : distDir)
-        ant.jar('destfile' : "${distDir}/${jarName}") {
+        // Take only last path element for each manifest class path
+        manifestClassPath = manifestClassPath.each { new File(it).name }
 
-            // call metainf('dir' : dir) for each metainf directory
-            if (new File(classesDir).isDirectory())
-            {
-                fileset('dir' : classesDir)
-            }
+        // Filter out non-existent directories
+        def filesets = [classesdir, resourcesdirs].flatten().grep {
+            new File(it).isDirectory()
+        }
+        metainfdirs = metainfdirs.grep {
+            new File(it).isDirectory()
+        }
+
+        ant.mkdir('dir' : distdir)
+        ant.jar('destfile' : "${distdir}/${jarname}") {
+            metainfdirs.each { metainf('dir': it) }
+            filesets.each { fileset('dir': it) }
             manifest() {
                 if (manifestClassPath)
                 {
                     attribute('name' : 'Class-Path',
                               'value' : manifestClassPath.join(pathSep))
                 }
-                if (mainClass)
+                if (mainclass)
                 {
-                    attribute('name' : 'Main-Class', 'value' : mainClass)
+                    attribute('name' : 'Main-Class', 'value' : mainclass)
                 }
-/*
-                otherManifestAttributes.each() {
+                extramanifestkeys.each() {
                     key, value -> attribute('name' : key, 'value' : value)
                 }
-*/
             }
         }
     }
@@ -194,6 +224,7 @@ class JavaRules
 
     def javadocTarget()
     {
+        // XXX REDO
         if (! javadocTitle)
         {
             return
@@ -220,6 +251,7 @@ class JavaRules
 
     private List<String> constructLinkPaths()
     {
+        // XXX?
         def javadocPaths = []
         abuild.itemPaths.each() {
             item, path ->

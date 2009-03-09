@@ -1,1 +1,6 @@
-abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/java-library.jar
+declare java-library.archiveName string
+java-library.archiveName = java-library.jar
+declare java-library.archivePath filename
+java-library.archivePath = $(ABUILD_OUTPUT_DIR)/dist/$(java-library.archiveName)
+abuild.classpath = $(java-library.archivePath)
+abuild.classpath.manifest = $(java-library.archivePath)

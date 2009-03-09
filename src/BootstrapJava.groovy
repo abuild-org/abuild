@@ -56,6 +56,9 @@ ant.javac('deprecation': 'yes',
           'destdir': classesDir,
           'classpath': antJar,
           'srcdir': srcDir.absolutePath)
+{
+    compilerarg('value': '-Xlint')
+}
 ant.groovyc('destdir': classesDir,
             'classpath': classesDir,
             'srcdir': srcDir.absolutePath)
