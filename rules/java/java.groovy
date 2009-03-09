@@ -194,7 +194,10 @@ class JavaRules
 
     def packageJarTarget()
     {
-        // XXX coverage
+        // XXX Make sure all cases are tested.  Alternatively,
+        // simplify this somewhat by making java.packageJar and
+        // java.jarName mutually exclusive.
+
         def packageJarActions = abuild.resolveAsList('java.packageJar')
         def jarName = abuild.resolve('java.jarName')
         if (jarName)

@@ -370,6 +370,14 @@ to 1.6.0.  From abuild/lib:
 Core Changes
 ============
 
+ * Implement
+
+   declare variable ... = value
+
+   in InterfaceParser.  We can probably do this by having an optional
+   initializer in nt_Declaration rather than going through the whole
+   process of adding a new non-terminal type.
+
  * Implement an optional 1.0-compatibility mode.  See "Compatibility"
    below.
 
