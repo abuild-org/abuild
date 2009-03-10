@@ -48,16 +48,6 @@ class GroovyRules
 
     def compile(Map attributes)
     {
-        def defaultAttrs = [
-            'srcdirs': ['src', 'generatedSrc'].collect {
-                getPathVariable(it, 'groovy')
-            },
-            'destdir': getPathVariable('classes', 'java'),
-            'classpath': this.defaultCompileClassPath,
-        ]
-
-        Util.addDefaults(attributes, defaultAttrs)
-
         attributes['srcdirs'] = attributes['srcdirs'].grep {
             dir -> new File(dir).isDirectory()
         }
@@ -84,7 +74,15 @@ class GroovyRules
 
     def compileTarget()
     {
-        abuild.runActions('groovy.compile', this.&compile)
+        def defaultAttrs = [
+            'srcdirs': ['src', 'generatedSrc'].collect {
+                getPathVariable(it, 'groovy')
+            },
+            'destdir': getPathVariable('classes', 'java'),
+            'classpath': this.defaultCompileClassPath,
+        ]
+
+        abuild.runActions('groovy.compile', this.&compile, defaultAttrs)
     }
 }
 
