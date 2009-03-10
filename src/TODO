@@ -18,6 +18,8 @@ release notes.
 Groovy Framework
 ================
 
+ * Include groovy rules in test suite
+
  * After groovy-1.6.0 receives security approval, upgrade embedded
    groovy to 1.6.0.  From abuild/lib:
 
