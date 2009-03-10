@@ -9,8 +9,7 @@ override TARGET-TYPE = platform-independent
 
 target-type $(TARGET-TYPE)
 
-declare HAVE_good2 boolean
-HAVE_good2 = 1
+declare HAVE_good2 boolean = 1
 
 after-build other-file
 

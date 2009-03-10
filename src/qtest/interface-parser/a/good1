@@ -5,8 +5,7 @@ declare LIBDIRS list string prepend
 declare PLATFORM string
 declare TARGET-TYPE string
 
-declare OTHER_LIST list string append
-OTHER_LIST = a
+declare OTHER_LIST list string append = a
 
 declare NONREC_LIST non-recursive list string append
 NONREC_LIST = a1 a2

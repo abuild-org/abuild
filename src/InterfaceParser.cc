@@ -544,6 +544,18 @@ InterfaceParser::evaluateDeclaration(
 	    declaration->getRecursive(),
 	    declaration->getType(),
 	    declaration->getListType());
+
+	nt_Words const* words = declaration->getInitializer();
+	if (words)
+	{
+	    std::deque<std::string> value = evaluateWords(words);
+	    this->_interface->assignVariable(
+		words->getLocation(),
+		declaration->getVariableName(),
+		value,
+		Interface::a_normal,
+		"");
+	}
     }
 }
 

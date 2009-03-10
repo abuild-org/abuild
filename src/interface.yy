@@ -84,6 +84,7 @@
 %type <conditional> elseifstatement
 %type <not_used> endifstatement
 %type <declaration> declaration
+%type <declaration> declbody
 %type <typespec> typespec
 %type <afterbuild> afterbuild
 %type <targettype> targettype
@@ -331,7 +332,18 @@ function : tok_function arguments tok_clope
 	  }
 	;
 
-declaration : tok_declare tok_identifier typespec endofline
+declaration : declbody endofline
+	  {
+	      $$ = $1;
+	  }
+	| declbody tok_equal words nospaceendofline
+	  {
+	      $1->addInitializer($3);
+	      $$ = $1;
+	  }
+	;
+
+declbody : tok_declare tok_identifier typespec
 	  {
 	      $$ = parser->createDeclaration($2, $3);
 	  }

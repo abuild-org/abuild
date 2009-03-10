@@ -88,6 +88,11 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
+ * Added new shorthand syntax for initializing an interface variable
+   at the time of declaration.  It is now possible to do
+
+   declare variable type = initializer
+
  * Unify methods for having build items supply rules.  Got rid of the
    "-with-rules" dep flag entirely.  All use of BUILD_ITEM_RULES and
    Rules.mk is deprecated.  Rules.groovy is no longer supported.
@@ -369,14 +374,6 @@ to 1.6.0.  From abuild/lib:
 
 Core Changes
 ============
-
- * Implement
-
-   declare variable ... = value
-
-   in InterfaceParser.  We can probably do this by having an optional
-   initializer in nt_Declaration rather than going through the whole
-   process of adding a new non-terminal type.
 
  * Implement an optional 1.0-compatibility mode.  See "Compatibility"
    below.

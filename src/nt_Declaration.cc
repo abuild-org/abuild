@@ -9,12 +9,25 @@ nt_Declaration::nt_Declaration(Token const* identifier,
     variable_name(identifier->getValue()),
     type(typespec->getType()),
     list_type(typespec->getListType()),
-    recursive(typespec->getRecursive())
+    recursive(typespec->getRecursive()),
+    initializer(0)
 {
 }
 
 nt_Declaration::~nt_Declaration()
 {
+}
+
+void
+nt_Declaration::addInitializer(nt_Words const* words)
+{
+    this->initializer = words;
+}
+
+nt_Words const*
+nt_Declaration::getInitializer() const
+{
+    return this->initializer;
 }
 
 std::string const&
