@@ -4,8 +4,8 @@ import org.codehaus.groovy.runtime.StackTraceUtils
 
 class Util
 {
-    static inWindows =
-        (System.getProperty('os.name') =~ /(?i:windows).*/) as boolean
+    static boolean inWindows =
+        (System.getProperty('os.name') =~ /(?i:windows).*/)
 
     static void printStackTrace(Throwable e)
     {
