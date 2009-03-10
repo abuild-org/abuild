@@ -1,79 +1,4 @@
 
-XXX Talk to CM about lh3-view-tps_build
-
-XXX instead of pre-compile and post-compile, come up with some more
-general way to decorate targets.  Maybe provide some general way to
-register pre-target and post-target closures.
-
-General strategy for rules:
-
- * Initialize parameters in _base.groovy or plugin.groovy.  These are
-   loaded before Abuild.groovy.
-
- * Abuild.groovy can manipulate parameters set in initialization as
-   needed.
-
- * No specific mechanism is provided for pre-initialization for build
-   item-supplied rules.  If code generators really need this facility,
-   they can set interface variables.  This does require a slight
-   difference in operation for groovy since interface variables and
-   parameters are in a different namespace.  Recommend "best practice"
-   of creating a rules plugin and throwing all your extra rules in
-   there.  Either that or provide some kind of mechanism for loading
-   rule initialization code from regular build items.  Maybe we can
-   have rule_init.{mk,groovy} or something.  Maybe it should be used
-   for plugins too.  Most likely it's better to just not provide this
-   for now as it encourages people to make these rules too complex.
-
------------
-
-"classpaths"
-
-Use prepend for all classpath variables.
-
- - compile: used as classpath attribute to javac
-
-     abuild.classpath: items you compile with and "probably" package
-
-     abuild.classpath.external: items you compile with and "probably"
-     don't package
-
-     both recursive
-
-     starting point: abuild.classpath + abuild.classpath.external
-
-     No method for overriding default compile-time classpath, though
-     it is possible by using the java.compile parameter
-
- - manifest: used as Manifest-Classpath attribute in manifest
-
-     starting point: items added to (new, non-recursive)
-     abuild.classpath.manifest interface variable by direct
-     dependencies
-
-     Override with java.manifestClasspath parameter
-
-     Usually need to append to this, sometimes need to replace.  If
-     append, just do
-
-     java.manifestClasspath << abuild.manifestClasspath << 'something-else'
-
- - packaging (not really classpath) including wrapper scripts
-     higher level archives (ear, war, rar)
-
-     Same mechanism as manifest.  Override with
-     java.packageClasspath.  Starting point is abuild.classpath.
-
- - runtime
-     wrapper scripts, test drivers
-
-     Same mechanism again.  Override with java.runtimeClasspath.
-     Starting point is abuild.classpath + abuild.classpath.external
-
-Ancillary problem: existing build items are not always set up properly
-for this model.
-
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -82,51 +7,50 @@ Notes for Next Release
 Remember to keep deprecated features list up-to-date.  Add the
 following:
 
- * abuild.hook-build-items is no longer deprecated as we have no
-   "rules" mechanism for ant and it's not really worth adding one.
+ * ...
 
 These changes have already been made and need to make it into the
 release notes.
 
- * Added new shorthand syntax for initializing an interface variable
-   at the time of declaration.  It is now possible to do
-
-   declare variable type = initializer
-
- * Unify methods for having build items supply rules.  Got rid of the
-   "-with-rules" dep flag entirely.  All use of BUILD_ITEM_RULES and
-   Rules.mk is deprecated.  Rules.groovy is no longer supported.
-   Instead, there is only one method for adding rules: creating a
-   rules directory with subdirectories for the platform type and
-   populating it with a named rules file.  The rules/all directory is
-   now also searched after the platform type directory to support
-   non-platform-type-specific rules.  For both plugins and regular
-   build items that offer rules, make the rules available by placing
-   rulename.groovy or rulename.mk (which can co-mingle) into their
-   rules directory, and build items make use of them by asking for
-   them by name in RULES (make) or abuild.rules (groovy).  Also merged
-   the make/rules and groovy/rules directories into rules, and moved
-   the empty.mk and empty.groovy rules files to "all".
-
-   This change was motivated both by the desire to remove confusion
-   over two different methods for supplying rules and also to make it
-   easier to support rule-specific help with the new help system.
-
- * Bring javadoc back into abuild core
-
- * XXX document abuild.runActions
-
- * XXX document stuff in Util
-
- * The order in which files are loaded by the make backend have been
-   changed slightly.  The compiler toolchain support files as well as
-   plugin.mk files are now loaded before Abuild.mk.  This makes it
-   possible for Abuild.mk files to manipulate the values of those
-   variables.
+ * ...
 
 
 Groovy Framework
 ================
+
+ * After groovy-1.6.0 receives security approval, upgrade embedded
+   groovy to 1.6.0.  From abuild/lib:
+
+     svn cp -r982 svn+q:///abuild/trunk/abuild/lib/groovy-all-1.6.0.jar@982 .
+
+ * Update rules/java/java_help.txt
+
+ * No specific mechanism (like plugin.groovy) is provided for
+   pre-initialization of parameters to be used by build item-supplied
+   rules.  This facility does not exist on the make side either, and
+   it has never been missed.  If code generators really need this
+   facility, they can set interface variables.  This does require a
+   slight difference in operation for groovy since interface variables
+   and parameters are in a different namespace.  Recommend "best
+   practice" of creating a rules plugin and throwing all your extra
+   rules in there.  Either that or provide some kind of mechanism for
+   loading rule initialization code from regular build items.  Maybe
+   we can have rule_init.{mk,groovy} or something.  Maybe it should be
+   used for plugins too.  Most likely it's better to just not provide
+   this for now as it encourages people to make these rules too
+   complex.
+
+ * Consider providing a way to "decorate" targets by adding closures
+   to be run before and after.  A pre-target closure would be run
+   after all dependencies were satisfied and before any of the
+   target's closures.  A post-target closure would be run after.
+   Alternatively, perhaps we should provide a mechanism for prepending
+   rather than appending a target closure, which might ave the same
+   effect.  This may no longer be necessary with the way
+   abuild.runActions works.
+
+Groovy Framework Documentation (incorporate into manual)
+========================================================
 
 General Guidelines
 ------------------
@@ -145,200 +69,270 @@ General Guidelines
    possible extent, even to the point of having ways of causing them
    to do nothing.  Although the interface has a way to completely
    override existing targets, using the capability should be reserved
-   for exteme cases.
+   for extreme cases.  Targets may use abuild.runActions to facilitate
+   this.
 
-Abuild Groovy Interface; add to documentation
----------------------------------------------
+ * Targets should be parameter driven.  Parameters should provide
+   defaults.  Users can override defaults by modifying preset
+   parameters or setting keys in maps that are appended to general
+   parameters.  Initialize parameters in _base.groovy (for built-in
+   rules) or plugin.groovy (for rules provided by plugins).  These are
+   loaded before Abuild.groovy.  Abuild.groovy can manipulate
+   parameters set in initialization as needed.  No mechanism, at the
+   moment, is provided for pre-initializing parameters for build
+   item-supplied rules.  Maybe we need to add one, but this facility
+   may not really be needed.
 
- * Abuild.groovy environment
+Class Paths
+-----------
 
-   Binding
-   -------
+Interface variables (all list filename prepend):
 
-     abuild -- access to abuild's groovy interface
-     ant -- an AntBuilder (gradle and gant also put "ant" in the binding)
-     parameters -- a closure method used to set abuild parameters
+ * abuild.classpath: items you compile with and probably package
 
-   Setting parameters
-   ------------------
+ * abuild.classpath.external: items you compile with and probably
+   don't package
 
-     In your Abuild.groovy, you can have the following:
+ * abuild.classpath.manifest: non-recursive: items that should go in
+   the manifest classpaths of things that directly depend on you.
 
-     parameters {
-         parameter.one = 'value'
-	 parameter.two << 'value-to-append'
-	 parameter.three = parameter.one
-     }
+Four different types of class paths:
 
-     The effect would be to set the following parameters:
+ * compile: used as classpath attribute to javac
 
-       parameter.one -> 'value'
-       parameter.two -> ['value-to-append']
-       parameter.three -> 'value'
+   default: abuild.classpath + abuild.classpath.external
 
-     Specifically, any variable assignment is treated as an assignment
-     to an equivalently named parameter, and any append using the left
-     shift operator appends to any existing value.  Variables on the
-     right hand side of an assignment or left shift are resolved as
-     parameters (or defines or interface variables).  They don't have
-     any special meaning in other contexts, so if you need to use them
-     elsewhere, you'll have to call resolve.
+   override by setting 'classpath' key in entry of java.compile
+   parameter
 
-     You can also delete parameters within this block:
+ - manifest: used as Manifest-Classpath attribute in manifest
 
-     parameters {
-          delete some.parameter
-     }
+   default: abuild.classpath.manifest
 
-     Accessing variables within this block is just shorthand for
-     calling abuild.setParameter, abuild.appendParameter, and
-     abuild.deleteParameter.  When using a parameter on the right hand
-     side of an assignment or append, the result is equilvalent to
-     having called abuild.resolve on the parameter name.
+   Override by setting 'manifest' key in entry of java.packageJar
 
-     For an example that exercises all the cases, see
-     qtest/parameter-helper/groovy/local.groovy.
+   To append rather than replace, you can always set the value of the
+   'manifest' key to something based on
+   resolve('abuild.classpath.manifest').
 
-   "abuild" object interface
-   -------------------------
+ - packaging (not really classpath) for higher level archives (ear,
+   war, rar)
 
-     Fields:
+   default: abuild.classpath.
 
-      - interfaceVars: a map corresponding to the values from
-        Abuild.interface; all values are strings or lists of strings
+ - runtime: for wrapper scripts, test drivers
 
-      - defines: a map of variables defined on the command line; all
-        values are strings
+   default: abuild.classpath + abuild.classpath.external + current jar
 
-      - params: a map of parameters defined by the user in
-        Abuild.groovy; keys are strings, but values can be any Object
-        or null
+   Override by setting 'classpath' attribute in java.wrapper.
 
-      - buildDirectory: a File object containing the build directory
+Abuild.groovy environment
+-------------------------
 
-      - sourceDirectory: a File object containing the source directory
+ * Binding
 
-     Methods:
+   abuild -- access to abuild's groovy interface
+   ant -- an AntBuilder (gradle and gant also put "ant" in the binding)
+   parameters -- a closure method used to set abuild parameters
 
-      - configureTarget('name', named parameteres) {
-            closureBody()
-        }
+ * Setting parameters
 
-	registers target 'name'; i.e., causes it to exist if it does
-	not already exist
+   In your Abuild.groovy, you can have the following:
 
-	if closure body is not null, adds it to the list of closures
-	for target 'name'
+   parameters {
+       parameter.one = 'value'
+       parameter.two << 'value-to-append'
+       parameter.three = parameter.one
+   }
 
-	if 'deps' named parameter is specified, its value must be a
-	string or a list of strings; each dependency is added as a
-	dependency of name
+   The effect would be to set the following parameters:
 
-	if 'replaceClosures' named parameter is specified, its value
-	must be a boolean; if true, removes any closures associated
-	with 'name' before (possibly) adding any specified closure
+     parameter.one -> 'value'
+     parameter.two -> ['value-to-append']
+     parameter.three -> 'value'
 
-      - configureTarget('name')
+   Specifically, any variable assignment is treated as an assignment
+   to an equivalently named parameter, and any append using the left
+   shift operator appends to any existing value.  Variables on the
+   right hand side of an assignment or left shift are resolved as
+   parameters (or defines or interface variables).  They don't have
+   any special meaning in other contexts, so if you need to use them
+   elsewhere, you'll have to call resolve.
 
-        calls full configureTarget with no named parameters or closure
-        body
+   You can also delete parameters within this block:
 
-      - addTarget('name') -- synonym for above form of configureTarget
+   parameters {
+	delete some.parameter
+   }
 
-      - configureTarget('name', named parameterse)
+   Accessing variables within this block is just shorthand for calling
+   abuild.setParameter, abuild.appendParameter, and
+   abuild.deleteParameter.  When using a parameter on the right hand
+   side of an assignment or append, the result is equilvalent to
+   having called abuild.resolve on the parameter name.
 
-        calls full configureTarget with no closure body
+   For an example that exercises all the cases, see
+   qtest/parameter-helper/groovy/local.groovy.
 
-      - addTargetDependencies('name', ['dep1', 'dep2'])
+ * "abuild" object interface
 
-	calls configureTarget('name', 'deps': ['dep1', 'dep2'])
+    Fields:
 
-      - configureTarget('name') {
-            closureBody()
-	}
+     - interfaceVars: a map corresponding to the values from
+       Abuild.interface; all values are strings or lists of strings
 
-	calls full configureTarget with no named parameters
+     - defines: a map of variables defined on the command line; all
+       values are strings
 
-      - addTargetClosure('name') {
-            closureBody()
-        }
+     - params: a map of parameters defined by the user in
+       Abuild.groovy; keys are strings, but values can be any Object
+       or null
 
-	synonym for above form of configureTarget
+     - buildDirectory: a File object containing the build directory
 
-      - setParameter('name', value)
+     - sourceDirectory: a File object containing the source directory
 
-        Sets parameter 'name' to value, replacing any previous value
-        that may have been set.
+    Methods:
 
-      - appendParameter('name', value)
+     - configureTarget('name', named parameteres) {
+	   closureBody()
+       }
 
-        If parameter 'name' has been previously set with setParameter
-        (and not subsequently deleted), this is an error.  Otherwise,
-        makes the value of the parameter a list and appends value to
-        it.
+       registers target 'name'; i.e., causes it to exist if it does
+       not already exist
 
-      - deletedParameter('name')
+       if closure body is not null, adds it to the list of closures
+       for target 'name'
 
-        Removes any previous value for parameter 'name'.
+       if 'deps' named parameter is specified, its value must be a
+       string or a list of strings; each dependency is added as a
+       dependency of name
 
-      - resolve('name', defaultValue)
+       if 'replaceClosures' named parameter is specified, its value
+       must be a boolean; if true, removes any closures associated
+       with 'name' before (possibly) adding any specified closure
 
-        If defines['name'] exists, return it
-	else if params['name'] exists, return it
-	else if interfaceVars['name'] exists, return it
-	else return defaultValue
+     - configureTarget('name')
 
-	Effect: defines override everything else, params overrides
-	interface, basically resulting in the same behavior as make
-	and ant
+       calls full configureTarget with no named parameters or closure
+       body
 
-	If 'name' names a parameter that may occur a variable number
-	of times, it is up to the caller to deal with it.
-	Alternatively, if you expect null or a single String, use
-	resolveAsString, and if you expect one or more items and want
-	to handle the result uniformly, use resolveAsList.
+     - addTarget('name') -- synonym for above form of configureTarget
 
-      - resolve('name')
+     - configureTarget('name', named parameterse)
 
-        calls resolve('name', null)
+       calls full configureTarget with no closure body
 
-      - resolveAsString('name', defaultValue)
+     - addTargetDependencies('name', ['dep1', 'dep2'])
 
-        If resolve('name', defaultValue) returns other than null or a
-        string, fail.  Otherwise, return value as type String.
+       calls configureTarget('name', 'deps': ['dep1', 'dep2'])
 
-      - resolveAsString('name')
+     - configureTarget('name') {
+	   closureBody()
+       }
 
-        calls resolveAsString('name', null)
+       calls full configureTarget with no named parameters
 
-      - resolveAsList('name', defaultValue)
+     - addTargetClosure('name') {
+	   closureBody()
+       }
 
-        If resolve('name', defaultValue) returns a list, return that
-        value.  Otherwise, return a list containing that value.  This
-        makes it convenient to deal with parameters whose values may
-        contain a single value or a list of values without having to
-        handle the special case in the target.
+       synonym for above form of configureTarget
 
-      - fail(String message)
+     - setParameter('name', value)
 
-        cause the build to fail immediately by throwing an instance of
-        AbuildBuildFailure
+       Sets parameter 'name' to value, replacing any previous value
+       that may have been set.
 
-      - error(String message)
+     - appendParameter('name', value)
 
-        issue an error message and continue to the end of the
-        closure; the build is considered to have failed, so (unless -k
-        has been specified) no additional closures will be called
+       If parameter 'name' has been previously set with setParameter
+       (and not subsequently deleted), this is an error.  Otherwise,
+       makes the value of the parameter a list and appends value to
+       it.
 
-      - runTarget(target)
+     - deletedParameter('name')
 
-        runs target preceded by its full dependency chain; no target
-        is ever run more than once
+       Removes any previous value for parameter 'name'.
 
-      - runTargets([target, ...])
+     - resolve('name', defaultValue)
 
-        runs each target specified in order (with the order possibly
-        overridden based on the dependency graph)
+       If defines['name'] exists, return it
+       else if params['name'] exists, return it
+       else if interfaceVars['name'] exists, return it
+       else return defaultValue
+
+       Effect: defines override everything else, params overrides
+       interface, basically resulting in the same behavior as make
+       and ant
+
+       If 'name' names a parameter that may occur a variable number
+       of times, it is up to the caller to deal with it.
+       Alternatively, if you expect null or a single String, use
+       resolveAsString, and if you expect one or more items and want
+       to handle the result uniformly, use resolveAsList.
+
+     - resolve('name')
+
+       calls resolve('name', null)
+
+     - resolveAsString('name', defaultValue)
+
+       If resolve('name', defaultValue) returns other than null or a
+       string, fail.  Otherwise, return value as type String.
+
+     - resolveAsString('name')
+
+       calls resolveAsString('name', null)
+
+     - resolveAsList('name', defaultValue)
+
+       If resolve('name', defaultValue) returns a list, return that
+       value.  Otherwise, return a list containing that value.  This
+       makes it convenient to deal with parameters whose values may
+       contain a single value or a list of values without having to
+       handle the special case in the target.
+
+
+     - runActions(String targetParameter, Closure defaultAction,
+                  Map defaultAttributes)
+
+       targetParameter, if defined, resolves to a list whose elements
+       are either maps or closures.  If not defined, it is treated as
+       if its value were a list containing an empty map.
+
+       For each element, if it is a closure, call it.  If it is a map,
+       then expand the map by copying entries from defaultAttributes
+       for keys that are not present in the map.  Then call
+       defaultAttributes on the resulting map.
+
+     - fail(String message)
+
+       cause the build to fail immediately by throwing an instance of
+       AbuildBuildFailure
+
+     - error(String message)
+
+       issue an error message and continue to the end of the
+       closure; the build is considered to have failed, so (unless -k
+       has been specified) no additional closures will be called
+
+     - runTarget(target)
+
+       runs target preceded by its full dependency chain; no target
+       is ever run more than once
+
+     - runTargets([target, ...])
+
+       runs each target specified in order (with the order possibly
+       overridden based on the dependency graph)
+
+ * org.abuild.groovy.Util
+
+     - absToRel(path, basedir) -- convert "path" into a path relative
+       to "basedir".
+
+     - field inWindows is true if in Windows
 
  * QTest support
 
@@ -362,14 +356,10 @@ Abuild Groovy Interface; add to documentation
       source directory, to load for defining local rules; abuild
       automatically appends .groovy suffix
 
+Rule-specific Help
+------------------
 
-Update Groovy Version
-=====================
-
-After groovy-1.6.0 receives security approval, upgrade embedded groovy
-to 1.6.0.  From abuild/lib:
-
-  svn cp -r982 svn+q:///abuild/trunk/abuild/lib/groovy-all-1.6.0.jar@982 .
+ * see rules/java/java_help.txt
 
 
 Core Changes
@@ -1431,15 +1421,6 @@ life even before private/bin/get_native_platform_data is called.
 Java Problems
 =============
 
- * abuild.classpath and abuild.classpath.external should probably go
-   away.  We need different mechanisms for specifying different kinds
-   of classpaths.  At a minimum, we need a compile-time classpath and
-   a manifest classpath.  There may be other situations.
-
- * The classpath in the manifest for a jar should only include
-   first-level dependencies.  Transitive dependencies are satisfied
-   automatically.
-
  * Reconsider using depends task for compile in abuild.xml.
 
  * Signed jar support will eventually be required.  See whether this
@@ -1453,10 +1434,6 @@ Java Problems
    happens with nested/inner classes that disappeared....does javac
    automatically remove the corresponding class files?  This would be
    an easy experiment to try.
-
- * Consider supporting creation of multiple jar files with different
-   contents analogous to different libraries being created from a
-   single C++ build item.
 
  * Ant seems to not complain when populating an ear file from a
    classpath that contains non-existent items.  In general, there may

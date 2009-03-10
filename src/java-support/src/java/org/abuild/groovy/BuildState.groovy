@@ -222,14 +222,6 @@ class BuildState implements Parameterized
         resolveAsList(name, null)
     }
 
-    // targetParameter, if defined, resolves to a list whose elements
-    // are either maps or closures.  If not defined, it is treated as
-    // if its value were a list containing an empty map.
-    //
-    // For each element, if it is a closure, call it.  If it is a map,
-    // then expand the map by copying entries from defaultAttributes
-    // that for keys that are not present in the map.  Then call
-    // defaultAttributes on the resulting map.
     def runActions(String targetParameter, Closure defaultAction,
                    Map defaultAttributes)
     {
