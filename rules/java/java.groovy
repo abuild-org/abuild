@@ -25,7 +25,10 @@ class JavaRules
         {
             result = "${itemDir}/${result}"
         }
-        result
+        // Wrap this in a file object and call absolutePath so
+        // paths are formatted appropriately for the operating
+        // system.
+        new File(result).absolutePath
     }
 
     def getPathListVariable(String var)
@@ -33,11 +36,11 @@ class JavaRules
         abuild.resolveAsList("java.dir.${var}").collect {
             if (new File(it).isAbsolute())
             {
-                it
+                new File(it).absolutePath
             }
             else
             {
-                "${itemDir}/${it}"
+                new File("${itemDir}/${it}").absolutePath
             }
         }
     }
