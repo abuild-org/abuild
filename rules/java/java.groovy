@@ -74,23 +74,10 @@ class JavaRules
 
     def compile(Map attributes)
     {
-        def defaultAttrs = [
-            'srcdirs': ['src', 'generatedSrc'].collect {getPathVariable(it) },
-            'extrasrcdirs' : getPathListVariable('extraSrc'),
-            'destdir': getPathVariable('classes'),
-            'classpath': this.defaultCompileClassPath,
-            // Would be nice to turn path warnings back on
-            'compilerargs': ['-Xlint', '-Xlint:-path'],
-            'debug': 'true',
-            'deprecation': 'on'
-        ]
-
-        Util.addDefaults(attributes, defaultAttrs)
-
         def srcdirs = attributes.remove('srcdirs')
         srcdirs.addAll(attributes.remove('extrasrcdirs'))
 
-        srcdirs = srcdirs.grep {dir -> new File(dir).isDirectory()}
+        srcdirs = srcdirs.grep { dir -> new File(dir).isDirectory() }
         if (! srcdirs)
         {
             return
@@ -115,49 +102,32 @@ class JavaRules
 
     def compileTarget()
     {
-        abuild.runActions('java.compile', this.&compile)
+        def defaultAttrs = [
+            'srcdirs': ['src', 'generatedSrc'].collect {getPathVariable(it) },
+            'extrasrcdirs' : getPathListVariable('extraSrc'),
+            'destdir': getPathVariable('classes'),
+            'classpath': this.defaultCompileClassPath,
+            // Would be nice to turn path warnings back on
+            'compilerargs': ['-Xlint', '-Xlint:-path'],
+            'debug': 'true',
+            'deprecation': 'on'
+        ]
+        abuild.runActions('java.compile', this.&compile, defaultAttrs)
     }
 
     def packageJar(Map attributes)
     {
-        // The packageJarTask method will already have initialized the
-        // jarname attribute based on the java.jarName parameter if
-        // appropriate, so we don't have to check that here.
+        // Remove keys that we will handle expicitly
         def jarname = attributes.remove('jarname')
         if (! jarname)
         {
             return
         }
 
-        // No way to associate filesets with directories...if you need
-        // to do that, use a closure instead of an attribute map.
-
-        def defaultAttrs = [
-            'distdir': getPathVariable('dist'),
-            'classesdir': getPathVariable('classes'),
-            'resourcesdirs': [getPathVariable('resources'),
-                              getPathVariable('generatedResources')],
-            'extraresourcesdirs' : getPathListVariable('extraResources'),
-            'confdirs': [getPathVariable('conf'),
-                         getPathVariable('generatedConf')],
-            'extraconfdirs' : getPathListVariable('extraConf'),
-            'metainfdirs' : [getPathVariable('metainf'),
-                             getPathVariable('generatedMetainf')],
-            'extrametainfdirs' : getPathListVariable('extraMetainf'),
-            'mainclass' : abuild.resolveAsString('java.mainClass'),
-            'manifestclasspath' : defaultManifestClassPath,
-            'extramanifestkeys' : [:]
-        ]
-
-        Util.addDefaults(attributes, defaultAttrs)
-
-        // Remove keys that we will handle expicitly
         def distdir = attributes.remove('distdir')
         def classesdir = attributes.remove('classesdir')
         def resourcesdirs = attributes.remove('resourcesdirs')
         resourcesdirs.addAll(attributes.remove('extraresourcesdirs'))
-        def confdirs = attributes.remove('confdirs')
-        confdirs.addAll(attributes.remove('extraconfdirs'))
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
         def mainclass = attributes.remove('mainclass')
@@ -173,7 +143,7 @@ class JavaRules
         }
 
         // Take only last path element for each manifest class path
-        manifestClassPath = manifestClassPath.each { new File(it).name }
+        manifestClassPath = manifestClassPath.collect { new File(it).name }
 
         // Filter out non-existent directories
         def filesets = [classesdir, resourcesdirs].flatten().grep {
@@ -206,67 +176,69 @@ class JavaRules
 
     def packageJarTarget()
     {
-        // XXX Make sure all cases are tested.  Alternatively,
-        // simplify this somewhat by making java.packageJar and
-        // java.jarName mutually exclusive.
+        // We provide no way to associate filesets with directories.
+        // If you need to do that, use a closure instead of an
+        // attribute map.
 
-        def packageJarActions = abuild.resolveAsList('java.packageJar')
-        def jarName = abuild.resolve('java.jarName')
-        if (jarName)
-        {
-            if (packageJarActions)
-            {
-                if ((packageJarActions.size() == 1) &&
-                    (packageJarActions[0] instanceof Map) &&
-                    (! packageJarActions[0].containsKey('jarname')))
-                {
-                    packageJarActions[0]['jarname'] = jarName
-                }
-                else
-                {
-                    fail('java.jarName and java.packageJar may not both be ' +
-                         ' set unless java.packageJar is a single map with' +
-                         ' no jarname key')
-                }
-            }
-            else
-            {
-                packageJarActions = [['jarname': jarName]]
-            }
-        }
-        abuild.runActions(packageJarActions, this.&packageJar)
+        def defaultAttrs = [
+            'jarname': abuild.resolveAsString('java.jarName'),
+            'distdir': getPathVariable('dist'),
+            'classesdir': getPathVariable('classes'),
+            'resourcesdirs': [getPathVariable('resources'),
+                              getPathVariable('generatedResources')],
+            'extraresourcesdirs' : getPathListVariable('extraResources'),
+            'metainfdirs' : [getPathVariable('metainf'),
+                             getPathVariable('generatedMetainf')],
+            'extrametainfdirs' : getPathListVariable('extraMetainf'),
+            'mainclass' : abuild.resolveAsString('java.mainClass'),
+            'manifestclasspath' : defaultManifestClassPath,
+            'extramanifestkeys' : [:]
+        ]
+
+        abuild.runActions('java.packageJar', this.&packageJar, defaultAttrs)
     }
 
     def javadocTarget()
     {
-        // XXX REDO
-        if (! javadocTitle)
+        def title = abuild.resolveAsString('java.javadocTitle')
+        def defaultAttrs = [
+            'Doctitle': title,
+            'Windowtitle': title,
+            'srcdirs': ['src', 'generatedSrc'].collect {getPathVariable(it) },
+            'classpath': this.defaultCompileClassPath,
+            'extrasrcdirs': getPathListVariable('extraSrc'),
+            'access': abuild.resolveAsString('java.doc.accessLevel',
+                                             'protected'),
+            'destdir': getPathVariable('generatedDoc')
+        ]
+
+        abuild.runActions('java.javadoc', this.&javadoc, defaultAttrs)
+    }
+
+    def javadoc(Map attributes)
+    {
+        def srcdirs = attributes.remove('srcdirs')
+        srcdirs.addAll(attributes.remove('extrasrcdirs'))
+        srcdirs = srcdirs.grep { dir -> new File(dir).isDirectory() }
+        if (! srcdirs)
         {
             return
         }
-        def srcDirs = [srcDir, generatedSrcDir].grep {
-            dir -> new File(dir).isDirectory()
-        }
-        if (! srcDirs)
-        {
-            return
-        }
-        def sourcePath = srcDirs.join(pathSep)
-        def access = abuild.resolveAsString('javadoc.accessLevel', 'protected')
-        ant.javadoc(['sourcepath' : sourcePath, 'destdir' : docDir,
-                     'access' : access, 'Windowtitle' : javadocTitle,
-                     'Doctitle' : javadocTitle])
-        {
-            constructLinkPaths().each() {
+
+        def javadocAttrs = attributes
+        javadocAttrs['sourcepath'] = srcdirs.join(pathSep)
+        javadocAttrs['classpath'] = attributes['classpath'].join(pathSep)
+        def linkPaths = constructLinkPaths(attributes['destdir'])
+        ant.javadoc(javadocAttrs) {
+            linkPaths.each() {
                 linkPath ->
                 link('href' : linkPath)
             }
         }
     }
 
-    private List<String> constructLinkPaths()
+    private List<String> constructLinkPaths(String destinationDir)
     {
-        // XXX?
         def javadocPaths = []
         abuild.itemPaths.each() {
             item, path ->
@@ -287,29 +259,22 @@ class JavaRules
         return javadocPaths
     }
 
-    def wrapperTarget()
+    def wrapper(Map attributes)
     {
-        // XXX REDO
-        def wrapperName = abuild.resolveAsString('java.wrapperName')
-        def mainClass = abuild.resolveAsString('java.mainClass')
-        def jarName = abuild.resolveAsString('java.jarName')
+        def wrapperName = attributes['name']
+        def mainClass = attributes['mainclass']
+        def jarName = attributes['jarname']
         if (! (wrapperName && mainClass && jarName))
         {
             return
         }
-        def buildDir = abuild.buildDirectory.absolutePath
-        def wrapperPath = "${buildDir}/${wrapperName}"
-        def distDir = getPathVariable('dist')
-
-        def wrapperClassPath = []
-        // XXX duplicated
-        wrapperClassPath.addAll(
-            abuild.resolve('abuild.classpath') ?: [])
-        // XXX include external?
-        wrapperClassPath.addAll(
-            abuild.resolve('abuild.classpath.external') ?: [])
-        wrapperClassPath << "${distDir}/${jarName}"
+        def wrapperDir = attributes['dir']
+        def wrapperPath = "$wrapperDir/$wrapperName"
+        def distDir = attributes['distdir']
+        def wrapperClassPath = attributes['classpath']
+        wrapperClassPath << "$distDir/$jarName"
         wrapperClassPath = wrapperClassPath.join(pathSep)
+
         if (Util.inWindows)
         {
             ant.echo('file' : "${wrapperPath}.bat", """@echo off
@@ -328,6 +293,21 @@ exec java -classpath ${wrapperClassPath} ${mainClass} ${1+"\$@"}
 """)
         }
         ant.chmod('file' : wrapperPath, 'perm' : 'a+x')
+    }
+
+    def wrapperTarget()
+    {
+        def buildDir = abuild.buildDirectory.absolutePath
+        def defaultAttrs = [
+            'name': abuild.resolveAsString('java.wrapperName'),
+            'mainclass': abuild.resolveAsString('java.mainClass'),
+            'jarname': abuild.resolveAsString('java.jarName'),
+            'dir': abuild.buildDirectory.absolutePath,
+            'distdir': getPathVariable('dist'),
+            'classpath': defaultWrapperClassPath
+        ]
+
+        abuild.runActions('java.wrapper', this.&wrapper, defaultAttrs)
     }
 }
 

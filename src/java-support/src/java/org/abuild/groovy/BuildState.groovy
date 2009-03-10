@@ -222,13 +222,19 @@ class BuildState implements Parameterized
         resolveAsList(name, null)
     }
 
-    def runActions(String parameter, Closure defaultAction)
+    // targetParameter, if defined, resolves to a list whose elements
+    // are either maps or closures.  If not defined, it is treated as
+    // if its value were a list containing an empty map.
+    //
+    // For each element, if it is a closure, call it.  If it is a map,
+    // then expand the map by copying entries from defaultAttributes
+    // that for keys that are not present in the map.  Then call
+    // defaultAttributes on the resulting map.
+    def runActions(String targetParameter, Closure defaultAction,
+                   Map defaultAttributes)
     {
-        runActions(resolveAsList(parameter, [:]), defaultAction)
-    }
+        def actions = resolveAsList(targetParameter, [:])
 
-    def runActions(List actions, Closure defaultAction)
-    {
         actions.each {
             action ->
             switch (action)
@@ -238,11 +244,19 @@ class BuildState implements Parameterized
                 break;
 
               case Map:
+                defaultAttributes.each {
+                    k, v ->
+                    if ((v != null) && (! action.containsKey(k)))
+                    {
+                        action[k] = v;
+                    }
+                }
                 defaultAction(action)
                 break;
 
               default:
-                fail('expected elements of $parameter to be a Closure or Map')
+                fail("expected elements of $targetParameter" +
+                     " to be a Closure or Map")
                 break;
             }
         }

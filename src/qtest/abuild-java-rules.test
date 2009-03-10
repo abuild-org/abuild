@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-java-rules") or die;
+
+my $td = new TestDriver("java rules");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+
+if (! $test_java)
+{
+    $td->notify("skipping java tests");
+    $td->report(0);
+    exit 0;
+}
+
+# This test suite contains basic functionality tests for the Java
+# rules.  Additional testing is done through the examples tests.
+
+setup($td);
+
+cd('work');
+
+$td->runtest("build",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run simple java program",
+	     {$td->COMMAND => "simple/prog/abuild-java/java-program"},
+	     {$td->FILE => "$top/prog1.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run multijar program 1",
+	     {$td->COMMAND => "multijar/abuild-java/wrapper"},
+	     {$td->FILE => "$top/prog1.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run multijar program 2",
+	     {$td->COMMAND => "multijar/abuild-java/other"},
+	     {$td->FILE => "$top/prog2.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("extract simple program manifest",
+	     {$td->COMMAND =>
+		  [$jar, 'xf', 'simple/prog/abuild-java/dist/java-program.jar',
+		   'META-INF/MANIFEST.MF']},
+	     {$td->REGEXP => ".*", $td->EXIT_STATUS => 0});
+
+$td->runtest("check Class-Path",
+	     {$td->COMMAND => "grep Class-Path META-INF/MANIFEST.MF"},
+	     {$td->STRING =>"Class-Path: lib2.jar\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check Main-Class",
+	     {$td->COMMAND => "grep Main-Class META-INF/MANIFEST.MF"},
+	     {$td->STRING =>"Main-Class: com.example.basic.BasicProgram\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("extract lib2 manifest",
+	     {$td->COMMAND =>
+		  [$jar, 'xf', 'simple/lib2/abuild-java/dist/lib2.jar',
+		   'META-INF/MANIFEST.MF']},
+	     {$td->REGEXP => ".*", $td->EXIT_STATUS => 0});
+
+$td->runtest("check Class-Path",
+	     {$td->COMMAND => "grep Class-Path META-INF/MANIFEST.MF"},
+	     {$td->STRING =>"Class-Path: lib1.jar\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("extract multijar other manifest",
+	     {$td->COMMAND =>
+		  [$jar, 'xf', 'multijar/abuild-java/dist/other.jar',
+		   'META-INF/MANIFEST.MF']},
+	     {$td->REGEXP => ".*", $td->EXIT_STATUS => 0});
+
+$td->runtest("check extra key",
+	     {$td->COMMAND => "grep custom-key META-INF/MANIFEST.MF"},
+	     {$td->STRING =>"custom-key: medeco\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check Main-Class",
+	     {$td->COMMAND => "grep Main-Class META-INF/MANIFEST.MF"},
+	     {$td->STRING =>"Main-Class: com.example.other.Other\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
+
+$td->report(13);

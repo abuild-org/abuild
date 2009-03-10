@@ -1,0 +1,5 @@
+declare lib1.archiveName string = lib1.jar
+declare lib1.archivePath filename = \
+   $(ABUILD_OUTPUT_DIR)/dist/$(lib1.archiveName)
+abuild.classpath = $(lib1.archivePath)
+abuild.classpath.manifest = $(lib1.archivePath)
