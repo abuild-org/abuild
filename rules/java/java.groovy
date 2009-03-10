@@ -28,6 +28,20 @@ class JavaRules
         result
     }
 
+    def getPathListVariable(String var)
+    {
+        abuild.resolveAsList("java.dir.${var}").collect {
+            if (new File(it).isAbsolute())
+            {
+                it
+            }
+            else
+            {
+                "${itemDir}/${it}"
+            }
+        }
+    }
+
     def initTarget()
     {
         // We have three classpath interface variables that we combine
@@ -62,7 +76,7 @@ class JavaRules
     {
         def defaultAttrs = [
             'srcdirs': ['src', 'generatedSrc'].collect {getPathVariable(it) },
-            'extrasrcdirs' : [],
+            'extrasrcdirs' : getPathListVariable('extraSrc'),
             'destdir': getPathVariable('classes'),
             'classpath': this.defaultCompileClassPath,
             // Would be nice to turn path warnings back on
@@ -115,29 +129,27 @@ class JavaRules
             return
         }
 
-        // XXX need a way to associate filesets with directories
+        // No way to associate filesets with directories...if you need
+        // to do that, use a closure instead of an attribute map.
 
         def defaultAttrs = [
             'distdir': getPathVariable('dist'),
             'classesdir': getPathVariable('classes'),
             'resourcesdirs': [getPathVariable('resources'),
                               getPathVariable('generatedResources')],
-            'extraresourcesdirs' : [],
+            'extraresourcesdirs' : getPathListVariable('extraResources'),
             'confdirs': [getPathVariable('conf'),
                          getPathVariable('generatedConf')],
-            'extraconfdirs' : [],
+            'extraconfdirs' : getPathListVariable('extraConf'),
             'metainfdirs' : [getPathVariable('metainf'),
                              getPathVariable('generatedMetainf')],
-            'extrametainfdirs' : [],
+            'extrametainfdirs' : getPathListVariable('extraMetainf'),
             'mainclass' : abuild.resolveAsString('java.mainClass'),
             'manifestclasspath' : defaultManifestClassPath,
             'extramanifestkeys' : [:]
         ]
 
         Util.addDefaults(attributes, defaultAttrs)
-
-        // XXX What am I supposed to do with confdirs for a simple jar
-        // task?
 
         // Remove keys that we will handle expicitly
         def distdir = attributes.remove('distdir')

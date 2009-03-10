@@ -56,6 +56,13 @@ parameters {
     java.dir.generatedWeb = "${buildDir}/src/web"
     java.dir.generatedWebcontent = "${buildDir}/src/web/content"
 
+    java.dir.extraSrc = []
+    java.dir.extraResources
+    java.dir.extraConf = []
+    java.dir.extraMetainf = []
+    java.dir.extraWeb = []
+    java.dir.extraWebcontent = []
+
     // Set defaults for the "groovy" rules.  The groovy rules require
     // that the java rules are also being used and get most of their
     // defaults from java parameters.
