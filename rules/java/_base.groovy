@@ -41,27 +41,24 @@ parameters {
 
     java.dir.src = "${itemDir}/src/java"
     java.dir.resources = "${itemDir}/src/resources"
-    java.dir.conf = "${itemDir}/src/conf"
     java.dir.metainf = "${itemDir}/src/conf/metainf"
-    java.dir.web = "${itemDir}/src/web"
     java.dir.webcontent = "${itemDir}/src/web/content"
+    java.dir.webinf = "${itemDir}/src/conf/webinf"
 
     java.dir.dist = "${buildDir}/dist"
     java.dir.classes = "${buildDir}/classes"
     java.dir.generatedDoc = "${buildDir}/doc"
     java.dir.generatedSrc = "${buildDir}/src/java"
     java.dir.generatedResources = "${buildDir}/src/resources"
-    java.dir.generatedConf = "${buildDir}/src/conf"
     java.dir.generatedMetainf = "${buildDir}/src/conf/metainf"
-    java.dir.generatedWeb = "${buildDir}/src/web"
     java.dir.generatedWebcontent = "${buildDir}/src/web/content"
+    java.dir.generatedWebinf = "${buildDir}/src/conf/webinf"
 
     java.dir.extraSrc = []
     java.dir.extraResources
-    java.dir.extraConf = []
     java.dir.extraMetainf = []
-    java.dir.extraWeb = []
     java.dir.extraWebcontent = []
+    java.dir.extraWebinf = []
 
     // Set defaults for the "groovy" rules.  The groovy rules require
     // that the java rules are also being used and get most of their

@@ -25,6 +25,33 @@ Groovy Framework
 
  * Update rules/java/java_help.txt
 
+ * Include junit support.  Consider whether we should embed it junit.
+   If so, which version?  Groovy embeds 3.8.2.  Current is 4.5.
+
+ * There is no way to specify separate includes and excludes for the
+   various filesets inside of jar, war, or ear.  I can think of three
+   possible solutions:
+
+    - Don't bother supporting this.  People can always put their own
+      closures in abuild.packageJar if they want this.
+
+    - Allow the map entries passed to java.packageJar (etc.) to be
+      either directories or maps.  If an entry is a map, it is treated
+      as arguments to fileset.
+
+    - Have a parameter that maps directories to includes and excludes.
+      This is a little more obscure than the previous option, but it
+      enables customization of the contents of standard directories
+      without having to resort to using java.packageJar and copying
+      names of standard directories around.
+
+   Which way we goes probably depends on how much this functionality
+   is needed.  I personally feel that doing selective includes and
+   excludes for creating jars makes things unnecessarily obtuse, but
+   I've seen lots of examples of people doing things like creating
+   test jars that include all files and non-test jars that exclude
+   Test*.class.
+
  * No specific mechanism (like plugin.groovy) is provided for
    pre-initialization of parameters to be used by build item-supplied
    rules.  This facility does not exist on the make side either, and
