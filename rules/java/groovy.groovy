@@ -20,7 +20,7 @@ class GroovyRules
         def result = abuild.resolveAsString("${prefix}.dir.${var}")
         if (! new File(result).isAbsolute())
         {
-            result = "${itemDir}/${result}"
+            result = new File(abuild.sourceDirectory, result)
         }
         new File(result).absolutePath
     }

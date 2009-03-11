@@ -23,7 +23,7 @@ class JavaRules
         def result = abuild.resolveAsString("java.dir.${var}")
         if (! new File(result).isAbsolute())
         {
-            result = "${itemDir}/${result}"
+            result = new File(abuild.sourceDirectory, result)
         }
         // Wrap this in a file object and call absolutePath so
         // paths are formatted appropriately for the operating
@@ -40,7 +40,7 @@ class JavaRules
             }
             else
             {
-                new File("${itemDir}/${it}").absolutePath
+                new File(abuild.sourceDirectory, it).absolutePath
             }
         }
     }
@@ -179,10 +179,6 @@ class JavaRules
 
     def packageJarTarget()
     {
-        // We provide no way to associate filesets with directories.
-        // If you need to do that, use a closure instead of an
-        // attribute map.
-
         def defaultAttrs = [
             'jarname': abuild.resolveAsString('java.jarName'),
             'distdir': getPathVariable('dist'),
@@ -199,6 +195,120 @@ class JavaRules
         ]
 
         abuild.runActions('java.packageJar', this.&packageJar, defaultAttrs)
+    }
+
+    def packageWar(Map attributes)
+    {
+        // Remove keys that we will handle expicitly
+        def warname = attributes.remove('warname')
+        def webxml = attributes.remove('webxml')
+        def wartype = attributes.remove('wartype')
+        if (! (warname && webxml && wartype))
+        {
+            return
+        }
+        if (! ((wartype == 'client') || (wartype == 'server')))
+        {
+            fail('war type must be either "client" or "server"')
+        }
+
+        if (! new File(webxml).isAbsolute())
+        {
+            webxml = new File(abuild.sourceDirectory, webxml).absolutePath
+        }
+
+        def distdir = attributes.remove('distdir')
+        def classesdir = attributes.remove('classesdir')
+        def webdirs = attributes.remove('webdirs')
+        webdirs.addAll(attributes.remove('extrawebdirs'))
+        def metainfdirs = attributes.remove('metainfdirs')
+        metainfdirs.addAll(attributes.remove('extrametainfdirs'))
+        def webinfdirs = attributes.remove('webinfdirs')
+        webinfdirs.addAll(attributes.remove('extrawebinfdirs'))
+        def mainclass = attributes.remove('mainclass')
+        def manifestClassPath = attributes.remove('manifestclasspath')
+        def archives = attributes.remove('archives')
+
+        def libdir
+
+        if (archives)
+        {
+            File destdir
+            if (wartype == 'client')
+            {
+                // archives are copied into the root of the war file.
+                def generatedWebContent =
+                    getPathVariable('generatedWebContent')
+                if (! (webdirs.grep {
+                           new File(it).absolutePath == generatedWebContent }))
+                {
+                    webdirs << generatedWebContent
+                }
+                destdir = new File(generatedWebContent)
+            }
+            else
+            {
+                // archives are copied into a WEB-INF/lib.
+                libdir = new File(abuild.buildDirectory, 'web-archives')
+                destdir = libdir
+            }
+
+            ant.mkdir('dir': destdir.absolutePath)
+            archives.each {
+                src ->
+                if (new File(src).absolutePath !=
+                    new File("${distdir}/${warname}").absolutePath)
+                {
+                    def dest = new File(destdir,
+                                        new File(src).name).absolutePath
+                    ant.copy('file': src, 'tofile': dest)
+                }
+            }
+        }
+
+        // Filter out non-existent directories
+        webdirs = webdirs.grep { new File(it).isDirectory() }
+        metainfdirs = metainfdirs.grep { new File(it).isDirectory() }
+        webinfdirs = webinfdirs.grep { new File(it).isDirectory() }
+
+        ant.mkdir('dir' : distdir)
+        ant.war('destfile' : "${distdir}/${warname}",
+                'webxml': webxml) {
+            webinfdirs.each { webinf('dir': it) }
+            metainfdirs.each { metainf('dir': it) }
+            webdirs.each { fileset('dir': it) }
+            if (new File(classesdir).isDirectory())
+            {
+                classes('dir': classesdir)
+            }
+            if (libdir)
+            {
+                lib('dir': libdir.absolutePath)
+            }
+        }
+    }
+
+    def packageWarTarget()
+    {
+        def defaultAttrs = [
+            'warname': abuild.resolveAsString('java.warName'),
+            'webxml': abuild.resolveAsString('java.webxml'),
+            'wartype': abuild.resolveAsString('java.warType'),
+            'distdir': getPathVariable('dist'),
+            'classesdir': getPathVariable('classes'),
+            'webdirs': [getPathVariable('webContent'),
+                        getPathVariable('generatedWebContent')],
+            'extrawebdirs' : getPathListVariable('extraWebContent'),
+            'metainfdirs' : [getPathVariable('metainf'),
+                             getPathVariable('generatedMetainf')],
+            'extrametainfdirs' : getPathListVariable('extraMetainf'),
+            'webinfdirs' : [getPathVariable('webinf'),
+                            getPathVariable('generatedWebinf')],
+            'extrawebinfdirs' : getPathListVariable('extraWebinf'),
+            'archives' : defaultPackageClassPath,
+        ]
+
+        abuild.runActions('java.packageWar', this.&packageWar, defaultAttrs)
     }
 
     def javadocTarget()
@@ -318,13 +428,15 @@ def javaRules = new JavaRules(abuild, ant)
 
 abuild.addTargetClosure('init', javaRules.&initTarget)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
-abuild.addTargetDependencies('package', ['init', 'package-jar'])
+abuild.addTargetDependencies('package', ['init', 'package-jar', 'package-war'])
 abuild.addTargetDependencies('generate', ['init'])
 abuild.addTargetDependencies('doc', ['javadoc'])
 abuild.configureTarget('compile', 'deps' : ['generate'],
                        javaRules.&compileTarget)
 abuild.configureTarget('package-jar', 'deps' : ['compile'],
                        javaRules.&packageJarTarget)
+abuild.configureTarget('package-war', 'deps' : ['compile'],
+                       javaRules.&packageWarTarget)
 abuild.configureTarget('javadoc', 'deps' : ['compile'],
                        javaRules.&javadocTarget)
 abuild.configureTarget('wrapper', 'deps' : ['package-jar'],

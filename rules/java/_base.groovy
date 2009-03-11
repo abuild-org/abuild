@@ -42,7 +42,7 @@ parameters {
     java.dir.src = "${itemDir}/src/java"
     java.dir.resources = "${itemDir}/src/resources"
     java.dir.metainf = "${itemDir}/src/conf/metainf"
-    java.dir.webcontent = "${itemDir}/src/web/content"
+    java.dir.webContent = "${itemDir}/src/web/content"
     java.dir.webinf = "${itemDir}/src/conf/webinf"
 
     java.dir.dist = "${buildDir}/dist"
@@ -51,13 +51,13 @@ parameters {
     java.dir.generatedSrc = "${buildDir}/src/java"
     java.dir.generatedResources = "${buildDir}/src/resources"
     java.dir.generatedMetainf = "${buildDir}/src/conf/metainf"
-    java.dir.generatedWebcontent = "${buildDir}/src/web/content"
+    java.dir.generatedWebContent = "${buildDir}/src/web/content"
     java.dir.generatedWebinf = "${buildDir}/src/conf/webinf"
 
     java.dir.extraSrc = []
     java.dir.extraResources
     java.dir.extraMetainf = []
-    java.dir.extraWebcontent = []
+    java.dir.extraWebContent = []
     java.dir.extraWebinf = []
 
     // Set defaults for the "groovy" rules.  The groovy rules require
