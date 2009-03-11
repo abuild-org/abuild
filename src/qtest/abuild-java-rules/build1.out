@@ -1,3 +1,4 @@
+abuild: groovy-runtime (abuild-java): all
 abuild: lib1 (abuild-java): all
     [mkdir] Created dir: --topdir--/simple/lib1/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/simple/lib1/abuild-java/classes
@@ -6,6 +7,7 @@ abuild: lib1 (abuild-java): all
 abuild: lib2 (abuild-java): all
     [mkdir] Created dir: --topdir--/simple/lib2/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/simple/lib2/abuild-java/classes
+  [groovyc] Compiling 1 source file to --topdir--/simple/lib2/abuild-java/classes
     [mkdir] Created dir: --topdir--/simple/lib2/abuild-java/dist
       [jar] Building jar: --topdir--/simple/lib2/abuild-java/dist/lib2.jar
 abuild: multijar (abuild-java): all

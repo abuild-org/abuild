@@ -44,7 +44,7 @@ $td->runtest("run simple java program",
 
 $td->runtest("run multijar program 1",
 	     {$td->COMMAND => "multijar/abuild-java/wrapper"},
-	     {$td->FILE => "$top/prog1.out", $td->EXIT_STATUS => 0},
+	     {$td->FILE => "$top/prog3.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("run multijar program 2",

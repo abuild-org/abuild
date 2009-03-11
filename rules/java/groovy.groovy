@@ -22,7 +22,7 @@ class GroovyRules
         {
             result = "${itemDir}/${result}"
         }
-        result
+        new File(result).absolutePath
     }
 
     def initTarget()
@@ -42,7 +42,7 @@ class GroovyRules
         // classpath.
         def dist = getPathVariable('dist', 'java')
         defaultCompileClassPath = defaultCompileClassPath.grep {
-            newFile(dir).parent != dist
+            dir -> new File(dir).parent != dist
         }
     }
 

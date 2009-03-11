@@ -8,5 +8,6 @@ public class BasicProgram
     {
 	BasicLibrary l = new BasicLibrary(10);
 	l.hello();
+	OtherThing.printClassName(l);
     }
 };

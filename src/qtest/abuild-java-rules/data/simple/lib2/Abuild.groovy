@@ -1,4 +1,4 @@
 parameters {
-    abuild.rules = 'java'
+    abuild.rules << 'java' << 'groovy'
     java.jarName = 'lib2.jar'
 }
