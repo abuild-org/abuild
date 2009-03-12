@@ -1,6 +1,11 @@
 
 === Changes Targeted for Version 1.1 ===
 
+Immediate
+=========
+
+ * local interface variables
+
 Notes for Next Release
 ======================
 
@@ -12,7 +17,13 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ...
+ * abuild.appendParameter will pre-initialize a previously
+   uninitialized parameter using resolve.  This makes it possible to
+   create a parameter with the same name as an interface variable by
+   appending to it.  This works for defines too, but if a symbol
+   exists both in defines and parameters, defines wins, so it doesn't
+   really have any effect (as long as normal interfaces are used) to
+   append to something defined on the command line.
 
 
 Groovy Framework
@@ -56,16 +67,8 @@ Groovy Framework
    pre-initialization of parameters to be used by build item-supplied
    rules.  This facility does not exist on the make side either, and
    it has never been missed.  If code generators really need this
-   facility, they can set interface variables.  This does require a
-   slight difference in operation for groovy since interface variables
-   and parameters are in a different namespace.  Recommend "best
-   practice" of creating a rules plugin and throwing all your extra
-   rules in there.  Either that or provide some kind of mechanism for
-   loading rule initialization code from regular build items.  Maybe
-   we can have rule_init.{mk,groovy} or something.  Maybe it should be
-   used for plugins too.  Most likely it's better to just not provide
-   this for now as it encourages people to make these rules too
-   complex.
+   facility, they can set interface variables.  Note that parameters {
+   interface.variable << 'new-val' } does actually work as of 1.1.a3.
 
  * Consider providing a way to "decorate" targets by adding closures
    to be run before and after.  A pre-target closure would be run

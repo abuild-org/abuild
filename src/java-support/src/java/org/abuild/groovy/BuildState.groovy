@@ -146,21 +146,29 @@ class BuildState implements Parameterized
 
     void setParameter(String name, Object value)
     {
-        params[name] = ['list': false, 'value': value]
+        params[name] = [
+            'list': (value instanceof List),
+            'value': value
+        ]
     }
 
     void appendParameter(String name, Object value)
     {
-        if (params.containsKey(name))
+        if (! params.containsKey(name))
         {
-            if (! params[name].list)
-            {
-                fail("parameter $name has been previously set as non-list")
-            }
+            setParameter(name, resolve(name))
         }
-        else
+        if (! params[name].list)
         {
-            params[name] = ['list': true, 'value': []]
+            if (params[name].value == null)
+            {
+                params[name].value = []
+            }
+            else
+            {
+                params[name].value = [params[name].value]
+            }
+            params[name].list = true
         }
         params[name]['value'] << value
     }

@@ -2,3 +2,4 @@ declare interface-variable-name list string append
 interface-variable-name = one two three
 declare other.ifc.variable string
 other.ifc.variable = stringval
+declare item.list.variable list string append = a b c
