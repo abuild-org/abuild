@@ -1,0 +1,2 @@
+abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/potato.jar
+abuild.classpath.manifest = $(ABUILD_OUTPUT_DIR)/dist/potato.jar

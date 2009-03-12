@@ -1,0 +1,16 @@
+abuild: code (abuild-java): test
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/junit/code/abuild-java/classes
+    [mkdir] Created dir: --topdir--/junit/code/abuild-java/dist
+      [jar] Building jar: --topdir--/junit/code/abuild-java/dist/potato.jar
+abuild: failing (abuild-java): test
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/junit/failing/abuild-java/classes
+    [mkdir] Created dir: --topdir--/junit/failing/abuild-java/dist
+      [jar] Building jar: --topdir--/junit/failing/abuild-java/dist/failing-test.jar
+    [junit] Running com.example.FailingTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: <time>
+abuild-groovy: ERROR: ant build failure: Test com.example.FailingTest failed
+abuild: failing (abuild-java): build failed
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: failing on platform java

@@ -137,14 +137,6 @@ class JavaRules
         def manifestClassPath = attributes.remove('manifestclasspath')
         def extramanifestkeys = attributes.remove('extramanifestkeys')
 
-        if ((! manifestClassPath) && defaultCompileClassPath)
-        {
-            ant.echo('level':'warning',
-                     "manifest class path is not set;" +
-                     " using compile classpath as manifest classpath")
-            manifestClassPath.addAll(defaultCompileClassPath)
-        }
-
         // Take only last path element for each manifest class path
         manifestClassPath = manifestClassPath.collect { new File(it).name }
 
@@ -444,7 +436,7 @@ exec `dirname $0`/`basename $0`.bat ${1+"$@"}
         {
             ant.echo('file' : wrapperPath,
                      """#!/bin/sh
-exec java -classpath ${wrapperClassPath} ${mainClass} ${1+"\$@"}
+exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 """)
         }
         ant.chmod('file' : wrapperPath, 'perm' : 'a+x')

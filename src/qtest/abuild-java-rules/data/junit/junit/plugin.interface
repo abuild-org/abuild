@@ -1,0 +1,2 @@
+# Set ABUILD_JUNIT_JAR to the location of a junit jar file.
+abuild.classpath.external = $(ENV:ABUILD_JUNIT_JAR)

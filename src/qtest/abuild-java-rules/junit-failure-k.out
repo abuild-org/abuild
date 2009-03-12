@@ -1,0 +1,37 @@
+abuild: code (abuild-java): test
+abuild: failing (abuild-java): test
+    [junit] Running com.example.FailingTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: <time>
+abuild-groovy: ERROR: ant build failure: Test com.example.FailingTest failed
+abuild: failing (abuild-java): build failed
+abuild: test (abuild-java): test
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/junit/test/abuild-java/classes
+    [mkdir] Created dir: --topdir--/junit/test/abuild-java/dist
+      [jar] Building jar: --topdir--/junit/test/abuild-java/dist/potato-test.jar
+    [junit] Running com.example.PotatoTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running ../qtest/potato.test
+     [exec] potato  1 (potato)                                 ... PASSED
+     [exec] potato  2 (fail)                                   ... PASSED
+     [exec] 
+     [exec] Overall test suite                                 ... PASSED
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 2
+     [exec] Passes: 2
+     [exec] Failures: 0
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: failing on platform java

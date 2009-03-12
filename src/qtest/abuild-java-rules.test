@@ -165,6 +165,37 @@ $td->runtest("other ear contents",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/junit");
+
+if ($test_junit)
+{
+    $td->runtest("junit with failure",
+		 {$td->COMMAND => "abuild -b all test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/junit-failure.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("junit with failure and -k",
+		 {$td->COMMAND => "abuild -k -b all test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/junit-failure-k.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("junit with no failures",
+		 {$td->COMMAND => "abuild -d test -C test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/junit-okay.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    # Make sure these files are accessed.
+    system("(tar cf - . | cat > /dev/null)");
+}
+
 check_work_accessed($td);
 
-$td->report(21);
+$td->report(21 + ($test_junit ? 3 : 0));

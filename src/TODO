@@ -33,6 +33,8 @@ release notes.
 
  * Pass extra attributes to ant.jar
 
+ * Added junit support
+
 Groovy Framework
 ================
 

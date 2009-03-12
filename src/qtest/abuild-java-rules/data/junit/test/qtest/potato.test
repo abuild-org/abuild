@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('potato');
+
+$td->runtest("potato",
+	     {$td->COMMAND => "test_potato"},
+	     {$td->FILE => "potato.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("fail",
+	     {$td->COMMAND => "test_potato fail"},
+	     {$td->FILE => "potato-fail.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(2);
