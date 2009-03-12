@@ -92,10 +92,10 @@ class JavaRules
         def excludes = attributes.remove('excludes')
         def compilerargs = attributes.remove('compilerargs')
 
-        def javacArgs = attributes
-        javacArgs['classpath'] = compileClassPath.join(pathSep)
+        def javacAttrs = attributes
+        javacAttrs['classpath'] = compileClassPath.join(pathSep)
         ant.mkdir('dir' : attributes['destdir'])
-        ant.javac(javacArgs) {
+        ant.javac(javacAttrs) {
             srcdirs.each { dir -> src('path' : dir) }
             compilerargs?.each { arg -> compilerarg('value' : arg) }
             includes?.each { include('name' : it) }
@@ -157,7 +157,9 @@ class JavaRules
         }
 
         ant.mkdir('dir' : distdir)
-        ant.jar('destfile' : "${distdir}/${jarname}") {
+        def jarAttrs = attributes
+        jarAttrs['destfile'] = "${distdir}/${jarname}"
+        ant.jar(jarAttrs) {
             metainfdirs.each { metainf('dir': it) }
             filesets.each { fileset('dir': it) }
             manifest() {
@@ -236,8 +238,10 @@ class JavaRules
         webinfdirs = webinfdirs.grep { new File(it).isDirectory() }
 
         ant.mkdir('dir' : distdir)
-        ant.war('destfile' : "${distdir}/${warname}",
-                'webxml': webxml) {
+        def warAttrs = attributes
+        warAttrs['destfile'] = "${distdir}/${warname}"
+        warAttrs['webxml'] = webxml
+        ant.war(warAttrs) {
             webinfdirs.each { webinf('dir': it) }
             metainfdirs.each { metainf('dir': it) }
             webdirs.each { fileset('dir': it) }
@@ -247,13 +251,17 @@ class JavaRules
             }
             archives.each {
                 File f = new File(it)
-                if (clientWar)
+                if (f.absolutePath !=
+                    new File("${distdir}/${warname}").absolutePath)
                 {
-                    fileset('dir': f.parent, 'includes': f.name)
-                }
-                else
-                {
-                    lib('dir': f.parent, 'includes': f.name)
+                    if (clientWar)
+                    {
+                        fileset('dir': f.parent, 'includes': f.name)
+                    }
+                    else
+                    {
+                        lib('dir': f.parent, 'includes': f.name)
+                    }
                 }
             }
         }
@@ -280,6 +288,69 @@ class JavaRules
         ]
 
         abuild.runActions('java.packageWar', this.&packageWar, defaultAttrs)
+    }
+
+    def packageEar(Map attributes)
+    {
+        // Remove keys that we will handle expicitly
+        def earname = attributes.remove('earname')
+        def appxml = attributes.remove('appxml')
+        if (! (earname && appxml))
+        {
+            return
+        }
+        if (! new File(appxml).isAbsolute())
+        {
+            appxml = new File(abuild.sourceDirectory, appxml).absolutePath
+        }
+
+        def distdir = attributes.remove('distdir')
+        def resourcesdirs = attributes.remove('resourcesdirs')
+        resourcesdirs.addAll(attributes.remove('extraresourcesdirs'))
+        def metainfdirs = attributes.remove('metainfdirs')
+        metainfdirs.addAll(attributes.remove('extrametainfdirs'))
+        def mainclass = attributes.remove('mainclass')
+        def manifestClassPath = attributes.remove('manifestclasspath')
+        def archives = attributes.remove('archives')
+
+        // Filter out non-existent directories
+        resourcesdirs = resourcesdirs.grep { new File(it).isDirectory() }
+        metainfdirs = metainfdirs.grep { new File(it).isDirectory() }
+
+        ant.mkdir('dir' : distdir)
+        def earAttrs = attributes
+        earAttrs['destfile'] = "${distdir}/${earname}"
+        earAttrs['appxml'] = appxml
+        ant.ear(earAttrs) {
+            metainfdirs.each { metainf('dir': it) }
+            resourcesdirs.each { fileset('dir': it) }
+            archives.each {
+                File f = new File(it)
+                if (f.absolutePath !=
+                    new File("${distdir}/${earname}").absolutePath)
+                {
+                    fileset('dir': f.parent, 'includes': f.name)
+                }
+            }
+        }
+    }
+
+    def packageEarTarget()
+    {
+        def defaultAttrs = [
+            'earname': abuild.resolveAsString('java.earName'),
+            'appxml': abuild.resolveAsString('java.appxml'),
+            'distdir': getPathVariable('dist'),
+            'resourcesdirs': [getPathVariable('resources'),
+                              getPathVariable('generatedResources')],
+            'extraresourcesdirs' : getPathListVariable('extraResources'),
+            'metainfdirs' : [getPathVariable('metainf'),
+                             getPathVariable('generatedMetainf')],
+            'extrametainfdirs' : getPathListVariable('extraMetainf'),
+            'archives' : defaultPackageClassPath,
+        ]
+
+        abuild.runActions('java.packageEar', this.&packageEar, defaultAttrs)
     }
 
     def javadocTarget()
@@ -399,7 +470,12 @@ def javaRules = new JavaRules(abuild, ant)
 
 abuild.addTargetClosure('init', javaRules.&initTarget)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
-abuild.addTargetDependencies('package', ['init', 'package-jar', 'package-war'])
+abuild.addTargetDependencies('package',
+                             ['init',
+                              'package-jar',
+                              'package-war',
+                              'package-ear'
+                             ])
 abuild.addTargetDependencies('generate', ['init'])
 abuild.addTargetDependencies('doc', ['javadoc'])
 abuild.configureTarget('compile', 'deps' : ['generate'],
@@ -408,6 +484,8 @@ abuild.configureTarget('package-jar', 'deps' : ['compile'],
                        javaRules.&packageJarTarget)
 abuild.configureTarget('package-war', 'deps' : ['compile'],
                        javaRules.&packageWarTarget)
+abuild.configureTarget('package-ear', 'deps' : ['compile'],
+                       javaRules.&packageEarTarget)
 abuild.configureTarget('javadoc', 'deps' : ['compile'],
                        javaRules.&javadocTarget)
 abuild.configureTarget('wrapper', 'deps' : ['package-jar'],

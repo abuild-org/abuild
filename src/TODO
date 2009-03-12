@@ -1,6 +1,8 @@
 
 === Changes Targeted for Version 1.1 ===
 
+XXX idempotency -- test in abuild-java-rules and for archive types
+
 Notes for Next Release
 ======================
 
@@ -29,7 +31,9 @@ release notes.
    depend on them.  If declared in Abuild.interface, they are visible
    to after-build files, and they are also to the build item.
 
- * Added war support to java rules
+ * Added war and ear support to java rules
+
+ * Pass extra attributes to ant.jar
 
 Groovy Framework
 ================
