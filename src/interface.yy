@@ -87,6 +87,8 @@
 %type <declaration> declaration
 %type <declaration> declbody
 %type <typespec> typespec
+%type <typespec> listtypespec
+%type <typespec> basetypespec
 %type <afterbuild> afterbuild
 %type <targettype> targettype
 %type <words> words
@@ -350,10 +352,39 @@ declbody : tok_declare tok_identifier typespec
 	  }
 	;
 
-// This actually allows stuff like
-// declare x local local non-recursive list list string append prepend
-// but we'll let that go for now.
-typespec : tok_boolean
+typespec : listtypespec
+	  {
+	      $$ = $1;
+	  }
+	| tok_nonrecursive listtypespec
+	  {
+	      $2->setScope(Interface::s_nonrecursive);
+	      $$ = $2;
+	  }
+	| tok_local listtypespec
+	  {
+	      $2->setScope(Interface::s_local);
+	      $$ = $2;
+	  }
+	;
+
+listtypespec : basetypespec
+          {
+	      $$ = $1;
+	  }
+        | tok_list basetypespec tok_append
+	  {
+	      $2->setListType(Interface::l_append);
+	      $$ = $2;
+	  }
+	| tok_list basetypespec tok_prepend
+	  {
+	      $2->setListType(Interface::l_prepend);
+	      $$ = $2;
+	  }
+	;
+
+basetypespec : tok_boolean
 	  {
 	      $$ = parser->createTypeSpec(
 		  $1->getLocation(), Interface::t_boolean);
@@ -367,26 +398,6 @@ typespec : tok_boolean
 	  {
 	      $$ = parser->createTypeSpec(
 		  $1->getLocation(), Interface::t_filename);
-	  }
-	| tok_list typespec tok_append
-	  {
-	      $2->setListType(Interface::l_append);
-	      $$ = $2;
-	  }
-	| tok_list typespec tok_prepend
-	  {
-	      $2->setListType(Interface::l_prepend);
-	      $$ = $2;
-	  }
-	| tok_nonrecursive typespec
-	  {
-	      $2->setScope(Interface::s_nonrecursive);
-	      $$ = $2;
-	  }
-	| tok_local typespec
-	  {
-	      $2->setScope(Interface::s_local);
-	      $$ = $2;
 	  }
 	;
 
