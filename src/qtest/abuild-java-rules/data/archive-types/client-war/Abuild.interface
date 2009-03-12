@@ -1,0 +1,2 @@
+# Not really a classpath item, but this is what you have to do for now.
+abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/client-war-example.war

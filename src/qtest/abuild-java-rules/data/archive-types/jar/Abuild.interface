@@ -1,0 +1,3 @@
+declare _localJar local filename = $(ABUILD_OUTPUT_DIR)/dist/jar-example.jar
+abuild.classpath = $(_localJar)
+abuild.classpath.manifest = $(_localJar)
