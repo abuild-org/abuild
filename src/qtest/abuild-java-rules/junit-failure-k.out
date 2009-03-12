@@ -9,8 +9,6 @@ abuild: test (abuild-java): test
     [javac] Compiling 1 source file to --topdir--/junit/test/abuild-java/classes
     [mkdir] Created dir: --topdir--/junit/test/abuild-java/dist
       [jar] Building jar: --topdir--/junit/test/abuild-java/dist/potato-test.jar
-    [junit] Running com.example.PotatoTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
      [exec] 
      [exec] *********************************
      [exec] STARTING TESTS on ---timestamp---
@@ -33,5 +31,7 @@ abuild: test (abuild-java): test
      [exec] Missing Tests: 0
      [exec] Extra Tests: 0
      [exec] 
+    [junit] Running com.example.PotatoTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: failing on platform java

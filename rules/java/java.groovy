@@ -456,11 +456,67 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 
         abuild.runActions('java.wrapper', this.&wrapper, defaultAttrs)
     }
+
+    def testJunit(Map attributes)
+    {
+        def testsuite = attributes.remove('testsuite')
+        if (! testsuite)
+        {
+            return
+        }
+        def distdir = attributes.remove('distdir')
+        def reportdir = attributes.remove('reportdir')
+        def testClassPath = attributes.remove('classpath')
+
+        ant.mkdir('dir': distdir)
+        def junitAttrs = attributes
+        ant.junit(junitAttrs) {
+            classpath {
+                testClassPath.each {
+                    pathelement('location': it)
+                }
+                fileset('dir': distdir, 'includes': '*.jar')
+            }
+            test('name': testsuite,
+                 'todir': distdir) {
+                formatter('type': 'xml')
+            }
+        }
+        ant.junitreport('todir': distdir) {
+            fileset('dir': distdir, 'includes':  'TEST-*.xml')
+            report('format': 'frames', 'todir': reportdir)
+        }
+    }
+
+    def testJunitTarget()
+    {
+        def defaultClassPath = []
+        defaultClassPath.addAll(
+            abuild.resolve('abuild.classpath') ?: [])
+        defaultClassPath.addAll(
+            abuild.resolve('abuild.classpath.external') ?: [])
+
+        def buildDir = abuild.buildDirectory.absolutePath
+        def defaultAttrs = [
+            'testsuite': abuild.resolveAsString('java.junitTestsuite'),
+            'classpath': defaultClassPath,
+            'distdir': getPathVariable('dist'),
+            'reportdir': new File(abuild.buildDirectory,
+                                  'junit/html').absolutePath,
+            'printsummary': 'yes',
+            'haltonfailure': 'yes',
+            'fork': 'true'
+        ]
+
+        abuild.runActions('java.junit', this.&testJunit, defaultAttrs)
+    }
+
 }
 
 def javaRules = new JavaRules(abuild, ant)
 
 abuild.addTargetClosure('init', javaRules.&initTarget)
+abuild.addTargetClosure('test-only', javaRules.&testJunitTarget)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
 abuild.addTargetDependencies('package',
                              ['init',
