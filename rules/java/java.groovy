@@ -211,6 +211,7 @@ class JavaRules
         {
             fail('war type must be either "client" or "server"')
         }
+        boolean clientWar = (wartype == 'client')
 
         if (! new File(webxml).isAbsolute())
         {
@@ -229,43 +230,6 @@ class JavaRules
         def manifestClassPath = attributes.remove('manifestclasspath')
         def archives = attributes.remove('archives')
 
-        def libdir
-
-        if (archives)
-        {
-            File destdir
-            if (wartype == 'client')
-            {
-                // archives are copied into the root of the war file.
-                def generatedWebContent =
-                    getPathVariable('generatedWebContent')
-                if (! (webdirs.grep {
-                           new File(it).absolutePath == generatedWebContent }))
-                {
-                    webdirs << generatedWebContent
-                }
-                destdir = new File(generatedWebContent)
-            }
-            else
-            {
-                // archives are copied into a WEB-INF/lib.
-                libdir = new File(abuild.buildDirectory, 'web-archives')
-                destdir = libdir
-            }
-
-            ant.mkdir('dir': destdir.absolutePath)
-            archives.each {
-                src ->
-                if (new File(src).absolutePath !=
-                    new File("${distdir}/${warname}").absolutePath)
-                {
-                    def dest = new File(destdir,
-                                        new File(src).name).absolutePath
-                    ant.copy('file': src, 'tofile': dest)
-                }
-            }
-        }
-
         // Filter out non-existent directories
         webdirs = webdirs.grep { new File(it).isDirectory() }
         metainfdirs = metainfdirs.grep { new File(it).isDirectory() }
@@ -281,9 +245,16 @@ class JavaRules
             {
                 classes('dir': classesdir)
             }
-            if (libdir)
-            {
-                lib('dir': libdir.absolutePath)
+            archives.each {
+                File f = new File(it)
+                if (clientWar)
+                {
+                    fileset('dir': f.parent, 'includes': f.name)
+                }
+                else
+                {
+                    lib('dir': f.parent, 'includes': f.name)
+                }
             }
         }
     }
