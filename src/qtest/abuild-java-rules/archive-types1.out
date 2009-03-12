@@ -1,0 +1,26 @@
+abuild: jar-example (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/classes
+    [javac] Compiling 2 source files to --topdir--/archive-types/jar/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/jar/abuild-java/dist
+      [jar] Building jar: --topdir--/archive-types/jar/abuild-java/dist/jar-example.jar
+abuild: client-war-example (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/archive-types/client-war/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/dist
+      [war] Building war: --topdir--/archive-types/client-war/abuild-java/dist/client-war-example.war
+abuild: ear-example.local-jar (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/archive-types/ear/local-jar/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/dist
+      [jar] Building jar: --topdir--/archive-types/ear/local-jar/abuild-java/dist/ear-code.jar
+abuild: war-example (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/archive-types/war/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/dist
+      [war] Building war: --topdir--/archive-types/war/abuild-java/dist/war-example.war
+abuild: ear-example (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/dist
+      [ear] Building ear: --topdir--/archive-types/ear/abuild-java/dist/ear-example.ear
+abuild: other-ear-example (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/other-ear/abuild-java/dist
+      [ear] Building ear: --topdir--/archive-types/other-ear/abuild-java/dist/other-ear-example.ear

@@ -28,12 +28,19 @@ if (! $test_java)
 
 setup($td);
 
-cd('work');
+cd('work/jars');
 
 $td->runtest("build",
 	     {$td->COMMAND => "abuild -b all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/build1.out",
+	     {$td->FILE => "$top/jars1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("rebuild when up to date",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/jars2.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -100,6 +107,64 @@ $td->runtest("check Main-Class",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/archive-types");
+
+$td->runtest("archive types",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/archive-types1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("rebuild when up to date",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/archive-types2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("jar contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "jar/abuild-java/dist/jar-example.jar"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/jar-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("war contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "war/abuild-java/dist/war-example.war"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/war-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("client war contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf',
+		   "client-war/abuild-java/dist/client-war-example.war"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/client-war-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("ear contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "ear/abuild-java/dist/ear-example.ear"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/ear-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("other ear contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf',
+		   "other-ear/abuild-java/dist/other-ear-example.ear"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/other-ear-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(13);
+$td->report(21);
