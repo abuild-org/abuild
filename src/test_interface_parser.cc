@@ -11,47 +11,6 @@
 static Logger* logger = 0;
 
 static std::string
-unparse_type(bool recursive, Interface::type_e type,
-	     Interface::list_e list_type)
-{
-    std::string result;
-    if (! recursive)
-    {
-	result += "non-recursive ";
-    }
-    switch (type)
-    {
-      case Interface::t_string:
-	result += "string";
-	break;
-
-      case Interface::t_boolean:
-	result += "boolean";
-	break;
-
-      case Interface::t_filename:
-	result += "filename";
-	break;
-    }
-    switch (list_type)
-    {
-      case Interface::l_scalar:
-	result += " scalar";
-	break;
-
-      case Interface::l_append:
-	result += " appendlist";
-	break;
-
-      case Interface::l_prepend:
-	result += " prependlist";
-	break;
-    }
-
-    return result;
-}
-
-static std::string
 unparse_values(std::deque<std::string> const& value)
 {
     std::string result;
@@ -77,7 +36,7 @@ static void dump_interface(std::string const& name, Interface const& _interface,
 	bool status = _interface.getVariable(*iter, flag_data, info);
 	assert(status);
 	std::string msg = "  " + *iter + ": " +
-	    unparse_type(info.recursive, info.type, info.list_type) +
+	    Interface::unparse_type(info.scope, info.type, info.list_type) +
 	    ", target type " + TargetType::getName(info.target_type);
 	if (info.initialized)
 	{

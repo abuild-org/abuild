@@ -4,8 +4,8 @@ nt_TypeSpec::nt_TypeSpec(FileLocation const& location,
 			 Interface::type_e type) :
     NonTerminal(location),
     type(type),
-    list_type(Interface::l_scalar),
-    recursive(true)
+    scope(Interface::s_recursive),
+    list_type(Interface::l_scalar)
 {
 }
 
@@ -20,9 +20,9 @@ nt_TypeSpec::setListType(Interface::list_e list_type)
 }
 
 void
-nt_TypeSpec::setNonRecursive()
+nt_TypeSpec::setScope(Interface::scope_e scope)
 {
-    this->recursive = false;
+    this->scope = scope;
 }
 
 Interface::type_e
@@ -37,8 +37,8 @@ nt_TypeSpec::getListType() const
     return this->list_type;
 }
 
-bool
-nt_TypeSpec::getRecursive() const
+Interface::scope_e
+nt_TypeSpec::getScope() const
 {
-    return this->recursive;
+    return this->scope;
 }

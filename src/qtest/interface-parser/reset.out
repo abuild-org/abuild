@@ -1,7 +1,7 @@
 parse(reset): success
 dumping interface reset
-  A: string scalar, target type all: uninitialized
-  B: string scalar, target type all = moo
-  C: string scalar, target type all = cluq
+  A: string, target type all: uninitialized
+  B: string, target type all = moo
+  C: string, target type all = cluq
   no after-build files
 end of interface reset

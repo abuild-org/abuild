@@ -1,11 +1,6 @@
 
 === Changes Targeted for Version 1.1 ===
 
-Immediate
-=========
-
- * local interface variables
-
 Notes for Next Release
 ======================
 
@@ -25,6 +20,14 @@ release notes.
    really have any effect (as long as normal interfaces are used) to
    append to something defined on the command line.
 
+ * Added local interface variables:
+
+   declare var local string = whatever
+
+   These have a scope of the current build item only.  Nothing about
+   them, including their declarations, are visible to items that
+   depend on them.  If declared in Abuild.interface, they are visible
+   to after-build files, and they are also to the build item.
 
 Groovy Framework
 ================

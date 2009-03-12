@@ -15,11 +15,11 @@ semantic1:54:10: ERROR: unknown variable UNKNOWN
 semantic1:55:6: ERROR: flag unknown-flag is not supported by this build item
 parse(semantic1): failure
 dumping interface semantic1
-  a: string scalar, target type object-code = 
-  b: string appendlist, target type object-code: uninitialized
-  c: boolean scalar, target type object-code = 1
-  d: filename scalar, target type object-code = --CWD--/a
-  e: filename prependlist, target type object-code: uninitialized
+  a: string, target type object-code = 
+  b: list string append, target type object-code: uninitialized
+  c: boolean, target type object-code = 1
+  d: filename, target type object-code = --CWD--/a
+  e: list filename prepend, target type object-code: uninitialized
   after-build files:
     --CWD--/something.interface
     --CWD--/a

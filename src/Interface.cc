@@ -35,9 +35,15 @@ Interface::importInterface(Interface const& other)
 	 iter != other.symbol_table.end(); ++iter)
     {
 	Variable const& var = (*iter).second;
+	if (var.scope == s_local)
+	{
+	    // Local variables, including their declarations, are not
+	    // imported at all.
+	    continue;
+	}
 
 	if (this->declareVariable(var.declare_location, var.target_type,
-				  var.name, var.recursive,
+				  var.name, var.scope,
 				  var.type, var.list_type))
 	{
 	    // Import reset history without the affect of the reset
@@ -63,7 +69,7 @@ Interface::importInterface(Interface const& other)
 		 aiter != var.assignment_history.end(); ++aiter)
 	    {
 		Assignment const& assignment = *aiter;
-		if (var.recursive ||
+		if ((var.scope == s_recursive) ||
 		    (assignment.item_name == other.item_name))
 		{
 		    if (! this->assignVariable(assignment.location,
@@ -96,17 +102,17 @@ Interface::setTargetType(TargetType::target_type_e target_type)
 bool
 Interface::declareVariable(FileLocation const& location,
 			   std::string const& variable_name,
-			   bool recursive, type_e type, list_e list_type)
+			   scope_e scope, type_e type, list_e list_type)
 {
     return declareVariable(location, this->target_type, variable_name,
-			   recursive, type, list_type);
+			   scope, type, list_type);
 }
 
 bool
 Interface::declareVariable(FileLocation const& location,
 			   TargetType::target_type_e target_type,
 			   std::string const& variable_name,
-			   bool recursive, type_e type, list_e list_type)
+			   scope_e scope, type_e type, list_e list_type)
 {
     bool status = true;
 
@@ -139,7 +145,7 @@ Interface::declareVariable(FileLocation const& location,
 	// Add this variable to the symbol table
 	this->symbol_table[variable_name] =
 	    Variable(variable_name, location, target_type,
-		     recursive, type, list_type);
+		     scope, type, list_type);
     }
 
     return status;
@@ -482,7 +488,7 @@ Interface::getVariable(std::string const& variable_name,
 	    (*(this->symbol_table.find(variable_name))).second;
 	info.target_type = var.target_type;
 	info.type = var.type;
-	info.recursive = var.recursive;
+	info.scope = var.scope;
 	info.list_type = var.list_type;
 	info.value.clear();
 
@@ -575,37 +581,50 @@ Interface::getVariable(std::string const& variable_name,
 }
 
 std::string
-Interface::unparse_type(type_e type, list_e list_type)
+Interface::unparse_type(scope_e scope, type_e type, list_e list_type)
 {
     std::string result;
-    if (list_type != Interface::l_scalar)
+    switch (scope)
+    {
+      case s_recursive:
+	break;
+
+      case s_nonrecursive:
+	result += "non-recursive ";
+	break;
+
+      case s_local:
+	result += "local ";
+	break;
+    }
+    if (list_type != l_scalar)
     {
 	result += "list ";
     }
     switch (type)
     {
-      case Interface::t_string:
+      case t_string:
 	result += "string";
 	break;
 
-      case Interface::t_boolean:
+      case t_boolean:
 	result += "boolean";
 	break;
 
-      case Interface::t_filename:
+      case t_filename:
 	result += "filename";
 	break;
     }
     switch (list_type)
     {
-      case Interface::l_scalar:
+      case l_scalar:
 	break;
 
-      case Interface::l_append:
+      case l_append:
 	result += " append";
 	break;
 
-      case Interface::l_prepend:
+      case l_prepend:
 	result += " prepend";
 	break;
     }
@@ -686,8 +705,7 @@ Interface::dump(std::ostream& out) const
 	Variable const& var = (*iter).second;
 
 	out << " <variable name=\"" << Util::XMLify(variable_name, true)
-	    << "\" type=\"" << unparse_type(var.type, var.list_type)
-	    << "\" recursive=\"" << (var.recursive ? "1" : "0")
+	    << "\" type=\"" << unparse_type(var.scope, var.type, var.list_type)
 	    << "\" target-type=\"" << TargetType::getName(var.target_type)
 	    << "\" declaration-location=\""
 	    << Util::XMLify(var.declare_location, true)

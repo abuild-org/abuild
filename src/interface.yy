@@ -60,6 +60,7 @@
 %token <token> tok_append
 %token <token> tok_prepend
 %token <token> tok_nonrecursive
+%token <token> tok_local
 %token <token> tok_afterbuild
 %token <token> tok_targettype
 %token <token> tok_identifier
@@ -349,6 +350,9 @@ declbody : tok_declare tok_identifier typespec
 	  }
 	;
 
+// This actually allows stuff like
+// declare x local local non-recursive list list string append prepend
+// but we'll let that go for now.
 typespec : tok_boolean
 	  {
 	      $$ = parser->createTypeSpec(
@@ -376,7 +380,12 @@ typespec : tok_boolean
 	  }
 	| tok_nonrecursive typespec
 	  {
-	      $2->setNonRecursive();
+	      $2->setScope(Interface::s_nonrecursive);
+	      $$ = $2;
+	  }
+	| tok_local typespec
+	  {
+	      $2->setScope(Interface::s_local);
 	      $$ = $2;
 	  }
 	;

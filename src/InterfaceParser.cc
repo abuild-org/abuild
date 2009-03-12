@@ -541,7 +541,7 @@ InterfaceParser::evaluateDeclaration(
 	this->_interface->declareVariable(
 	    declaration->getLocation(),
 	    declaration->getVariableName(),
-	    declaration->getRecursive(),
+	    declaration->getScope(),
 	    declaration->getType(),
 	    declaration->getListType());
 

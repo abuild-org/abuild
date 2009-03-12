@@ -1,5 +1,5 @@
 parse(spaces1): success
 dumping interface spaces1
-  A: string appendlist, target type all = B C D E
+  A: list string append, target type all = B C D E
   no after-build files
 end of interface spaces1

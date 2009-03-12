@@ -28,11 +28,11 @@ conditional1:128:15: ERROR: this argument must be a filename
 conditional1:137:9: ERROR: this argument must be a function call or a boolean variable
 parse(conditional1): failure
 dumping interface conditional1
-  a: boolean scalar, target type all = 1
-  b: boolean scalar, target type all = 0
-  l1: string appendlist, target type all = one two three
-  q: boolean scalar, target type all: uninitialized
-  str: string scalar, target type all = asdf
+  a: boolean, target type all = 1
+  b: boolean, target type all = 0
+  l1: list string append, target type all = one two three
+  q: boolean, target type all: uninitialized
+  str: string, target type all = asdf
   after-build files:
     --CWD--/seen17
 end of interface conditional1

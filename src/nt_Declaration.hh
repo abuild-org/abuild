@@ -18,15 +18,15 @@ class nt_Declaration: public NonTerminal
 
     std::string const& getVariableName() const;
     nt_Words const* getInitializer() const;
+    Interface::scope_e getScope() const;
     Interface::type_e getType() const;
     Interface::list_e getListType() const;
-    bool getRecursive() const;
 
   private:
     std::string variable_name;
+    Interface::scope_e scope;
     Interface::type_e type;
     Interface::list_e list_type;
-    bool recursive;
     nt_Words const* initializer;
 };
 
