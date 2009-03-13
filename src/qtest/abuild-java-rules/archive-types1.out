@@ -17,11 +17,14 @@ abuild: war-example (abuild-java): all
     [javac] Compiling 1 source file to --topdir--/archive-types/war/abuild-java/classes
     [mkdir] Created dir: --topdir--/archive-types/war/abuild-java/dist
       [war] Building war: --topdir--/archive-types/war/abuild-java/dist/war-example.war
+abuild: rar-example (abuild-java): all
+    [mkdir] Created dir: --topdir--/archive-types/rar/abuild-java/dist
+      [jar] Building jar: --topdir--/archive-types/rar/abuild-java/dist/rar-example.rar
 abuild: ear-example (abuild-java): all
     [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/archive-types/ear/abuild-java/classes
     [mkdir] Created dir: --topdir--/archive-types/ear/abuild-java/dist
-      [jar] Building jar: --topdir--/archive-types/ear/abuild-java/dist/ear-code-unsigned.jar
+      [jar] Building jar: --topdir--/archive-types/ear/abuild-java/dist/ear-code.jar.unsigned
      [copy] Copying 1 file to --topdir--/archive-types/ear/abuild-java/dist
   [signjar] Signing JAR: --topdir--/archive-types/ear/abuild-java/dist/ear-code.jar to --topdir--/archive-types/ear/abuild-java/dist/ear-code.jar as abuild-testsuite
   [signjar] Enter Passphrase for keystore: Enter key password for abuild-testsuite: 

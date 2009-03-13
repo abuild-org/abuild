@@ -5,5 +5,5 @@ parameters {
     // Prevent jar-example.jar from being included in the ear.
     def archives = resolve('abuild.classpath').grep {
         new File(it).name != 'jar-example.jar' }
-    java.packageEar = ['archives': archives]
+    java.packageEar = ['otherfiles': archives]
 }

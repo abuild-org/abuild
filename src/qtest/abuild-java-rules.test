@@ -140,6 +140,14 @@ $td->runtest("jar contents",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("rar contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "rar/abuild-java/dist/rar-example.rar"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/rar-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("war contents",
 	     {$td->COMMAND =>
 		  [$jar, 'tf', "war/abuild-java/dist/war-example.war"],
@@ -207,4 +215,4 @@ else
 
 check_work_accessed($td, 'not-accessed.out');
 
-$td->report(21 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));
+$td->report(22 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));

@@ -19,7 +19,8 @@ they are initialized.
 
 Dependencies:
 
-all -> package -> package-ear -> package-war -> sign-jars -> copy-jars
+all -> package -> package-ear -> package-war -> package-rar
+  -> sign-jars -> copy-jars
   -> package-jar -> compile -> generate -> init
 
 For war packaging:

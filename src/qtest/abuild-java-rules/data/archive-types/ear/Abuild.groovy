@@ -1,7 +1,7 @@
 parameters {
     abuild.rules = 'java'
     def dist = new File(abuild.resolve('java.dir.dist'))
-    def unsigned = new File(dist, 'ear-code-unsigned.jar')
+    def unsigned = new File(dist, 'ear-code.jar.unsigned')
     def signed = new File(dist, 'ear-code.jar')
     java.jarName = unsigned.name
     java.earName = 'ear-example.ear'

@@ -45,6 +45,21 @@ class JavaRules
         }
     }
 
+    def getArchiveAttributes()
+    {
+        [
+            'distdir': getPathVariable('dist'),
+            'classesdir': getPathVariable('classes'),
+            'resourcesdirs': [getPathVariable('resources'),
+                              getPathVariable('generatedResources')],
+            'extraresourcesdirs' : getPathListVariable('extraResources'),
+            'metainfdirs' : [getPathVariable('metainf'),
+                             getPathVariable('generatedMetainf')],
+            'extrametainfdirs' : getPathListVariable('extraMetainf'),
+            'extramanifestkeys' : [:]
+        ]
+    }
+
     def initTarget()
     {
         // We have three classpath interface variables that we combine
@@ -118,10 +133,10 @@ class JavaRules
         abuild.runActions('java.compile', this.&compile, defaultAttrs)
     }
 
-    def packageJar(Map attributes)
+    def packageJarGeneral(Map attributes, String namekey)
     {
         // Remove keys that we will handle expicitly
-        def jarname = attributes.remove('jarname')
+        def jarname = attributes.remove(namekey)
         if (! jarname)
         {
             return
@@ -136,6 +151,7 @@ class JavaRules
         def mainclass = attributes.remove('mainclass')
         def manifestClassPath = attributes.remove('manifestclasspath')
         def extramanifestkeys = attributes.remove('extramanifestkeys')
+        def otherfiles = attributes.remove('otherfiles')
 
         // Take only last path element for each manifest class path
         manifestClassPath = manifestClassPath.collect { new File(it).name }
@@ -154,7 +170,19 @@ class JavaRules
         ant.jar(jarAttrs) {
             metainfdirs.each { metainf('dir': it) }
             filesets.each { fileset('dir': it) }
-            manifest() {
+            otherfiles?.each {
+                File f = new File(it)
+                if (! f.isAbsolute())
+                {
+                    f = new File(abuild.sourceDirectory, it)
+                }
+                if (f.absolutePath !=
+                    new File("${distdir}/${jarname}").absolutePath)
+                {
+                    fileset('file': f.absolutePath)
+                }
+            }
+            manifest {
                 if (manifestClassPath)
                 {
                     attribute('name' : 'Class-Path',
@@ -171,22 +199,20 @@ class JavaRules
         }
     }
 
+    def packageJar(Map attributes)
+    {
+        packageJarGeneral(attributes, 'jarname')
+    }
+
     def packageJarTarget()
     {
-        def defaultAttrs = [
+        def defaultAttrs =
+        [
             'jarname': abuild.resolveAsString('java.jarName'),
-            'distdir': getPathVariable('dist'),
-            'classesdir': getPathVariable('classes'),
-            'resourcesdirs': [getPathVariable('resources'),
-                              getPathVariable('generatedResources')],
-            'extraresourcesdirs' : getPathListVariable('extraResources'),
-            'metainfdirs' : [getPathVariable('metainf'),
-                             getPathVariable('generatedMetainf')],
-            'extrametainfdirs' : getPathListVariable('extraMetainf'),
             'mainclass' : abuild.resolveAsString('java.mainClass'),
             'manifestclasspath' : defaultManifestClassPath,
-            'extramanifestkeys' : [:]
         ]
+        archiveAttributes.each { k, v -> defaultAttrs[k] = v }
 
         abuild.runActions('java.packageJar', this.&packageJar, defaultAttrs)
     }
@@ -273,6 +299,22 @@ class JavaRules
         abuild.runActions('java.signJars', this.&signJars, defaultAttrs)
     }
 
+    def packageRar(Map attributes)
+    {
+        packageJarGeneral(attributes, 'rarname')
+    }
+
+    def packageRarTarget()
+    {
+        def defaultAttrs = [
+            'rarname': abuild.resolveAsString('java.rarName'),
+            'otherfiles' : defaultPackageClassPath,
+        ]
+        archiveAttributes.each { k, v -> defaultAttrs[k] = v }
+
+        abuild.runActions('java.packageRar', this.&packageRar, defaultAttrs)
+    }
+
     def packageWar(Map attributes)
     {
         // Remove keys that we will handle expicitly
@@ -297,9 +339,10 @@ class JavaRules
         webdirs << getPathVariable('copiedJars')
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
+        def extramanifestkeys = attributes.remove('extramanifestkeys')
         def webinfdirs = attributes.remove('webinfdirs')
         webinfdirs.addAll(attributes.remove('extrawebinfdirs'))
-        def archives = attributes.remove('archives')
+        def libfiles = attributes.remove('libfiles')
 
         // Filter out non-existent directories
         resourcesdirs = resourcesdirs.grep { new File(it).isDirectory() }
@@ -316,12 +359,17 @@ class JavaRules
             metainfdirs.each { metainf('dir': it) }
             webdirs.each { fileset('dir': it) }
             resourcesdirs.each { classes('dir': it) }
-            archives.each {
+            libfiles.each {
                 File f = new File(it)
                 if (f.absolutePath !=
                     new File("${distdir}/${warname}").absolutePath)
                 {
-                    lib('dir': f.parent, 'includes': f.name)
+                    lib('file': f.absolutePath)
+                }
+            }
+            manifest {
+                extramanifestkeys.each() {
+                    key, value -> attribute('name' : key, 'value' : value)
                 }
             }
         }
@@ -332,22 +380,15 @@ class JavaRules
         def defaultAttrs = [
             'warname': abuild.resolveAsString('java.warName'),
             'webxml': abuild.resolveAsString('java.webxml'),
-            'distdir': getPathVariable('dist'),
-            'classesdir': getPathVariable('classes'),
-            'resourcesdirs': [getPathVariable('resources'),
-                              getPathVariable('generatedResources')],
-            'extraresourcesdirs' : getPathListVariable('extraResources'),
             'webdirs': [getPathVariable('webContent'),
                         getPathVariable('generatedWebContent')],
             'extrawebdirs' : getPathListVariable('extraWebContent'),
-            'metainfdirs' : [getPathVariable('metainf'),
-                             getPathVariable('generatedMetainf')],
-            'extrametainfdirs' : getPathListVariable('extraMetainf'),
             'webinfdirs' : [getPathVariable('webinf'),
                             getPathVariable('generatedWebinf')],
             'extrawebinfdirs' : getPathListVariable('extraWebinf'),
-            'archives' : abuild.resolveAsList('java.warLibJars')
+            'libfiles' : abuild.resolveAsList('java.warLibJars')
         ]
+        archiveAttributes.each { k, v -> defaultAttrs[k] = v }
 
         abuild.runActions('java.packageWar', this.&packageWar, defaultAttrs)
     }
@@ -371,7 +412,8 @@ class JavaRules
         resourcesdirs.addAll(attributes.remove('extraresourcesdirs'))
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
-        def archives = attributes.remove('archives')
+        def extramanifestkeys = attributes.remove('extramanifestkeys')
+        def otherfiles = attributes.remove('otherfiles')
 
         // Filter out non-existent directories
         resourcesdirs = resourcesdirs.grep { new File(it).isDirectory() }
@@ -384,12 +426,21 @@ class JavaRules
         ant.ear(earAttrs) {
             metainfdirs.each { metainf('dir': it) }
             resourcesdirs.each { fileset('dir': it) }
-            archives.each {
+            otherfiles.each {
                 File f = new File(it)
+                if (! f.isAbsolute())
+                {
+                    f = new File(abuild.sourceDirectory, it)
+                }
                 if (f.absolutePath !=
                     new File("${distdir}/${earname}").absolutePath)
                 {
-                    fileset('dir': f.parent, 'includes': f.name)
+                    fileset('file': f.absolutePath)
+                }
+            }
+            manifest {
+                extramanifestkeys.each() {
+                    key, value -> attribute('name' : key, 'value' : value)
                 }
             }
         }
@@ -401,14 +452,10 @@ class JavaRules
             'earname': abuild.resolveAsString('java.earName'),
             'appxml': abuild.resolveAsString('java.appxml'),
             'distdir': getPathVariable('dist'),
-            'resourcesdirs': [getPathVariable('resources'),
-                              getPathVariable('generatedResources')],
-            'extraresourcesdirs' : getPathListVariable('extraResources'),
-            'metainfdirs' : [getPathVariable('metainf'),
-                             getPathVariable('generatedMetainf')],
-            'extrametainfdirs' : getPathListVariable('extraMetainf'),
-            'archives' : defaultPackageClassPath,
+            'otherfiles' : defaultPackageClassPath,
         ]
+        archiveAttributes.each { k, v -> defaultAttrs[k] = v }
+        defaultAttrs.remove('classesdir')
 
         abuild.runActions('java.packageEar', this.&packageEar, defaultAttrs)
     }
@@ -609,7 +656,9 @@ abuild.configureTarget('copy-jars', 'deps' : ['package-jar'],
                        javaRules.&copyJarsTarget)
 abuild.configureTarget('sign-jars', 'deps' : ['copy-jars'],
                        javaRules.&signJarsTarget)
-abuild.configureTarget('package-war', 'deps' : ['sign-jars'],
+abuild.configureTarget('package-rar', 'deps' : ['sign-jars'],
+                       javaRules.&packageRarTarget)
+abuild.configureTarget('package-war', 'deps' : ['package-rar'],
                        javaRules.&packageWarTarget)
 abuild.configureTarget('package-ear', 'deps' : ['package-war'],
                        javaRules.&packageEarTarget)

@@ -1,8 +1,4 @@
 
-find sun conventions on directory structure for _base.groovy
-
-Next: rar, ear
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -41,6 +37,8 @@ release notes.
 
 Groovy Framework
 ================
+
+ * Find sun conventions on directory structure for _base.groovy
 
  * After groovy-1.6.0 receives security approval, upgrade embedded
    groovy to 1.6.0.  From abuild/lib:
