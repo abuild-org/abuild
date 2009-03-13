@@ -31,7 +31,7 @@ Exception caught during build: --COMPILATION ERRORS SUPPRESSED--
 --JAVA STACK TRACE--
 abuild: d (abuild-indep): build failed
 abuild: e (abuild-indep): all
-abuild-groovy: ERROR: runTarget may not be called during initialization
+abuild-groovy: ERROR: build failure in --topdir--/failures/e/Abuild.groovy: runTarget may not be called during initialization
 abuild: e (abuild-indep): build failed
 abuild: f (abuild-indep): all
 abuild-groovy: ERROR: no build rules are defined; one of abuild.rules or abuild.localRules must be defined
