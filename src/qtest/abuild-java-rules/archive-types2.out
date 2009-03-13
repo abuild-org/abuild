@@ -1,6 +1,5 @@
 abuild: jar-example (abuild-java): all
 abuild: client-war-example (abuild-java): all
-abuild: ear-example.local-jar (abuild-java): all
 abuild: war-example (abuild-java): all
 abuild: ear-example (abuild-java): all
 abuild: other-ear-example (abuild-java): all
