@@ -490,16 +490,10 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 
     def testJunitTarget()
     {
-        def defaultClassPath = []
-        defaultClassPath.addAll(
-            abuild.resolve('abuild.classpath') ?: [])
-        defaultClassPath.addAll(
-            abuild.resolve('abuild.classpath.external') ?: [])
-
         def buildDir = abuild.buildDirectory.absolutePath
         def defaultAttrs = [
             'testsuite': abuild.resolveAsString('java.junitTestsuite'),
-            'classpath': defaultClassPath,
+            'classpath': defaultWrapperClassPath,
             'distdir': getPathVariable('dist'),
             'reportdir': new File(abuild.buildDirectory,
                                   'junit/html').absolutePath,
