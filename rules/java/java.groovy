@@ -416,19 +416,39 @@ class JavaRules
             return
         }
         def wrapperDir = attributes['dir']
-        def wrapperPath = "$wrapperDir/$wrapperName"
+        def wrapperPath = new File("$wrapperDir/$wrapperName").absolutePath
         def distDir = attributes['distdir']
         def wrapperClassPath = attributes['classpath']
-        wrapperClassPath << "$distDir/$jarName"
+        wrapperClassPath << new File("$distDir/$jarName").absolutePath
         wrapperClassPath = wrapperClassPath.join(pathSep)
 
-        ant.echo('file' : "${wrapperPath}.bat", """@echo off
+        // The wrapper script has different contents on Windows and
+        // UNIX.  This has the unfortunate side effect of making it
+        // impossible to run wrapper scripts in an OS other than the
+        // one on which they were generated.  However, since wrapper
+        // scripts contain paths to things that may themselves be
+        // system dependent, this doesn't really add any new problems.
+        // As such, wrapper script generation is done unconditionally,
+        // so if you run abuild wrapper on two different systems,
+        // they'll each leave behind their own versions of the wrapper
+        // script.
+        if (Util.inWindows)
+        {
+            ant.echo('file' : "${wrapperPath}.bat", """@echo off
 java -classpath ${wrapperClassPath} ${mainClass} %1 %2 %3 %4 %5 %6 %7 %8 %9
 """)
-        ant.echo('file' : wrapperPath,
+            // In case we're in Cygwin...
+            ant.echo('file' : wrapperPath, '''#!/bin/sh
+exec `dirname $0`/`basename $0`.bat ${1+"$@"}
+''')
+        }
+        else
+        {
+            ant.echo('file' : wrapperPath,
                      """#!/bin/sh
 exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 """)
+        }
         ant.chmod('file' : wrapperPath, 'perm' : 'a+x')
     }
 
