@@ -1,0 +1,20 @@
+To create keystore.jks:
+
+% KSP=keystore-password
+% KF=keystore.jks
+% KP=key-password
+% keytool -keystore $KF -storepass $KSP -genkey -keyalg RSA -alias abuild-testsuite -keypass $KP -validity 36500
+What is your first and last name?
+  [Unknown]:  Abuild Test Suite
+What is the name of your organizational unit?
+  [Unknown]:  
+What is the name of your organization?
+  [Unknown]:  Abuild
+What is the name of your City or Locality?
+  [Unknown]:  
+What is the name of your State or Province?
+  [Unknown]:  
+What is the two-letter country code for this unit?
+  [Unknown]:  US
+Is CN=Abuild Test Suite, OU=abuild.org, O=Abuild, L=Unknown, ST=Unknown, C=US correct?
+  [no]:  yes

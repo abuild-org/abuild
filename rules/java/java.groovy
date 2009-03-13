@@ -191,21 +191,97 @@ class JavaRules
         abuild.runActions('java.packageJar', this.&packageJar, defaultAttrs)
     }
 
+    def copyJars(Map attributes)
+    {
+        def jarsToCopy = attributes.remove('jars')
+        if (! jarsToCopy)
+        {
+            return
+        }
+        def copydir = new File(attributes.remove('copydir'))
+        ant.mkdir('dir': copydir)
+        def dist = getPathVariable('dist')
+        jarsToCopy.each {
+            def src = new File(it)
+            if (src.name =~ /(?i:\.jar)$/)
+            {
+                def dest = new File(copydir, src.name)
+                ant.copy('file': src.absolutePath,
+                         'tofile': dest.absolutePath)
+            }
+        }
+    }
+
+    def copyJarsTarget()
+    {
+        def defaultAttrs = [
+            'jars': abuild.resolveAsList('java.jarsToCopy'),
+            'copydir': getPathVariable('copiedJars')
+        ]
+
+        abuild.runActions('java.copyJars', this.&copyJars, defaultAttrs)
+    }
+
+    def signJars(Map attributes)
+    {
+        def alias = attributes.remove('alias')
+        def storepass = attributes.remove('storepass')
+        def signdir = attributes.remove('signdir')
+
+        if (! (alias && storepass && (new File(signdir).isDirectory())))
+        {
+            return
+        }
+
+        def keystore = attributes.remove('keystore')
+        def keypass = attributes.remove('keypass')
+        if (keystore && (! new File(keystore).absolutePath))
+        {
+            keystore =
+                new File(abuild.sourceDirectory + "/$keystore").absolutePath
+        }
+
+        def includes = attributes.remove('includes')
+        def signjarAttrs = attributes
+        signjarAttrs['alias'] = alias
+        signjarAttrs['storepass'] = storepass
+        if (keystore)
+        {
+            signjarAttrs['keystore'] = keystore
+        }
+        if (keypass)
+        {
+            signjarAttrs['keypass'] = keypass
+        }
+        ant.signjar(signjarAttrs) {
+            fileset('dir': signdir, 'includes': includes)
+        }
+    }
+
+    def signJarsTarget()
+    {
+        def defaultAttrs = [
+            'includes': '*.jar',
+            'signdir': getPathVariable('copiedJars'),
+            'alias': abuild.resolve('java.sign.alias'),
+            'storepass': abuild.resolve('java.sign.storepass'),
+            'keystore': abuild.resolve('java.sign.keystore'),
+            'keypass': abuild.resolve('java.sign.keypass'),
+            'lazy': 'true'
+        ]
+
+        abuild.runActions('java.signJars', this.&signJars, defaultAttrs)
+    }
+
     def packageWar(Map attributes)
     {
         // Remove keys that we will handle expicitly
         def warname = attributes.remove('warname')
         def webxml = attributes.remove('webxml')
-        def wartype = attributes.remove('wartype')
-        if (! (warname && webxml && wartype))
+        if (! (warname && webxml))
         {
             return
         }
-        if (! ((wartype == 'client') || (wartype == 'server')))
-        {
-            fail('war type must be either "client" or "server"')
-        }
-        boolean clientWar = (wartype == 'client')
 
         if (! new File(webxml).isAbsolute())
         {
@@ -213,18 +289,20 @@ class JavaRules
         }
 
         def distdir = attributes.remove('distdir')
-        def classesdir = attributes.remove('classesdir')
+        def resourcesdirs = attributes.remove('resourcesdirs')
+        resourcesdirs.addAll(attributes.remove('extraresourcesdirs'))
+        resourcesdirs << attributes.remove('classesdir')
         def webdirs = attributes.remove('webdirs')
         webdirs.addAll(attributes.remove('extrawebdirs'))
+        webdirs << getPathVariable('copiedJars')
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
         def webinfdirs = attributes.remove('webinfdirs')
         webinfdirs.addAll(attributes.remove('extrawebinfdirs'))
-        def mainclass = attributes.remove('mainclass')
-        def manifestClassPath = attributes.remove('manifestclasspath')
         def archives = attributes.remove('archives')
 
         // Filter out non-existent directories
+        resourcesdirs = resourcesdirs.grep { new File(it).isDirectory() }
         webdirs = webdirs.grep { new File(it).isDirectory() }
         metainfdirs = metainfdirs.grep { new File(it).isDirectory() }
         webinfdirs = webinfdirs.grep { new File(it).isDirectory() }
@@ -237,23 +315,13 @@ class JavaRules
             webinfdirs.each { webinf('dir': it) }
             metainfdirs.each { metainf('dir': it) }
             webdirs.each { fileset('dir': it) }
-            if (new File(classesdir).isDirectory())
-            {
-                classes('dir': classesdir)
-            }
+            resourcesdirs.each { classes('dir': it) }
             archives.each {
                 File f = new File(it)
                 if (f.absolutePath !=
                     new File("${distdir}/${warname}").absolutePath)
                 {
-                    if (clientWar)
-                    {
-                        fileset('dir': f.parent, 'includes': f.name)
-                    }
-                    else
-                    {
-                        lib('dir': f.parent, 'includes': f.name)
-                    }
+                    lib('dir': f.parent, 'includes': f.name)
                 }
             }
         }
@@ -264,9 +332,11 @@ class JavaRules
         def defaultAttrs = [
             'warname': abuild.resolveAsString('java.warName'),
             'webxml': abuild.resolveAsString('java.webxml'),
-            'wartype': abuild.resolveAsString('java.warType'),
             'distdir': getPathVariable('dist'),
             'classesdir': getPathVariable('classes'),
+            'resourcesdirs': [getPathVariable('resources'),
+                              getPathVariable('generatedResources')],
+            'extraresourcesdirs' : getPathListVariable('extraResources'),
             'webdirs': [getPathVariable('webContent'),
                         getPathVariable('generatedWebContent')],
             'extrawebdirs' : getPathListVariable('extraWebContent'),
@@ -276,7 +346,7 @@ class JavaRules
             'webinfdirs' : [getPathVariable('webinf'),
                             getPathVariable('generatedWebinf')],
             'extrawebinfdirs' : getPathListVariable('extraWebinf'),
-            'archives' : defaultPackageClassPath,
+            'archives' : abuild.resolveAsList('java.warLibJars')
         ]
 
         abuild.runActions('java.packageWar', this.&packageWar, defaultAttrs)
@@ -301,8 +371,6 @@ class JavaRules
         resourcesdirs.addAll(attributes.remove('extraresourcesdirs'))
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
-        def mainclass = attributes.remove('mainclass')
-        def manifestClassPath = attributes.remove('manifestclasspath')
         def archives = attributes.remove('archives')
 
         // Filter out non-existent directories
@@ -530,21 +598,20 @@ def javaRules = new JavaRules(abuild, ant)
 abuild.addTargetClosure('init', javaRules.&initTarget)
 abuild.addTargetClosure('test-only', javaRules.&testJunitTarget)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
-abuild.addTargetDependencies('package',
-                             ['init',
-                              'package-jar',
-                              'package-war',
-                              'package-ear'
-                             ])
+abuild.addTargetDependencies('package', ['package-ear'])
 abuild.addTargetDependencies('generate', ['init'])
 abuild.addTargetDependencies('doc', ['javadoc'])
 abuild.configureTarget('compile', 'deps' : ['generate'],
                        javaRules.&compileTarget)
 abuild.configureTarget('package-jar', 'deps' : ['compile'],
                        javaRules.&packageJarTarget)
-abuild.configureTarget('package-war', 'deps' : ['compile'],
+abuild.configureTarget('copy-jars', 'deps' : ['package-jar'],
+                       javaRules.&copyJarsTarget)
+abuild.configureTarget('sign-jars', 'deps' : ['copy-jars'],
+                       javaRules.&signJarsTarget)
+abuild.configureTarget('package-war', 'deps' : ['sign-jars'],
                        javaRules.&packageWarTarget)
-abuild.configureTarget('package-ear', 'deps' : ['compile'],
+abuild.configureTarget('package-ear', 'deps' : ['package-war'],
                        javaRules.&packageEarTarget)
 abuild.configureTarget('javadoc', 'deps' : ['compile'],
                        javaRules.&javadocTarget)

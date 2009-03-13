@@ -31,7 +31,7 @@ class GroovyRules
         // in various ways to initialize our various classpath
         // variables here.  See java_help.txt for details.  For
         // groovy, we are concerned only with the compile classpath.
-        // We rely on the java rules for everythnig else.
+        // We rely on the java rules for everything else.
 
         defaultCompileClassPath.addAll(
             abuild.resolve('abuild.classpath') ?: [])

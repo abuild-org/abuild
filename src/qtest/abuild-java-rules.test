@@ -205,6 +205,6 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
-check_work_accessed($td);
+check_work_accessed($td, 'not-accessed.out');
 
 $td->report(21 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));

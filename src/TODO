@@ -1,45 +1,7 @@
 
 find sun conventions on directory structure for _base.groovy
 
-clean up war, do jar signing, release a3
-
-deps: ear -> war -> sign -> copy -> jar
-
-signing uses signjar task.
-
 Next: rar, ear
-
-For war packaging:
-
- - src/resources is arbitrary content to go into WEB-INF/classes
-
- - src/web/content is arbitrary content to go into the root of the war
-
- - There are generated versions of these
-
- - Put classes in WEB-INF/classes
-
- - src/web/WEB-INF
-
- - src/conf/META-INF (change for jars too)
-
- - Provide a list of jars that go into lib.  This is empty by default.
-   Users can assign abuild.classpath to this.  Jars in this list are
-   automatically included in the war through the lib task.  They are
-   not copied.
-
- - Provide a list of jars that will be copied into
-   $(ABUILD_OUTPUT_DIR)/src/web/content.  These may need to be
-   subsequently signed before inclusion in the war.  We could do the
-   copies in a separate target that is a dependency of
-   package-war.  This, combined with decorator functionality, should
-   make it possible to sign things at the right time.
-
-Signing brings up the general problem of decorators and library of
-closures....
-
-Move ee stuff into a separate set of rules?
-
 
 === Changes Targeted for Version 1.1 ===
 
@@ -1504,10 +1466,6 @@ Java Problems
 =============
 
  * Reconsider using depends task for compile in abuild.xml.
-
- * Signed jar support will eventually be required.  See whether this
-   should be provided by default.  Most likely it should not as it can
-   be provided easily with a hook.
 
  * Our default java compile rule doesn't notice if a .java file was
    removed.  Maybe we want to force full recompilation if the list of

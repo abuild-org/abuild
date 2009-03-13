@@ -41,18 +41,20 @@ parameters {
 
     java.dir.src = "${itemDir}/src/java"
     java.dir.resources = "${itemDir}/src/resources"
-    java.dir.metainf = "${itemDir}/src/conf/metainf"
+    java.dir.metainf = "${itemDir}/src/conf/META-INF"
     java.dir.webContent = "${itemDir}/src/web/content"
-    java.dir.webinf = "${itemDir}/src/conf/webinf"
+    java.dir.webinf = "${itemDir}/src/web/WEB-INF"
 
     java.dir.dist = "${buildDir}/dist"
     java.dir.classes = "${buildDir}/classes"
+    java.dir.copiedJars = "${buildDir}/copied-jars"
+
     java.dir.generatedDoc = "${buildDir}/doc"
     java.dir.generatedSrc = "${buildDir}/src/java"
     java.dir.generatedResources = "${buildDir}/src/resources"
-    java.dir.generatedMetainf = "${buildDir}/src/conf/metainf"
+    java.dir.generatedMetainf = "${buildDir}/src/conf/META-INF"
     java.dir.generatedWebContent = "${buildDir}/src/web/content"
-    java.dir.generatedWebinf = "${buildDir}/src/conf/webinf"
+    java.dir.generatedWebinf = "${buildDir}/src/web/WEB-INF"
 
     java.dir.extraSrc = []
     java.dir.extraResources

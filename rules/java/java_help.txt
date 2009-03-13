@@ -16,3 +16,34 @@ Targets use abuild.runActions.  We need to document all available
 parameters (from _base.groovy) and attribute keys.  Look at the
 targets' calls to runActions to see what keys are available and how
 they are initialized.
+
+Dependencies:
+
+all -> package -> package-ear -> package-war -> sign-jars -> copy-jars
+  -> package-jar -> compile -> generate -> init
+
+For war packaging:
+
+ - src/resources is arbitrary content to go into WEB-INF/classes along
+   with "classes" directory
+
+ - src/web/content is arbitrary content to go into the root of the war
+   along with "copied-jars" directory
+
+ - There are generated versions of these
+
+ - Put classes and resources in WEB-INF/classes via classes task
+
+ - src/web/WEB-INF -> webinf task
+
+ - src/conf/META-INF -> metainf task
+
+ - Jars in java.warLibJars go into lib.  This is empty by default.
+   Users can assign abuild.classpath to this.  Jars in this list are
+   automatically included in the war through the lib task.  They are
+   not copied.
+
+ - Jars in java.copiedJars are be copied into
+   $(ABUILD_OUTPUT_DIR)/copied-jars.  These are included in the war
+   via fileset.  If parameters for signing are set, these will get
+   signed automatically.
