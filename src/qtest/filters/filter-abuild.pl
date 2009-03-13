@@ -15,6 +15,7 @@ my ($os_data, $compiler) = ($1, $2);
 
 my $in_autoconf = 0;
 my $in_stacktrace = 0;
+my $saw_junitreport = 0;
 
 while (<>)
 {
@@ -56,7 +57,15 @@ while (<>)
     # Skip VC++'s DLL creation output
     next if m/Creating library .*\.lib and object .*\.exp/i;
     # Filter junitreport
-    next if m/\[junitreport\]\s/;
+    if (m/\[junitreport\]\s/)
+    {
+	if (! $saw_junitreport)
+	{
+	    print "[junitreport]...\n";
+	    $saw_junitreport = 1;
+	}
+	next;
+    }
     s,--abuild-dir--.*abuild.xml,--abuild.xml--,;
     s,(--abuild.xml--):(\d+),$1:nn,;
     s/^(Total time: ).*/$1<time>/;

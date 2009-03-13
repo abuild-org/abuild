@@ -9,6 +9,7 @@ Buildfile: --abuild.xml--
 -test-junit:
     [junit] Running com.example.PotatoTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
+[junitreport]...
 
 -test-qtest:
      [exec] 

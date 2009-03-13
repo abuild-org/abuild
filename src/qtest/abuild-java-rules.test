@@ -54,6 +54,14 @@ $td->runtest("run multijar program 1",
 	     {$td->FILE => "$top/prog3.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+if (in_windows())
+{
+    $td->runtest("run wrapper batch file",
+		 {$td->COMMAND => "cmd /c multijar\\abuild-java\\wrapper.bat"},
+		 {$td->FILE => "$top/prog3.out", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 $td->runtest("run multijar program 2",
 	     {$td->COMMAND => "multijar/abuild-java/other"},
 	     {$td->FILE => "$top/prog2.out", $td->EXIT_STATUS => 0},
@@ -198,4 +206,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(21 + ($test_junit ? 3 : 0));
+$td->report(21 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));

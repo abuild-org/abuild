@@ -24,3 +24,4 @@ abuild: test (abuild-java): test
      [exec] 
     [junit] Running com.example.PotatoTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
+[junitreport]...

@@ -422,23 +422,13 @@ class JavaRules
         wrapperClassPath << "$distDir/$jarName"
         wrapperClassPath = wrapperClassPath.join(pathSep)
 
-        if (Util.inWindows)
-        {
-            ant.echo('file' : "${wrapperPath}.bat", """@echo off
+        ant.echo('file' : "${wrapperPath}.bat", """@echo off
 java -classpath ${wrapperClassPath} ${mainClass} %1 %2 %3 %4 %5 %6 %7 %8 %9
 """)
-            // In case we're in Cygwin...
-            ant.echo('file' : wrapperPath, '''#!/bin/sh
-exec `dirname $0`/`basename $0`.bat ${1+"$@"}
-''')
-        }
-        else
-        {
-            ant.echo('file' : wrapperPath,
+        ant.echo('file' : wrapperPath,
                      """#!/bin/sh
 exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 """)
-        }
         ant.chmod('file' : wrapperPath, 'perm' : 'a+x')
     }
 
@@ -470,21 +460,29 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 
         ant.mkdir('dir': distdir)
         def junitAttrs = attributes
-        ant.junit(junitAttrs) {
-            classpath {
-                testClassPath.each {
-                    pathelement('location': it)
+        // Make sure we run junitreport even if junit fails and
+        // haltonfailure is set.
+        try
+        {
+            ant.junit(junitAttrs) {
+                classpath {
+                    testClassPath.each {
+                        pathelement('location': it)
+                    }
+                    fileset('dir': distdir, 'includes': '*.jar')
                 }
-                fileset('dir': distdir, 'includes': '*.jar')
-            }
-            test('name': testsuite,
-                 'todir': distdir) {
-                formatter('type': 'xml')
+                test('name': testsuite,
+                     'todir': distdir) {
+                    formatter('type': 'xml')
+                }
             }
         }
-        ant.junitreport('todir': distdir) {
-            fileset('dir': distdir, 'includes':  'TEST-*.xml')
-            report('format': 'frames', 'todir': reportdir)
+        finally
+        {
+            ant.junitreport('todir': distdir) {
+                fileset('dir': distdir, 'includes':  'TEST-*.xml')
+                report('format': 'frames', 'todir': reportdir)
+            }
         }
     }
 
