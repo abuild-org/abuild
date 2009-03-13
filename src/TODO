@@ -190,7 +190,7 @@ Abuild.groovy environment
    parameters {
        parameter.one = 'value'
        parameter.two << 'value-to-append'
-       parameter.three = parameter.one
+       parameter.three = resolve(parameter.one)
    }
 
    The effect would be to set the following parameters:
@@ -201,11 +201,18 @@ Abuild.groovy environment
 
    Specifically, any variable assignment is treated as an assignment
    to an equivalently named parameter, and any append using the left
-   shift operator appends to any existing value.  Variables on the
-   right hand side of an assignment or left shift are resolved as
-   parameters (or defines or interface variables).  They don't have
-   any special meaning in other contexts, so if you need to use them
-   elsewhere, you'll have to call resolve.
+   shift operator appends to any existing value.  In order to
+   reference the value of a parameter, you must call resolve.  You can
+   pass the bare parameter name or a string containing the parameter
+   name to resolve.
+
+   (Footnote: although it would be possible to avoid having to put
+   parameters in calls to resolve on the right hand side of assignment
+   or append operators, making this work requires support by the
+   assignee.  There are all sorts of cases where it doesn't work, such
+   as when parameters are used as values in map keys, passed as
+   arguments to arbitrary functions, or assigned to local variables.
+   To avoid confusion, we force use of resolve in all cases.)
 
    You can also delete parameters within this block:
 

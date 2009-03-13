@@ -12,13 +12,22 @@ parameters {
     q = 'r'
     assert [10, 15] == resolve('z')
     delete z
-    p.q.r << a.b.c.d
+    p.q.r << resolve(a.b.c.d)
     def v = 'some other value'
     a.b.c.d = v
     scope = outer
-    list << [1, 2] << x.y.z << [5, [6], q] << 7
-    s.t.u = x.y.z
-    w.w.w = n.u.l.l
+    list << [1, 2] << resolve(x.y.z) << [5, [6], resolve(q)] << 7
+    try
+    {
+        s.t.u = x.y.z
+        assert false
+    }
+    catch (BuildFailure e)
+    {
+        assert e.message =~ /resolve/
+    }
+    s.t.u = resolve(x.y.z)
+    w.w.w = resolve(n.u.l.l)
     something.'with-dashes' = f(12)
     xjc = ['a': 'b']
     xjc << ['c': 'd']
@@ -27,7 +36,17 @@ parameters {
     some.value = resolve('interface-variable-name')
     // okay to use resolve on a variable too
     other.value = resolve(a.b.c.d)
-    yet_another_value = other.ifc.variable
+    try
+    {
+        yet_another_value = other.ifc.variable
+        assert false
+    }
+    catch (Exception e)
+    {
+        assert e.cause.class.name == 'org.abuild.groovy.BuildFailure'
+        assert e.message =~ /resolve/
+    }
+    yet_another_value = resolve(other.ifc.variable)
     // Append to list variable with initial value coming from
     // interface
     item.list.variable << 'd' << 'e' << 'f'

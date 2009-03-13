@@ -47,7 +47,10 @@ class ParameterHelper
     {
         if (value instanceof ParameterHelper)
         {
-            _p.setParameter(child(property), _p.resolve(value._name))
+            throw new BuildFailure(
+                'abuild parameter names must be passed' +
+                ' to resolve to be used on the right hand side of' +
+                ' an assignment')
         }
         else
         {
@@ -62,7 +65,10 @@ class ParameterHelper
         }
         else if (value instanceof ParameterHelper)
         {
-            this << _p.resolve(value._name)
+            throw new BuildFailure(
+                'abuild parameter names must be passed' +
+                ' to resolve to be used on the right hand side of' +
+                ' an append operator')
         }
         else
         {

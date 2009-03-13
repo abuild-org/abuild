@@ -187,7 +187,11 @@ class Backend implements GroovyBackend
         catch (BuildFailure e)
         {
             QTC.TC("abuild", "groovy ERR script run exception")
-            buildState.error(e.message)
+            buildState.error("build failure in ${file}: " + e.message)
+            if (buildArgs.verbose)
+            {
+                Util.printStackTrace(e)
+            }
         }
         catch (Exception e)
         {

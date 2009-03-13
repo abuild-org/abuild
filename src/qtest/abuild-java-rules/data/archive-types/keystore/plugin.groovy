@@ -3,6 +3,6 @@
 parameters {
     java.sign.alias = 'abuild-testsuite'
     java.sign.storepass = 'keystore-password'
-    java.sign.keystore = keystore.file
+    java.sign.keystore = resolve(keystore.file)
     java.sign.keypass = 'key-password'
 }

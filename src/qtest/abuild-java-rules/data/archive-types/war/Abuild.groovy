@@ -1,6 +1,6 @@
 parameters {
     abuild.rules = 'java'
     java.warName = 'war-example.war'
-    java.warLibJars = abuild.classpath
+    java.warLibJars = resolve(abuild.classpath)
     java.webxml = 'war-example.xml'
 }
