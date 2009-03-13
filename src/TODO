@@ -47,15 +47,21 @@ Groovy Framework
 
  * Update rules/java/java_help.txt
 
- * Include junit support.  Consider whether we should embed it junit.
-   If so, which version?  Groovy embeds 3.8.2.  Current is 4.5.
+ * Consider whether we should embed it junit.  If so, which version?
+   Groovy embeds 3.8.2.  Current is 4.5.  Right now, you must have
+   some version of junit in your classpath for the junit tasks in the
+   java rules (or ant code) to work.  This seems okay to me since it
+   avoids the need to worry about abuild's integrated junit taking
+   precedence over a user-provided version.
 
  * There is no way to specify separate includes and excludes for the
    various filesets inside of jar, war, or ear.  I can think of three
    possible solutions:
 
     - Don't bother supporting this.  People can always put their own
-      closures in abuild.packageJar if they want this.
+      closures in abuild.packageJar if they want this.  Besides, we
+      have enough different directories that we use that there are
+      plenty of other approaches.
 
     - Allow the map entries passed to java.packageJar (etc.) to be
       either directories or maps.  If an entry is a map, it is treated
