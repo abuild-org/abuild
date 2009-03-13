@@ -7,14 +7,48 @@ abuild.addTargetClosure('test-only') {
     {
         def build = abuild.buildDirectory.path
         def tty = abuild.interfaceVars['ABUILD_STDOUT_IS_TTY']
-        def command = 'qtest-driver';
+        def command = 'qtest-driver'
         def args = ['-datadir', '../qtest',
             '-bindirs', '..:.', '-covdir', '..',
             "-stdout-tty=${tty}"]
         if (Util.inWindows)
         {
-            command = 'perl'
-            args = ['-S', 'qtest-driver', *args]
+            // Find qtest-driver in path and figure out how to invoke
+            // it.  qtest requires cygwin perl, so it won't work
+            // without cygwin in the path anyway.  Look for either
+            // something that starts with #!/.../perl or #!/.../sh,
+            // which could be a wrapper script.
+            def pathSep = ant.project.properties['path.separator']
+            def path = System.env['PATH'].split(pathSep)
+            String interpreter
+            String driver
+            for (p in path)
+            {
+                def candidate = new File(p, 'qtest-driver')
+                if (candidate.isFile())
+                {
+                    candidate.withReader {
+                        reader ->
+                        def firstline = reader.readLine()
+                        def m = (firstline =~ /#!(\S+)/)
+                        if (m)
+                        {
+                            interpreter = new File(m.group(1)).name
+                            driver = candidate.absolutePath
+                        }
+                    }
+                }
+                if ((interpreter == 'perl') || (interpreter == 'sh'))
+                {
+                    break
+                }
+            }
+
+            if (interpreter)
+            {
+                command = interpreter
+                args = [driver, *args]
+            }
         }
 
         ant.exec('failonerror':'true', 'executable': command,

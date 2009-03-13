@@ -57,7 +57,8 @@ $td->runtest("run multijar program 1",
 if (in_windows())
 {
     $td->runtest("run wrapper batch file",
-		 {$td->COMMAND => "cmd /c multijar\\abuild-java\\wrapper.bat"},
+		 {$td->COMMAND =>
+		      "cmd /c multijar\\\\abuild-java\\\\wrapper.bat"},
 		 {$td->FILE => "$top/prog3.out", $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 }
