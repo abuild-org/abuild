@@ -14,8 +14,7 @@ Abuild release checklist
  * On Solaris, make sure LD_LIBRARY_PATH contains /opt/tps/lib and the
    BOOST variables in Abuild.mk are set properly.
 
- * On Windows, make sure qtest-driver --version works; add something
-   before /opt/tps/bin/qtest-driver if needed
+ * On Windows, make sure qtest-driver --version works
 
  * When building Java, make sure ABUILD_JUNIT_JAR is set.  On Windows,
    it's a Windows path, not a cygwin path.
