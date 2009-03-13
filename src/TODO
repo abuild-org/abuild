@@ -1557,18 +1557,13 @@ See also "Known Limitations" in the documentation.
    program and a library object file and that no object file may be
    generated from more than one source file (with different suffixes)
 
- * Consider converting abuild_data.dtd to a schema for tighter
-   validation (which attributes are allowed in which contexts).
-   Search for DTD in the documentation and test suite.  Probably don't
-   really want to do this.
-
  * In the manual, it would be nice if we could use higher resolution
    figures for the PDF than for the HTML.  There is plenty of material
    in the sagehill.net DocBook XSL guide about this.  The best
    solution would be to convert the figures to SVG.  It may work to
    use graphviz to generate the SVG.
 
- * Orphan target detection won't find orphan targets in
+ * Orphan target detection in make won't find orphan targets in
    subdirectories.  This is very hard to fix in general.  We could
    search directories represented in the source lists, but that
    wouldn't help if we removed the last file from a subdirectory.  For
@@ -1588,13 +1583,6 @@ See also "Known Limitations" in the documentation.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
-
- * Abuild.interface files necessarily duplicate information from
-   Abuild-ant.properties or Abuild.mk such as jar names or library
-   names.  This is probably okay as you can always avoid it by having
-   a convention of setting "local" variables (i.e., variables named in
-   such a way to not conflict with anything) that are referenced in
-   the Abuild.mk or Abuild-ant.propertiesd. files.
 
  * It might be useful to have abuild recognize certain error
    conditions currently reported as global as instead being specific
