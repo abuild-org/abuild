@@ -212,7 +212,12 @@ Abuild.groovy environment
    assignee.  There are all sorts of cases where it doesn't work, such
    as when parameters are used as values in map keys, passed as
    arguments to arbitrary functions, or assigned to local variables.
-   To avoid confusion, we force use of resolve in all cases.)
+   It would be possible to alleviate this to some extent by changing
+   the implementation of ParameterHelper to automatically resolve
+   parameter names to values a resolution is available.  However, this
+   would prevent simultaneous use of a.b and a.b.c, as in
+   abuild.classpath and abuild.classpath.manifest.  To keep things
+   simple and avoid confusion, we force use of resolve in all cases.)
 
    You can also delete parameters within this block:
 
