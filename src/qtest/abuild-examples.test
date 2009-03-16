@@ -420,115 +420,10 @@ $td->runtest("dump build graph",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-# Test Java support.  Some other test cases are here that aren't
-# strictly Java related but use Java.
-
 cd("work");
 
 if ($test_java)
 {
-    cd("work/java/other-executable");
-
-    $td->runtest("java",
-		 {$td->COMMAND => "abuild --build=all test",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/java.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    sleep 1;
-    $now = time;
-    utime $now, $now, "../library/src/java/com/example/library/Library.java"
-	or die;
-
-    $td->runtest("java test-only",
-		 {$td->COMMAND => "abuild --build=all test-only",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/java-test-only.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("java recheck",
-		 {$td->COMMAND => "abuild --build=all test",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/java2.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    # Test different Java archive types
-
-    cd("work/archive-types");
-
-    $td->runtest("archive types",
-		 {$td->COMMAND => "abuild -b all",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/archive-types.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("jar contents",
-		 {$td->COMMAND =>
-		      [$jar, 'tf', "jar/abuild-java/dist/jar-example.jar"],
-		      $td->FILTER => "perl $filters/filter-jar.pl"},
-		 {$td->FILE => "$top/jar-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("har contents",
-		 {$td->COMMAND =>
-		      [$jar, 'tf', "har/abuild-java/dist/har-example.har"],
-		      $td->FILTER => "perl $filters/filter-jar.pl"},
-		 {$td->FILE => "$top/har-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("war contents",
-		 {$td->COMMAND =>
-		      [$jar, 'tf', "war/abuild-java/dist/war-example.war"],
-		      $td->FILTER => "perl $filters/filter-jar.pl"},
-		 {$td->FILE => "$top/war-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("client war contents",
-		 {$td->COMMAND =>
-		      [$jar, 'tf',
-		       "client-war/abuild-java/dist/client-war-example.war"],
-		      $td->FILTER => "perl $filters/filter-jar.pl"},
-		 {$td->FILE => "$top/client-war-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("ear contents",
-		 {$td->COMMAND =>
-		      [$jar, 'tf', "ear/abuild-java/dist/ear-example.ear"],
-		      $td->FILTER => "perl $filters/filter-jar.pl"},
-		 {$td->FILE => "$top/ear-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    $td->runtest("other ear contents",
-		 {$td->COMMAND =>
-		      [$jar, 'tf',
-		       "other-ear/abuild-java/dist/other-ear-example.ear"],
-		      $td->FILTER => "perl $filters/filter-jar.pl"},
-		 {$td->FILE => "$top/other-ear-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    # Alternative Java
-
-    cd("work/java/alternative");
-
-    $td->runtest("alternative java support",
-		 {$td->COMMAND => "abuild run",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/alternative-java.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
-
-    # Mixed classification example happens to also be in Java.
-
     cd("work/mixed-classification/sensitive");
 
     $td->runtest("mixed classification",
@@ -544,7 +439,7 @@ else
     # don't get a false test failure.  Note that we pipe to cat >
     # /dev/null instead of just writing to /dev/null because gnu tar
     # has a special case and won't actually read the file otherwise.
-    system("(tar cf - basic/java* java mixed-classification archive-types" .
+    system("(tar cf - basic/java* mixed-classification" .
 	   " | cat > /dev/null)");
 }
 
@@ -573,7 +468,7 @@ else
 {
     cd("work/plugin");
 
-    system("(tar cf - java plugins/echoer/plugin-ant.xml | cat > /dev/null)");
+    system("(tar cf - java plugins/echoer/plugin.groovy | cat > /dev/null)");
 }
 
 # Specific cases for documentation
@@ -831,5 +726,5 @@ check_work_accessed($td, "not-accessed.out");
 
 $td->report(73 +
 	    (in_windows() ? 0 : 1) +
-	    ($test_java ? 18 : 0) +
+	    ($test_java ? 7 : 0) +
 	    ($have_whole_archive ? 2 : 1));

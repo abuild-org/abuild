@@ -1,0 +1,14 @@
+abuild: alternative (abuild-java): run
+Buildfile: --topdir--/basic/alternative/Abuild-ant.xml
+
+all:
+    [mkdir] Created dir: --topdir--/basic/alternative/abuild-java/classes
+    [mkdir] Created dir: --topdir--/basic/alternative/abuild-java/dist
+    [javac] Compiling 1 source file to --topdir--/basic/alternative/abuild-java/classes
+      [jar] Building jar: --topdir--/basic/alternative/abuild-java/dist/alternative.jar
+
+run:
+     [java] The opposite of 12 is -12
+
+BUILD SUCCESSFUL
+Total time: <time>

@@ -11895,7 +11895,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       item and modifying <varname>BUILD_ITEM_RULES</varname> or
       <varname>abuild.hook-build-items</varname> for every build item:
       <?example plugin/plugins/echoer/plugin.mk?>
-      <?example plugin/plugins/echoer/plugin-ant.xml?>
+      <?example plugin/plugins/echoer/plugin.groovy?>
      </para>
      <para>
       Although this example is trivial and doesn't do anything useful,

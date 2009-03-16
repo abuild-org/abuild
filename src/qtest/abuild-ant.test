@@ -65,6 +65,106 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
+cd("work/basic/other-executable");
+
+$td->runtest("ant",
+	     {$td->COMMAND => "abuild --build=all test",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/basic.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+sleep 1;
+my $now = time;
+utime $now, $now, "../library/src/java/com/example/library/Library.java"
+    or die;
+
+$td->runtest("ant test-only",
+	     {$td->COMMAND => "abuild --build=all test-only",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/test-only.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("ant recheck",
+	     {$td->COMMAND => "abuild --build=all test",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/basic2.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Test different archive types
+
+cd("work/archive-types");
+
+$td->runtest("archive types",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/archive-types.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("jar contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "jar/abuild-java/dist/jar-example.jar"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/jar-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("har contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "har/abuild-java/dist/har-example.har"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/har-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("war contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "war/abuild-java/dist/war-example.war"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/war-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("client war contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf',
+		   "client-war/abuild-java/dist/client-war-example.war"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/client-war-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("ear contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf', "ear/abuild-java/dist/ear-example.ear"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/ear-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("other ear contents",
+	     {$td->COMMAND =>
+		  [$jar, 'tf',
+		   "other-ear/abuild-java/dist/other-ear-example.ear"],
+		  $td->FILTER => "perl $filters/filter-jar.pl"},
+	     {$td->FILE => "$top/other-ear-contents.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Alternative ant
+
+cd("work/basic/alternative");
+
+$td->runtest("alternative ant support",
+	     {$td->COMMAND => "abuild run",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/alternative-ant.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/ant-qtest");
 
 # Test failing qtest test suite from ant
@@ -74,6 +174,23 @@ $td->runtest("failing qtest from ant",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/ant-qtest-failure.out",
 	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/plugin/java/code");
+
+$td->runtest("java plugin",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/plugin-ant.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run java program",
+	     {$td->COMMAND => [$java, "-classpath",
+			       "abuild-java/dist/code.jar",
+			       "com.example.Main"]},
+	     {$td->STRING => "What am I supposed to say again?\n",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 cd("work/junit");
@@ -142,6 +259,6 @@ $td->runtest("new target with hook",
 
 check_work_accessed($td);
 
-$td->report(6 +
+$td->report(19 +
 	    ($java_cygwin ? 1 : 0) +
 	    ($test_junit ? 3 : 0));
