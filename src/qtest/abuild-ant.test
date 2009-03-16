@@ -7,9 +7,9 @@ use strict;
 require TestDriver;
 require abuild_test_utils;
 
-chdir("abuild-ant-misc") or die;
+chdir("abuild-ant") or die;
 
-my $td = new TestDriver("miscellaneous ant");
+my $td = new TestDriver("ant framework");
 test_setup();
 
 my $top = get_top();
@@ -22,7 +22,7 @@ if (! $test_java)
     exit 0;
 }
 
-# This test contains miscellaneous ant tests.
+# This test suite tests the ant framework.
 
 setup($td);
 
