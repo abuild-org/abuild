@@ -203,6 +203,12 @@ Documentation
    documentation accordingly.  Save this until all the new features
    are implemented, if possible.
 
+ * Note: references to ant examples are still in the documentation.
+   There are comments like <!-- ?example ....? --> marking where the
+   file references used to be.  Files can be found in the abuild-ant
+   test suite.  Paths that used to start with java now start with
+   basic.
+
  * Describe groovy framework (obviously).  Specific things to remember:
 
     - For groovy backends, defining a new test procedure requires only
