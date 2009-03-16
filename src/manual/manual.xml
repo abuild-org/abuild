@@ -9276,13 +9276,13 @@ endif
      item in the <filename>executable</filename> directory.  If you
      look at its <filename>Abuild.conf</filename> file, you will see
      that it depends on <classname>library</classname>:
-     <?example java/executable/Abuild.conf?>
+     <!-- ?example java/executable/Abuild.conf? -->
      From <classname>executable</classname>'s
      <filename>Abuild-ant.properties</filename> file, you can see that
      this build item is generating the file
      <filename>example-executable.jar</filename>, and that it is
      generating a wrapper script:
-     <?example java/executable/Abuild-ant.properties?>
+     <!-- ?example java/executable/Abuild-ant.properties? -->
     </para>
     <para>
      The <filename>src</filename> directory under
@@ -9306,7 +9306,7 @@ endif
      can see from looking at the value of
      <varname>abuild.jar-name</varname> in its
      <filename>Abuild-ant.properties</filename> file:
-     <?example java/library/Abuild-ant.properties?>
+     <!-- ?example java/library/Abuild-ant.properties? -->
      In addition, this build item makes use of hooks in the
      <classname>code-generator</classname> build item.  Specifically,
      we tell that build item to generate a class called
@@ -9334,7 +9334,7 @@ endif
      &abuild; property <varname>abuild.include-ant-runtime</varname>
      so that the <application>ant</application> runtime library will
      be included in the compile-time classpath:
-     <?example java/code-generator/Abuild-ant.properties?>
+     <!-- ?example java/code-generator/Abuild-ant.properties? -->
     </para>
     <para>
      This build item also has a file called
@@ -9344,8 +9344,8 @@ endif
      <varname>code-generator.classpath</varname>, which is declared in
      the <filename>Abuild.interface</filename> file.  Here are those
      files:
-     <?example java/code-generator/Abuild.interface?>
-     <?example java/code-generator/ant-hooks.xml?>
+     <!-- ?example java/code-generator/Abuild.interface? -->
+     <!-- ?example java/code-generator/ant-hooks.xml? -->
      This particular build item provides two hooks: a
      <command>generate</command> hook, and a
      <command>properties-help</command> hook.  These are implemented
@@ -9376,7 +9376,7 @@ endif
      build items don't have to do: it declares a custom variable that
      holds the name of the JAR file that it generates, and it does not
      add this JAR file to the classpath:
-     <?example java/code-generator/Abuild.interface?>
+     <!-- ?example java/code-generator/Abuild.interface? -->
      The reason for this is that
      <classname>code-generator</classname>'s users don't need to call
      anything from its JAR file in their code, but its
@@ -9408,8 +9408,8 @@ endif
      hook, from a build item that doesn't actually package anything.
      Here are its <filename>Abuild.conf</filename> and
      <filename>Abuild-ant.properties</filename> files:
-     <?example java/other-executable/Abuild.conf?>
-     <?example java/other-executable/Abuild-ant.properties?>
+     <!-- ?example java/other-executable/Abuild.conf? -->
+     <!-- ?example java/other-executable/Abuild-ant.properties? -->
     </para>
    </sect1>
    <sect1 id="ref.example.build-driven-java">
@@ -9434,7 +9434,7 @@ endif
      <filename>abuild-java</filename> output directory, all references
      to source paths must be prefixed by
      &ldquo;<filename>../</filename>&rdquo;:
-     <?example java/alternative/Abuild-ant.xml?>
+     <!-- ?example java/alternative/Abuild-ant.xml? -->
      Also observe that this build file loads the
      <filename>.ab-dynamic-ant.properties</filename> so that it can
      still benefit from classpath information as determined by the
@@ -11069,8 +11069,8 @@ flag private INCLUDES = private-include
      we are creating a HAR file here exactly the way we would create a
      JAR file except that we are using the <filename>.har</filename>
      suffix:
-     <?example archive-types/har/Abuild-ant.properties?>
-     <?example archive-types/har/Abuild.interface?>
+     <!-- ?example archive-types/har/Abuild-ant.properties? -->
+     <!-- ?example archive-types/har/Abuild.interface? -->
      Note that the HAR file created here probably wouldn't work as a
      HAR (hibernate archive) file.  We're just naming it this way for
      purposes of illustration.  If you needed to add other things to
@@ -11079,14 +11079,14 @@ flag private INCLUDES = private-include
      <filename>src/resources</filename>, or their automatically
      generated counterparts as appropriate).  Here are the contents of
      the HAR file:
-     <?qtest har-contents.out?>
+     <!-- ?qtest har-contents.out? -->
      Note that the <filename>META-INF</filename> directory and the
      <filename>MANIFEST.MF</filename> file are created automatically
      during the JAR creation process.  Next, look at the JAR example.
      It is essentially identical to the HAR example except that this
      build item depends on <classname>har-example</classname>:
-     <?example archive-types/jar/Abuild-ant.properties?>
-     <?example archive-types/jar/Abuild.interface?>
+     <!-- ?example archive-types/jar/Abuild-ant.properties? -->
+     <!-- ?example archive-types/jar/Abuild.interface? -->
      The <filename>JarExample.java</filename> class imports a class
      defined in the HAR file to illustrate that it works in &abuild;
      to add a HAR file to the <varname>abuild.classpath</varname>
@@ -11094,7 +11094,7 @@ flag private INCLUDES = private-include
      because &abuild; is creating a file whose ends with
      <filename>.har.jar</filename> and is adding that to the real
      classpath instead.  Here are the contents of the JAR file:
-     <?qtest jar-contents.out?>
+     <!-- ?qtest jar-contents.out? -->
     </para>
    </sect1>
    <sect1 id="ref.example.war-files">
@@ -11144,16 +11144,16 @@ flag private INCLUDES = private-include
      includes a demonstration of using a
      <command>pre-package</command> hook for manipulating the contents
      of the <filename>classpath</filename> directory:
-     <?example archive-types/war/Abuild-ant.properties?>
-     <?example archive-types/war/Abuild.interface?>
+     <!-- ?example archive-types/war/Abuild-ant.properties? -->
+     <!-- ?example archive-types/war/Abuild.interface? -->
      Here are the contents of this server WAR file:
-     <?qtest war-contents.out?>
+     <!-- ?qtest war-contents.out? -->
      The <classname>client-war</classname> example is identical except
      it creates a client WAR instead:
-     <?example archive-types/client-war/Abuild-ant.properties?>
-     <?example archive-types/client-war/Abuild.interface?>
+     <!-- ?example archive-types/client-war/Abuild-ant.properties? -->
+     <!-- ?example archive-types/client-war/Abuild.interface? -->
      Here are its contents:
-     <?qtest client-war-contents.out?>
+     <!-- ?qtest client-war-contents.out? -->
      In this example, the <classname>war-example</classname> build
      item depends on the <classname>jar-example</classname> build item
      which in turn depends on <classname>har-example</classname>.
@@ -11195,13 +11195,13 @@ flag private INCLUDES = private-include
      this, but making it a private build item inside of
      <classname>ear-example</classname> makes it clear that it is
      private to the EAR file:
-     <?example archive-types/ear/Abuild.conf?>
-     <?example archive-types/ear/Abuild-ant.properties?>
+     <!-- ?example archive-types/ear/Abuild.conf? -->
+     <!-- ?example archive-types/ear/Abuild-ant.properties? -->
      Unlike with WAR files, EAR files actually contain the direct
      products produced by other build items, not their JAR
      counterparts: notice that the HAR and WAR files are directly
      contained in the EAR file:
-     <?qtest ear-contents.out?>
+     <!-- ?qtest ear-contents.out? -->
      Note also that the EAR file contains the WAR file and it also
      directly contains some of its contents, notably the JAR and HAR
      files.  (The HAR file is included in the WAR by a different name;
@@ -11221,10 +11221,10 @@ flag private INCLUDES = private-include
      the <filename>other-ear</filename> directory.  It defines a local
      build file and enables local hooks.  Here is its
      <filename>Abuild-ant.properties</filename> file:
-     <?example archive-types/other-ear/Abuild-ant.properties?>
+     <!-- ?example archive-types/other-ear/Abuild-ant.properties? -->
      This file refers to the local build file
      <filename>local.xml</filename>:
-     <?example archive-types/other-ear/local.xml?>
+     <!-- ?example archive-types/other-ear/local.xml? -->
      This same mechanism can be used to create hybrid client/server
      WAR files.  The main problem with this approach is that it
      requires you to know the name of the archives you want to move or
