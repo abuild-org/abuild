@@ -16710,35 +16710,6 @@ Y = $(X)
       </para>
      </listitem>
     </varlistentry>
-    <varlistentry>
-     <term>Java archive creation</term>
-     <listitem>
-      <para>
-       EAR and WAR files are currently populated from the contents
-       of the <varname>abuild.classpath</varname> interface
-       variable.  It may be necessary to have some other mechanism
-       for specifying the contents of these types of archive files
-       should it be necessary to have a build item create and
-       &ldquo;export&rdquo; something without wanting it to be
-       deployed.  This problem will be addressed again as the need
-       arises.
-      </para>
-      <para>
-       EAR and WAR files both contain items that are copied from
-       <varname>abuild.classpath</varname>.  There is no general
-       facility for allowing this functionality.  If we were to have
-       to support some other archive type such as a RAR file that
-       also contains items from other build items, there would be no
-       convenient way to handle this using &abuild;'s JAR creation
-       abilities.  It would be possible to implement it by defining
-       a <varname>generate</varname> hook that copied files into the
-       generated <filename>src/resources</filename> directory.  The
-       names of these files could come from any
-       <filename>Abuild.interface</filename> variable, including one
-       provided by a build item for this purpose.
-      </para>
-     </listitem>
-    </varlistentry>
    </variablelist>
   </appendix>
   <appendix id="ref.dump-data">
