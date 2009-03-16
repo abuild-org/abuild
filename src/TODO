@@ -12,28 +12,8 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * abuild.appendParameter will pre-initialize a previously
-   uninitialized parameter using resolve.  This makes it possible to
-   create a parameter with the same name as an interface variable by
-   appending to it.  This works for defines too, but if a symbol
-   exists both in defines and parameters, defines wins, so it doesn't
-   really have any effect (as long as normal interfaces are used) to
-   append to something defined on the command line.
+ * ...
 
- * Added local interface variables:
-
-   declare var local string = whatever
-
-   These have a scope of the current build item only.  Nothing about
-   them, including their declarations, are visible to items that
-   depend on them.  If declared in Abuild.interface, they are visible
-   to after-build files, and they are also to the build item.
-
- * Added war and ear support to java rules
-
- * Pass extra attributes to ant.jar
-
- * Added junit support
 
 Groovy Framework
 ================
