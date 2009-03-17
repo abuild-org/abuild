@@ -20,11 +20,6 @@ class CompatLevel
 	return (this->level <= cl_1_0);
     }
 
-    bool allow_1_1() const
-    {
-	return (this->level <= cl_1_1);
-    }
-
   private:
     level_e level;
 };
