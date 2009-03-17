@@ -56,7 +56,6 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     dump_build_graph(false),
     verbose_mode(false),
     silent(false),
-    deprecate_is_error(false),
     monitored(false),
     dump_interfaces(false),
     apply_targets_to_deps(false),
@@ -415,7 +414,7 @@ Abuild::parseArgv()
 	{
 	    this->make_args.push_back("ABUILD_DEPRECATE_IS_ERROR=1");
 	    this->java_builder_args.push_back("-de");
-	    this->deprecate_is_error = true;
+	    Error::setDeprecationIsError(true);
 	}
 	else if (arg == "--dump-data")
 	{

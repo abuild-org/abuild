@@ -242,7 +242,6 @@ class Abuild
     bool dump_build_graph;
     bool verbose_mode;
     bool silent;
-    bool deprecate_is_error;
     bool monitored;
     bool dump_interfaces;
     std::string special_target;

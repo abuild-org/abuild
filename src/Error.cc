@@ -1,3 +1,4 @@
+
 #include <Error.hh>
 
 #include <sstream>
@@ -6,6 +7,7 @@
 #include <QEXC.hh>
 
 bool Error::any_errors = false;
+bool Error::deprecate_is_error = false;
 boost::function<void (std::string const&)> Error::error_callback;
 
 Error::Error(std::string const& default_prefix) :
@@ -13,6 +15,12 @@ Error::Error(std::string const& default_prefix) :
     num_errors(0),
     logger(*(Logger::getInstance()))
 {
+}
+
+void
+Error::setDeprecationIsError(bool val)
+{
+    deprecate_is_error = val;
 }
 
 void
@@ -27,8 +35,8 @@ Error::clearErrorCallback()
     error_callback = boost::function<void (std::string const&)>();
 }
 
-std::string
-Error::getText(FileLocation const& location, std::string const& msg)
+void
+Error::logText(FileLocation const& location, std::string const& msg)
 {
     std::ostringstream fullmsg;
     if (location == FileLocation())
@@ -43,7 +51,11 @@ Error::getText(FileLocation const& location, std::string const& msg)
 	fullmsg << location << ": ";
     }
     fullmsg << msg;
-    return fullmsg.str();
+    this->logger.logError(fullmsg.str());
+    if (error_callback)
+    {
+	error_callback(fullmsg.str());
+    }
 }
 
 void
@@ -51,11 +63,22 @@ Error::error(FileLocation const& location, std::string const& msg)
 {
     any_errors = true;
     ++this->num_errors;
-    std::string const& text = getText(location, "ERROR: " + msg);
-    this->logger.logError(text);
-    if (error_callback)
+    logText(location, "ERROR: " + msg);
+}
+
+void
+Error::deprecate(std::string const& version,
+		 FileLocation const& location, std::string const& orig_message)
+{
+    std::string message = "*** DEPRECATION WARNING *** (abuild version " +
+	version + "): " + orig_message;
+    if (deprecate_is_error)
     {
-	error_callback(text);
+	error(location, message);
+    }
+    else
+    {
+	logText(location, message);
     }
 }
 

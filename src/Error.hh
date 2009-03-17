@@ -15,6 +15,14 @@ class Error
     // Writes an error message using the logger
     void error(FileLocation const&, std::string const&);
 
+    // Writes a deprecation error or warning
+    void deprecate(std::string const& version,
+		   FileLocation const&, std::string const&);
+
+    // Set globally whether or not deprecation messages are considered
+    // errors.  By default, they are warnings.
+    static void setDeprecationIsError(bool);
+
     // Register a callback to be called with the any error message
     // text that is generated from the error function.
     static void setErrorCallback(boost::function<void (std::string const&)>);
@@ -24,10 +32,10 @@ class Error
     static bool anyErrors();
 
   private:
-    // Returns the string corresponding to a particular error message
-    std::string getText(FileLocation const&, std::string const&);
+    void logText(FileLocation const&, std::string const&);
 
     static bool any_errors;
+    static bool deprecate_is_error;
     static boost::function<void (std::string const&)> error_callback;
 
     std::string default_prefix;
