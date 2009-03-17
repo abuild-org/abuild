@@ -7,6 +7,7 @@
 #include <Util.hh>
 #include <FileLocation.hh>
 #include <KeyVal.hh>
+#include <CompatLevel.hh>
 
 std::string const ItemConfig::FILE_CONF = "Abuild.conf";
 std::string const ItemConfig::FILE_MK = "Abuild.mk";
@@ -16,10 +17,13 @@ std::string const ItemConfig::FILE_GROOVY = "Abuild.groovy";
 std::string const ItemConfig::FILE_ANT_BUILD = "Abuild-ant.xml";
 std::map<std::string, ItemConfig::ItemConfig_ptr> ItemConfig::cache;
 std::string const ItemConfig::k_THIS = "this";
-std::string const ItemConfig::k_DESCRIPTION = "description";
 std::string const ItemConfig::k_PARENT = "parent-dir";
-std::string const ItemConfig::k_CHILDREN = "child-dirs";
 std::string const ItemConfig::k_EXTERNAL = "external-dirs";
+std::string const ItemConfig::k_DELETED = "deleted";
+std::string const ItemConfig::k_NAME = "name";
+std::string const ItemConfig::k_TREENAME = "treename";
+std::string const ItemConfig::k_DESCRIPTION = "description";
+std::string const ItemConfig::k_CHILDREN = "child-dirs";
 std::string const ItemConfig::k_VISIBLE_TO = "visible-to";
 std::string const ItemConfig::k_BUILD_ALSO = "build-also";
 std::string const ItemConfig::k_DEPS = "deps";
@@ -27,7 +31,6 @@ std::string const ItemConfig::k_PLATFORM = "platform-types";
 std::string const ItemConfig::k_SUPPORTED_FLAGS = "supported-flags";
 std::string const ItemConfig::k_SUPPORTED_TRAITS = "supported-traits";
 std::string const ItemConfig::k_TRAITS = "traits";
-std::string const ItemConfig::k_DELETED = "deleted";
 std::string const ItemConfig::k_PLUGINS = "plugins";
 
 // The following characters may never appear in build item names:
@@ -76,7 +79,8 @@ bool ItemConfig::initializeStatics()
 }
 
 ItemConfig*
-ItemConfig::readConfig(Error& error, std::string const& dir)
+ItemConfig::readConfig(Error& error, CompatLevel const& compat_level,
+		       std::string const& dir)
 {
     std::string file = dir + "/" + FILE_CONF;
     if (cache.count(dir))
@@ -92,7 +96,7 @@ ItemConfig::readConfig(Error& error, std::string const& dir)
 
     FileLocation location(file, 0, 0);
     ItemConfig_ptr item;
-    item.reset(new ItemConfig(error, location, kv, dir));
+    item.reset(new ItemConfig(error, compat_level, location, kv, dir));
     item->validate();
 
     // Cache and return
@@ -733,11 +737,13 @@ ItemConfig::maybeSetBuildFile(std::string const& file, int& count)
 
 ItemConfig::ItemConfig(
     Error& error,
+    CompatLevel const& compat_level,
     FileLocation const& location,
     KeyVal const& kv,
     std::string const& dir)
     :
     error(error),
+    compat_level(compat_level),
     location(location),
     kv(kv),
     dir(dir)

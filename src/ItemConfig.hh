@@ -19,6 +19,7 @@
 #include <PlatformSelector.hh>
 
 class Error;
+class CompatLevel;
 
 class ItemConfig
 {
@@ -34,17 +35,24 @@ class ItemConfig
     // Read the FILE_CONF file in dir and return a pointer to it.  The
     // ItemConfig class manages the memory.  The "dir" parameter must
     // be a canonical path.  For efficiency, this is not checked.
-    static ItemConfig* readConfig(Error& error_handler, std::string const& dir);
+    static ItemConfig* readConfig(Error& error_handler,
+				  CompatLevel const& compat_level,
+				  std::string const& dir);
 
     static std::string const FILE_CONF;
     static std::string const FILE_INTERFACE;
 
-    // configuration file keys
+    // deprecated configuration file keys
     static std::string const k_THIS;
-    static std::string const k_DESCRIPTION;
     static std::string const k_PARENT;
-    static std::string const k_CHILDREN;
     static std::string const k_EXTERNAL;
+    static std::string const k_DELETED;
+
+    // configuration file keys
+    static std::string const k_NAME;
+    static std::string const k_TREENAME;
+    static std::string const k_DESCRIPTION;
+    static std::string const k_CHILDREN;
     static std::string const k_BUILD_ALSO;
     static std::string const k_DEPS;
     static std::string const k_VISIBLE_TO;
@@ -52,7 +60,6 @@ class ItemConfig
     static std::string const k_SUPPORTED_FLAGS;
     static std::string const k_SUPPORTED_TRAITS;
     static std::string const k_TRAITS;
-    static std::string const k_DELETED;
     static std::string const k_PLUGINS;
     static std::string const ITEM_NAME_RE;
     static std::map<std::string, std::string> valid_keys;
@@ -125,13 +132,14 @@ class ItemConfig
 			    std::string const& description);
     void maybeSetBuildFile(std::string const& file, int& count);
 
-    ItemConfig(Error&, FileLocation const&, KeyVal const&,
-	       std::string const& dir);
+    ItemConfig(Error&, CompatLevel const&, FileLocation const&,
+	       KeyVal const&, std::string const& dir);
 
     typedef boost::shared_ptr<ItemConfig> ItemConfig_ptr;
     static std::map<std::string, ItemConfig_ptr> cache;
 
     Error& error;
+    CompatLevel const& compat_level;
     FileLocation location;
     KeyVal kv;
     std::string dir;

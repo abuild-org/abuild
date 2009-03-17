@@ -1020,7 +1020,8 @@ Abuild::readConfig(std::string const& dir)
     ItemConfig* result = 0;
     try
     {
-	result = ItemConfig::readConfig(this->error_handler, dir);
+	result = ItemConfig::readConfig(
+	    this->error_handler, this->compat_level, dir);
     }
     catch (QEXC::General& e)
     {
