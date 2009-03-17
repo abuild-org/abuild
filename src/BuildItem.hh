@@ -23,7 +23,6 @@ class BuildItem
     // Proxy methods to ItemConfig
     std::string const& getName() const;
     std::string const& getDescription() const;
-    std::string const& getParent() const;
     std::list<std::string> const& getChildren() const;
     std::list<ExternalData> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;

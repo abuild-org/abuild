@@ -1,4 +1,8 @@
 
+XXX Next: introduce tree-name, implement proper root detection,
+deprecate parent-dir.  Will have to think through conversion program
+again and start setting up 1.0 tree test cases.
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -8,6 +12,9 @@ Remember to keep deprecated features list up-to-date.  Add the
 following:
 
  * ...
+
+/groovy stuff below\
+--------------------
 
 These changes have already been made and need to make it into the
 release notes.
@@ -27,6 +34,29 @@ release notes.
  * Support --compat-level=x.y.  When specified, backward compatibility
    support is disabled for features that were deprecated at or before
    version x.y.
+
+--------------------
+\groovy stuff above/
+
+
+ * Non-compatible changes to handling child-dirs and parent-dir:
+
+    - Require parent-dir to point up and child-dirs to point down in
+      the file system
+
+    - Require that an item's parent-dir directory must contain an
+      Abuild.conf file and that no intervening directories between an
+      item and its parent-dir directory contain Abuild.conf files
+
+   These changes, along with the existing check that an item's child's
+   parent point back to the item, are sufficient to enable abuild to
+   safely ignore the value of the parent-dir key.  This means that it
+   can walk up the file system one directory at a time when locating
+   the root of a tree or forest.
+
+ * As an intermediate step toward adoption of the new traversal
+   system, we now walk up the tree looking for an item that doesn't
+   have us as its child when finding the top of the forest.
 
 
 Groovy Framework
@@ -869,8 +899,6 @@ deprecation warning.  Abuild can be run in a mode in which deprecation
 warnings are treated as errors.  There will be no option for
 suppressing deprecation warnings.
 
-(XXX check below this point)
-
 Compatibility mode will work by having abuild map a 1.0 structure into
 the internal representation of a 1.1 structure.  Compatibility does
 not apply to the command-line invocation of abuild, but only to
@@ -888,23 +916,25 @@ compatibility level, the logic is somewhat more complex.  This
 algorithm determines a build item's root status to be one of not a
 root, a 1.0 root, or a 1.1 root.
 
- * If parent-dir appears, return "not a root".
+ * If "tree-name" appears, return "1.1 root"
 
- * Else if "tree-name" appears, return "1.1 root"
+ * Else if compatibility level is 1.0:
 
- * Else if any key that is only allowed in a root build item
-   (excluding tree-name) appears, return "1.0 root"
+    * If parent-dir appears, return "not a root".
 
- * Else if there is a 1.0-syntax Abuild.backing in the same directory,
-   return "1.0 root"
+    * Else if any key that is only allowed in a root build item
+      (excluding tree-name) appears, return "1.0 root"
 
- * Else if it has any obsolete 1.0 keys ("this"), return "1.0 root"
+    * Else if there is a 1.0-syntax Abuild.backing in the same directory,
+      return "1.0 root"
 
- * Else if it has any new 1.1 keys, return "not root"
+    * Else if it has any obsolete 1.0 keys ("this"), return "1.0 root"
 
- * Else if any children have parent-dir keys, return "1.0 root"
+    * Else if it has any new 1.1 keys, return "not root"
 
- * Else return "not root"
+    * Else if any children have parent-dir keys, return "1.0 root"
+
+ * Return "not root"
 
 Note that a build item with only a child-dirs key in its Abuild.conf
 can be a forest root even if it is not a tree root.
@@ -970,7 +1000,7 @@ files in 1.0 roots, but in all cases, we will get error messages for
 any other rogue Abuild.backing files.
 
 During traversal, in compatibility mode, we will need to read 1.0
-Abuild.conf files as if they were 1.0 files.  The following mapping is
+Abuild.conf files as if they were 1.1 files.  The following mapping is
 used when reading Abuild.conf files.  In all cases, a deprecation
 warning is issued when any mapping rule is applied.
 

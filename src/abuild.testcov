@@ -47,14 +47,11 @@ KeyVal ERR invalid key 0
 KeyVal ERR missing keys 0
 KeyVal ignore blank line 0
 Abuild with_deps 0
-Abuild ERR cycle reading Abuild.conf 0
 ItemConfig ERR build item invalid name 0
 ItemConfig ERR deps without this 0
 ItemConfig ERR external on non-root 0
-ItemConfig ERR absolute parent 0
-Abuild ERR missing parent 0
+ItemConfig ERR invalid parent 0
 ItemConfig ERR absolute child 0
-Abuild ERR not child of parent 0
 Abuild ERR unknown platform type 0
 Abuild ERR incompatible platform types 0
 Abuild ERR inaccessible dep 0
@@ -257,3 +254,9 @@ groovy stop after closure error 0
 groovy ERR re-entrant target 0
 groovy cached target result 0
 groovy ERR configureTarget after init 0
+ItemConfig ERR .. in child 0
+ItemConfig ERR no parent Abuild.conf 0
+ItemConfig ERR interleaved Abuild.conf 0
+Abuild found root while searching for top 0
+Abuild skipping dir in top search 0
+Abuild ERR top is not root 0

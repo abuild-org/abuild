@@ -3,6 +3,7 @@
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
+use File::Temp 'tempdir';
 
 require TestDriver;
 require abuild_test_utils;
@@ -89,7 +90,7 @@ $td->runtest("bad externals 1",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/a/ab/aba");
+cd("work/a/ab/abc");
 
 $td->runtest("bad externals 2",
 	     {$td->COMMAND => "abuild --build=all",
@@ -134,7 +135,7 @@ $td->runtest("child-dir cycle",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/a/af");
+cd("work/h");
 
 # Also tests monitored with errors
 $td->runtest("after-build errors",
@@ -221,6 +222,20 @@ $td->runtest("abuild dependency errors",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+# To actually bump into the root directory while finding the top of
+# the tree, we need to create a directory outside of the abuild source
+# tree.  Otherwise, abuild's own Abuild.conf will block us.
+my $dir = tempdir();
+open(F, ">$dir/Abuild.conf") or die;
+print F "this: hello\n";
+close(F);
+$td->runtest("find root looking for top",
+	     {$td->COMMAND => "abuild -C $dir",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/found-root.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(25);
+$td->report(26);

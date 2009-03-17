@@ -160,6 +160,16 @@
     is-plugin-anywhere="0"
    />
    <build-item
+    name="aha"
+    home-tree="bt-1"
+    absolute-path="--topdir--/a/ah/aha"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
     name="b"
     home-tree="bt-1"
     absolute-path="--topdir--/b"

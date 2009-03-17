@@ -1,2 +1,2 @@
---topdir--/a/aa/aad/aada/Abuild.conf: ERROR: this directory is not listed as a child of its parent
-abuild: ERROR: errors detected; exiting
+--topdir--/a/aa/aad/aada/Abuild.conf: ERROR: apparent root of local forest does not appear to be a build tree root
+abuild: ERROR: unable to find top of local build forest

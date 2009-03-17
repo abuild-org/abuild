@@ -53,6 +53,8 @@ std::string const ItemConfig::k_PLUGINS = "plugins";
 std::string const ItemConfig::ITEM_NAME_RE =
     "[a-zA-Z0-9_][a-zA-Z0-9_-]*(?:\\.[a-zA-Z0-9_-]+)*";
 
+std::string const ItemConfig::PARENT_RE = "\\.\\.(?:/\\.\\.)*";
+
 std::map<std::string, std::string> ItemConfig::valid_keys;
 
 // Initialize this after all other status
@@ -203,11 +205,44 @@ ItemConfig::checkName()
 void
 ItemConfig::checkParent()
 {
-    if (Util::isAbsolutePath(this->parent))
+    boost::regex parent_re(PARENT_RE);
+    boost::smatch match;
+    if (! boost::regex_match(this->parent, match, parent_re))
     {
-	QTC::TC("abuild", "ItemConfig ERR absolute parent");
+	QTC::TC("abuild", "ItemConfig ERR invalid parent");
 	this->error.error(this->location,
-			  "\"" + k_PARENT + "\" must be a relative path");
+			  "\"" + k_PARENT +
+			  "\" must point up in the file system");
+    }
+    else if (! Util::isFile(this->dir + "/" + this->parent + "/" + FILE_CONF))
+    {
+	QTC::TC("abuild", "ItemConfig ERR no parent Abuild.conf");
+	this->error.error(this->location,
+			  "\"" + k_PARENT +
+			  "\" points to a directory that does not contain " +
+			  FILE_CONF);
+    }
+    else
+    {
+	// Make sure there are no intervening Abuild.conf files.  We
+	// check parent/child symmetry during traversal.
+	std::list<std::string> elements = Util::split('/', this->parent);
+	elements.pop_back();
+	while (! elements.empty())
+	{
+	    std::string path = Util::join("/", elements);
+	    if (Util::isFile(this->dir + "/" + path + "/" + FILE_CONF))
+	    {
+		QTC::TC("abuild", "ItemConfig ERR interleaved Abuild.conf");
+		this->error.error(
+		    this->location,
+		    "relative to this item, directory \"" + path + "\","
+		    " which is between this item and its parent, contains " +
+		    FILE_CONF + "; interleaved " + FILE_CONF + " files are"
+		    " not permitted");
+	    }
+	    elements.pop_back();
+	}
     }
 }
 
@@ -218,6 +253,31 @@ ItemConfig::checkChildren()
     if (checkRelativePaths(this->children, k_CHILDREN + " entries"))
     {
 	QTC::TC("abuild", "ItemConfig ERR absolute child");
+    }
+    std::list<std::string>::iterator iter = this->children.begin();
+    while (iter != this->children.end())
+    {
+	std::list<std::string>::iterator next = iter;
+	++next;
+	std::list<std::string> elements = Util::split('/', *iter);
+	bool error_found = false;
+	for (std::list<std::string>::iterator eiter = elements.begin();
+	     eiter != elements.end(); ++eiter)
+	{
+	    if (*eiter == "..")
+	    {
+		error_found = true;
+		break;
+	    }
+	}
+	if (error_found)
+	{
+	    QTC::TC("abuild", "ItemConfig ERR .. in child");
+	    this->error.error(this->location,
+			      k_CHILDREN + " entries may not include \"..\"");
+	    this->children.erase(iter, next);
+	}
+	iter = next;
     }
 }
 

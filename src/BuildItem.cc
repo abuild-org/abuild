@@ -40,12 +40,6 @@ BuildItem::getDescription() const
     return this->config->getDescription();
 }
 
-std::string const&
-BuildItem::getParent() const
-{
-    return this->config->getParent();
-}
-
 std::list<std::string> const&
 BuildItem::getChildren() const
 {

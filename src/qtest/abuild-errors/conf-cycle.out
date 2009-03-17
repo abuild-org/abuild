@@ -1,1 +1,3 @@
-abuild: ERROR: parent-dir loop detected while looking for root of build tree
+--topdir--/a/aa/aae/Abuild.conf: ERROR: "parent-dir" must point up in the file system
+--topdir--/a/aa/aae/Abuild.conf: ERROR: apparent root of local forest does not appear to be a build tree root
+abuild: ERROR: unable to find top of local build forest

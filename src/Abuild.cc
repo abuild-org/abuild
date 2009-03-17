@@ -1034,48 +1034,58 @@ Abuild::findTop()
 {
     // Find the top directory of the system containing this build item
     // directory.  That is the first directory above us that contains
-    // an ItemConfig::FILE_CONF file without a parent-dir key.  Cycles
-    // are detected, so this is not an infinite loop.
+    // an ItemConfig::FILE_CONF file without a parent-dir key.
 
     std::string dir = this->this_config_dir;
 
     bool found = false;
-    std::set<std::string> seen;
-    std::string child_dir;
-    FileLocation child_location;
     while (! found)
     {
-	if (seen.count(dir))
+	std::string parent;
+	std::string parent_candidate = dir;
+	while (! parent_candidate.empty())
 	{
-	    QTC::TC("abuild", "Abuild ERR cycle reading Abuild.conf");
-	    fatal("parent-dir loop detected while looking for root of "
-		  "build tree");
+	    std::string tmp = Util::dirname(parent_candidate);
+	    if (tmp == parent_candidate)
+	    {
+		// We reached the root
+		QTC::TC("abuild", "Abuild found root while searching for top");
+		parent_candidate.clear();
+		break;
+	    }
+	    else
+	    {
+		parent_candidate = tmp;
+		if (Util::fileExists(
+			parent_candidate + "/" + ItemConfig::FILE_CONF))
+		{
+		    break;
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild skipping dir in top search");
+		}
+	    }
 	}
-	seen.insert(dir);
-
-	ItemConfig* config = readConfig(dir);
-	FileLocation location = config->getLocation();
-	std::string const& parent = config->getParent();
-
-	if (! child_dir.empty())
+	if (! parent_candidate.empty())
 	{
-	    // Make sure the last item's parent has it as a child
+	    // See if this item has this directory as a child.
+	    ItemConfig* config = readConfig(parent_candidate);
 	    bool parent_has_child = false;
 	    std::list<std::string> const& children = config->getChildren();
 	    for (std::list<std::string>::const_iterator iter = children.begin();
 		 iter != children.end(); ++iter)
 	    {
-		if (Util::canonicalizePath(dir + "/" + *iter) == child_dir)
+		if (Util::canonicalizePath(
+			parent_candidate + "/" + *iter) == dir)
 		{
 		    parent_has_child = true;
 		    break;
 		}
 	    }
-	    if (! parent_has_child)
+	    if (parent_has_child)
 	    {
-		QTC::TC("abuild", "Abuild ERR not child of parent");
-		error(child_location, "this directory is not listed as"
-		      " a child of its parent");
+		parent = parent_candidate;
 	    }
 	}
 
@@ -1085,17 +1095,19 @@ Abuild::findTop()
 	}
 	else
 	{
-	    child_dir = dir;
-	    child_location = location;
-	    dir = Util::canonicalizePath(dir + "/" + parent);
-	    if (! Util::fileExists(dir + "/" + ItemConfig::FILE_CONF))
-	    {
-		QTC::TC("abuild", "Abuild ERR missing parent");
-		error(location, "parent " + parent + " has no " +
-		      ItemConfig::FILE_CONF);
-		fatal("unable to find root of build tree");
-	    }
+	    dir = parent;
 	}
+    }
+
+    ItemConfig* config = readConfig(dir);
+    if (! config->getParent().empty())
+    {
+	QTC::TC("abuild", "Abuild ERR top is not root");
+	// still 1.0 logic...need to eventually allow item with only
+	// child-dirs
+	error(config->getLocation(), "apparent root of local forest"
+	      " does not appear to be a build tree root");
+	fatal("unable to find top of local build forest");
     }
 
     return dir;

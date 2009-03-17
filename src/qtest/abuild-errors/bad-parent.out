@@ -1,3 +1,3 @@
---topdir--/a/aa/aab/Abuild.conf: ERROR: "parent-dir" must be a relative path
---topdir--/a/aa/aab/Abuild.conf: ERROR: parent /does/not/exist has no Abuild.conf
-abuild: ERROR: unable to find root of build tree
+--topdir--/a/aa/aab/Abuild.conf: ERROR: "parent-dir" must point up in the file system
+--topdir--/a/aa/aab/Abuild.conf: ERROR: apparent root of local forest does not appear to be a build tree root
+abuild: ERROR: unable to find top of local build forest

@@ -62,6 +62,7 @@ class ItemConfig
     static std::string const k_TRAITS;
     static std::string const k_PLUGINS;
     static std::string const ITEM_NAME_RE;
+    static std::string const PARENT_RE;
     static std::map<std::string, std::string> valid_keys;
 
     std::string const& getName() const;

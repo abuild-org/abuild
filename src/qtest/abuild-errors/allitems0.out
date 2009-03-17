@@ -29,6 +29,7 @@
 --topdir--/a/ag/Abuild.conf: ERROR: invalid trait !wrong!
 --topdir--/a/ag/Abuild.conf: ERROR: deleted item "quack" listed more than once
 --topdir--/a/ag/Abuild.conf: ERROR: plugin "oink" listed more than once
+--topdir--/a/Abuild.conf: ERROR: child a/ah/aha/Abuild.conf has parent-dir that doesn't point to this directory
 --topdir--/c/cd/Abuild.conf: ERROR: build item names may contain only alphanumeric characters, underscores, periods, and dashes
 --topdir--/c/cd/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
 --topdir--/d/a/Abuild.conf: ERROR: visible-to value must be * or end with .*
@@ -37,11 +38,13 @@
 --topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
 --topdir--/a/ab/Abuild.conf: ERROR: child a/ab/aba/Abuild.conf has no parent-dir
+--topdir--/a/ab/abb/Abuild.conf: ERROR: relative to this item, directory "..", which is between this item and its parent, contains Abuild.conf; interleaved Abuild.conf files are not permitted
 --topdir--/a/ab/Abuild.conf: ERROR: child a/ab/abb/Abuild.conf has parent-dir that doesn't point to this directory
 --topdir--/b/bc/Abuild.conf: ERROR: build item bb appears in multiple locations
 --topdir--/b/bb/Abuild.conf: ERROR: here is another location
 --topdir--/d/b/a/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
 --topdir--/d/b/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
+--topdir--/a/ah/aha/Abuild.conf: ERROR: loop detected while reading Abuild.conf files: build item aha reached by multiple paths
 --topdir--/c/cd/Abuild.conf: ERROR: unknown platform type "potato"
 --topdir--/d/a/Abuild.conf: ERROR: platforms in different target types may not be mixed
 --topdir--/a/ab/Abuild.conf: ERROR: ab may not depend on b.private because it is private to another scope

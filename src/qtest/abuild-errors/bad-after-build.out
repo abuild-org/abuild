@@ -17,7 +17,7 @@ abuild-monitor: begin-dump-data
  <build-trees>
   <build-tree
    id="bt-1"
-   absolute-path="--topdir--/a/af"
+   absolute-path="--topdir--/h"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -35,7 +35,7 @@ abuild-monitor: begin-dump-data
    <build-item
     name="af-dep"
     home-tree="bt-1"
-    absolute-path="--topdir--/a/af/dep"
+    absolute-path="--topdir--/h/dep"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"
@@ -52,7 +52,7 @@ abuild-monitor: begin-dump-data
    <build-item
     name="af"
     home-tree="bt-1"
-    absolute-path="--topdir--/a/af"
+    absolute-path="--topdir--/h"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"
@@ -75,7 +75,7 @@ abuild-monitor: begin-dump-data
    <build-item
     name="af-rdep"
     home-tree="bt-1"
-    absolute-path="--topdir--/a/af/rdep"
+    absolute-path="--topdir--/h/rdep"
     backing-depth="0"
     external-depth="0"
     target-type="platform-independent"
@@ -111,10 +111,10 @@ abuild-monitor: state-change af indep ready
 abuild-monitor: state-change af indep running
 abuild-monitor: targets af indep all
 abuild: af (abuild-indep): all
---topdir--/a/af/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
-abuild-monitor: error --topdir--/a/af/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
---topdir--/a/af/Abuild.interface: ERROR: after-build file 2.interface does not exist
-abuild-monitor: error --topdir--/a/af/Abuild.interface: ERROR: after-build file 2.interface does not exist
+--topdir--/h/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
+abuild-monitor: error --topdir--/h/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
+--topdir--/h/Abuild.interface: ERROR: after-build file 2.interface does not exist
+abuild-monitor: error --topdir--/h/Abuild.interface: ERROR: after-build file 2.interface does not exist
 abuild: af (abuild-indep): build failed
 abuild-monitor: state-change af indep failed
 abuild-monitor: state-change af-rdep indep dependency-failed
