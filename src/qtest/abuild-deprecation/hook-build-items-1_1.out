@@ -1,0 +1,8 @@
+abuild: old (abuild-java): all
+Buildfile: --abuild.xml--
+
+-pre-compile:
+     [echo] pre-compile hook
+
+BUILD SUCCESSFUL
+Total time: <time>

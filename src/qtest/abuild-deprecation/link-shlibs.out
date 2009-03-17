@@ -1,6 +1,4 @@
 abuild: shlib (abuild-<native>): all
 make: Entering directory `--topdir--/link-shlibs/abuild-<native>'
 --abuild-dir--/rules/object-code/ccxx.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): LINK_SHLIBS is deprecated; as of version 1.0.3, abuild always links shared libraries
-Compiling ../a.cc as C++
-Creating shared library
 make: Leaving directory `--topdir--/link-shlibs/abuild-<native>'

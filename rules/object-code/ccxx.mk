@@ -193,11 +193,13 @@ XLINKFLAGS ?=
 LINKWRAPPER ?=
 LINK_AS_C ?=
 
-ifneq ($(origin LINK_SHLIBS), undefined)
- ifeq (-$(strip $(LINK_SHLIBS))-,--)
-  $(error setting LINK_SHLIBS to an empty value no longer works; override LIBS instead)
- else
-  $(call deprecate,1.1,LINK_SHLIBS is deprecated; as of version 1.0.3$(_comma) abuild always links shared libraries)
+ifeq ($(ABUILD_SUPPORT_1_0),1)
+ ifneq ($(origin LINK_SHLIBS), undefined)
+  ifeq (-$(strip $(LINK_SHLIBS))-,--)
+   $(error setting LINK_SHLIBS to an empty value no longer works; override LIBS instead)
+  else
+   $(call deprecate,1.1,LINK_SHLIBS is deprecated; as of version 1.0.3$(_comma) abuild always links shared libraries)
+  endif
  endif
 endif
 

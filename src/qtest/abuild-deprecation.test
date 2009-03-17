@@ -37,6 +37,13 @@ $td->runtest("build-item-rules deprecation error",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("build-item-rules compat level 1.1",
+	     {$td->COMMAND => "abuild -b all --compat-level=1.1 -k",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build-item-rules-1_1.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 if ($test_java)
 {
     cd("work/hook-build-items");
@@ -54,9 +61,23 @@ if ($test_java)
 		 {$td->FILE => "$top/hook-build-items-error.out",
 		  $td->EXIT_STATUS => 2},
 		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("hook-build-items compat level 1.1",
+		 {$td->COMMAND => "abuild -b all -k --compat-level=1.1",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/hook-build-items-1_1.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
 }
 
 cd("work/link-shlibs");
+
+$td->runtest("LINK_SHLIBS compat level 1.1",
+	     {$td->COMMAND => "abuild -b all -k --compat-level=1.1",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/link-shlibs-1_1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("LINK_SHLIBS",
 	     {$td->COMMAND => "abuild -b all -k",
@@ -67,4 +88,4 @@ $td->runtest("LINK_SHLIBS",
 
 check_work_accessed($td);
 
-$td->report(4 + ($test_java ? 2 : 0));
+$td->report(6 + ($test_java ? 3 : 0));

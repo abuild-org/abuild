@@ -10,6 +10,7 @@ public class BuildArgs
     public boolean emacsMode = false;
     public boolean noOp = false;
     public boolean deprecationIsError = false;
+    public boolean support1_0 = true;
 
     public boolean parseArgs(List<String> args)
     {
@@ -39,6 +40,10 @@ public class BuildArgs
 	    else if (arg.equals("-de"))
 	    {
 		deprecationIsError = true;
+	    }
+	    else if (arg.equals("-cl1_1"))
+	    {
+		support1_0 = false;
 	    }
 	    else
 	    {

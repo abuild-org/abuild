@@ -1,0 +1,11 @@
+abuild: old1 (abuild-indep): all
+make: Entering directory `--topdir--/build-item-rules/old/abuild-indep'
+--abuild-dir--/make/abuild.mk:nn: *** No rules defined..  Stop.
+make: Leaving directory `--topdir--/build-item-rules/old/abuild-indep'
+abuild: old1 (abuild-indep): build failed
+abuild: old2 (abuild-indep): all
+make: Entering directory `--topdir--/build-item-rules/old2/abuild-indep'
+local rule
+make: Leaving directory `--topdir--/build-item-rules/old2/abuild-indep'
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: old1 on platform indep

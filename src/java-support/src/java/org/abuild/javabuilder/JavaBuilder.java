@@ -203,6 +203,10 @@ class JavaBuilder
 	    p.setUserProperty("abuild.private.deprecate-is-error", "1");
 	    Deprecate.setDeprecateIsError(true);
 	}
+	if (buildArgs.support1_0)
+	{
+	    p.setUserProperty("abuild.private.support-1_0", "1");
+	}
 	p.addBuildListener(logger);
 
 	p.addTaskDefinition("deprecate", Deprecate.class);

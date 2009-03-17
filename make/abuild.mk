@@ -59,17 +59,21 @@ include $(SRCDIR)/Abuild.mk
 
 RULES ?=
 LOCAL_RULES ?=
-BUILD_ITEM_RULES ?=
+ALL_RULES = $(RULES) $(LOCAL_RULES)
 
-ifdef BUILD_ITEM_RULES
-  $(call deprecate,1.1,BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead)
-  _UNDEFINED := $(call undefined_items,BUILD_ITEM_RULES)
-  ifneq ($(words $(_UNDEFINED)),0)
-    $(error These build items from BUILD_ITEM_RULES in are unknown: $(_UNDEFINED))
+ifeq ($(ABUILD_SUPPORT_1_0),1)
+  BUILD_ITEM_RULES ?=
+  ifdef BUILD_ITEM_RULES
+    $(call deprecate,1.1,BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead)
+    _UNDEFINED := $(call undefined_items,BUILD_ITEM_RULES)
+    ifneq ($(words $(_UNDEFINED)),0)
+      $(error These build items from BUILD_ITEM_RULES in are unknown: $(_UNDEFINED))
+    endif
+    ALL_RULES += $(BUILD_ITEM_RULES)
   endif
 endif
 
-ifeq ($(words $(RULES) $(BUILD_ITEM_RULES) $(LOCAL_RULES)), 0)
+ifeq ($(words $(ALL_RULES)), 0)
   $(error No rules defined.)
 endif
 
@@ -84,10 +88,12 @@ doc:: all ;
 # Include base rule and user-specified built-in rules
 include $(foreach RULE,$(RULES),$(call load_rule,$(RULE)))
 
-# Include any build-item-specific rules
-ifneq ($(words $(BUILD_ITEM_RULES)),0)
-  _qtx_dummy := $(call QTC.TC,abuild,abuild.mk BUILD_ITEM_RULES,0)
-  include $(foreach BI,$(BUILD_ITEM_RULES),$(abDIR_$(BI))/Rules.mk)
+ifeq ($(ABUILD_SUPPORT_1_0),1)
+  # Include any build-item-specific rules
+  ifneq ($(words $(BUILD_ITEM_RULES)),0)
+    _qtx_dummy := $(call QTC.TC,abuild,abuild.mk BUILD_ITEM_RULES,0)
+    include $(foreach BI,$(BUILD_ITEM_RULES),$(abDIR_$(BI))/Rules.mk)
+  endif
 endif
 
 # Finally, include any local rules

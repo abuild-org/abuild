@@ -1,0 +1,5 @@
+abuild: shlib (abuild-<native>): all
+make: Entering directory `--topdir--/link-shlibs/abuild-<native>'
+Compiling ../a.cc as C++
+Creating shared library
+make: Leaving directory `--topdir--/link-shlibs/abuild-<native>'

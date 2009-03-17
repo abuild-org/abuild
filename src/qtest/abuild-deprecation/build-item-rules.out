@@ -1,5 +1,11 @@
-abuild: old (abuild-indep): all
+abuild: old1 (abuild-indep): all
 make: Entering directory `--topdir--/build-item-rules/old/abuild-indep'
 --abuild-dir--/make/abuild.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead
 message from rules
 make: Leaving directory `--topdir--/build-item-rules/old/abuild-indep'
+abuild: old2 (abuild-indep): all
+make: Entering directory `--topdir--/build-item-rules/old2/abuild-indep'
+--abuild-dir--/make/abuild.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead
+message from rules
+local rule
+make: Leaving directory `--topdir--/build-item-rules/old2/abuild-indep'

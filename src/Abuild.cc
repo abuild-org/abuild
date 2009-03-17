@@ -60,6 +60,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     monitored(false),
     dump_interfaces(false),
     apply_targets_to_deps(false),
+    compat_level(CompatLevel::cl_1_0),
     local_build(false),
     error_handler(whoami),
     this_config(0),
@@ -253,6 +254,7 @@ Abuild::parseArgv()
     boost::regex buildset_re("--build=(\\S+)");
     boost::regex cleanset_re("--clean=(\\S+)");
     boost::regex define_re("([^-][^=]*)=(.*)");
+    boost::regex compat_re("--compat-level=(\\d+\\.\\d+)");
 
     boost::smatch match;
 
@@ -442,6 +444,24 @@ Abuild::parseArgv()
 	else if (arg == "--dump-interfaces")
 	{
 	    this->dump_interfaces = true;
+	}
+	else if (boost::regex_match(arg, match, compat_re))
+	{
+	    std::string version = match.str(1);
+	    if (version == "1.0")
+	    {
+		this->compat_level.setLevel(CompatLevel::cl_1_0);
+	    }
+	    else if (version == "1.1")
+	    {
+		this->compat_level.setLevel(CompatLevel::cl_1_1);
+		this->java_builder_args.push_back("-cl1_1");
+		this->make_args.push_back("ABUILD_SUPPORT_1_0=0");
+	    }
+	    else
+	    {
+		usage("invalid compatibility level " + arg);
+	    }
 	}
 	else if ((! arg.empty()) && (arg[0] == '-'))
 	{
@@ -5187,6 +5207,8 @@ Abuild::help()
     h("    -c set");
     h("  --clean-platforms pattern   when cleaning, only remove platforms that");
     h("                    match the given shell-style filename pattern");
+    h("  --compat-level=x.y       disable backward compatible for constructs that");
+    h("                    were deprecated at or before version x.y");
     h("  --deprecation-is-error   treat deprecation warnings as errors");
     h("  --dump-build-graph  dump abuild's internal build graph");
     h("  --dump-data       dump abuild's data to stdout and build no targets");

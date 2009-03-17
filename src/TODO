@@ -16,6 +16,18 @@ release notes.
    src/manual/groovy-framework.txt pending full inclusion in the
    manual.
 
+ * Java examples that are not specifically illustrating the ant
+   framework have been have been converted to use the groovy
+   framework.  The rest have been moved into an ant-specific portion
+   of the test suite.  The text remains in the manual, but the files
+   are no longer included.  Prior to 1.1, new examples to illustrate
+   the Groovy framework will be introduced, ant the ant framework will
+   be mentioned briefly in an appendix.
+
+ * Support --compat-level=x.y.  When specified, backward compatibility
+   support is disabled for features that were deprecated at or before
+   version x.y.
+
 
 Groovy Framework
 ================
@@ -836,23 +848,28 @@ lh3-style trees.
 Compatibility
 =============
 
-By default, abuild 1.1 will recognize all valid 1.0 build trees and
-will issue deprecation warnings with concrete fix suggestions,
-including a reference to the 1.0 to 1.1 conversion tool, whenever it
-sees a deprecated construct.  Abuild can be run in a mode in which
-deprecation warnings are treated as errors.  It will also be possible
-to run abuild in strict 1.1 mode, in which case obsolete 1.0
-constructs will not be recognized at all.  In compatibility mode,
-there will be an option for suppressing deprecation warnings for
-backing areas a read-only externals only.  There will be no option for
-suppressing deprecation warnings for writable build trees and build
-items.
+Starting with version 1.1, abuild runs with a compatibility level
+equal to x.y where x.y is a released major/minor version.  In version
+1.1, the only valid compatibility levels are 1.0 and 1.1.  When abuild
+is running at compatibility level x.y, backward compatibility is
+disabled for features deprecated at or before version x.y.  For
+example, at compatibility level 1.0, abuild will recognize the "this"
+keyword in Abuild.conf, issue a deprecation warning, and treat it as
+if it were "name".  At compatibility level 1.1, abuild will not
+recognize the "this" key at all.
 
-Within the code, there will be a smart pointer to a compatibility
-object that is only initialized when not in strict 1.1 mode.  To the
-maximum possible extent, both data and logic will be encapsulated
-there.  In other cases, code devoted to compatibility will be clearly
-marked and maximally isolated.
+The default compatibility level is 1.0.  At the present time, there is
+no expectation of supporting compatibility levels more than one minor
+release old, but this general capability level framework would make
+that possible if it were desired.
+
+When abuild recognizes feature from a version between the
+compatibility level and the current version, it will issue a
+deprecation warning.  Abuild can be run in a mode in which deprecation
+warnings are treated as errors.  There will be no option for
+suppressing deprecation warnings.
+
+(XXX check below this point)
 
 Compatibility mode will work by having abuild map a 1.0 structure into
 the internal representation of a 1.1 structure.  Compatibility does
@@ -865,10 +882,11 @@ the goal is for all "normal" abuild 1.0 trees to create the same
 builds with 1.1 as with 1.0.
 
 With pure abuild 1.1, a build item is a build tree root iff it has a
-tree-name key.  In pure abuild 1.0, a build item is a build tree root
-iff it does not have parent-dir key.  In 1.1 with 1.0 compatibility,
-the logic is somewhat more complex.  This algorithm determines a build
-item's root status to be one of not a root, a 1.0 root, or a 1.1 root.
+tree-name key.  In pure abuild 1.0, a build item was a build tree root
+iff it did not have parent-dir key.  In 1.1 operating at 1.0
+compatibility level, the logic is somewhat more complex.  This
+algorithm determines a build item's root status to be one of not a
+root, a 1.0 root, or a 1.1 root.
 
  * If parent-dir appears, return "not a root".
 

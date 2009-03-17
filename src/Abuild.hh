@@ -16,6 +16,7 @@
 #include <PlatformData.hh>
 #include <PlatformSelector.hh>
 #include <JavaBuilder.hh>
+#include <CompatLevel.hh>
 
 class Logger;
 class ItemConfig;
@@ -252,6 +253,7 @@ class Abuild
     std::list<std::string> related_by_traits;
     std::map<std::string, PlatformSelector> platform_selectors;
     std::set<std::string> clean_platforms;
+    CompatLevel compat_level;
     bool local_build;
 
     // Other data
