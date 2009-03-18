@@ -1,7 +1,8 @@
 
+XXX Release 1.1.a4 from here and recreate java branch.
+
 XXX Next: introduce tree-name, implement proper root detection,
-deprecate parent-dir.  Will have to think through conversion program
-again and start setting up 1.0 tree test cases.
+deprecate parent-dir.
 
 === Changes Targeted for Version 1.1 ===
 
