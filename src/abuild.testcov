@@ -260,3 +260,4 @@ ItemConfig ERR interleaved Abuild.conf 0
 Abuild found root while searching for top 0
 Abuild skipping dir in top search 0
 Abuild ERR top is not root 0
+ItemConfig ERR interleaved child Abuild.conf 0

@@ -277,6 +277,31 @@ ItemConfig::checkChildren()
 			      k_CHILDREN + " entries may not include \"..\"");
 	    this->children.erase(iter, next);
 	}
+	else
+	{
+	    // Check for intervening Abuild.conf directories.  No need
+	    // to check for existence of child Abuild.conf.  It may
+	    // not exist because of backing areas, and we'll check
+	    // during traversal.  However, it is never correct for an
+	    // intervening file to exist.
+	    elements.pop_back();
+	    while (! elements.empty())
+	    {
+		std::string path = Util::join("/", elements);
+		if (Util::isFile(this->dir + "/" + path + "/" + FILE_CONF))
+		{
+		    QTC::TC("abuild", "ItemConfig ERR interleaved child Abuild.conf");
+		    this->error.error(
+			this->location,
+			"relative to this item, directory \"" + path + "\","
+			" which is between this item and one of its children,"
+			" contains " +
+			FILE_CONF + "; interleaved " + FILE_CONF + " files are"
+			" not permitted");
+		}
+		elements.pop_back();
+	    }
+	}
 	iter = next;
     }
 }
