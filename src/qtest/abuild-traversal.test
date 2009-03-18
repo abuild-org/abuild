@@ -1,0 +1,128 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-traversal") or die;
+
+my $td = new TestDriver("traversal");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my $native_out = get_native_out();
+
+# These tests the traversal algorithm and the various issues
+# surrounding 1.0 to 1.1 changes.
+
+# We create a rather elaborate scenario that tries to exercise the
+# traversal system as fully as possible.  The easiest way to explain
+# this is to present it as a series of events in time.  This tree is
+# constructed using abuild 1.0 features, though we may still speak
+# about forests and tree names for illustrative purposes.
+
+# Supporting this, we have a forest called PLUGINS that contains a
+# single build item, "rules", which provides indep echo rules.  This
+# is referenced as a plugin in all other trees and is not otherwise
+# mentioned below.
+
+# To start off with, we have a project, "proj", that has two
+# capabilities, "c1" and "c2".  Each capability is divided into an
+# interface tree and an implementation tree.  The c1 and c2 trees each
+# depend on their interface trees.  The implementation trees also
+# depend on their interface trees.  In addition, c2's implementation
+# depends on c1's interface.  Then there is an integration test that
+# depends on the two implementations.  This stand-alone,
+# self-contained forest is called "PROJ0".  Directories whose names
+# appear in parentheses are not tree roots.  Other directories are
+# tree roots.
+
+#   (proj)               [PROJ0]
+#     c1 -ext-> ifc
+#       ifc
+#       impl -ext-> ../ifc
+#     c2 -ext-> ifc
+#       ifc
+#       impl -ext-> ../ifc, ../../c1
+#     (tests)
+#       int -ext-> ../../c1/impl, ../../c2/impl
+
+
+# Entirely separate from this, there is a tree that implements some
+# stand-alone features.  We'll call this tree "util".  It implements
+# two features, "f1" and "f2".  There is also a test tree that depends
+# on both "f2" and "f2".  This stand-alone, self-contained forest is
+# called "UTIL0".
+
+#   (util)      [UTIL0]
+#     f1
+#     f2
+#     (tests)
+#       int -ext-> ../../f1, ../../f2
+
+# In a separate, sparsely popuated area, we modify c2 in proj to make
+# use of f2 in util.  This includes taking some of the build items
+# from the c2 implementation tree and moving them into the f2 tree, so
+# we have build items that belong to a different tree in the main area
+# from in the backing area.  We call this forest C2F2.  It is
+# populated with c2's implementation, f2, and both original forests'
+# integration test areas.  The various subtrees back to PROJ0 or UTIL0
+# as needed.  Only new externals are shown here, but all existing ones
+# still apply.
+
+#                (proj)           [C2F2]
+# PROJ0 <-back-    c2
+# PROJ0 <-back-      impl -ext-> ../../../util/f2
+#                  (tests)
+# PROJ0 <-back-      int
+#                (util)
+# UTIL0 <-back-    f2
+#                  (tests)
+# UTIL0 <-back-      int
+
+
+# Finally, we have a tree (C3) in which we are going to add a third
+# capability to proj.  This capability, c3, will make use of c2's
+# interfaces.  We will also modify c1's and c2's implementations here.
+# The integration test will also be modified to make use of c3's
+# implementation.  c2's implementation tree will be backed to the C2F2
+# forest (which is in turn backed to PROJ0) while c1's implementation
+# will be backed directly to PROJ0 since there is no instance of it in
+# C2F2.
+
+#                (proj)            [C3]
+# PROJ0 <-back-    c1
+# PROJ0 <-back-      impl
+# PROJ0 <-back-    c2
+# C2F2  <-back-      impl
+#                  c3 -ext-> ifc
+#                    ifc
+#                    impl -ext-> ../ifc, ../../c2
+#                  (tests)
+# C2F2  <-back-      int -ext-> ../../c3/impl
+
+# Basic test strategy:
+#
+#  * Set up 1.0 tree.
+#
+#  * Make sure everything works and carefully validated dump data.
+#
+#  * Use conversion program to generate 1.1 tree.
+#
+#  * Make sure results are identical.
+#
+#  * Try various manually hybrid 1.0/1.1 trees including upgrading
+#    PROJ but not UTIL and/or the other way around.
+
+
+
+
+setup($td);
+
+check_work_accessed($td);
+
+$td->report(1);
