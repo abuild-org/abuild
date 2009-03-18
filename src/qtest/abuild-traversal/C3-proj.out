@@ -1,0 +1,29 @@
+abuild: c1-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest2/C3/proj/c1/impl/a/abuild-indep'
+IFC1: PROJ0-c1-ifc
+IMPL1: C3-c1-a-impl
+make: Leaving directory `--topdir--/1.0/forest2/C3/proj/c1/impl/a/abuild-indep'
+abuild: c2-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest2/C3/proj/c2/impl/b/abuild-indep'
+IFC1: PROJ0-c1-ifc PROJ0-c2-ifc F2C2-f2-c-ifc
+IMPL1: F2C2-f2-c-impl C3-c2-b-impl
+make: Leaving directory `--topdir--/1.0/forest2/C3/proj/c2/impl/b/abuild-indep'
+abuild: c3 (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest2/C3/proj/c3/ifc/abuild-indep'
+IFC1: C3-c3-ifc
+make: Leaving directory `--topdir--/1.0/forest2/C3/proj/c3/ifc/abuild-indep'
+abuild: c3-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest2/C3/proj/c3/impl/a/abuild-indep'
+IFC1: C3-c3-ifc
+IMPL1: C3-c3-a-impl
+make: Leaving directory `--topdir--/1.0/forest2/C3/proj/c3/impl/a/abuild-indep'
+abuild: c3-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest2/C3/proj/c3/impl/b/abuild-indep'
+IFC1: C3-c3-ifc
+IMPL1: C3-c3-b-impl
+make: Leaving directory `--topdir--/1.0/forest2/C3/proj/c3/impl/b/abuild-indep'
+abuild: proj-int (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest2/C3/proj/tests/int/abuild-indep'
+IFC1: PROJ0-c1-ifc PROJ0-c2-ifc F2C2-f2-b-ifc F2C2-f2-c-ifc C3-c3-ifc
+IMPL1: C3-c1-a-impl PROJ0-c1-b-impl F2C2-f2-b-impl F2C2-c2-a-impl F2C2-f2-c-impl C3-c2-b-impl C3-c3-a-impl C3-c3-b-impl C3-proj-int
+make: Leaving directory `--topdir--/1.0/forest2/C3/proj/tests/int/abuild-indep'

@@ -3,6 +3,9 @@ XXX Next: introduce tree-name, implement proper root detection,
 deprecate parent-dir.  Will have to think through conversion program
 again and start setting up 1.0 tree test cases.
 
+XXX total time message after build -- do in java branch and then
+merge.  ~/source/examples/boost/date-time/date-time.cc
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -13,8 +16,8 @@ following:
 
  * ...
 
-/groovy stuff below\
---------------------
+/java branch stuff below\
+-------------------------
 
 These changes have already been made and need to make it into the
 release notes.
@@ -35,9 +38,10 @@ release notes.
    support is disabled for features that were deprecated at or before
    version x.y.
 
---------------------
-\groovy stuff above/
+-------------------------
+\java branch stuff above/
 
+ * Upgraded embedded groovy to version 1.6.0
 
  * Non-compatible changes to handling child-dirs and parent-dir:
 

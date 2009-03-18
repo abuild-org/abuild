@@ -1,0 +1,4 @@
+abuild: c1 (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c1/ifc/abuild-indep'
+IFC1: PROJ0-c1-ifc
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c1/ifc/abuild-indep'

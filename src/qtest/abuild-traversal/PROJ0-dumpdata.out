@@ -1,0 +1,681 @@
+<?xml version="1.0"?>
+<abuild-data version="1">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <build-trees>
+  <build-tree
+   id="bt-1"
+   absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-2"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-1"/>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <build-item
+    name="c1"
+    home-tree="bt-2"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-3"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-2"/>
+   <build-item
+    name="c1"
+    home-tree="bt-2"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="2"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-4"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-3"/>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <build-item
+    name="c1"
+    home-tree="bt-2"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+    backing-depth="0"
+    external-depth="2"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c1-a"
+    home-tree="bt-4"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c1-b"
+    home-tree="bt-4"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="3"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-5"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-1"/>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <build-item
+    name="c2"
+    home-tree="bt-5"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-6"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-5"/>
+   <build-item
+    name="c2"
+    home-tree="bt-5"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="2"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-7"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-6"/>
+   <external build-tree="bt-3"/>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <build-item
+    name="c1"
+    home-tree="bt-2"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+    backing-depth="0"
+    external-depth="2"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2"
+    home-tree="bt-5"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+    backing-depth="0"
+    external-depth="2"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2-a"
+    home-tree="bt-7"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="f2-c"
+    home-tree="bt-7"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2-b"
+    home-tree="bt-7"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+     <dependency name="f2-c"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+     <dependency name="f2-c"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="3"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-8"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <external build-tree="bt-4"/>
+   <external build-tree="bt-7"/>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <build-item
+    name="c1"
+    home-tree="bt-2"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+    backing-depth="0"
+    external-depth="3"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c1-a"
+    home-tree="bt-4"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c1-b"
+    home-tree="bt-4"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2"
+    home-tree="bt-5"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+    backing-depth="0"
+    external-depth="3"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2-a"
+    home-tree="bt-7"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="f2-c"
+    home-tree="bt-7"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2-b"
+    home-tree="bt-7"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b"
+    backing-depth="0"
+    external-depth="1"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+     <dependency name="f2-c"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+     <dependency name="f2-c"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="proj-int"
+    home-tree="bt-8"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
+    backing-depth="0"
+    external-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1-a"/>
+     <dependency name="c1-b"/>
+     <dependency name="c2-a"/>
+     <dependency name="c2-b"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c1-a"/>
+     <dependency name="c1-b"/>
+     <dependency name="c2"/>
+     <dependency name="c2-a"/>
+     <dependency name="f2-c"/>
+     <dependency name="c2-b"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="0"
+    external-depth="4"
+    target-type="all"
+    is-plugin="1"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+ </build-trees>
+</abuild-data>

@@ -118,11 +118,36 @@ my $native_out = get_native_out();
 #  * Try various manually hybrid 1.0/1.1 trees including upgrading
 #    PROJ but not UTIL and/or the other way around.
 
-
-
-
 setup($td);
+
+cd("work/1.0");
+
+check_tree("isolated tree", "forest0/PROJ0/proj/c1/ifc", "PROJ0-c1-ifc");
+check_tree("PROJ0 all", "forest0/PROJ0/proj/tests/int", "PROJ0");
+check_tree("UTIL0 all", "forest0/UTIL0/util/tests/int", "UTIL0");
+check_tree("F2C2 proj", "forest1/F2C2/proj/tests/int", "F2C2-proj");
+check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
+check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
 
 check_work_accessed($td);
 
-$td->report(1);
+$td->report(13);
+
+sub check_tree
+{
+    my ($description, $path, $out) = @_;
+
+    $td->runtest($description,
+		 {$td->COMMAND => "abuild -C $path -d",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/$out.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("dump data",
+		 {$td->COMMAND => "abuild -C $path --dump-data",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/$out-dumpdata.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}

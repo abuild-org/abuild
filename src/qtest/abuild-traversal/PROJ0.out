@@ -1,0 +1,38 @@
+abuild: c1 (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c1/ifc/abuild-indep'
+IFC1: PROJ0-c1-ifc
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c1/ifc/abuild-indep'
+abuild: c1-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a/abuild-indep'
+IFC1: PROJ0-c1-ifc
+IMPL1: PROJ0-c1-a-impl
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a/abuild-indep'
+abuild: c1-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b/abuild-indep'
+IFC1: PROJ0-c1-ifc
+IMPL1: PROJ0-c1-b-impl
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b/abuild-indep'
+abuild: c2 (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c2/ifc/abuild-indep'
+IFC1: PROJ0-c2-ifc
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c2/ifc/abuild-indep'
+abuild: c2-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a/abuild-indep'
+IFC1: PROJ0-c1-ifc PROJ0-c2-ifc
+IMPL1: PROJ0-c2-a-impl
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a/abuild-indep'
+abuild: f2-c (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c/abuild-indep'
+IFC1: PROJ0-f2-c-ifc
+IMPL1: PROJ0-f2-c-impl
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c/abuild-indep'
+abuild: c2-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b/abuild-indep'
+IFC1: PROJ0-c1-ifc PROJ0-c2-ifc PROJ0-f2-c-ifc
+IMPL1: PROJ0-f2-c-impl PROJ0-c2-b-impl
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b/abuild-indep'
+abuild: proj-int (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/tests/int/abuild-indep'
+IFC1: PROJ0-c1-ifc PROJ0-c2-ifc PROJ0-f2-c-ifc
+IMPL1: PROJ0-c1-a-impl PROJ0-c1-b-impl PROJ0-c2-a-impl PROJ0-f2-c-impl PROJ0-c2-b-impl PROJ0-proj-int
+make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/tests/int/abuild-indep'

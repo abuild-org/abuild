@@ -1,0 +1,25 @@
+abuild: f1-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f1/a/abuild-indep'
+IFC1: UTIL0-f1-a-ifc
+IMPL1: UTIL0-f1-a-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f1/a/abuild-indep'
+abuild: f1-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f1/b/abuild-indep'
+IFC1: UTIL0-f1-b-ifc
+IMPL1: UTIL0-f1-b-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f1/b/abuild-indep'
+abuild: f2-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f2/a/abuild-indep'
+IFC1: UTIL0-f2-a-ifc
+IMPL1: UTIL0-f2-a-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f2/a/abuild-indep'
+abuild: f2-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f2/b/abuild-indep'
+IFC1: UTIL0-f2-b-ifc
+IMPL1: UTIL0-f2-b-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f2/b/abuild-indep'
+abuild: util-int (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/tests/int/abuild-indep'
+IFC1: UTIL0-f1-a-ifc UTIL0-f1-b-ifc UTIL0-f2-a-ifc UTIL0-f2-b-ifc
+IMPL1: UTIL0-f1-a-impl UTIL0-f1-b-impl UTIL0-f2-a-impl UTIL0-f2-b-impl UTIL0-util-int
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/tests/int/abuild-indep'
