@@ -58,14 +58,16 @@ setup($td);
 cd("work/A");
 
 $td->runtest("no traits",
-	     {$td->COMMAND => "abuild --build=desc hello"},
+	     {$td->COMMAND => "abuild --build=desc hello",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/no-traits.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("desc expanded with eater",
 	     {$td->COMMAND => "abuild --build=desc" .
-		  " --related-by-traits eater eat"},
+		  " --related-by-traits eater eat",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/desc-eater.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -74,21 +76,24 @@ cd("work");
 
 $td->runtest("build eater painter",
 	     {$td->COMMAND => "abuild --build=all" .
-		  " --only-with-traits eater,painter eat paint"},
+		  " --only-with-traits eater,painter eat paint",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-eater-painter.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build eater expand painter",
 	     {$td->COMMAND => "abuild --build=all --only-with-traits eater" .
-		  " --related-by-traits painter paint"},
+		  " --related-by-traits painter paint",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-eater-expand-painter.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build painter expand eater",
 	     {$td->COMMAND => "abuild --build=all --only-with-traits painter" .
-		  " --related-by-traits eater eat"},
+		  " --related-by-traits eater eat",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-painter-expand-eater.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -97,14 +102,16 @@ cd("work/A");
 
 $td->runtest("build edible",
 	     {$td->COMMAND => "abuild --build=all" .
-		  " --only-with-traits edible hello"},
+		  " --only-with-traits edible hello",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-edible.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build desc edible",
 	     {$td->COMMAND => "abuild --build=desc" .
-		  " --only-with-traits edible hello"},
+		  " --only-with-traits edible hello",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-desc-edible.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
@@ -113,7 +120,8 @@ cd("work");
 
 $td->runtest("build edible expand eater",
 	     {$td->COMMAND => "abuild --build=all --only-with-traits edible" .
-		  " --related-by-traits eater eat"},
+		  " --related-by-traits eater eat",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-edible-expand-eater.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
@@ -188,6 +189,7 @@ Abuild::runInternal()
 
     exitIfErrors();
 
+    boost::shared_ptr<boost::posix_time::time_duration> build_time;
     bool okay = true;
     if (this->special_target == s_CLEAN)
     {
@@ -200,7 +202,15 @@ Abuild::runInternal()
     }
     else
     {
+	boost::posix_time::ptime now(
+	    boost::posix_time::second_clock::local_time());
         okay = buildBuildset();
+	if (this->special_target.empty())
+	{
+	    build_time.reset(
+		new boost::posix_time::time_duration(
+		    boost::posix_time::second_clock::local_time() - now));
+	}
     }
 
     if (this->java_builder)
@@ -224,6 +234,13 @@ Abuild::runInternal()
 	    error("build failure: " + item_name + " on platform " +
 		  item_platform);
 	}
+    }
+
+    if (build_time.get())
+    {
+	std::ostringstream time;
+	time << "total build time: " << *build_time;
+	info(time.str());
     }
 
     return okay;

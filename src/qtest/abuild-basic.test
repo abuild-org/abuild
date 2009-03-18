@@ -499,10 +499,20 @@ $td->runtest("no more .ab-dyanmic.mk files",
 cd("work/a");
 
 $td->runtest("unnamed directory",
-	     {$td->COMMAND => "abuild"},
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->STRING =>
 		  "abuild: nothing to build in this directory\n",
 	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/a/aa/aaa");
+
+$td->runtest("build time message",
+	     {$td->COMMAND => "abuild"}, # NO FILTER!
+	     {$td->REGEXP => "abuild: aaa \\(abuild-indep\\): all\n" .
+		  "abuild: total build time: 00:00:\\d\\d\n",
+		  $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 cd("work/a/aa");
@@ -523,4 +533,4 @@ $td->runtest("descendants",
 
 check_work_accessed($td);
 
-$td->report(71);
+$td->report(72);

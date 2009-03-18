@@ -3,9 +3,6 @@ XXX Next: introduce tree-name, implement proper root detection,
 deprecate parent-dir.  Will have to think through conversion program
 again and start setting up 1.0 tree test cases.
 
-XXX total time message after build -- do in java branch and then
-merge.  ~/source/examples/boost/date-time/date-time.cc
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -37,6 +34,8 @@ release notes.
  * Support --compat-level=x.y.  When specified, backward compatibility
    support is disabled for features that were deprecated at or before
    version x.y.
+
+ * Print total build time at the end of the build.
 
 -------------------------
 \java branch stuff above/
