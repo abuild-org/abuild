@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <boost/regex.hpp>
 #include <QEXC.hh>
@@ -41,48 +42,65 @@ bool
 KeyVal::readFile()
 {
     boost::regex comment_line("\\s*#.*");
-    boost::regex strip_spaces("\\s*(.*?)\\s*");
-    boost::regex kv_line("([^\\s:]+)\\s*:\\s*(.*?)");
+    boost::regex kv_line("(\\s*)([^\\s:]+)(\\s*:\\s*(.*?)(\\\\?)\\s*)");
+    boost::regex content_re("\\s*(.*?)(\\\\?)\\s*");
     boost::smatch match;
 
-    std::list<std::string> lines = Util::readLinesFromFile(this->filename);
-    std::string line;
+    std::list<std::string> lines =
+	Util::readLinesFromFile(this->filename, false);
     int lineno = 0;
+    this->orig_data.push_back(OrigData());
+    std::string* accumulated_text = &(this->orig_data.back().before);
+    std::string* value = 0;
+    std::string trash;
     for (std::list<std::string>::iterator iter = lines.begin();
 	 iter != lines.end(); ++iter)
     {
 	FileLocation location(this->filename, ++lineno, 0);
+	std::string orig_line = *iter;
 
 	// Ignore comments even if they occur after a continuation
 	// line.
-	if (boost::regex_match(*iter, match, comment_line))
+	if (boost::regex_match(orig_line, match, comment_line))
 	{
 	    QTC::TC("abuild", "KeyVal ignore comment");
+	    *accumulated_text += orig_line;
 	    continue;
 	}
 
-	// Strip leading and trailing spaces
-	assert(boost::regex_match(*iter, match, strip_spaces));
-	line += match[1].str();
+	// Extract content
+	assert(boost::regex_match(orig_line, match, content_re));
+	std::string content = match[1].str();
+	bool continuation = (! match[2].str().empty());
+	if (continuation)
+	{
+	    // If line ends with a continuation character, replace
+	    // with a space.
+	    content += " ";
+	}
 
-	if (line.empty())
+	if (value)
+	{
+	    // Still accumulating text from the current line
+	    *accumulated_text += orig_line;
+	    *value += content;
+	}
+	else if (content.empty())
 	{
 	    QTC::TC("abuild", "KeyVal ignore blank line");
-	    continue;
+	    *accumulated_text += orig_line;
 	}
-
-	// If line ends with a continuation character, replace with a
-	// space and ignore until we get a line that doesn't.
-	if (*(line.rbegin()) == '\\')
+	else if (boost::regex_match(orig_line, match, kv_line))
 	{
-	    line[line.length() - 1] = ' ';
-	    continue;
-	}
-
-	if (boost::regex_match(line, match, kv_line))
-	{
-	    std::string key = match[1].str();
-	    std::string value = match[2].str();
+	    std::string leading = match[1].str();
+	    std::string key = match[2].str();
+	    std::string trailing = match[3].str();
+	    std::string val_str = match[4].str();
+	    std::string continuation = match[5].str();
+	    if (! (continuation.empty() || val_str.empty()))
+	    {
+		val_str += " ";
+	    }
 	    if (this->data.count(key))
 	    {
 		QTC::TC("abuild", "KeyVal ERR duplicate key");
@@ -94,22 +112,37 @@ KeyVal::readFile()
 		QTC::TC("abuild", "KeyVal ERR invalid key");
 		this->error.error(location, "invalid key " + key +
 				  " (ignored)");
+		trash.clear();
+		value = &trash;
 	    }
 	    else
 	    {
-		this->data[key] = value;
+		this->data[key] = val_str;
+		this->explicit_keys.insert(key);
+		value = &(this->data[key]);
 	    }
+	    assert(accumulated_text == &(this->orig_data.back().before));
+	    *accumulated_text += leading;
+	    this->orig_data.back().key = key;
+	    accumulated_text = &(this->orig_data.back().after);
+	    *accumulated_text += trailing;
 	}
 	else
 	{
 	    QTC::TC("abuild", "KeyVal ERR syntax error");
 	    this->error.error(location, "syntax error");
+	    *accumulated_text += orig_line;
 	}
 
-	line.clear();
+	if (! continuation)
+	{
+	    this->orig_data.push_back(OrigData());
+	    accumulated_text = &(this->orig_data.back().before);
+	    value = 0;
+	}
     }
 
-    if (! line.empty())
+    if (accumulated_text != &(this->orig_data.back().before))
     {
 	QTC::TC("abuild", "KeyVal ERR end with continuation line");
 	this->error.error(FileLocation(this->filename, 0, 0),
@@ -146,10 +179,53 @@ KeyVal::readFile()
     return (this->error.numErrors() == 0);
 }
 
+void
+KeyVal::writeFile(char const* newfile,
+		  std::map<std::string, std::string> const& key_changes) const
+{
+    std::ofstream of(newfile,
+		     std::ios_base::out |
+		     std::ios_base::trunc |
+		     std::ios_base::binary);
+    if (! of.is_open())
+    {
+	throw QEXC::System(std::string("create ") + newfile, errno);
+    }
+
+    for (std::vector<OrigData>::const_iterator iter = this->orig_data.begin();
+	 iter != this->orig_data.end(); ++iter)
+    {
+	OrigData const& od = *iter;
+	of << od.before;
+	if (! od.key.empty())
+	{
+	    std::map<std::string, std::string>::const_iterator k =
+		key_changes.find(od.key);
+	    if (k != key_changes.end())
+	    {
+		of << (*k).second;
+	    }
+	    else
+	    {
+		of << od.key;
+	    }
+	}
+	of << od.after;
+    }
+
+    of.close();
+}
+
 std::set<std::string>
 KeyVal::getKeys() const
 {
     return this->keys;
+}
+
+std::set<std::string>
+KeyVal::getExplicitKeys() const
+{
+    return this->explicit_keys;
 }
 
 std::string const&

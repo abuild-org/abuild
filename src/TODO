@@ -31,6 +31,10 @@ release notes.
  * NON-COMPATIBLE CHANGE: absolute path externals are no longer
    supported.
 
+ * Compatibility level can be set with the ABUILD_COMPAT_LEVEL
+   environment variable in addition to the command line argument.  The
+   command line argument takes precedence.
+
 
 Groovy Framework
 ================

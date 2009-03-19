@@ -2,6 +2,7 @@
 
 #include <Logger.hh>
 #include <QEXC.hh>
+#include <Util.hh>
 
 Logger* logger = 0;
 
@@ -34,6 +35,9 @@ int main(int argc, char* argv[])
     keys.insert("duck");
     keys.insert("pig");
     defaults["potato"] = "salad";
+    std::map<std::string, std::string> substitutions;
+    substitutions["chicken"] = "adventurous";
+    substitutions["pig"] = "small"; // opposite of pig
 
     try
     {
@@ -50,6 +54,23 @@ int main(int argc, char* argv[])
 	{
 	    dump_keyval(kv2);
 	}
+
+	std::string ek1 = Util::join(" ", kv1.getExplicitKeys());
+	std::string ek2 = Util::join(" ", kv2.getExplicitKeys());
+	if (ek1 == ek2)
+	{
+	    logger->logInfo("explicit keys: " + ek1);
+	}
+	else
+	{
+	    logger->logError("explicit keys: no defaults: " + ek1 +
+			     "; defaults: " + ek2);
+	}
+
+	std::string newfile = std::string(filename) + ".wr1";
+	kv2.writeFile(newfile.c_str(), std::map<std::string, std::string>());
+	newfile = std::string(filename) + ".wr2";
+	kv2.writeFile(newfile.c_str(), substitutions);
     }
     catch (std::exception& e)
     {

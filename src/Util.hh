@@ -83,9 +83,11 @@ namespace Util
     }
 
     // Return a list of lines from the given file.  All newline
-    // terminators are removed.
-    std::list<std::string> readLinesFromFile(std::string const& filename);
-    std::list<std::string> readLinesFromFile(std::istream& in);
+    // terminators are removed unless otherwised specified.
+    std::list<std::string> readLinesFromFile(
+	std::string const& filename, bool strip_newlines = true);
+    std::list<std::string> readLinesFromFile(
+	std::istream& in, bool strip_newlines = true);
 
     std::string getCurrentDirectory();
     void setCurrentDirectory(std::string const&);

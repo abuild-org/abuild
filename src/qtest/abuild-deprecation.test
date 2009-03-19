@@ -73,7 +73,7 @@ if ($test_java)
 cd("work/link-shlibs");
 
 $td->runtest("LINK_SHLIBS compat level 1.1",
-	     {$td->COMMAND => "abuild -b all -k --compat-level=1.1",
+	     {$td->COMMAND => "ABUILD_COMPAT_LEVEL=1.1 abuild -b all -k",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/link-shlibs-1_1.out",
 	      $td->EXIT_STATUS => 0},

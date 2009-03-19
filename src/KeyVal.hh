@@ -4,6 +4,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <vector>
 #include <Error.hh>
 
 // This class loads a file whose lines are of the form
@@ -33,8 +34,16 @@ class KeyVal
     // opened.  Otherwise, returns true if there were no errors.
     bool readFile();
 
+    // Rewrite the data to newfile.  For each element of key_changes,
+    // replace any occurrences of map keys with the associated value.
+    void writeFile(char const* newfile,
+		   std::map<std::string, std::string> const& key_changes) const;
+
     // Get a list of all keys.
     std::set<std::string> getKeys() const;
+
+    // Get a list of all keys that appeared explicitly.
+    std::set<std::string> getExplicitKeys() const;
 
     // Get a specific key.  It is an error to ask for a key that is
     // not defined.
@@ -46,11 +55,23 @@ class KeyVal
 			      std::string const& fallback_value) const;
 
   private:
+    class OrigData
+    {
+      public:
+	// a key/value entry, possibly spanning multiple lines and
+	// included embedded comments
+	std::string before;
+	std::string key;
+	std::string after;
+    };
+
     Error error;
     std::string filename;
     std::set<std::string> keys;
+    std::set<std::string> explicit_keys;
     std::map<std::string, std::string> defaults;
     std::map<std::string, std::string> data;
+    std::vector<OrigData> orig_data;
 };
 
 #endif // __KEYVAL_HH__

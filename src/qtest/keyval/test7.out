@@ -6,3 +6,4 @@ duck: meow
 pig: oink
 potato: mashed
 qoww: moo
+explicit keys: no defaults: chicken duck pig qoww; defaults: chicken duck pig potato qoww

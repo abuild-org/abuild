@@ -98,7 +98,7 @@ class ItemConfig
     static std::string const FILE_ANT_BUILD;
     static std::string const FILE_GROOVY;
 
-    static bool initializeStatics();
+    static void initializeStatics(CompatLevel const&);
     static bool statics_initialized;
 
     void validate();

@@ -17,6 +17,22 @@ for (my $i = 1; $i <= $n; ++$i)
 		 {$td->COMMAND => "test_keyval test$i.in"},
 		 {$td->FILE => "test$i.out", $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+    if ($i != 1)
+    {
+	$td->runtest("check rewrite",
+		     {$td->FILE => "test$i.in.wr1"},
+		     {$td->FILE => "test$i.in"});
+	$td->runtest("check rewrite with substitutions",
+		     {$td->FILE => "test$i.in.wr2"},
+		     {$td->FILE => "test$i.out2"});
+    }
 }
 
-$td->report($n);
+cleanup();
+
+$td->report($n + (2 * ($n - 1)));
+
+sub cleanup
+{
+    system("rm -f *.wr1 *.wr2");
+}

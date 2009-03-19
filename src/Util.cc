@@ -173,54 +173,63 @@ Util::splitBySpace(std::string const& input)
 }
 
 std::list<std::string>
-Util::readLinesFromFile(std::string const& filename)
+Util::readLinesFromFile(std::string const& filename, bool strip_newlines)
 {
     std::ifstream in(filename.c_str());
     if (! in.is_open())
     {
 	throw QEXC::System("unable to open file " + filename, errno);
     }
-    std::list<std::string> lines = readLinesFromFile(in);
+    std::list<std::string> lines = readLinesFromFile(in, strip_newlines);
     in.close();
     return lines;
 }
 
 std::list<std::string>
-Util::readLinesFromFile(std::istream& in)
+Util::readLinesFromFile(std::istream& in, bool strip_newlines)
 {
     // tested in KeyVal's test suite and in other places
 
-    std::string buf;
+    std::list<std::string> result;
+    std::string* buf = 0;
 
-    buf.reserve(in.rdbuf()->in_avail());
     char c;
     while (in.get(c))
     {
-	if (buf.capacity() == buf.size())
+	if (buf == 0)
 	{
-	    buf.reserve(buf.capacity() * 2);
+	    result.push_back("");
+	    buf = &(result.back());
+	    buf->reserve(80);
 	}
-	buf.append(1, c);
+
+	if (buf->capacity() == buf->size())
+	{
+	    buf->reserve(buf->capacity() * 2);
+	}
+	if (c == '\n')
+	{
+	    if (strip_newlines)
+	    {
+		// Remove any carriage return that preceded the
+		// newline and discard the newline
+		if ((! buf->empty()) && ((*(buf->rbegin())) == '\r'))
+		{
+		    buf->erase(buf->length() - 1);
+		}
+	    }
+	    else
+	    {
+		buf->append(1, c);
+	    }
+	    buf = 0;
+	}
+	else
+	{
+	    buf->append(1, c);
+	}
     }
 
-    // Manually strip any trailing newline so that split won't add an
-    // extra blank line at the end of the output.
-    if ((! buf.empty()) && ((*(buf.rbegin())) == '\n'))
-    {
-	buf.erase(buf.length() - 1);
-    }
-    std::list<std::string> result = split('\n', buf);
-    for (std::list<std::string>::iterator iter = result.begin();
-	 iter != result.end(); ++iter)
-    {
-	// Strip any carriage return that preceded the line
-	// terminating newline.
-	std::string& line = *iter;
-	if ((! line.empty()) && ((*(line.rbegin())) == '\r'))
-	{
-	    line.erase(line.length() - 1);
-	}
-    }
     return result;
 }
 
