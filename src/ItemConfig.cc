@@ -56,17 +56,23 @@ std::string const ItemConfig::ITEM_NAME_RE =
 std::string const ItemConfig::PARENT_RE = "\\.\\.(?:/\\.\\.)*";
 
 std::map<std::string, std::string> ItemConfig::valid_keys;
+bool ItemConfig::statics_initialized = false;
 
-// Initialize this after all other status
-bool ItemConfig::statics_initialized = ItemConfig::initializeStatics();
-
-bool ItemConfig::initializeStatics()
+void ItemConfig::initializeStatics(CompatLevel const& compat_level)
 {
+    if (statics_initialized)
+    {
+	return;
+    }
+
+    // 1.0 keys
     valid_keys[k_THIS] = "";
-    valid_keys[k_DESCRIPTION] = "";
     valid_keys[k_PARENT] = "";
-    valid_keys[k_CHILDREN] = "";
     valid_keys[k_EXTERNAL] = "";
+    valid_keys[k_DELETED] = "";
+
+    valid_keys[k_DESCRIPTION] = "";
+    valid_keys[k_CHILDREN] = "";
     valid_keys[k_BUILD_ALSO] = "";
     valid_keys[k_DEPS] = "";
     valid_keys[k_VISIBLE_TO] = "";
@@ -74,16 +80,17 @@ bool ItemConfig::initializeStatics()
     valid_keys[k_SUPPORTED_FLAGS] = "";
     valid_keys[k_SUPPORTED_TRAITS] = "";
     valid_keys[k_TRAITS] = "";
-    valid_keys[k_DELETED] = "";
     valid_keys[k_PLUGINS] = "";
 
-    return true;
+    statics_initialized = true;
 }
 
 ItemConfig*
 ItemConfig::readConfig(Error& error, CompatLevel const& compat_level,
 		       std::string const& dir)
 {
+    initializeStatics(compat_level);
+
     std::string file = dir + "/" + FILE_CONF;
     if (cache.count(dir))
     {
