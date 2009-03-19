@@ -258,8 +258,8 @@
     </platform-type>
    </platform-data>
    <external build-tree="bt-3"/>
-   <external build-tree="bt-4" read-only="1"/>
    <external build-tree="bt-2"/>
+   <external build-tree="bt-4" read-only="1"/>
    <build-item
     name="common"
     home-tree="bt-1"

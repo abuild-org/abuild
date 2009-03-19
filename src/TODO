@@ -25,7 +25,11 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ...
+ * NON-COMPATIBLE CHANGE: -winpath is no longer a valid option to
+   external-dirs.
+
+ * NON-COMPATIBLE CHANGE: absolute path externals are no longer
+   supported.
 
 
 Groovy Framework

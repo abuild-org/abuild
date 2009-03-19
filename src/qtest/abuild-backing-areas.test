@@ -32,24 +32,6 @@ my $native_out = get_native_out();
 
 setup($td);
 
-# Modify Abuild.conf in multi/product to contain an absolute external
-cd("work/multi/product");
-{
-    open(IN, "<Abuild.conf") or die;
-    my @lines = (<IN>);
-    close(IN);
-    open(OUT, ">Abuild.conf") or die;
-    my $cwd = getcwd();
-    my $newpath = dirname($cwd) . "/b";
-    my $winpath = windir($newpath);
-    for (@lines)
-    {
-	s,(external-dirs:.*?)(\Q../b\E),$1$newpath -winpath=$winpath,;
-	print OUT;
-    }
-    close(OUT);
-}
-
 cd("work/shared/common");
 
 $td->runtest("build backing area",

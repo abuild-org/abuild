@@ -587,22 +587,16 @@ ItemConfig::checkExternals()
 	}
 	else if (boost::regex_match(word, match, winpath_re))
 	{
-	    if (this->externals.empty())
-	    {
-		QTC::TC("abuild", "ItemConfig ERR winpath without external");
-		this->error.error(this->location, "-winpath is not preceded by"
-				  " external directory");
-	    }
-	    else
-	    {
-		QTC::TC("abuild", "ItemConfig winpath");
-#ifdef _WIN32
-		ExternalData data = this->externals.back();
-		this->externals.pop_back();
-		this->externals.push_back(
-		    ExternalData(match.str(1), data.isReadOnly()));
-#endif
-	    }
+	    QTC::TC("abuild", "ItemConfig ERR winpath");
+	    this->error.error(this->location,
+			      "-winpath is no longer supported");
+	}
+	else if (Util::isAbsolutePath(*iter))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR absolute external");
+	    this->error.error(
+		this->location,
+		"absolute path externals are no longer supported");
 	}
 	else
 	{

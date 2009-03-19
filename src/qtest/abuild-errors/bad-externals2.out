@@ -7,5 +7,5 @@
 --topdir--/a/ab/Abuild.conf: ERROR: invalid dependency !heh!
 --topdir--/a/ab/Abuild.conf: ERROR: visible-to not permitted for public build items
 --topdir--/a/ab/Abuild.conf: ERROR: flag names may contain only alphanumeric characters, underscores, periods, and dashes
---topdir--/a/ab/abc/Abuild.conf: ERROR: unable to find external /does/not/exist
+--topdir--/a/ab/abc/Abuild.conf: ERROR: unable to find external does-not-exist
 abuild: ERROR: errors detected; exiting

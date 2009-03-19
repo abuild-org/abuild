@@ -38,6 +38,7 @@
 --topdir--/d/a/Abuild.conf: ERROR: platform type "native" listed more than once
 --topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
+--topdir--/a/ab/aba/Abuild.conf: ERROR: absolute path externals are no longer supported
 --topdir--/a/ab/Abuild.conf: ERROR: child a/ab/aba/Abuild.conf has no parent-dir
 --topdir--/a/ab/abb/Abuild.conf: ERROR: relative to this item, directory "..", which is between this item and its parent, contains Abuild.conf; interleaved Abuild.conf files are not permitted
 --topdir--/a/ab/Abuild.conf: ERROR: child a/ab/abb/Abuild.conf has parent-dir that doesn't point to this directory
