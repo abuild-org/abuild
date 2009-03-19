@@ -2,6 +2,10 @@
 XXX keyval fails on windows on file with hybrid line terminators.  Add
 file to test suite with all CRLN.
 
+XXX Next: maybe implement converseion tool.  May want a single tree
+updater in C++ in abuild and a helper tool in perl or something.  Need
+to think it through carefully.
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
