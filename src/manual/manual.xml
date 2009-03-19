@@ -6,8 +6,8 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "1.1.a3">
-<!ENTITY lastreleased "March 16, 2009">
+<!ENTITY swversion "1.1.a4">
+<!ENTITY lastreleased "March 19, 2009">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13693,6 +13693,103 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
+     <term>1.1.a4: March 19, 2009</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Deprecated Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           No features have been deprecated in this release.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Documentation Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Documentation for the groovy framework has been moved to
+           <filename>src/manual/groovy-framework.txt</filename>
+           pending full inclusion in the manual.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Java examples that are not specifically illustrating the
+           ant framework have been converted to use the groovy
+           framework.  The rest have been moved into an ant-specific
+           portion of the test suite.  The text remains in the manual,
+           but the files are no longer included.  Prior to the release
+           of version 1.1, new examples to illustrate the Groovy
+           framework will be introduced, ant the ant framework will be
+           mentioned briefly in an appendix.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Support
+           <option>--compat-level=<replaceable>x.y</replaceable></option>.
+           When specified, backward compatibility support is disabled
+           for features that were deprecated at or before version
+           <replaceable>x.y</replaceable>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; now prints the total clock time that elapsed
+           during a build right before it exits.  The time is printed
+           in the form HH:MM:SS.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           In preparation for deprecation of
+           <property>parent-dir</property>, the value of
+           <property>parent-dir</property> is required to point up in
+           the file system, and all values of
+           <property>child-dirs</property> are required to point
+           down.  Additionally, if either
+           <property>parent-dir</property> or
+           <property>child-dirs</property> reach more than one
+           directory away, no <filename>Abuild.conf</filename> files
+           are permitted in intervening directories.
+          </para>
+          <para>
+           These changes, along with the existing check that an item's
+           child's parent point back to the item, are sufficient to
+           enable abuild to safely ignore the value of the
+           <property>parent-dir</property> key.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           As an intermediate step toward adoption of the new
+           traversal system, we now walk up the tree looking for an
+           item that doesn't have us as its child when finding the top
+           of the forest.  The old behavior was to follow
+           <property>parent-dir</property>, which is now ignored.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.a3: March 16, 2009</term>
      <listitem>
       <itemizedlist>
@@ -13766,31 +13863,6 @@ Y = $(X)
            variable assignment in a properties file, shell script,
            make file, or even &abuild; interface file, which makes it
            consistent with the rest of &abuild;.
-          </para>
-         </listitem>
-         <listitem>
-          <para>
-           Parameter names have been changed to use camelCaps instead
-           of dashed-components to make the syntax more natural when
-           setting parameters from a closure.
-          </para>
-         </listitem>
-         <listitem>
-          <para>
-           All <function>getVariable</function> methods have been
-           replaced with calls to methods whose name start with
-           <function>resolve</function>.
-          </para>
-         </listitem>
-         <listitem>
-          <para>
-           There is now a <function>replaceClosures</function> method
-           that allows closures for a target to be replaced rather
-           than appended to.  This practice should generally be
-           avoided, and seldom be necessary based on the way the
-           default rule implementations work.  (You can already
-           provide your own closures to run instead of the default
-           ones.)
           </para>
          </listitem>
         </itemizedlist>

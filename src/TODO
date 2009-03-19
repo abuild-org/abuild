@@ -1,66 +1,31 @@
 
-XXX Release 1.1.a4 from here and recreate java branch.
-
-XXX Next: introduce tree-name, implement proper root detection,
-deprecate parent-dir.
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
 ======================
+
+
+ _________________________________
+/vv Changes made on Java Branch vv\
+-----------------------------------
+
+
+
+___________________________________
+\^^ Changes made on Java Branch ^^/
+ ---------------------------------
+
+
 
 Remember to keep deprecated features list up-to-date.  Add the
 following:
 
  * ...
 
-/java branch stuff below\
--------------------------
-
 These changes have already been made and need to make it into the
 release notes.
 
- * Groovy framework documentation has been moved to
-   src/manual/groovy-framework.txt pending full inclusion in the
-   manual.
-
- * Java examples that are not specifically illustrating the ant
-   framework have been have been converted to use the groovy
-   framework.  The rest have been moved into an ant-specific portion
-   of the test suite.  The text remains in the manual, but the files
-   are no longer included.  Prior to 1.1, new examples to illustrate
-   the Groovy framework will be introduced, ant the ant framework will
-   be mentioned briefly in an appendix.
-
- * Support --compat-level=x.y.  When specified, backward compatibility
-   support is disabled for features that were deprecated at or before
-   version x.y.
-
- * Print total build time at the end of the build.
-
--------------------------
-\java branch stuff above/
-
- * Upgraded embedded groovy to version 1.6.0
-
- * Non-compatible changes to handling child-dirs and parent-dir:
-
-    - Require parent-dir to point up and child-dirs to point down in
-      the file system
-
-    - Require that an item's parent-dir directory must contain an
-      Abuild.conf file and that no intervening directories between an
-      item and its parent-dir directory contain Abuild.conf files
-
-   These changes, along with the existing check that an item's child's
-   parent point back to the item, are sufficient to enable abuild to
-   safely ignore the value of the parent-dir key.  This means that it
-   can walk up the file system one directory at a time when locating
-   the root of a tree or forest.
-
- * As an intermediate step toward adoption of the new traversal
-   system, we now walk up the tree looking for an item that doesn't
-   have us as its child when finding the top of the forest.
+ * ...
 
 
 Groovy Framework
