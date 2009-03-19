@@ -282,6 +282,11 @@ Abuild::parseArgv()
 	QTC::TC("abuild", "Abuild ABUILD_PLATFORM_SELECTORS");
 	platform_selector_strings = Util::splitBySpace(platform_selector_env);
     }
+    std::string compat_level_version;
+    if (! Util::getEnv("ABUILD_COMPAT_LEVEL", &compat_level_version))
+    {
+	compat_level_version = "1.0";
+    }
 
     bool with_deps = false;
     char** argp = &argv[1];
@@ -463,21 +468,7 @@ Abuild::parseArgv()
 	}
 	else if (boost::regex_match(arg, match, compat_re))
 	{
-	    std::string version = match.str(1);
-	    if (version == "1.0")
-	    {
-		this->compat_level.setLevel(CompatLevel::cl_1_0);
-	    }
-	    else if (version == "1.1")
-	    {
-		this->compat_level.setLevel(CompatLevel::cl_1_1);
-		this->java_builder_args.push_back("-cl1_1");
-		this->make_args.push_back("ABUILD_SUPPORT_1_0=0");
-	    }
-	    else
-	    {
-		usage("invalid compatibility level " + arg);
-	    }
+	    compat_level_version = match.str(1);
 	}
 	else if ((! arg.empty()) && (arg[0] == '-'))
 	{
@@ -495,6 +486,22 @@ Abuild::parseArgv()
 	{
 	    this->targets.push_back(arg);
 	}
+    }
+
+    // Compatability level
+    if (compat_level_version == "1.0")
+    {
+	this->compat_level.setLevel(CompatLevel::cl_1_0);
+    }
+    else if (compat_level_version == "1.1")
+    {
+	this->compat_level.setLevel(CompatLevel::cl_1_1);
+	this->java_builder_args.push_back("-cl1_1");
+	this->make_args.push_back("ABUILD_SUPPORT_1_0=0");
+    }
+    else
+    {
+	usage("invalid compatibility level " + compat_level_version);
     }
 
     // If an alternative start directory was specified, chdir to it
