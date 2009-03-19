@@ -35,6 +35,10 @@ release notes.
    environment variable in addition to the command line argument.  The
    command line argument takes precedence.
 
+ * Document somewhere that, when converting, abuild will be happier if
+   you don't change this to name on trees whose roots don't have
+   tree-name.
+
 
 Groovy Framework
 ================

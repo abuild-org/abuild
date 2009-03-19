@@ -40,13 +40,8 @@ class ItemConfig
 				  std::string const& dir);
 
     static std::string const FILE_CONF;
+    static std::string const FILE_BACKING;
     static std::string const FILE_INTERFACE;
-
-    // deprecated configuration file keys
-    static std::string const k_THIS;
-    static std::string const k_PARENT;
-    static std::string const k_EXTERNAL;
-    static std::string const k_DELETED;
 
     // configuration file keys
     static std::string const k_NAME;
@@ -55,6 +50,7 @@ class ItemConfig
     static std::string const k_CHILDREN;
     static std::string const k_BUILD_ALSO;
     static std::string const k_DEPS;
+    static std::string const k_TREEDEPS;
     static std::string const k_VISIBLE_TO;
     static std::string const k_PLATFORM;
     static std::string const k_SUPPORTED_FLAGS;
@@ -65,9 +61,10 @@ class ItemConfig
     static std::string const PARENT_RE;
     static std::map<std::string, std::string> valid_keys;
 
+    bool isTreeRoot() const;
+    bool isCandidateForestRoot() const;
     std::string const& getName() const;
     std::string const& getDescription() const;
-    std::string const& getParent() const;
     std::list<std::string> const& getChildren() const;
     std::list<ExternalData> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;
@@ -90,6 +87,12 @@ class ItemConfig
     std::list<std::string> const& getPlugins() const;
 
   private:
+    // deprecated configuration file keys
+    static std::string const k_THIS;
+    static std::string const k_PARENT;
+    static std::string const k_EXTERNAL;
+    static std::string const k_DELETED;
+
     ItemConfig(ItemConfig const&);
     ItemConfig& operator=(ItemConfig const&);
 
@@ -125,7 +128,7 @@ class ItemConfig
     // useful for constructing coverage cases.
     bool filterInvalidNames(std::set<std::string>& names,
 			    std::string const& description);
-    bool checkEmptyKey(std::string const& key, std::string const& msg);
+    bool checkKeyPresent(std::string const& key, std::string const& msg);
     bool checkDuplicates(std::list<std::string> const& declared,
 			 std::set<std::string>& filtered,
 			 std::string const& thing);

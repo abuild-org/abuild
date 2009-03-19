@@ -15,7 +15,6 @@
 --topdir--/a/ac/Abuild.conf: ERROR: file ended with continuation line
 --topdir--/a/ac/Abuild.conf: ERROR: "build-also" is not permitted for unnamed build items
 --topdir--/a/ac/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
---topdir--/a/Abuild.conf: ERROR: child a/ac/Abuild.conf has no parent-dir
 --topdir--/a/ad/Abuild.conf: ERROR: "platform-types" is not permitted for unnamed build items
 --topdir--/a/ad/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
 --topdir--/a/ag/Abuild.conf: ERROR: "supported-flags" is not permitted for unnamed build items
@@ -30,7 +29,6 @@
 --topdir--/a/ag/Abuild.conf: ERROR: invalid trait !wrong!
 --topdir--/a/ag/Abuild.conf: ERROR: deleted item "quack" listed more than once
 --topdir--/a/ag/Abuild.conf: ERROR: plugin "oink" listed more than once
---topdir--/a/Abuild.conf: ERROR: child a/ah/aha/Abuild.conf has parent-dir that doesn't point to this directory
 --topdir--/c/cd/Abuild.conf: ERROR: build item names may contain only alphanumeric characters, underscores, periods, and dashes
 --topdir--/c/cd/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
 --topdir--/d/a/Abuild.conf: ERROR: visible-to value must be * or end with .*
@@ -39,9 +37,7 @@
 --topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
 --topdir--/a/ab/aba/Abuild.conf: ERROR: absolute path externals are no longer supported
---topdir--/a/ab/Abuild.conf: ERROR: child a/ab/aba/Abuild.conf has no parent-dir
 --topdir--/a/ab/abb/Abuild.conf: ERROR: relative to this item, directory "..", which is between this item and its parent, contains Abuild.conf; interleaved Abuild.conf files are not permitted
---topdir--/a/ab/Abuild.conf: ERROR: child a/ab/abb/Abuild.conf has parent-dir that doesn't point to this directory
 --topdir--/b/bc/Abuild.conf: ERROR: build item bb appears in multiple locations
 --topdir--/b/bb/Abuild.conf: ERROR: here is another location
 --topdir--/d/b/a/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope

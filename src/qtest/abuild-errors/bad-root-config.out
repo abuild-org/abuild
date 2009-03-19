@@ -1,5 +1,5 @@
 --topdir--/a/aa/aag/Abuild.conf: ERROR: -ro is not preceded by external directory
 --topdir--/a/aa/aag/Abuild.conf: ERROR: -winpath is no longer supported
---topdir--/a/aa/aag/aaga/Abuild.conf:2: ERROR: syntax error
+--topdir--/a/aa/aag/aaga/Abuild.conf:3: ERROR: syntax error
 --topdir--/a/aa/aag/aaga/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
 abuild: ERROR: errors detected; exiting

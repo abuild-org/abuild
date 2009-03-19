@@ -195,7 +195,6 @@ class Abuild
 
     static std::string const ABUILD_VERSION;
     static std::string const OUTPUT_DIR_PREFIX;
-    static std::string const FILE_BACKING;
     static std::string const FILE_DYNAMIC_MK;
     static std::string const FILE_DYNAMIC_ANT;
     static std::string const FILE_DYNAMIC_GROOVY;

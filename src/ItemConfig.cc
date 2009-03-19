@@ -10,6 +10,7 @@
 #include <CompatLevel.hh>
 
 std::string const ItemConfig::FILE_CONF = "Abuild.conf";
+std::string const ItemConfig::FILE_BACKING = "Abuild.backing";
 std::string const ItemConfig::FILE_MK = "Abuild.mk";
 std::string const ItemConfig::FILE_INTERFACE = "Abuild.interface";
 std::string const ItemConfig::FILE_ANT = "Abuild-ant.properties";
@@ -21,12 +22,13 @@ std::string const ItemConfig::k_PARENT = "parent-dir";
 std::string const ItemConfig::k_EXTERNAL = "external-dirs";
 std::string const ItemConfig::k_DELETED = "deleted";
 std::string const ItemConfig::k_NAME = "name";
-std::string const ItemConfig::k_TREENAME = "treename";
+std::string const ItemConfig::k_TREENAME = "tree-name";
 std::string const ItemConfig::k_DESCRIPTION = "description";
 std::string const ItemConfig::k_CHILDREN = "child-dirs";
 std::string const ItemConfig::k_VISIBLE_TO = "visible-to";
 std::string const ItemConfig::k_BUILD_ALSO = "build-also";
 std::string const ItemConfig::k_DEPS = "deps";
+std::string const ItemConfig::k_TREEDEPS = "tree-deps";
 std::string const ItemConfig::k_PLATFORM = "platform-types";
 std::string const ItemConfig::k_SUPPORTED_FLAGS = "supported-flags";
 std::string const ItemConfig::k_SUPPORTED_TRAITS = "supported-traits";
@@ -71,6 +73,8 @@ void ItemConfig::initializeStatics(CompatLevel const& compat_level)
     valid_keys[k_EXTERNAL] = "";
     valid_keys[k_DELETED] = "";
 
+    valid_keys[k_NAME] = "";
+    valid_keys[k_TREENAME] = "";
     valid_keys[k_DESCRIPTION] = "";
     valid_keys[k_CHILDREN] = "";
     valid_keys[k_BUILD_ALSO] = "";
@@ -155,23 +159,23 @@ ItemConfig::checkUnnamed()
 {
     std::string msg = "is not permitted for unnamed build items";
 
-    if (checkEmptyKey(k_BUILD_ALSO, msg))
+    if (checkKeyPresent(k_BUILD_ALSO, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR build-also without this");
     }
-    if (checkEmptyKey(k_DEPS, msg))
+    if (checkKeyPresent(k_DEPS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR deps without this");
     }
-    if (checkEmptyKey(k_PLATFORM, msg))
+    if (checkKeyPresent(k_PLATFORM, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR platform-types without this");
     }
-    if (checkEmptyKey(k_SUPPORTED_FLAGS, msg))
+    if (checkKeyPresent(k_SUPPORTED_FLAGS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR supported-flags without this");
     }
-    if (checkEmptyKey(k_TRAITS, msg))
+    if (checkKeyPresent(k_TRAITS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR traits without this");
     }
@@ -182,19 +186,19 @@ ItemConfig::checkNonRoot()
 {
     std::string msg = "may only appear in a root build item";
 
-    if (checkEmptyKey(k_EXTERNAL, msg))
+    if (checkKeyPresent(k_EXTERNAL, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR external on non-root");
     }
-    if (checkEmptyKey(k_SUPPORTED_TRAITS, msg))
+    if (checkKeyPresent(k_SUPPORTED_TRAITS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR supported-traits on non-root");
     }
-    if (checkEmptyKey(k_DELETED, msg))
+    if (checkKeyPresent(k_DELETED, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR deleted on non-root");
     }
-    if (checkEmptyKey(k_PLUGINS, msg))
+    if (checkKeyPresent(k_PLUGINS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR plugins on non-root");
     }
@@ -754,9 +758,9 @@ ItemConfig::filterInvalidNames(std::set<std::string>& names,
 }
 
 bool
-ItemConfig::checkEmptyKey(std::string const& key, std::string const& msg)
+ItemConfig::checkKeyPresent(std::string const& key, std::string const& msg)
 {
-    if (! this->kv.getVal(key).empty())
+    if (this->kv.getExplicitKeys().count(key))
     {
 	this->error.error(this->location, "\"" + key + "\" " + msg);
 	return true;
@@ -838,6 +842,77 @@ ItemConfig::ItemConfig(
 {
 }
 
+bool
+ItemConfig::isTreeRoot() const
+{
+    std::set<std::string> const& ek = this->kv.getExplicitKeys();
+    if (ek.count(k_TREENAME))
+    {
+	return true;
+    }
+    else if (this->compat_level.allow_1_0())
+    {
+	if (ek.count(k_PARENT))
+	{
+	    return false;
+	}
+	else if ((ek.count(k_EXTERNAL) ||
+		  ek.count(k_SUPPORTED_TRAITS) ||
+		  ek.count(k_DELETED) ||
+		  ek.count(k_PLUGINS)))
+	{
+	    return true;
+	}
+	else if (Util::isFile(this->dir + "/" + FILE_BACKING))
+	{
+	    return true;
+	}
+	else if (ek.count(k_THIS))
+	{
+	    return true;
+	}
+	else if (ek.count(k_NAME)) // XXX other new 1.1 non-root keys
+	{
+	    return false;
+	}
+	else
+	{
+	    for (std::list<std::string>::const_iterator iter =
+		     this->children.begin();
+		 iter != this->children.end(); ++iter)
+	    {
+		std::string child_dir =
+		    Util::canonicalizePath(this->dir + "/" + *iter);
+		ItemConfig* child_config =
+		    readConfig(this->error, this->compat_level, child_dir);
+		if (child_config->kv.getExplicitKeys().count(k_PARENT))
+		{
+		    return true;
+		}
+	    }
+	}
+    }
+    return false;
+}
+
+bool
+ItemConfig::isCandidateForestRoot() const
+{
+    std::set<std::string> const& ek = this->kv.getExplicitKeys();
+    if ((ek.size() == 1) && (ek.count(k_CHILDREN)))
+    {
+	return true;
+    }
+    else if (isTreeRoot())
+    {
+	return true;
+    }
+    else
+    {
+	return false;
+    }
+}
+
 std::string const&
 ItemConfig::getName() const
 {
@@ -848,12 +923,6 @@ std::string const&
 ItemConfig::getDescription() const
 {
     return this->description;
-}
-
-std::string const&
-ItemConfig::getParent() const
-{
-    return this->parent;
 }
 
 std::list<std::string> const&

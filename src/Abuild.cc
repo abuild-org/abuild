@@ -17,7 +17,6 @@
 
 std::string const Abuild::ABUILD_VERSION = "1.1.a4";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
-std::string const Abuild::FILE_BACKING = "Abuild.backing";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
 std::string const Abuild::FILE_DYNAMIC_GROOVY = ".ab-dynamic.groovy";
@@ -1124,13 +1123,11 @@ Abuild::findTop()
     }
 
     ItemConfig* config = readConfig(dir);
-    if (! config->getParent().empty())
+    if (! config->isCandidateForestRoot())
     {
 	QTC::TC("abuild", "Abuild ERR top is not root");
-	// still 1.0 logic...need to eventually allow item with only
-	// child-dirs
 	error(config->getLocation(), "apparent root of local forest"
-	      " does not appear to be a build tree root");
+	      " does not appear to be a valid forest root");
 	fatal("unable to find top of local build forest");
     }
 
@@ -1163,13 +1160,13 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
     if (Util::isFile(top_conf))
     {
         config = readConfig(top_path);
-        if (! config->getParent().empty())
+        if (! config->isTreeRoot())
         {
-            QTC::TC("abuild", "Abuild ERR build tree root with parent");
+            QTC::TC("abuild", "Abuild ERR build tree root not root");
 	    FileLocation top_location(
 		top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
-            error(top_location, "this build item sets " + ItemConfig::k_PARENT +
-		  " but is referenced as a build tree root (" +
+            error(top_location, "this build item does not appear to be"
+		  " a build tree root, but it is referenced as one (" +
 		  description +")");
 	    if (! referrer.getFilename().empty())
 	    {
@@ -1179,7 +1176,7 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
         }
     }
 
-    std::string top_backing = top_path + "/" + FILE_BACKING;
+    std::string top_backing = top_path + "/" + ItemConfig::FILE_BACKING;
     if (Util::isFile(top_backing))
     {
 	readBacking(top_path, backing_area);
@@ -1407,25 +1404,8 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
 		    Util::absToRel(child_dir + "/" + ItemConfig::FILE_CONF);
                 if (Util::isFile(child_conf))
                 {
-                    ItemConfig* child_config = readConfig(child_dir);
 		    dirs.push_back(child_dir);
-		    std::string ch_parent = child_config->getParent();
-		    if (ch_parent.empty())
-		    {
-			QTC::TC("abuild", "Abuild ERR child no parent");
-			error(location,
-			      "child " + child_conf + " has no " +
-			      ItemConfig::k_PARENT);
-		    }
-		    else if (Util::canonicalizePath(
-				 dir + "/" + *iter + "/" +
-				 ch_parent) != dir)
-		    {
-			QTC::TC("abuild", "Abuild ERR wrong parent");
-			error(location, "child " + child_conf + " has " +
-			      ItemConfig::k_PARENT +
-			      " that doesn't point to this directory");
-		    }
+		    readConfig(child_dir); // XXX don't do this here...
                 }
                 else
                 {
@@ -2564,7 +2544,7 @@ void
 Abuild::readBacking(std::string const& dir,
 		    std::string& backing_area)
 {
-    std::string file = dir + "/" + FILE_BACKING;
+    std::string file = dir + "/" + ItemConfig::FILE_BACKING;
     std::list<std::string> lines = Util::readLinesFromFile(file);
 
     { // local scope

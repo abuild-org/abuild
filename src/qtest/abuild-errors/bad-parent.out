@@ -1,3 +1,3 @@
 --topdir--/a/aa/aab/Abuild.conf: ERROR: "parent-dir" must point up in the file system
---topdir--/a/aa/aab/Abuild.conf: ERROR: apparent root of local forest does not appear to be a build tree root
+--topdir--/a/aa/aab/Abuild.conf: ERROR: apparent root of local forest does not appear to be a valid forest root
 abuild: ERROR: unable to find top of local build forest
