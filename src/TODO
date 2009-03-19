@@ -891,29 +891,8 @@ builds with 1.1 as with 1.0.
 With pure abuild 1.1, a build item is a build tree root iff it has a
 tree-name key.  In pure abuild 1.0, a build item was a build tree root
 iff it did not have parent-dir key.  In 1.1 operating at 1.0
-compatibility level, the logic is somewhat more complex.  This
-algorithm determines a build item's root status to be one of not a
-root, a 1.0 root, or a 1.1 root.
-
- * If "tree-name" appears, return "1.1 root"
-
- * Else if compatibility level is 1.0:
-
-    * If parent-dir appears, return "not a root".
-
-    * Else if any key that is only allowed in a root build item
-      (excluding tree-name) appears, return "1.0 root"
-
-    * Else if there is a 1.0-syntax Abuild.backing in the same directory,
-      return "1.0 root"
-
-    * Else if it has any obsolete 1.0 keys ("this"), return "1.0 root"
-
-    * Else if it has any new 1.1 keys, return "not root"
-
-    * Else if any children have parent-dir keys, return "1.0 root"
-
- * Return "not root"
+compatibility level, the logic is somewhat more complex.  See comments
+in ItemConfig::isTreeRoot() for details on how the determination is made.
 
 Note that a build item with only a child-dirs key in its Abuild.conf
 can be a forest root even if it is not a tree root.

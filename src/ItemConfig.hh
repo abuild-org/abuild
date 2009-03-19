@@ -101,6 +101,10 @@ class ItemConfig
     static std::string const FILE_ANT_BUILD;
     static std::string const FILE_GROOVY;
 
+    static KeyVal const& readKeyVal(Error& error_handler,
+				    CompatLevel const& compat_level,
+				    std::string const& dir);
+
     static void initializeStatics(CompatLevel const&);
     static bool statics_initialized;
 
@@ -139,8 +143,10 @@ class ItemConfig
     ItemConfig(Error&, CompatLevel const&, FileLocation const&,
 	       KeyVal const&, std::string const& dir);
 
+    typedef boost::shared_ptr<KeyVal> KeyVal_ptr;
+    static std::map<std::string, KeyVal_ptr> kv_cache;
     typedef boost::shared_ptr<ItemConfig> ItemConfig_ptr;
-    static std::map<std::string, ItemConfig_ptr> cache;
+    static std::map<std::string, ItemConfig_ptr> ic_cache;
 
     Error& error;
     CompatLevel const& compat_level;

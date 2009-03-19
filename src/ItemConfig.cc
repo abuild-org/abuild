@@ -16,7 +16,8 @@ std::string const ItemConfig::FILE_INTERFACE = "Abuild.interface";
 std::string const ItemConfig::FILE_ANT = "Abuild-ant.properties";
 std::string const ItemConfig::FILE_GROOVY = "Abuild.groovy";
 std::string const ItemConfig::FILE_ANT_BUILD = "Abuild-ant.xml";
-std::map<std::string, ItemConfig::ItemConfig_ptr> ItemConfig::cache;
+std::map<std::string, ItemConfig::KeyVal_ptr> ItemConfig::kv_cache;
+std::map<std::string, ItemConfig::ItemConfig_ptr> ItemConfig::ic_cache;
 std::string const ItemConfig::k_THIS = "this";
 std::string const ItemConfig::k_PARENT = "parent-dir";
 std::string const ItemConfig::k_EXTERNAL = "external-dirs";
@@ -93,28 +94,42 @@ ItemConfig*
 ItemConfig::readConfig(Error& error, CompatLevel const& compat_level,
 		       std::string const& dir)
 {
-    initializeStatics(compat_level);
-
-    std::string file = dir + "/" + FILE_CONF;
-    if (cache.count(dir))
+    if (ic_cache.count(dir))
     {
-	return cache[dir].get();
+	return ic_cache[dir].get();
     }
 
-    // An exception is thrown if the file does not exist.  It is the
-    // caller's responsibility to ensure that it does.
-    KeyVal kv(file.c_str(), std::set<std::string>(), valid_keys);
-
-    kv.readFile();
-
-    FileLocation location(file, 0, 0);
+    initializeStatics(compat_level);
+    KeyVal const& kv = readKeyVal(error, compat_level, dir);
+    FileLocation location(dir + "/" + FILE_CONF, 0, 0);
     ItemConfig_ptr item;
     item.reset(new ItemConfig(error, compat_level, location, kv, dir));
     item->validate();
 
     // Cache and return
-    cache[dir] = item;
+    ic_cache[dir] = item;
     return item.get();
+}
+
+KeyVal const&
+ItemConfig::readKeyVal(Error& error, CompatLevel const& compat_level,
+		       std::string const& dir)
+{
+    if (kv_cache.count(dir))
+    {
+	return *(kv_cache[dir]);
+    }
+
+    initializeStatics(compat_level);
+    std::string file = dir + "/" + FILE_CONF;
+    KeyVal_ptr kv(
+	new KeyVal(file.c_str(), std::set<std::string>(), valid_keys));
+
+    // An exception is thrown if the file does not exist.  It is the
+    // caller's responsibility to ensure that it does.
+    kv->readFile();
+    kv_cache[dir] = kv;
+    return *kv;
 }
 
 void
@@ -848,50 +863,74 @@ ItemConfig::isTreeRoot() const
     std::set<std::string> const& ek = this->kv.getExplicitKeys();
     if (ek.count(k_TREENAME))
     {
+	// If a file has a tree-name key, it is definitely a 1.1 root.
+	// In strict 1.1 mode, that's the only way it can be a root.
 	return true;
     }
     else if (this->compat_level.allow_1_0())
     {
+	// In 1.0 compatibility mode...
 	if (ek.count(k_PARENT))
 	{
+	    // If the file has a parent-dir key, it's definitely not a
+	    // root.
 	    return false;
 	}
-	else if ((ek.count(k_EXTERNAL) ||
-		  ek.count(k_SUPPORTED_TRAITS) ||
-		  ek.count(k_DELETED) ||
-		  ek.count(k_PLUGINS)))
+	else if (ek.count(k_EXTERNAL))
 	{
+	    // If it has external-dirs, it has to be a root.
 	    return true;
 	}
-	else if (Util::isFile(this->dir + "/" + FILE_BACKING))
+	else if (ek.count(k_CHILDREN))
 	{
-	    return true;
-	}
-	else if (ek.count(k_THIS))
-	{
-	    return true;
-	}
-	else if (ek.count(k_NAME)) // XXX other new 1.1 non-root keys
-	{
-	    return false;
-	}
-	else
-	{
+	    // Otherwise, if it has child-dirs, then it's either a 1.0
+	    // root or a 1.1 non-root.  If any of its children have
+	    // parent-dir keys, assume it's a 1.0 root.  If any of its
+	    // children don't have parent-dir keys, assume it's not a
+	    // root.
 	    for (std::list<std::string>::const_iterator iter =
 		     this->children.begin();
 		 iter != this->children.end(); ++iter)
 	    {
 		std::string child_dir =
 		    Util::canonicalizePath(this->dir + "/" + *iter);
-		ItemConfig* child_config =
-		    readConfig(this->error, this->compat_level, child_dir);
-		if (child_config->kv.getExplicitKeys().count(k_PARENT))
+		if (Util::isFile(child_dir + "/" + FILE_CONF))
 		{
-		    return true;
+		    KeyVal const& child_keys =
+			readKeyVal(this->error, this->compat_level, child_dir);
+		    if (child_keys.getExplicitKeys().count(k_PARENT))
+		    {
+			return true;
+		    }
+		    else
+		    {
+			return false;
+		    }
 		}
 	    }
+	    // If we didn't find any of its children, see if there's
+	    // an Abuild.backing file.  If there is, assume it's a
+	    // root.
+	    if (Util::isFile(this->dir + "/" + FILE_BACKING))
+	    {
+		// XXX Better would be to verify that it's a 1.0
+		// format backing file.
+		return true;
+	    }
+	}
+	else if (ek.count(k_THIS))
+	{
+	    // Otherwise, it has neither tree-name, parent-dir,
+	    // child-dirs, nor external-dirs.  It's either a 1.1 leaf
+	    // node or a 1.0 stand-alone tree.  If it's a stand-alone
+	    // tree, it has to have 'this' to be useful.  If it has
+	    // 'this', assume we're deadling with a 1.0 stand-alone
+	    // tree, in which case this is a root.
+	    return true;
 	}
     }
+
+    // In all other cases, this is not a root.
     return false;
 }
 

@@ -1055,9 +1055,10 @@ Abuild::readConfig(std::string const& dir)
 std::string
 Abuild::findTop()
 {
-    // Find the top directory of the system containing this build item
-    // directory.  That is the first directory above us that contains
-    // an ItemConfig::FILE_CONF file without a parent-dir key.
+    // Find the top directory that contains the root of the current
+    // forest.  That is the first directory above us that contains an
+    // ItemConfig::FILE_CONF not referenced as a child of the next
+    // higher ItemConfig::FILE_CONF.
 
     std::string dir = this->this_config_dir;
 
@@ -1405,7 +1406,6 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
                 if (Util::isFile(child_conf))
                 {
 		    dirs.push_back(child_dir);
-		    readConfig(child_dir); // XXX don't do this here...
                 }
                 else
                 {

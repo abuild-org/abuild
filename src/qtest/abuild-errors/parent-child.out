@@ -1,5 +1,5 @@
 --topdir--/a/aa/aac/Abuild.conf: ERROR: child-dirs entries must be relative paths
+--topdir--/a/aa/aac/Abuild.conf: ERROR: unable to find child does-not-exist
 --topdir--/a/aa/aac/aaca/Abuild.conf: ERROR: relative to this item, directory "..", which is between this item and its parent, contains Abuild.conf; interleaved Abuild.conf files are not permitted
 --topdir--/a/aa/aac/aacb/Abuild.conf: ERROR: "parent-dir" must point up in the file system
---topdir--/a/aa/aac/Abuild.conf: ERROR: unable to find child does-not-exist
 abuild: ERROR: errors detected; exiting
