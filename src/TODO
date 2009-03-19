@@ -1,4 +1,7 @@
 
+XXX keyval fails on windows on file with hybrid line terminators.  Add
+file to test suite with all CRLN.
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -918,6 +921,8 @@ Here is the full traversal algorithm, including compatibility support.
            end search
         else
            error: unable to find top of build forest
+
+# XXXXXX ABOVE THIS POINT IS CODED AND TESTED.
 
   # Find backing areas
 
