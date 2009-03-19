@@ -48,3 +48,6 @@ glob a\ threw exception: filename pattern a\ terminated prematurely
 glob a[ threw exception: filename pattern a[ terminated prematurely
 glob a{ threw exception: filename pattern a{ terminated prematurely
 glob a{{ threw exception: nested { characters are not allowed in a filename pattern
+"" -> ""
+"a/b" -> "a/b"
+"a/b/" -> "a/b"

@@ -122,6 +122,15 @@ Util::strCaseCmp(std::string const& str1, std::string const& str2)
 	    : 0);
 }
 
+void
+Util::stripTrailingSlash(std::string& str)
+{
+    if ((! str.empty()) && ((*(str.rbegin())) == '/'))
+    {
+	str.erase(str.length() - 1);
+    }
+}
+
 std::list<std::string>
 Util::split(char sep, std::string input)
 {

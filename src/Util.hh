@@ -30,6 +30,9 @@ namespace Util
     // < s2, -1 if s1 > s2, or 0 otherwise.
     int strCaseCmp(std::string const& s1, std::string const& s2);
 
+    // Strip a trailing slash from the end of a string
+    void stripTrailingSlash(std::string& str);
+
     // A comparator class suitable for use as the comparator template
     // argument for map or set to get case-insensitive string
     // comparison

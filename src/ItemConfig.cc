@@ -205,6 +205,7 @@ ItemConfig::checkName()
 void
 ItemConfig::checkParent()
 {
+    Util::stripTrailingSlash(this->parent);
     boost::regex parent_re(PARENT_RE);
     boost::smatch match;
     if (! boost::regex_match(this->parent, match, parent_re))
@@ -259,6 +260,7 @@ ItemConfig::checkChildren()
     {
 	std::list<std::string>::iterator next = iter;
 	++next;
+	Util::stripTrailingSlash(*iter);
 	std::list<std::string> elements = Util::split('/', *iter);
 	bool error_found = false;
 	for (std::list<std::string>::iterator eiter = elements.begin();

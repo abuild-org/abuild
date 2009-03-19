@@ -27,6 +27,13 @@ static void test_glob_to_regex(char const* glob)
     }
 }
 
+static void test_strip_trailing_slash(std::string const& str)
+{
+    std::string buf = str;
+    Util::stripTrailingSlash(buf);
+    std::cout << "\"" << str << "\" -> \"" << buf << "\"" << std::endl;
+}
+
 int main()
 {
     std::cout << Util::intToString(5) << " "
@@ -147,6 +154,11 @@ int main()
     test_glob_to_regex("a[");
     test_glob_to_regex("a{");
     test_glob_to_regex("a{{");
+
+    // trailing slash
+    test_strip_trailing_slash("");
+    test_strip_trailing_slash("a/b");
+    test_strip_trailing_slash("a/b/");
 
     return 0;
 }
