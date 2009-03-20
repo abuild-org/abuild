@@ -1,3 +1,1 @@
---topdir--/a/aa/aah/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
---topdir--/a/aa/aah/aaha/Abuild.conf: ERROR: apparent root of local forest does not appear to be a valid forest root
-abuild: ERROR: unable to find top of local build forest
+abuild: ERROR: unable to find top of local build forest; run with --verbose for details

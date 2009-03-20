@@ -1,10 +1,13 @@
 
-XXX keyval fails on windows on file with hybrid line terminators.  Add
-file to test suite with all CRLN.
+readConfig should error if directory is a symbolic link.  validation
+should report error if child dir crosses a link.
 
-XXX Next: maybe implement converseion tool.  May want a single tree
-updater in C++ in abuild and a helper tool in perl or something.  Need
-to think it through carefully.
+conversion tool general strategy: readConfigs for all Abuild.conf
+files, allowing specification of prune directories.  Ignore links as
+they will be reported as errors if relevant.  Stop if any errors after
+all are read.  Otherwise, do analysis and rewrite by walking kv_cache
+for all paths at or below starting point (keeping in mind that we may
+have read an Abuild.conf above the top).
 
 === Changes Targeted for Version 1.1 ===
 

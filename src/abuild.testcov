@@ -253,8 +253,8 @@ groovy ERR configureTarget after init 0
 ItemConfig ERR .. in child 0
 ItemConfig ERR no parent Abuild.conf 0
 ItemConfig ERR interleaved Abuild.conf 0
-Abuild found root while searching for top 0
-Abuild skipping dir in top search 0
-Abuild ERR top is not root 0
+Abuild ERR can't find top 0
 ItemConfig ERR interleaved child Abuild.conf 0
 ItemConfig ERR absolute external 0
+ItemConfig found root searching for parent 0
+ItemConfig skipping dir in parent search 0

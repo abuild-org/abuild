@@ -1,2 +1,1 @@
---topdir--/a/aa/aad/aada/Abuild.conf: ERROR: apparent root of local forest does not appear to be a valid forest root
-abuild: ERROR: unable to find top of local build forest
+abuild: ERROR: unable to find top of local build forest; run with --verbose for details

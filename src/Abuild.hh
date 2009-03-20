@@ -52,7 +52,8 @@ class Abuild
     void initializeJavaPlatforms();
     void loadPlatformData(PlatformData&, std::string const& dir);
     bool readConfigs();
-    ItemConfig* readConfig(std::string const& dir);
+    ItemConfig* readConfig(std::string const& dir,
+			   std::string const& parent_dir);
     std::string findTop();
     void traverse(BuildTree_map&, std::string const& top_path,
 		  std::set<std::string>& visiting,

@@ -37,7 +37,8 @@ class ItemConfig
     // be a canonical path.  For efficiency, this is not checked.
     static ItemConfig* readConfig(Error& error_handler,
 				  CompatLevel const& compat_level,
-				  std::string const& dir);
+				  std::string const& dir,
+				  std::string const& parent_dir);
 
     static std::string const FILE_CONF;
     static std::string const FILE_BACKING;
@@ -63,6 +64,7 @@ class ItemConfig
 
     bool isTreeRoot() const;
     bool isCandidateForestRoot() const;
+    std::string const& getParentDir() const;
     std::string const& getName() const;
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
@@ -109,6 +111,8 @@ class ItemConfig
     static bool statics_initialized;
 
     void validate();
+    void detectRoot();
+    void findParentDir();
     void checkUnnamed();
     void checkNonRoot();
     void checkName();
@@ -141,7 +145,8 @@ class ItemConfig
     void maybeSetBuildFile(std::string const& file, int& count);
 
     ItemConfig(Error&, CompatLevel const&, FileLocation const&,
-	       KeyVal const&, std::string const& dir);
+	       KeyVal const&, std::string const& dir,
+	       std::string const& parent_dir);
 
     typedef boost::shared_ptr<KeyVal> KeyVal_ptr;
     static std::map<std::string, KeyVal_ptr> kv_cache;
@@ -153,13 +158,14 @@ class ItemConfig
     FileLocation location;
     KeyVal kv;
     std::string dir;
+    std::string parent_dir;
+    bool is_root;
 
     // Information used during validation
     std::string buildfile;
 
     // Information read from the file
     std::string name;
-    std::string parent;
     std::list<std::string> children;
     std::list<std::string> build_also;
     std::list<std::string> deps;

@@ -38,6 +38,7 @@
 --topdir--/d/a/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
 --topdir--/d/a/Abuild.conf: ERROR: platform type "native" listed more than once
 --topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
+--topdir--/a/ab/aba/Abuild.conf: ERROR: "external-dirs" may only appear in a root build item
 --topdir--/a/ab/aba/Abuild.conf: ERROR: absolute path externals are no longer supported
 --topdir--/a/ab/abb/Abuild.conf: ERROR: relative to this item, directory "..", which is between this item and its parent, contains Abuild.conf; interleaved Abuild.conf files are not permitted
 --topdir--/a/ah/aha/Abuild.conf: ERROR: loop detected while reading Abuild.conf files: build item aha reached by multiple paths

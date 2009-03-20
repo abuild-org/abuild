@@ -937,7 +937,7 @@ Abuild::readConfigs()
 	QTC::TC("abuild", "Abuild ERR no abuild.conf");
 	fatal(ItemConfig::FILE_CONF + " not found");
     }
-    this->this_config = readConfig(this->this_config_dir);
+    this->this_config = readConfig(this->this_config_dir, "");
 
     std::string local_top = findTop();
 
@@ -1037,13 +1037,13 @@ Abuild::readConfigs()
 }
 
 ItemConfig*
-Abuild::readConfig(std::string const& dir)
+Abuild::readConfig(std::string const& dir, std::string const& parent_dir)
 {
     ItemConfig* result = 0;
     try
     {
 	result = ItemConfig::readConfig(
-	    this->error_handler, this->compat_level, dir);
+	    this->error_handler, this->compat_level, dir, parent_dir);
     }
     catch (QEXC::General& e)
     {
@@ -1060,79 +1060,50 @@ Abuild::findTop()
     // ItemConfig::FILE_CONF not referenced as a child of the next
     // higher ItemConfig::FILE_CONF.
 
+    std::string top;
     std::string dir = this->this_config_dir;
+    std::string candidate;
 
-    bool found = false;
-    while (! found)
+    verbose("looking for top of build forest");
+
+    while (true)
     {
-	std::string parent;
-	std::string parent_candidate = dir;
-	while (! parent_candidate.empty())
+	verbose("top-search: checking " + dir);
+	ItemConfig* config = readConfig(dir, "");
+	if (config->isCandidateForestRoot())
 	{
-	    std::string tmp = Util::dirname(parent_candidate);
-	    if (tmp == parent_candidate)
-	    {
-		// We reached the root
-		QTC::TC("abuild", "Abuild found root while searching for top");
-		parent_candidate.clear();
-		break;
-	    }
-	    else
-	    {
-		parent_candidate = tmp;
-		if (Util::fileExists(
-			parent_candidate + "/" + ItemConfig::FILE_CONF))
-		{
-		    break;
-		}
-		else
-		{
-		    QTC::TC("abuild", "Abuild skipping dir in top search");
-		}
-	    }
+	    verbose("top-search: " + dir + " is a possible root");
+	    candidate = dir;
 	}
-	if (! parent_candidate.empty())
+	std::string parent_dir = config->getParentDir();
+	if (parent_dir.empty())
 	{
-	    // See if this item has this directory as a child.
-	    ItemConfig* config = readConfig(parent_candidate);
-	    bool parent_has_child = false;
-	    std::list<std::string> const& children = config->getChildren();
-	    for (std::list<std::string>::const_iterator iter = children.begin();
-		 iter != children.end(); ++iter)
+	    verbose("top-search: " + dir + " has no parent; ending search");
+	    if (candidate == dir)
 	    {
-		if (Util::canonicalizePath(
-			parent_candidate + "/" + *iter) == dir)
-		{
-		    parent_has_child = true;
-		    break;
-		}
+		top = candidate;
 	    }
-	    if (parent_has_child)
-	    {
-		parent = parent_candidate;
-	    }
-	}
-
-	if (parent.empty())
-	{
-	    found = true;
+	    break;
 	}
 	else
 	{
-	    dir = parent;
+	    verbose("top-search: " + dir + " has a parent");
+	    dir = parent_dir;
 	}
     }
 
-    ItemConfig* config = readConfig(dir);
-    if (! config->isCandidateForestRoot())
+    if (top.empty())
     {
-	QTC::TC("abuild", "Abuild ERR top is not root");
-	error(config->getLocation(), "apparent root of local forest"
-	      " does not appear to be a valid forest root");
-	fatal("unable to find top of local build forest");
+	QTC::TC("abuild", "Abuild ERR can't find top");
+	fatal("unable to find top of local build forest;"
+	      " run with --verbose for details");
+    }
+    else
+    {
+	verbose("top-search: " + top + " is forest root");
     }
 
-    return dir;
+    return top;
 }
 
 void
@@ -1160,7 +1131,7 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
     std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
     if (Util::isFile(top_conf))
     {
-        config = readConfig(top_path);
+        config = readConfig(top_path, "");
         if (! config->isTreeRoot())
         {
             QTC::TC("abuild", "Abuild ERR build tree root not root");
@@ -1352,13 +1323,19 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
     bool has_backing_area = (! tree_data.getBackingArea().empty());
 
     std::list<std::string> dirs;
+    std::map<std::string, std::string> parent_dirs;
     dirs.push_back(top_path);
     while (! dirs.empty())
     {
 	std::string dir = dirs.front();
 	dirs.pop_front();
 	std::string tree_relative = Util::absToRel(dir, top_path);
-        ItemConfig* config = readConfig(dir);
+	std::string parent_dir;
+	if (parent_dirs.count(dir))
+	{
+	    parent_dir = parent_dirs[dir];
+	}
+        ItemConfig* config = readConfig(dir, parent_dir);
 	FileLocation location = config->getLocation();
 
 	std::string item_this = config->getName(); // may be empty
@@ -1406,6 +1383,7 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
                 if (Util::isFile(child_conf))
                 {
 		    dirs.push_back(child_dir);
+		    parent_dirs[child_dir] = dir;
                 }
                 else
                 {

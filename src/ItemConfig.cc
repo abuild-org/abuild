@@ -92,7 +92,7 @@ void ItemConfig::initializeStatics(CompatLevel const& compat_level)
 
 ItemConfig*
 ItemConfig::readConfig(Error& error, CompatLevel const& compat_level,
-		       std::string const& dir)
+		       std::string const& dir, std::string const& parent_dir)
 {
     if (ic_cache.count(dir))
     {
@@ -103,7 +103,8 @@ ItemConfig::readConfig(Error& error, CompatLevel const& compat_level,
     KeyVal const& kv = readKeyVal(error, compat_level, dir);
     FileLocation location(dir + "/" + FILE_CONF, 0, 0);
     ItemConfig_ptr item;
-    item.reset(new ItemConfig(error, compat_level, location, kv, dir));
+    item.reset(
+	new ItemConfig(error, compat_level, location, kv, dir, parent_dir));
     item->validate();
 
     // Cache and return
@@ -135,6 +136,12 @@ ItemConfig::readKeyVal(Error& error, CompatLevel const& compat_level,
 void
 ItemConfig::validate()
 {
+    if (this->parent_dir.empty())
+    {
+	findParentDir();
+    }
+    detectRoot();
+
     this->name = this->kv.getVal(k_THIS);
     if (this->name.empty())
     {
@@ -145,13 +152,12 @@ ItemConfig::validate()
 	checkName();
     }
 
-    this->parent = this->kv.getVal(k_PARENT);
-    if (! this->parent.empty())
+    if (! this->is_root)
     {
-	checkParent();
 	checkNonRoot();
     }
 
+    checkParent();
     checkChildren();
     checkBuildAlso();
     checkDeps();
@@ -167,6 +173,100 @@ ItemConfig::validate()
 
     // no validation required for description
     this->description = this->kv.getVal(k_DESCRIPTION);
+}
+
+void
+ItemConfig::findParentDir()
+{
+    std::string parent_candidate = this->dir;
+
+    while (! parent_candidate.empty())
+    {
+	std::string tmp = Util::dirname(parent_candidate);
+	if (tmp == parent_candidate)
+	{
+	    // We reached the root
+	    QTC::TC("abuild", "ItemConfig found root searching for parent");
+	    parent_candidate.clear();
+	    break;
+	}
+	else
+	{
+	    parent_candidate = tmp;
+	    if (Util::fileExists(
+		    parent_candidate + "/" + ItemConfig::FILE_CONF))
+	    {
+		break;
+	    }
+	    else
+	    {
+		QTC::TC("abuild", "ItemConfig skipping dir in parent search");
+	    }
+	}
+    }
+
+    if (! parent_candidate.empty())
+    {
+	// See if this item has this directory as a child.
+	KeyVal const& kv = readKeyVal(this->error, this->compat_level,
+				      parent_candidate);
+	bool parent_has_child = false;
+	// Just read the keys and parse directly rather than calling
+	// readConfig().  This prevents repeatedly recursing all the
+	// way up to the root, seeing unwanted errors, etc.
+	std::list<std::string> const& children =
+	    Util::splitBySpace(kv.getVal(k_CHILDREN));
+	for (std::list<std::string>::const_iterator iter = children.begin();
+	     iter != children.end(); ++iter)
+	{
+	    if (Util::canonicalizePath(
+		    parent_candidate + "/" + *iter) == dir)
+	    {
+		parent_has_child = true;
+		break;
+	    }
+	}
+	if (parent_has_child)
+	{
+	    this->parent_dir = parent_candidate;
+	}
+    }
+}
+
+void
+ItemConfig::detectRoot()
+{
+    std::set<std::string> const& ek = this->kv.getExplicitKeys();
+    if (ek.count(k_TREENAME))
+    {
+	// If a file has a tree-name key, it is definitely a 1.1 root.
+	// In strict 1.1 mode, that's the only way it can be a root.
+	this->is_root = true;
+    }
+    else if (this->compat_level.allow_1_0())
+    {
+	// In 1.0 compatibility mode...
+	if (ek.count(k_PARENT))
+	{
+	    // If the file has a parent-dir key, it's definitely not a
+	    // root.
+	    this->is_root = false;
+	}
+	else if (! this->parent_dir.empty())
+	{
+	    // If it is a child of the next higher build item and
+	    // doesn't have tree-name, it is not a root.
+	    this->is_root = false;
+	}
+	else
+	{
+	    this->is_root = true;
+	}
+    }
+    else
+    {
+	this->is_root = false;
+    }
 }
 
 void
@@ -231,17 +331,23 @@ ItemConfig::checkName()
 void
 ItemConfig::checkParent()
 {
-    Util::stripTrailingSlash(this->parent);
+    std::string parent_key = this->kv.getVal(k_PARENT);
+    if (parent_key.empty())
+    {
+	return;
+    }
+
+    Util::stripTrailingSlash(parent_key);
     boost::regex parent_re(PARENT_RE);
     boost::smatch match;
-    if (! boost::regex_match(this->parent, match, parent_re))
+    if (! boost::regex_match(parent_key, match, parent_re))
     {
 	QTC::TC("abuild", "ItemConfig ERR invalid parent");
 	this->error.error(this->location,
 			  "\"" + k_PARENT +
 			  "\" must point up in the file system");
     }
-    else if (! Util::isFile(this->dir + "/" + this->parent + "/" + FILE_CONF))
+    else if (! Util::isFile(this->dir + "/" + parent_key + "/" + FILE_CONF))
     {
 	QTC::TC("abuild", "ItemConfig ERR no parent Abuild.conf");
 	this->error.error(this->location,
@@ -253,7 +359,7 @@ ItemConfig::checkParent()
     {
 	// Make sure there are no intervening Abuild.conf files.  We
 	// check parent/child symmetry during traversal.
-	std::list<std::string> elements = Util::split('/', this->parent);
+	std::list<std::string> elements = Util::split('/', parent_key);
 	elements.pop_back();
 	while (! elements.empty())
 	{
@@ -847,91 +953,23 @@ ItemConfig::ItemConfig(
     CompatLevel const& compat_level,
     FileLocation const& location,
     KeyVal const& kv,
-    std::string const& dir)
+    std::string const& dir,
+    std::string const& parent_dir)
     :
     error(error),
     compat_level(compat_level),
     location(location),
     kv(kv),
-    dir(dir)
+    dir(dir),
+    parent_dir(parent_dir),
+    is_root(false)
 {
 }
 
 bool
 ItemConfig::isTreeRoot() const
 {
-    std::set<std::string> const& ek = this->kv.getExplicitKeys();
-    if (ek.count(k_TREENAME))
-    {
-	// If a file has a tree-name key, it is definitely a 1.1 root.
-	// In strict 1.1 mode, that's the only way it can be a root.
-	return true;
-    }
-    else if (this->compat_level.allow_1_0())
-    {
-	// In 1.0 compatibility mode...
-	if (ek.count(k_PARENT))
-	{
-	    // If the file has a parent-dir key, it's definitely not a
-	    // root.
-	    return false;
-	}
-	else if (ek.count(k_EXTERNAL))
-	{
-	    // If it has external-dirs, it has to be a root.
-	    return true;
-	}
-	else if (ek.count(k_CHILDREN))
-	{
-	    // Otherwise, if it has child-dirs, then it's either a 1.0
-	    // root or a 1.1 non-root.  If any of its children have
-	    // parent-dir keys, assume it's a 1.0 root.  If any of its
-	    // children don't have parent-dir keys, assume it's not a
-	    // root.
-	    for (std::list<std::string>::const_iterator iter =
-		     this->children.begin();
-		 iter != this->children.end(); ++iter)
-	    {
-		std::string child_dir =
-		    Util::canonicalizePath(this->dir + "/" + *iter);
-		if (Util::isFile(child_dir + "/" + FILE_CONF))
-		{
-		    KeyVal const& child_keys =
-			readKeyVal(this->error, this->compat_level, child_dir);
-		    if (child_keys.getExplicitKeys().count(k_PARENT))
-		    {
-			return true;
-		    }
-		    else
-		    {
-			return false;
-		    }
-		}
-	    }
-	    // If we didn't find any of its children, see if there's
-	    // an Abuild.backing file.  If there is, assume it's a
-	    // root.
-	    if (Util::isFile(this->dir + "/" + FILE_BACKING))
-	    {
-		// XXX Better would be to verify that it's a 1.0
-		// format backing file.
-		return true;
-	    }
-	}
-	else if (ek.count(k_THIS))
-	{
-	    // Otherwise, it has neither tree-name, parent-dir,
-	    // child-dirs, nor external-dirs.  It's either a 1.1 leaf
-	    // node or a 1.0 stand-alone tree.  If it's a stand-alone
-	    // tree, it has to have 'this' to be useful.  If it has
-	    // 'this', assume we're deadling with a 1.0 stand-alone
-	    // tree, in which case this is a root.
-	    return true;
-	}
-    }
-
-    // In all other cases, this is not a root.
-    return false;
+    return this->is_root;
 }
 
 bool
@@ -950,6 +988,12 @@ ItemConfig::isCandidateForestRoot() const
     {
 	return false;
     }
+}
+
+std::string const&
+ItemConfig::getParentDir() const
+{
+    return this->parent_dir;
 }
 
 std::string const&
