@@ -2,11 +2,11 @@ no defaults
 chicken: quack
 duck: meow
 pig: oink
-qoww: moo moo
+qoww: moo mooo moooo
 defaults
 chicken: quack
 duck: meow
 pig: oink
 potato: salad
-qoww: moo moo
+qoww: moo mooo moooo
 explicit keys: chicken duck pig qoww

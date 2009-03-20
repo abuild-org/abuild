@@ -175,7 +175,7 @@ Util::splitBySpace(std::string const& input)
 std::list<std::string>
 Util::readLinesFromFile(std::string const& filename, bool strip_newlines)
 {
-    std::ifstream in(filename.c_str());
+    std::ifstream in(filename.c_str(), std::ios_base::binary);
     if (! in.is_open())
     {
 	throw QEXC::System("unable to open file " + filename, errno);

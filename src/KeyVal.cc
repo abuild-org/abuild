@@ -58,25 +58,28 @@ KeyVal::readFile()
     {
 	FileLocation location(this->filename, ++lineno, 0);
 	std::string orig_line = *iter;
+	std::string content;
+	bool continuation = false;
+	bool comment = false;
 
-	// Ignore comments even if they occur after a continuation
-	// line.
+	// Comments are allowed even after a continuation line.
 	if (boost::regex_match(orig_line, match, comment_line))
 	{
 	    QTC::TC("abuild", "KeyVal ignore comment");
-	    *accumulated_text += orig_line;
-	    continue;
+	    comment = true;
 	}
-
-	// Extract content
-	assert(boost::regex_match(orig_line, match, content_re));
-	std::string content = match[1].str();
-	bool continuation = (! match[2].str().empty());
-	if (continuation)
+	else
 	{
-	    // If line ends with a continuation character, replace
-	    // with a space.
-	    content += " ";
+	    // Extract content
+	    assert(boost::regex_match(orig_line, match, content_re));
+	    content = match[1].str();
+	    continuation = (! match[2].str().empty());
+	    if (continuation)
+	    {
+		// If line ends with a continuation character, replace
+		// with a space.
+		content += " ";
+	    }
 	}
 
 	if (value)
@@ -84,8 +87,14 @@ KeyVal::readFile()
 	    // Still accumulating text from the current line
 	    *accumulated_text += orig_line;
 	    *value += content;
+	    if (comment)
+	    {
+		// Comments embedded in values remain associated with
+		// the value they are embedded within.
+		continue;
+	    }
 	}
-	else if (content.empty())
+	else if (content.empty() || comment)
 	{
 	    QTC::TC("abuild", "KeyVal ignore blank line");
 	    *accumulated_text += orig_line;
@@ -96,8 +105,7 @@ KeyVal::readFile()
 	    std::string key = match[2].str();
 	    std::string trailing = match[3].str();
 	    std::string val_str = match[4].str();
-	    std::string continuation = match[5].str();
-	    if (! (continuation.empty() || val_str.empty()))
+	    if (continuation && (! val_str.empty()))
 	    {
 		val_str += " ";
 	    }
@@ -181,8 +189,13 @@ KeyVal::readFile()
 
 void
 KeyVal::writeFile(char const* newfile,
-		  std::map<std::string, std::string> const& key_changes) const
+		  std::map<std::string, std::string> const& key_changes,
+		  std::map<std::string, std::string> const& replacements,
+		  std::set<std::string> const& omissions) const
 {
+    boost::regex eol_re(".*?((?:\\r?\\n)?)");
+    boost::smatch match;
+
     std::ofstream of(newfile,
 		     std::ios_base::out |
 		     std::ios_base::trunc |
@@ -195,22 +208,47 @@ KeyVal::writeFile(char const* newfile,
     for (std::vector<OrigData>::const_iterator iter = this->orig_data.begin();
 	 iter != this->orig_data.end(); ++iter)
     {
+	std::map<std::string, std::string>::const_iterator change =
+	    key_changes.end();
+	std::map<std::string, std::string>::const_iterator replacement =
+	    replacements.end();
+	bool omit = false;
 	OrigData const& od = *iter;
-	of << od.before;
+
 	if (! od.key.empty())
 	{
-	    std::map<std::string, std::string>::const_iterator k =
-		key_changes.find(od.key);
-	    if (k != key_changes.end())
+	    change = key_changes.find(od.key);
+	    replacement = replacements.find(od.key);
+	    omit = (omissions.count(od.key) != 0);
+	}
+
+	if (omit)
+	{
+	    // omit entirely
+	}
+	else
+	{
+	    of << od.before;
+	    if (replacement != replacements.end())
 	    {
-		of << (*k).second;
+		of << (*replacement).second;
+		// output original line terminator
+		assert(boost::regex_match(od.after, match, eol_re));
+		of << match.str(1);
 	    }
 	    else
 	    {
-		of << od.key;
+		if (change != key_changes.end())
+		{
+		    of << (*change).second;
+		}
+		else
+		{
+		    of << od.key;
+		}
+		of << od.after;
 	    }
 	}
-	of << od.after;
     }
 
     of.close();

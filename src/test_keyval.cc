@@ -37,7 +37,15 @@ int main(int argc, char* argv[])
     defaults["potato"] = "salad";
     std::map<std::string, std::string> substitutions;
     substitutions["chicken"] = "adventurous";
-    substitutions["pig"] = "small"; // opposite of pig
+    std::map<std::string, std::string> replacements;
+    replacements["pig"] = "small: whatever smalls say"; // opposite of pig
+    std::set<std::string> omissions;
+
+    if (std::string(filename) == "test9.in")
+    {
+	keys.insert("sheep");
+	omissions.insert("sheep");
+    }
 
     try
     {
@@ -68,9 +76,12 @@ int main(int argc, char* argv[])
 	}
 
 	std::string newfile = std::string(filename) + ".wr1";
-	kv2.writeFile(newfile.c_str(), std::map<std::string, std::string>());
+	kv2.writeFile(newfile.c_str(),
+		      std::map<std::string, std::string>(),
+		      std::map<std::string, std::string>(),
+		      std::set<std::string>());
 	newfile = std::string(filename) + ".wr2";
-	kv2.writeFile(newfile.c_str(), substitutions);
+	kv2.writeFile(newfile.c_str(), substitutions, replacements, omissions);
     }
     catch (std::exception& e)
     {

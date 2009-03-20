@@ -1,4 +1,13 @@
+# before followed by blank
+
+sheep: \
+ baaa \
+ #embedded comment...is this really sheep frog?
+ ribbit
+# after
+
 qoww: moo
+
 pig: oink
 chicken : \
   # confused chicken

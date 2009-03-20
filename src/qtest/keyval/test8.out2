@@ -1,7 +1,13 @@
-  qoww: moo\
-moo
 
-small: oink 
+# leading comment preceded and followed by blank line
+
+  qoww: moo\
+mooo\
+  # embedded comment
+moooo
+
+# trailing comment preceded by blank line
+small: whatever smalls say
 
 # confused chicken
  adventurous   : quack
