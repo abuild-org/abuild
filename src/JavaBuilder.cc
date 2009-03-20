@@ -360,6 +360,8 @@ JavaBuilder::runJava(unsigned short port)
 
     std::vector<std::string> args;
     args.push_back("java");
+    args.push_back("-Xms" + Util::intToString(1 << 29));
+    args.push_back("-Xmx" + Util::intToString(1 << 30));
     args.push_back("-classpath");
     args.push_back(Util::join(Util::pathSeparator(), jars));
     args.push_back("org.abuild.javabuilder.JavaBuilder");
