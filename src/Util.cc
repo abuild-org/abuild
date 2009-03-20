@@ -556,7 +556,8 @@ Util::isDirectory(std::string const& filename)
     }
 #else
     struct stat statbuf;
-    if ((stat(filename.c_str(), &statbuf) != -1) &&
+    if ((lstat(filename.c_str(), &statbuf) != -1) &&
+	(! S_ISLNK(statbuf.st_mode)) &&
 	(S_ISDIR(statbuf.st_mode)))
     {
 	result = true;

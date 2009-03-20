@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -172,6 +173,10 @@ Abuild::runInternal()
 	    this->logger.logInfo(this->abuild_top);
 	    return true;
 	}
+	else if (strcmp(argv[1], "--upgrade-trees") == 0)
+	{
+	    return upgradeTrees();
+	}
     }
 
     parseArgv();
@@ -243,6 +248,180 @@ Abuild::runInternal()
     }
 
     return okay;
+}
+
+bool
+Abuild::upgradeTrees()
+{
+    info("finding roots...");
+
+    std::set<std::string> root_dirs;
+    std::set<std::string> all_dirs;
+
+    std::list<std::string> dirs;
+    dirs.push_back(".");
+    while (! dirs.empty())
+    {
+	std::string dir = dirs.front();
+	dirs.pop_front();
+
+	// XXX support pruning
+
+	if (Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
+	{
+	    // XXX deprecation should be disabled
+	    ItemConfig* config = readConfig(dir, "");
+	    all_dirs.insert(dir);
+	    if (config->isTreeRoot())
+	    {
+		root_dirs.insert(dir);
+	    }
+	}
+
+	std::vector<std::string> entries = Util::getDirEntries(dir);
+	std::sort(entries.begin(), entries.end());
+	for (std::vector<std::string>::iterator iter = entries.begin();
+	     iter != entries.end(); ++iter)
+	{
+	    std::string const& entry = *iter;
+	    if ((entry == ".") || (entry == ".."))
+	    {
+		continue;
+	    }
+	    std::string fullpath;
+	    if (dir != ".")
+	    {
+		fullpath += dir + "/";
+	    }
+	    fullpath += entry;
+	    if (Util::isDirectory(fullpath))
+	    {
+		dirs.push_back(fullpath);
+	    }
+	}
+    }
+
+    info("discovering relationships among trees...");
+
+    // XXX currently handles only 1.0 logic...
+    // XXX exclude trees with backing areas...
+    DependencyGraph root_graph;
+    for (std::set<std::string>::iterator iter = root_dirs.begin();
+	 iter != root_dirs.end(); ++iter)
+    {
+	std::string const& dir = *iter;
+	root_graph.addItem(dir);
+	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
+	ItemConfig* config = readConfig(*iter, "");
+	std::list<ExternalData> const& externals = config->getExternals();
+	for (std::list<ExternalData>::const_iterator eiter = externals.begin();
+	     eiter != externals.end(); ++eiter)
+	{
+	    std::string edecl = (*eiter).getDeclaredPath();
+	    std::string epath = Util::absToRel(
+		Util::canonicalizePath(dir + "/" + edecl));
+	    if (! Util::isDirectory(epath))
+	    {
+		error(location,
+		      "external " + edecl + " (" + epath +
+		      " relative to current directory)"
+		      " does not exist or is not a directory");
+	    }
+	    else if (! root_dirs.count(epath))
+	    {
+		if (all_dirs.count(epath))
+		{
+		    error(location,
+			  "external " + edecl + " (" + epath +
+			  " relative to current directory) was not found"
+			  " as a root below the current directory");
+		}
+		else
+		{
+		    // XXX Here we probably want to preserve this
+		    // external as an external-dirs.  This could
+		    // happen if the external points up above the top
+		    // of the start directory or in a pruned area.
+		    // Maybe we want to handle those differently.  See
+		    // discussion in TODO.
+		    error(location, "XXX unknown external");
+		}
+	    }
+	    else
+	    {
+		root_graph.addDependency(dir, epath);
+	    }
+	}
+    }
+
+    if (! root_graph.check())
+    {
+	// XXX report errors
+	error("errors found checking dependencies among root build items");
+    }
+
+    // Do identification and output of islands before exiting if
+    // errors.  This information can be helpful for people resolving
+    // errors, and it will also make it possible to use output from
+    // this program as part of manual conversion of error cases in
+    // abuild's test suite.
+
+    info("identifying islands...");
+
+    std::map<std::string, int> island_numbers;
+    int next_island = 0;
+    std::list<std::string> const& sorted_roots = root_graph.getSortedGraph();
+    for (std::list<std::string>::const_iterator iter = sorted_roots.begin();
+	 iter != sorted_roots.end(); ++iter)
+    {
+	std::string const& dir = *iter;
+	if (island_numbers.count(dir) == 0)
+	{
+	    int island = next_island++;
+	    std::list<std::string> nodes;
+	    nodes.push_back(dir);
+	    while (! nodes.empty())
+	    {
+		std::string const& node = nodes.front();
+		if (! island_numbers.count(node))
+		{
+		    island_numbers[node] = island;
+		    std::list<std::string> const& deps =
+			root_graph.getDirectDependencies(node);
+		    nodes.insert(nodes.end(), deps.begin(), deps.end());
+		    std::list<std::string> const& rdeps =
+			root_graph.getReverseDependencies(node);
+		    nodes.insert(nodes.end(), rdeps.begin(), rdeps.end());
+		}
+		nodes.pop_front();
+	    }
+	}
+    }
+    std::map<int, std::set<std::string> > islands;
+    for (std::map<std::string, int>::iterator iter = island_numbers.begin();
+	 iter != island_numbers.end(); ++iter)
+    {
+	islands[(*iter).second].insert((*iter).first);
+    }
+    for (std::map<int, std::set<std::string> >::iterator i1 = islands.begin();
+	 i1 != islands.end(); ++i1)
+    {
+	info("island number " + Util::intToString((*i1).first));
+	std::vector<std::string> dirs;
+	dirs.insert(dirs.end(), (*i1).second.begin(), (*i1).second.end());
+	std::sort(dirs.begin(), dirs.end(),
+		  boost::bind(&DependencyGraph::itemLess,
+			      &root_graph, _1, _2));
+	for (std::vector<std::string>::const_iterator i2 = dirs.begin();
+	     i2 != dirs.end(); ++i2)
+	{
+	    info("  " + *i2);
+	}
+    }
+
+    exitIfErrors();
+
+    return true;
 }
 
 void
@@ -5227,6 +5406,7 @@ Abuild::help()
     h("                    relate to any item already in the build set by all of");
     h("                    the named traits");
     h("  --silent          suppress most non-error output");
+    h("  --upgrade-trees   run special mode to upgrade build trees");
     h("  --verbose         generate more detailed output");
     h("  --with-deps | -d  short-hand for --build=current");
     h("");

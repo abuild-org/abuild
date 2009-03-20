@@ -44,6 +44,7 @@ class Abuild
             item_filter_t;
 
     bool runInternal();
+    bool upgradeTrees();
     void getThisPlatform();
     void parseArgv();
     std::string findConf();

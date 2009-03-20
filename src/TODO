@@ -1,14 +1,4 @@
 
-readConfig should error if directory is a symbolic link.  validation
-should report error if child dir crosses a link.
-
-conversion tool general strategy: readConfigs for all Abuild.conf
-files, allowing specification of prune directories.  Ignore links as
-they will be reported as errors if relevant.  Stop if any errors after
-all are read.  Otherwise, do analysis and rewrite by walking kv_cache
-for all paths at or below starting point (keeping in mind that we may
-have read an Abuild.conf above the top).
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -947,6 +937,9 @@ Here is the full traversal algorithm, including compatibility support.
      child-dirs pointers and, if in compatibility mode, then following
      external-dirs pointers
 
+XXX Other things to work in: child-dirs and external-dirs should not
+be allowed to traverse symbolic links.
+
 The build_tree structure changes a bit.  Rather than having a single
 list for each tree, we'll have a single list for the forest.  This is
 described in the revamped build tree section above.
@@ -1034,69 +1027,99 @@ parser (ItemConfig) and the DependencyGraph object.
 
 Usage: abuild --upgrade-trees
 
-If no file "abuild.upgrade-data" exists:
+If abuild.upgrade-data exists, read it.  It can contain two pieces of
+information: a mapping from paths (relative to current directory) to
+tree names, and a list of directories to prune.  The string *** is
+used as a place holder for names of trees that we don't know.
 
-  Find all roots.  (See abuild-lint/find-abuild-trees.)  Do this by
-  finding all Abuild.conf files at or below the current directory that
-  look like roots.
+----
+[ignore-directories]
+# place the names of directories specified relative to the current
+# directory, one per line, that you wish to not traverse while
+# searching for trees to upgrade.
+relative-path
+relative-path
+...
 
-  Use DependencyGraph to create a dependency of all build tree roots.
-  This is to include named and unnamed trees.  This should share as
-  much code as possible with the actual traversal code, except that we
-  will traverse starting from EVERY apparent root build item that has
-  not been visited by an earlier traversal.  This means we will detect
-  nested build trees, private build trees that only point up, etc.
+[island]
+path: name
+...
 
-  Analyze the dependency graph to identify islands.  Something like
-  this:
+[island]
+path: name
+...
 
-     sort the graph
-     compute the transpose of the graph
+...
+----
 
-     for each node in the sorted graph
-       if the node does not have an island number
-         get the next island number
-         do a depth-first traversal of the transpose graph starting
-              with this node and assign this island number to each node
+Traverse file system reading all Abuild.conf files.  Keep track of
+which items are roots and which items have errors.
 
-     create abuild.upgrade-data listing each island and each tree root
-         path with any name that tree might have or a marker
-         indicating that a name must be assigned
+Use DependencyGraph to create a dependency of all build tree roots.
 
-     tell the user to edit the abuild.upgrade-data file
+Exit if errors
 
-     exit
+Analyze the dependency graph to identify islands.
 
-  It's possible that we can enhance DependencyGraph to keep track of
-  islands during the traversal or at least add this functionality to
-  DependencyGraph.
+Rewrite abuild.upgrade-data, preserving any previous prune directories
+and tree names, with all tree names arranged in islands.  For any tree
+for which no name was known, write *** as a place-holder.
 
-If there is an "abuild.upgrade-data" file:
+If any trees had unknown names, tell user to edit abuild.upgrade-data,
+and exit.
 
-  Ignore any islands that are marked as ignored.
+Otherwise, for every Abuild.conf that needs to be rewritten, write
+Abuild-1.1.conf.
 
-  Make sure each tree root listed in the file has name.
+When completely finished, if all went well, for each rewritten file,
+rename Abuild.conf to Abuild-1.0.conf and rename Abuild-1.1.conf to
+Abuild.conf.
 
-  Do a traversal from each tree root, verifying we visit every root
-  in the island and no other roots
+Other issues to work in:
 
-At the end of this process, we should know the path and name of every
-tree in each forest, with one forest corresponding to each island.  At
-that point, we can rewrite all the Abuild.conf files filling in the
-tree names, replacing external-dirs with tree-deps, and adding any
-missing child-dirs entries as required to connect in all the subtrees.
-(Also replacing "this" with "name", and do other in-place
-transformations.)
+ * Backing areas: we need to be able to resolve externals through
+   backing areas and convert backing area files.  When an external is
+   resolved through a backing area, make sure the external in the
+   backing area has been converted, and pull its name from there.  Do
+   not generate a new tree name.
 
-We probably want to refuse conversion of anything with a backing area.
+ * If we have externals that fall outside of the forest or in a pruned
+   area (i.e., we can find the directory, but it is not one we know
+   about either as a root or a regular item), maybe we should leave it
+   as an external.  This makes it possible to have forests with
+   mixtures of 1.0 and 1.1 trees, which may be important for the
+   transition.  E.g., we could leave tps-build-items as 1.0 when
+   updating some forests that use it but not others.
 
-The new files should be written out as Abuild.conf.new or something
-along those lines.  Or maybe the old ones should be called
-Abuild.conf.pre-conversion or something and the new ones should be
-called Abuild.conf.
+   One way to approach this would be to include their paths, relative
+   to the start directory, in the abuild.upgrade-data file in a
+   section of trees that should remain unconverted.  Only in those
+   cases should we leave the external-dirs alone and create a hybrid
+   situation.
 
-If we really wanted to be paranoid, we could retraverse in strict 1.1
-mode and make sure we get the same results.
+
+Converting Abuild.conf files:
+
+ * For root files
+
+    - add tree-name
+
+    - if next Abuild.conf up belongs to a tree in the same island,
+      append to (or create) its child-dirs.
+
+ * this -> name
+
+ * parent-dir: remove
+
+ * external-dirs: replace with tree-deps.
+
+ * deleted: remove and store; will be used when we rewrite
+   Abuild.backing files.
+
+Converting Abuild.backing files:
+
+ * XXX fill in...process is more or less described in compatibility
+   section.
 
 ----------------------------------------------------------------------
 

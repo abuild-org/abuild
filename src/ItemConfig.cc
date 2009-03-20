@@ -420,6 +420,8 @@ ItemConfig::checkChildren()
 	}
 	else
 	{
+	    // XXX report error if child dir crosses a symbolic link.
+
 	    // Check for intervening Abuild.conf directories.  No need
 	    // to check for existence of child Abuild.conf.  It may
 	    // not exist because of backing areas, and we'll check
