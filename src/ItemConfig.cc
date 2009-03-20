@@ -317,6 +317,13 @@ ItemConfig::checkNonRoot()
     {
 	QTC::TC("abuild", "ItemConfig ERR plugins on non-root");
     }
+    if (Util::isFile(this->dir + "/" + FILE_BACKING))
+    {
+	QTC::TC("abuild", "ItemConfig ERR Abuild.backing at non-root");
+	this->error.error(FileLocation(dir + "/" + FILE_BACKING, 0, 0),
+			  FILE_BACKING +
+			  " file ignored for non-root build item");
+    }
 }
 
 void

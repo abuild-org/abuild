@@ -23,6 +23,7 @@
 --topdir--/a/ag/Abuild.conf: ERROR: "supported-traits" may only appear in a root build item
 --topdir--/a/ag/Abuild.conf: ERROR: "deleted" may only appear in a root build item
 --topdir--/a/ag/Abuild.conf: ERROR: "plugins" may only appear in a root build item
+--topdir--/a/ag/Abuild.backing: ERROR: Abuild.backing file ignored for non-root build item
 --topdir--/a/ag/Abuild.conf: ERROR: flag "moo" listed more than once
 --topdir--/a/ag/Abuild.conf: ERROR: trait "oink" listed more than once
 --topdir--/a/ag/Abuild.conf: ERROR: trait names may contain only alphanumeric characters, underscores, periods, and dashes

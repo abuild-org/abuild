@@ -258,3 +258,4 @@ ItemConfig ERR interleaved child Abuild.conf 0
 ItemConfig ERR absolute external 0
 ItemConfig found root searching for parent 0
 ItemConfig skipping dir in parent search 0
+ItemConfig ERR Abuild.backing at non-root 0
