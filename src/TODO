@@ -940,6 +940,18 @@ Here is the full traversal algorithm, including compatibility support.
 XXX Other things to work in: child-dirs and external-dirs should not
 be allowed to traverse symbolic links.
 
+XXX Deprecation warnings on old trees: detect if any build item in a
+tree uses deprecated features.  This includes both using deprecated
+keys and also being a root and not having tree-name.  If that happens
+for any item in the tree, issue a single deprecation warning that
+points to the user to abuild --upgrade-trees.  Something like
+
+  The build tree whose root build item is located at X uses deprecated
+  features.  When you are ready to upgrade this build tree, you can
+  use "abuild --upgrade-trees" to do most of the work.  Please see the
+  section in the abuild user's manual entitled "Upgrading Build Trees"
+  for details.
+
 The build_tree structure changes a bit.  Rather than having a single
 list for each tree, we'll have a single list for the forest.  This is
 described in the revamped build tree section above.
@@ -1081,7 +1093,11 @@ Other issues to work in:
    backing areas and convert backing area files.  When an external is
    resolved through a backing area, make sure the external in the
    backing area has been converted, and pull its name from there.  Do
-   not generate a new tree name.
+   not generate a new tree name.  Maybe a good way to do this would be
+   to generate an explicit backing area chain for each root and check
+   it iteratively.  Need to figure out the exact behavior of
+   Abuild.backing files with respect to hybrid 1.0/1.1 trees, if this
+   is not already discussed above.
 
  * If we have externals that fall outside of the forest or in a pruned
    area (i.e., we can find the directory, but it is not one we know
