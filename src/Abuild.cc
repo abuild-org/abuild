@@ -366,54 +366,14 @@ Abuild::upgradeTrees()
     // this program as part of manual conversion of error cases in
     // abuild's test suite.
 
-    info("identifying islands...");
-
-    std::map<std::string, int> island_numbers;
-    int next_island = 0;
-    std::list<std::string> const& sorted_roots = root_graph.getSortedGraph();
-    for (std::list<std::string>::const_iterator iter = sorted_roots.begin();
-	 iter != sorted_roots.end(); ++iter)
+    info("identifying independent sets...");
+    std::vector<DependencyGraph::ItemList> const& sets =
+	root_graph.getIndependentSets();
+    for (unsigned int i = 0; i < sets.size(); ++i)
     {
-	std::string const& dir = *iter;
-	if (island_numbers.count(dir) == 0)
-	{
-	    int island = next_island++;
-	    std::list<std::string> nodes;
-	    nodes.push_back(dir);
-	    while (! nodes.empty())
-	    {
-		std::string const& node = nodes.front();
-		if (! island_numbers.count(node))
-		{
-		    island_numbers[node] = island;
-		    std::list<std::string> const& deps =
-			root_graph.getDirectDependencies(node);
-		    nodes.insert(nodes.end(), deps.begin(), deps.end());
-		    std::list<std::string> const& rdeps =
-			root_graph.getReverseDependencies(node);
-		    nodes.insert(nodes.end(), rdeps.begin(), rdeps.end());
-		}
-		nodes.pop_front();
-	    }
-	}
-    }
-    std::map<int, std::set<std::string> > islands;
-    for (std::map<std::string, int>::iterator iter = island_numbers.begin();
-	 iter != island_numbers.end(); ++iter)
-    {
-	islands[(*iter).second].insert((*iter).first);
-    }
-    for (std::map<int, std::set<std::string> >::iterator i1 = islands.begin();
-	 i1 != islands.end(); ++i1)
-    {
-	info("island number " + Util::intToString((*i1).first));
-	std::vector<std::string> dirs;
-	dirs.insert(dirs.end(), (*i1).second.begin(), (*i1).second.end());
-	std::sort(dirs.begin(), dirs.end(),
-		  boost::bind(&DependencyGraph::itemLess,
-			      &root_graph, _1, _2));
-	for (std::vector<std::string>::const_iterator i2 = dirs.begin();
-	     i2 != dirs.end(); ++i2)
+	info("set number " + Util::intToString(i));
+	for (DependencyGraph::ItemList::const_iterator i2 = sets[i].begin();
+	     i2 != sets[i].end(); ++i2)
 	{
 	    info("  " + *i2);
 	}

@@ -12,9 +12,15 @@ my $td = new TestDriver('DependencyGraph');
 test_setup();
 my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 
-$td->runtest("full test",
+$td->runtest("normal test",
 	     {$td->COMMAND => "test_dependency_graph"},
 	     {$td->FILE => "dependency-graph.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("independent sets",
+	     {$td->COMMAND => "test_dependency_graph independent-sets"},
+	     {$td->FILE => "independent-sets.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -33,4 +39,4 @@ if ($test_java)
 		 $td->NORMALIZE_NEWLINES);
 }
 
-$td->report(1 + ($test_java ? 2 : 0));
+$td->report(2 + ($test_java ? 2 : 0));

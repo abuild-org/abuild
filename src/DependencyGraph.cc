@@ -1,6 +1,7 @@
 #include <DependencyGraph.hh>
 
 #include <assert.h>
+#include <boost/bind.hpp>
 
 DependencyGraph::DependencyGraph() :
     graph_state(gs_INIT)
@@ -73,9 +74,16 @@ DependencyGraph::compareItems(ItemType const& i1, ItemType const& i2) const
 }
 
 bool
-DependencyGraph::itemLess(ItemType const& i1, ItemType const& i2) const
+DependencyGraph::itemLessFunction(ItemType const& i1, ItemType const& i2) const
 {
     return compareItems(i1, i2) == -1;
+}
+
+boost::function<bool (DependencyGraph::ItemType const&,
+		      DependencyGraph::ItemType const&)>
+DependencyGraph::itemLess() const
+{
+    return boost::bind(&DependencyGraph::itemLessFunction, this, _1, _2);
 }
 
 DependencyGraph::ItemList const&
@@ -83,6 +91,68 @@ DependencyGraph::getSortedGraph() const
 {
     assertChecked(true);
     return this->in_order;
+}
+
+std::vector<DependencyGraph::ItemList> const&
+DependencyGraph::getIndependentSets()
+{
+    assertChecked(true);
+    if (! this->independent_sets.empty())
+    {
+	return this->independent_sets;
+    }
+
+    std::map<ItemType, int> set_numbers;
+    int next_set = 0;
+
+    // Assign each item to an independent set by traversing the graph
+    // in both directions from any node that does not already appear
+    // in a set.
+    for (ItemList::const_iterator iter = in_order.begin();
+	 iter != in_order.end(); ++iter)
+    {
+	ItemType const& node = *iter;
+	if (set_numbers.count(node) == 0)
+	{
+	    int set = next_set++;
+	    ItemList nodes;
+	    nodes.push_back(node);
+	    while (! nodes.empty())
+	    {
+		ItemType const& node = nodes.front();
+		if (! set_numbers.count(node))
+		{
+		    set_numbers[node] = set;
+		    ItemList const& deps = getDirectDependencies(node);
+		    nodes.insert(nodes.end(), deps.begin(), deps.end());
+		    ItemList const& rdeps = getReverseDependencies(node);
+		    nodes.insert(nodes.end(), rdeps.begin(), rdeps.end());
+		}
+		nodes.pop_front();
+	    }
+	}
+    }
+
+    // Gather nodes in groups based on their set numbers
+    std::map<int, std::vector<ItemType> > sets;
+    for (std::map<ItemType, int>::iterator iter = set_numbers.begin();
+	 iter != set_numbers.end(); ++iter)
+    {
+	sets[(*iter).second].push_back((*iter).first);
+    }
+
+    // Generate final results
+    for (std::map<int, std::vector<ItemType> >::iterator iter = sets.begin();
+	 iter != sets.end(); ++iter)
+    {
+	std::vector<ItemType>& nodes = (*iter).second;
+	std::sort(nodes.begin(), nodes.end(), itemLess());
+	this->independent_sets.push_back(ItemList());
+	ItemList& nodelist = this->independent_sets.back();
+	nodelist.insert(nodelist.end(), nodes.begin(), nodes.end());
+    }
+
+    return this->independent_sets;
 }
 
 void

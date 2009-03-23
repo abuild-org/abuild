@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <cstring>
+#include <assert.h>
 
 static void report(DependencyGraph& g)
 {
@@ -49,10 +51,7 @@ static void report(DependencyGraph& g)
 
 	// Create a predicate based on DependencyGraph::itemLess to
 	// sort the items in dependency order.
-	boost::function<bool (DependencyGraph::ItemType const&,
-			      DependencyGraph::ItemType const&)> pred =
-	    boost::bind(&DependencyGraph::itemLess, boost::ref(g), _1, _2);
-	std::sort(vec.begin(), vec.end(), pred);
+	std::sort(vec.begin(), vec.end(), g.itemLess());
 	std::cout << "Dependency order:";
 	for (std::vector<DependencyGraph::ItemType>::iterator iter =
 		 vec.begin();
@@ -133,7 +132,26 @@ static void report(DependencyGraph& g)
     }
 }
 
-int main()
+static void report_independent_sets(DependencyGraph& g)
+{
+    assert(g.check());
+    std::vector<DependencyGraph::ItemList> const& sets =
+	g.getIndependentSets();
+    std::cout << "number of independent sets: " << sets.size() << std::endl;
+    for (std::vector<DependencyGraph::ItemList>::const_iterator i1 =
+	     sets.begin();
+	 i1 != sets.end(); ++i1)
+    {
+	std::cout << "  independent set" << std::endl;
+	for (DependencyGraph::ItemList::const_iterator i2 = (*i1).begin();
+	     i2 != (*i1).end(); ++i2)
+	{
+	    std::cout << "    " << (*i2) << std::endl;
+	}
+    }
+}
+
+static void test_normal()
 {
     // Create a correct graph.
     DependencyGraph g1;
@@ -190,6 +208,57 @@ int main()
     report(g1);
     std::cout << std::endl;
     report(g2);
+}
 
+static void test_independent_sets()
+{
+    DependencyGraph g1;
+    g1.addItem("a1");
+    g1.addItem("b1");
+    g1.addItem("c1");
+    g1.addItem("d1");
+    g1.addItem("e1");
+    g1.addItem("f1");
+    g1.addItem("g1");
+    g1.addDependency("b1", "a1");
+    g1.addDependency("b1", "c1");
+    g1.addDependency("d1", "c1");
+    g1.addDependency("d1", "e1");
+    g1.addDependency("f1", "e1");
+    g1.addDependency("f1", "g1");
+
+    DependencyGraph g2 = g1;
+    g2.addItem("z2");
+    g2.addItem("y2");
+    g2.addItem("x2");
+    g2.addItem("w2");
+    g2.addItem("v2");
+    g2.addItem("u2");
+    g2.addItem("t2");
+    g2.addDependency("z2", "y2");
+    g2.addDependency("y2", "x2");
+    g2.addDependency("y2", "w2");
+    g2.addDependency("w2", "v2");
+    g2.addDependency("w2", "u2");
+    g2.addDependency("u2", "t2");
+
+    g2.addItem("q3");
+    g2.addItem("r3");
+    g2.addDependency("q3", "r3");
+
+    report_independent_sets(g1);
+    report_independent_sets(g2);
+}
+
+int main(int argc, char* argv[])
+{
+    if (argc == 1)
+    {
+	test_normal();
+    }
+    else if (std::strcmp(argv[1], "independent-sets") == 0)
+    {
+	test_independent_sets();
+    }
     return 0;
 }

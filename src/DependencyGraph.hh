@@ -17,6 +17,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <boost/function.hpp>
 
 class DependencyGraph
 {
@@ -71,13 +72,25 @@ class DependencyGraph
     // item is greater than the second item.
     int compareItems(ItemType const&, ItemType const&) const;
 
-    // Compare two items based on dependency order, returning true iff
-    // the first item is less than the second item.
-    bool itemLess(ItemType const&, ItemType const&) const;
+    // Return a predicate that compare two items based on dependency
+    // order, returning true iff the first item is less than the
+    // second item.  This is suitable as a predicate to std::sort or
+    // as a sort template parameter for std::set or std::map.
+    boost::function<bool (DependencyGraph::ItemType const&,
+			  DependencyGraph::ItemType const&)> itemLess() const;
 
     // Returns all the items in the graph topologically sorted in
     // dependency order.
     ItemList const& getSortedGraph() const;
+
+    // Returns a vector, each of whose members is an independent
+    // subset of the graph.  An independent subset is a subset of
+    // nodes (which may include all nodes in the graph) such that
+    // there are no connections between members of that subset and
+    // nodes of the graph that are not in the subset.  Each ItemList
+    // in the resulting data structure is topologically sorted.  The
+    // order of the lists is arbitrary but consistent.
+    std::vector<ItemList> const& getIndependentSets();
 
     // Error function.  This function may be called only if check()
     // has been called and has returned false.  Initializes "unknowns"
@@ -114,6 +127,8 @@ class DependencyGraph
 	std::set<std::string>& cycles_seen,
 	ItemList& result);
 
+    bool itemLessFunction(ItemType const& i1, ItemType const& i2) const;
+
     GraphState graph_state;
 
     // Data for the normal case
@@ -122,6 +137,7 @@ class DependencyGraph
     ItemMap reverse_dependencies;
     ItemList in_order;
     std::map<ItemType, unsigned int> item_order;
+    std::vector<ItemList> independent_sets; // initialized as needed
 
     // Error data -- these are empty if there were no errors.  The
     // formats of these are described in the comments for the
