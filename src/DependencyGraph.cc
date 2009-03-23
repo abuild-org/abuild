@@ -97,6 +97,7 @@ std::vector<DependencyGraph::ItemList> const&
 DependencyGraph::getIndependentSets()
 {
     assertChecked(true);
+    assert(check());
     if (! this->independent_sets.empty())
     {
 	return this->independent_sets;

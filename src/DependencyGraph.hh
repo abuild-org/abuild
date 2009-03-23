@@ -89,7 +89,8 @@ class DependencyGraph
     // there are no connections between members of that subset and
     // nodes of the graph that are not in the subset.  Each ItemList
     // in the resulting data structure is topologically sorted.  The
-    // order of the lists is arbitrary but consistent.
+    // order of the lists is arbitrary but consistent.  May not be
+    // called on a graph with errors.
     std::vector<ItemList> const& getIndependentSets();
 
     // Error function.  This function may be called only if check()
