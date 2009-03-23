@@ -144,7 +144,12 @@ void
 UpgradeData::scan()
 {
     // XXX This code is broken for build trees with only backing and
-    // not conf.
+    // not conf.  Maybe we need a general version of readConfig that
+    // does this automatically...we'd have to check all readConfig
+    // calls here and in Abuild-upgrade.cc.  Or maybe we need to do
+    // the readConfig logic for externals here instead of
+    // Abuild-upgrade.cc.  Or maybe we need to cache the results of
+    // readConfig and not call it there.
 
     CompatLevel cl(CompatLevel::cl_1_0);
     std::list<std::string> dirs;
