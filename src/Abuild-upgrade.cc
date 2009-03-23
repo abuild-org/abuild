@@ -60,6 +60,9 @@ Abuild::upgradeTrees()
 void
 Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 {
+    // XXX This code is broken for build trees with only backing and
+    // not conf.
+
     std::map<std::string, bool> const& item_dirs = ud.getItemDirs();
 
     // XXX currently handles only 1.0 logic...
@@ -87,6 +90,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		   ((rel_backing.length() > 2) &&
 		    (rel_backing.substr(0, 3) == "../"))))
 	    {
+		QTC::TC("abuild", "Abuild-upgrade ERR local backing chain");
 		error(FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
 		      "Part of this item's backing area chain falls under"
 		      " the current directory.  You must either rerun " +
@@ -102,8 +106,6 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    backing_chain.clear();
 	}
 
-	// XXX deal with backing areas
-
 	std::list<ExternalData> const& externals = config->getExternals();
 	for (std::list<ExternalData>::const_iterator eiter = externals.begin();
 	     eiter != externals.end(); ++eiter)
@@ -111,12 +113,40 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    std::string edecl = (*eiter).getDeclaredPath();
 	    std::string epath = Util::absToRel(
 		Util::canonicalizePath(dir + "/" + edecl));
-	    if (! Util::isDirectory(epath))
+	    if (! Util::isFile(epath + "/" + ItemConfig::FILE_CONF))
 	    {
-		error(location,
-		      "external " + edecl + " (" + epath +
-		      " relative to current directory)"
-		      " does not exist or is not a directory");
+		// See if we can find the directory in the backing
+		// area chain.
+		std::string resolved;
+		for (std::list<std::string>::iterator biter =
+			 backing_chain.begin();
+		     biter != backing_chain.end(); ++biter)
+		{
+		    std::string candidate = *biter + "/" + edecl;
+		    if (Util::isFile(candidate + "/" + ItemConfig::FILE_CONF))
+		    {
+			resolved = candidate;
+			break;
+		    }
+		}
+		if (resolved.empty())
+		{
+		    QTC::TC("abuild", "Abuild-upgrade ERR external not found");
+		    error(location,
+			  "external " + edecl + " (" + epath +
+			  " relative to current directory)"
+			  " does not exist or is not a directory and can't"
+			  " be found in the backing area chain");
+		}
+		else
+		{
+		    /*ItemConfig* econfig =*/ readConfig(resolved, "");
+		    // XXX if econfig has a tree name, use it.
+		    // Otherwise, give a warning that the external
+		    // resolves to a backing area has not been
+		    // upgraded yet, and add it to the do-not-upgrade
+		    // list.  Create coverage cases for both.
+		}
 	    }
 	    else if (! (item_dirs.count(epath) &&
 			(*item_dirs.find(epath)).second))
@@ -136,7 +166,9 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		    // of the start directory or in a pruned area.
 		    // Maybe we want to handle those differently.  See
 		    // discussion in TODO.
-		    error(location, "XXX unknown external");
+		    error(location,
+			  "XXX external " + edecl + " (" + epath +
+			  " relative to current directory) is unknown");
 		}
 	    }
 	    else

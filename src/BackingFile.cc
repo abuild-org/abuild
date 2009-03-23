@@ -5,6 +5,7 @@
 #include <Util.hh>
 #include <QTC.hh>
 #include <QEXC.hh>
+#include <set>
 
 std::string const BackingFile::FILE_BACKING = "Abuild.backing";
 
@@ -29,6 +30,46 @@ BackingFile::readBacking(Error& error_handler,
     // Cache and return
     cache[dir] = bf;
     return bf.get();
+}
+
+std::list<std::string>
+BackingFile::getBackingChain(Error& error_handler,
+			     CompatLevel const& compat_level,
+			     std::string const& dir)
+{
+    // XXX this may not be in the right place...
+    std::list<std::string> result;
+
+    std::set<std::string> seen;
+    std::string path = dir;
+    while (Util::isFile(path + "/" + FILE_BACKING))
+    {
+	if (seen.count(path))
+	{
+	    QTC::TC("abuild", "Abuild getBackingChain loop");
+	    // XXX generates message without whoami
+	    throw QEXC::General("loop detected reading " +
+				dir + "/" + FILE_BACKING);
+	}
+	else
+	{
+	    seen.insert(path);
+	}
+
+	BackingFile* bf = BackingFile::readBacking(
+	    error_handler, compat_level, path);
+	std::string const& backing_area = bf->getBackingArea();
+	if (backing_area.empty())
+	{
+	    // XXX generates message without whoami
+	    throw QEXC::General(dir + "/" + FILE_BACKING +
+				": unable to get backing area data");
+	}
+	result.push_back(backing_area);
+	path = backing_area;
+    }
+
+    return result;
 }
 
 BackingFile::BackingFile(

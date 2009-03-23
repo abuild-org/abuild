@@ -109,28 +109,21 @@ UpgradeData::readUpgradeData()
 	    {
 		std::string path = match.str(1);
 		std::string name = match.str(2);
-		// Any line that maps a path to *** is dispensible.
 		if (name != "***")
 		{
-		    if (Util::isDirectory(path))
+		    // Don't check to make sure path is a directory.  When
+		    // an external is resolved to a backing area, we
+		    // generate an entry to where that external would be
+		    // if it were local.
+		    if (this->tree_names.count(path))
 		    {
-			if (this->tree_names.count(path))
-			{
-			    QTC::TC("abuild", "UpgradeData ERR duplicate");
-			    this->error.error(location, "duplicate name for"
-					      " path\"" + path + "\"");
-			}
-			else
-			{
-			    this->tree_names[path] = name;
-			}
+			QTC::TC("abuild", "UpgradeData ERR duplicate");
+			this->error.error(location, "duplicate name for"
+					  " path \"" + path + "\"");
 		    }
 		    else
 		    {
-			QTC::TC("abuild", "UpgradeData ERR tree not directory");
-			this->error.error(
-			    location, "path \"" + line +
-			    "\" is not a directory");
+			this->tree_names[path] = name;
 		    }
 		}
 	    }
@@ -150,6 +143,9 @@ UpgradeData::readUpgradeData()
 void
 UpgradeData::scan()
 {
+    // XXX This code is broken for build trees with only backing and
+    // not conf.
+
     CompatLevel cl(CompatLevel::cl_1_0);
     std::list<std::string> dirs;
     dirs.push_back(".");
@@ -171,6 +167,36 @@ UpgradeData::scan()
 	    if (config->usesDeprecatedFeatures())
 	    {
 		this->upgrade_required = true;
+	    }
+	}
+	else if (Util::isFile(dir + "/" + BackingFile::FILE_BACKING))
+	{
+	    QTC::TC("abuild", "UpgradeData backing without conf");
+	    std::list<std::string> backing_chain =
+		BackingFile::getBackingChain(this->error, cl, dir);
+
+	    // XXX more or less duplicated with code in
+	    // Abuild-upgrade.cc....search for "resolved".  Also
+	    // doesn't completely give us what we need, which is the
+	    // name of the tree in the backing area, if any.
+
+	    std::string resolved;
+	    for (std::list<std::string>::iterator biter =
+		     backing_chain.begin();
+		 biter != backing_chain.end(); ++biter)
+	    {
+		std::string candidate = *biter;
+		if (Util::isFile(candidate + "/" + ItemConfig::FILE_CONF))
+		{
+		    resolved = candidate;
+		    break;
+		}
+	    }
+	    if (! resolved.empty())
+	    {
+		// XXX but how are we going to get the config?
+		QTC::TC("abuild", "UpgradeData got root from backing");
+		this->item_dirs[dir] = true;
 	    }
 	}
 

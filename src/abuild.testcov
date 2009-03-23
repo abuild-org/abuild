@@ -273,8 +273,10 @@ UpgradeData ERR expected section 0
 UpgradeData ERR ignored not directory 0
 UpgradeData ERR no upgrade not directory 0
 UpgradeData ERR invalid treename 0
-UpgradeData ERR tree not directory 0
 UpgradeData ERR duplicate 0
 UpgradeData orphan names 0
 BackingFile ERR invalid backing file 0
 Abuild getBackingChain loop 0
+Abuild-upgrade ERR local backing chain 0
+Abuild-upgrade ERR external not found 0
+UpgradeData backing without conf 0

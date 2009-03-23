@@ -4,6 +4,7 @@
 #include <FileLocation.hh>
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <list>
 #include <map>
 
 class Error;
@@ -15,6 +16,10 @@ class BackingFile
     static BackingFile* readBacking(Error& error_handler,
 				    CompatLevel const& compat_level,
 				    std::string const& dir);
+    static std::list<std::string>
+    getBackingChain(Error& error_handler,
+		    CompatLevel const& compat_level,
+		    std::string const& dir);
 
     static std::string const FILE_BACKING;
 

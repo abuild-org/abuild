@@ -2528,30 +2528,8 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
 std::list<std::string>
 Abuild::getBackingChain(std::string const& dir)
 {
-    // XXX this may not be in the right place...
-    std::list<std::string> result;
-
-    std::set<std::string> seen;
-    std::string path = dir;
-    while (Util::isFile(path + "/" + BackingFile::FILE_BACKING))
-    {
-	if (seen.count(path))
-	{
-	    QTC::TC("abuild", "Abuild getBackingChain loop");
-	    fatal("loop detected reading " +
-		  dir + "/" + BackingFile::FILE_BACKING);
-	}
-	else
-	{
-	    seen.insert(path);
-	}
-	std::string backing_area;
-	readBacking(path, backing_area);
-	result.push_back(backing_area);
-	path = backing_area;
-    }
-
-    return result;
+    return BackingFile::getBackingChain(
+	this->error_handler, this->compat_level, dir);
 }
 
 void
