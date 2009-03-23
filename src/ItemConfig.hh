@@ -64,6 +64,7 @@ class ItemConfig
 
     bool isTreeRoot() const;
     bool isCandidateForestRoot() const;
+    bool usesDeprecatedFeatures() const;
     std::string const& getParentDir() const;
     std::string const& getName() const;
     std::string const& getDescription() const;
@@ -113,6 +114,7 @@ class ItemConfig
     void validate();
     void detectRoot();
     void findParentDir();
+    void checkDeprecated();
     void checkUnnamed();
     void checkNonRoot();
     void checkName();
@@ -160,6 +162,7 @@ class ItemConfig
     std::string dir;
     std::string parent_dir;
     bool is_root;
+    bool deprecated;
 
     // Information used during validation
     std::string buildfile;

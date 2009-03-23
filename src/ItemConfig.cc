@@ -69,10 +69,13 @@ void ItemConfig::initializeStatics(CompatLevel const& compat_level)
     }
 
     // 1.0 keys
-    valid_keys[k_THIS] = "";
-    valid_keys[k_PARENT] = "";
-    valid_keys[k_EXTERNAL] = "";
-    valid_keys[k_DELETED] = "";
+    if (compat_level.allow_1_0())
+    {
+	valid_keys[k_THIS] = "";
+	valid_keys[k_PARENT] = "";
+	valid_keys[k_EXTERNAL] = "";
+	valid_keys[k_DELETED] = "";
+    }
 
     valid_keys[k_NAME] = "";
     valid_keys[k_TREENAME] = "";
@@ -142,21 +145,9 @@ ItemConfig::validate()
     }
     detectRoot();
 
-    this->name = this->kv.getVal(k_THIS);
-    if (this->name.empty())
-    {
-	checkUnnamed();
-    }
-    else
-    {
-	checkName();
-    }
-
-    if (! this->is_root)
-    {
-	checkNonRoot();
-    }
-
+    checkDeprecated();
+    checkName();
+    checkNonRoot();
     checkParent();
     checkChildren();
     checkBuildAlso();
@@ -270,6 +261,44 @@ ItemConfig::detectRoot()
 }
 
 void
+ItemConfig::checkDeprecated()
+{
+    std::set<std::string> const& ek = this->kv.getExplicitKeys();
+    if (this->is_root && (! ek.count(k_TREENAME)))
+    {
+	QTC::TC("abuild", "ItemConfig root without tree-name");
+	this->deprecated = true;
+    }
+    if (ek.count(k_THIS))
+    {
+	QTC::TC("abuild", "ItemConfig has this");
+	this->deprecated = true;
+    }
+    if (ek.count(k_PARENT))
+    {
+	QTC::TC("abuild", "ItemConfig has parent-dir");
+	this->deprecated = true;
+    }
+    if (ek.count(k_EXTERNAL))
+    {
+	QTC::TC("abuild", "ItemConfig has external-dirs");
+	this->deprecated = true;
+    }
+    if (ek.count(k_DELETED))
+    {
+	QTC::TC("abuild", "ItemConfig has deleted");
+	this->deprecated = true;
+    }
+
+    if (this->deprecated && (! this->compat_level.allow_1_0()))
+    {
+	throw QEXC::Internal(
+	    std::string(this->location) +
+	    ": deprecated is true but we're not in 1.0-compatibility mode");
+    }
+}
+
+void
 ItemConfig::checkUnnamed()
 {
     std::string msg = "is not permitted for unnamed build items";
@@ -299,19 +328,27 @@ ItemConfig::checkUnnamed()
 void
 ItemConfig::checkNonRoot()
 {
+    if (this->is_root)
+    {
+	return;
+    }
+
     std::string msg = "may only appear in a root build item";
 
-    if (checkKeyPresent(k_EXTERNAL, msg))
+    if (this->compat_level.allow_1_0())
     {
-	QTC::TC("abuild", "ItemConfig ERR external on non-root");
+	if (checkKeyPresent(k_EXTERNAL, msg))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR external on non-root");
+	}
+	if (checkKeyPresent(k_DELETED, msg))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR deleted on non-root");
+	}
     }
     if (checkKeyPresent(k_SUPPORTED_TRAITS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR supported-traits on non-root");
-    }
-    if (checkKeyPresent(k_DELETED, msg))
-    {
-	QTC::TC("abuild", "ItemConfig ERR deleted on non-root");
     }
     if (checkKeyPresent(k_PLUGINS, msg))
     {
@@ -329,7 +366,27 @@ ItemConfig::checkNonRoot()
 void
 ItemConfig::checkName()
 {
-    if (! validName(this->name, "build item names"))
+    this->name = this->kv.getVal(k_NAME);
+    if (this->compat_level.allow_1_0())
+    {
+	if (this->kv.getExplicitKeys().count(k_THIS))
+	{
+	    if (this->kv.getExplicitKeys().count(k_NAME))
+	    {
+		QTC::TC("abuild", "ItemConfig ERR this and name");
+		this->error.error(this->location,
+				  "\"" + k_THIS + "\" and \"" +
+				  k_NAME + "\" may not appear in the same " +
+				  FILE_CONF + " file");
+	    }
+	    this->name = this->kv.getVal(k_THIS);
+	}
+    }
+    if (this->name.empty())
+    {
+	checkUnnamed();
+    }
+    else if (! validName(this->name, "build item names"))
     {
 	QTC::TC("abuild", "ItemConfig ERR build item invalid name");
     }
@@ -338,6 +395,11 @@ ItemConfig::checkName()
 void
 ItemConfig::checkParent()
 {
+    if (! this->compat_level.allow_1_0())
+    {
+	return;
+    }
+
     std::string parent_key = this->kv.getVal(k_PARENT);
     if (parent_key.empty())
     {
@@ -697,9 +759,11 @@ ItemConfig::checkPlatforms()
 void
 ItemConfig::checkExternals()
 {
-    // For now, don't provide any mechanism to allow spaces in
-    // winpath.  Even if we did, it probably wouldn't work right with
-    // make.  People can always use the short forms of the paths.
+    if (! this->compat_level.allow_1_0())
+    {
+	return;
+    }
+
     boost::regex winpath_re("-winpath=(\\S+)");
     boost::smatch match;
 
@@ -829,6 +893,11 @@ ItemConfig::checkTraits()
 void
 ItemConfig::checkDeleted()
 {
+    if (! this->compat_level.allow_1_0())
+    {
+	return;
+    }
+
     std::list<std::string> o_deleted =
 	Util::splitBySpace(this->kv.getVal(k_DELETED));
     if (checkDuplicates(o_deleted, this->deleted, "deleted item"))
@@ -971,7 +1040,8 @@ ItemConfig::ItemConfig(
     kv(kv),
     dir(dir),
     parent_dir(parent_dir),
-    is_root(false)
+    is_root(false),
+    deprecated(false)
 {
 }
 
@@ -997,6 +1067,12 @@ ItemConfig::isCandidateForestRoot() const
     {
 	return false;
     }
+}
+
+bool
+ItemConfig::usesDeprecatedFeatures() const
+{
+    return this->deprecated;
 }
 
 std::string const&

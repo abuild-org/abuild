@@ -259,3 +259,9 @@ ItemConfig ERR absolute external 0
 ItemConfig found root searching for parent 0
 ItemConfig skipping dir in parent search 0
 ItemConfig ERR Abuild.backing at non-root 0
+ItemConfig ERR this and name 0
+ItemConfig root without tree-name 0
+ItemConfig has parent-dir 0
+ItemConfig has external-dirs 0
+ItemConfig has this 0
+ItemConfig has deleted 0
