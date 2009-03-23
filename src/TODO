@@ -25,6 +25,10 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
+ * Documentation for new features (other than groovy framework) is
+   being placed in src/manual/pending.txt until it is integrated into
+   the documentation.
+
  * NON-COMPATIBLE CHANGES TO EXTERNALS:
 
     - -winpath is no longer a valid option to external-dirs.
@@ -223,7 +227,7 @@ Core Changes
 Documentation
 =============
 
- * Incorporate manual/groovy-framework.txt
+ * Incorporate manual/groovy-framework.txt and manual/pending.txt.
 
  * Read through all 1.1 release notes and update the body of the
    documentation accordingly.  Save this until all the new features
@@ -954,8 +958,8 @@ points to the user to abuild --upgrade-trees.  Something like
   The build tree whose root build item is located at X uses deprecated
   features.  When you are ready to upgrade this build tree, you can
   use "abuild --upgrade-trees" to do most of the work.  Please see the
-  section in the abuild user's manual entitled "Upgrading Build Trees"
-  for details.
+  section in the abuild user's manual entitled "Upgrading Build Trees
+  from 1.0 to 1.1" for details.
 
 The build_tree structure changes a bit.  Rather than having a single
 list for each tree, we'll have a single list for the forest.  This is
@@ -1102,7 +1106,8 @@ Other issues to work in:
    to generate an explicit backing area chain for each root and check
    it iteratively.  Need to figure out the exact behavior of
    Abuild.backing files with respect to hybrid 1.0/1.1 trees, if this
-   is not already discussed above.
+   is not already discussed above.  Upgrading should not support the
+   case of a build tree and its backing area being in the same forest.
 
  * If we have externals that fall outside of the forest or in a pruned
    area (i.e., we can find the directory, but it is not one we know

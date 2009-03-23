@@ -3,42 +3,53 @@
 #include <Abuild.hh>
 
 #include <assert.h>
-#include <fstream>
-#include <algorithm>
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
 #include <ItemConfig.hh>
+#include <UpgradeData.hh>
 
 bool
 Abuild::upgradeTrees()
 {
+    // Creating UpgradeData object reads the upgrade configuration file.
+    UpgradeData ud(this->error_handler);
+    exitIfErrors();
+
     info("searching for build items...");
-    std::map<std::string, bool> item_dirs;
-    findItems(item_dirs);
-
-    info("discovering relationships among trees...");
-
-    DependencyGraph root_graph;
-    constructTreeGraph(item_dirs, root_graph);
-
-    // Do identification and output of islands before exiting if
-    // errors.  This information can be helpful for people resolving
-    // errors, and it will also make it possible to use output from
-    // this program as part of manual conversion of error cases in
-    // abuild's test suite.
-
-    info("identifying groups of independent build trees...");
-    std::vector<DependencyGraph::ItemList> const& sets =
-	root_graph.getIndependentSets();
-    for (unsigned int i = 0; i < sets.size(); ++i)
+    ud.scan();
+    if (! ud.upgradeRequired())
     {
-	info("set number " + Util::intToString(i));
-	for (DependencyGraph::ItemList::const_iterator i2 = sets[i].begin();
-	     i2 != sets[i].end(); ++i2)
-	{
-	    info("  " + *i2);
-	}
+	QTC::TC("abuild", "Abuild-upgrade upgrade not required");
+	info("this forest is already up to date; no upgrade is required");
+	return true;
+    }
+
+    info("analyzing...");
+    DependencyGraph root_graph;
+    constructTreeGraph(ud, root_graph);
+    std::vector<DependencyGraph::ItemList> const& forests =
+	root_graph.getIndependentSets();
+
+    // XXX remember to make sure that everything in do_not_upgrade
+    // appears in external-dirs but is not a key in item_dirs
+
+    // XXX remember to validate tree names and to make sure they are
+    // unique within a forest
+
+    // XXX check all upgrade conditions
+
+    // XXX Only write if not doing an upgrade
+    info("writing upgrade data file...");
+    ud.writeUpgradeData(forests);
+
+    if (this->error_handler.anyErrors())
+    {
+	info("upgrade data has been written to " +
+	     UpgradeData::FILE_UPGRADE_DATA);
+	info("please edit that file and rerun; for details, see"
+	     " \"Upgrading Build Trees from 1.0 to 1.1\""
+	     " in the user's manual");
     }
 
     exitIfErrors();
@@ -47,54 +58,12 @@ Abuild::upgradeTrees()
 }
 
 void
-Abuild::findItems(std::map<std::string, bool>& item_dirs)
+Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 {
-    std::list<std::string> dirs;
-    dirs.push_back(".");
-    while (! dirs.empty())
-    {
-	std::string dir = dirs.front();
-	dirs.pop_front();
+    std::map<std::string, bool> const& item_dirs = ud.getItemDirs();
 
-	// XXX support pruning
-
-	if (Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
-	{
-	    // XXX deprecation should be disabled
-	    ItemConfig* config = readConfig(dir, "");
-	    item_dirs[dir] = config->isTreeRoot();
-	}
-
-	std::vector<std::string> entries = Util::getDirEntries(dir);
-	std::sort(entries.begin(), entries.end());
-	for (std::vector<std::string>::iterator iter = entries.begin();
-	     iter != entries.end(); ++iter)
-	{
-	    std::string const& entry = *iter;
-	    if ((entry == ".") || (entry == ".."))
-	    {
-		continue;
-	    }
-	    std::string fullpath;
-	    if (dir != ".")
-	    {
-		fullpath += dir + "/";
-	    }
-	    fullpath += entry;
-	    if (Util::isDirectory(fullpath))
-	    {
-		dirs.push_back(fullpath);
-	    }
-	}
-    }
-}
-
-void
-Abuild::constructTreeGraph(std::map<std::string, bool> const& item_dirs,
-			   DependencyGraph& g)
-{
     // XXX currently handles only 1.0 logic...
-    // XXX deal with backing areas...
+
     for (std::map<std::string, bool>::const_iterator iter = item_dirs.begin();
 	 iter != item_dirs.end(); ++iter)
     {
@@ -107,6 +76,34 @@ Abuild::constructTreeGraph(std::map<std::string, bool> const& item_dirs,
 	g.addItem(dir);
 	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
 	ItemConfig* config = readConfig(dir, "");
+
+	bool bad_backing = false;
+	std::list<std::string> backing_chain = getBackingChain(dir);
+	for (std::list<std::string>::iterator biter = backing_chain.begin();
+	     biter != backing_chain.end(); ++biter)
+	{
+	    std::string rel_backing = Util::absToRel(*biter);
+	    if (! ((rel_backing == "..") ||
+		   ((rel_backing.length() > 2) &&
+		    (rel_backing.substr(0, 3) == "../"))))
+	    {
+		error(FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
+		      "Part of this item's backing area chain falls under"
+		      " the current directory.  You must either rerun " +
+		      this->whoami + " from a lower directory or exclude" +
+		      " the backing area.  Ignoring the backing chain;"
+		      " expect spurious errors");
+		bad_backing = true;
+		break;
+	    }
+	}
+	if (bad_backing)
+	{
+	    backing_chain.clear();
+	}
+
+	// XXX deal with backing areas
+
 	std::list<ExternalData> const& externals = config->getExternals();
 	for (std::list<ExternalData>::const_iterator eiter = externals.begin();
 	     eiter != externals.end(); ++eiter)

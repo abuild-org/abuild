@@ -17,6 +17,7 @@
 #include <ExternalData.hh>
 #include <TraitData.hh>
 #include <PlatformSelector.hh>
+#include <BackingFile.hh>
 
 class Error;
 class CompatLevel;
@@ -41,7 +42,6 @@ class ItemConfig
 				  std::string const& parent_dir);
 
     static std::string const FILE_CONF;
-    static std::string const FILE_BACKING;
     static std::string const FILE_INTERFACE;
 
     // configuration file keys
@@ -90,14 +90,14 @@ class ItemConfig
     std::list<std::string> const& getPlugins() const;
 
   private:
+    ItemConfig(ItemConfig const&);
+    ItemConfig& operator=(ItemConfig const&);
+
     // deprecated configuration file keys
     static std::string const k_THIS;
     static std::string const k_PARENT;
     static std::string const k_EXTERNAL;
     static std::string const k_DELETED;
-
-    ItemConfig(ItemConfig const&);
-    ItemConfig& operator=(ItemConfig const&);
 
     static std::string const FILE_MK;
     static std::string const FILE_ANT;

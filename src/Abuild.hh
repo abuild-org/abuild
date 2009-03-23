@@ -21,6 +21,7 @@
 class Logger;
 class ItemConfig;
 class InterfaceParser;
+class UpgradeData;
 
 class Abuild
 {
@@ -100,6 +101,7 @@ class Abuild
     void computeBuildablePlatforms(BuildTree& tree_data,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
+    std::list<std::string> getBackingChain(std::string const& dir);
     void readBacking(std::string const& dir,
 		     std::string& backing_area);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
@@ -196,9 +198,7 @@ class Abuild
 
     // methods in Abuild-upgrade.cc
     bool upgradeTrees();
-    void findItems(std::map<std::string, bool>& item_dirs);
-    void constructTreeGraph(std::map<std::string, bool> const& item_dirs,
-			    DependencyGraph& g);
+    void constructTreeGraph(UpgradeData&, DependencyGraph& g);
 
     static std::string const ABUILD_VERSION;
     static std::string const OUTPUT_DIR_PREFIX;

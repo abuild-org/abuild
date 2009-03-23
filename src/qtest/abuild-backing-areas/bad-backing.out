@@ -1,1 +1,2 @@
-abuild: ERROR: --topdir--/bad/2/common/Abuild.backing: invalid syntax
+--topdir--/bad/2/common/Abuild.backing: ERROR: invalid syntax
+abuild: ERROR: --topdir--/bad/2/common/Abuild.backing: unable to get backing area data

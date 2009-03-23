@@ -1666,6 +1666,35 @@
   </build-tree>
   <build-tree
    id="bt-18"
+   absolute-path="--topdir--/1.0/forest2/PLUGINS/plugins"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <backing-area build-tree="bt-1"/>
+   <build-item
+    name="rules"
+    home-tree="bt-1"
+    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+    backing-depth="1"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="1"
+   />
+  </build-tree>
+  <build-tree
+   id="bt-19"
    absolute-path="--topdir--/1.0/forest2/C3/proj/c3/ifc"
   >
    <platform-data>
@@ -1681,13 +1710,13 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
-   <external build-tree="bt-1"/>
+   <external build-tree="bt-18"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
    <build-item
     name="c3"
-    home-tree="bt-18"
+    home-tree="bt-19"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/ifc"
     backing-depth="0"
     external-depth="0"
@@ -1706,7 +1735,7 @@
     name="rules"
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
+    backing-depth="1"
     external-depth="1"
     target-type="all"
     is-plugin="1"
@@ -1714,7 +1743,7 @@
    />
   </build-tree>
   <build-tree
-   id="bt-19"
+   id="bt-20"
    absolute-path="--topdir--/1.0/forest2/C3/proj/c3"
   >
    <platform-data>
@@ -1730,10 +1759,10 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
-   <external build-tree="bt-18"/>
+   <external build-tree="bt-19"/>
    <build-item
     name="c3"
-    home-tree="bt-18"
+    home-tree="bt-19"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/ifc"
     backing-depth="0"
     external-depth="1"
@@ -1752,7 +1781,7 @@
     name="rules"
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
+    backing-depth="1"
     external-depth="2"
     target-type="all"
     is-plugin="0"
@@ -1760,7 +1789,7 @@
    />
   </build-tree>
   <build-tree
-   id="bt-20"
+   id="bt-21"
    absolute-path="--topdir--/1.0/forest2/C3/proj/c3/impl"
   >
    <platform-data>
@@ -1776,13 +1805,13 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
-   <external build-tree="bt-19"/>
+   <external build-tree="bt-20"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
    <build-item
     name="c3"
-    home-tree="bt-18"
+    home-tree="bt-19"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/ifc"
     backing-depth="0"
     external-depth="2"
@@ -1799,7 +1828,7 @@
    </build-item>
    <build-item
     name="c3-a"
-    home-tree="bt-20"
+    home-tree="bt-21"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/impl/a"
     backing-depth="0"
     external-depth="0"
@@ -1822,7 +1851,7 @@
    </build-item>
    <build-item
     name="c3-b"
-    home-tree="bt-20"
+    home-tree="bt-21"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/impl/b"
     backing-depth="0"
     external-depth="0"
@@ -1847,7 +1876,7 @@
     name="rules"
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
+    backing-depth="1"
     external-depth="3"
     target-type="all"
     is-plugin="1"
@@ -1855,7 +1884,7 @@
    />
   </build-tree>
   <build-tree
-   id="bt-21"
+   id="bt-22"
    absolute-path="--topdir--/1.0/forest2/C3/proj/tests/int"
   >
    <platform-data>
@@ -1874,7 +1903,7 @@
    <backing-area build-tree="bt-13"/>
    <external build-tree="bt-15"/>
    <external build-tree="bt-17"/>
-   <external build-tree="bt-20"/>
+   <external build-tree="bt-21"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
@@ -2048,7 +2077,7 @@
    </build-item>
    <build-item
     name="c3"
-    home-tree="bt-18"
+    home-tree="bt-19"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/ifc"
     backing-depth="0"
     external-depth="3"
@@ -2065,7 +2094,7 @@
    </build-item>
    <build-item
     name="c3-a"
-    home-tree="bt-20"
+    home-tree="bt-21"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/impl/a"
     backing-depth="0"
     external-depth="1"
@@ -2088,7 +2117,7 @@
    </build-item>
    <build-item
     name="c3-b"
-    home-tree="bt-20"
+    home-tree="bt-21"
     absolute-path="--topdir--/1.0/forest2/C3/proj/c3/impl/b"
     backing-depth="0"
     external-depth="1"
@@ -2128,7 +2157,7 @@
    </build-item>
    <build-item
     name="proj-int"
-    home-tree="bt-21"
+    home-tree="bt-22"
     absolute-path="--topdir--/1.0/forest2/C3/proj/tests/int"
     backing-depth="0"
     external-depth="0"

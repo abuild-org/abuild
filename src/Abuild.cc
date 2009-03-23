@@ -13,6 +13,7 @@
 #include <Logger.hh>
 #include <FileLocation.hh>
 #include <ItemConfig.hh>
+#include <BackingFile.hh>
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
@@ -1154,7 +1155,7 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
         }
     }
 
-    std::string top_backing = top_path + "/" + ItemConfig::FILE_BACKING;
+    std::string top_backing = top_path + "/" + BackingFile::FILE_BACKING;
     if (Util::isFile(top_backing))
     {
 	readBacking(top_path, backing_area);
@@ -2524,41 +2525,47 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
     }
 }
 
+std::list<std::string>
+Abuild::getBackingChain(std::string const& dir)
+{
+    // XXX this may not be in the right place...
+    std::list<std::string> result;
+
+    std::set<std::string> seen;
+    std::string path = dir;
+    while (Util::isFile(path + "/" + BackingFile::FILE_BACKING))
+    {
+	if (seen.count(path))
+	{
+	    QTC::TC("abuild", "Abuild getBackingChain loop");
+	    fatal("loop detected reading " +
+		  dir + "/" + BackingFile::FILE_BACKING);
+	}
+	else
+	{
+	    seen.insert(path);
+	}
+	std::string backing_area;
+	readBacking(path, backing_area);
+	result.push_back(backing_area);
+	path = backing_area;
+    }
+
+    return result;
+}
+
 void
 Abuild::readBacking(std::string const& dir,
 		    std::string& backing_area)
 {
-    std::string file = dir + "/" + ItemConfig::FILE_BACKING;
-    std::list<std::string> lines = Util::readLinesFromFile(file);
-
-    { // local scope
-	// Remove comments and blank lines
-	std::list<std::string>::iterator iter = lines.begin();
-	while (iter != lines.end())
-	{
-	    std::list<std::string>::iterator next = iter;
-	    ++next;
-	    if (((*iter).length() == 0) || ((*iter)[0] == '#'))
-	    {
-		lines.erase(iter, next);
-	    }
-	    iter = next;
-	}
-    }
-
-    if (lines.size() == 1)
-    {
-	backing_area = lines.front();
-	if (! Util::isAbsolutePath(backing_area))
-	{
-	    backing_area = dir + "/" + backing_area;
-	}
-	backing_area = Util::canonicalizePath(backing_area);
-    }
-    else
+    BackingFile* bf = BackingFile::readBacking(
+	this->error_handler, this->compat_level, dir);
+    backing_area = bf->getBackingArea();
+    if (backing_area.empty())
     {
         QTC::TC("abuild", "Abuild ERR invalid backing file");
-        fatal(file + ": invalid syntax");
+        fatal(dir + "/" + BackingFile::FILE_BACKING +
+	      ": unable to get backing area data");
     }
 }
 

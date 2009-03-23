@@ -1,0 +1,164 @@
+
+This file contains fragments of documentation to be integrated into
+the manual.
+
+----------------------------------------------------------------------
+
+Upgrading Build Trees from 1.0 to 1.1
+=====================================
+
+Abuild can help you with the process of upgrading your build trees
+from 1.0 format to 1.1 format.  This chapter describes how to use
+abuild to help you perform these updates.
+
+Outline
+-------
+
+Here is an outline of the basic process:
+
+ * cd to a directory that is above all your build trees and that you
+   wish to use as the new "forest root".
+
+ * run "abuild --upgrade-trees"
+
+ * abuild --upgrade-trees will analyze all Abuild.conf files and
+   generate a file called "abuild.upgrade-data" that you will have to
+   edit.  Edit the file as described in this document.
+
+ * Rerun "abuild --upgrade-trees".  Once abuild has all the
+   information it needs, it will perform the upgrade by rewriting any
+   Abuild.conf that needs to be rewritten.  The original file will be
+   renamed to Abuild-1.0.conf.  When you are satisfied with the
+   upgrade, you can delete the Abuild-1.0.conf files, as those files
+   are not used by abuild under any circumstances.
+
+
+Information You Will Need
+-------------------------
+
+Among the most significant changes to abuild for version 1.1 is the
+requirement that all build trees have names.  In order for abuild to
+upgrade your trees from version 1.0 to version 1.1, it will need to
+know what name you wish to assign to all your build trees.  You will
+use the "abuild.upgrade-data" file to provide this information to
+abuild.  Once it has all the required information, abuild will insert
+the "tree-name" key into the root Abuild.conf file of every tree, and
+it will replace any "external-dirs" keys with "tree-deps" keys.  It
+will also remove "parent-dir" keys, replace "this" with "name",
+upgrade "Abuild.backing" files, and move any occurrences of "deleted"
+from root "Abuild.conf" files into the forest-wide "Abuild.backing"
+file.
+
+The "abuild.upgrade-data" File Format
+-------------------------------------
+
+XXX HERE
+
+QUICK START
+
+ * For each directory whose contents you wish to (recursively) ignore,
+   place the directory in the [ignored-directories] section.  Place
+   one directory per line, and specify directories relative to the one
+   containing this file.
+
+ * For each detected build tree root below, replace '***' with the
+   name you intend to give the tree.
+
+ * Rerun abuild --upgrade-data
+
+DETAILS
+
+This is a configuration file used to assist abuild --upgrade-trees.
+The main body of the file begins after the line containing the word
+"BEGIN" on a line by itself.  Everything prior to that point is
+documentation on how to use this file.  There is no comment syntax in
+this file.  (XXX Yes there is, but comments aren't preserved.)  When
+abuild --upgrade-trees is run, it will rewrite this file.  It will
+preserve any information that has been filled in, but it will not
+otherwise preserve format or layout.
+
+This file is divided into sections.  Each section is opened with a
+line of the form
+
+[section-name]
+
+where "section-name" is replaced by one of the valid section names.
+
+The "abuild --upgrade-trees" command recursively scans the current
+directory looking for Abuild.conf files.  It reads every Abuild.conf
+file that it can find and analyzes them to determine what build trees
+are available.  Based on the relationships it detects among the build
+trees by looking at each tree's external-dirs entry, it creates a list
+of possible forests.  Each forest is a group of build trees that refer
+to each other in some way.  The list of forests is generated such that
+no tree in one forest refers to any tree in another forest through any
+of its items' Abuild.conf files.  In other words, all forests are
+expected to be completely independent.  There are several cases in
+which you might have multiple forests.  Normal cases could include
+self-contained groups of build trees inside of test suites or abuild
+setups to build third-party packages or other external software.
+There may also be erroneous cases resulting from stray Abuild.conf
+files that are not connected to the rest of the trees.  You should
+examine the list of forests carefully to determine whether there are
+stray files that you wish to remove.
+
+If there are directories below the current directory that you wish to
+ignore during the conversion process, list them in the
+[ignored-directories] section as described in "QUICK START" above.
+
+In each forest that abuild discovers, it will require a name for each
+tree.  If the tree already has a name, that name will appear filled in
+below.  Otherwise, the place-holder '***' will appear.
+
+In some cases, there may be a tree that you are not ready to upgrade,
+perhaps because that tree is still being used by a project that hasn't
+yet upgraded its version of abuild.  In that case, you may list the
+path to the root of the tree, again relative to the current directory,
+in the [do-not-upgrade] section.  You must also remove it from the
+forest in which it appeared.  You may also place paths to trees that
+are either inside ignored directories or are located outside of the
+current directory in [do-not-upgrade].
+
+Abuild is able to perform the actual upgrade when all of the following
+conditions are met:
+
+ * Abuild is able to parse all Abuild.conf files at or below the
+   current directory, excluding any ignored directories, without
+   finding any errors.
+
+ * Every external-dirs entry exists (or can be resolved through a
+   backing area).
+
+ * Every tree root listed in a given [forest] section has a name
+   assigned to it.
+
+ * Every tree that abuild finds during its scan as well as every
+   external-dirs entry referenced by those trees appears either in a
+   [forest] section or in the [do-not-upgrade].
+
+When abuild performs the upgrade, it does the following 
+
+
+XXXX
+
+
+
+BEGIN
+
+[ignored-directories]
+
+[do-not-upgrade]
+
+[forest]
+path: name
+...
+
+[forest]
+path: name
+...
+
+[orphan-names]
+# for previous names that no longer fit anywhere
+path: name
+
+----

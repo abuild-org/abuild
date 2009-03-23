@@ -10,7 +10,6 @@
 #include <CompatLevel.hh>
 
 std::string const ItemConfig::FILE_CONF = "Abuild.conf";
-std::string const ItemConfig::FILE_BACKING = "Abuild.backing";
 std::string const ItemConfig::FILE_MK = "Abuild.mk";
 std::string const ItemConfig::FILE_INTERFACE = "Abuild.interface";
 std::string const ItemConfig::FILE_ANT = "Abuild-ant.properties";
@@ -354,12 +353,13 @@ ItemConfig::checkNonRoot()
     {
 	QTC::TC("abuild", "ItemConfig ERR plugins on non-root");
     }
-    if (Util::isFile(this->dir + "/" + FILE_BACKING))
+    if (Util::isFile(this->dir + "/" + BackingFile::FILE_BACKING))
     {
 	QTC::TC("abuild", "ItemConfig ERR Abuild.backing at non-root");
-	this->error.error(FileLocation(dir + "/" + FILE_BACKING, 0, 0),
-			  FILE_BACKING +
-			  " file ignored for non-root build item");
+	this->error.error(
+	    FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
+	    BackingFile::FILE_BACKING +
+	    " file ignored for non-root build item");
     }
 }
 

@@ -7,7 +7,7 @@ endif
 BOOST_LIB_SUFFIX ?=
 # MSVC doesn't require explicitly naming of boost libraries
 ifneq ($(CCXX_TOOLCHAIN), msvc)
-LIBS += $(foreach L,thread regex system date_time,boost_$(L)$(BOOST_LIB_SUFFIX))
+LIBS += $(foreach L,thread regex system filesystem date_time,boost_$(L)$(BOOST_LIB_SUFFIX))
 endif
 ifneq ($(ABUILD_PLATFORM_OS),windows)
 ifneq ($(ABUILD_PLATFORM_OS),darwin)
@@ -117,9 +117,11 @@ SRCS_bin_abuild := \
 	PlatformSelector.cc \
 	ExternalData.cc \
 	ItemConfig.cc \
+	BackingFile.cc \
 	BuildTree.cc \
 	BuildItem.cc \
 	JavaBuilder.cc \
+	UpgradeData.cc \
 	Abuild-upgrade.cc \
 	Abuild.cc \
 	abuild_main.cc

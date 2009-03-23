@@ -31,7 +31,7 @@ newer):
 
   * gnu make 3.81
 
-  * boost >= 1.35 thread, regex, system, and date_time libraries
+  * boost >= 1.35 thread, regex, system, filesystem, and date_time libraries
 
   * Java >= 1.5
 
