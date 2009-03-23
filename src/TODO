@@ -25,11 +25,14 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * NON-COMPATIBLE CHANGE: -winpath is no longer a valid option to
-   external-dirs.
+ * NON-COMPATIBLE CHANGES TO EXTERNALS:
 
- * NON-COMPATIBLE CHANGE: absolute path externals are no longer
-   supported.
+    - -winpath is no longer a valid option to external-dirs.
+
+    - absolute path externals are no longer supported.
+
+    - external-dirs may no longer be symbolic links nor may they cross
+      symbolic links.
 
  * Compatibility level can be set with the ABUILD_COMPAT_LEVEL
    environment variable in addition to the command line argument.  The
@@ -38,6 +41,11 @@ release notes.
  * Document somewhere that, when converting, abuild will be happier if
    you don't change this to name on trees whose roots don't have
    tree-name.
+
+ * Having a child-dirs entry be a symbolic link or cross a symbolic
+   link now results in an explicit error message.  This has never
+   really worked, but in the past, the result would most likely have
+   been something about a parent/child mismatch.
 
 
 Groovy Framework
@@ -661,10 +669,10 @@ more backing areas may be specified in a backing-areas keyword, as in
 Backing areas as searched in the order in which they appear, and in a
 depth-first fashion.  The normal integrity guarantee still applies.
 
-Disallow build item directories from being symbolic links.  When a
-symbolic link is detected, suggest for people to use a backing area
-instead.  This is more practical with support for multiple backing
-areas.
+[DONE] Disallow build item directories from being symbolic links.
+When a symbolic link is detected, suggest for people to use a backing
+area instead.  This is more practical with support for multiple
+backing areas.
 
 Traits, supported flags, and plugins behave with respect to subtrees
 in 1.1 just as they behaved with respect to externals in 1.0.  This
@@ -936,9 +944,6 @@ Here is the full traversal algorithm, including compatibility support.
   traverse local items by doing a depth-first traversal following
      child-dirs pointers and, if in compatibility mode, then following
      external-dirs pointers
-
-XXX Other things to work in: child-dirs and external-dirs should not
-be allowed to traverse symbolic links.
 
 XXX Deprecation warnings on old trees: detect if any build item in a
 tree uses deprecated features.  This includes both using deprecated

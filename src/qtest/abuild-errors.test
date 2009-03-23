@@ -237,6 +237,25 @@ $td->runtest("find root looking for top",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/symlink");
+
+if (! in_windows())
+{
+    symlink "target", "link" or die;
+    symlink "child.target", "child" or die;
+    symlink "ext.target", "ext" or die;
+    $td->runtest("symlink errors",
+		 {$td->COMMAND => "abuild",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/symlink-errors.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    system("(tar cf - . | cat > /dev/null)");
+}
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(26);
+$td->report(26 + (in_windows() ? 0 : 1));

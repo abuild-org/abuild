@@ -265,3 +265,5 @@ ItemConfig has parent-dir 0
 ItemConfig has external-dirs 0
 ItemConfig has this 0
 ItemConfig has deleted 0
+ItemConfig ERR external symlink 0
+ItemConfig ERR child symlink 0

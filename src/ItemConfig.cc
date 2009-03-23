@@ -482,7 +482,19 @@ ItemConfig::checkChildren()
 	}
 	else
 	{
-	    // XXX report error if child dir crosses a symbolic link.
+	    bool has_symlinks = false;
+	    if (hasSymlinks(*iter))
+	    {
+		// Coverage check is below
+		this->error.error(this->location,
+				  "child directory \"" + *iter + "\" is a"
+				  " symbolic link or crosses a symbolic link");
+		has_symlinks = true;
+	    }
+	    if ((! Util::osSupportsSymlinks()) || has_symlinks)
+	    {
+		QTC::TC("abuild", "ItemConfig ERR child symlink");
+	    }
 
 	    // Check for intervening Abuild.conf directories.  No need
 	    // to check for existence of child Abuild.conf.  It may
@@ -766,6 +778,7 @@ ItemConfig::checkExternals()
 
     boost::regex winpath_re("-winpath=(\\S+)");
     boost::smatch match;
+    bool any_symlinks = false;
 
     std::list<std::string> words =
 	Util::splitBySpace(this->kv.getVal(k_EXTERNAL));
@@ -803,10 +816,34 @@ ItemConfig::checkExternals()
 		this->location,
 		"absolute path externals are no longer supported");
 	}
+	else if (hasSymlinks(*iter))
+	{
+	    this->error.error(
+		this->location,
+		"external directory \"" + *iter + "\" is a symbolic link or"
+		" crosses a symbolic link");
+	    // Coverage check is below
+	    any_symlinks = true;
+	}
 	else
 	{
 	    this->externals.push_back(ExternalData(*iter, false));
 	}
+    }
+
+    if (any_symlinks)
+    {
+	this->error.error(
+	    this->location,
+	    "NOTE: Although external-dirs may no longer traverse symbolic "
+	    "links, abuild 1.1 supports use of multiple backing areas, so "
+	    "that solution may work for you instead.");
+    }
+
+    if ((! Util::osSupportsSymlinks()) || any_symlinks)
+    {
+	// avoid coverage failure on operating systems without symlinks
+	QTC::TC("abuild", "ItemConfig ERR external symlink");
     }
 }
 
@@ -1011,6 +1048,25 @@ ItemConfig::checkRelativePaths(std::list<std::string>& paths,
 	iter = next;
     }
     return error_found;
+}
+
+bool
+ItemConfig::hasSymlinks(std::string const& to_check)
+{
+
+    std::string path = this->dir;
+    std::list<std::string> elements = Util::split('/', to_check);
+    while (! elements.empty())
+    {
+	path += "/" + elements.front();
+	elements.pop_front();
+	if (Util::isSymlink(path))
+	{
+	    return true;
+	}
+    }
+
+    return false;
 }
 
 void

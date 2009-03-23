@@ -567,6 +567,33 @@ Util::isDirectory(std::string const& filename)
     return result;
 }
 
+bool
+Util::isSymlink(std::string const& filename)
+{
+    bool result = false;
+
+#ifndef _WIN32
+    struct stat statbuf;
+    if ((lstat(filename.c_str(), &statbuf) != -1) &&
+	(S_ISLNK(statbuf.st_mode)))
+    {
+	result = true;
+    }
+#endif
+
+    return result;
+}
+
+bool
+Util::osSupportsSymlinks()
+{
+#ifdef _WIN32
+    return false;
+#else
+    return true;
+#endif
+}
+
 std::string
 Util::getExtension(std::string const& path)
 {

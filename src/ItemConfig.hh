@@ -144,6 +144,7 @@ class ItemConfig
 			 std::string const& thing);
     bool checkRelativePaths(std::list<std::string>& paths,
 			    std::string const& description);
+    bool hasSymlinks(std::string const& path);
     void maybeSetBuildFile(std::string const& file, int& count);
 
     ItemConfig(Error&, CompatLevel const&, FileLocation const&,

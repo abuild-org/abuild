@@ -156,6 +156,10 @@ namespace Util
     // Is file a directory?
     bool isDirectory(std::string const& filename);
 
+    // Is file a symbolic link?
+    bool isSymlink(std::string const& filename);
+    bool osSupportsSymlinks();
+
     // Returns a relative path for abs_path that reaches it from dir.
     // If dir is the empty string, return a relative path from the
     // current directory.  Both abs_path and dir must be canonical
