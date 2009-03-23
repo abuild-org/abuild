@@ -1,0 +1,6 @@
+--topdir--/symlink/Abuild.conf: ERROR: child directory "child" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf: ERROR: child directory "link/child" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf: ERROR: external directory "ext" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf: ERROR: external directory "link/ext" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf: ERROR: NOTE: Although external-dirs may no longer traverse symbolic links, abuild 1.1 supports use of multiple backing areas, so that solution may work for you instead.
+abuild: ERROR: errors detected; exiting
