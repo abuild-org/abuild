@@ -120,6 +120,7 @@ SRCS_bin_abuild := \
 	BuildTree.cc \
 	BuildItem.cc \
 	JavaBuilder.cc \
+	Abuild-upgrade.cc \
 	Abuild.cc \
 	abuild_main.cc
 

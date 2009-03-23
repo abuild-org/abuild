@@ -44,7 +44,6 @@ class Abuild
             item_filter_t;
 
     bool runInternal();
-    bool upgradeTrees();
     void getThisPlatform();
     void parseArgv();
     std::string findConf();
@@ -194,6 +193,12 @@ class Abuild
     void error(std::string const& msg);
     void error(FileLocation const&, std::string const& msg);
     void fatal(std::string const& msg);
+
+    // methods in Abuild-upgrade.cc
+    bool upgradeTrees();
+    void findItems(std::map<std::string, bool>& item_dirs);
+    void constructTreeGraph(std::map<std::string, bool> const& item_dirs,
+			    DependencyGraph& g);
 
     static std::string const ABUILD_VERSION;
     static std::string const OUTPUT_DIR_PREFIX;
