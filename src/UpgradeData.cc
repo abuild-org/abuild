@@ -194,7 +194,8 @@ UpgradeData::scan()
 	    }
 	    if (! resolved.empty())
 	    {
-		// XXX but how are we going to get the config?
+		// XXX but how are we going to get the config?  This
+		// isn't quite right.
 		QTC::TC("abuild", "UpgradeData got root from backing");
 		this->item_dirs[dir] = true;
 	    }
