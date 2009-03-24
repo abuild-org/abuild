@@ -13,8 +13,8 @@
 std::string const UpgradeData::FILE_UPGRADE_DATA = "abuild.upgrade-data";
 
 UpgradeData::UpgradeData(Error& error) :
-    error(error),
-    upgrade_required(false)
+    upgrade_required(false),
+    error(error)
 {
     readUpgradeData();
 }
@@ -109,7 +109,7 @@ UpgradeData::readUpgradeData()
 	    {
 		std::string path = match.str(1);
 		std::string name = match.str(2);
-		if (name != "***")
+		if (name != "***") // XXX hard-coded ***
 		{
 		    // Don't check to make sure path is a directory.  When
 		    // an external is resolved to a backing area, we
@@ -136,96 +136,6 @@ UpgradeData::readUpgradeData()
 	{
 	    QTC::TC("abuild", "UpgradeData ERR expected section");
 	    this->error.error(location, "expected section marker");
-	}
-    }
-}
-
-void
-UpgradeData::scan()
-{
-    // XXX This code is broken for build trees with only backing and
-    // not conf.  Maybe we need a general version of readConfig that
-    // does this automatically...we'd have to check all readConfig
-    // calls here and in Abuild-upgrade.cc.  Or maybe we need to do
-    // the readConfig logic for externals here instead of
-    // Abuild-upgrade.cc.  Or maybe we need to cache the results of
-    // readConfig and not call it there.
-
-    CompatLevel cl(CompatLevel::cl_1_0);
-    std::list<std::string> dirs;
-    dirs.push_back(".");
-    while (! dirs.empty())
-    {
-	std::string dir = dirs.front();
-	dirs.pop_front();
-
-	if (this->ignored_directories.count(Util::canonicalizePath(dir)))
-	{
-	    continue;
-	}
-
-	if (Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
-	{
-	    ItemConfig* config = ItemConfig::readConfig(
-		this->error, cl, dir, "");
-	    this->item_dirs[dir] = config->isTreeRoot();
-	    if (config->usesDeprecatedFeatures())
-	    {
-		this->upgrade_required = true;
-	    }
-	}
-	else if (Util::isFile(dir + "/" + BackingFile::FILE_BACKING))
-	{
-	    QTC::TC("abuild", "UpgradeData backing without conf");
-	    std::list<std::string> backing_chain =
-		BackingFile::getBackingChain(this->error, cl, dir);
-
-	    // XXX more or less duplicated with code in
-	    // Abuild-upgrade.cc....search for "resolved".  Also
-	    // doesn't completely give us what we need, which is the
-	    // name of the tree in the backing area, if any.
-
-	    std::string resolved;
-	    for (std::list<std::string>::iterator biter =
-		     backing_chain.begin();
-		 biter != backing_chain.end(); ++biter)
-	    {
-		std::string candidate = *biter;
-		if (Util::isFile(candidate + "/" + ItemConfig::FILE_CONF))
-		{
-		    resolved = candidate;
-		    break;
-		}
-	    }
-	    if (! resolved.empty())
-	    {
-		// XXX but how are we going to get the config?  This
-		// isn't quite right.
-		QTC::TC("abuild", "UpgradeData got root from backing");
-		this->item_dirs[dir] = true;
-	    }
-	}
-
-	std::vector<std::string> entries = Util::getDirEntries(dir);
-	std::sort(entries.begin(), entries.end());
-	for (std::vector<std::string>::iterator iter = entries.begin();
-	     iter != entries.end(); ++iter)
-	{
-	    std::string const& entry = *iter;
-	    if ((entry == ".") || (entry == ".."))
-	    {
-		continue;
-	    }
-	    std::string fullpath;
-	    if (dir != ".")
-	    {
-		fullpath += dir + "/";
-	    }
-	    fullpath += entry;
-	    if (Util::isDirectory(fullpath))
-	    {
-		dirs.push_back(fullpath);
-	    }
 	}
     }
 }
@@ -282,7 +192,7 @@ UpgradeData::writeUpgradeData(
 	     i2 != trees.end(); ++i2)
 	{
 	    std::string const& path = *i2;
-	    std::string name = "***";
+	    std::string name = "***"; // XXX hard-coded ***
 	    if (names.count(path))
 	    {
 		name = names[path];
@@ -314,16 +224,4 @@ UpgradeData::writeUpgradeData(
 	boost::filesystem::remove(FILE_UPGRADE_DATA);
     }
     boost::filesystem::rename(newfile, FILE_UPGRADE_DATA);
-}
-
-std::map<std::string, bool> const&
-UpgradeData::getItemDirs() const
-{
-    return this->item_dirs;
-}
-
-bool
-UpgradeData::upgradeRequired() const
-{
-    return this->upgrade_required;
 }

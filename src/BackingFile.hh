@@ -16,11 +16,6 @@ class BackingFile
     static BackingFile* readBacking(Error& error_handler,
 				    CompatLevel const& compat_level,
 				    std::string const& dir);
-    static std::list<std::string>
-    getBackingChain(Error& error_handler,
-		    CompatLevel const& compat_level,
-		    std::string const& dir);
-
     static std::string const FILE_BACKING;
 
     std::string const& getBackingArea() const;

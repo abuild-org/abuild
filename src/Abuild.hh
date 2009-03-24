@@ -55,6 +55,8 @@ class Abuild
     bool readConfigs();
     ItemConfig* readConfig(std::string const& dir,
 			   std::string const& parent_dir);
+    ItemConfig* readPossiblyBackedConfig(std::string const& dir,
+					 std::string const& reldir = "");
     std::string findTop();
     void traverse(BuildTree_map&, std::string const& top_path,
 		  std::set<std::string>& visiting,
@@ -198,6 +200,7 @@ class Abuild
 
     // methods in Abuild-upgrade.cc
     bool upgradeTrees();
+    void findBuildItems(UpgradeData&);
     void constructTreeGraph(UpgradeData&, DependencyGraph& g);
 
     static std::string const ABUILD_VERSION;

@@ -17,8 +17,8 @@ Abuild::upgradeTrees()
     exitIfErrors();
 
     info("searching for build items...");
-    ud.scan();
-    if (! ud.upgradeRequired())
+    findBuildItems(ud);
+    if (! ud.upgrade_required)
     {
 	QTC::TC("abuild", "Abuild-upgrade upgrade not required");
 	info("this forest is already up to date; no upgrade is required");
@@ -58,17 +58,63 @@ Abuild::upgradeTrees()
 }
 
 void
+Abuild::findBuildItems(UpgradeData& ud)
+{
+    CompatLevel cl(CompatLevel::cl_1_0);
+    std::list<std::string> dirs;
+    dirs.push_back(".");
+    while (! dirs.empty())
+    {
+	std::string dir = dirs.front();
+	dirs.pop_front();
+
+	if (ud.ignored_directories.count(Util::canonicalizePath(dir)))
+	{
+	    continue;
+	}
+
+	ItemConfig* config = readPossiblyBackedConfig(dir);
+	if (config)
+	{
+	    ud.item_dirs[dir] = config->isTreeRoot();
+	    if (config->usesDeprecatedFeatures())
+	    {
+		ud.upgrade_required = true;
+	    }
+	}
+
+	std::vector<std::string> entries = Util::getDirEntries(dir);
+	std::sort(entries.begin(), entries.end());
+	for (std::vector<std::string>::iterator iter = entries.begin();
+	     iter != entries.end(); ++iter)
+	{
+	    std::string const& entry = *iter;
+	    if ((entry == ".") || (entry == ".."))
+	    {
+		continue;
+	    }
+	    std::string fullpath;
+	    if (dir != ".")
+	    {
+		fullpath += dir + "/";
+	    }
+	    fullpath += entry;
+	    if (Util::isDirectory(fullpath))
+	    {
+		dirs.push_back(fullpath);
+	    }
+	}
+    }
+}
+
+void
 Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 {
-    // XXX This code is broken for build trees with only backing and
-    // not conf.
-
-    std::map<std::string, bool> const& item_dirs = ud.getItemDirs();
-
     // XXX currently handles only 1.0 logic...
 
-    for (std::map<std::string, bool>::const_iterator iter = item_dirs.begin();
-	 iter != item_dirs.end(); ++iter)
+    for (std::map<std::string, bool>::const_iterator iter =
+	     ud.item_dirs.begin();
+	 iter != ud.item_dirs.end(); ++iter)
     {
 	std::string const& dir = (*iter).first;
 	bool is_root = (*iter).second;
@@ -77,6 +123,13 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    continue;
 	}
 	g.addItem(dir);
+	if (! Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
+	{
+	    // This is a tree root with Abuild.backing but no
+	    // Abuild.conf.
+	    QTC::TC("abuild", "Abuild-upgrade skipping root with no conf");
+	    continue;
+	}
 	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
 	ItemConfig* config = readConfig(dir, "");
 
@@ -86,9 +139,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	     biter != backing_chain.end(); ++biter)
 	{
 	    std::string rel_backing = Util::absToRel(*biter);
-	    if (! ((rel_backing == "..") ||
-		   ((rel_backing.length() > 2) &&
-		    (rel_backing.substr(0, 3) == "../"))))
+	    if (Util::isDirUnder(*biter))
 	    {
 		QTC::TC("abuild", "Abuild-upgrade ERR local backing chain");
 		error(FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
@@ -113,67 +164,62 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    std::string edecl = (*eiter).getDeclaredPath();
 	    std::string epath = Util::absToRel(
 		Util::canonicalizePath(dir + "/" + edecl));
-	    if (! Util::isFile(epath + "/" + ItemConfig::FILE_CONF))
+
+	    // XXX This logic is still wrong for externals that point
+	    // into pruned areas.
+
+	    if (ud.item_dirs.count(epath))
 	    {
-		// See if we can find the directory in the backing
-		// area chain.
-		std::string resolved;
-		for (std::list<std::string>::iterator biter =
-			 backing_chain.begin();
-		     biter != backing_chain.end(); ++biter)
+		if (! ud.item_dirs[epath])
 		{
-		    std::string candidate = *biter + "/" + edecl;
-		    if (Util::isFile(candidate + "/" + ItemConfig::FILE_CONF))
-		    {
-			resolved = candidate;
-			break;
-		    }
-		}
-		if (resolved.empty())
-		{
-		    QTC::TC("abuild", "Abuild-upgrade ERR external not found");
+		    QTC::TC("abuild", "Abuild-upgrade ERR external not root");
 		    error(location,
 			  "external " + edecl + " (" + epath +
-			  " relative to current directory)"
-			  " does not exist or is not a directory and can't"
-			  " be found in the backing area chain");
+			  " relative to current directory) is not"
+			  " a build tree root");
 		}
 		else
 		{
-		    /*ItemConfig* econfig =*/ readConfig(resolved, "");
-		    // XXX if econfig has a tree name, use it.
-		    // Otherwise, give a warning that the external
-		    // resolves to a backing area has not been
-		    // upgraded yet, and add it to the do-not-upgrade
-		    // list.  Create coverage cases for both.
-		}
-	    }
-	    else if (! (item_dirs.count(epath) &&
-			(*item_dirs.find(epath)).second))
-	    {
-		if (item_dirs.count(epath))
-		{
-		    error(location,
-			  "external " + edecl + " (" + epath +
-			  " relative to current directory) was not found"
-			  " as a root below the current directory");
-		}
-		else
-		{
-		    // XXX Here we probably want to preserve this
-		    // external as an external-dirs.  This could
-		    // happen if the external points up above the top
-		    // of the start directory or in a pruned area.
-		    // Maybe we want to handle those differently.  See
-		    // discussion in TODO.
-		    error(location,
-			  "XXX external " + edecl + " (" + epath +
-			  " relative to current directory) is unknown");
+		    // XXX good...get tree name, if any
+		    g.addDependency(dir, epath);
 		}
 	    }
 	    else
 	    {
-		g.addDependency(dir, epath);
+		ItemConfig* econfig = readPossiblyBackedConfig(dir, edecl);
+		if (econfig)
+		{
+		    // XXX We can't really tell whether this points
+		    // into a pruned area or came from a backing area.
+		    // readPossiblyBackedConfig needs to provide some
+		    // information.
+		    info("XXX resolved " + dir + "//" + edecl +
+			 " through a backing area");
+		    if (Util::isDirUnder(Util::canonicalizePath(epath)))
+		    {
+			QTC::TC("abuild", "Abuild-upgrade resolved local ext");
+			info("XXX declared location is under start dir");
+			// XXX get tree name.  Right now, this ends up
+			// in orphan-trees, which is not where it
+			// should be.
+			ud.tree_names[epath] = "***"; // XXX hard-coded ***
+		    }
+		    else
+		    {
+			QTC::TC("abuild", "Abuild-upgrade non-local ext");
+			// XXX Here we probably want to preserve this
+			// external as an external-dirs.  This could
+			// happen if the external points up above the
+			// top of the start directory or is in a
+			// pruned area.
+		    }
+		}
+		else
+		{
+		    error(location,
+			  "external " + edecl + " does not exist and cannot"
+			  " be resolved through a backing area");
+		}
 	    }
 	}
     }

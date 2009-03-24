@@ -450,6 +450,15 @@ Util::canonicalizePath(std::string path)
     return canonical;
 }
 
+bool
+Util::isDirUnder(std::string const& dir, std::string const& topdir)
+{
+    std::string rel = absToRel(dir, topdir);
+    return (! ((rel == "..") ||
+	       ((rel.length() > 2) &&
+		(rel.substr(0, 3) == "../"))));
+}
+
 std::string
 Util::dirname(std::string path)
 {

@@ -279,5 +279,9 @@ BackingFile ERR invalid backing file 0
 Abuild getBackingChain loop 0
 Abuild-upgrade ERR local backing chain 0
 Abuild-upgrade ERR external not found 0
-UpgradeData backing without conf 0
-UpgradeData got root from backing 0
+Abuild backing without conf 0
+Abuild got config from backing 0
+Abuild-upgrade skipping root with no conf 0
+Abuild-upgrade ERR external not root 0
+Abuild-upgrade resolved local ext 0
+Abuild-upgrade non-local ext 0

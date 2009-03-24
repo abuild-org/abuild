@@ -1059,6 +1059,45 @@ Abuild::readConfig(std::string const& dir, std::string const& parent_dir)
     return result;
 }
 
+ItemConfig*
+Abuild::readPossiblyBackedConfig(std::string const& dir,
+				 std::string const& reldir)
+{
+    ItemConfig* config = 0;
+    std::string relsuf;
+    if (! reldir.empty())
+    {
+	relsuf = "/" + reldir;
+    }
+    if (Util::isFile(dir + relsuf + "/" + ItemConfig::FILE_CONF))
+    {
+	config = readConfig(dir, "");
+    }
+    else
+    {
+	std::list<std::string> backing_chain = getBackingChain(dir);
+	std::string resolved;
+	for (std::list<std::string>::iterator biter = backing_chain.begin();
+	     biter != backing_chain.end(); ++biter)
+	{
+	    std::string candidate = *biter + relsuf;
+	    if (Util::isFile(candidate + "/" + ItemConfig::FILE_CONF))
+	    {
+		QTC::TC("abuild", "Abuild backing without conf");
+		resolved = candidate;
+		break;
+	    }
+	}
+	if (! resolved.empty())
+	{
+	    QTC::TC("abuild", "Abuild got config from backing");
+	    config = readConfig(resolved, "");
+	}
+    }
+
+    return config;		// might be 0
+}
+
 std::string
 Abuild::findTop()
 {
@@ -2528,8 +2567,30 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
 std::list<std::string>
 Abuild::getBackingChain(std::string const& dir)
 {
-    return BackingFile::getBackingChain(
-	this->error_handler, this->compat_level, dir);
+    std::list<std::string> result;
+
+    std::set<std::string> seen;
+    std::string path = dir;
+    while (Util::isFile(path + "/" + BackingFile::FILE_BACKING))
+    {
+	if (seen.count(path))
+	{
+	    QTC::TC("abuild", "Abuild getBackingChain loop");
+	    fatal("loop detected reading " +
+		  dir + "/" + BackingFile::FILE_BACKING);
+	}
+	else
+	{
+	    seen.insert(path);
+	}
+
+	std::string backing_area;
+	readBacking(path, backing_area);
+	result.push_back(backing_area);
+	path = backing_area;
+    }
+
+    return result;
 }
 
 void

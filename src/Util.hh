@@ -100,6 +100,10 @@ namespace Util
     // it does not need to exist.
     std::string canonicalizePath(std::string path);
 
+    // Indicate whether "dir" is under "topdir".  If topdir is empty,
+    // the current directory is used.
+    bool isDirUnder(std::string const& dir, std::string const& topdir = "");
+
     // Return the directory name of the given path.  Just trucates
     // everything after the last / or \ character, or if there are
     // none, returns ".".
