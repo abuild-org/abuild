@@ -55,8 +55,8 @@ class Abuild
     bool readConfigs();
     ItemConfig* readConfig(std::string const& dir,
 			   std::string const& parent_dir);
-    ItemConfig* readPossiblyBackedConfig(std::string const& dir,
-					 std::string const& reldir = "");
+    ItemConfig* readExternalConfig(std::string const& dir,
+				   std::string const& external);
     std::string findTop();
     void traverse(BuildTree_map&, std::string const& top_path,
 		  std::set<std::string>& visiting,
@@ -103,7 +103,6 @@ class Abuild
     void computeBuildablePlatforms(BuildTree& tree_data,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
-    std::list<std::string> getBackingChain(std::string const& dir);
     void readBacking(std::string const& dir,
 		     std::string& backing_area);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,

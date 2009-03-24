@@ -17,6 +17,7 @@ class UpgradeData
 {
   public:
     static std::string const FILE_UPGRADE_DATA;
+    static std::string const PLACEHOLDER;
 
     UpgradeData(Error& error);
     void writeUpgradeData(
@@ -30,10 +31,13 @@ class UpgradeData
     std::set<std::string> ignored_directories;
     std::set<std::string> do_not_upgrade;
     std::map<std::string, std::string> tree_names;
+    std::map<std::string, std::list<std::string> > externals;
+    std::map<std::string, std::list<std::string> > tree_deps;
 
     // work data for abuild --upgrade-trees
     std::map<std::string, bool> item_dirs; // item_dir -> is_root
     bool upgrade_required;
+    bool missing_treenames;
 
   private:
     void readUpgradeData();

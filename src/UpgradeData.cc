@@ -11,9 +11,11 @@
 #include <algorithm>
 
 std::string const UpgradeData::FILE_UPGRADE_DATA = "abuild.upgrade-data";
+std::string const UpgradeData::PLACEHOLDER = "***";
 
 UpgradeData::UpgradeData(Error& error) :
     upgrade_required(false),
+    missing_treenames(false),
     error(error)
 {
     readUpgradeData();
@@ -30,7 +32,7 @@ UpgradeData::readUpgradeData()
     std::list<std::string> lines = Util::readLinesFromFile(FILE_UPGRADE_DATA);
 
     enum {
-	st_top, st_ignored_dirs, st_do_not_upgrade, st_names
+	st_top, st_ignored_dirs, st_names
     } state = st_top;
 
     boost::regex trim_re("\\s*(.*?)\\s*");
@@ -59,10 +61,6 @@ UpgradeData::readUpgradeData()
 	    {
 		state = st_ignored_dirs;
 	    }
-	    else if (section_name == "do-not-upgrade")
-	    {
-		state = st_do_not_upgrade;
-	    }
 	    else if ((section_name == "forest") ||
 		     (section_name == "orphan-trees"))
 	    {
@@ -89,41 +87,36 @@ UpgradeData::readUpgradeData()
 		    location, "path \"" + line + "\" is not a directory");
 	    }
 	}
-	else if (state == st_do_not_upgrade)
-	{
-	    if (Util::isDirectory(line))
-	    {
-		this->do_not_upgrade.insert(
-		    Util::canonicalizePath(line));
-	    }
-	    else
-	    {
-		QTC::TC("abuild", "UpgradeData ERR no upgrade not directory");
-		this->error.error(
-		    location, "path \"" + line + "\" is not a directory");
-	    }
-	}
 	else if (state == st_names)
 	{
 	    if (boost::regex_match(line, match, treename_re))
 	    {
 		std::string path = match.str(1);
 		std::string name = match.str(2);
-		if (name != "***") // XXX hard-coded ***
+		// Any trees with place holder names are dispensible
+		// because the user has not put any effort into naming
+		// them.
+		if (name != PLACEHOLDER)
 		{
-		    // Don't check to make sure path is a directory.  When
-		    // an external is resolved to a backing area, we
-		    // generate an entry to where that external would be
-		    // if it were local.
-		    if (this->tree_names.count(path))
+		    if (Util::isDirectory(path))
 		    {
-			QTC::TC("abuild", "UpgradeData ERR duplicate");
-			this->error.error(location, "duplicate name for"
-					  " path \"" + path + "\"");
+			if (this->tree_names.count(path))
+			{
+			    QTC::TC("abuild", "UpgradeData ERR duplicate");
+			    this->error.error(location, "duplicate name for"
+					      " path \"" + path + "\"");
+			}
+			else
+			{
+			    this->tree_names[path] = name;
+			}
 		    }
 		    else
 		    {
-			this->tree_names[path] = name;
+			QTC::TC("abuild", "UpgradeData ERR tree not directory");
+			this->error.error(
+			    location, "path \"" + path +
+			    "\" is not a directory");
 		    }
 		}
 	    }
@@ -163,23 +156,6 @@ UpgradeData::writeUpgradeData(
 	of << Util::absToRel(*iter) << std::endl;
     }
 
-    of << std::endl;
-
-    of << "[do-not-upgrade]" << std::endl;
-    of << "# List valid external-dirs that are not being converted here."
-       << std::endl
-       << "# Each entry here must be in some tree's external-dirs list"
-       << " and must not" << std::endl
-       << "# be found during the scan because it's either under an "
-       << "ignored location" << std::endl
-       << "# or not somewhere under the current directory." << std::endl;
-    for (std::set<std::string>::const_iterator iter =
-	     this->do_not_upgrade.begin();
-	 iter != this->do_not_upgrade.end(); ++iter)
-    {
-	of << Util::absToRel(*iter) << std::endl;
-    }
-
     std::map<std::string, std::string> names = this->tree_names;
     for (std::vector<std::list<std::string> >::const_iterator i1 =
 	     forests.begin();
@@ -192,11 +168,11 @@ UpgradeData::writeUpgradeData(
 	     i2 != trees.end(); ++i2)
 	{
 	    std::string const& path = *i2;
-	    std::string name = "***"; // XXX hard-coded ***
+	    std::string name = PLACEHOLDER;
 	    if (names.count(path))
 	    {
 		name = names[path];
-		names.erase(name);
+		names.erase(path);
 	    }
 	    of << path << ": " << name << std::endl;
 	}

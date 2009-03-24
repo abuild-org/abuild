@@ -146,6 +146,7 @@ ItemConfig::validate()
 
     checkDeprecated();
     checkName();
+    checkTreeName();
     checkNonRoot();
     checkParent();
     checkChildren();
@@ -361,6 +362,7 @@ ItemConfig::checkNonRoot()
 	    BackingFile::FILE_BACKING +
 	    " file ignored for non-root build item");
     }
+    // XXX other non-root keys
 }
 
 void
@@ -389,6 +391,19 @@ ItemConfig::checkName()
     else if (! validName(this->name, "build item names"))
     {
 	QTC::TC("abuild", "ItemConfig ERR build item invalid name");
+    }
+}
+
+void
+ItemConfig::checkTreeName()
+{
+    this->tree_name = this->kv.getVal(k_TREENAME);
+    if (! this->tree_name.empty())
+    {
+	if (! validName(this->tree_name, "build tree names"))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR build tree invalid name");
+	}
     }
 }
 
@@ -1141,6 +1156,12 @@ std::string const&
 ItemConfig::getName() const
 {
     return this->name;
+}
+
+std::string const&
+ItemConfig::getTreeName() const
+{
+    return this->tree_name;
 }
 
 std::string const&

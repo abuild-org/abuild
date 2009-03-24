@@ -67,6 +67,7 @@ class ItemConfig
     bool usesDeprecatedFeatures() const;
     std::string const& getParentDir() const;
     std::string const& getName() const;
+    std::string const& getTreeName() const;
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
     std::list<ExternalData> const& getExternals() const;
@@ -118,6 +119,7 @@ class ItemConfig
     void checkUnnamed();
     void checkNonRoot();
     void checkName();
+    void checkTreeName();
     void checkParent();
     void checkChildren();
     void checkBuildAlso();
@@ -176,6 +178,7 @@ class ItemConfig
     FlagData flag_data;
     std::string visible_to;
     std::set<std::string> platform_types;
+    std::string tree_name;
     std::list<ExternalData> externals;
     std::set<std::string> supported_flags;
     std::set<std::string> supported_traits;

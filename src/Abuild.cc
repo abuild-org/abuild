@@ -1060,38 +1060,58 @@ Abuild::readConfig(std::string const& dir, std::string const& parent_dir)
 }
 
 ItemConfig*
-Abuild::readPossiblyBackedConfig(std::string const& dir,
-				 std::string const& reldir)
+Abuild::readExternalConfig(std::string const& dir,
+			   std::string const& external)
 {
     ItemConfig* config = 0;
-    std::string relsuf;
-    if (! reldir.empty())
+    std::string suf;
+    if (! external.empty())
     {
-	relsuf = "/" + reldir;
+	suf = "/" + external;
     }
-    if (Util::isFile(dir + relsuf + "/" + ItemConfig::FILE_CONF))
+
+    std::set<std::string> seen;
+    std::string candidate = dir;
+
+    while ((! candidate.empty()) && (config == 0))
     {
-	config = readConfig(dir, "");
-    }
-    else
-    {
-	std::list<std::string> backing_chain = getBackingChain(dir);
-	std::string resolved;
-	for (std::list<std::string>::iterator biter = backing_chain.begin();
-	     biter != backing_chain.end(); ++biter)
+	if (seen.count(candidate))
 	{
-	    std::string candidate = *biter + relsuf;
-	    if (Util::isFile(candidate + "/" + ItemConfig::FILE_CONF))
-	    {
-		QTC::TC("abuild", "Abuild backing without conf");
-		resolved = candidate;
-		break;
-	    }
+	    QTC::TC("abuild", "Abuild ERR readExternalConfig loop");
+	    error("loop detected trying to find " + ItemConfig::FILE_CONF +
+		  " for \"" + external + "\" relative to \"" + dir + "\"");
+	    break;
 	}
-	if (! resolved.empty())
+	else
 	{
-	    QTC::TC("abuild", "Abuild got config from backing");
-	    config = readConfig(resolved, "");
+	    seen.insert(candidate);
+	}
+
+	if (Util::isDirectory(candidate + suf))
+	{
+	    // The external directory exists, so work relative to that
+	    // directory rather than our original one.  Don't worry
+	    // about adding candidate to "seen".  If there's a loop,
+	    // we'll catch it soon enough.
+	    candidate += suf;
+	    suf.clear();
+	}
+
+	if (Util::isFile(candidate + suf + "/" + ItemConfig::FILE_CONF))
+	{
+	    // Simple case: there's an actual Abuild.conf here.
+	    config = readConfig(dir + suf, "");
+	}
+	else if (Util::isFile(candidate + "/" + BackingFile::FILE_BACKING))
+	{
+	    // There's an Abuild.backing but no Abuild.conf.  Traverse
+	    // the backing chain.  If the external exists, we're
+	    // traversing its backing chain.  Otherwise, we're
+	    // traversing the original directory's backing chain.
+	    QTC::TC("abuild", "Abuild backing without conf");
+	    std::string backing_area;
+	    readBacking(candidate, backing_area);
+	    candidate = backing_area;
 	}
     }
 
@@ -2562,35 +2582,6 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
         }
         item.setBuildPlatforms(build_platforms);
     }
-}
-
-std::list<std::string>
-Abuild::getBackingChain(std::string const& dir)
-{
-    std::list<std::string> result;
-
-    std::set<std::string> seen;
-    std::string path = dir;
-    while (Util::isFile(path + "/" + BackingFile::FILE_BACKING))
-    {
-	if (seen.count(path))
-	{
-	    QTC::TC("abuild", "Abuild getBackingChain loop");
-	    fatal("loop detected reading " +
-		  dir + "/" + BackingFile::FILE_BACKING);
-	}
-	else
-	{
-	    seen.insert(path);
-	}
-
-	std::string backing_area;
-	readBacking(path, backing_area);
-	result.push_back(backing_area);
-	path = backing_area;
-    }
-
-    return result;
 }
 
 void

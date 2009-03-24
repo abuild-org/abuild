@@ -271,17 +271,17 @@ Abuild-upgrade upgrade not required 0
 UpgradeData ERR unknown section 0
 UpgradeData ERR expected section 0
 UpgradeData ERR ignored not directory 0
-UpgradeData ERR no upgrade not directory 0
 UpgradeData ERR invalid treename 0
 UpgradeData ERR duplicate 0
 UpgradeData orphan names 0
 BackingFile ERR invalid backing file 0
-Abuild getBackingChain loop 0
-Abuild-upgrade ERR local backing chain 0
-Abuild-upgrade ERR external not found 0
+Abuild-upgrade ERR local backing 0
 Abuild backing without conf 0
-Abuild got config from backing 0
 Abuild-upgrade skipping root with no conf 0
 Abuild-upgrade ERR external not root 0
-Abuild-upgrade resolved local ext 0
-Abuild-upgrade non-local ext 0
+UpgradeData ERR tree not directory 0
+Abuild-upgrade ERR unknown external 0
+ItemConfig ERR build tree invalid name 0
+Abuild-upgrade ERR name mismatch 0
+Abuild-upgrade ERR tree-dep cycle 0
+Abuild ERR readExternalConfig loop 0

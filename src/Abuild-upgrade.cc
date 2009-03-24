@@ -31,28 +31,30 @@ Abuild::upgradeTrees()
     std::vector<DependencyGraph::ItemList> const& forests =
 	root_graph.getIndependentSets();
 
-    // XXX remember to make sure that everything in do_not_upgrade
-    // appears in external-dirs but is not a key in item_dirs
-
     // XXX remember to validate tree names and to make sure they are
     // unique within a forest
 
     // XXX check all upgrade conditions
 
-    // XXX Only write if not doing an upgrade
-    info("writing upgrade data file...");
-    ud.writeUpgradeData(forests);
+    if (ud.missing_treenames)
+    {
+	error("some build trees have not been assigned names");
+    }
 
     if (this->error_handler.anyErrors())
     {
+	ud.writeUpgradeData(forests);
 	info("upgrade data has been written to " +
 	     UpgradeData::FILE_UPGRADE_DATA);
 	info("please edit that file and rerun; for details, see"
 	     " \"Upgrading Build Trees from 1.0 to 1.1\""
 	     " in the user's manual");
     }
-
     exitIfErrors();
+
+    // XXX do upgrade
+
+    // XXX When writing, remember to preserve any existing tree deps
 
     return true;
 }
@@ -73,13 +75,36 @@ Abuild::findBuildItems(UpgradeData& ud)
 	    continue;
 	}
 
-	ItemConfig* config = readPossiblyBackedConfig(dir);
-	if (config)
+	if (Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
 	{
-	    ud.item_dirs[dir] = config->isTreeRoot();
+	    ItemConfig* config = readConfig(dir, "");
 	    if (config->usesDeprecatedFeatures())
 	    {
 		ud.upgrade_required = true;
+	    }
+	    bool is_root = config->isTreeRoot();
+	    ud.item_dirs[dir] = is_root;
+	    if (is_root)
+	    {
+		std::string treename = config->getTreeName();
+		if (! treename.empty())
+		{
+		    if (ud.tree_names.count(dir))
+		    {
+			QTC::TC("abuild", "Abuild-upgrade ERR name mismatch");
+			error("the name assigned to the tree at \"" +
+			      dir + "\" in the upgrade data file (\"" +
+			      ud.tree_names[dir] + "\") differs from"
+			      " the tree's actual name (\"" + treename +
+			      "\"); ignoring information from the upgrade"
+			      " data file");
+		    }
+		    ud.tree_names[dir] = treename;
+		}
+		else if (! ud.tree_names.count(dir))
+		{
+		    ud.missing_treenames = true;
+		}
 	    }
 	}
 
@@ -110,8 +135,6 @@ Abuild::findBuildItems(UpgradeData& ud)
 void
 Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 {
-    // XXX currently handles only 1.0 logic...
-
     for (std::map<std::string, bool>::const_iterator iter =
 	     ud.item_dirs.begin();
 	 iter != ud.item_dirs.end(); ++iter)
@@ -133,100 +156,102 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
 	ItemConfig* config = readConfig(dir, "");
 
-	bool bad_backing = false;
-	std::list<std::string> backing_chain = getBackingChain(dir);
-	for (std::list<std::string>::iterator biter = backing_chain.begin();
-	     biter != backing_chain.end(); ++biter)
+	if (Util::isFile(dir + "/" + BackingFile::FILE_BACKING))
 	{
-	    std::string rel_backing = Util::absToRel(*biter);
-	    if (Util::isDirUnder(*biter))
+	    std::string backing_area;
+	    readBacking(dir, backing_area);
+	    std::string rel_backing = Util::absToRel(backing_area);
+	    if (ud.item_dirs.count(rel_backing))
 	    {
-		QTC::TC("abuild", "Abuild-upgrade ERR local backing chain");
+		QTC::TC("abuild", "Abuild-upgrade ERR local backing");
 		error(FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
-		      "Part of this item's backing area chain falls under"
-		      " the current directory.  You must either rerun " +
+		      "This item's backing area falls within the area"
+		      " being upgraded.  You must either rerun " +
 		      this->whoami + " from a lower directory or exclude" +
-		      " the backing area.  Ignoring the backing chain;"
-		      " expect spurious errors");
-		bad_backing = true;
-		break;
+		      " the backing area.");
 	    }
 	}
-	if (bad_backing)
-	{
-	    backing_chain.clear();
-	}
 
-	std::list<ExternalData> const& externals = config->getExternals();
-	for (std::list<ExternalData>::const_iterator eiter = externals.begin();
-	     eiter != externals.end(); ++eiter)
+	std::list<std::string>& externals = ud.externals[dir];
+	std::list<std::string>& tree_deps = ud.tree_deps[dir];
+	std::list<ExternalData> const& old_externals = config->getExternals();
+	for (std::list<ExternalData>::const_iterator eiter =
+		 old_externals.begin();
+	     eiter != old_externals.end(); ++eiter)
 	{
 	    std::string edecl = (*eiter).getDeclaredPath();
 	    std::string epath = Util::absToRel(
 		Util::canonicalizePath(dir + "/" + edecl));
+	    ItemConfig* econfig = readExternalConfig(dir, edecl);
+	    std::string dep_tree_name;
 
-	    // XXX This logic is still wrong for externals that point
-	    // into pruned areas.
-
-	    if (ud.item_dirs.count(epath))
+	    if (ud.item_dirs.count(epath) && ud.item_dirs[epath])
 	    {
-		if (! ud.item_dirs[epath])
-		{
-		    QTC::TC("abuild", "Abuild-upgrade ERR external not root");
-		    error(location,
-			  "external " + edecl + " (" + epath +
-			  " relative to current directory) is not"
-			  " a build tree root");
-		}
-		else
-		{
-		    // XXX good...get tree name, if any
-		    g.addDependency(dir, epath);
-		}
+		// The external points to a known tree root inside our
+		// area of concern.
+
+		g.addDependency(dir, epath);
+		dep_tree_name = readConfig(dir, "")->getTreeName();
+	    }
+	    else if (econfig && econfig->isTreeRoot())
+	    {
+		// The external is valid but falls outside of our area
+		// of interest.  It could be somewhere not below the
+		// current directory, in a pruned area, or resolved
+		// through a backing area.
+		dep_tree_name = econfig->getTreeName();
+	    }
+	    else if (econfig)
+	    {
+		QTC::TC("abuild", "Abuild-upgrade ERR external not root");
+		error(location,
+		      "external " + edecl + " (" + epath +
+		      " relative to current directory) is not"
+		      " a build tree root");
 	    }
 	    else
 	    {
-		ItemConfig* econfig = readPossiblyBackedConfig(dir, edecl);
-		if (econfig)
-		{
-		    // XXX We can't really tell whether this points
-		    // into a pruned area or came from a backing area.
-		    // readPossiblyBackedConfig needs to provide some
-		    // information.
-		    info("XXX resolved " + dir + "//" + edecl +
-			 " through a backing area");
-		    if (Util::isDirUnder(Util::canonicalizePath(epath)))
-		    {
-			QTC::TC("abuild", "Abuild-upgrade resolved local ext");
-			info("XXX declared location is under start dir");
-			// XXX get tree name.  Right now, this ends up
-			// in orphan-trees, which is not where it
-			// should be.
-			ud.tree_names[epath] = "***"; // XXX hard-coded ***
-		    }
-		    else
-		    {
-			QTC::TC("abuild", "Abuild-upgrade non-local ext");
-			// XXX Here we probably want to preserve this
-			// external as an external-dirs.  This could
-			// happen if the external points up above the
-			// top of the start directory or is in a
-			// pruned area.
-		    }
-		}
-		else
-		{
-		    error(location,
-			  "external " + edecl + " does not exist and cannot"
-			  " be resolved through a backing area");
-		}
+		QTC::TC("abuild", "Abuild-upgrade ERR unknown external");
+		error(location,
+		      "external " + edecl + " does not exist and cannot"
+		      " be resolved through a backing area");
+	    }
+
+	    if (dep_tree_name.empty())
+	    {
+		externals.push_back(edecl);
+	    }
+	    else
+	    {
+		tree_deps.push_back(dep_tree_name);
 	    }
 	}
     }
 
     if (! g.check())
     {
-	// XXX report errors
-	fatal("errors found checking tree-level dependencies");
+	DependencyGraph::ItemMap unknowns;
+	std::vector<DependencyGraph::ItemList> cycles;
+	g.getErrors(unknowns, cycles);
+	// We only add the dependency to known roots, so unknowns
+	// could happen only as a result of a programming error.
+	assert(unknowns.empty());
+
+	QTC::TC("abuild", "Abuild-upgrade ERR tree-dep cycle");
+	for (std::vector<DependencyGraph::ItemList>::iterator i1 =
+		 cycles.begin();
+	     i1 != cycles.end(); ++i1)
+	{
+	    DependencyGraph::ItemList const& cycle = *i1;
+	    error("the following trees are involved in"
+		  " an external-dirs cycle:");
+	    for (DependencyGraph::ItemList::const_iterator i2 = cycle.begin();
+		 i2 != cycle.end(); ++i2)
+	    {
+		error("  " + *i2);
+	    }
+	}
+
+	exitIfErrors();
     }
 }
