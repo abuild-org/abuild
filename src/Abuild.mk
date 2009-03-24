@@ -118,6 +118,7 @@ SRCS_bin_abuild := \
 	ExternalData.cc \
 	ItemConfig.cc \
 	BackingFile.cc \
+	BuildForest.cc \
 	BuildTree.cc \
 	BuildItem.cc \
 	JavaBuilder.cc \
