@@ -1071,10 +1071,13 @@ Abuild::readExternalConfig(std::string const& dir,
     }
 
     std::set<std::string> seen;
-    std::string candidate = dir;
+    std::list<std::string> candidates;
+    candidates.push_back(dir);
 
-    while ((! candidate.empty()) && (config == 0))
+    while ((! candidates.empty()) && (config == 0))
     {
+	std::string candidate = candidates.front();
+	candidates.pop_front();
 	if (seen.count(candidate))
 	{
 	    QTC::TC("abuild", "Abuild ERR readExternalConfig loop");
@@ -1109,9 +1112,9 @@ Abuild::readExternalConfig(std::string const& dir,
 	    // traversing its backing chain.  Otherwise, we're
 	    // traversing the original directory's backing chain.
 	    QTC::TC("abuild", "Abuild backing without conf");
-	    std::string backing_area;
-	    readBacking(candidate, backing_area);
-	    candidate = backing_area;
+	    std::list<std::string> backing_areas = readBacking(candidate);
+	    candidates.insert(candidates.end(),
+			      backing_areas.begin(), backing_areas.end());
 	}
     }
 
@@ -1217,7 +1220,12 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
     std::string top_backing = top_path + "/" + BackingFile::FILE_BACKING;
     if (Util::isFile(top_backing))
     {
-	readBacking(top_path, backing_area);
+	std::list<std::string> backing_areas = readBacking(top_path);
+	if (backing_areas.size() > 1)
+	{
+	    fatal("XXX multiple backing areas not yet supported");
+	}
+	backing_area = backing_areas.front();
     }
 
     if (config == 0)
@@ -2584,19 +2592,19 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
     }
 }
 
-void
-Abuild::readBacking(std::string const& dir,
-		    std::string& backing_area)
+std::list<std::string>
+Abuild::readBacking(std::string const& dir)
 {
     BackingFile* bf = BackingFile::readBacking(
 	this->error_handler, this->compat_level, dir);
-    backing_area = bf->getBackingArea();
-    if (backing_area.empty())
+    std::list<std::string> backing_areas = bf->getBackingAreas();
+    if (backing_areas.empty())
     {
         QTC::TC("abuild", "Abuild ERR invalid backing file");
         fatal(dir + "/" + BackingFile::FILE_BACKING +
 	      ": unable to get backing area data");
     }
+    return backing_areas;
 }
 
 bool

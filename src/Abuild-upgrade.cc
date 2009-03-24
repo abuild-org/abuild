@@ -163,17 +163,21 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 
 	if (Util::isFile(dir + "/" + BackingFile::FILE_BACKING))
 	{
-	    std::string backing_area;
-	    readBacking(dir, backing_area);
-	    std::string rel_backing = Util::absToRel(backing_area);
-	    if (ud.item_dirs.count(rel_backing))
+	    std::list<std::string> backing_areas = readBacking(dir);
+	    for (std::list<std::string>::iterator iter = backing_areas.begin();
+		 iter != backing_areas.end(); ++iter)
 	    {
-		QTC::TC("abuild", "Abuild-upgrade ERR local backing");
-		error(FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
-		      "This item's backing area falls within the area"
-		      " being upgraded.  You must either rerun " +
-		      this->whoami + " from a lower directory or exclude" +
-		      " the backing area.");
+		std::string rel_backing = Util::absToRel(*iter);
+		if (ud.item_dirs.count(rel_backing))
+		{
+		    QTC::TC("abuild", "Abuild-upgrade ERR local backing");
+		    error(FileLocation(dir + "/" +
+				       BackingFile::FILE_BACKING, 0, 0),
+			  "backing area \"" + *iter + "\" falls within the"
+			  " area being upgraded; rerun " +
+			  this->whoami + " from a lower directory or exclude" +
+			  " the backing area");
+		}
 	    }
 	}
 

@@ -5,11 +5,33 @@
 #include <Util.hh>
 #include <QTC.hh>
 #include <QEXC.hh>
+#include <KeyVal.hh>
 #include <set>
 
 std::string const BackingFile::FILE_BACKING = "Abuild.backing";
 
 std::map<std::string, BackingFile::BackingFile_ptr> BackingFile::cache;
+std::set<std::string> BackingFile::required_keys;
+std::map<std::string, std::string> BackingFile::defaulted_keys;
+
+std::string const BackingFile::k_BACKING_AREAS = "backing-areas";
+std::string const BackingFile::k_DELETED_ITEMS = "deleted-items";
+std::string const BackingFile::k_DELETED_TREES = "deleted-trees";
+bool BackingFile::statics_initialized = false;
+
+void BackingFile::initializeStatics()
+{
+    if (statics_initialized)
+    {
+	return;
+    }
+
+    required_keys.insert(k_BACKING_AREAS);
+    defaulted_keys[k_DELETED_ITEMS] = "";
+    defaulted_keys[k_DELETED_TREES] = "";
+
+    statics_initialized = true;
+}
 
 BackingFile*
 BackingFile::readBacking(Error& error_handler,
@@ -49,6 +71,39 @@ BackingFile::BackingFile(
 void
 BackingFile::validate()
 {
+    if (! (this->compat_level.allow_1_0() && readOldFormat()))
+    {
+	std::string file = dir + "/" + FILE_BACKING;
+	KeyVal kv(file.c_str(), required_keys, defaulted_keys);
+	if (! kv.readFile())
+	{
+	    // An error message has already been issued
+	    QTC::TC("abuild", "BackingFile ERR invalid backing file");
+	    return;
+	}
+
+	this->backing_areas = Util::splitBySpace(kv.getVal(k_BACKING_AREAS));
+	std::list<std::string> tmp =
+	    Util::splitBySpace(kv.getVal(k_DELETED_ITEMS));
+	this->deleted_items.insert(tmp.begin(), tmp.end());
+	tmp = Util::splitBySpace(kv.getVal(k_DELETED_TREES));
+	this->deleted_trees.insert(tmp.begin(), tmp.end());
+    }
+
+    for (std::list<std::string>::iterator iter = this->backing_areas.begin();
+	 iter != this->backing_areas.end(); ++iter)
+    {
+	if (! Util::isAbsolutePath(*iter))
+	{
+	    *iter = this->dir + "/" + *iter;
+	}
+	*iter = Util::canonicalizePath(*iter);
+    }
+}
+
+bool
+BackingFile::readOldFormat()
+{
     std::string file = dir + "/" + FILE_BACKING;
     std::list<std::string> lines = Util::readLinesFromFile(file);
 
@@ -69,22 +124,37 @@ BackingFile::validate()
 
     if (lines.size() == 1)
     {
-	this->backing_area = lines.front();
-	if (! Util::isAbsolutePath(backing_area))
+	std::string line = lines.front();
+	if (line.find(':') == std::string::npos)
 	{
-	    backing_area = dir + "/" + backing_area;
+	    backing_areas.push_back(line);
+	    this->deprecated = true;
 	}
-	backing_area = Util::canonicalizePath(backing_area);
     }
-    else
+
+    if (this->deprecated)
     {
-        QTC::TC("abuild", "BackingFile ERR invalid backing file");
-        this->error.error(this->location, "invalid syntax");
+	// XXX report somewhere
+	return true;
     }
+
+    return false;
 }
 
-std::string const&
-BackingFile::getBackingArea() const
+std::list<std::string> const&
+BackingFile::getBackingAreas() const
 {
-    return this->backing_area;
+    return this->backing_areas;
+}
+
+std::set<std::string> const&
+BackingFile::getDeletedTrees() const
+{
+    return this->deleted_trees;
+}
+
+std::set<std::string> const&
+BackingFile::getDeletedItems() const
+{
+    return this->deleted_items;
 }

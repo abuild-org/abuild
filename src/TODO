@@ -961,6 +961,11 @@ points to the user to abuild --upgrade-trees.  Something like
   section in the abuild user's manual entitled "Upgrading Build Trees
   from 1.0 to 1.1" for details.
 
+If the root of the tree has tree-name, provide more information.  This
+may indicate a partially upgraded tree or someone accidentally using
+an old key.
+
+
 The build_tree structure changes a bit.  Rather than having a single
 list for each tree, we'll have a single list for the forest.  This is
 described in the revamped build tree section above.

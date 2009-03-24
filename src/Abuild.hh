@@ -103,8 +103,7 @@ class Abuild
     void computeBuildablePlatforms(BuildTree& tree_data,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
-    void readBacking(std::string const& dir,
-		     std::string& backing_area);
+    std::list<std::string> readBacking(std::string const& dir);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
 		      ExternalData& external);
     void computeValidTraits(BuildTree_map& buildtrees);
