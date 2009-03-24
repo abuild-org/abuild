@@ -8,6 +8,7 @@
 #include <Util.hh>
 #include <ItemConfig.hh>
 #include <UpgradeData.hh>
+#include <BackingConfig.hh>
 
 bool
 Abuild::upgradeTrees()
@@ -161,9 +162,10 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
 	ItemConfig* config = readConfig(dir, "");
 
-	if (Util::isFile(dir + "/" + BackingFile::FILE_BACKING))
+	if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
 	{
-	    std::list<std::string> backing_areas = readBacking(dir);
+	    std::list<std::string> backing_areas =
+		readBacking(dir)->getBackingAreas();
 	    for (std::list<std::string>::iterator iter = backing_areas.begin();
 		 iter != backing_areas.end(); ++iter)
 	    {
@@ -172,7 +174,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		{
 		    QTC::TC("abuild", "Abuild-upgrade ERR local backing");
 		    error(FileLocation(dir + "/" +
-				       BackingFile::FILE_BACKING, 0, 0),
+				       BackingConfig::FILE_BACKING, 0, 0),
 			  "backing area \"" + *iter + "\" falls within the"
 			  " area being upgraded; rerun " +
 			  this->whoami + " from a lower directory or exclude" +

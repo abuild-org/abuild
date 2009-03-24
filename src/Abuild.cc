@@ -13,7 +13,7 @@
 #include <Logger.hh>
 #include <FileLocation.hh>
 #include <ItemConfig.hh>
-#include <BackingFile.hh>
+#include <BackingConfig.hh>
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
 
@@ -946,9 +946,15 @@ Abuild::readConfigs()
     }
     this->this_config = readConfig(this->this_config_dir, "");
 
-    std::string local_top = findTop();
+    std::string local_top = findTop(
+	this->this_config_dir, "local forest");
+    if (local_top.empty())
+    {
+	QTC::TC("abuild", "Abuild ERR can't find local top");
+	fatal("unable to find root of local forest");
+    }
 
-    // We explicitly make buildtrees local to readConfigs.  By not
+    // We explicitly make forests local to readConfigs.  By not
     // holding onto it after readConfigs exits, we ensure that we
     // don't have any way to get any information about items not in
     // the build set.  This policy has helped to prevent a number of
@@ -959,15 +965,15 @@ Abuild::readConfigs()
     // dependency relationships are subject to the integrity
     // guarantee.  See comments in BuildItem::getReferences for
     // additional discussion.
-    BuildTree_map buildtrees;
+    BuildForest_map forests;
     std::set<std::string> visiting;
-    traverse(buildtrees, local_top, visiting, FileLocation(),
-	     "root of local tree");
+    traverse(forests, local_top, visiting, FileLocation(),
+	     "root of local forest");
 
     // Compute the list of all known traits.  This routine also
     // validates to make sure that any traits specified on the command
     // line are valid.
-    computeValidTraits(buildtrees);
+    computeValidTraits(forests);
 
     if (this->monitored || this->dump_data)
     {
@@ -1105,14 +1111,15 @@ Abuild::readExternalConfig(std::string const& dir,
 	    // Simple case: there's an actual Abuild.conf here.
 	    config = readConfig(dir + suf, "");
 	}
-	else if (Util::isFile(candidate + "/" + BackingFile::FILE_BACKING))
+	else if (Util::isFile(candidate + "/" + BackingConfig::FILE_BACKING))
 	{
 	    // There's an Abuild.backing but no Abuild.conf.  Traverse
 	    // the backing chain.  If the external exists, we're
 	    // traversing its backing chain.  Otherwise, we're
 	    // traversing the original directory's backing chain.
 	    QTC::TC("abuild", "Abuild backing without conf");
-	    std::list<std::string> backing_areas = readBacking(candidate);
+	    std::list<std::string> backing_areas =
+		readBacking(candidate)->getBackingAreas();
 	    candidates.insert(candidates.end(),
 			      backing_areas.begin(), backing_areas.end());
 	}
@@ -1122,18 +1129,19 @@ Abuild::readExternalConfig(std::string const& dir,
 }
 
 std::string
-Abuild::findTop()
+Abuild::findTop(std::string const& start_dir,
+		std::string const& description)
 {
-    // Find the top directory that contains the root of the current
-    // forest.  That is the first directory above us that contains an
-    // ItemConfig::FILE_CONF not referenced as a child of the next
-    // higher ItemConfig::FILE_CONF.
+    // Find the directory that contains the root of the forest
+    // containing the item with the given start directory.  That is
+    // the first directory above it that contains an Abuild.conf not
+    // referenced as a child of the next higher Abuild.conf.
 
     std::string top;
-    std::string dir = this->this_config_dir;
+    std::string dir = start_dir;
     std::string candidate;
 
-    verbose("looking for top of build forest");
+    verbose("looking for top of build forest \"" + description + "\"");
 
     while (true)
     {
@@ -1164,7 +1172,8 @@ Abuild::findTop()
     if (top.empty())
     {
 	QTC::TC("abuild", "Abuild ERR can't find top");
-	fatal("unable to find top of local build forest;"
+	error("unable to find top of build forest containing \"" +
+	      start_dir + "\" (" + description + ");"
 	      " run with --verbose for details");
     }
     else
@@ -1176,71 +1185,39 @@ Abuild::findTop()
 }
 
 void
-Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
+Abuild::traverse(BuildForest_map& forests, std::string const& item_dir,
 		 std::set<std::string>& visiting,
 		 FileLocation const& referrer,
 		 std::string const& description)
 {
+    std::string top_path = findTop(item_dir, description);
+    if (top_path.empty())
+    {
+	QTC::TC("abuild", "Abuild can't find top in traverse");
+	return;
+    }
+
     if (visiting.count(top_path))
     {
         QTC::TC("abuild", "Abuild ERR backing cycle");
-        fatal("backing area/externals cycle detected for " + top_path +
+        fatal("backing area cycle detected for " + top_path +
 	      " (" + description + ")");
     }
 
-    if (buildtrees.count(top_path))
+    if (forests.count(top_path))
     {
 	return;
     }
 
-    verbose("traversing build tree " + top_path);
-    std::string backing_area;
-    ItemConfig* config = 0;
+    verbose("traversing forest from " + top_path);
+    ItemConfig* config = readConfig(top_path, "");
+    std::list<std::string> backing_areas;
+    std::set<std::string> deleted_trees;
+    std::set<std::string> deleted_items;
+    getBackingAreaData(
+	top_path, config, backing_areas, deleted_trees, deleted_items);
 
-    std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
-    if (Util::isFile(top_conf))
-    {
-        config = readConfig(top_path, "");
-        if (! config->isTreeRoot())
-        {
-            QTC::TC("abuild", "Abuild ERR build tree root not root");
-	    FileLocation top_location(
-		top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
-            error(top_location, "this build item does not appear to be"
-		  " a build tree root, but it is referenced as one (" +
-		  description +")");
-	    if (! referrer.getFilename().empty())
-	    {
-		error(referrer, "here is the referring build item");
-	    }
-            return;
-        }
-    }
-
-    std::string top_backing = top_path + "/" + BackingFile::FILE_BACKING;
-    if (Util::isFile(top_backing))
-    {
-	std::list<std::string> backing_areas = readBacking(top_path);
-	if (backing_areas.size() > 1)
-	{
-	    fatal("XXX multiple backing areas not yet supported");
-	}
-	backing_area = backing_areas.front();
-    }
-
-    if (config == 0)
-    {
-        if (backing_area.empty())
-        {
-            QTC::TC("abuild", "Abuild ERR no build tree top config");
-            fatal("no " + ItemConfig::FILE_CONF + " found in " + top_path +
-		  " (" + description + ")");
-        }
-        else
-        {
-            QTC::TC("abuild", "Abuild Abuild.backing without Abuild.conf");
-        }
-    }
+    // XXXX HERE (0)
 
     // DO NOT RETURN BELOW THIS POINT until after we remove top_path
     // from visiting.
@@ -1346,6 +1323,80 @@ Abuild::traverse(BuildTree_map& buildtrees, std::string const& top_path,
 		      this->internal_platform_data));
 
     traverseTree(buildtrees, top_path);
+}
+
+void
+Abuild::getBackingAreaData(std::string const& top_path,
+			   ItemConfig* config,
+			   std::list<std::string>& backing_areas,
+			   std::set<std::string>& deleted_trees,
+			   std::set<std::string>& deleted_items)
+{
+    if (Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING))
+    {
+	BackingConfig* backing = readBacking(top_path);
+	backing->appendBackingData(backing_areas, deleted_trees, deleted_items);
+    }
+
+    if (! this->compat_level.allow_1_0())
+    {
+	return;
+    }
+
+    // 1.0-compatibility mode: traverse through all external-dirs
+    // looking for Abuild.backing files and also looking for "deleted"
+    // keys in root Abuild.conf files.
+
+    // XXXX HERE (1)
+
+    // XXX need some kind of traverseExternals both here and when we
+    // make up and assign tree names.
+
+
+#if 0 // XXX
+
+    std::set<std::string> const& d = config->getDeleted();
+    deleted_items.insert(d.begin(), d.end());
+
+#endif
+
+
+#if 0 // XXX
+    if (! config->isTreeRoot())
+    {
+	QTC::TC("abuild", "Abuild ERR build tree root not root");
+	FileLocation top_location(
+	    top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
+	error(top_location, "this build item does not appear to be"
+	      " a build tree root, but it is referenced as one (" +
+	      description +")");
+	if (! referrer.getFilename().empty())
+	{
+	    error(referrer, "here is the referring build item");
+	}
+	return;
+    }
+#endif
+
+#if 0 // XXX
+    if (config == 0)
+    {
+        if (backing_area.empty())
+        {
+            QTC::TC("abuild", "Abuild ERR no build tree top config");
+            fatal("no " + ItemConfig::FILE_CONF + " found in " + top_path +
+		  " (" + description + ")");
+        }
+        else
+        {
+            QTC::TC("abuild", "Abuild Abuild.backing without Abuild.conf");
+        }
+    }
+#endif
+
+
+
+
 }
 
 void
@@ -2592,19 +2643,19 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
     }
 }
 
-std::list<std::string>
+BackingConfig*
 Abuild::readBacking(std::string const& dir)
 {
-    BackingFile* bf = BackingFile::readBacking(
+    BackingConfig* backing = BackingConfig::readBacking(
 	this->error_handler, this->compat_level, dir);
-    std::list<std::string> backing_areas = bf->getBackingAreas();
+    std::list<std::string> backing_areas = backing->getBackingAreas();
     if (backing_areas.empty())
     {
         QTC::TC("abuild", "Abuild ERR invalid backing file");
-        fatal(dir + "/" + BackingFile::FILE_BACKING +
+        fatal(dir + "/" + BackingConfig::FILE_BACKING +
 	      ": unable to get backing area data");
     }
-    return backing_areas;
+    return backing;
 }
 
 bool
@@ -2649,14 +2700,19 @@ Abuild::haveExternal(BuildTree_map& buildtrees,
 }
 
 void
-Abuild::computeValidTraits(BuildTree_map& buildtrees)
+Abuild::computeValidTraits(BuildForest_map& forests)
 {
-    for (BuildTree_map::iterator iter = buildtrees.begin();
-	 iter != buildtrees.end(); ++iter)
+    for (BuildForest_map::iterator i1 = forests.begin();
+	 i1 != forests.end(); ++i1)
     {
-	BuildTree& tree = *((*iter).second);
-	std::set<std::string> const& traits = tree.getSupportedTraits();
-	this->valid_traits.insert(traits.begin(), traits.end());
+	BuildTree_map& buildtrees = (*i1).getBuildTrees();
+	for (BuildTree_map::iterator iter = buildtrees.begin();
+	     iter != buildtrees.end(); ++iter)
+	{
+	    BuildTree& tree = *((*iter).second);
+	    std::set<std::string> const& traits = tree.getSupportedTraits();
+	    this->valid_traits.insert(traits.begin(), traits.end());
+	}
     }
 
     std::list<std::string> all_traits = this->only_with_traits;

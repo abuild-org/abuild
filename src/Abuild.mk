@@ -117,7 +117,7 @@ SRCS_bin_abuild := \
 	PlatformSelector.cc \
 	ExternalData.cc \
 	ItemConfig.cc \
-	BackingFile.cc \
+	BackingConfig.cc \
 	BuildForest.cc \
 	BuildTree.cc \
 	BuildItem.cc \

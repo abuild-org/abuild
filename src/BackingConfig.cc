@@ -35,8 +35,8 @@ void BackingConfig::initializeStatics()
 
 BackingConfig*
 BackingConfig::readBacking(Error& error_handler,
-			 CompatLevel const& compat_level,
-			 std::string const& dir)
+			   CompatLevel const& compat_level,
+			   std::string const& dir)
 {
     if (cache.count(dir))
     {
@@ -163,4 +163,14 @@ std::set<std::string> const&
 BackingConfig::getDeletedItems() const
 {
     return this->deleted_items;
+}
+
+void
+BackingConfig::appendBackingData(std::list<std::string>& ba,
+				 std::set<std::string>& dt,
+				 std::set<std::string>& di)
+{
+    ba.insert(ba.end(), this->backing_areas.begin(), this->backing_areas.end());
+    dt.insert(this->deleted_trees.begin(), this->deleted_trees.end());
+    di.insert(this->deleted_items.begin(), this->deleted_items.end());
 }

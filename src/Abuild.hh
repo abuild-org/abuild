@@ -9,7 +9,7 @@
 #include <boost/function.hpp>
 #include <Error.hh>
 #include <QEXC.hh>
-#include <BuildTree.hh>
+#include <BuildForest.hh>
 #include <DependencyGraph.hh>
 #include <DependencyEvaluator.hh>
 #include <Interface.hh>
@@ -22,6 +22,7 @@ class Logger;
 class ItemConfig;
 class InterfaceParser;
 class UpgradeData;
+class BackingConfig;
 
 class Abuild
 {
@@ -34,13 +35,15 @@ class Abuild
     Abuild(Abuild const&);
     Abuild& operator=(Abuild const&);
 
-    typedef boost::shared_ptr<BuildTree> BuildTree_ptr;
-    typedef std::map<std::string, BuildTree_ptr> BuildTree_map;
+    typedef boost::shared_ptr<BuildForest> BuildForest_ptr;
+    typedef std::map<std::string, BuildForest_ptr> BuildForest_map;
 
     static bool initializeStatics();
 
-    typedef BuildTree::BuildItem_ptr BuildItem_ptr;
-    typedef BuildTree::BuildItem_map BuildItem_map;
+    typedef BuildForest::BuildItem_ptr BuildItem_ptr;
+    typedef BuildForest::BuildItem_map BuildItem_map;
+    typedef BuildForest::BuildTree_ptr BuildTree_ptr;
+    typedef BuildForest::BuildTree_map BuildTree_map;
     typedef boost::function<bool(std::string const&, std::string const&)>
             item_filter_t;
 
@@ -57,11 +60,17 @@ class Abuild
 			   std::string const& parent_dir);
     ItemConfig* readExternalConfig(std::string const& dir,
 				   std::string const& external);
-    std::string findTop();
-    void traverse(BuildTree_map&, std::string const& top_path,
+    std::string findTop(std::string const& start_dir,
+			std::string const& description);
+    void traverse(BuildForest_map&, std::string const& item_dir,
 		  std::set<std::string>& visiting,
 		  FileLocation const& referrer,
 		  std::string const& description);
+    void getBackingAreaData(std::string const& top_path,
+			    ItemConfig* config,
+			    std::list<std::string>& backing_areas,
+			    std::set<std::string>& deleted_trees,
+			    std::set<std::string>& deleted_items);
     void traverseTree(BuildTree_map& buildtrees,
 		      std::string const& top_path);
     void traverseItems(BuildTree_map& buildtrees,
@@ -103,10 +112,10 @@ class Abuild
     void computeBuildablePlatforms(BuildTree& tree_data,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
-    std::list<std::string> readBacking(std::string const& dir);
+    BackingConfig* readBacking(std::string const& dir);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
 		      ExternalData& external);
-    void computeValidTraits(BuildTree_map& buildtrees);
+    void computeValidTraits(BuildForest_map& forests);
     void listTraits();
     void listPlatforms(BuildTree_map& buildtrees);
     void dumpData(BuildTree_map& buildtrees);

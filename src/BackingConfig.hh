@@ -23,6 +23,9 @@ class BackingConfig
     std::list<std::string> const& getBackingAreas() const;
     std::set<std::string> const& getDeletedTrees() const;
     std::set<std::string> const& getDeletedItems() const;
+    void appendBackingData(std::list<std::string>& backing_areas,
+			   std::set<std::string>& deleted_trees,
+			   std::set<std::string>& deleted_items);
 
   private:
     BackingConfig(BackingConfig const&);

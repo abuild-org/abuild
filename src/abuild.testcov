@@ -274,7 +274,7 @@ UpgradeData ERR ignored not directory 0
 UpgradeData ERR invalid treename 0
 UpgradeData ERR duplicate 0
 UpgradeData orphan names 0
-BackingFile ERR invalid backing file 0
+BackingConfig ERR invalid backing file 0
 Abuild-upgrade ERR local backing 0
 Abuild backing without conf 0
 Abuild-upgrade skipping root with no conf 0
@@ -288,3 +288,5 @@ Abuild ERR readExternalConfig loop 0
 ItemConfig ERR tree-deps on non-root 0
 Abuild-upgrade ERR duplicate name 0
 Abuild-upgrade ERR invalid name 0
+Abuild ERR can't find local top 0
+Abuild can't find top in traverse 0

@@ -17,7 +17,6 @@
 #include <ExternalData.hh>
 #include <TraitData.hh>
 #include <PlatformSelector.hh>
-#include <BackingFile.hh>
 
 class Error;
 class CompatLevel;

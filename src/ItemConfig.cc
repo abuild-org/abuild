@@ -8,6 +8,7 @@
 #include <FileLocation.hh>
 #include <KeyVal.hh>
 #include <CompatLevel.hh>
+#include <BackingConfig.hh>
 
 std::string const ItemConfig::FILE_CONF = "Abuild.conf";
 std::string const ItemConfig::FILE_MK = "Abuild.mk";
@@ -358,15 +359,15 @@ ItemConfig::checkNonRoot()
     {
 	QTC::TC("abuild", "ItemConfig ERR plugins on non-root");
     }
-    if (Util::isFile(this->dir + "/" + BackingFile::FILE_BACKING))
+    if (Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING))
     {
 	// XXX This check is in the wrong place.  Put it in traversal
 	// so we can yell about bad backing files in more
 	// context-specific ways.
 	QTC::TC("abuild", "ItemConfig ERR Abuild.backing at non-root");
 	this->error.error(
-	    FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
-	    BackingFile::FILE_BACKING +
+	    FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
+	    BackingConfig::FILE_BACKING +
 	    " file ignored for non-root build item");
     }
 }
