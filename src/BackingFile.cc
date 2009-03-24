@@ -141,6 +141,12 @@ BackingFile::readOldFormat()
     return false;
 }
 
+bool
+BackingFile::isDeprecated() const
+{
+    return this->deprecated;
+}
+
 std::list<std::string> const&
 BackingFile::getBackingAreas() const
 {

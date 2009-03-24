@@ -19,6 +19,7 @@ class BackingFile
 				    std::string const& dir);
     static std::string const FILE_BACKING;
 
+    bool isDeprecated() const;
     std::list<std::string> const& getBackingAreas() const;
     std::set<std::string> const& getDeletedTrees() const;
     std::set<std::string> const& getDeletedItems() const;

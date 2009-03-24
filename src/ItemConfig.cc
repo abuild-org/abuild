@@ -360,6 +360,9 @@ ItemConfig::checkNonRoot()
     }
     if (Util::isFile(this->dir + "/" + BackingFile::FILE_BACKING))
     {
+	// XXX This check is in the wrong place.  Put it in traversal
+	// so we can yell about bad backing files in more
+	// context-specific ways.
 	QTC::TC("abuild", "ItemConfig ERR Abuild.backing at non-root");
 	this->error.error(
 	    FileLocation(dir + "/" + BackingFile::FILE_BACKING, 0, 0),
