@@ -1,5 +1,5 @@
-#ifndef __BACKINGFILE_HH__
-#define __BACKINGFILE_HH__
+#ifndef __BACKINGCONFIG_HH__
+#define __BACKINGCONFIG_HH__
 
 #include <FileLocation.hh>
 #include <boost/shared_ptr.hpp>
@@ -11,12 +11,12 @@
 class Error;
 class CompatLevel;
 
-class BackingFile
+class BackingConfig
 {
   public:
-    static BackingFile* readBacking(Error& error_handler,
-				    CompatLevel const& compat_level,
-				    std::string const& dir);
+    static BackingConfig* readBacking(Error& error_handler,
+				      CompatLevel const& compat_level,
+				      std::string const& dir);
     static std::string const FILE_BACKING;
 
     bool isDeprecated() const;
@@ -25,9 +25,8 @@ class BackingFile
     std::set<std::string> const& getDeletedItems() const;
 
   private:
-    BackingFile(BackingFile const&);
-    BackingFile& operator=(BackingFile const&);
-
+    BackingConfig(BackingConfig const&);
+    BackingConfig& operator=(BackingConfig const&);
 
     static std::string const k_BACKING_AREAS;
     static std::string const k_DELETED_ITEMS;
@@ -38,11 +37,11 @@ class BackingFile
     static bool statics_initialized;
     static void initializeStatics();
 
-    typedef boost::shared_ptr<BackingFile> BackingFile_ptr;
-    static std::map<std::string, BackingFile_ptr> cache;
+    typedef boost::shared_ptr<BackingConfig> BackingConfig_ptr;
+    static std::map<std::string, BackingConfig_ptr> cache;
 
-    BackingFile(Error&, CompatLevel const&, FileLocation const&,
-		std::string const& dir);
+    BackingConfig(Error&, CompatLevel const&, FileLocation const&,
+		  std::string const& dir);
     bool readOldFormat();
     void validate();
 
@@ -57,4 +56,4 @@ class BackingFile
     std::set<std::string> deleted_items;
 };
 
-#endif // __BACKINGFILE_HH__
+#endif // __BACKINGCONFIG_HH__

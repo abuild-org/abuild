@@ -1,4 +1,4 @@
-#include <BackingFile.hh>
+#include <BackingConfig.hh>
 
 #include <Error.hh>
 #include <CompatLevel.hh>
@@ -8,18 +8,18 @@
 #include <KeyVal.hh>
 #include <set>
 
-std::string const BackingFile::FILE_BACKING = "Abuild.backing";
+std::string const BackingConfig::FILE_BACKING = "Abuild.backing";
 
-std::map<std::string, BackingFile::BackingFile_ptr> BackingFile::cache;
-std::set<std::string> BackingFile::required_keys;
-std::map<std::string, std::string> BackingFile::defaulted_keys;
+std::map<std::string, BackingConfig::BackingConfig_ptr> BackingConfig::cache;
+std::set<std::string> BackingConfig::required_keys;
+std::map<std::string, std::string> BackingConfig::defaulted_keys;
 
-std::string const BackingFile::k_BACKING_AREAS = "backing-areas";
-std::string const BackingFile::k_DELETED_ITEMS = "deleted-items";
-std::string const BackingFile::k_DELETED_TREES = "deleted-trees";
-bool BackingFile::statics_initialized = false;
+std::string const BackingConfig::k_BACKING_AREAS = "backing-areas";
+std::string const BackingConfig::k_DELETED_ITEMS = "deleted-items";
+std::string const BackingConfig::k_DELETED_TREES = "deleted-trees";
+bool BackingConfig::statics_initialized = false;
 
-void BackingFile::initializeStatics()
+void BackingConfig::initializeStatics()
 {
     if (statics_initialized)
     {
@@ -33,8 +33,8 @@ void BackingFile::initializeStatics()
     statics_initialized = true;
 }
 
-BackingFile*
-BackingFile::readBacking(Error& error_handler,
+BackingConfig*
+BackingConfig::readBacking(Error& error_handler,
 			 CompatLevel const& compat_level,
 			 std::string const& dir)
 {
@@ -44,9 +44,9 @@ BackingFile::readBacking(Error& error_handler,
     }
 
     FileLocation location(dir + "/" + FILE_BACKING, 0, 0);
-    BackingFile_ptr bf;
+    BackingConfig_ptr bf;
     bf.reset(
-	new BackingFile(error_handler, compat_level, location, dir));
+	new BackingConfig(error_handler, compat_level, location, dir));
     bf->validate();
 
     // Cache and return
@@ -54,7 +54,7 @@ BackingFile::readBacking(Error& error_handler,
     return bf.get();
 }
 
-BackingFile::BackingFile(
+BackingConfig::BackingConfig(
     Error& error,
     CompatLevel const& compat_level,
     FileLocation const& location,
@@ -69,7 +69,7 @@ BackingFile::BackingFile(
 }
 
 void
-BackingFile::validate()
+BackingConfig::validate()
 {
     if (! (this->compat_level.allow_1_0() && readOldFormat()))
     {
@@ -78,7 +78,7 @@ BackingFile::validate()
 	if (! kv.readFile())
 	{
 	    // An error message has already been issued
-	    QTC::TC("abuild", "BackingFile ERR invalid backing file");
+	    QTC::TC("abuild", "BackingConfig ERR invalid backing file");
 	    return;
 	}
 
@@ -102,7 +102,7 @@ BackingFile::validate()
 }
 
 bool
-BackingFile::readOldFormat()
+BackingConfig::readOldFormat()
 {
     std::string file = dir + "/" + FILE_BACKING;
     std::list<std::string> lines = Util::readLinesFromFile(file);
@@ -142,25 +142,25 @@ BackingFile::readOldFormat()
 }
 
 bool
-BackingFile::isDeprecated() const
+BackingConfig::isDeprecated() const
 {
     return this->deprecated;
 }
 
 std::list<std::string> const&
-BackingFile::getBackingAreas() const
+BackingConfig::getBackingAreas() const
 {
     return this->backing_areas;
 }
 
 std::set<std::string> const&
-BackingFile::getDeletedTrees() const
+BackingConfig::getDeletedTrees() const
 {
     return this->deleted_trees;
 }
 
 std::set<std::string> const&
-BackingFile::getDeletedItems() const
+BackingConfig::getDeletedItems() const
 {
     return this->deleted_items;
 }
