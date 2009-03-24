@@ -201,6 +201,10 @@ class Abuild
     bool upgradeTrees();
     void findBuildItems(UpgradeData&);
     void constructTreeGraph(UpgradeData&, DependencyGraph& g);
+    void validateProposedForests(
+	UpgradeData&,
+	std::vector<DependencyGraph::ItemList> const& forests);
+    std::string getForestRoot(std::list<std::string> const& forest);
 
     static std::string const ABUILD_VERSION;
     static std::string const OUTPUT_DIR_PREFIX;

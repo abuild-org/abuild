@@ -973,12 +973,17 @@ ItemConfig::checkPlugins()
 }
 
 bool
-ItemConfig::validName(std::string const& val, std::string const& description)
+ItemConfig::isNameValid(std::string const& name)
 {
     boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
+    return boost::regex_match(name, match, item_name_re);
+}
 
-    if (! boost::regex_match(val, match, item_name_re))
+bool
+ItemConfig::validName(std::string const& val, std::string const& description)
+{
+    if (! isNameValid(val))
     {
 	this->error.error(this->location,
 			  description + " may contain only alphanumeric"

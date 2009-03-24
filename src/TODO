@@ -1042,15 +1042,15 @@ points to a 1.1 tree.
 1.0 to 1.1 Conversion Tool
 ==========================
 
-Most or all of the conversion tool should be implemented inside of
-abuild proper so that we have the benefit of the real Abuild.conf
-parser (ItemConfig) and the DependencyGraph object.
+The conversion tool is implemented inside of abuild proper so that we
+have the benefit of the real Abuild.conf parser (ItemConfig) and the
+DependencyGraph object.
 
 Usage: abuild --upgrade-trees
 
 If abuild.upgrade-data exists, read it.  It can contain two pieces of
 information: a mapping from paths (relative to current directory) to
-tree names, and a list of directories to prune.  The string *** is
+tree names, and a list of directories to ignore.  The string *** is
 used as a place holder for names of trees that we don't know.
 
 ----
@@ -1062,11 +1062,11 @@ relative-path
 relative-path
 ...
 
-[island]
+[forest]
 path: name
 ...
 
-[island]
+[forest]
 path: name
 ...
 
@@ -1080,10 +1080,16 @@ Use DependencyGraph to create a dependency of all build tree roots.
 
 Exit if errors
 
-Analyze the dependency graph to identify islands.
+Analyze the dependency graph to identify independent subsets, each of
+which is considered its own forest.
+
+XXX Need to identify forest roots.  The forest root is the lowest
+directory that is above all the tree roots in the forest.  It is an
+error if there are any Abuild.conf files in any intervening directory
+between a forest root and any of the trees in the forest.
 
 Rewrite abuild.upgrade-data, preserving any previous prune directories
-and tree names, with all tree names arranged in islands.  For any tree
+and tree names, with all tree names arranged in forests.  For any tree
 for which no name was known, write *** as a place-holder.
 
 If any trees had unknown names, tell user to edit abuild.upgrade-data,
@@ -1096,48 +1102,24 @@ When completely finished, if all went well, for each rewritten file,
 rename Abuild.conf to Abuild-1.0.conf and rename Abuild-1.1.conf to
 Abuild.conf.
 
-Other issues to work in:
-
- * Backing areas: we need to be able to resolve externals through
-   backing areas and convert backing area files.  When an external is
-   resolved through a backing area, make sure the external in the
-   backing area has been converted, and pull its name from there.  Do
-   not generate a new tree name.  Maybe a good way to do this would be
-   to generate an explicit backing area chain for each root and check
-   it iteratively.  Need to figure out the exact behavior of
-   Abuild.backing files with respect to hybrid 1.0/1.1 trees, if this
-   is not already discussed above.  Upgrading should not support the
-   case of a build tree and its backing area being in the same forest.
-
- * If we have externals that fall outside of the forest or in a pruned
-   area (i.e., we can find the directory, but it is not one we know
-   about either as a root or a regular item), maybe we should leave it
-   as an external.  This makes it possible to have forests with
-   mixtures of 1.0 and 1.1 trees, which may be important for the
-   transition.  E.g., we could leave tps-build-items as 1.0 when
-   updating some forests that use it but not others.
-
-   One way to approach this would be to include their paths, relative
-   to the start directory, in the abuild.upgrade-data file in a
-   section of trees that should remain unconverted.  Only in those
-   cases should we leave the external-dirs alone and create a hybrid
-   situation.
-
-
 Converting Abuild.conf files:
 
  * For root files
 
     - add tree-name
 
-    - if next Abuild.conf up belongs to a tree in the same island,
+    - if next Abuild.conf up belongs to a tree in the same forest,
       append to (or create) its child-dirs.
+
+    - external-dirs: delete or replace with whatever externals are
+      left
+
+    - tree-deps: add or append to whatever tree-deps were already
+      there and are not redundant with what we have
 
  * this -> name
 
  * parent-dir: remove
-
- * external-dirs: replace with tree-deps.
 
  * deleted: remove and store; will be used when we rewrite
    Abuild.backing files.

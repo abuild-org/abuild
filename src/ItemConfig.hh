@@ -40,6 +40,7 @@ class ItemConfig
 				  CompatLevel const& compat_level,
 				  std::string const& dir,
 				  std::string const& parent_dir);
+    static bool isNameValid(std::string const& name);
 
     static std::string const FILE_CONF;
     static std::string const FILE_INTERFACE;

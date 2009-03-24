@@ -31,10 +31,7 @@ Abuild::upgradeTrees()
     std::vector<DependencyGraph::ItemList> const& forests =
 	root_graph.getIndependentSets();
 
-    // XXX remember to validate tree names and to make sure they are
-    // unique within a forest
-
-    // XXX check all upgrade conditions
+    validateProposedForests(ud, forests);
 
     if (ud.missing_treenames)
     {
@@ -55,6 +52,14 @@ Abuild::upgradeTrees()
     // XXX do upgrade
 
     // XXX When writing, remember to preserve any existing tree deps
+
+    // XXX Get forest root for each forest.  If there is no
+    // Abuild.conf in the forest root directory and if there is any
+    // tree in the forest for which the next higher Abuild.conf is
+    // above the forest root directory, then create a forest root
+    // Abuild.conf.  Its children will be updated normally with
+    // pointers to tree roots below it, except that it will have to be
+    // created instead of rewritten.
 
     return true;
 }
@@ -254,4 +259,60 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 
 	exitIfErrors();
     }
+}
+
+void
+Abuild::validateProposedForests(
+    UpgradeData& ud, std::vector<DependencyGraph::ItemList> const& forests)
+{
+    for (std::vector<DependencyGraph::ItemList>::const_iterator iter =
+	     forests.begin();
+	 iter != forests.end(); ++iter)
+    {
+	// Make sure each tree in the forest has a unique name.
+	std::list<std::string> const& forest = *iter;
+	std::map<std::string, std::string> names;
+	for (std::list<std::string>::const_iterator iter = forest.begin();
+	     iter != forest.end(); ++iter)
+	{
+	    std::string const& tree = *iter;
+	    if (ud.tree_names.count(tree))
+	    {
+		std::string const& name = ud.tree_names[tree];
+		if (names.count(name))
+		{
+		    QTC::TC("abuild", "Abuild-upgrade ERR duplicate name");
+		    error("tree name \"" + name + "\" has been assigned to \"" +
+			  tree + "\" and also to \"" + names[name] + "\"");
+		}
+		else
+		{
+		    names[name] = tree;
+		}
+		if (! ItemConfig::isNameValid(name))
+		{
+		    QTC::TC("abuild", "Abuild-upgrade ERR invalid name");
+		    error("tree name \"" + name + "\", assigned to \"" +
+			  tree + "\", is not a valid tree name");
+		}
+	    }
+	}
+    }
+}
+
+std::string
+Abuild::getForestRoot(std::list<std::string> const& forest)
+{
+    std::string result = Util::canonicalizePath(forest.front());
+    for (std::list<std::string>::const_iterator iter = forest.begin();
+	 iter != forest.end(); ++iter)
+    {
+	std::string const& dir = *iter;
+	while (! Util::isDirUnder(Util::canonicalizePath(dir), result))
+	{
+	    result = Util::dirname(result);
+	}
+    }
+    assert(Util::isDirUnder(result));
+    return Util::absToRel(result);
 }
