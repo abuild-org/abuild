@@ -346,6 +346,10 @@ ItemConfig::checkNonRoot()
 	    QTC::TC("abuild", "ItemConfig ERR deleted on non-root");
 	}
     }
+    if (checkKeyPresent(k_TREEDEPS, msg))
+    {
+	QTC::TC("abuild", "ItemConfig ERR tree-deps on non-root");
+    }
     if (checkKeyPresent(k_SUPPORTED_TRAITS, msg))
     {
 	QTC::TC("abuild", "ItemConfig ERR supported-traits on non-root");
@@ -362,7 +366,6 @@ ItemConfig::checkNonRoot()
 	    BackingFile::FILE_BACKING +
 	    " file ignored for non-root build item");
     }
-    // XXX other non-root keys
 }
 
 void
