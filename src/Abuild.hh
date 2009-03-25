@@ -77,15 +77,17 @@ class Abuild
     std::string getAssignedTreeName(std::string const& dir);
     void validateForest(BuildForest_map& forests,
 			std::string const& top_path);
-    void resolveItems(BuildTree_map& buildtrees,
+    void checkTreeDependencies(BuildForest& forest,
+			       std::string const& top_path);
+    void resolveItems(BuildForest_map& forests,
 		      std::string const& top_path);
-    void resolveTraits(BuildTree_map& buildtrees,
+    void resolveTraits(BuildForest_map& forests,
 		       std::string const& top_path);
-    void checkPlugins(BuildTree& tree_data,
+    void checkPlugins(BuildForest& forest,
 		      BuildItem_map& builditems,
 		      std::string const& top_path);
     bool isPluginAnywhere(std::string const& item_name);
-    void checkPlatformTypes(BuildTree& tree_data,
+    void checkPlatformTypes(BuildForest& forest,
 			    BuildItem_map& builditems,
 			    std::string const& top_path);
     void checkItemNames(BuildItem_map& builditems,
@@ -95,23 +97,23 @@ class Abuild
 			std::string const& accessee);
     void checkBuildAlso(BuildItem_map& builditems,
 			std::string const& top_path);
-    void checkDependencies(BuildTree& tree_data,
-			   BuildItem_map& builditems,
-			   std::string const& top_path);
-    void updatePlatformTypes(BuildTree& tree_data,
+    void checkItemDependencies(BuildForest& forest,
+			       BuildItem_map& builditems,
+			       std::string const& top_path);
+    void updatePlatformTypes(BuildForest& forest,
 			     BuildItem_map& builditems,
 			     std::string const& top_path);
     void checkDependencyPlatformTypes(BuildItem_map& builditems);
     void checkFlags(BuildItem_map& builditems);
-    void checkTraits(BuildTree& tree_data,
+    void checkTraits(BuildForest& forest,
 		     BuildItem_map& builditems,
 		     std::string const& top_path);
-    void checkIntegrity(BuildTree_map& buildtrees,
+    void checkIntegrity(BuildForest_map& forests,
 			std::string const& top_path);
     void reportIntegrityErrors(BuildForest_map& forests,
 			       BuildItem_map& builditems,
 			       std::string const& top_path);
-    void computeBuildablePlatforms(BuildTree& tree_data,
+    void computeBuildablePlatforms(BuildForest& forest,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
     void appendBackingData(std::string const& dir,

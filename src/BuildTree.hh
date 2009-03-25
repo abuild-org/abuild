@@ -5,6 +5,7 @@
 #include <list>
 #include <set>
 #include <PlatformData.hh>
+#include <FileLocation.hh>
 
 class BuildTree
 {
@@ -20,12 +21,14 @@ class BuildTree
     PlatformData& getPlatformData();
 
     std::string const& getRootPath() const;
+    FileLocation const& getLocation() const;
     std::list<std::string> const& getTreeDeps() const;
     std::set<std::string> const& getSupportedTraits() const;
     std::list<std::string> const& getPlugins() const;
 
   private:
     std::string root_path;
+    FileLocation location;
     std::list<std::string> tree_deps;
     std::set<std::string> supported_traits;
     std::list<std::string> plugins;

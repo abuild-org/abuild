@@ -1,4 +1,5 @@
 #include <BuildTree.hh>
+#include <ItemConfig.hh>
 
 BuildTree::BuildTree(std::string const& root_path,
 		     std::list<std::string> const& tree_deps,
@@ -6,6 +7,7 @@ BuildTree::BuildTree(std::string const& root_path,
 		     std::list<std::string> const& plugins,
 		     PlatformData const& platform_data) :
     root_path(root_path),
+    location(root_path + "/" + ItemConfig::FILE_CONF, 0, 0),
     tree_deps(tree_deps),
     supported_traits(declared_traits),
     plugins(plugins),
@@ -29,6 +31,12 @@ std::string const&
 BuildTree::getRootPath() const
 {
     return this->root_path;
+}
+
+FileLocation const&
+BuildTree::getLocation() const
+{
+    return this->location;
 }
 
 std::list<std::string> const&

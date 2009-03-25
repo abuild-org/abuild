@@ -1539,6 +1539,8 @@ Abuild::registerBuildTree(BuildTree_map& buildtrees,
 	      "another tree with the name \"" + tree_name + "\" has been"
 	      " found in this forest at \"" +
 	      buildtrees[tree_name]->getRootPath() + "\"");
+	error(buildtrees[tree_name]->getLocation(),
+	      "here is the other tree");
     }
     else
     {
@@ -1577,51 +1579,145 @@ Abuild::getAssignedTreeName(std::string const& dir)
 void
 Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
 {
-    // XXX used to be traverseTree
+    verbose("build tree " + top_path + ": validating");
 
-    // XXX Create dependency graph of tree-deps and check
+    BuildForest& forest = *(forests[top_path]);
+    BuildItem_map& builditems = forest.getBuildItems();
 
-    // Traverse build items defined locally and then perform a series
-    // of analysis and validation.
-    std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
-    if (Util::isFile(top_conf))
-    {
-	verbose("build tree " + top_path + ": processing build items");
-	traverseItems(buildtrees, top_path);
-    }
-
-    resolveItems(buildtrees, top_path);
-
-    BuildTree& tree_data = *(buildtrees[top_path]);
-    BuildItem_map& builditems = tree_data.getBuildItems();
+    // XXX Where are we going to issue deprecation warnings?  We
+    // probably don't want to bother with warnings for unresolvable
+    // external-dirs.  We should basically report deprecation warnings
+    // whenever it would be possible to improve the situation by
+    // running abuild --upgrade-trees.
 
     // Many of these checks have side effects.  The order of these
     // checks is very sensitive as some checks depend upon side
     // effects of other operations having been completed.
-    verbose("build tree " + top_path + ": validating");
-    resolveTraits(buildtrees, top_path);
-    checkPlatformTypes(tree_data, builditems, top_path);
-    checkPlugins(tree_data, builditems, top_path);
+    checkTreeDependencies(forest, top_path);
+    resolveItems(forests, top_path);
+    resolveTraits(forests, top_path);
+    checkPlatformTypes(forest, builditems, top_path);
+    checkPlugins(forest, builditems, top_path);
     checkItemNames(builditems, top_path);
     checkBuildAlso(builditems, top_path);
-    checkDependencies(tree_data, builditems, top_path);
-    updatePlatformTypes(tree_data, builditems, top_path);
+    checkItemDependencies(forest, builditems, top_path);
+    updatePlatformTypes(forest, builditems, top_path);
     checkDependencyPlatformTypes(builditems);
     checkFlags(builditems);
-    checkTraits(tree_data, builditems, top_path);
-    checkIntegrity(buildtrees, top_path);
+    checkTraits(forest, builditems, top_path);
+    checkIntegrity(forests, top_path);
     if (this->full_integrity)
     {
-	reportIntegrityErrors(buildtrees, builditems, top_path);
+	reportIntegrityErrors(forests, builditems, top_path);
     }
-    computeBuildablePlatforms(tree_data, builditems, top_path);
-    verbose("build tree " + top_path + ": traversal completed");
+    computeBuildablePlatforms(forest, builditems, top_path);
+    verbose("build tree " + top_path + ": validation completed");
+}
+
+void
+Abuild::checkTreeDependencies(BuildForest& forest,
+			      std::string const& top_path)
+{
+    // Make sure that there are no cycles or errors (references to
+    // non-existent trees) in the dependency graph of build trees.
+    // This code is essentially identicasl to checkItemDependencies
+    // but with enough surface differences to be different code.
+
+    // Create a dependency graph for all build trees in this forest.
+
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+
+    DependencyGraph g;
+    for (BuildTree_map::iterator iter = buildtrees.begin();
+	 iter != buildtrees.end(); ++iter)
+    {
+	std::string const& tree_name = (*iter).first;
+	BuildTree& tree = *((*iter).second);
+	g.addItem(tree_name);
+	std::list<std::string> const& dependencies = tree.getTreeDeps();
+	for (std::list<std::string>::const_iterator i2 = dependencies.begin();
+	     i2 != dependencies.end(); ++i2)
+        {
+            g.addDependency(tree_name, *i2);
+        }
+    }
+
+    bool check_okay = g.check();
+
+    // Whether or not we found errors, create a table indicating which
+    // trees can see which other trees.
+    std::map<std::string, std::set<std::string> >& tree_access_table =
+	forest.getTreeAccessTable();
+
+    for (BuildTree_map::iterator iter = buildtrees.begin();
+	 iter != buildtrees.end(); ++iter)
+    {
+	std::string const& tree_name = (*iter).first;
+	DependencyGraph::ItemList const& sdeps =
+	    g.getSortedDependencies(tree_name);
+	for (std::list<std::string>::const_iterator i2 = sdeps.begin();
+	     i2 != sdeps.end(); ++i2)
+	{
+	    tree_access_table[tree_name].insert(*i2);
+	}
+    }
+
+    if (! check_okay)
+    {
+	DependencyGraph::ItemMap unknowns;
+	std::vector<DependencyGraph::ItemList> cycles;
+	g.getErrors(unknowns, cycles);
+
+	for (DependencyGraph::ItemMap::iterator iter = unknowns.begin();
+	     iter != unknowns.end(); ++iter)
+	{
+	    std::string const& node = (*iter).first;
+	    DependencyGraph::ItemList const& unknown_items = (*iter).second;
+	    for (DependencyGraph::ItemList::const_iterator i2 =
+		     unknown_items.begin();
+		 i2 != unknown_items.end(); ++i2)
+	    {
+		std::string const& unknown = *i2;
+		QTC::TC("abuild", "Abuild ERR unknown tree dependency");
+		error(buildtrees[node]->getLocation(),
+		      "tree " + node + " depends on unknown build tree " +
+		      unknown);
+	    }
+	}
+
+	std::set<std::string> cycle_trees;
+	for (std::vector<DependencyGraph::ItemList>::const_iterator iter =
+		 cycles.begin();
+	     iter != cycles.end(); ++iter)
+	{
+	    DependencyGraph::ItemList const& data = *iter;
+	    QTC::TC("abuild", "Abuild ERR circular tree dependency");
+	    std::string cycle = Util::join(" -> ", data);
+	    cycle += " -> " + data.front();
+	    error("circular dependency detected among build trees: " + cycle);
+	    for (DependencyGraph::ItemList::const_iterator i2 = data.begin();
+		 i2 != data.end(); ++i2)
+	    {
+		cycle_trees.insert(*i2);
+	    }
+	}
+
+	for (std::set<std::string>::iterator iter = cycle_trees.begin();
+	     iter != cycle_trees.end(); ++iter)
+        {
+            error(buildtrees[*iter]->getLocation(),
+		  *iter + " participates in a circular tree dependency");
+        }
+    }
 }
 
 void
 Abuild::resolveItems(BuildTree_map& buildtrees,
 		     std::string const& top_path)
 {
+    // XXX somewhere we need to check to make sure no item references
+    // an item in a tree that its does not depend on
+
     BuildTree& tree_data = *(buildtrees[top_path]);
     std::map<std::string, ExternalData> const& externals =
 	tree_data.getExternals();
@@ -2106,9 +2202,9 @@ Abuild::accessibleFrom(BuildItem_map& builditems,
 
 
 void
-Abuild::checkDependencies(BuildTree& tree_data,
-			  BuildItem_map& builditems,
-			  std::string const& top_path)
+Abuild::checkItemDependencies(BuildTree& tree_data,
+			      BuildItem_map& builditems,
+			      std::string const& top_path)
 {
     // Make sure that there are no cycles or errors (references to
     // non-existent build items) in the dependency graph.

@@ -35,6 +35,12 @@ BuildForest::getDeletedItems()
     return this->deleted_items;
 }
 
+std::map<std::string, std::set<std::string> >&
+BuildForest::getTreeAccessTable()
+{
+    return this->tree_access_table;
+}
+
 void
 BuildForest::setSortedItemNames(std::list<std::string> const& sorted_items)
 {

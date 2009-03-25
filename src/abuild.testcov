@@ -299,3 +299,5 @@ Abuild external has already been seen 0
 BackingConfig ERR no Abuild.conf 0
 Abuild ERR can't find backing top 0
 Abuild duplicate backing area 0
+Abuild ERR unknown tree dependency 0
+Abuild ERR circular tree dependency 0

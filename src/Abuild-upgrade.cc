@@ -54,6 +54,10 @@ Abuild::upgradeTrees()
 
     // XXX When writing, remember to preserve any existing tree deps
 
+    // XXX Generate a report.  Alert to any cases where deprecated
+    // features were left behind.  This would mainly be for
+    // external-dirs that couldn't be translated to tree-deps.
+
     // XXX Get forest root for each forest.  If there is no
     // Abuild.conf in the forest root directory and if there is any
     // tree in the forest for which the next higher Abuild.conf is
