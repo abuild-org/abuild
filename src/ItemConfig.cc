@@ -139,20 +139,18 @@ ItemConfig::readKeyVal(Error& error, CompatLevel const& compat_level,
 void
 ItemConfig::validate()
 {
-    if (this->parent_dir.empty())
-    {
-	findParentDir();
-    }
+    findParentDir();
     detectRoot();
 
     checkDeprecated();
     checkName();
     checkTreeName();
-    checkNonRoot();
+    checkRoot();
     checkParent();
     checkChildren();
     checkBuildAlso();
     checkDeps();
+    checkTreeDeps();
     checkVisibleTo();
     checkBuildfile();
     checkPlatforms();
@@ -170,6 +168,11 @@ ItemConfig::validate()
 void
 ItemConfig::findParentDir()
 {
+    if (! this->parent_dir.empty())
+    {
+	return;
+    }
+
     std::string parent_candidate = this->dir;
 
     while (! parent_candidate.empty())
@@ -229,6 +232,7 @@ void
 ItemConfig::detectRoot()
 {
     std::set<std::string> const& ek = this->kv.getExplicitKeys();
+
     if (ek.count(k_TREENAME))
     {
 	// If a file has a tree-name key, it is definitely a 1.1 root.
@@ -258,6 +262,12 @@ ItemConfig::detectRoot()
     else
     {
 	this->is_root = false;
+    }
+
+    if (this->parent_dir.empty() &&
+	(this->is_root || ((ek.size() == 1) && ek.count(k_CHILDREN))))
+    {
+	this->is_forest_root = true;
     }
 }
 
@@ -327,48 +337,49 @@ ItemConfig::checkUnnamed()
 }
 
 void
-ItemConfig::checkNonRoot()
+ItemConfig::checkRoot()
 {
-    if (this->is_root)
+    if (! this->is_forest_root)
     {
-	return;
+	if (Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR Abuild.backing non-forest root");
+	    this->error.error(
+		FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
+		BackingConfig::FILE_BACKING +
+		" file ignored for non forest-root build item");
+	}
+	if (this->compat_level.allow_1_0() && (! this->tree_name.empty()) &&
+	    checkKeyPresent(k_DELETED, "is ignored except in deprecated"
+			    " 1.0 build tree roots with no tree name"))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR deleted on non-1.0-root");
+	}
     }
 
-    std::string msg = "may only appear in a root build item";
+    if (! this->is_root)
+    {
+	std::string msg = "may only appear in a root build item";
 
-    if (this->compat_level.allow_1_0())
-    {
-	if (checkKeyPresent(k_EXTERNAL, msg))
+	if (this->compat_level.allow_1_0())
 	{
-	    QTC::TC("abuild", "ItemConfig ERR external on non-root");
+	    if (checkKeyPresent(k_EXTERNAL, msg))
+	    {
+		QTC::TC("abuild", "ItemConfig ERR external on non-root");
+	    }
 	}
-	if (checkKeyPresent(k_DELETED, msg))
+	if (checkKeyPresent(k_TREEDEPS, msg))
 	{
-	    QTC::TC("abuild", "ItemConfig ERR deleted on non-root");
+	    QTC::TC("abuild", "ItemConfig ERR tree-deps on non-root");
 	}
-    }
-    if (checkKeyPresent(k_TREEDEPS, msg))
-    {
-	QTC::TC("abuild", "ItemConfig ERR tree-deps on non-root");
-    }
-    if (checkKeyPresent(k_SUPPORTED_TRAITS, msg))
-    {
-	QTC::TC("abuild", "ItemConfig ERR supported-traits on non-root");
-    }
-    if (checkKeyPresent(k_PLUGINS, msg))
-    {
-	QTC::TC("abuild", "ItemConfig ERR plugins on non-root");
-    }
-    if (Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING))
-    {
-	// XXX This check is in the wrong place.  Put it in traversal
-	// so we can yell about bad backing files in more
-	// context-specific ways.
-	QTC::TC("abuild", "ItemConfig ERR Abuild.backing at non-root");
-	this->error.error(
-	    FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
-	    BackingConfig::FILE_BACKING +
-	    " file ignored for non-root build item");
+	if (checkKeyPresent(k_SUPPORTED_TRAITS, msg))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR supported-traits on non-root");
+	}
+	if (checkKeyPresent(k_PLUGINS, msg))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR plugins on non-root");
+	}
     }
 }
 
@@ -660,6 +671,31 @@ ItemConfig::checkDeps()
 }
 
 void
+ItemConfig::checkTreeDeps()
+{
+    boost::regex item_name_re(ITEM_NAME_RE);
+    boost::smatch match;
+
+    this->tree_deps = Util::splitBySpace(this->kv.getVal(k_DEPS));
+
+    std::string last_dep;
+    std::list<std::string>::iterator iter = this->tree_deps.begin();
+    while (iter != this->tree_deps.end())
+    {
+	std::list<std::string>::iterator next = iter;
+	++next;
+	if (! boost::regex_match(*iter, match, item_name_re))
+	{
+	    QTC::TC("abuild", "ItemConfig ERR bad tree dep");
+	    this->error.error(this->location,
+			      "invalid tree dependency " + *iter);
+	    this->tree_deps.erase(iter, next);
+	}
+	iter = next;
+    }
+}
+
+void
 ItemConfig::checkVisibleTo()
 {
     this->visible_to = this->kv.getVal(k_VISIBLE_TO);
@@ -819,10 +855,11 @@ ItemConfig::checkExternals()
 	    else
 	    {
 		QTC::TC("abuild", "ItemConfig read-only external");
-		ExternalData data = this->externals.back();
-		this->externals.pop_back();
-		this->externals.push_back(
-		    ExternalData(data.getDeclaredPath(), true));
+		this->error.deprecate(
+		    "1.1", this->location,
+		    "the read-only flag for externals is now ignored;"
+		    " use --ro-path and --rw-path from the command-line"
+		    " instead");
 	    }
 	}
 	else if (boost::regex_match(word, match, winpath_re))
@@ -849,7 +886,7 @@ ItemConfig::checkExternals()
 	}
 	else
 	{
-	    this->externals.push_back(ExternalData(*iter, false));
+	    this->externals.push_back(ExternalData(*iter));
 	}
     }
 
@@ -1124,6 +1161,7 @@ ItemConfig::ItemConfig(
     dir(dir),
     parent_dir(parent_dir),
     is_root(false),
+    is_forest_root(false),
     deprecated(false)
 {
 }
@@ -1135,27 +1173,21 @@ ItemConfig::isTreeRoot() const
 }
 
 bool
-ItemConfig::isCandidateForestRoot() const
+ItemConfig::isForestRoot() const
 {
-    std::set<std::string> const& ek = this->kv.getExplicitKeys();
-    if ((ek.size() == 1) && (ek.count(k_CHILDREN)))
-    {
-	return true;
-    }
-    else if (isTreeRoot())
-    {
-	return true;
-    }
-    else
-    {
-	return false;
-    }
+    return this->is_forest_root;
 }
 
 bool
 ItemConfig::usesDeprecatedFeatures() const
 {
     return this->deprecated;
+}
+
+std::string const&
+ItemConfig::getAbsolutePath() const
+{
+    return this->dir;
 }
 
 std::string const&
@@ -1204,6 +1236,12 @@ std::list<std::string> const&
 ItemConfig::getDeps() const
 {
     return this->deps;
+}
+
+std::list<std::string> const&
+ItemConfig::getTreeDeps() const
+{
+    return this->tree_deps;
 }
 
 std::string const&

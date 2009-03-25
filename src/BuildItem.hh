@@ -16,9 +16,8 @@ class BuildItem
 {
   public:
     BuildItem(std::string const& item_name,
-	      ItemConfig const* config,
-	      std::string const& absolute_path,
-	      std::string const& tree_top);
+	      std::string const& tree_name,
+	      ItemConfig const* config);
 
     // Proxy methods to ItemConfig
     std::string const& getName() const;
@@ -40,9 +39,9 @@ class BuildItem
     ItemConfig::Backend getBackend() const;
     bool hasAntBuild() const;
     std::string const& getBuildFile() const;
-
     std::string const& getAbsolutePath() const;
-    std::string const& getTreeTop() const;
+
+    std::string const& getTreeName() const;
     // Note: list does not include the item itself
     std::list<std::string> const& getExpandedDependencies() const;
     unsigned int getBackingDepth() const;
@@ -105,8 +104,7 @@ class BuildItem
 
     std::string item_name;
     ItemConfig const* config;         // memory managed by ItemConfig
-    std::string absolute_path;	// canonical path to item directory
-    std::string tree_top;	// containing tree
+    std::string tree_name;	// containing tree
     unsigned int backing_depth;	// 0 in local build tree and externals
     unsigned int external_depth;    // 0 in local build tree and backing chain
     bool force_read_only;

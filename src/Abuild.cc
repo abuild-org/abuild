@@ -1,12 +1,5 @@
 #include <Abuild.hh>
 
-#include <assert.h>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
@@ -16,6 +9,14 @@
 #include <BackingConfig.hh>
 #include <InterfaceParser.hh>
 #include <DependencyRunner.hh>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <cstdlib>
+#include <assert.h>
 
 std::string const Abuild::ABUILD_VERSION = "1.1.a4";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
@@ -65,6 +66,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     local_build(false),
     error_handler(whoami),
     this_config(0),
+    last_assigned_tree_number(0),
 #ifdef _WIN32
     have_perl(false),
 #endif
@@ -72,6 +74,12 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
 {
     Error::setErrorCallback(
 	boost::bind(&Abuild::monitorErrorCallback, this, _1));
+
+    boost::posix_time::time_duration epoch =
+	boost::posix_time::second_clock::universal_time() -
+	boost::posix_time::ptime(boost::gregorian::date(1970, 1, 1));
+    std::srand(epoch.total_seconds());
+    this->last_assigned_tree_number = 50 + (std::rand() % 99);
 }
 
 Abuild::~Abuild()
@@ -1133,13 +1141,10 @@ Abuild::findTop(std::string const& start_dir,
 		std::string const& description)
 {
     // Find the directory that contains the root of the forest
-    // containing the item with the given start directory.  That is
-    // the first directory above it that contains an Abuild.conf not
-    // referenced as a child of the next higher Abuild.conf.
+    // containing the item with the given start directory.
 
     std::string top;
     std::string dir = start_dir;
-    std::string candidate;
 
     verbose("looking for top of build forest \"" + description + "\"");
 
@@ -1147,24 +1152,19 @@ Abuild::findTop(std::string const& start_dir,
     {
 	verbose("top-search: checking " + dir);
 	ItemConfig* config = readConfig(dir, "");
-	if (config->isCandidateForestRoot())
+	if (config->isForestRoot())
 	{
-	    verbose("top-search: " + dir + " is a possible root");
-	    candidate = dir;
+	    top = dir;
+	    break;
 	}
 	std::string parent_dir = config->getParentDir();
 	if (parent_dir.empty())
 	{
 	    verbose("top-search: " + dir + " has no parent; ending search");
-	    if (candidate == dir)
-	    {
-		top = candidate;
-	    }
 	    break;
 	}
 	else
 	{
-	    verbose("top-search: " + dir + " has a parent");
 	    dir = parent_dir;
 	}
     }
@@ -1185,20 +1185,14 @@ Abuild::findTop(std::string const& start_dir,
 }
 
 void
-Abuild::traverse(BuildForest_map& forests, std::string const& item_dir,
+Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		 std::set<std::string>& visiting,
 		 FileLocation const& referrer,
 		 std::string const& description)
 {
-    std::string top_path = findTop(item_dir, description);
-    if (top_path.empty())
-    {
-	QTC::TC("abuild", "Abuild can't find top in traverse");
-	return;
-    }
-
     if (visiting.count(top_path))
     {
+	// XXX is this right anymore?
         QTC::TC("abuild", "Abuild ERR backing cycle");
         fatal("backing area cycle detected for " + top_path +
 	      " (" + description + ")");
@@ -1211,22 +1205,31 @@ Abuild::traverse(BuildForest_map& forests, std::string const& item_dir,
 
     verbose("traversing forest from " + top_path);
     ItemConfig* config = readConfig(top_path, "");
-    std::list<std::string> backing_areas;
-    std::set<std::string> deleted_trees;
-    std::set<std::string> deleted_items;
-    getBackingAreaData(
-	top_path, config, backing_areas, deleted_trees, deleted_items);
-
-    // XXXX HERE (0)
+    assert(config->isForestRoot());
 
     // DO NOT RETURN BELOW THIS POINT until after we remove top_path
     // from visiting.
     visiting.insert(top_path);
 
+    BuildForest forest;
+    traverseItems(forest, top_path);
+
+    // XXXX HERE (0)
+
+
+
+
+
+
+
+
+
+
     // Do a post-order traversal of the backing area/externals tree,
     // traversing each build tree once we have traversed its backing
     // area and externals.
 
+#if 0 // XXX
     if (! backing_area.empty())
     {
 	verbose("build tree " + top_path + " has backing area " + backing_area);
@@ -1240,6 +1243,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& item_dir,
 	verbose("build tree " + top_path +
 		": backing area traversal completed");
     }
+#endif
 
     std::map<std::string, ExternalData> externals;
     std::map<std::string, ExternalData> backed_externals;
@@ -1326,135 +1330,30 @@ Abuild::traverse(BuildForest_map& forests, std::string const& item_dir,
 }
 
 void
-Abuild::getBackingAreaData(std::string const& top_path,
-			   ItemConfig* config,
-			   std::list<std::string>& backing_areas,
-			   std::set<std::string>& deleted_trees,
-			   std::set<std::string>& deleted_items)
+Abuild::traverseItems(BuildForest& forest, std::string const& top_path)
 {
-    if (Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING))
-    {
-	BackingConfig* backing = readBacking(top_path);
-	backing->appendBackingData(backing_areas, deleted_trees, deleted_items);
-    }
+    // XXX Traverse items.  When we come to a tree root, keep track of
+    // this fact.  After we're done, look at all externals that we
+    // encountered anywhere during the traversal.  If we've already
+    // seen tree at that location, no further action is required.
+    // Otherwise, it has to be a forest root, and we have to add it to
+    // a list of other areas that need to be traversed.
 
-    if (! this->compat_level.allow_1_0())
-    {
-	return;
-    }
+    bool has_backing_area =
+	Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING);
+    std::list<std::string> has_externals;
 
-    // 1.0-compatibility mode: traverse through all external-dirs
-    // looking for Abuild.backing files and also looking for "deleted"
-    // keys in root Abuild.conf files.
-
-    // XXXX HERE (1)
-
-    // XXX need some kind of traverseExternals both here and when we
-    // make up and assign tree names.
-
-
-#if 0 // XXX
-
-    std::set<std::string> const& d = config->getDeleted();
-    deleted_items.insert(d.begin(), d.end());
-
-#endif
-
-
-#if 0 // XXX
-    if (! config->isTreeRoot())
-    {
-	QTC::TC("abuild", "Abuild ERR build tree root not root");
-	FileLocation top_location(
-	    top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
-	error(top_location, "this build item does not appear to be"
-	      " a build tree root, but it is referenced as one (" +
-	      description +")");
-	if (! referrer.getFilename().empty())
-	{
-	    error(referrer, "here is the referring build item");
-	}
-	return;
-    }
-#endif
-
-#if 0 // XXX
-    if (config == 0)
-    {
-        if (backing_area.empty())
-        {
-            QTC::TC("abuild", "Abuild ERR no build tree top config");
-            fatal("no " + ItemConfig::FILE_CONF + " found in " + top_path +
-		  " (" + description + ")");
-        }
-        else
-        {
-            QTC::TC("abuild", "Abuild Abuild.backing without Abuild.conf");
-        }
-    }
-#endif
-
-
-
-
-}
-
-void
-Abuild::traverseTree(BuildTree_map& buildtrees, std::string const& top_path)
-{
-    // Traverse build items defined locally and then perform a series
-    // of analysis and validation.
-    std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
-    if (Util::isFile(top_conf))
-    {
-	verbose("build tree " + top_path + ": processing build items");
-	traverseItems(buildtrees, top_path);
-    }
-
-    resolveItems(buildtrees, top_path);
-
-    BuildTree& tree_data = *(buildtrees[top_path]);
-    BuildItem_map& builditems = tree_data.getBuildItems();
-
-    // Many of these checks have side effects.  The order of these
-    // checks is very sensitive as some checks depend upon side
-    // effects of other operations having been completed.
-    verbose("build tree " + top_path + ": validating");
-    resolveTraits(buildtrees, top_path);
-    checkPlatformTypes(tree_data, builditems, top_path);
-    checkPlugins(tree_data, builditems, top_path);
-    checkItemNames(builditems, top_path);
-    checkBuildAlso(builditems, top_path);
-    checkDependencies(tree_data, builditems, top_path);
-    updatePlatformTypes(tree_data, builditems, top_path);
-    checkDependencyPlatformTypes(builditems);
-    checkFlags(builditems);
-    checkTraits(tree_data, builditems, top_path);
-    checkIntegrity(buildtrees, top_path);
-    if (this->full_integrity)
-    {
-	reportIntegrityErrors(buildtrees, builditems, top_path);
-    }
-    computeBuildablePlatforms(tree_data, builditems, top_path);
-    verbose("build tree " + top_path + ": traversal completed");
-}
-
-void
-Abuild::traverseItems(BuildTree_map& buildtrees,
-		      std::string const& top_path)
-{
-    BuildItem_map builditems;
-    BuildTree& tree_data = *(buildtrees[top_path]);
-    bool has_backing_area = (! tree_data.getBackingArea().empty());
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+    BuildItem_map& builditems = forest.getBuildItems();
 
     std::list<std::string> dirs;
     std::map<std::string, std::string> parent_dirs;
+    std::map<std::string, std::string> dir_trees;
     dirs.push_back(top_path);
     while (! dirs.empty())
     {
 	std::string dir = dirs.front();
 	dirs.pop_front();
-	std::string tree_relative = Util::absToRel(dir, top_path);
 	std::string parent_dir;
 	if (parent_dirs.count(dir))
 	{
@@ -1463,36 +1362,55 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
         ItemConfig* config = readConfig(dir, parent_dir);
 	FileLocation location = config->getLocation();
 
-	std::string item_this = config->getName(); // may be empty
-        if (! item_this.empty())
+	std::string tree_name;
+	if (dir_trees.count(parent_dir))
+	{
+	    tree_name = dir_trees[parent_dir];
+	}
+	if (config->isTreeRoot())
+	{
+	    tree_name = registerBuildTree(buildtrees, dir, config,
+					  has_externals);
+	    dir_trees[dir] = tree_name;
+	}
+
+	std::string item_name = config->getName();
+        if (! item_name.empty())
         {
-            if (builditems.count(item_this))
+            if (builditems.count(item_name))
             {
 		std::string other_dir =
-		    builditems[item_this]->getAbsolutePath();
+		    builditems[item_name]->getAbsolutePath();
 		if (dir == other_dir)
 		{
 		    QTC::TC("abuild", "Abuild ERR item traversal loop");
-		    error(builditems[item_this]->getLocation(),
+		    error(builditems[item_name]->getLocation(),
 			  "loop detected while reading " +
 			  ItemConfig::FILE_CONF + " files: build item " +
-			  item_this + " reached by multiple paths");
+			  item_name + " reached by multiple paths");
 		    continue;
 		}
 		else
 		{
 		    QTC::TC("abuild", "Abuild ERR item multiple locations");
 		    error(FileLocation(dir + "/" + ItemConfig::FILE_CONF, 0, 0),
-			  "build item " + item_this +
+			  "build item " + item_name +
 			  " appears in multiple locations");
-		    error(builditems[item_this]->getLocation(),
+		    error(builditems[item_name]->getLocation(),
 			  "here is another location");
 		}
             }
             else
             {
-		builditems[item_this].reset(
-		    new BuildItem(item_this, config, dir, top_path));
+		if (tree_name.empty())
+		{
+		    QTC::TC("abuild", "Abuild ERR named item outside of tree");
+		    error(location,
+			  "named build items are not allowed outside of"
+			  " build trees");
+		}
+		builditems[item_name].reset(
+		    new BuildItem(item_name, tree_name, config));
             }
         }
 
@@ -1537,7 +1455,143 @@ Abuild::traverseItems(BuildTree_map& buildtrees,
         }
     }
 
-    tree_data.setBuildItems(builditems);
+    if (this->compat_level.allow_1_0())
+    {
+	// XXX
+    }
+    else
+    {
+	assert(has_externals.empty());
+    }
+}
+
+std::string
+Abuild::registerBuildTree(BuildTree_map& buildtrees,
+			  std::string const& dir,
+			  ItemConfig* config,
+			  std::list<std::string>& has_externals)
+{
+    std::string tree_name = config->getTreeName();
+    std::list<std::string> tree_deps = config->getTreeDeps();
+
+    if (this->compat_level.allow_1_0())
+    {
+	// Assign a name if needed.
+	if (tree_name.empty())
+	{
+	    tree_name = getAssignedTreeName(dir);
+	}
+
+	// Map any externals to tree dependencies.
+	std::list<ExternalData> const& externals = config->getExternals();
+	if (! externals.empty())
+	{
+	    has_externals.push_back(dir);
+	}
+	for (std::list<ExternalData>::const_iterator eiter = externals.begin();
+	     eiter != externals.end(); ++eiter)
+	{
+	    ExternalData const& edata = *eiter;
+	    std::string edecl = edata.getDeclaredPath();
+	    ItemConfig* econfig = readExternalConfig(dir, edecl);
+	    if (econfig)
+	    {
+		std::string ext_tree_name = econfig->getTreeName();
+		if (ext_tree_name.empty())
+		{
+		    ext_tree_name = getAssignedTreeName(
+			econfig->getAbsolutePath());
+		}
+		tree_deps.push_back(ext_tree_name);
+	    }
+	    else
+	    {
+		// We'll surely notice this problem again, but report
+		// it here anyway just to be safe.
+		QTC::TC("abuild", "Abuild ERR missing external");
+		error(config->getLocation(),
+		      "unable to resolve external \"" + edecl +
+		      "\" to translate it into a tree dependency");
+	    }
+	}
+    }
+    else
+    {
+	assert(! tree_name.empty());
+    }
+
+    buildtrees[tree_name].reset(
+	new BuildTree(tree_deps,
+		      config->getSupportedTraits(),
+		      config->getPlugins(),
+		      this->internal_platform_data));
+
+    return tree_name;
+}
+
+std::string
+Abuild::getAssignedTreeName(std::string const& dir)
+{
+    std::string tree_name;
+    if (this->assigned_tree_names.count(dir))
+    {
+	QTC::TC("abuild", "Abuild previously assigned tree name");
+	tree_name = this->assigned_tree_names[dir];
+    }
+    else
+    {
+	// Assign a name to this tree.  The random number is there to
+	// prevent people from ever being able to rely on what the
+	// tree is called, which in turn should hopefully encourage
+	// people to upgrade.
+	tree_name = "tree." +
+	    Util::intToString(++this->last_assigned_tree_number) +
+	    ".-" + Util::intToString(std::rand() % 9999) + "-";
+	this->assigned_tree_names[dir] = tree_name;
+    }
+    return tree_name;
+}
+
+void
+Abuild::traverseTree(BuildTree_map& buildtrees, std::string const& top_path)
+{
+    // XXX not called?
+
+    // Traverse build items defined locally and then perform a series
+    // of analysis and validation.
+    std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
+    if (Util::isFile(top_conf))
+    {
+	verbose("build tree " + top_path + ": processing build items");
+	traverseItems(buildtrees, top_path);
+    }
+
+    resolveItems(buildtrees, top_path);
+
+    BuildTree& tree_data = *(buildtrees[top_path]);
+    BuildItem_map& builditems = tree_data.getBuildItems();
+
+    // Many of these checks have side effects.  The order of these
+    // checks is very sensitive as some checks depend upon side
+    // effects of other operations having been completed.
+    verbose("build tree " + top_path + ": validating");
+    resolveTraits(buildtrees, top_path);
+    checkPlatformTypes(tree_data, builditems, top_path);
+    checkPlugins(tree_data, builditems, top_path);
+    checkItemNames(builditems, top_path);
+    checkBuildAlso(builditems, top_path);
+    checkDependencies(tree_data, builditems, top_path);
+    updatePlatformTypes(tree_data, builditems, top_path);
+    checkDependencyPlatformTypes(builditems);
+    checkFlags(builditems);
+    checkTraits(tree_data, builditems, top_path);
+    checkIntegrity(buildtrees, top_path);
+    if (this->full_integrity)
+    {
+	reportIntegrityErrors(buildtrees, builditems, top_path);
+    }
+    computeBuildablePlatforms(tree_data, builditems, top_path);
+    verbose("build tree " + top_path + ": traversal completed");
 }
 
 void
@@ -2641,6 +2695,82 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
         }
         item.setBuildPlatforms(build_platforms);
     }
+}
+
+void
+Abuild::getBackingAreaData(std::string const& top_path,
+			   ItemConfig* config,
+			   std::list<std::string>& backing_areas,
+			   std::set<std::string>& deleted_trees,
+			   std::set<std::string>& deleted_items)
+{
+    // XXX not called yet
+
+    if (Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING))
+    {
+	BackingConfig* backing = readBacking(top_path);
+	backing->appendBackingData(backing_areas, deleted_trees, deleted_items);
+    }
+
+    if (! this->compat_level.allow_1_0())
+    {
+	return;
+    }
+
+    // 1.0-compatibility mode: traverse through all external-dirs
+    // looking for Abuild.backing files and also looking for "deleted"
+    // keys in root Abuild.conf files.
+
+    // XXXX HERE (1)
+
+    // XXX need some kind of traverseExternals both here and when we
+    // make up and assign tree names.
+
+
+#if 0 // XXX
+
+    std::set<std::string> const& d = config->getDeleted();
+    deleted_items.insert(d.begin(), d.end());
+
+#endif
+
+
+#if 0 // XXX
+    if (! config->isTreeRoot())
+    {
+	QTC::TC("abuild", "Abuild ERR build tree root not root");
+	FileLocation top_location(
+	    top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
+	error(top_location, "this build item does not appear to be"
+	      " a build tree root, but it is referenced as one (" +
+	      description +")");
+	if (! referrer.getFilename().empty())
+	{
+	    error(referrer, "here is the referring build item");
+	}
+	return;
+    }
+#endif
+
+#if 0 // XXX
+    if (config == 0)
+    {
+        if (backing_area.empty())
+        {
+            QTC::TC("abuild", "Abuild ERR no build tree top config");
+            fatal("no " + ItemConfig::FILE_CONF + " found in " + top_path +
+		  " (" + description + ")");
+        }
+        else
+        {
+            QTC::TC("abuild", "Abuild Abuild.backing without Abuild.conf");
+        }
+    }
+#endif
+
+
+
+
 }
 
 BackingConfig*

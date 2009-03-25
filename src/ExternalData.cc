@@ -3,16 +3,13 @@
 #include <QTC.hh>
 #include <assert.h>
 
-ExternalData::ExternalData() :
-    read_only(true)
+ExternalData::ExternalData()
 {
-    // empty constructor std::map
+    // empty constructor for std::map
 }
 
-ExternalData::ExternalData(std::string const& declared_path,
-			   bool read_only) :
-    declared_path(declared_path),
-    read_only(read_only)
+ExternalData::ExternalData(std::string const& declared_path) :
+    declared_path(declared_path)
 {
 }
 
@@ -29,12 +26,6 @@ ExternalData::getAbsolutePath() const
     // it before it is computed.
     assert(! this->absolute_path.empty());
     return this->absolute_path;
-}
-
-bool
-ExternalData::isReadOnly() const
-{
-    return this->read_only;
 }
 
 void

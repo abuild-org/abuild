@@ -62,19 +62,18 @@ class Abuild
 				   std::string const& external);
     std::string findTop(std::string const& start_dir,
 			std::string const& description);
-    void traverse(BuildForest_map&, std::string const& item_dir,
+    void traverse(BuildForest_map&, std::string const& forest_top,
 		  std::set<std::string>& visiting,
 		  FileLocation const& referrer,
 		  std::string const& description);
-    void getBackingAreaData(std::string const& top_path,
-			    ItemConfig* config,
-			    std::list<std::string>& backing_areas,
-			    std::set<std::string>& deleted_trees,
-			    std::set<std::string>& deleted_items);
+    void traverseItems(BuildForest& forest, std::string const& top_path);
+    std::string registerBuildTree(BuildTree_map& buildtrees,
+				  std::string const& dir,
+				  ItemConfig* config,
+				  std::list<std::string>& has_externals);
+    std::string getAssignedTreeName(std::string const& dir);
     void traverseTree(BuildTree_map& buildtrees,
 		      std::string const& top_path);
-    void traverseItems(BuildTree_map& buildtrees,
-		       std::string const& top_path);
     void resolveItems(BuildTree_map& buildtrees,
 		      std::string const& top_path);
     void resolveTraits(BuildTree_map& buildtrees,
@@ -112,6 +111,11 @@ class Abuild
     void computeBuildablePlatforms(BuildTree& tree_data,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
+    void getBackingAreaData(std::string const& top_path,
+			    ItemConfig* config,
+			    std::list<std::string>& backing_areas,
+			    std::set<std::string>& deleted_trees,
+			    std::set<std::string>& deleted_items);
     BackingConfig* readBacking(std::string const& dir);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
 		      ExternalData& external);
@@ -286,6 +290,8 @@ class Abuild
     std::string this_platform;
     std::string this_config_dir;
     ItemConfig* this_config;
+    unsigned int last_assigned_tree_number;
+    std::map<std::string, std::string> assigned_tree_names;
     PlatformData internal_platform_data;
     std::set<std::string> valid_traits;
     BuildItem_map buildset;

@@ -6,13 +6,11 @@
 #include <boost/regex.hpp>
 
 BuildItem::BuildItem(std::string const& item_name,
-		     ItemConfig const* config,
-		     std::string const& absolute_path,
-		     std::string const& tree_top) :
+		     std::string const& tree_name,
+		     ItemConfig const* config) :
     item_name(item_name),
     config(config),
-    absolute_path(absolute_path),
-    tree_top(tree_top),
+    tree_name(tree_name),
     backing_depth(0),
     external_depth(0),
     force_read_only(false),
@@ -141,13 +139,13 @@ BuildItem::getBuildFile() const
 std::string const&
 BuildItem::getAbsolutePath() const
 {
-    return this->absolute_path;
+    return this->config->getAbsolutePath();
 }
 
 std::string const&
-BuildItem::getTreeTop() const
+BuildItem::getTreeName() const
 {
-    return this->tree_top;
+    return this->tree_name;
 }
 
 std::list<std::string> const&
@@ -309,11 +307,12 @@ BuildItem::isWritable() const
 bool
 BuildItem::isAtOrBelowPath(std::string const& path) const
 {
-    if (path == this->absolute_path)
+    std::string const& absolute_path = getAbsolutePath();
+    if (path == absolute_path)
     {
 	return true;
     }
-    else if (this->absolute_path.substr(0, path.length() + 1) == (path + "/"))
+    else if (absolute_path.substr(0, path.length() + 1) == (path + "/"))
     {
 	return true;
     }

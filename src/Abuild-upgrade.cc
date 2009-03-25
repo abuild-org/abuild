@@ -202,7 +202,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		// area of concern.
 
 		g.addDependency(dir, epath);
-		dep_tree_name = readConfig(dir, "")->getTreeName();
+		dep_tree_name = econfig->getTreeName();
 	    }
 	    else if (econfig && econfig->isTreeRoot())
 	    {

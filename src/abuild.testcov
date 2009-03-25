@@ -258,7 +258,6 @@ ItemConfig ERR interleaved child Abuild.conf 0
 ItemConfig ERR absolute external 0
 ItemConfig found root searching for parent 0
 ItemConfig skipping dir in parent search 0
-ItemConfig ERR Abuild.backing at non-root 0
 ItemConfig ERR this and name 0
 ItemConfig root without tree-name 0
 ItemConfig has parent-dir 0
@@ -289,4 +288,8 @@ ItemConfig ERR tree-deps on non-root 0
 Abuild-upgrade ERR duplicate name 0
 Abuild-upgrade ERR invalid name 0
 Abuild ERR can't find local top 0
-Abuild can't find top in traverse 0
+ItemConfig ERR Abuild.backing non-forest root 0
+Abuild previously assigned tree name 0
+Abuild ERR named item outside of tree 0
+ItemConfig ERR bad tree dep 0
+Abuild ERR missing external 0

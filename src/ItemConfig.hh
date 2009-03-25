@@ -63,8 +63,9 @@ class ItemConfig
     static std::map<std::string, std::string> valid_keys;
 
     bool isTreeRoot() const;
-    bool isCandidateForestRoot() const;
+    bool isForestRoot() const;
     bool usesDeprecatedFeatures() const;
+    std::string const& getAbsolutePath() const;
     std::string const& getParentDir() const;
     std::string const& getName() const;
     std::string const& getTreeName() const;
@@ -73,6 +74,7 @@ class ItemConfig
     std::list<ExternalData> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;
     std::list<std::string> const& getDeps() const;
+    std::list<std::string> const& getTreeDeps() const;
     std::string const& getDepPlatformType(std::string const& dep,
 					  PlatformSelector const*& ps) const;
     FlagData const& getFlagData() const;
@@ -117,13 +119,14 @@ class ItemConfig
     void findParentDir();
     void checkDeprecated();
     void checkUnnamed();
-    void checkNonRoot();
+    void checkRoot();
     void checkName();
     void checkTreeName();
     void checkParent();
     void checkChildren();
     void checkBuildAlso();
     void checkDeps();
+    void checkTreeDeps();
     void checkVisibleTo();
     void checkBuildfile();
     void checkPlatforms();
@@ -165,6 +168,7 @@ class ItemConfig
     std::string dir;
     std::string parent_dir;
     bool is_root;
+    bool is_forest_root;
     bool deprecated;
 
     // Information used during validation
@@ -175,6 +179,7 @@ class ItemConfig
     std::list<std::string> children;
     std::list<std::string> build_also;
     std::list<std::string> deps;
+    std::list<std::string> tree_deps;
     FlagData flag_data;
     std::string visible_to;
     std::set<std::string> platform_types;
