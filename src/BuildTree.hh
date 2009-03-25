@@ -9,7 +9,8 @@
 class BuildTree
 {
   public:
-    BuildTree(std::list<std::string> const& tree_deps,
+    BuildTree(std::string const& root_path,
+	      std::list<std::string> const& tree_deps,
 	      std::set<std::string> const& declared_traits,
 	      std::list<std::string> const& plugins,
 	      PlatformData const& platform_data);
@@ -18,11 +19,13 @@ class BuildTree
     // Return writable reference to platform data so it can be modified
     PlatformData& getPlatformData();
 
+    std::string const& getRootPath() const;
     std::list<std::string> const& getTreeDeps() const;
     std::set<std::string> const& getSupportedTraits() const;
     std::list<std::string> const& getPlugins() const;
 
   private:
+    std::string root_path;
     std::list<std::string> tree_deps;
     std::set<std::string> supported_traits;
     std::list<std::string> plugins;

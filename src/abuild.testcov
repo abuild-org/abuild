@@ -59,10 +59,10 @@ Abuild multiple target types 1
 Abuild empty build set 0
 Abuild integrity errors in buildset 0
 Abuild ERR backing cycle 0
-Abuild ERR build tree root not root 0
+Abuild ERR external not root 0
 Abuild ERR invalid backing file 0
 Abuild ERR no build tree top config 0
-Abuild Abuild.backing without Abuild.conf 0
+Abuild traverse backing without conf 0
 Abuild external in backing area 0
 Abuild ERR can't resolve external 0
 Abuild ERR item multiple locations 0
@@ -293,3 +293,6 @@ Abuild previously assigned tree name 0
 Abuild ERR named item outside of tree 0
 ItemConfig ERR bad tree dep 0
 Abuild ERR missing external 0
+Abuild ERR duplicate tree 0
+Abuild ERR findTop from external 0
+Abuild external has already been seen 0

@@ -190,9 +190,8 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		 old_externals.begin();
 	     eiter != old_externals.end(); ++eiter)
 	{
-	    std::string edecl = (*eiter).getDeclaredPath();
-	    std::string epath = Util::absToRel(
-		Util::canonicalizePath(dir + "/" + edecl));
+	    std::string const& edecl = (*eiter).getDeclaredPath();
+	    std::string epath = Util::absToRel((*eiter).getAbsolutePath());
 	    ItemConfig* econfig = readExternalConfig(dir, edecl);
 	    std::string dep_tree_name;
 

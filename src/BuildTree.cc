@@ -1,9 +1,11 @@
 #include <BuildTree.hh>
 
-BuildTree::BuildTree(std::list<std::string> const& tree_deps,
+BuildTree::BuildTree(std::string const& root_path,
+		     std::list<std::string> const& tree_deps,
 		     std::set<std::string> const& declared_traits,
 		     std::list<std::string> const& plugins,
 		     PlatformData const& platform_data) :
+    root_path(root_path),
     tree_deps(tree_deps),
     supported_traits(declared_traits),
     plugins(plugins),
@@ -21,6 +23,12 @@ PlatformData&
 BuildTree::getPlatformData()
 {
     return this->platform_data;
+}
+
+std::string const&
+BuildTree::getRootPath() const
+{
+    return this->root_path;
 }
 
 std::list<std::string> const&

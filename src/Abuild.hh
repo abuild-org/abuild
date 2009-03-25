@@ -66,14 +66,18 @@ class Abuild
 		  std::set<std::string>& visiting,
 		  FileLocation const& referrer,
 		  std::string const& description);
-    void traverseItems(BuildForest& forest, std::string const& top_path);
+    void traverseItems(BuildForest& forest, std::string const& top_path,
+		       std::list<std::string>& dirs_with_externals,
+		       std::list<std::string>& backing_areas,
+		       std::set<std::string>& deleted_trees,
+		       std::set<std::string>& deleted_items);
     std::string registerBuildTree(BuildTree_map& buildtrees,
 				  std::string const& dir,
 				  ItemConfig* config,
-				  std::list<std::string>& has_externals);
+				  std::list<std::string>& dirs_with_externals);
     std::string getAssignedTreeName(std::string const& dir);
-    void traverseTree(BuildTree_map& buildtrees,
-		      std::string const& top_path);
+    void validateForest(BuildForest_map& forests,
+			std::string const& top_path);
     void resolveItems(BuildTree_map& buildtrees,
 		      std::string const& top_path);
     void resolveTraits(BuildTree_map& buildtrees,
@@ -111,11 +115,10 @@ class Abuild
     void computeBuildablePlatforms(BuildTree& tree_data,
 				   BuildItem_map& builditems,
 				   std::string const& top_path);
-    void getBackingAreaData(std::string const& top_path,
-			    ItemConfig* config,
-			    std::list<std::string>& backing_areas,
-			    std::set<std::string>& deleted_trees,
-			    std::set<std::string>& deleted_items);
+    void appendBackingData(std::string const& dir,
+			   std::list<std::string>& backing_areas,
+			   std::set<std::string>& deleted_trees,
+			   std::set<std::string>& deleted_items);
     BackingConfig* readBacking(std::string const& dir);
     bool haveExternal(BuildTree_map&, std::string const& backing_area,
 		      ExternalData& external);
