@@ -985,7 +985,7 @@ Abuild::readConfigs()
     if (this->monitored || this->dump_data)
     {
 	monitorOutput("begin-dump-data");
-	dumpData(buildtrees);
+	dumpData(forests);
 	monitorOutput("end-dump-data");
     }
 
@@ -1004,12 +1004,12 @@ Abuild::readConfigs()
 
     if (this->list_platforms)
     {
-	listPlatforms(buildtrees);
+	listPlatforms(forests);
 	return true;
     }
 
-    BuildTree& tree_data = *(buildtrees[local_top]);
-    BuildItem_map& builditems = tree_data.getBuildItems();
+    BuildForest& local_forest = *(forests[local_top]);
+    BuildItem_map& builditems = local_forest.getBuildItems();
     computeBuildset(builditems);
 
     if (! this->full_integrity)
@@ -1017,7 +1017,7 @@ Abuild::readConfigs()
 	// Note: we do these checks even when cleaning.  Otherwise,
 	// shadowed items won't get cleaned in their backing areas on
 	// --clean=all, which is not the expected behavior.
-	reportIntegrityErrors(buildtrees, this->buildset, local_top);
+	reportIntegrityErrors(forests, this->buildset, local_top);
 	if (Error::anyErrors())
 	{
 	    QTC::TC("abuild", "Abuild integrity errors in buildset");
@@ -1040,7 +1040,7 @@ Abuild::readConfigs()
     // order.  This list is used during construction of the build
     // graph.
     std::list<std::string> const& sorted_items =
-	tree_data.getSortedItemNames();
+	local_forest.getSortedItemNames();
     for (std::list<std::string>::const_reverse_iterator iter =
 	     sorted_items.rbegin();
 	 iter != sorted_items.rend(); ++iter)

@@ -108,7 +108,7 @@ class Abuild
 		     std::string const& top_path);
     void checkIntegrity(BuildTree_map& buildtrees,
 			std::string const& top_path);
-    void reportIntegrityErrors(BuildTree_map& buildtrees,
+    void reportIntegrityErrors(BuildForest_map& forests,
 			       BuildItem_map& builditems,
 			       std::string const& top_path);
     void computeBuildablePlatforms(BuildTree& tree_data,
@@ -121,8 +121,8 @@ class Abuild
     BackingConfig* readBacking(std::string const& dir);
     void computeValidTraits(BuildForest_map& forests);
     void listTraits();
-    void listPlatforms(BuildTree_map& buildtrees);
-    void dumpData(BuildTree_map& buildtrees);
+    void listPlatforms(BuildForest_map& buildtrees);
+    void dumpData(BuildForest_map& buildtrees);
     void dumpPlatformData(PlatformData const&, std::string const& indent);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& tree_numbers);

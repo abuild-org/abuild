@@ -25,7 +25,6 @@ class BuildForest
     std::set<std::string>& getDeletedTrees();
     std::set<std::string>& getDeletedItems();
 
-    // XXX needed?
     void setSortedItemNames(std::list<std::string> const& sorted_items);
     std::list<std::string> const& getSortedItemNames() const;
 
