@@ -25,11 +25,15 @@ class BuildTree
     std::list<std::string> const& getTreeDeps() const;
     std::set<std::string> const& getSupportedTraits() const;
     std::list<std::string> const& getPlugins() const;
+    std::list<std::string> const& getExpandedTreeDeps() const;
+
+    void setExpandedTreeDeps(std::list<std::string> const&);
 
   private:
     std::string root_path;
     FileLocation location;
     std::list<std::string> tree_deps;
+    std::list<std::string> expanded_tree_deps;
     std::set<std::string> supported_traits;
     std::list<std::string> plugins;
     PlatformData platform_data;

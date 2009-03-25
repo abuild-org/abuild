@@ -81,8 +81,8 @@ class Abuild
 			       std::string const& top_path);
     void resolveItems(BuildForest_map& forests,
 		      std::string const& top_path);
-    void resolveTraits(BuildForest_map& forests,
-		       std::string const& top_path);
+    void checkTreeAccess(BuildForest& forest);
+    void resolveTraits(BuildForest& forest);
     void checkPlugins(BuildForest& forest,
 		      BuildItem_map& builditems,
 		      std::string const& top_path);

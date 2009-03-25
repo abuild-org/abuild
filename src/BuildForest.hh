@@ -26,6 +26,8 @@ class BuildForest
     std::set<std::string>& getDeletedItems();
 
     std::map<std::string, std::set<std::string> >& getTreeAccessTable();
+    void setSortedTreeNames(std::list<std::string> const& sorted_trees);
+    std::list<std::string> const& getSortedTreeNames() const;
     void setSortedItemNames(std::list<std::string> const& sorted_items);
     std::list<std::string> const& getSortedItemNames() const;
 
@@ -40,6 +42,7 @@ class BuildForest
     std::set<std::string> deleted_items;
 
     std::map<std::string, std::set<std::string> > tree_access_table;
+    std::list<std::string> sorted_tree_names;
     std::list<std::string> sorted_item_names;
 };
 

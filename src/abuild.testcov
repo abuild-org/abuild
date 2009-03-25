@@ -301,3 +301,6 @@ Abuild ERR can't find backing top 0
 Abuild duplicate backing area 0
 Abuild ERR unknown tree dependency 0
 Abuild ERR circular tree dependency 0
+Abuild not copying item from deleted tree 0
+Abuild not copying deleted item 0
+Abuild ERR access to invisible item 0

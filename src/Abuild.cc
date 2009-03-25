@@ -1590,12 +1590,16 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     // whenever it would be possible to improve the situation by
     // running abuild --upgrade-trees.
 
+    // XXX Where are we going to mark build items read only based on
+    // paths?
+
     // Many of these checks have side effects.  The order of these
     // checks is very sensitive as some checks depend upon side
     // effects of other operations having been completed.
     checkTreeDependencies(forest, top_path);
     resolveItems(forests, top_path);
-    resolveTraits(forests, top_path);
+    checkTreeAccess(forest);
+    resolveTraits(forest);
     checkPlatformTypes(forest, builditems, top_path);
     checkPlugins(forest, builditems, top_path);
     checkItemNames(builditems, top_path);
@@ -1653,14 +1657,18 @@ Abuild::checkTreeDependencies(BuildForest& forest,
 	 iter != buildtrees.end(); ++iter)
     {
 	std::string const& tree_name = (*iter).first;
+	BuildTree& tree = *((*iter).second);
 	DependencyGraph::ItemList const& sdeps =
 	    g.getSortedDependencies(tree_name);
+	tree.setExpandedTreeDeps(sdeps);
 	for (std::list<std::string>::const_iterator i2 = sdeps.begin();
 	     i2 != sdeps.end(); ++i2)
 	{
 	    tree_access_table[tree_name].insert(*i2);
 	}
     }
+
+    forest.setSortedTreeNames(g.getSortedGraph());
 
     if (! check_okay)
     {
@@ -1712,165 +1720,122 @@ Abuild::checkTreeDependencies(BuildForest& forest,
 }
 
 void
-Abuild::resolveItems(BuildTree_map& buildtrees,
+Abuild::resolveItems(BuildForest_map& forests,
 		     std::string const& top_path)
 {
-    // XXX somewhere we need to check to make sure no item references
-    // an item in a tree that its does not depend on
+    BuildForest& forest = *(forests[top_path]);
+    BuildItem_map& builditems = forest.getBuildItems();
+    std::list<std::string> const& backing_areas = forest.getBackingAreas();
+    std::set<std::string> const& deleted_trees = forest.getDeletedItems();
+    std::set<std::string> const& deleted_items = forest.getDeletedItems();
 
-    BuildTree& tree_data = *(buildtrees[top_path]);
-    std::map<std::string, ExternalData> const& externals =
-	tree_data.getExternals();
-    BuildItem_map& builditems = tree_data.getBuildItems();
-    std::set<std::string> const& deleted_items = tree_data.getDeletedItems();
-    std::set<std::string> deleted_in_externals;
+    // Copy any items from the backing areas.  Exclude any deleted
+    // items or any items in deleted trees.
 
-    // Resolve any build items visible in our externals.  Anything
-    // visible in an external and also visible here is an error.
-
-    for (std::map<std::string, ExternalData>::const_iterator ext_iter =
-	     externals.begin();
-	 ext_iter != externals.end(); ++ext_iter)
+    for (std::list<std::string>::const_iterator iter = backing_areas.begin();
+	 iter != backing_areas.end(); ++iter)
     {
-	ExternalData const& external_data = (*ext_iter).second;
-	bool read_only_external = external_data.isReadOnly();
-	BuildTree& external_tree =
-	    *(buildtrees[external_data.getAbsolutePath()]);
-	BuildItem_map const& external_items =
-	    external_tree.getBuildItems();
-	std::set<std::string> const& external_deleted =
-	    external_tree.getDeletedItems();
-	deleted_in_externals.insert(external_deleted.begin(),
-				    external_deleted.end());
-	for (BuildItem_map::const_iterator item_iter = external_items.begin();
-	     item_iter != external_items.end(); ++item_iter)
-	{
-	    std::string const& item_name = (*item_iter).first;
-	    BuildItem const& item = *((*item_iter).second);
-	    if (builditems.count(item_name))
-            {
-		std::string const& this_path =
-		    builditems[item_name]->getAbsolutePath();
-		std::string const& other_path = item.getAbsolutePath();
-                if (this_path == other_path)
-                {
-                    // Okay -- perhaps two of our externals share a
-                    // common external.
-                    QTC::TC("abuild", "Abuild build item multiple paths");
-                }
-                else
-                {
-                    QTC::TC("abuild", "Abuild ERR in local and external");
-		    error(FileLocation(this_path + "/" + ItemConfig::FILE_CONF,
-				       0, 0),
-			  "build item " + item_name +
-			  " conflicts with an item in an external");
-		    error(FileLocation(other_path + "/" + ItemConfig::FILE_CONF,
-				       0, 0),
-			  "here is another location");
-                }
-            }
-            else
-            {
-                builditems[item_name].reset(new BuildItem(item));
-		builditems[item_name]->incrementExternalDepth();
-		if (read_only_external)
-		{
-		    builditems[item_name]->setReadOnly();
-		}
-            }
-        }
-    }
-
-    // Resolve anything visible in our backing area.  In this case,
-    // name clashes are normal and just indicate that we are shadowing
-    // a backed build item with a local build item.  Avoid copying any
-    // items from backing areas that were deleted in externals.
-
-    std::string const& backing_area = tree_data.getBackingArea();
-    if (! backing_area.empty())
-    {
-	BuildItem_map const& backing_items =
-	    buildtrees[backing_area]->getBuildItems();
+	BuildItem_map const& backing_items = forests[*iter]->getBuildItems();
 	for (BuildItem_map::const_iterator item_iter = backing_items.begin();
 	     item_iter != backing_items.end(); ++item_iter)
 	{
 	    std::string const& item_name = (*item_iter).first;
-	    if (deleted_in_externals.count(item_name))
+	    BuildItem const& item = *((*item_iter).second);
+	    if (deleted_trees.count(item.getTreeName()))
 	    {
-		QTC::TC("abuild", "Abuild not copying deleted in external");
+		QTC::TC("abuild", "Abuild not copying item from deleted tree");
+	    }
+	    else if (deleted_items.count(item_name))
+	    {
+		QTC::TC("abuild", "Abuild not copying deleted item");
+	    }
+	    else if (builditems.count(item_name))
+	    {
+		QTC::TC("abuild", "Abuild override build item");
 	    }
 	    else
 	    {
-		BuildItem const& item = *((*item_iter).second);
-		if (builditems.count(item_name))
-		{
-		    QTC::TC("abuild", "Abuild override build item");
-		}
-		else
-		{
-		    // Copy build item information from backing area
-		    builditems[item_name].reset(new BuildItem(item));
-		    BuildItem& new_item = *(builditems[item_name]);
-		    new_item.incrementBackingDepth();
-		}
+		// Copy build item information from backing area
+		builditems[item_name].reset(new BuildItem(item));
+		BuildItem& new_item = *(builditems[item_name]);
+		new_item.incrementBackingDepth();
 	    }
         }
     }
+}
 
-    // Remove any items that have been marked for deletion.  Any such
-    // items must exist and must have external depth = 0 and backing
-    // depth > 0.
-    FileLocation top_location(top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
-    for (std::set<std::string>::const_iterator iter = deleted_items.begin();
-	 iter != deleted_items.end(); ++iter)
+void
+Abuild::checkTreeAccess(BuildForest& forest)
+{
+    // Check to make sure no item references an item in a tree that
+    // its tree does not depend on
+
+    BuildItem_map& builditems = forest.getBuildItems();
+    std::map<std::string, std::set<std::string> >& tree_access_table =
+	forest.getTreeAccessTable();
+
+    for (BuildItem_map::iterator iter = builditems.begin();
+	 iter != builditems.end(); ++iter)
     {
-	std::string const& item_name = *iter;
-	if (builditems.count(item_name) == 0)
+	std::string const& item_name = (*iter).first;
+	BuildItem& item = *((*iter).second);
+	std::string const& item_tree = item.getTreeName();
+	if (tree_access_table.count(item_tree) == 0)
 	{
-	    QTC::TC("abuild", "Abuild ERR deleting non-existent item");
-	    error(top_location, "unable to delete non-existent build item \"" +
-		  item_name + "\"");
+	    continue;
 	}
-	else
+	std::set<std::string> const& allowed_trees =
+	    tree_access_table[item_tree];
+	std::list<std::string> const& alldeps = item.getExpandedDependencies();
+	for (std::list<std::string>::const_iterator diter = alldeps.begin();
+	     diter != alldeps.end(); ++diter)
 	{
-	    BuildItem const& item = *(builditems[item_name]);
-	    if (! ((item.getBackingDepth() > 0) &&
-		   (item.getExternalDepth() == 0)))
+	    std::string const& dep_name = (*diter);
+	    if (! builditems.count(dep_name))
 	    {
-		QTC::TC("abuild", "Abuild ERR deleting unqualified item");
-		error(top_location, "unable to delete item \"" + item_name +
-		      "\" because it is not in our direct backing chain");
+		continue;
 	    }
-	    else
+	    BuildItem& dep_item = *(builditems[dep_name]);
+	    std::string const& dep_tree = dep_item.getTreeName();
+	    if (allowed_trees.count(dep_tree) == 0)
 	    {
-		QTC::TC("abuild", "Abuild deleting item");
-		builditems.erase(item_name);
+		QTC::TC("abuild", "Abuild ERR access to invisible item");
+		error(item.getLocation(),
+		      "build item \"" + item_name + "\" may not depend on"
+		      " item \"" + dep_name + "\" because \"" + item_name +
+		      "\"'s tree (\"" + item_tree + "\") does not depend on"
+		      " \"" + dep_name + "\"'s tree (\"" + dep_tree + "\")");
 	    }
 	}
     }
 }
 
 void
-Abuild::resolveTraits(BuildTree_map& buildtrees,
-		      std::string const& top_path)
+Abuild::resolveTraits(BuildForest& forest)
 {
-    // XXX make sure we haven't broken traits inheriting through
-    // backed externals.
+    // Merge supported traits of each tree's dependencies into the tree.
 
-    // Merge supported traits of this tree's externals into this tree.
-    BuildTree& tree_data = *(buildtrees[top_path]);
-    std::map<std::string, ExternalData> externals =
-	tree_data.getExternals();
-    std::map<std::string, ExternalData> const& backed_externals =
-	tree_data.getBackedExternals();
-    externals.insert(backed_externals.begin(), backed_externals.end());
-    for (std::map<std::string, ExternalData>::const_iterator iter =
-	     externals.begin();
-	 iter != externals.end(); ++iter)
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+    std::list<std::string> treenames = forest.getSortedTreeNames();
+    for (std::list<std::string>::iterator iter = treenames.begin();
+	 iter != treenames.end(); ++iter)
     {
-	tree_data.addTraits(
-	    buildtrees[(*iter).second.getAbsolutePath()]->getSupportedTraits());
+	std::string const& tree_name = *iter;
+	BuildTree& tree = *(buildtrees[tree_name]);
+	std::list<std::string> deps = tree.getExpandedTreeDeps();
+	assert(deps.back() == tree_name);
+	deps.pop_back();
+	for (std::list<std::string>::iterator i2 = deps.begin();
+	     i2 != deps.end(); ++i2)
+	{
+	    if (buildtrees.count(*i2) == 0)
+	    {
+		// An error would have reported already
+		continue;
+	    }
+	    BuildTree& dtree = *(buildtrees[*i2]);
+	    tree.addTraits(dtree.getSupportedTraits());
+	}
     }
 }
 

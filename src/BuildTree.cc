@@ -56,3 +56,15 @@ BuildTree::getPlugins() const
 {
     return this->plugins;
 }
+
+std::list<std::string> const&
+BuildTree::getExpandedTreeDeps() const
+{
+    return this->expanded_tree_deps;
+}
+
+void
+BuildTree::setExpandedTreeDeps(std::list<std::string> const& exp)
+{
+    this->expanded_tree_deps = exp;
+}

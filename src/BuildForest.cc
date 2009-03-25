@@ -42,6 +42,18 @@ BuildForest::getTreeAccessTable()
 }
 
 void
+BuildForest::setSortedTreeNames(std::list<std::string> const& sorted_trees)
+{
+    this->sorted_tree_names = sorted_trees;
+}
+
+std::list<std::string> const&
+BuildForest::getSortedTreeNames() const
+{
+    return this->sorted_tree_names;
+}
+
+void
 BuildForest::setSortedItemNames(std::list<std::string> const& sorted_items)
 {
     this->sorted_item_names = sorted_items;
