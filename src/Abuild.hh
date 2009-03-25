@@ -64,7 +64,6 @@ class Abuild
 			std::string const& description);
     void traverse(BuildForest_map&, std::string const& forest_top,
 		  std::set<std::string>& visiting,
-		  FileLocation const& referrer,
 		  std::string const& description);
     void traverseItems(BuildForest& forest, std::string const& top_path,
 		       std::list<std::string>& dirs_with_externals,
@@ -120,8 +119,6 @@ class Abuild
 			   std::set<std::string>& deleted_trees,
 			   std::set<std::string>& deleted_items);
     BackingConfig* readBacking(std::string const& dir);
-    bool haveExternal(BuildTree_map&, std::string const& backing_area,
-		      ExternalData& external);
     void computeValidTraits(BuildForest_map& forests);
     void listTraits();
     void listPlatforms(BuildTree_map& buildtrees);

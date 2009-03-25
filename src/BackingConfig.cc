@@ -6,6 +6,7 @@
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <KeyVal.hh>
+#include <ItemConfig.hh>
 #include <set>
 
 std::string const BackingConfig::FILE_BACKING = "Abuild.backing";
@@ -90,14 +91,29 @@ BackingConfig::validate()
 	this->deleted_trees.insert(tmp.begin(), tmp.end());
     }
 
-    for (std::list<std::string>::iterator iter = this->backing_areas.begin();
-	 iter != this->backing_areas.end(); ++iter)
+    std::list<std::string>::iterator iter = this->backing_areas.begin();
+    while (iter != backing_areas.end())
     {
+	std::list<std::string>::iterator next = iter;
+	++next;
+	std::string decl = *iter;
 	if (! Util::isAbsolutePath(*iter))
 	{
 	    *iter = this->dir + "/" + *iter;
 	}
 	*iter = Util::canonicalizePath(*iter);
+	if (! Util::isFile(*iter + "/" + ItemConfig::FILE_CONF))
+	{
+	    // Abuild 1.0 would have allowed Abuild.backing to point a
+	    // directory containing only Abuild.backing, but we don't
+	    // allow that anymore.
+	    QTC::TC("abuild", "BackingConfig ERR no Abuild.conf");
+	    this->error.error(this->location,
+			      "backing area \"" + decl + "\" does not contain"
+			      " an " + ItemConfig::FILE_CONF + " file");
+	    backing_areas.erase(iter, next);
+	}
+	iter = next;
     }
 }
 
@@ -141,6 +157,12 @@ BackingConfig::readOldFormat()
     return false;
 }
 
+FileLocation const&
+BackingConfig::getLocation() const
+{
+    return this->location;
+}
+
 bool
 BackingConfig::isDeprecated() const
 {
@@ -166,11 +188,9 @@ BackingConfig::getDeletedItems() const
 }
 
 void
-BackingConfig::appendBackingData(std::list<std::string>& ba,
-				 std::set<std::string>& dt,
+BackingConfig::appendBackingData(std::set<std::string>& dt,
 				 std::set<std::string>& di)
 {
-    ba.insert(ba.end(), this->backing_areas.begin(), this->backing_areas.end());
     dt.insert(this->deleted_trees.begin(), this->deleted_trees.end());
     di.insert(this->deleted_items.begin(), this->deleted_items.end());
 }

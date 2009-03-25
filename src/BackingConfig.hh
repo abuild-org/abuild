@@ -19,12 +19,12 @@ class BackingConfig
 				      std::string const& dir);
     static std::string const FILE_BACKING;
 
+    FileLocation const& getLocation() const;
     bool isDeprecated() const;
     std::list<std::string> const& getBackingAreas() const;
     std::set<std::string> const& getDeletedTrees() const;
     std::set<std::string> const& getDeletedItems() const;
-    void appendBackingData(std::list<std::string>& backing_areas,
-			   std::set<std::string>& deleted_trees,
+    void appendBackingData(std::set<std::string>& deleted_trees,
 			   std::set<std::string>& deleted_items);
 
   private:

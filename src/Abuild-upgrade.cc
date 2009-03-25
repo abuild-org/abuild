@@ -164,9 +164,10 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 
 	if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
 	{
-	    std::list<std::string> backing_areas =
+	    std::list<std::string> const& backing_areas =
 		readBacking(dir)->getBackingAreas();
-	    for (std::list<std::string>::iterator iter = backing_areas.begin();
+	    for (std::list<std::string>::const_iterator iter =
+		     backing_areas.begin();
 		 iter != backing_areas.end(); ++iter)
 	    {
 		std::string rel_backing = Util::absToRel(*iter);

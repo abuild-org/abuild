@@ -975,8 +975,7 @@ Abuild::readConfigs()
     // additional discussion.
     BuildForest_map forests;
     std::set<std::string> visiting;
-    traverse(forests, local_top, visiting, FileLocation(),
-	     "root of local forest");
+    traverse(forests, local_top, visiting, "root of local forest");
 
     // Compute the list of all known traits.  This routine also
     // validates to make sure that any traits specified on the command
@@ -1126,7 +1125,7 @@ Abuild::readExternalConfig(std::string const& dir,
 	    // traversing its backing chain.  Otherwise, we're
 	    // traversing the original directory's backing chain.
 	    QTC::TC("abuild", "Abuild backing without conf");
-	    std::list<std::string> backing_areas =
+	    std::list<std::string> const& backing_areas =
 		readBacking(candidate)->getBackingAreas();
 	    candidates.insert(candidates.end(),
 			      backing_areas.begin(), backing_areas.end());
@@ -1187,12 +1186,10 @@ Abuild::findTop(std::string const& start_dir,
 void
 Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		 std::set<std::string>& visiting,
-		 FileLocation const& referrer,
 		 std::string const& description)
 {
     if (visiting.count(top_path))
     {
-	// XXX is this right anymore?
         QTC::TC("abuild", "Abuild ERR backing cycle");
         fatal("backing area cycle detected for " + top_path +
 	      " (" + description + ")");
@@ -1211,13 +1208,13 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
     // from visiting.
     visiting.insert(top_path);
 
-    BuildForest forest;
+    BuildForest_ptr forest(new BuildForest());
     std::list<std::string> dirs_with_externals;
     std::list<std::string> backing_areas;
     std::set<std::string> deleted_trees;
     std::set<std::string> deleted_items;
     verbose("traversing items for " + top_path);
-    traverseItems(forest, top_path, dirs_with_externals,
+    traverseItems(*forest, top_path, dirs_with_externals,
 		  backing_areas, deleted_trees, deleted_items);
     verbose("done traversing items for " + top_path);
 
@@ -1287,7 +1284,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		forests_traversed.insert(ext_top);
 		verbose("traversing items for external " + ext_top +
 			", which is " + edecl + " from " + dir);
-		traverseItems(forest, ext_top, dirs_with_externals,
+		traverseItems(*forest, ext_top, dirs_with_externals,
 			      backing_areas, deleted_trees, deleted_items);
 		verbose("done traversing items for external " + ext_top);
 	    }
@@ -1298,22 +1295,46 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 	assert(dirs_with_externals.empty());
     }
 
-    // XXXX HERE (0)
+    // Normalize backing areas to filter out duplicates and resolve to
+    // forest roots.
+    { // private scope
+	std::set<std::string> seen;
+	std::list<std::string>::iterator iter = backing_areas.begin();
+	while (iter != backing_areas.end())
+	{
+	    std::list<std::string>::iterator next = iter;
+	    ++next;
+	    std::string btop = findTop(
+		*iter, "backing area of \"" + top_path + "\"");
+	    // We've already verified that everything appending to
+	    // backing_areas has a valid top.
+	    assert(! btop.empty());
+	    if (seen.count(btop))
+	    {
+		QTC::TC("abuild", "Abuild duplicate backing area");
+		backing_areas.erase(iter, next);
+	    }
+	    else
+	    {
+		seen.insert(btop);
+		*iter = btop;
+	    }
+	    iter = next;
+	}
+    }
 
-    // XXX Create dependency graph of tree-deps and check
-
-
-    // XXX we're going to need to normalize the backing area list to
-    // forest roots
-
-    // XXX traverse backing areas
-
-    // XXX make sure we haven't broken traits inheriting through
-    // backed externals.
+    // Traverse backing areas
+    for (std::list<std::string>::iterator iter = backing_areas.begin();
+	 iter != backing_areas.end(); ++iter)
+    {
+	traverse(forests, *iter, visiting,
+		 "backing area of \"" + top_path + "\"");
+    }
 
     visiting.erase(top_path);
 
-    // XXX add forest to forests
+    forests[top_path] = forest;
+
     validateForest(forests, top_path);
 }
 
@@ -1558,6 +1579,8 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
 {
     // XXX used to be traverseTree
 
+    // XXX Create dependency graph of tree-deps and check
+
     // Traverse build items defined locally and then perform a series
     // of analysis and validation.
     std::string top_conf = top_path + "/" + ItemConfig::FILE_CONF;
@@ -1736,6 +1759,9 @@ void
 Abuild::resolveTraits(BuildTree_map& buildtrees,
 		      std::string const& top_path)
 {
+    // XXX make sure we haven't broken traits inheriting through
+    // backed externals.
+
     // Merge supported traits of this tree's externals into this tree.
     BuildTree& tree_data = *(buildtrees[top_path]);
     std::map<std::string, ExternalData> externals =
@@ -2704,10 +2730,36 @@ Abuild::appendBackingData(std::string const& dir,
 			  std::set<std::string>& deleted_trees,
 			  std::set<std::string>& deleted_items)
 {
-    if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
+    std::string file_backing = dir + "/" + BackingConfig::FILE_BACKING;
+    if (Util::isFile(file_backing))
     {
 	BackingConfig* backing = readBacking(dir);
-	backing->appendBackingData(backing_areas, deleted_trees, deleted_items);
+	std::list<std::string> const& dirs = backing->getBackingAreas();
+	for (std::list<std::string>::const_iterator iter = dirs.begin();
+	     iter != dirs.end(); ++iter)
+	{
+	    // The backing area must be a directory that contains an
+	    // Abuild.conf (which is guaranteed by BackingConfig), and
+	    // we must be able to find the root of the forest from
+	    // there.  We detect this here when we have enough
+	    // information to create a good error message.
+	    std::string const& bdir = *iter;
+	    std::string btop = findTop(
+		bdir, "backing area \"" + bdir +
+		"\" from \"" + file_backing + "\"");
+	    if (btop.empty())
+	    {
+		QTC::TC("abuild", "Abuild ERR can't find backing top");
+		error(backing->getLocation(),
+		      "unable to determine top of forest containing"
+		      " backing area \"" + bdir + "\"");
+	    }
+	    else
+	    {
+		backing_areas.push_back(bdir);
+	    }
+	}
+	backing->appendBackingData(deleted_trees, deleted_items);
     }
 
     if (this->compat_level.allow_1_0())
@@ -2726,7 +2778,7 @@ Abuild::readBacking(std::string const& dir)
 {
     BackingConfig* backing = BackingConfig::readBacking(
 	this->error_handler, this->compat_level, dir);
-    std::list<std::string> backing_areas = backing->getBackingAreas();
+    std::list<std::string> const& backing_areas = backing->getBackingAreas();
     if (backing_areas.empty())
     {
         QTC::TC("abuild", "Abuild ERR invalid backing file");
@@ -2734,49 +2786,6 @@ Abuild::readBacking(std::string const& dir)
 	      ": unable to get backing area data");
     }
     return backing;
-}
-
-bool
-Abuild::haveExternal(BuildTree_map& buildtrees,
-		     std::string const& backing_top,
-		     ExternalData& external)
-{
-    // XXX probably no longer needed
-
-    if (backing_top.empty())
-    {
-	return false;
-    }
-
-    std::string const& declared_path = external.getDeclaredPath();
-
-    // Don't attempt to resolve absolute path externals.
-    if (Util::isAbsolutePath(declared_path))
-    {
-	return false;
-    }
-
-    if (! buildtrees.count(backing_top))
-    {
-	fatal("Abuild::getExternal: no build tree data for " + backing_top);
-    }
-    BuildTree& tree_data = *(buildtrees[backing_top]);
-
-    std::map<std::string, ExternalData> const& externals =
-	tree_data.getExternals();
-    bool result = false;
-    if (externals.count(declared_path))
-    {
-        result = true;
-	external.setAbsolutePath(
-	    (*(externals.find(declared_path))).second.getAbsolutePath());
-    }
-    else
-    {
-	std::string const& backing_area = tree_data.getBackingArea();
-        result = haveExternal(buildtrees, backing_area, external);
-    }
-    return result;
 }
 
 void
