@@ -1,11 +1,13 @@
 #include <BuildTree.hh>
 #include <ItemConfig.hh>
 
-BuildTree::BuildTree(std::string const& root_path,
+BuildTree::BuildTree(std::string const& name,
+		     std::string const& root_path,
 		     std::list<std::string> const& tree_deps,
 		     std::set<std::string> const& declared_traits,
 		     std::list<std::string> const& plugins,
 		     PlatformData const& platform_data) :
+    name(name),
     root_path(root_path),
     location(root_path + "/" + ItemConfig::FILE_CONF, 0, 0),
     tree_deps(tree_deps),
@@ -25,6 +27,12 @@ PlatformData&
 BuildTree::getPlatformData()
 {
     return this->platform_data;
+}
+
+std::string const&
+BuildTree::getName() const
+{
+    return this->name;
 }
 
 std::string const&
@@ -67,4 +75,8 @@ void
 BuildTree::setExpandedTreeDeps(std::list<std::string> const& exp)
 {
     this->expanded_tree_deps = exp;
+    if (this->expanded_tree_deps.back() == this->name)
+    {
+	this->expanded_tree_deps.pop_back();
+    }
 }

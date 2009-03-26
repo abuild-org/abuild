@@ -116,8 +116,11 @@ class Abuild
     void listPlatforms(BuildForest_map& forests);
     void dumpData(BuildForest_map& forests);
     void dumpPlatformData(PlatformData const&, std::string const& indent);
+    void dumpBuildTree(BuildTree& tree, std::string const& tree_name,
+		       BuildForest& forest,
+		       std::map<std::string, int>& forest_numbers);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
-		       std::map<std::string, int>& tree_numbers);
+		       std::map<std::string, int>& forest_numbers);
     void computeBuildset(BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);

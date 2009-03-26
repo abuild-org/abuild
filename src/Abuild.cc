@@ -1548,7 +1548,7 @@ Abuild::registerBuildTree(BuildTree_map& buildtrees,
     else
     {
 	buildtrees[tree_name].reset(
-	    new BuildTree(dir, tree_deps,
+	    new BuildTree(tree_name, dir, tree_deps,
 			  config->getSupportedTraits(),
 			  config->getPlugins(),
 			  this->internal_platform_data));
@@ -1729,8 +1729,15 @@ Abuild::resolveItems(BuildForest_map& forests,
     BuildForest& forest = *(forests[top_path]);
     BuildItem_map& builditems = forest.getBuildItems();
     std::list<std::string> const& backing_areas = forest.getBackingAreas();
-    std::set<std::string> const& deleted_trees = forest.getDeletedItems();
+    std::set<std::string> const& deleted_trees = forest.getDeletedTrees();
     std::set<std::string> const& deleted_items = forest.getDeletedItems();
+
+    // XXX error if deleted items exist; okay if deleted tree
+    // exists...must document the distinction (for deleted trees, we
+    // don't copy items from that tree in the backing areas, but
+    // there's nothing wrong with a new tree...with items, there's no
+    // point in deleting if you are going to replace because it
+    // doesn't change anything)
 
     // Copy any items from the backing areas.  Exclude any deleted
     // items or any items in deleted trees.
@@ -1836,10 +1843,8 @@ Abuild::resolveTraits(BuildForest& forest)
     {
 	std::string const& tree_name = *iter;
 	BuildTree& tree = *(buildtrees[tree_name]);
-	std::list<std::string> deps = tree.getExpandedTreeDeps();
-	assert(deps.back() == tree_name);
-	deps.pop_back();
-	for (std::list<std::string>::iterator i2 = deps.begin();
+	std::list<std::string> const& deps = tree.getExpandedTreeDeps();
+	for (std::list<std::string>::const_iterator i2 = deps.begin();
 	     i2 != deps.end(); ++i2)
 	{
 	    if (buildtrees.count(*i2) == 0)
@@ -3030,38 +3035,32 @@ Abuild::dumpData(BuildForest_map& forests)
 
     std::ostream& o = std::cout;
 
-    // Create a dependency graph of build trees based on backing areas
-    // and externals.  Output build trees in order based on that graph.
+    // Create a dependency graph of build forests based on backing
+    // areas.  Output forests in order based on that graph.
 
     DependencyGraph g;
-    for (BuildTree_map::iterator tree_iter = buildtrees.begin();
-	 tree_iter != buildtrees.end(); ++tree_iter)
+    for (BuildForest_map::iterator forest_iter = forests.begin();
+	 forest_iter != forests.end(); ++forest_iter)
     {
-	std::string const& path = (*tree_iter).first;
+	std::string const& path = (*forest_iter).first;
 	g.addItem(path);
-	BuildTree& tree = *((*tree_iter).second);
-	std::string const& backing_area = tree.getBackingArea();
-	if (! backing_area.empty())
+	BuildForest& forest = *((*forest_iter).second);
+	std::list<std::string> const& backing_areas = forest.getBackingAreas();
+	for (std::list<std::string>::const_iterator biter =
+		 backing_areas.begin();
+	     biter != backing_areas.end(); ++biter)
 	{
-	    g.addDependency(path, backing_area);
-	}
-	std::map<std::string, ExternalData> const& externals =
-	    tree.getExternals();
-	for (std::map<std::string, ExternalData>::const_iterator iter =
-		 externals.begin();
-	     iter != externals.end(); ++iter)
-	{
-	    g.addDependency(path, (*iter).second.getAbsolutePath());
+	    g.addDependency(path, *biter);
 	}
     }
     // Even if there were errors, the build tree graph must always be
-    // consistent.  Abuild doesn't store invalid backing areas or
-    // externals in the build tree structures.
+    // consistent.  Abuild doesn't store invalid backing areas in the
+    // build tree structures.
     assert(g.check());
-    std::list<std::string> const& allTrees = g.getSortedGraph();
+    std::list<std::string> const& all_forests = g.getSortedGraph();
 
     o << "<?xml version=\"1.0\"?>" << std::endl
-      << "<abuild-data version=\"1\"";
+      << "<abuild-data version=\"2\"";
     if (Error::anyErrors())
     {
 	o << " errors=\"1\"";
@@ -3079,113 +3078,70 @@ Abuild::dumpData(BuildForest_map& forests)
 	o << " </supported-traits>" << std::endl;
     }
 
-    o << " <build-trees>" << std::endl;
-
-    std::map<std::string, int> tree_numbers;
-    int cur_tree = 0;
-    for (std::list<std::string>::const_iterator tree_iter = allTrees.begin();
-	 tree_iter != allTrees.end(); ++tree_iter)
+    std::map<std::string, int> forest_numbers;
+    int cur_forest = 0;
+    for (std::list<std::string>::const_iterator forest_iter =
+	     all_forests.begin();
+	 forest_iter != all_forests.end(); ++forest_iter)
     {
-	std::string const& tree_path = *tree_iter;
-	tree_numbers[tree_path] = ++cur_tree;
-	BuildTree& tree_data = *(buildtrees[tree_path]);
-	std::string const& backing_area = tree_data.getBackingArea();
-	std::map<std::string, ExternalData> const& externals =
-	    tree_data.getExternals();
-	std::map<std::string, ExternalData> const& backed_externals =
-	    tree_data.getBackedExternals();
-	BuildItem_map& builditems = tree_data.getBuildItems();
-	std::set<std::string> const& traits = tree_data.getSupportedTraits();
-	std::set<std::string> const& deleted_items =
-	    tree_data.getDeletedItems();
-	std::list<std::string> const& plugins = tree_data.getPlugins();
+	std::string const& forest_root = *forest_iter;
+	forest_numbers[forest_root] = ++cur_forest;
+	BuildForest& forest = *(forests[forest_root]);
+	std::list<std::string> const& backing_areas = forest.getBackingAreas();
+	std::set<std::string> const& deleted_trees = forest.getDeletedTrees();
+	std::set<std::string> const& deleted_items = forest.getDeletedItems();
 
-	o << "  <build-tree" << std::endl
-	  << "   id=\"bt-" << cur_tree << "\"" << std::endl
-	  << "   absolute-path=\"" << tree_path << "\"" << std::endl
-	  << "  >" << std::endl;
-	dumpPlatformData(tree_data.getPlatformData(), "   ");
-	if (! traits.empty())
+	o << " <forest" << std::endl
+	  << "  id=\"f-" << cur_forest << "\"" << std::endl
+	  << "  absolute-path=\"" << forest_root << "\"" << std::endl
+	  << " >" << std::endl;
+
+	for (std::list<std::string>::const_iterator biter =
+		 backing_areas.begin();
+	     biter != backing_areas.end(); ++biter)
 	{
-	    o << "   <supported-traits>" << std::endl;
-	    for (std::set<std::string>::const_iterator trait_iter =
-		     traits.begin();
-		 trait_iter != traits.end(); ++trait_iter)
-	    {
-		o << "    <supported-trait name=\"" << *trait_iter << "\"/>"
-		  << std::endl;
-	    }
-	    o << "   </supported-traits>" << std::endl;
-	}
-	if (! backing_area.empty())
-	{
-	    o << "   <backing-area build-tree=\"bt-"
-	      << tree_numbers[backing_area]
+	    o << "  <backing-area forest=\"f-"
+	      << forest_numbers[*biter]
 	      << "\"/>" << std::endl;
 	}
-	for (std::map<std::string, ExternalData>::const_iterator iter =
-		 externals.begin();
-	     iter != externals.end(); ++iter)
+	if (! deleted_trees.empty())
 	{
-	    o << "   <external build-tree=\"bt-"
-	      << tree_numbers[(*iter).second.getAbsolutePath()] << "\"";
-	    if ((*iter).second.isReadOnly())
+	    o << "  <deleted-trees>" << std::endl;
+	    for (std::set<std::string>::const_iterator iter =
+		     deleted_trees.begin();
+		 iter != deleted_trees.end(); ++iter)
 	    {
-		o << " read-only=\"1\"";
+		o << "   <deleted-tree name=\"" + *iter + "\"/>" << std::endl;
 	    }
-	    o << "/>" << std::endl;
-	}
-	for (std::map<std::string, ExternalData>::const_iterator iter =
-		 backed_externals.begin();
-	     iter != backed_externals.end(); ++iter)
-	{
-	    o << "   <external build-tree=\"bt-"
-	      << tree_numbers[(*iter).second.getAbsolutePath()]
-	      << "\" backed=\"1\"";
-	    if ((*iter).second.isReadOnly())
-	    {
-		o << " read-only=\"1\"";
-	    }
-	    o << "/>" << std::endl;
+	    o << "  </deleted-trees>" << std::endl;
 	}
 	if (! deleted_items.empty())
 	{
-	    o << "   <deleted-items>" << std::endl;
+	    o << "  <deleted-items>" << std::endl;
 	    for (std::set<std::string>::const_iterator iter =
 		     deleted_items.begin();
 		 iter != deleted_items.end(); ++iter)
 	    {
-		o << "    <deleted-item name=\"" + *iter + "\"/>" << std::endl;
+		o << "   <deleted-item name=\"" + *iter + "\"/>" << std::endl;
 	    }
-	    o << "   </deleted-items>" << std::endl;
-	}
-	if (! plugins.empty())
-	{
-	    o << "   <plugins>" << std::endl;
-	    for (std::list<std::string>::const_iterator iter = plugins.begin();
-		 iter != plugins.end(); ++iter)
-	    {
-		o << "    <plugin name=\"" + *iter + "\"/>" << std::endl;
-	    }
-	    o << "   </plugins>" << std::endl;
+	    o << "  </deleted-items>" << std::endl;
 	}
 
-	std::list<std::string> const& sorted_items =
-	    tree_data.getSortedItemNames();
-
-	for (std::list<std::string>::const_iterator item_iter =
-		 sorted_items.begin();
-	     item_iter != sorted_items.end(); ++item_iter)
+	std::list<std::string> const& sorted_trees =
+	    forest.getSortedTreeNames();
+	BuildTree_map& buildtrees = forest.getBuildTrees();
+	for (std::list<std::string>::const_iterator iter = sorted_trees.begin();
+	     iter != sorted_trees.end(); ++iter)
 	{
-	    std::string const& name = (*item_iter);
-	    BuildItem& item = *(builditems[name]);
-	    dumpBuildItem(item, name, tree_numbers);
-        }
-	o << "  </build-tree>" << std::endl;
+	    std::string const& tree_name = *iter;
+	    BuildTree& tree = *(buildtrees[tree_name]);
+	    dumpBuildTree(tree, tree_name, forest, forest_numbers);
+	}
+
+	o << " </forest>" << std::endl;
     }
 
-    o << " </build-trees>" << std::endl
-      << "</abuild-data>" << std::endl;
+    o << "</abuild-data>" << std::endl;
 }
 
 void
@@ -3242,8 +3198,87 @@ Abuild::dumpPlatformData(PlatformData const& platform_data,
 }
 
 void
+Abuild::dumpBuildTree(BuildTree& tree, std::string const& tree_name,
+		      BuildForest& forest,
+		      std::map<std::string, int>& forest_numbers)
+{
+    std::ostream& o = std::cout;
+
+    std::string const& root_path = tree.getRootPath();
+    std::set<std::string> const& traits = tree.getSupportedTraits();
+    std::list<std::string> const& plugins = tree.getPlugins();
+    std::list<std::string> const& deps = tree.getTreeDeps();
+    std::list<std::string> const& alldeps = tree.getExpandedTreeDeps();
+
+    o << "  <build-tree" << std::endl
+      << "   name=\"" << tree_name << "\"" << std::endl
+      << "   absolute-path=\"" << root_path << "\"" << std::endl
+      << "  >" << std::endl;
+    dumpPlatformData(tree.getPlatformData(), "   ");
+    if (! traits.empty())
+    {
+	o << "   <supported-traits>" << std::endl;
+	for (std::set<std::string>::const_iterator trait_iter = traits.begin();
+	     trait_iter != traits.end(); ++trait_iter)
+	{
+	    o << "    <supported-trait name=\"" << *trait_iter << "\"/>"
+	      << std::endl;
+	}
+	o << "   </supported-traits>" << std::endl;
+    }
+    if (! plugins.empty())
+    {
+	o << "   <plugins>" << std::endl;
+	for (std::list<std::string>::const_iterator iter = plugins.begin();
+	     iter != plugins.end(); ++iter)
+	{
+	    o << "    <plugin name=\"" + *iter + "\"/>" << std::endl;
+	}
+	o << "   </plugins>" << std::endl;
+    }
+    if (! deps.empty())
+    {
+	o << "   <declared-tree-dependencies>" << std::endl;
+	for (std::list<std::string>::const_iterator iter = deps.begin();
+	     iter != deps.end(); ++iter)
+	{
+	    o << "    <tree-dependency name=\"" << *iter << "\"/>" << std::endl;
+	}
+	o << "   </declared-tree-dependencies>" << std::endl;
+    }
+    if (! alldeps.empty())
+    {
+	o << "   <expanded-tree-dependencies>" << std::endl;
+	for (std::list<std::string>::const_iterator iter = alldeps.begin();
+	     iter != alldeps.end(); ++iter)
+	{
+	    o << "    <tree-dependency name=\"" << *iter << "\"/>" << std::endl;
+	}
+	o << "   </expanded-tree-dependencies>" << std::endl;
+    }
+
+    std::list<std::string> const& sorted_items =
+	forest.getSortedItemNames();
+    BuildItem_map& builditems = forest.getBuildItems();
+
+    for (std::list<std::string>::const_iterator item_iter =
+	     sorted_items.begin();
+	 item_iter != sorted_items.end(); ++item_iter)
+    {
+	std::string const& name = (*item_iter);
+	BuildItem& item = *(builditems[name]);
+	if (item.getTreeName() == tree_name)
+	{
+	    dumpBuildItem(item, name, forest_numbers);
+	}
+    }
+
+    o << "  </build-tree>" << std::endl;
+}
+
+void
 Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
-		      std::map<std::string, int>& tree_numbers)
+		      std::map<std::string, int>& forest_numbers)
 {
     std::ostream& o = std::cout;
 
@@ -3278,13 +3313,11 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     {
 	o << "    description=\"" << description << "\"" << std::endl;
     }
-    o << "    home-tree=\"bt-"
-      << tree_numbers[item.getTreeTop()] << "\"" << std::endl
+    o << "    home-forest=\"f-"
+      << forest_numbers[item.getForestRoot()] << "\"" << std::endl
       << "    absolute-path=\"" << item.getAbsolutePath() << "\""
       << std::endl
       << "    backing-depth=\"" << item.getBackingDepth() << "\""
-      << std::endl
-      << "    external-depth=\"" << item.getExternalDepth() << "\""
       << std::endl;
     if (item.hasShadowedReferences())
     {

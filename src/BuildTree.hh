@@ -10,7 +10,8 @@
 class BuildTree
 {
   public:
-    BuildTree(std::string const& root_path,
+    BuildTree(std::string const& name,
+	      std::string const& root_path,
 	      std::list<std::string> const& tree_deps,
 	      std::set<std::string> const& declared_traits,
 	      std::list<std::string> const& plugins,
@@ -20,6 +21,7 @@ class BuildTree
     // Return writable reference to platform data so it can be modified
     PlatformData& getPlatformData();
 
+    std::string const& getName() const;
     std::string const& getRootPath() const;
     FileLocation const& getLocation() const;
     std::list<std::string> const& getTreeDeps() const;
@@ -30,6 +32,7 @@ class BuildTree
     void setExpandedTreeDeps(std::list<std::string> const&);
 
   private:
+    std::string name;
     std::string root_path;
     FileLocation location;
     std::list<std::string> tree_deps;

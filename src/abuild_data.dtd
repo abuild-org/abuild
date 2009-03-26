@@ -31,7 +31,7 @@
 <!--  traits, etc.  Abuild will still make every effort to         -->
 <!--  produce useful and coherent data and will also always        -->
 <!--  produce XML output that parses against this DTD.             -->
-<!ELEMENT abuild-data (platform-data, supported-traits?, forests)>
+<!ELEMENT abuild-data (platform-data, supported-traits?, forest+)>
 <!ATTLIST abuild-data
   version       CDATA     #REQUIRED
   errors        %boolean; #IMPLIED
@@ -81,8 +81,6 @@
   name           CDATA   #REQUIRED
 >
 
-<!ELEMENT forests (forest+)>
-
 <!--  forests are given IDs so that they may be referred to by     -->
 <!--  other forests and by build items.  forests are always        -->
 <!--  output in an order such that no forest refers to a later     -->
@@ -90,8 +88,8 @@
 <!--  on this if it is helpful.  This constraint is satisfied      -->
 <!--  even with the errors attribute of the top-level element is   -->
 <!--  set.                                                         -->
-<!ELEMENT forest (backing-area*, deleted-trees*,
-                  deleted-items*, build-tree+)>
+<!ELEMENT forest (backing-area*, deleted-trees?,
+                  deleted-items?, build-tree+)>
 <!ATTLIST forest
   id             ID      #REQUIRED
   absolute-path  CDATA   #REQUIRED
