@@ -649,6 +649,13 @@ Building Abuild
 Revamped Build Tree Structure
 =============================
 
+XXX Explain that we copy build tree structures, not just build item
+structures, from backing areas.  Explain the semantics of deleted-tree
+and deleted-item...how deleted-tree does double duty and how if item x
+is in deleted tree y in the backing area, it's okay for item x to
+appear in the local area in some other tree.  (There is a coverage
+case for this.)
+
 Introduce the concept of a "build forest".  A build forest is a
 collection of related build trees that are physically located under a
 common root.  Build forests already exist with abuild 1.0, but they

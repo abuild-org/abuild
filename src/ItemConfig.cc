@@ -83,6 +83,7 @@ void ItemConfig::initializeStatics(CompatLevel const& compat_level)
     valid_keys[k_CHILDREN] = "";
     valid_keys[k_BUILD_ALSO] = "";
     valid_keys[k_DEPS] = "";
+    valid_keys[k_TREEDEPS] = "";
     valid_keys[k_VISIBLE_TO] = "";
     valid_keys[k_PLATFORM] = "";
     valid_keys[k_SUPPORTED_FLAGS] = "";
@@ -95,8 +96,9 @@ void ItemConfig::initializeStatics(CompatLevel const& compat_level)
 
 ItemConfig*
 ItemConfig::readConfig(Error& error, CompatLevel const& compat_level,
-		       std::string const& dir, std::string const& parent_dir)
+		       std::string const& odir, std::string const& parent_dir)
 {
+    std::string dir = Util::canonicalizePath(odir);
     if (ic_cache.count(dir))
     {
 	return ic_cache[dir].get();
@@ -676,7 +678,7 @@ ItemConfig::checkTreeDeps()
     boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
 
-    this->tree_deps = Util::splitBySpace(this->kv.getVal(k_DEPS));
+    this->tree_deps = Util::splitBySpace(this->kv.getVal(k_TREEDEPS));
 
     std::string last_dep;
     std::list<std::string>::iterator iter = this->tree_deps.begin();
@@ -886,7 +888,7 @@ ItemConfig::checkExternals()
 	}
 	else
 	{
-	    this->externals.push_back(ExternalData(*iter));
+	    this->externals.push_back(*iter);
 	}
     }
 
@@ -1220,7 +1222,7 @@ ItemConfig::getChildren() const
     return this->children;
 }
 
-std::list<ExternalData> const&
+std::list<std::string> const&
 ItemConfig::getExternals() const
 {
     return this->externals;

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -13,10 +13,15 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--/case3"
+ >
   <build-tree
-   id="bt-1"
+   name="tree.1.-RND-"
    absolute-path="--topdir--/case3"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -33,10 +38,9 @@
    </platform-data>
    <build-item
     name="indep1"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/platforms/1/indep"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -50,10 +54,9 @@
    </build-item>
    <build-item
     name="java1"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/platforms/1/java"
     backing-depth="0"
-    external-depth="0"
     target-type="java"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -67,10 +70,9 @@
    </build-item>
    <build-item
     name="native1"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/platforms/1/native"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -86,10 +88,9 @@
    </build-item>
    <build-item
     name="everything"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/all"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -113,10 +114,9 @@
    </build-item>
    <build-item
     name="indep2"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/platforms/2/indep"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -133,10 +133,9 @@
    </build-item>
    <build-item
     name="java2"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/platforms/2/java"
     backing-depth="0"
-    external-depth="0"
     target-type="java"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -150,10 +149,9 @@
    </build-item>
    <build-item
     name="native2"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/platforms/2/native"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -169,10 +167,9 @@
    </build-item>
    <build-item
     name="top-level"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/build-also"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -185,10 +182,9 @@
    </build-item>
    <build-item
     name="top-level-dep"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/case3/dep-build-also"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -210,5 +206,5 @@
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

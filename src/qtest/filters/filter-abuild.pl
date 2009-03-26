@@ -70,6 +70,7 @@ while (<>)
     s,(--abuild.xml--):(\d+),$1:nn,;
     s/^(Total time: ).*/$1<time>/;
     s/(\[junit\].*Time elapsed: ).*/$1<time>/;
+    s/("tree.\d+.-)\d+(-")/${1}RND${2}/;
     next if m/^abuild: total build time: /;
     if (m,--begin stack trace--,)
     {

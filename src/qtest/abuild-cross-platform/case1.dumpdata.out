@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -13,10 +13,15 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--/case1"
+ >
   <build-tree
-   id="bt-1"
+   name="tree.2.-RND-"
    absolute-path="--topdir--/rules"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -33,18 +38,19 @@
    </platform-data>
    <build-item
     name="rules"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/rules"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
     is-plugin-anywhere="0"
    />
   </build-tree>
   <build-tree
-   id="bt-2"
+   name="tree.1.-RND-"
    absolute-path="--topdir--/case1"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -59,23 +65,17 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
-   <external build-tree="bt-1"/>
-   <build-item
-    name="rules"
-    home-tree="bt-1"
-    absolute-path="--topdir--/rules"
-    backing-depth="0"
-    external-depth="1"
-    target-type="all"
-    is-plugin="0"
-    is-plugin-anywhere="0"
-   />
+   <declared-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+   </expanded-tree-dependencies>
    <build-item
     name="03-object-code"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/case1/03-object-code"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -97,10 +97,9 @@
    </build-item>
    <build-item
     name="02-indep"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/case1/02-indep"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -122,10 +121,9 @@
    </build-item>
    <build-item
     name="01-object-code"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/case1/01-object-code"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -149,5 +147,5 @@
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

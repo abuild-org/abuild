@@ -121,7 +121,9 @@
 <!--  build tree will depend on another build tree that has not    -->
 <!--  already been output.  Readers may rely on this behavior if   -->
 <!--  it is helpful, unless the errors attribute of the top level  -->
-<!--  element is set.                                              -->
+<!--  element is set.  The home-forest and backing-depth           -->
+<!--  attributes have the same meaning as with build-item.  See    -->
+<!--  its comment for a description.                               -->
 <!ELEMENT build-tree (platform-data, supported-traits?, plugins?,
                       declared-tree-dependencies?,
                       expanded-tree-dependencies?,
@@ -129,6 +131,8 @@
 <!ATTLIST build-tree
   name           CDATA   #REQUIRED
   absolute-path  CDATA   #REQUIRED
+  home-forest    IDREF   #REQUIRED
+  backing-depth  CDATA   #REQUIRED
 >
 
 <!--  The plugins element contains a list of build items that are  -->

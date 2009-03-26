@@ -70,17 +70,18 @@ class Abuild
 		       std::list<std::string>& backing_areas,
 		       std::set<std::string>& deleted_trees,
 		       std::set<std::string>& deleted_items);
-    std::string registerBuildTree(BuildTree_map& buildtrees,
+    std::string registerBuildTree(BuildForest& forest,
 				  std::string const& dir,
 				  ItemConfig* config,
 				  std::list<std::string>& dirs_with_externals);
     std::string getAssignedTreeName(std::string const& dir);
+    std::string getAssignedTreeName(std::string const& dir,
+				    std::set<std::string>& visiting);
     void validateForest(BuildForest_map& forests,
 			std::string const& top_path);
-    void checkTreeDependencies(BuildForest& forest,
-			       std::string const& top_path);
-    void resolveItems(BuildForest_map& forests,
-		      std::string const& top_path);
+    void resolveFromBackingAreas(BuildForest_map& forests,
+				 std::string const& top_path);
+    void checkTreeDependencies(BuildForest& forest);
     void checkTreeAccess(BuildForest& forest);
     bool checkAllowedTree(BuildForest& forest,
 			  BuildItem& referrer,

@@ -1,6 +1,6 @@
 abuild-monitor: begin-dump-data
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -14,10 +14,15 @@ abuild-monitor: begin-dump-data
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--"
+ >
   <build-tree
-   id="bt-1"
+   name="tree.1.-RND-"
    absolute-path="--topdir--"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -44,10 +49,9 @@ abuild-monitor: begin-dump-data
    </plugins>
    <build-item
     name="bb"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b/bb"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -61,10 +65,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="ca"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/ca"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -81,10 +84,9 @@ abuild-monitor: begin-dump-data
    <build-item
     name="aa"
     description="Here&apos;s a &lt;nice&gt; &quot;description&quot; for you &amp; you!"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/aa"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -108,10 +110,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="aaa"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/aa/aaa"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -125,20 +126,18 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="d.a.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/a/a"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
     is-plugin-anywhere="0"
    />
    <build-item
     name="d.b.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b/a"
     backing-depth="0"
-    external-depth="0"
     visible-to="d.*"
     target-type="all"
     is-plugin="0"
@@ -146,10 +145,9 @@ abuild-monitor: begin-dump-data
    />
    <build-item
     name="d.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/a"
     backing-depth="0"
-    external-depth="0"
     visible-to="*"
     target-type="all"
     is-plugin="0"
@@ -166,10 +164,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="ab"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ab"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -191,10 +188,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="ac"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ac"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -208,10 +204,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="ad"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ad"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -225,10 +220,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="b"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -242,10 +236,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="ba"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b/ba"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -259,10 +252,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="bc"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b/bc"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -276,10 +268,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="cb"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/cb"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -301,10 +292,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="cc"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/cc"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -318,20 +308,18 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="d"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
     is-plugin-anywhere="0"
    />
    <build-item
     name="d.b.a.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b/a/a"
     backing-depth="0"
-    external-depth="0"
     visible-to="d.b.*"
     target-type="all"
     is-plugin="0"
@@ -339,10 +327,9 @@ abuild-monitor: begin-dump-data
    />
    <build-item
     name="d.b"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -358,10 +345,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="e.lib"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/e/lib"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -378,10 +364,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="e.shlib"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/e/shlib"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -404,10 +389,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="e.bin"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/e/bin"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -432,10 +416,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="e.global"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/e/global-overrides"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -452,10 +435,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="e.multi"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/e/multi"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -476,10 +458,9 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="e.shlib2"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/e/shlib2"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -502,30 +483,27 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="plugin.echo"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/plugins/echo"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
     is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.qrwx"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/plugins/qrwx"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
     is-plugin-anywhere="1"
    />
    <build-item
     name="root"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
     is-plugin-anywhere="0"
@@ -538,7 +516,7 @@ abuild-monitor: begin-dump-data
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>
 abuild-monitor: end-dump-data
 abuild-monitor: state-change aa <native> waiting

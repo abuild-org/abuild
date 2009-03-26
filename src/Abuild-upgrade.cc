@@ -190,17 +190,21 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 
 	std::list<std::string>& externals = ud.externals[dir];
 	std::list<std::string>& tree_deps = ud.tree_deps[dir];
-	std::list<ExternalData> const& old_externals = config->getExternals();
-	for (std::list<ExternalData>::const_iterator eiter =
+	std::list<std::string> const& old_externals = config->getExternals();
+	for (std::list<std::string>::const_iterator eiter =
 		 old_externals.begin();
 	     eiter != old_externals.end(); ++eiter)
 	{
-	    std::string const& edecl = (*eiter).getDeclaredPath();
-	    std::string epath = Util::absToRel((*eiter).getAbsolutePath());
+	    std::string const& edecl = *eiter;
 	    ItemConfig* econfig = readExternalConfig(dir, edecl);
+	    std::string epath;
+	    if (econfig)
+	    {
+		epath = econfig->getAbsolutePath();
+	    }
 	    std::string dep_tree_name;
 
-	    if (ud.item_dirs.count(epath) && ud.item_dirs[epath])
+	    if (econfig && ud.item_dirs.count(epath) && ud.item_dirs[epath])
 	    {
 		// The external points to a known tree root inside our
 		// area of concern.

@@ -12,12 +12,14 @@
 class BuildForest
 {
   public:
-    BuildForest();
+    BuildForest(std::string const& root_path);
 
     typedef boost::shared_ptr<BuildItem> BuildItem_ptr;
     typedef std::map<std::string, BuildItem_ptr> BuildItem_map;
     typedef boost::shared_ptr<BuildTree> BuildTree_ptr;
     typedef std::map<std::string, BuildTree_ptr> BuildTree_map;
+
+    std::string const& getRootPath() const;
 
     BuildItem_map& getBuildItems();
     BuildTree_map& getBuildTrees();
@@ -34,6 +36,8 @@ class BuildForest
   private:
     BuildForest(BuildForest const&);
     BuildForest& operator=(BuildForest const&);
+
+    std::string root_path;
 
     BuildItem_map build_items;
     BuildTree_map build_trees;

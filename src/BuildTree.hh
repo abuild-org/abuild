@@ -12,6 +12,7 @@ class BuildTree
   public:
     BuildTree(std::string const& name,
 	      std::string const& root_path,
+	      std::string const& forest_root,
 	      std::list<std::string> const& tree_deps,
 	      std::set<std::string> const& declared_traits,
 	      std::list<std::string> const& plugins,
@@ -29,17 +30,22 @@ class BuildTree
     std::list<std::string> const& getPlugins() const;
     std::list<std::string> const& getExpandedTreeDeps() const;
 
+    std::string const& getForestRoot() const;
+    int getBackingDepth() const;
+    void incrementBackingDepth();
     void setExpandedTreeDeps(std::list<std::string> const&);
 
   private:
     std::string name;
     std::string root_path;
+    std::string forest_root;
     FileLocation location;
     std::list<std::string> tree_deps;
     std::list<std::string> expanded_tree_deps;
     std::set<std::string> supported_traits;
     std::list<std::string> plugins;
     PlatformData platform_data;
+    int backing_depth;
 };
 
 #endif // __BUILDTREE_HH__

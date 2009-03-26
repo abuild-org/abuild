@@ -14,7 +14,6 @@
 #include <FileLocation.hh>
 #include <KeyVal.hh>
 #include <FlagData.hh>
-#include <ExternalData.hh>
 #include <TraitData.hh>
 #include <PlatformSelector.hh>
 
@@ -71,7 +70,7 @@ class ItemConfig
     std::string const& getTreeName() const;
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
-    std::list<ExternalData> const& getExternals() const;
+    std::list<std::string> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;
     std::list<std::string> const& getDeps() const;
     std::list<std::string> const& getTreeDeps() const;
@@ -184,7 +183,7 @@ class ItemConfig
     std::string visible_to;
     std::set<std::string> platform_types;
     std::string tree_name;
-    std::list<ExternalData> externals;
+    std::list<std::string> externals;
     std::set<std::string> supported_flags;
     std::set<std::string> supported_traits;
     TraitData trait_data;

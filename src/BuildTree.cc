@@ -3,17 +3,20 @@
 
 BuildTree::BuildTree(std::string const& name,
 		     std::string const& root_path,
+		     std::string const& forest_root,
 		     std::list<std::string> const& tree_deps,
 		     std::set<std::string> const& declared_traits,
 		     std::list<std::string> const& plugins,
 		     PlatformData const& platform_data) :
     name(name),
     root_path(root_path),
+    forest_root(forest_root),
     location(root_path + "/" + ItemConfig::FILE_CONF, 0, 0),
     tree_deps(tree_deps),
     supported_traits(declared_traits),
     plugins(plugins),
-    platform_data(platform_data)
+    platform_data(platform_data),
+    backing_depth(0)
 {
 }
 
@@ -69,6 +72,24 @@ std::list<std::string> const&
 BuildTree::getExpandedTreeDeps() const
 {
     return this->expanded_tree_deps;
+}
+
+std::string const&
+BuildTree::getForestRoot() const
+{
+    return this->forest_root;
+}
+
+int
+BuildTree::getBackingDepth() const
+{
+    return this->backing_depth;
+}
+
+void
+BuildTree::incrementBackingDepth()
+{
+    ++this->backing_depth;
 }
 
 void

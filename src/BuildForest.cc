@@ -1,7 +1,14 @@
 #include <BuildForest.hh>
 
-BuildForest::BuildForest()
+BuildForest::BuildForest(std::string const& root_path) :
+    root_path(root_path)
 {
+}
+
+std::string const&
+BuildForest::getRootPath() const
+{
+    return this->root_path;
 }
 
 BuildForest::BuildItem_map&
