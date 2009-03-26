@@ -17,6 +17,7 @@ class BuildItem
   public:
     BuildItem(std::string const& item_name,
 	      std::string const& tree_name,
+	      std::string const& forest_root,
 	      ItemConfig const* config);
 
     // Proxy methods to ItemConfig
@@ -41,6 +42,7 @@ class BuildItem
     std::string const& getAbsolutePath() const;
 
     std::string const& getTreeName() const;
+    std::string const& getForestRoot() const;
     // Note: list does not include the item itself
     std::list<std::string> const& getExpandedDependencies() const;
     unsigned int getBackingDepth() const;
@@ -100,9 +102,10 @@ class BuildItem
 
     std::string item_name;
     ItemConfig const* config;         // memory managed by ItemConfig
-    std::string tree_name;	// containing tree
-    unsigned int backing_depth;	// 0 in local build tree and externals
-    pt_map platform_types;	    // platform types and associated platforms
+    std::string tree_name;	      // containing tree
+    std::string forest_root;	      // containing forest
+    unsigned int backing_depth;	      // 0 in local build tree and externals
+    pt_map platform_types;	      // platform types and associated platforms
     std::map<std::string, std::string> platform_to_type;
     std::set<std::string> build_platforms; // platforms we will build on
     std::list<std::string> expanded_dependencies; // recursively expanded

@@ -113,8 +113,8 @@ class Abuild
     BackingConfig* readBacking(std::string const& dir);
     void computeValidTraits(BuildForest_map& forests);
     void listTraits();
-    void listPlatforms(BuildForest_map& buildtrees);
-    void dumpData(BuildForest_map& buildtrees);
+    void listPlatforms(BuildForest_map& forests);
+    void dumpData(BuildForest_map& forests);
     void dumpPlatformData(PlatformData const&, std::string const& indent);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& tree_numbers);
@@ -298,7 +298,7 @@ class Abuild
     std::vector<std::string> buildset_reverse_order;
     std::vector<std::string> failed_builds;
 
-    // (tree, other_tree) -> [plugin, ...]
+    // (forest, other_forest) -> [plugin, ...]
     typedef std::map<std::string,
 		     std::vector<std::string> > map_string_vec_string;
     typedef std::map<std::string, map_string_vec_string> shadowed_plugin_map;

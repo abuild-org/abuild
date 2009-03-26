@@ -1423,7 +1423,7 @@ Abuild::traverseItems(BuildForest& forest, std::string const& top_path,
 		// always be a valid tree, so only store the build
 		// item if everything checks out.
 		builditems[item_name].reset(
-		    new BuildItem(item_name, tree_name, config));
+		    new BuildItem(item_name, tree_name, top_path, config));
             }
         }
 
@@ -2549,17 +2549,17 @@ Abuild::checkIntegrity(BuildForest_map& forests,
     // Check abuild's basic integrity guarantee.  Refer to the manual
     // for details.
 
-    BuildItem_map& builditems = buildtrees[top_path]->getBuildItems();
-
-    std::set<std::string> plugin_check_trees;
+    std::set<std::string> plugin_check_forests;
 
     // Find items with shadowed dependencies.  An item has a shadowed
-    // dependency if the local tree resolves the item to a different
-    // path than the item's local tree.  Local items therefore can't
-    // have shadowed dependencies.  (They can still have dependencies
-    // with shadowed dependencies, so they can still have integrity
-    // errors.)  Also store a list of all build trees for which we
-    // have to perform plugin checks.
+    // dependency if the local forest resolves the item to a different
+    // path than the item's native forest.  Local items therefore
+    // can't have shadowed dependencies.  (They can still have
+    // dependencies with shadowed dependencies, so they can still have
+    // integrity errors.)  Also store a list of all forests for which
+    // we have to perform plugin checks.
+    BuildForest& forest = *(forests[top_path]);
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -2569,9 +2569,10 @@ Abuild::checkIntegrity(BuildForest_map& forests,
 	    continue;
 	}
 
-	std::string const& item_tree = item.getTreeTop();
-	plugin_check_trees.insert(item_tree);
-	BuildItem_map& item_tree_items = buildtrees[item_tree]->getBuildItems();
+	std::string const& item_forest = item.getForestRoot();
+	plugin_check_forests.insert(item_forest);
+	BuildItem_map& item_forest_items =
+	    forests[item_forest]->getBuildItems();
 	std::set<std::string> shadowed_dependencies;
 
 	std::list<std::string> const& deps = item.getExpandedDependencies();
@@ -2580,14 +2581,14 @@ Abuild::checkIntegrity(BuildForest_map& forests,
         {
 	    std::string const& dep_name = (*dep_iter);
 	    if ((builditems.count(dep_name) == 0) ||
-		(item_tree_items.count(dep_name) == 0))
+		(item_forest_items.count(dep_name) == 0))
 	    {
 		// unknown dependency error already reported
 		continue;
 	    }
 
 	    if (builditems[dep_name]->getAbsolutePath() !=
-		item_tree_items[dep_name]->getAbsolutePath())
+		item_forest_items[dep_name]->getAbsolutePath())
 	    {
 		// The instance of dep_name that item would see is
 		// shadowed.
@@ -2599,56 +2600,68 @@ Abuild::checkIntegrity(BuildForest_map& forests,
     }
 
     // Create a mapping of name to path for each plugin that is
-    // declared by the local tree and also present natively in the
-    // local tree.  Any such plugin could potentially be shadowing a
-    // plugin in a more distant tree.
-    BuildTree& tree_data = *(buildtrees[top_path]);
-    std::list<std::string> const& plugins = tree_data.getPlugins();
+    // declared by the local forest and also present natively in the
+    // local forest.  Any such plugin could potentially be shadowing a
+    // plugin in a more distant forest.
     std::map<std::string, std::string> plugin_paths;
-    for (std::list<std::string>::const_iterator iter = plugins.begin();
-	 iter != plugins.end(); ++iter)
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+    for (BuildTree_map::iterator iter = buildtrees.begin();
+	 iter != buildtrees.end(); ++iter)
     {
-	std::string const& plugin_name = *iter;
-	if (builditems.count(plugin_name) == 0)
+	BuildTree& tree = *((*iter).second);
+	std::list<std::string> const& plugins = tree.getPlugins();
+	for (std::list<std::string>::const_iterator iter = plugins.begin();
+	     iter != plugins.end(); ++iter)
 	{
-	    // error already reported
-	    continue;
-	}
-	BuildItem& plugin = *(builditems[plugin_name]);
-	plugin_paths[plugin_name] = plugin.getAbsolutePath();
-    }
-
-    // For each plugin check tree, see if that tree defines any of the
-    // same plugins the local tree does and resolves them to a
-    // different location.
-    for (std::set<std::string>::const_iterator iter =
-	     plugin_check_trees.begin();
-	 iter != plugin_check_trees.end(); ++iter)
-    {
-	std::string const& other_top_path = *iter;
-	BuildTree& other_tree = *(buildtrees[other_top_path]);
-	std::list<std::string> const& other_plugins = other_tree.getPlugins();
-	for (std::list<std::string>::const_iterator plugin_iter =
-		 other_plugins.begin();
-	     plugin_iter != other_plugins.end(); ++plugin_iter)
-	{
-	    std::string const& plugin = *plugin_iter;
-	    if (plugin_paths.count(plugin) == 0)
-	    {
-		// We don't care about this plugin
-		continue;
-	    }
-	    BuildItem_map& other_items = other_tree.getBuildItems();
-	    if (other_items.count(plugin) == 0)
+	    std::string const& plugin_name = *iter;
+	    if (builditems.count(plugin_name) == 0)
 	    {
 		// error already reported
 		continue;
 	    }
-	    if (other_items[plugin]->getAbsolutePath() !=
-		plugin_paths[plugin])
+	    BuildItem& plugin = *(builditems[plugin_name]);
+	    plugin_paths[plugin_name] = plugin.getAbsolutePath();
+	}
+    }
+
+    // For each plugin check forest, see if that forest defines any of
+    // the same plugins the local forest does and resolves them to a
+    // different location.
+    for (std::set<std::string>::const_iterator iter =
+	     plugin_check_forests.begin();
+	 iter != plugin_check_forests.end(); ++iter)
+    {
+	std::string const& other_top_path = *iter;
+	BuildForest& other_forest = *(forests[other_top_path]);
+	BuildTree_map& other_trees = other_forest.getBuildTrees();
+	BuildItem_map& other_items = other_forest.getBuildItems();
+	for (BuildTree_map::iterator iter = other_trees.begin();
+	     iter != other_trees.end(); ++iter)
+	{
+	    BuildTree& other_tree = *((*iter).second);
+	    std::list<std::string> const& other_plugins =
+		other_tree.getPlugins();
+	    for (std::list<std::string>::const_iterator plugin_iter =
+		     other_plugins.begin();
+		 plugin_iter != other_plugins.end(); ++plugin_iter)
 	    {
-		this->shadowed_plugins[top_path][other_top_path].
-		    push_back(plugin);
+		std::string const& plugin = *plugin_iter;
+		if (plugin_paths.count(plugin) == 0)
+		{
+		    // We don't care about this plugin
+		    continue;
+		}
+		if (other_items.count(plugin) == 0)
+		{
+		    // error already reported
+		    continue;
+		}
+		if (other_items[plugin]->getAbsolutePath() !=
+		    plugin_paths[plugin])
+		{
+		    this->shadowed_plugins[top_path][other_top_path].
+			push_back(plugin);
+		}
 	    }
         }
     }
@@ -2665,22 +2678,22 @@ Abuild::checkIntegrity(BuildForest_map& forests,
 	    continue;
 	}
 
-	std::string const& item_tree = item.getTreeTop();
+	std::string const& item_forest = item.getForestRoot();
 	if ((this->shadowed_plugins.count(top_path) != 0) &&
-	    (this->shadowed_plugins[top_path].count(item_tree) != 0))
+	    (this->shadowed_plugins[top_path].count(item_forest) != 0))
 	{
-	    item.addShadowedPlugin(top_path, item_tree);
+	    item.addShadowedPlugin(top_path, item_forest);
 	}
     }
 }
 
 void
-Abuild::reportIntegrityErrors(BuildTree_map& buildtrees,
+Abuild::reportIntegrityErrors(BuildForest_map& forests,
 			      BuildItem_map& builditems,
 			      std::string const& top_path)
 {
     std::set<std::string> integrity_error_items;
-    std::map<std::string, std::set<std::string> > plugin_error_trees;
+    std::map<std::string, std::set<std::string> > plugin_error_forests;
 
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
@@ -2697,20 +2710,20 @@ Abuild::reportIntegrityErrors(BuildTree_map& buildtrees,
 		 item_shadowed_plugins.begin();
 	     i2 != item_shadowed_plugins.end(); ++i2)
 	{
-	    std::string const& local_tree = (*i2).first;
-	    if (this->full_integrity && (local_tree != top_path))
+	    std::string const& local_forest = (*i2).first;
+	    if (this->full_integrity && (local_forest != top_path))
 	    {
-		// In full integrity mode, let each tree report its
+		// In full integrity mode, let each forest report its
 		// own errors.
 		continue;
 	    }
-	    std::set<std::string> const& remote_trees = (*i2).second;
+	    std::set<std::string> const& remote_forests = (*i2).second;
 	    for (std::set<std::string>::const_iterator i3 =
-		     remote_trees.begin();
-		 i3 != remote_trees.end(); ++i3)
+		     remote_forests.begin();
+		 i3 != remote_forests.end(); ++i3)
 	    {
-		std::string const& remote_tree = *i3;
-		plugin_error_trees[local_tree].insert(remote_tree);
+		std::string const& remote_forest = *i3;
+		plugin_error_forests[local_forest].insert(remote_forest);
 	    }
 	}
     }
@@ -2738,34 +2751,34 @@ Abuild::reportIntegrityErrors(BuildTree_map& buildtrees,
     }
 
     for (std::map<std::string, std::set<std::string> >::const_iterator i1 =
-	     plugin_error_trees.begin();
-	 i1 != plugin_error_trees.end(); ++i1)
+	     plugin_error_forests.begin();
+	 i1 != plugin_error_forests.end(); ++i1)
     {
-	std::string const& local_tree = (*i1).first;
-	if (this->full_integrity && (local_tree != top_path))
+	std::string const& local_forest = (*i1).first;
+	if (this->full_integrity && (local_forest != top_path))
 	{
-	    // In full integrity mode, let each tree report its
+	    // In full integrity mode, let each forest report its
 	    // own errors.
 	    continue;
 	}
-	std::set<std::string> const& remote_trees = (*i1).second;
-	for (std::set<std::string>::const_iterator i2 = remote_trees.begin();
-	     i2 != remote_trees.end(); ++i2)
+	std::set<std::string> const& remote_forests = (*i1).second;
+	for (std::set<std::string>::const_iterator i2 = remote_forests.begin();
+	     i2 != remote_forests.end(); ++i2)
 	{
-	    std::string const& remote_tree = *i2;
+	    std::string const& remote_forest = *i2;
 	    std::vector<std::string> plugins =
-		this->shadowed_plugins[local_tree][remote_tree];
-	    FileLocation local_tree_location(
-		local_tree + "/" + ItemConfig::FILE_CONF, 0, 0);
-	    FileLocation remote_tree_location(
-		remote_tree + "/" + ItemConfig::FILE_CONF, 0, 0);
+		this->shadowed_plugins[local_forest][remote_forest];
+	    FileLocation local_forest_location(
+		local_forest + "/" + ItemConfig::FILE_CONF, 0, 0);
+	    FileLocation remote_forest_location(
+		remote_forest + "/" + ItemConfig::FILE_CONF, 0, 0);
 	    BuildItem_map& local_items =
-		buildtrees[local_tree]->getBuildItems();
+		forests[local_forest]->getBuildItems();
 	    QTC::TC("abuild", "Abuild ERR plugin integrity");
-	    error(remote_tree_location,
-		  "some plugins declared by this tree are shadowed");
-	    error(local_tree_location,
-		  "this is the tree that contains the shadowing plugins");
+	    error(remote_forest_location,
+		  "some plugins declared by this forest are shadowed");
+	    error(local_forest_location,
+		  "this is the forest that contains the shadowing plugins");
 	    for (std::vector<std::string>::const_iterator p_iter =
 		     plugins.begin();
 		 p_iter != plugins.end(); ++p_iter)
@@ -2781,14 +2794,13 @@ Abuild::reportIntegrityErrors(BuildTree_map& buildtrees,
 }
 
 void
-Abuild::computeBuildablePlatforms(BuildTree& tree_data,
-				  BuildItem_map& builditems,
-				  std::string const& top_path)
+Abuild::computeBuildablePlatforms(BuildForest& forest)
 {
     // For each build item, determine the list of platforms that are
     // to be built for that item.  Do this only for items that are
-    // local to the local tree.
-    PlatformData& platform_data = tree_data.getPlatformData();
+    // native to the local forest.
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -2797,6 +2809,9 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
 	{
 	    continue;
 	}
+
+	BuildTree& item_tree = *(buildtrees[item.getTreeName()]);
+	PlatformData& platform_data = item_tree.getPlatformData();
 	std::set<std::string> const& platform_types =
 	    item.getPlatformTypes();
 	std::set<std::string> build_platforms;
@@ -2904,7 +2919,7 @@ Abuild::computeValidTraits(BuildForest_map& forests)
     for (BuildForest_map::iterator i1 = forests.begin();
 	 i1 != forests.end(); ++i1)
     {
-	BuildTree_map& buildtrees = (*i1).getBuildTrees();
+	BuildTree_map& buildtrees = ((*i1).second)->getBuildTrees();
 	for (BuildTree_map::iterator iter = buildtrees.begin();
 	     iter != buildtrees.end(); ++iter)
 	{
@@ -2950,52 +2965,66 @@ Abuild::listTraits()
 }
 
 void
-Abuild::listPlatforms(BuildTree_map& buildtrees)
+Abuild::listPlatforms(BuildForest_map& forests)
 {
-    for (BuildTree_map::iterator tree_iter = buildtrees.begin();
-	 tree_iter != buildtrees.end(); ++tree_iter)
+    for (BuildForest_map::iterator forest_iter = forests.begin();
+	 forest_iter != forests.end(); ++forest_iter)
     {
-	bool tree_name_output = false;
-	BuildTree& tree_data = *((*tree_iter).second);
-	PlatformData& platform_data = tree_data.getPlatformData();
-	std::set<std::string> const& platform_types =
-	    platform_data.getPlatformTypes(TargetType::tt_object_code);
-	for (std::set<std::string>::const_iterator pt_iter =
-		 platform_types.begin();
-	     pt_iter != platform_types.end(); ++pt_iter)
+	bool forest_root_output = false;
+	std::string const& forest_root = (*forest_iter).first;
+	BuildForest& forest = *((*forest_iter).second);
+	BuildTree_map& buildtrees = forest.getBuildTrees();
+	for (BuildTree_map::iterator tree_iter = buildtrees.begin();
+	     tree_iter != buildtrees.end(); ++tree_iter)
 	{
-	    bool platform_type_output = false;
-	    std::string const& platform_type = *pt_iter;
-	    PlatformData::selected_platforms_t const& platforms =
-		platform_data.getPlatformsByType(platform_type);
-	    for (PlatformData::selected_platforms_t::const_iterator p_iter =
-			 platforms.begin();
-		 p_iter != platforms.end(); ++p_iter)
+	    bool tree_name_output = false;
+	    std::string const& tree_name = (*tree_iter).first;
+	    BuildTree& tree = *((*tree_iter).second);
+	    PlatformData& platform_data = tree.getPlatformData();
+	    std::set<std::string> const& platform_types =
+		platform_data.getPlatformTypes(TargetType::tt_object_code);
+	    for (std::set<std::string>::const_iterator pt_iter =
+		     platform_types.begin();
+		 pt_iter != platform_types.end(); ++pt_iter)
 	    {
-		if (! tree_name_output)
+		bool platform_type_output = false;
+		std::string const& platform_type = *pt_iter;
+		PlatformData::selected_platforms_t const& platforms =
+		    platform_data.getPlatformsByType(platform_type);
+		for (PlatformData::selected_platforms_t::const_iterator p_iter =
+			 platforms.begin();
+		     p_iter != platforms.end(); ++p_iter)
 		{
-		    std::cout << "tree " << (*tree_iter).first << std::endl;
-		    tree_name_output = true;
-		}
-		if (! platform_type_output)
-		{
-		    std::cout << "  platform type " << platform_type
+		    if (! forest_root_output)
+		    {
+			std::cout << "forest " << forest_root << std::endl;
+			forest_root_output = true;
+		    }
+		    if (! tree_name_output)
+		    {
+			std::cout << "  tree " << tree_name << std::endl;
+			tree_name_output = true;
+		    }
+		    if (! platform_type_output)
+		    {
+			std::cout << "    platform type " << platform_type
+				  << std::endl;
+			platform_type_output = true;
+		    }
+		    std::string const& platform = (*p_iter).first;
+		    bool selected = (*p_iter).second;
+		    std::cout << "      platform " << platform
+			      << "; built by default: "
+			      << (selected ? "yes" : "no")
 			      << std::endl;
-		    platform_type_output = true;
 		}
-		std::string const& platform = (*p_iter).first;
-		bool selected = (*p_iter).second;
-		std::cout << "    platform " << platform
-			  << "; built by default: "
-			  << (selected ? "yes" : "no")
-			  << std::endl;
 	    }
 	}
     }
 }
 
 void
-Abuild::dumpData(BuildTree_map& buildtrees)
+Abuild::dumpData(BuildForest_map& forests)
 {
     this->logger.flushLog();
 

@@ -7,10 +7,12 @@
 
 BuildItem::BuildItem(std::string const& item_name,
 		     std::string const& tree_name,
+		     std::string const& forest_root,
 		     ItemConfig const* config) :
     item_name(item_name),
     config(config),
     tree_name(tree_name),
+    forest_root(forest_root),
     backing_depth(0),
     target_type(TargetType::tt_unknown),
     plugin(false)
@@ -138,6 +140,12 @@ std::string const&
 BuildItem::getTreeName() const
 {
     return this->tree_name;
+}
+
+std::string const&
+BuildItem::getForestRoot() const
+{
+    return this->forest_root;
 }
 
 std::list<std::string> const&
