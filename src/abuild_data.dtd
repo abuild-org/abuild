@@ -14,10 +14,12 @@
 <!ENTITY % target-type "(all|platform-independent|object-code|java)">
 
 
-<!--  The version attribute is always "1".  We will only           -->
+<!--  The version attribute is always "2".  We will only           -->
 <!--  increment this if there is a change to the output such that  -->
 <!--  previously valid data is either no longer valid or is valid  -->
-<!--  but has different semantics.  Adding new attributes with     -->
+<!--  but has different semantics.  The version attribute was      -->
+<!--  incremented from "1" when a new build tree structure was     -->
+<!--  introduced in version 1.1.  Adding new attributes with       -->
 <!--  default values, optional attributes, or optional elements    -->
 <!--  will not cause the version number to be increased.  Code     -->
 <!--  that reads this output should be prepared to accept and      -->
@@ -29,7 +31,7 @@
 <!--  traits, etc.  Abuild will still make every effort to         -->
 <!--  produce useful and coherent data and will also always        -->
 <!--  produce XML output that parses against this DTD.             -->
-<!ELEMENT abuild-data (platform-data, supported-traits?, build-trees)>
+<!ELEMENT abuild-data (platform-data, supported-traits?, forests)>
 <!ATTLIST abuild-data
   version       CDATA     #REQUIRED
   errors        %boolean; #IMPLIED
@@ -79,50 +81,56 @@
   name           CDATA   #REQUIRED
 >
 
-<!ELEMENT build-trees (build-tree+)>
+<!ELEMENT forests (forest+)>
 
-<!--  build-trees are given IDs so that they may be referred to    -->
-<!--  by other build trees and by build items.  build-trees are    -->
-<!--  always output in an order such that no build tree refers to  -->
-<!--  a later build tree.  Although not enforced by the DTD,       -->
-<!--  readers may rely on this if it is helpful.  This constraint  -->
-<!--  is satisfied even with the errors attribute of the           -->
-<!--  top-level element is set.                                    -->
-<!ELEMENT build-tree (platform-data, supported-traits?, backing-area?,
-                      external*, deleted-items?, plugins?, build-item+)>
-<!ATTLIST build-tree
+<!--  forests are given IDs so that they may be referred to by     -->
+<!--  other forests and by build items.  forests are always        -->
+<!--  output in an order such that no forest refers to a later     -->
+<!--  forest.  Although not enforced by the DTD, readers may rely  -->
+<!--  on this if it is helpful.  This constraint is satisfied      -->
+<!--  even with the errors attribute of the top-level element is   -->
+<!--  set.                                                         -->
+<!ELEMENT forest (backing-area*, deleted-trees*,
+                  deleted-items*, build-tree+)>
+<!ATTLIST forest
   id             ID      #REQUIRED
   absolute-path  CDATA   #REQUIRED
 >
 
-<!--  The backing-area element contains a reference to the         -->
-<!--  backing area.  It is omitted if there is no backing area.    -->
+<!--  Each backing-area element contains a reference to a backing  -->
+<!--  area.  It is omitted if there are no backing areas.          -->
 <!ELEMENT backing-area EMPTY>
 <!ATTLIST backing-area
-  build-tree     IDREF     #REQUIRED
+  forest         IDREF     #REQUIRED
 >
 
-<!--  One external element appears for each external.  It          -->
-<!--  contains a reference to the external build tree.  Externals  -->
-<!--  that don't explicitly exist but are resolved through a       -->
-<!--  backing area appear with the backed="1" attribute.           -->
-<!--  Externals that are declared read-only appear with the        -->
-<!--  read-only="1" attribute.                                     -->
-<!ELEMENT external EMPTY>
-<!ATTLIST external
-  build-tree     IDREF     #REQUIRED
-  backed         %boolean; #IMPLIED
-  read-only      %boolean; #IMPLIED
+<!--  The deleted-trees and deleted-items elements contain a list  -->
+<!--  of build trees and build items that were deleted in this     -->
+<!--  forest.  This information comes from Abuild.backing.         -->
+<!ELEMENT deleted-trees (deleted-tree+)>
+<!ELEMENT deleted-tree EMPTY>
+<!ATTLIST deleted-tree
+  name           CDATA   #REQUIRED
 >
-
-<!--  The deleted-items element contains a list of build items     -->
-<!--  that were deleted in this build tree.  These item names      -->
-<!--  will appear in the direct backing chain of this tree but     -->
-<!--  not in this tree.                                            -->
 <!ELEMENT deleted-items (deleted-item+)>
 <!ELEMENT deleted-item EMPTY>
 <!ATTLIST deleted-item
   name           CDATA   #REQUIRED
+>
+
+<!--  One build-tree element appears for each build tree.          -->
+<!--  build-trees are output in dependency order such that no      -->
+<!--  build tree will depend on another build tree that has not    -->
+<!--  already been output.  Readers may rely on this behavior if   -->
+<!--  it is helpful, unless the errors attribute of the top level  -->
+<!--  element is set.                                              -->
+<!ELEMENT build-tree (platform-data, supported-traits?, plugins?,
+                      declared-tree-dependencies?,
+                      expanded-tree-dependencies?,
+                      build-item+)>
+<!ATTLIST build-tree
+  name           CDATA   #REQUIRED
+  absolute-path  CDATA   #REQUIRED
 >
 
 <!--  The plugins element contains a list of build items that are  -->
@@ -131,6 +139,25 @@
 <!ELEMENT plugin EMPTY>
 <!ATTLIST plugin
   name           CDATA   #REQUIRED
+>
+
+<!--  declared-tree-dependencies contains the list of direct       -->
+<!--  dependencies in the order in which they were declared in     -->
+<!--  the Abuild.conf file.                                        -->
+<!ELEMENT declared-tree-dependencies (tree-dependency+)>
+
+<!--  expanded-tree-dependencies contains the list of recursively  -->
+<!--  expanded tree dependencies in sorted order from least to     -->
+<!--  most dependent.  In other words, if A depends on B and B     -->
+<!--  depends on C, A's expanded-tree-dependencies contains C,     -->
+<!--  and then B.                                                  -->
+<!ELEMENT expanded-tree-dependencies (tree-dependency+)>
+
+<!--  The tree-dependency element represents a single tree         -->
+<!--  dependency.                                                  -->
+<!ELEMENT tree-dependency EMPTY>
+<!ATTLIST tree-dependency
+  name                 CDATA    #REQUIRED
 >
 
 <!--  One build-item element appears for each build-item.          -->
@@ -150,15 +177,12 @@
 <!--  description: an optional description of the build item for   -->
 <!--  informational purposes only                                  -->
 
-<!--  home-tree: a reference to the tree from which the build      -->
+<!--  home-forest: a reference to the forest from which the build  -->
 <!--  item is resolved                                             -->
 
 <!--  absolute-path: the absolute path of the build item           -->
 
 <!--  backing-depth: the number of backing areas that have to be   -->
-<!--  crossed to reach this build item                             -->
-
-<!--  external-depth: the number of externals that have to be      -->
 <!--  crossed to reach this build item                             -->
 
 <!--  has-shadowed-references: "1" if this build item uses any     -->
@@ -184,10 +208,9 @@
 <!ATTLIST build-item
   name                    CDATA     #REQUIRED
   description             CDATA     #IMPLIED
-  home-tree               IDREF     #REQUIRED
+  home-forest             IDREF     #REQUIRED
   absolute-path           CDATA     #REQUIRED
   backing-depth           CDATA     #REQUIRED
-  external-depth          CDATA     #REQUIRED
   has-shadowed-references %boolean; "0"
   visible-to              CDATA     #IMPLIED
   target-type             %target-type;  #REQUIRED
