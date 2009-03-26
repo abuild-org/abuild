@@ -1410,15 +1410,18 @@ Abuild::traverseItems(BuildForest& forest, std::string const& top_path,
 			  "here is another location");
 		}
             }
-            else
-            {
-		if (tree_name.empty())
-		{
-		    QTC::TC("abuild", "Abuild ERR named item outside of tree");
-		    error(location,
-			  "named build items are not allowed outside of"
-			  " build trees");
-		}
+            else if (tree_name.empty())
+	    {
+		QTC::TC("abuild", "Abuild ERR named item outside of tree");
+		error(location,
+		      "named build items are not allowed outside of"
+		      " build trees");
+	    }
+	    else
+	    {
+		// We want to make sure that item->getTreeName will
+		// always be a valid tree, so only store the build
+		// item if everything checks out.
 		builditems[item_name].reset(
 		    new BuildItem(item_name, tree_name, config));
             }
@@ -1582,7 +1585,6 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     verbose("build tree " + top_path + ": validating");
 
     BuildForest& forest = *(forests[top_path]);
-    BuildItem_map& builditems = forest.getBuildItems();
 
     // XXX Where are we going to issue deprecation warnings?  We
     // probably don't want to bother with warnings for unresolvable
@@ -1600,21 +1602,22 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     resolveItems(forests, top_path);
     checkTreeAccess(forest);
     resolveTraits(forest);
-    checkPlatformTypes(forest, builditems, top_path);
-    checkPlugins(forest, builditems, top_path);
-    checkItemNames(builditems, top_path);
-    checkBuildAlso(builditems, top_path);
-    checkItemDependencies(forest, builditems, top_path);
-    updatePlatformTypes(forest, builditems, top_path);
-    checkDependencyPlatformTypes(builditems);
-    checkFlags(builditems);
-    checkTraits(forest, builditems, top_path);
+    checkPlatformTypes(forest);
+    checkPlugins(forest);
+    checkItemNames(forest);
+    checkBuildAlso(forest);
+    checkItemDependencies(forest);
+    updatePlatformTypes(forest);
+    checkDependencyPlatformTypes(forest);
+    checkFlags(forest);
+    checkTraits(forest);
     checkIntegrity(forests, top_path);
     if (this->full_integrity)
     {
-	reportIntegrityErrors(forests, builditems, top_path);
+	reportIntegrityErrors(forests, forest.getBuildItems(), top_path);
     }
-    computeBuildablePlatforms(forest, builditems, top_path);
+    computeBuildablePlatforms(forest);
+
     verbose("build tree " + top_path + ": validation completed");
 }
 
@@ -1771,21 +1774,10 @@ Abuild::checkTreeAccess(BuildForest& forest)
     // its tree does not depend on
 
     BuildItem_map& builditems = forest.getBuildItems();
-    std::map<std::string, std::set<std::string> >& tree_access_table =
-	forest.getTreeAccessTable();
-
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
-	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	std::string const& item_tree = item.getTreeName();
-	if (tree_access_table.count(item_tree) == 0)
-	{
-	    continue;
-	}
-	std::set<std::string> const& allowed_trees =
-	    tree_access_table[item_tree];
 	std::list<std::string> const& alldeps = item.getExpandedDependencies();
 	for (std::list<std::string>::const_iterator diter = alldeps.begin();
 	     diter != alldeps.end(); ++diter)
@@ -1796,18 +1788,40 @@ Abuild::checkTreeAccess(BuildForest& forest)
 		continue;
 	    }
 	    BuildItem& dep_item = *(builditems[dep_name]);
-	    std::string const& dep_tree = dep_item.getTreeName();
-	    if (allowed_trees.count(dep_tree) == 0)
+	    if (! checkAllowedTree(forest, item, dep_item, "depend on"))
 	    {
-		QTC::TC("abuild", "Abuild ERR access to invisible item");
-		error(item.getLocation(),
-		      "build item \"" + item_name + "\" may not depend on"
-		      " item \"" + dep_name + "\" because \"" + item_name +
-		      "\"'s tree (\"" + item_tree + "\") does not depend on"
-		      " \"" + dep_name + "\"'s tree (\"" + dep_tree + "\")");
+		QTC::TC("abuild", "Abuild ERR depend on invisible item");
 	    }
 	}
     }
+}
+
+bool
+Abuild::checkAllowedTree(BuildForest& forest,
+			 BuildItem& referrer,
+			 BuildItem& referent,
+			 std::string const& action)
+{
+    bool okay = true;
+    std::map<std::string, std::set<std::string> > const& tree_access_table =
+	forest.getTreeAccessTable();
+    std::string const& referrer_name = referrer.getName();
+    std::string const& referrer_tree = referrer.getTreeName();
+    std::string const& referent_name = referent.getName();
+    std::string const& referent_tree = referent.getTreeName();
+    std::set<std::string> const& allowed_trees =
+	(*(tree_access_table.find(referrer_tree))).second;
+    if (allowed_trees.count(referent_tree) == 0)
+    {
+	okay = false;
+	error(referrer.getLocation(),
+	      "build item \"" + referrer_name + "\" may not " +
+	      action + " build item \"" + referent_name + "\" because \"" +
+	      referrer_name + "\"'s tree (\"" + referrer_tree +
+	      "\") does not depend on \"" + referent_name +
+	      "\"'s tree (\"" + referent_tree + "\")");
+    }
+    return okay;
 }
 
 void
@@ -1840,12 +1854,13 @@ Abuild::resolveTraits(BuildForest& forest)
 }
 
 void
-Abuild::checkPlugins(BuildTree& tree_data,
-		     BuildItem_map& builditems,
-		     std::string const& top_path)
+Abuild::checkPlugins(BuildForest& forest)
 {
-    // Make sure each plugin actually exists, and mark the item as a
-    // plugin just for this tree.
+    // Make sure each plugin exists and lives in an accessible tree,
+    // and mark the item as a plugin just for this tree.
+
+    BuildItem_map& builditems = forest.getBuildItems();
+    BuildTree_map& buildtrees = forest.getBuildTrees();
 
     // First, clear the plugin flag for all build items.
     for (BuildItem_map::iterator iter = builditems.begin();
@@ -1856,16 +1871,42 @@ Abuild::checkPlugins(BuildTree& tree_data,
     }
 
     // Next, set the plugin flag for any build item that is declared
-    // as a plugin in this tree.
-    FileLocation top_location(top_path + "/" + ItemConfig::FILE_CONF, 0, 0);
-    std::list<std::string> const& plugins = tree_data.getPlugins();
-    for (std::list<std::string>::const_iterator iter = plugins.begin();
-	 iter != plugins.end(); ++iter)
+    // as a plugin in each tree, and check to make sure the tree is
+    // allowed to declare the item as a plugin.
+    std::map<std::string, std::set<std::string> > const& access_table =
+	forest.getTreeAccessTable();
+    for (BuildTree_map::iterator iter = buildtrees.begin();
+	 iter != buildtrees.end(); ++iter)
     {
-	std::string const& item_name = *iter;
-	if (builditems.count(item_name))
+	std::string const& tree_name = (*iter).first;
+	BuildTree& tree = *((*iter).second);
+	std::set<std::string> const& allowed_trees =
+	    (*(access_table.find(tree_name))).second;
+	std::list<std::string> const& plugins = tree.getPlugins();
+	for (std::list<std::string>::const_iterator iter = plugins.begin();
+	     iter != plugins.end(); ++iter)
 	{
+	    std::string const& item_name = *iter;
+	    if (builditems.count(item_name) == 0)
+	    {
+		QTC::TC("abuild", "Abuild ERR invalid plugin");
+		error(tree.getLocation(),
+		      "plugin \"" + item_name + "\" does not exist");
+		continue;
+	    }
 	    BuildItem& item = *(builditems[item_name]);
+	    std::string const& item_tree = item.getTreeName();
+	    if (allowed_trees.count(item_tree) == 0)
+	    {
+		QTC::TC("abuild", "Abuild ERR plugin in invisible tree");
+		error(tree.getLocation(),
+		      "this tree may not declare item \"" +
+		      item_name + "\" as a plugin because because its"
+		      " tree does not depend on \"" + item_name +
+		      "\"'s tree (\"" + item_tree + "\")");
+		continue;
+	    }
+
 	    item.setPlugin(true);
 	    this->plugins_anywhere.insert(item_name);
 	    bool item_error = false;
@@ -1876,7 +1917,7 @@ Abuild::checkPlugins(BuildTree& tree_data,
 	    {
 		QTC::TC("abuild", "Abuild ERR plugin with dependencies");
 		item_error = true;
-		error(top_location,
+		error(tree.getLocation(),
 		      "item \"" + item_name + "\" is declared as a plugin,"
 		      " but it has dependencies");
 	    }
@@ -1884,7 +1925,7 @@ Abuild::checkPlugins(BuildTree& tree_data,
 	    {
 		QTC::TC("abuild", "Abuild ERR plugin with build-also");
 		item_error = true;
-		error(top_location,
+		error(tree.getLocation(),
 		      "item \"" + item_name + "\" is declared as a plugin,"
 		      " but it specifies other items to build");
 	    }
@@ -1897,7 +1938,7 @@ Abuild::checkPlugins(BuildTree& tree_data,
 	    {
 		QTC::TC("abuild", "Abuild ERR plugin with target type !all");
 		item_error = true;
-		error(top_location,
+		error(tree.getLocation(),
 		      "item \"" + item_name + "\" is declared as a plugin,"
 		      " but it has a build or non-plugin interface file");
 	    }
@@ -1909,21 +1950,12 @@ Abuild::checkPlugins(BuildTree& tree_data,
 		      ItemConfig::FILE_CONF);
 	    }
 	}
-	else
-	{
-	    QTC::TC("abuild", "Abuild ERR invalid plugin");
-	    error(top_location,
-		  "plugin \"" + item_name + "\" does not exist");
-	}
     }
 
     // Check to make sure no item depends on a plugin.  Also store the
-    // list of plugins this build item should see.  Do this only for
-    // items local to this tree.  If an item from another tree depends
-    // on a plugin in this tree, that's a shadowed plugin, and it will
-    // be reported later.  Also, since the list of plugins is specific
-    // to the tree, it would be incorrect to override the plugin list
-    // here.
+    // list of plugins each build item should see.  Do this only for
+    // items local to this forest.
+
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -1948,14 +1980,12 @@ Abuild::checkPlugins(BuildTree& tree_data,
 		    error(item.getLocation(),
 			  "this item depends on \"" + dep_name + "\","
 			  " which is declared as a plugin");
-		    error(top_location,
-			  "the dependency is declared as a plugin here");
 		}
 	    }
 	}
 
 	// Store the list of plugins
-	item.setPlugins(plugins);
+	item.setPlugins(buildtrees[item.getTreeName()]->getPlugins());
     }
 }
 
@@ -1966,27 +1996,32 @@ Abuild::isPluginAnywhere(std::string const& item)
 }
 
 void
-Abuild::checkPlatformTypes(BuildTree& tree_data,
-			   BuildItem_map& builditems,
-			   std::string const& top_path)
+Abuild::checkPlatformTypes(BuildForest& forest)
 {
-    PlatformData& platform_data = tree_data.getPlatformData();
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+    BuildItem_map& builditems = forest.getBuildItems();
 
-    // Load any additional platform data from our plugins
-
-    std::list<std::string> const& plugins = tree_data.getPlugins();
-    for (std::list<std::string>::const_iterator iter = plugins.begin();
-	 iter != plugins.end(); ++iter)
+    for (BuildTree_map::iterator iter = buildtrees.begin();
+	 iter != buildtrees.end(); ++iter)
     {
-	std::string const& plugin_name = *iter;
-	if (builditems.count(plugin_name) != 0)
+	BuildTree& tree = *((*iter).second);
+	PlatformData& platform_data = tree.getPlatformData();
+
+	// Load any additional platform data from our plugins
+	std::list<std::string> const& plugins = tree.getPlugins();
+	for (std::list<std::string>::const_iterator iter = plugins.begin();
+	     iter != plugins.end(); ++iter)
 	{
-	    BuildItem& plugin = *(builditems[plugin_name]);
-	    loadPlatformData(platform_data, plugin.getAbsolutePath());
+	    std::string const& plugin_name = *iter;
+	    if (builditems.count(plugin_name) != 0)
+	    {
+		BuildItem& plugin = *(builditems[plugin_name]);
+		loadPlatformData(platform_data, plugin.getAbsolutePath());
+	    }
 	}
     }
 
-    // Validate all native build items to ensure that they have valid
+    // Validate all local build items to ensure that they have valid
     // platform types.
 
     for (BuildItem_map::iterator iter = builditems.begin();
@@ -1994,12 +2029,14 @@ Abuild::checkPlatformTypes(BuildTree& tree_data,
     {
 	BuildItem& item = *((*iter).second);
 
-	// Check only native build items
+	// Check only local build items
 	if (! item.isLocal())
 	{
 	    continue;
 	}
 
+	BuildTree& tree = *(buildtrees[item.getTreeName()]);
+	PlatformData& platform_data = tree.getPlatformData();
 	FileLocation const& location = item.getLocation();
 	std::set<std::string> platform_types = item.getPlatformTypes();
 
@@ -2054,9 +2091,9 @@ Abuild::checkPlatformTypes(BuildTree& tree_data,
 }
 
 void
-Abuild::checkItemNames(BuildItem_map& builditems,
-		       std::string const& top_path)
+Abuild::checkItemNames(BuildForest& forest)
 {
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -2081,27 +2118,34 @@ Abuild::checkItemNames(BuildItem_map& builditems,
 }
 
 void
-Abuild::checkBuildAlso(BuildItem_map& builditems,
-		       std::string const& top_path)
+Abuild::checkBuildAlso(BuildForest& forest)
 {
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
-	BuildItem const& item = *((*iter).second);
+	BuildItem& item = *((*iter).second);
 	std::string const& item_name = (*iter).first;
 	FileLocation const& item_location = item.getLocation();
+
 	std::list<std::string> const& build_also = item.getBuildAlso();
 	for (std::list<std::string>::const_iterator biter =
 		 build_also.begin();
 	     biter != build_also.end(); ++biter)
 	{
-	    std::string const& item = *biter;
-	    if (builditems.count(item) == 0)
+	    std::string const& other_item = *biter;
+	    if (builditems.count(other_item) == 0)
 	    {
 		QTC::TC("abuild", "Abuild ERR invalid build also");
 		error(item_location,
 		      item_name + " requests building of unknown build item " +
-		      item);
+		      other_item);
+		continue;
+	    }
+	    if (! checkAllowedTree(forest, item, *(builditems[other_item]),
+				   "request build of"))
+	    {
+		QTC::TC("abuild", "Abuild ERR build-also invisible item");
 	    }
 	}
     }
@@ -2167,15 +2211,12 @@ Abuild::accessibleFrom(BuildItem_map& builditems,
 
 
 void
-Abuild::checkItemDependencies(BuildTree& tree_data,
-			      BuildItem_map& builditems,
-			      std::string const& top_path)
+Abuild::checkItemDependencies(BuildForest& forest)
 {
     // Make sure that there are no cycles or errors (references to
     // non-existent build items) in the dependency graph.
 
-    // Create a dependency graph for all build items we can see.
-
+    BuildItem_map& builditems = forest.getBuildItems();
     DependencyGraph g;
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
@@ -2203,7 +2244,7 @@ Abuild::checkItemDependencies(BuildTree& tree_data,
 	item.setExpandedDependencies(g.getSortedDependencies(item_name));
     }
 
-    tree_data.setSortedItemNames(g.getSortedGraph());
+    forest.setSortedItemNames(g.getSortedGraph());
 
     if (! check_okay)
     {
@@ -2257,9 +2298,7 @@ Abuild::checkItemDependencies(BuildTree& tree_data,
 }
 
 void
-Abuild::updatePlatformTypes(BuildTree& tree_data,
-			    BuildItem_map& builditems,
-			    std::string const& top_path)
+Abuild::updatePlatformTypes(BuildForest& forest)
 {
     // For every build item with target type "all", if all the item's
     // direct dependencies have the same platform types, inherit
@@ -2268,8 +2307,9 @@ Abuild::updatePlatformTypes(BuildTree& tree_data,
     // that were originally target type "all" but didn't have to be
     // have already been updated.
 
+    BuildItem_map& builditems = forest.getBuildItems();
     std::list<std::string> const& sorted_items =
-	tree_data.getSortedItemNames();
+	forest.getSortedItemNames();
     for (std::list<std::string>::const_iterator iter = sorted_items.begin();
 	 iter != sorted_items.end(); ++iter)
     {
@@ -2339,13 +2379,14 @@ Abuild::updatePlatformTypes(BuildTree& tree_data,
 }
 
 void
-Abuild::checkDependencyPlatformTypes(BuildItem_map& builditems)
+Abuild::checkDependencyPlatformTypes(BuildForest& forest)
 {
     // Verify that each dependency that is declared with a specific
     // platform type is from an item whose target type is not tt_all
     // and to an item that has the given platform type.  Must be
     // called after updatePlatformTypes.
 
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -2402,8 +2443,9 @@ Abuild::checkDependencyPlatformTypes(BuildItem_map& builditems)
 }
 
 void
-Abuild::checkFlags(BuildItem_map& builditems)
+Abuild::checkFlags(BuildForest& forest)
 {
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -2443,26 +2485,28 @@ Abuild::checkFlags(BuildItem_map& builditems)
 }
 
 void
-Abuild::checkTraits(BuildTree& tree_data,
-		    BuildItem_map& builditems,
-		    std::string const& top_path)
+Abuild::checkTraits(BuildForest& forest)
 {
+    // XXX referent items and access table
+
     // For each build item, make sure each trait is allowed in the
     // current build tree and that any referent build items are
-    // accessible.  Check only items that are native to the current
+    // accessible.  Check only items that are local to the current
     // tree.
 
-    std::set<std::string> const& supported_traits =
-	tree_data.getSupportedTraits();
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+    BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
+	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (item.getTreeTop() != top_path)
+	if (! item.isLocal())
 	{
 	    continue;
 	}
-	std::string const& item_name = (*iter).first;
+	std::set<std::string> const& supported_traits =
+	    buildtrees[item.getTreeName()]->getSupportedTraits();
 	FileLocation const& location = item.getLocation();
 	TraitData::trait_data_t const& trait_data =
 	    item.getTraitData().getTraitData();
@@ -2488,13 +2532,18 @@ Abuild::checkTraits(BuildTree& tree_data,
 			  " refers to item " + referent_item +
 			  " which is private to another scope");
 		}
+		if (! checkAllowedTree(forest, item, *builditems[referent_item],
+				       "refer by trait to"))
+		{
+		    QTC::TC("abuild", "Abuild ERR invisible trait referent");
+		}
 	    }
 	}
     }
 }
 
 void
-Abuild::checkIntegrity(BuildTree_map& buildtrees,
+Abuild::checkIntegrity(BuildForest_map& forests,
 		       std::string const& top_path)
 {
     // Check abuild's basic integrity guarantee.  Refer to the manual
@@ -2506,7 +2555,7 @@ Abuild::checkIntegrity(BuildTree_map& buildtrees,
 
     // Find items with shadowed dependencies.  An item has a shadowed
     // dependency if the local tree resolves the item to a different
-    // path than the item's native tree.  Native items therefore can't
+    // path than the item's local tree.  Local items therefore can't
     // have shadowed dependencies.  (They can still have dependencies
     // with shadowed dependencies, so they can still have integrity
     // errors.)  Also store a list of all build trees for which we
@@ -2604,7 +2653,7 @@ Abuild::checkIntegrity(BuildTree_map& buildtrees,
         }
     }
 
-    // For each non-native build item, if it references shadowed
+    // For each non-local build item, if it references shadowed
     // plugins, store this fact.
 
     for (BuildItem_map::iterator iter = builditems.begin();
@@ -2738,7 +2787,7 @@ Abuild::computeBuildablePlatforms(BuildTree& tree_data,
 {
     // For each build item, determine the list of platforms that are
     // to be built for that item.  Do this only for items that are
-    // native to the local tree.
+    // local to the local tree.
     PlatformData& platform_data = tree_data.getPlatformData();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)

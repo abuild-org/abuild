@@ -12,8 +12,6 @@ BuildItem::BuildItem(std::string const& item_name,
     config(config),
     tree_name(tree_name),
     backing_depth(0),
-    external_depth(0),
-    force_read_only(false),
     target_type(TargetType::tt_unknown),
     plugin(false)
 {
@@ -42,12 +40,6 @@ std::list<std::string> const&
 BuildItem::getChildren() const
 {
     return this->config->getChildren();
-}
-
-std::list<ExternalData> const&
-BuildItem::getExternals() const
-{
-    return this->config->getExternals();
 }
 
 std::list<std::string> const&
@@ -160,16 +152,10 @@ BuildItem::getBackingDepth() const
     return this->backing_depth;
 }
 
-unsigned int
-BuildItem::getExternalDepth() const
-{
-    return this->external_depth;
-}
-
 bool
 BuildItem::isLocal() const
 {
-    return ((this->backing_depth == 0) && (this->external_depth == 0));
+    return (this->backing_depth == 0);
 }
 
 std::map<std::string, std::set<std::string> > const&
@@ -301,7 +287,7 @@ BuildItem::matchesPattern(boost::regex& pattern) const
 bool
 BuildItem::isWritable() const
 {
-    return (! (this->force_read_only || (this->backing_depth > 0)));
+    return (this->backing_depth == 0);
 }
 
 bool
@@ -389,18 +375,6 @@ void
 BuildItem::incrementBackingDepth()
 {
     ++this->backing_depth;
-}
-
-void
-BuildItem::incrementExternalDepth()
-{
-    ++this->external_depth;
-}
-
-void
-BuildItem::setReadOnly()
-{
-    this->force_read_only = true;
 }
 
 void
@@ -500,8 +474,7 @@ BuildItem::setPlugins(std::list<std::string> const& plugins)
 void
 BuildItem::assertLocal() const
 {
-    if (! ((this->backing_depth == 0) &&
-	   (this->external_depth == 0)))
+    if (this->backing_depth != 0)
     {
 	throw QEXC::Internal(
 	    "attempt to perform disallowed operation on non-local build item");

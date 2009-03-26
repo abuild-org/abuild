@@ -23,7 +23,6 @@ class BuildItem
     std::string const& getName() const;
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
-    std::list<ExternalData> const& getExternals() const;
     std::list<std::string> const& getBuildAlso() const;
     std::list<std::string> const& getDeps() const;
     std::string const& getDepPlatformType(std::string const&) const;
@@ -45,7 +44,6 @@ class BuildItem
     // Note: list does not include the item itself
     std::list<std::string> const& getExpandedDependencies() const;
     unsigned int getBackingDepth() const;
-    unsigned int getExternalDepth() const;
     bool isLocal() const;
     std::set<std::string> const& getShadowedDependencies() const;
     std::map<std::string, std::set<std::string> > const&
@@ -71,8 +69,6 @@ class BuildItem
     std::set<std::string> getReferences() const;
 
     void incrementBackingDepth();
-    void incrementExternalDepth();
-    void setReadOnly();
     void addShadowedPlugin(std::string const& local_tree,
 			   std::string const& remote_tree);
     void setPlatformTypes(std::set<std::string> const& platform_types);
@@ -106,8 +102,6 @@ class BuildItem
     ItemConfig const* config;         // memory managed by ItemConfig
     std::string tree_name;	// containing tree
     unsigned int backing_depth;	// 0 in local build tree and externals
-    unsigned int external_depth;    // 0 in local build tree and backing chain
-    bool force_read_only;
     pt_map platform_types;	    // platform types and associated platforms
     std::map<std::string, std::string> platform_to_type;
     std::set<std::string> build_platforms; // platforms we will build on

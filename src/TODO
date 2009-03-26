@@ -379,6 +379,18 @@ Usability Improvements
    sorts after "item2" because the strings being compared are
    item:platform and item2:platform, and : sorts after numbers.
 
+   Both of these items can be achieved by having build graph nodes be
+   of the form "prefix item platform" with space as the separator.
+   The "prefix" field is a fixed-width, zero-filled, numeric prefix
+   corresponding to the tree name and assigned in sorted order.  We
+   should parse and unparse the build graph node names in one place,
+   and we should change all functions (other than the one directly
+   called by DependencyRunner) that take a build graph node to take an
+   item and a platform as separate arguments.  Do the refactoring
+   first including adding a test for the item/item2 sort.  Then, once
+   everything is good, change the sort order to be sensitive to tree
+   ordering.
+
  * Consider adding a new special-case target "help" that would provide
    help in a manner that does not require invoking a back end.  This
    should remove the serious problems with rules-help and
