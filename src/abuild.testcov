@@ -61,7 +61,6 @@ Abuild integrity errors in buildset 0
 Abuild ERR backing cycle 0
 Abuild ERR external not root 0
 Abuild ERR invalid backing file 0
-Abuild ERR no build tree top config 0
 Abuild traverse backing without conf 0
 Abuild external in backing area 0
 Abuild ERR can't resolve external 0
@@ -69,8 +68,6 @@ Abuild ERR item multiple locations 0
 Abuild ERR no child config 0
 Abuild sparse tree 0
 Abuild ERR can't resolve child 0
-Abuild build item multiple paths 0
-Abuild ERR in local and external 0
 Abuild override build item 0
 Abuild ERR unknown dependency 0
 Abuild ERR circular dependency 0
@@ -137,7 +134,6 @@ ItemConfig ERR duplicate trait 0
 ItemConfig ERR duplicate flag 0
 ItemConfig ERR bad trait 0
 ItemConfig ERR item without trait 0
-Abuild inherit traits from backing area 0
 Abuild ERR unsupported trait 0
 Abuild ERR inaccessible trait referent 0
 Abuild listTraits with no traits 0
@@ -146,11 +142,8 @@ Abuild expand by trait 1
 Abuild category et_traits 1
 Abuild ERR unknown trait 0
 ItemConfig ERR duplicate platform type 0
-ItemConfig ERR deleted on non-root 0
+ItemConfig ERR deleted on non-1.0-root 0
 ItemConfig ERR duplicate deleted item 0
-Abuild ERR deleting non-existent item 0
-Abuild ERR deleting unqualified item 0
-Abuild deleting item 0
 ItemConfig ERR duplicate plugins item 0
 ItemConfig ERR plugins on non-root 0
 Abuild ERR invalid plugin 0
@@ -195,7 +188,6 @@ ItemConfig ptype is selector 0
 ItemConfig bad ptype selector 0
 BuildItem used selector for type 0
 BuildItem used first for type 0
-Abuild not copying deleted in external 0
 Abuild buildset names 1
 Abuild ERR unknown items in set 0
 Abuild ERR bad buildset pattern 0
@@ -292,7 +284,6 @@ ItemConfig ERR Abuild.backing non-forest root 0
 Abuild previously assigned tree name 0
 Abuild ERR named item outside of tree 0
 ItemConfig ERR bad tree dep 0
-Abuild ERR missing external 0
 Abuild ERR duplicate tree 0
 Abuild ERR findTop from external 0
 Abuild external has already been seen 0
@@ -303,7 +294,11 @@ Abuild ERR unknown tree dependency 0
 Abuild ERR circular tree dependency 0
 Abuild not copying item from deleted tree 0
 Abuild not copying deleted item 0
-Abuild ERR access to invisible item 0
+Abuild ERR depend on invisible item 0
 Abuild ERR plugin in invisible tree 0
 Abuild ERR build-also invisible item 0
 Abuild ERR invisible trait referent 0
+Abuild followed external's backing area 0
+Abuild ERR deleted item exists locally 0
+Abuild ERR deleting non-existent item 0
+Abuild ERR deleting non-existent tree 0

@@ -1086,6 +1086,7 @@ Abuild::readExternalConfig(std::string const& dir,
     std::set<std::string> seen;
     std::list<std::string> candidates;
     candidates.push_back(dir);
+    bool went_to_backing_area = false;
 
     while ((! candidates.empty()) && (config == 0))
     {
@@ -1129,6 +1130,19 @@ Abuild::readExternalConfig(std::string const& dir,
 		readBacking(candidate)->getBackingAreas();
 	    candidates.insert(candidates.end(),
 			      backing_areas.begin(), backing_areas.end());
+	    went_to_backing_area = true;
+	}
+    }
+
+    if (config && went_to_backing_area)
+    {
+	if (suf.empty())
+	{
+	    QTC::TC("abuild", "Abuild followed external's backing area");
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild external in backing area");
 	}
     }
 
@@ -1729,8 +1743,16 @@ Abuild::resolveItems(BuildForest_map& forests,
     BuildForest& forest = *(forests[top_path]);
     BuildItem_map& builditems = forest.getBuildItems();
     std::list<std::string> const& backing_areas = forest.getBackingAreas();
-    std::set<std::string> const& deleted_trees = forest.getDeletedTrees();
-    std::set<std::string> const& deleted_items = forest.getDeletedItems();
+    std::set<std::string> const& trees_to_delete = forest.getDeletedTrees();
+    std::set<std::string> const& items_to_delete = forest.getDeletedItems();
+    std::set<std::string> trees_not_deleted = trees_to_delete;
+    std::set<std::string> items_not_deleted = items_to_delete;
+
+    // The most likely location for a problem is the forest root
+    // Abuild.backing file.  In 1.0 compatibility mode, it might be
+    // some Abuild.conf, but we're not going to keep track of the
+    // origin of ever single item/tree deletion request.
+    FileLocation location(top_path + "/" + BackingConfig::FILE_BACKING, 0, 0);
 
     // XXX error if deleted items exist; okay if deleted tree
     // exists...must document the distinction (for deleted trees, we
@@ -1751,13 +1773,27 @@ Abuild::resolveItems(BuildForest_map& forests,
 	{
 	    std::string const& item_name = (*item_iter).first;
 	    BuildItem const& item = *((*item_iter).second);
-	    if (deleted_trees.count(item.getTreeName()))
+	    std::string const& tree_name = item.getTreeName();
+	    if (trees_to_delete.count(tree_name))
 	    {
 		QTC::TC("abuild", "Abuild not copying item from deleted tree");
+		trees_not_deleted.erase(tree_name);
 	    }
-	    else if (deleted_items.count(item_name))
+	    else if (items_to_delete.count(item_name))
 	    {
 		QTC::TC("abuild", "Abuild not copying deleted item");
+		items_not_deleted.erase(item_name);
+		if (builditems.count(item_name))
+		{
+		    QTC::TC("abuild", "Abuild ERR deleted item exists locally");
+		    error(location,
+			  "item \"" + item_name + "\" is marked for"
+			  " deletion, but it appears locally in this"
+			  " forest");
+		    error(builditems[item_name]->getLocation(),
+			  "here is the location of the item in"
+			  " this forest");
+		}
 	    }
 	    else if (builditems.count(item_name))
 	    {
@@ -1771,6 +1807,23 @@ Abuild::resolveItems(BuildForest_map& forests,
 		new_item.incrementBackingDepth();
 	    }
         }
+    }
+
+    for (std::set<std::string>::iterator iter = trees_not_deleted.begin();
+	 iter != trees_not_deleted.end(); ++iter)
+    {
+	QTC::TC("abuild", "Abuild ERR deleting non-existent tree");
+	error(location,
+	      "tree \"" + *iter + "\" was marked for deletion"
+	      " but was not seen in a backing area");
+    }
+    for (std::set<std::string>::iterator iter = items_not_deleted.begin();
+	 iter != items_not_deleted.end(); ++iter)
+    {
+	QTC::TC("abuild", "Abuild ERR deleting non-existent item");
+	error(location,
+	      "item \"" + *iter + "\" was marked for deletion"
+	      " but was not seen in a backing area");
     }
 }
 
@@ -2492,8 +2545,6 @@ Abuild::checkFlags(BuildForest& forest)
 void
 Abuild::checkTraits(BuildForest& forest)
 {
-    // XXX referent items and access table
-
     // For each build item, make sure each trait is allowed in the
     // current build tree and that any referent build items are
     // accessible.  Check only items that are local to the current
