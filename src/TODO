@@ -1,3 +1,15 @@
+Remaining failing test suites:
+
+abuild-backing-areas
+abuild-errors
+abuild-examples
+abuild-traversal
+
+Work on backing-areas first.  It has some failures that are real
+failures and not just change to error messages and dump data.  This
+may be true of traversal as well.
+
+Still need to review code.
 
 === Changes Targeted for Version 1.1 ===
 
