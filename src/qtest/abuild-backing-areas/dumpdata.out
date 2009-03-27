@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -20,7 +20,10 @@
   <supported-trait name="shared-common"/>
   <supported-trait name="shared-product"/>
  </supported-traits>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--/shared/common"
@@ -46,20 +49,16 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="common-lib1"
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib1"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -75,10 +74,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib2"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -94,10 +91,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib3"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -138,20 +133,16 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="common-lib1"
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib1"
     backing-depth="1"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -167,10 +158,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib2"
     backing-depth="1"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -186,10 +175,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/libs/lib3"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -205,10 +192,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/plugin"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -238,20 +223,16 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="common-lib1"
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib1"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -267,10 +248,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib2"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -286,10 +265,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib3"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -305,10 +282,8 @@
     home-tree="bt-3"
     absolute-path="--topdir--/shared/product/new"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -322,20 +297,16 @@
     home-tree="bt-3"
     absolute-path="--topdir--/shared/product"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="product-common"
     home-tree="bt-3"
     absolute-path="--topdir--/shared/product/common"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -351,10 +322,8 @@
     home-tree="bt-3"
     absolute-path="--topdir--/shared/product/lib"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <build-also-items>
      <build-also name="product-common"/>
@@ -381,10 +350,8 @@
     home-tree="bt-3"
     absolute-path="--topdir--/shared/product/bin"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="product-lib"/>
@@ -442,20 +409,16 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="common-lib1"
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib1"
     backing-depth="1"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -471,10 +434,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib2"
     backing-depth="1"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -490,10 +451,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/libs/lib3"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -509,30 +468,24 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/plugin"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="product"
     home-tree="bt-4"
     absolute-path="--topdir--/other/2/product"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="product-common"
     home-tree="bt-4"
     absolute-path="--topdir--/other/2/product/common"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -548,10 +501,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/other/2/product/lib"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="product-common"/>
@@ -575,11 +526,9 @@
     home-tree="bt-3"
     absolute-path="--topdir--/shared/product/bin"
     backing-depth="1"
-    external-depth="0"
     has-shadowed-references="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="product-lib"/>
@@ -629,20 +578,16 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common"
     backing-depth="1"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="common-lib1"
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib1"
     backing-depth="2"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -658,10 +603,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib2"
     backing-depth="2"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -677,10 +620,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/libs/lib3"
     backing-depth="1"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -696,10 +637,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/plugin"
     backing-depth="1"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -730,20 +669,16 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common"
     backing-depth="1"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="common-lib1"
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib1"
     backing-depth="2"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -759,10 +694,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/shared/common/libs/lib2"
     backing-depth="2"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -778,10 +711,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/libs/lib3"
     backing-depth="1"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -797,30 +728,24 @@
     home-tree="bt-2"
     absolute-path="--topdir--/other/2/common/plugin"
     backing-depth="1"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="product"
     home-tree="bt-6"
     absolute-path="--topdir--/read-only/product"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="product-common"
     home-tree="bt-4"
     absolute-path="--topdir--/other/2/product/common"
     backing-depth="1"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -836,10 +761,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/other/2/product/lib"
     backing-depth="1"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="product-common"/>
@@ -863,10 +786,8 @@
     home-tree="bt-6"
     absolute-path="--topdir--/read-only/product/bin"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="product-lib"/>
@@ -890,5 +811,5 @@
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

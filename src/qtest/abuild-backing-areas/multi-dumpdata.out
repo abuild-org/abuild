@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -13,7 +13,10 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--/multi/common"
@@ -36,10 +39,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/multi/common"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -74,10 +75,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/multi/common"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -93,10 +92,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/multi/b"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="common"/>
@@ -138,10 +135,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/multi/common"
     backing-depth="0"
-    external-depth="2"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -157,10 +152,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/multi/b"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="common"/>
@@ -182,10 +175,8 @@
     home-tree="bt-3"
     absolute-path="--topdir--/multi/a"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="b"/>
@@ -227,10 +218,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/multi/c"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -265,10 +254,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/multi/common"
     backing-depth="0"
-    external-depth="3"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -284,10 +271,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/multi/b"
     backing-depth="0"
-    external-depth="2"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="common"/>
@@ -309,10 +294,8 @@
     home-tree="bt-3"
     absolute-path="--topdir--/multi/a"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="b"/>
@@ -336,10 +319,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/multi/c"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -353,10 +334,8 @@
     home-tree="bt-5"
     absolute-path="--topdir--/multi/product"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="a"/>
@@ -380,5 +359,5 @@
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

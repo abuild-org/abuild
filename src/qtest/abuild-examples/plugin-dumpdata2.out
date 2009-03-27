@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -13,7 +13,10 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--/native-compiler"
@@ -42,10 +45,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/native-compiler/lib"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -64,10 +65,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/native-compiler/compiler"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -93,10 +92,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/native-compiler/lib"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -115,10 +112,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/native-compiler/outside"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="lib"/>
@@ -140,11 +135,9 @@
     home-tree="bt-1"
     absolute-path="--topdir--/native-compiler/compiler"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

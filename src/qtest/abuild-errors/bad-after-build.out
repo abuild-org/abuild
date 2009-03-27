@@ -1,6 +1,6 @@
 abuild-monitor: begin-dump-data
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -14,7 +14,10 @@ abuild-monitor: begin-dump-data
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--/h"
@@ -37,10 +40,8 @@ abuild-monitor: begin-dump-data
     home-tree="bt-1"
     absolute-path="--topdir--/h/dep"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -54,10 +55,8 @@ abuild-monitor: begin-dump-data
     home-tree="bt-1"
     absolute-path="--topdir--/h"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="af-dep"/>
@@ -77,10 +76,8 @@ abuild-monitor: begin-dump-data
     home-tree="bt-1"
     absolute-path="--topdir--/h/rdep"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="af"/>
@@ -97,7 +94,7 @@ abuild-monitor: begin-dump-data
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>
 abuild-monitor: end-dump-data
 abuild-monitor: state-change af-dep indep ready

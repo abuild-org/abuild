@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -13,7 +13,10 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--/plugin"
@@ -44,10 +47,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/lib"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -65,10 +66,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/bin"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="lib"/>
@@ -92,10 +91,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/indep/a"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -109,10 +106,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/indep/b"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="indep-a"/>
@@ -132,10 +127,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/java/code"
     backing-depth="0"
-    external-depth="0"
     target-type="java"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="java"/>
@@ -149,30 +142,24 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/plugins/counter"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.echoer"
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/plugins/echoer"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.printer"
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/plugins/printer"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -198,10 +185,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/lib"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -219,10 +204,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/bin"
     backing-depth="0"
-    external-depth="1"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="lib"/>
@@ -246,10 +229,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/indep/a"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -263,10 +244,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/other/indep/b"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="indep-a"/>
@@ -286,10 +265,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/java/code"
     backing-depth="0"
-    external-depth="1"
     target-type="java"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="java"/>
@@ -303,40 +280,32 @@
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/plugins/counter"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.echoer"
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/plugins/echoer"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.printer"
     home-tree="bt-1"
     absolute-path="--topdir--/plugin/plugins/printer"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="prog2"
     home-tree="bt-2"
     absolute-path="--topdir--/plugin/outside/prog2"
     backing-depth="0"
-    external-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="lib"/>
@@ -354,5 +323,5 @@
     </buildable-platforms>
    </build-item>
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

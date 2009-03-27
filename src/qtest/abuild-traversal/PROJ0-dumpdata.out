@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -23,7 +23,10 @@
   <supported-trait name="PROJ0-c2-impl"/>
   <supported-trait name="PROJ0-proj-int"/>
  </supported-traits>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
@@ -49,10 +52,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -85,10 +86,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -102,10 +101,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -136,10 +133,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -153,10 +148,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="2"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -191,10 +184,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
     backing-depth="0"
-    external-depth="2"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -208,10 +199,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -231,10 +220,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -254,10 +241,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="3"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -290,10 +275,8 @@
     home-tree="bt-5"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -307,10 +290,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -341,10 +322,8 @@
     home-tree="bt-5"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -358,20 +337,16 @@
     home-tree="bt-6"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="rules"
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="2"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -409,10 +384,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
     backing-depth="0"
-    external-depth="2"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -426,10 +399,8 @@
     home-tree="bt-5"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
     backing-depth="0"
-    external-depth="2"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -443,10 +414,8 @@
     home-tree="bt-7"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -468,10 +437,8 @@
     home-tree="bt-7"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -485,10 +452,8 @@
     home-tree="bt-7"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -512,20 +477,16 @@
     home-tree="bt-6"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
     backing-depth="0"
-    external-depth="1"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="rules"
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="3"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
   <build-tree
@@ -565,10 +526,8 @@
     home-tree="bt-2"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
     backing-depth="0"
-    external-depth="3"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -582,10 +541,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -605,10 +562,8 @@
     home-tree="bt-4"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -628,10 +583,8 @@
     home-tree="bt-5"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
     backing-depth="0"
-    external-depth="3"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -645,10 +598,8 @@
     home-tree="bt-7"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -670,10 +621,8 @@
     home-tree="bt-7"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -687,10 +636,8 @@
     home-tree="bt-7"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b"
     backing-depth="0"
-    external-depth="1"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1"/>
@@ -714,20 +661,16 @@
     home-tree="bt-6"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
     backing-depth="0"
-    external-depth="2"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="proj-int"
     home-tree="bt-8"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="c1-a"/>
@@ -756,11 +699,9 @@
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="4"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

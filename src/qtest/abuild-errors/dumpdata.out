@@ -17,7 +17,10 @@
   <supported-trait name="trait1"/>
   <supported-trait name="trait2"/>
  </supported-traits>
- <build-trees>
+ <forest
+  id=""
+  absolute-path=""
+ >
   <build-tree
    id="bt-1"
    absolute-path="--topdir--"
@@ -44,30 +47,24 @@
     home-tree="bt-1"
     absolute-path="--topdir--/a"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="bb"
     home-tree="bt-1"
     absolute-path="--topdir--/b/bb"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="ca"
     home-tree="bt-1"
     absolute-path="--topdir--/c/ca"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="cc"/>
@@ -78,10 +75,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/c/cb"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="ca"/>
@@ -95,10 +90,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/a/aa"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="bb"/>
@@ -115,10 +108,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/a/ab"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <build-also-items>
      <build-also name="does-not-exist"/>
@@ -144,60 +135,48 @@
     home-tree="bt-1"
     absolute-path="--topdir--/a/ab/aba"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="abb"
     home-tree="bt-1"
     absolute-path="--topdir--/a/ab/abb"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="aha"
     home-tree="bt-1"
     absolute-path="--topdir--/a/ah/aha"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="b"
     home-tree="bt-1"
     absolute-path="--topdir--/b"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="ba"
     home-tree="bt-1"
     absolute-path="--topdir--/b/ba"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="c d"
     home-tree="bt-1"
     absolute-path="--topdir--/c/cd"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="potato"/>
@@ -208,10 +187,8 @@
     home-tree="bt-1"
     absolute-path="--topdir--/c/cc"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="cb"/>
@@ -230,20 +207,16 @@
     home-tree="bt-1"
     absolute-path="--topdir--/d"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.a.a"
     home-tree="bt-1"
     absolute-path="--topdir--/d/a/a"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <supported-flags>
      <supported-flag name="moo"/>
@@ -254,21 +227,17 @@
     home-tree="bt-1"
     absolute-path="--topdir--/d/b/a"
     backing-depth="0"
-    external-depth="0"
     visible-to="d.b.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.a"
     home-tree="bt-1"
     absolute-path="--topdir--/d/a"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d.a.a">
@@ -296,22 +265,18 @@
     home-tree="bt-1"
     absolute-path="--topdir--/d/b/a/a"
     backing-depth="0"
-    external-depth="0"
     visible-to="d.b.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b"
     home-tree="bt-1"
     absolute-path="--topdir--/d/b"
     backing-depth="0"
-    external-depth="0"
     visible-to="d.b.q.r.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d"/>
@@ -327,22 +292,18 @@
     home-tree="bt-1"
     absolute-path="--topdir--/d/b/b"
     backing-depth="0"
-    external-depth="0"
     visible-to="q.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="root"
     home-tree="bt-1"
     absolute-path="--topdir--"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>
