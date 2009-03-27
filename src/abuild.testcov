@@ -304,7 +304,6 @@ Abuild ERR deleting non-existent tree 0
 Abuild not copying deleted tree 0
 Abuild ERR deleted tree exists locally 0
 Abuild override build tree 0
-Abuild ERR loop getting assigned tree name 0
 Abuild inherit tree name from backing 0
 Abuild trying backing of backing 0
 Abuild replace item from deleted tree 0
@@ -312,3 +311,5 @@ Abuild nested backing areas 0
 Abuild forest merge required 0
 Abuild ERR tree clash during murge 0
 Abuild ERR item clash during murge 0
+Abuild ERR backing area loop 0
+Abuild ERR external_graph failure 0

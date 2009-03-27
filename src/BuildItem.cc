@@ -171,6 +171,12 @@ BuildItem::isLocal() const
     return (this->backing_depth == 0);
 }
 
+bool
+BuildItem::isInTree(std::string const& tree) const
+{
+    return (this->tree_name == tree);
+}
+
 std::map<std::string, std::set<std::string> > const&
 BuildItem::getShadowedPlugins() const
 {

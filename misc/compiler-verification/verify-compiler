@@ -206,15 +206,15 @@ my $abuild_out = undef;
 { # private scope
     open(P, "abuild --list-platforms|") or
 	die "$whoami: can't run abuild --list-platformns: $!\n";
-    my $in_tree = 0;
+    my $in_forest = 0;
     my $in_platform_type = 0;
     while (<P>)
     {
-	if (m,tree .*/$tmpdir,)
+	if (m,forest .*/$tmpdir,)
 	{
-	    $in_tree = 1;
+	    $in_forest = 1;
 	}
-	elsif ($in_tree)
+	elsif ($in_forest)
 	{
 	    if (m/platform type (\S+)/)
 	    {

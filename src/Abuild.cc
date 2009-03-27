@@ -66,10 +66,10 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     local_build(false),
     error_handler(whoami),
     this_config(0),
-    last_assigned_tree_number(0),
 #ifdef _WIN32
     have_perl(false),
 #endif
+    last_assigned_tree_number(0),
     logger(*(Logger::getInstance()))
 {
     Error::setErrorCallback(
@@ -975,6 +975,7 @@ Abuild::readConfigs()
     // additional discussion.
     BuildForest_map forests;
     traverse(forests, local_top);
+    assert(! this->local_tree.empty());
 
     // Compute the list of all known traits.  This routine also
     // validates to make sure that any traits specified on the command
@@ -1207,7 +1208,7 @@ void
 Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 {
     std::set<std::string> visiting;
-    DependencyGraph external_graph;
+    DependencyGraph external_graph; // 1.0-compatibility only
 
     traverseForests(forests, external_graph,
 		    top_path, visiting, "root of local forest");
@@ -1226,11 +1227,11 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 
 	if (! external_graph.check())
 	{
-	    // XXX Not sure how to reproduce this....can we?  Maybe
-	    // something as simple as an external cycle would do it.
+	    QTC::TC("abuild", "Abuild ERR external_graph failure");
 	    error("1.0 compatibility mode was unable to determine"
 		  " proper relationships among externals; some errors"
-		  " about unknown tree dependencies may be spurious");
+		  " about unknown tree dependencies may be spurious and"
+		  " may disappear after you fix tree dependency cycles");
 	}
 	else
 	{
@@ -1458,6 +1459,8 @@ void
 Abuild::mergeForests(BuildForest_map& forests,
 		     DependencyGraph& external_graph)
 {
+    assert(this->compat_level.allow_1_0());
+
     // XXX It would be better if we could figure this out earlier so
     // we wouldn't have to repeat duplication detection and other
     // logic.
@@ -1627,13 +1630,16 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		      std::set<std::string>& deleted_trees,
 		      std::set<std::string>& deleted_items)
 {
-    if (this->items_traversed.count(top_path))
+    if (this->compat_level.allow_1_0())
     {
-	QTC::TC("abuild", "Abuild forest has already been seen");
-	return;
+	if (this->items_traversed.count(top_path))
+	{
+	    QTC::TC("abuild", "Abuild forest has already been seen");
+	    return;
+	}
+	external_graph.addItem(top_path);
+	this->items_traversed.insert(top_path);
     }
-    external_graph.addItem(top_path);
-    this->items_traversed.insert(top_path);
 
     bool has_backing_area =
 	Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING);
@@ -1674,6 +1680,10 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 					  config, dirs_with_externals);
 	}
 	dir_trees[dir] = tree_name;
+	if (dir == this->this_config_dir)
+	{
+	    this->local_tree = tree_name;
+	}
 
 	std::string item_name = config->getName();
         if (! item_name.empty())
@@ -1818,7 +1828,8 @@ Abuild::registerBuildTree(BuildForest& forest,
 	    {
 		QTC::TC("abuild", "Abuild ERR can't resolve external");
 		error(config->getLocation(),
-		      "unable to locate or resolve external \"" + edecl);
+		      "unable to locate or resolve external \"" +
+		      edecl + "\"");
 	    }
 	}
     }
@@ -1869,13 +1880,9 @@ std::string
 Abuild::getAssignedTreeName(std::string const& dir,
 			    std::set<std::string>& visiting)
 {
-    if (visiting.count(dir))
-    {
-	QTC::TC("abuild", "Abuild ERR loop getting assigned tree name");
-	fatal("backing are loop found while attempting to assign a tree name"
-	      " to " + dir);
-    }
-
+    // We check visitnig before calling recursively so we can create a
+    // better error message.
+    assert(! visiting.count(dir));
     visiting.insert(dir);
 
     std::string tree_name;
@@ -1921,8 +1928,17 @@ Abuild::getAssignedTreeName(std::string const& dir,
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild trying backing of backing");
-		tree_name = getAssignedTreeName(backing_area, visiting);
+		if (visiting.count(backing_area))
+		{
+		    QTC::TC("abuild", "Abuild ERR backing area loop");
+		    fatal("backing ares loop found for " + backing_area +
+			  ", a backing area of " + dir);
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild trying backing of backing");
+		    tree_name = getAssignedTreeName(backing_area, visiting);
+		}
 	    }
 	}
     }
@@ -3958,7 +3974,8 @@ Abuild::computeBuildset(BuildItem_map& builditems)
         {
             QTC::TC("abuild", "Abuild buildset local", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
-			     boost::bind(&BuildItem::isLocal, _1));
+			     boost::bind(&BuildItem::isInTree, _1,
+					 this->local_tree));
         }
         else if (set_name == b_DESC)
         {

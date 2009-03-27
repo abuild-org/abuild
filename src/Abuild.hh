@@ -292,10 +292,8 @@ class Abuild
     std::string native_toolset;
     std::string this_platform;
     std::string this_config_dir;
+    std::string local_tree;
     ItemConfig* this_config;
-    unsigned int last_assigned_tree_number;
-    std::map<std::string, std::string> assigned_tree_names;
-    std::set<std::string> items_traversed;
     PlatformData internal_platform_data;
     std::set<std::string> valid_traits;
     BuildItem_map buildset;
@@ -315,6 +313,11 @@ class Abuild
 		     std::vector<std::string> > map_string_vec_string;
     typedef std::map<std::string, map_string_vec_string> shadowed_plugin_map;
     shadowed_plugin_map shadowed_plugins;
+
+    // Used by 1.0 compatibility mode only
+    unsigned int last_assigned_tree_number;
+    std::map<std::string, std::string> assigned_tree_names;
+    std::set<std::string> items_traversed;
 
     Logger& logger;
 };
