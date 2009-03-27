@@ -13,6 +13,10 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
+ <supported-traits>
+  <supported-trait name="PLUGINS-plugins"/>
+  <supported-trait name="PROJ0-c1-ifc"/>
+ </supported-traits>
  <build-trees>
   <build-tree
    id="bt-1"
@@ -31,6 +35,9 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+   </supported-traits>
    <build-item
     name="rules"
     home-tree="bt-1"
@@ -59,6 +66,10 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+   </supported-traits>
    <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>

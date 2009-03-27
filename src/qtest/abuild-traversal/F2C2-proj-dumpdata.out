@@ -13,6 +13,21 @@
    <platform name="java" selected="1"/>
   </platform-type>
  </platform-data>
+ <supported-traits>
+  <supported-trait name="F2C2-c2"/>
+  <supported-trait name="F2C2-c2-impl"/>
+  <supported-trait name="F2C2-f2"/>
+  <supported-trait name="F2C2-proj-int"/>
+  <supported-trait name="PLUGINS-plugins"/>
+  <supported-trait name="PROJ0-c1"/>
+  <supported-trait name="PROJ0-c1-ifc"/>
+  <supported-trait name="PROJ0-c1-impl"/>
+  <supported-trait name="PROJ0-c2"/>
+  <supported-trait name="PROJ0-c2-ifc"/>
+  <supported-trait name="PROJ0-c2-impl"/>
+  <supported-trait name="PROJ0-proj-int"/>
+  <supported-trait name="UTIL0-f2"/>
+ </supported-traits>
  <build-trees>
   <build-tree
    id="bt-1"
@@ -31,6 +46,9 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+   </supported-traits>
    <build-item
     name="rules"
     home-tree="bt-1"
@@ -59,6 +77,10 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+   </supported-traits>
    <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>
@@ -108,6 +130,11 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+   </supported-traits>
    <external build-tree="bt-2"/>
    <build-item
     name="c1"
@@ -154,6 +181,12 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c1-impl"/>
+   </supported-traits>
    <external build-tree="bt-3"/>
    <plugins>
     <plugin name="rules"/>
@@ -249,6 +282,10 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
    <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>
@@ -298,6 +335,11 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c2"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
    <external build-tree="bt-5"/>
    <build-item
     name="c2"
@@ -316,6 +358,16 @@
      <platform name="indep"/>
     </buildable-platforms>
    </build-item>
+   <build-item
+    name="c2-extra"
+    home-tree="bt-6"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
+    backing-depth="0"
+    external-depth="0"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
    <build-item
     name="rules"
     home-tree="bt-1"
@@ -344,6 +396,14 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c2"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+    <supported-trait name="PROJ0-c2-impl"/>
+   </supported-traits>
    <external build-tree="bt-6"/>
    <external build-tree="bt-3"/>
    <plugins>
@@ -453,6 +513,16 @@
     </buildable-platforms>
    </build-item>
    <build-item
+    name="c2-extra"
+    home-tree="bt-6"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
+    backing-depth="0"
+    external-depth="1"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
     name="rules"
     home-tree="bt-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
@@ -480,6 +550,16 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c1-impl"/>
+    <supported-trait name="PROJ0-c2"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+    <supported-trait name="PROJ0-c2-impl"/>
+    <supported-trait name="PROJ0-proj-int"/>
+   </supported-traits>
    <external build-tree="bt-4"/>
    <external build-tree="bt-7"/>
    <plugins>
@@ -635,6 +715,16 @@
     </buildable-platforms>
    </build-item>
    <build-item
+    name="c2-extra"
+    home-tree="bt-6"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
+    backing-depth="0"
+    external-depth="2"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
+   <build-item
     name="proj-int"
     home-tree="bt-8"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
@@ -694,6 +784,10 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="UTIL0-f2"/>
+   </supported-traits>
    <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>
@@ -760,8 +854,16 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="F2C2-c2"/>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
    <backing-area build-tree="bt-6"/>
    <external build-tree="bt-5" backed="1"/>
+   <deleted-items>
+    <deleted-item name="c2-extra"/>
+   </deleted-items>
    <build-item
     name="c2"
     home-tree="bt-5"
@@ -807,6 +909,10 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="F2C2-f2"/>
+    <supported-trait name="PLUGINS-plugins"/>
+   </supported-traits>
    <backing-area build-tree="bt-9"/>
    <external build-tree="bt-1" backed="1"/>
    <plugins>
@@ -891,6 +997,15 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="F2C2-c2"/>
+    <supported-trait name="F2C2-c2-impl"/>
+    <supported-trait name="F2C2-f2"/>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
    <backing-area build-tree="bt-7"/>
    <external build-tree="bt-10"/>
    <external build-tree="bt-11"/>
@@ -1065,6 +1180,17 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
+   <supported-traits>
+    <supported-trait name="F2C2-c2"/>
+    <supported-trait name="F2C2-c2-impl"/>
+    <supported-trait name="F2C2-f2"/>
+    <supported-trait name="F2C2-proj-int"/>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c1-impl"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
    <backing-area build-tree="bt-8"/>
    <external build-tree="bt-12"/>
    <external build-tree="bt-4" backed="1"/>
@@ -1239,6 +1365,16 @@
      <platform name="indep"/>
     </buildable-platforms>
    </build-item>
+   <build-item
+    name="c2-extra"
+    home-tree="bt-6"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
+    backing-depth="1"
+    external-depth="2"
+    target-type="all"
+    is-plugin="0"
+    is-plugin-anywhere="0"
+   />
    <build-item
     name="f2-a"
     home-tree="bt-9"

@@ -129,9 +129,63 @@ check_tree("F2C2 proj", "forest1/F2C2/proj/tests/int", "F2C2-proj");
 check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
 check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
 
+# errors
+
+cd("work/errors/cycle");
+
+$td->runtest("backing cycle",
+	     {$td->COMMAND => "abuild -C a",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backing-cycle.out",
+	      $td->EXIT_STATUS => 2});
+
+$td->runtest("external cycle",
+	     {$td->COMMAND => "abuild -C c",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-cycle.out",
+	      $td->EXIT_STATUS => 2});
+
+$td->runtest("backed external cycle",
+	     {$td->COMMAND => "abuild -C e",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backed-external-cycle.out",
+	      $td->EXIT_STATUS => 2});
+
+cd("work/errors/ext-not-root");
+
+$td->runtest("external not root",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-not-root.out",
+	      $td->EXIT_STATUS => 2});
+
+cd("work/errors/ext-no-conf");
+
+$td->runtest("external lacks conf",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-no-conf.out",
+	      $td->EXIT_STATUS => 2});
+
+cd("work/errors/ext-not-found");
+
+$td->runtest("can't resolve external",
+	     {$td->COMMAND => "abuild -C a",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-not-found.out",
+	      $td->EXIT_STATUS => 2});
+
+cd("work/errors/integrity");
+
+$td->runtest("shadowed deps and plugins",
+	     {$td->COMMAND => "abuild -C f2/main -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/integrity.out",
+	      $td->EXIT_STATUS => 2});
+
 check_work_accessed($td);
 
-$td->report(13);
+$td->report(20);
 
 sub check_tree
 {
