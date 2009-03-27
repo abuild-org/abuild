@@ -109,6 +109,17 @@ Groovy Framework
    abuild.runActions works.
 
 
+Compatibility Issues
+====================
+
+ * Update compiler verification to work with compat level 1.1.
+
+ * Upgrade all examples to 1.1.  Set up abuild-examples test suite to
+   run twice: once with compat level 1.1 and once with compat level
+   1.0.  This helps to exercise that 1.0 compatibility stuff doesn't
+   get in the way when not needed.
+
+
 Core Changes
 ============
 
@@ -222,8 +233,6 @@ Core Changes
       of platform-specific dependencies and platform conditionals.
 
  * Drop internal "clean" targets and update documentation.
-
- * Update compiler verification to work with compat level 1.1.
 
 Documentation
 =============

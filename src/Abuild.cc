@@ -1538,7 +1538,7 @@ Abuild::mergeForests(BuildForest_map& forests,
 		BuildTree_ptr tree = (*i3).second;
 		if (buildtrees.count(tree_name))
 		{
-		    QTC::TC("abuild", "Abuild ERR tree clash during murge");
+		    QTC::TC("abuild", "Abuild ERR tree clash during merge");
 		    error(tree->getLocation(),
 			  "another tree with the name \"" + tree_name +
 			  "\" exists");
@@ -1559,7 +1559,7 @@ Abuild::mergeForests(BuildForest_map& forests,
 		BuildItem_ptr item = (*i3).second;
 		if (builditems.count(item_name))
 		{
-		    QTC::TC("abuild", "Abuild ERR item clash during murge");
+		    QTC::TC("abuild", "Abuild ERR item clash during merge");
 		    error(item->getLocation(),
 			  "another item with the name \"" + item_name +
 			  "\" exists");
