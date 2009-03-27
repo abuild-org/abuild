@@ -43,7 +43,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
   </build-tree>
   <build-tree
@@ -78,7 +77,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="rules"/>
@@ -102,7 +100,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="rules"/>
@@ -126,7 +123,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="rules"/>

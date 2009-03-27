@@ -198,10 +198,8 @@
 
 <!--  target-type: the target type of this build item              -->
 
-<!--  is-plugin: true if the item is a plugin in this tree         -->
-
-<!--  is-plugin-anywhere: true if the item is a plugin in this     -->
-<!--  tree or any tree known to this tree                          -->
+<!--  is-plugin: true if the item is used as a plugin by at least  -->
+<!--  one tree                                                     -->
 
 <!ELEMENT build-item (build-also-items?, declared-dependencies?,
                       expanded-dependencies?,
@@ -217,7 +215,6 @@
   visible-to              CDATA     #IMPLIED
   target-type             %target-type;  #REQUIRED
   is-plugin               %boolean; #REQUIRED
-  is-plugin-anywhere      %boolean; #REQUIRED
 >
 
 <!--  build-also-items contains the list of build items named in   -->

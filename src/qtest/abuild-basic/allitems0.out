@@ -54,7 +54,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -70,7 +69,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -89,7 +87,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="bb"/>
@@ -115,7 +112,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -131,7 +127,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b.a"
@@ -141,7 +136,6 @@ abuild-monitor: begin-dump-data
     visible-to="d.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.a"
@@ -151,7 +145,6 @@ abuild-monitor: begin-dump-data
     visible-to="*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d.a.a"/>
@@ -169,7 +162,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d.a"/>
@@ -193,7 +185,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -209,7 +200,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -225,7 +215,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -241,7 +230,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -257,7 +245,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -273,7 +260,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="ca"/>
@@ -297,7 +283,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -313,7 +298,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b.a.a"
@@ -323,7 +307,6 @@ abuild-monitor: begin-dump-data
     visible-to="d.b.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b"
@@ -332,7 +315,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d"/>
@@ -350,7 +332,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="echo"/>
@@ -369,7 +350,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="e.lib"/>
@@ -394,7 +374,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="e.lib"/>
@@ -421,7 +400,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="echo"/>
@@ -440,7 +418,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="echo"/>
@@ -463,7 +440,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="e.lib"/>
@@ -488,7 +464,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.qrwx"
@@ -497,7 +472,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="root"
@@ -506,7 +480,6 @@ abuild-monitor: begin-dump-data
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>

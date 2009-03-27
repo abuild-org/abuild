@@ -53,7 +53,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -69,7 +68,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -88,7 +86,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="bb"/>
@@ -114,7 +111,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -130,7 +126,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b.a"
@@ -140,7 +135,6 @@
     visible-to="d.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.a"
@@ -150,7 +144,6 @@
     visible-to="*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d.a.a"/>
@@ -168,7 +161,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d.a"/>
@@ -192,7 +184,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -208,7 +199,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -224,7 +214,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -240,7 +229,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -256,7 +244,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -272,7 +259,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="ca"/>
@@ -296,7 +282,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -312,7 +297,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b.a.a"
@@ -322,7 +306,6 @@
     visible-to="d.b.*"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    />
    <build-item
     name="d.b"
@@ -331,7 +314,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="d"/>
@@ -349,7 +331,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="echo"/>
@@ -368,7 +349,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="e.lib"/>
@@ -393,7 +373,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="e.lib"/>
@@ -420,7 +399,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="echo"/>
@@ -439,7 +417,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="echo"/>
@@ -462,7 +439,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="e.lib"/>
@@ -487,7 +463,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="plugin.qrwx"
@@ -496,7 +471,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="1"
-    is-plugin-anywhere="1"
    />
    <build-item
     name="root"
@@ -505,7 +479,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>

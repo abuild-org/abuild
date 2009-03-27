@@ -43,7 +43,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -59,7 +58,6 @@
     backing-depth="0"
     target-type="java"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="java"/>
@@ -75,7 +73,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -93,7 +90,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <declared-dependencies>
      <dependency name="indep1"/>
@@ -119,7 +115,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <build-also-items>
      <build-also name="java1"/>
@@ -138,7 +133,6 @@
     backing-depth="0"
     target-type="java"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="java"/>
@@ -154,7 +148,6 @@
     backing-depth="0"
     target-type="object-code"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="native"/>
@@ -172,7 +165,6 @@
     backing-depth="0"
     target-type="all"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <build-also-items>
      <build-also name="indep2"/>
@@ -187,7 +179,6 @@
     backing-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <build-also-items>
      <build-also name="indep1"/>
