@@ -974,8 +974,7 @@ Abuild::readConfigs()
     // guarantee.  See comments in BuildItem::getReferences for
     // additional discussion.
     BuildForest_map forests;
-    std::set<std::string> visiting;
-    traverse(forests, local_top, visiting, "root of local forest");
+    traverse(forests, local_top);
 
     // Compute the list of all known traits.  This routine also
     // validates to make sure that any traits specified on the command
@@ -1205,9 +1204,80 @@ Abuild::findTop(std::string const& start_dir,
 }
 
 void
-Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
-		 std::set<std::string>& visiting,
-		 std::string const& description)
+Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
+{
+    std::set<std::string> visiting;
+    DependencyGraph external_graph;
+
+    traverseForests(forests, external_graph,
+		    top_path, visiting, "root of local forest");
+    if (this->compat_level.allow_1_0())
+    {
+	// If we have A -ext-> B <-ext- C, neither a traversal
+	// starting from A nor one starting from C will catch all
+	// three build trees.  If, as a result of backing areas, we
+	// end up traversing from both A and C, will will end up with
+	// too many forests, and we will need to merge some of them.
+	// We use items_traversed to prevent the same tree from ever
+	// being included in more than one forest.  This is all a
+	// result of the forests we are creating in 1.1 actually
+	// containing multiple 1.0 trees, each of which looks like the
+	// root of a forest.
+
+	if (! external_graph.check())
+	{
+	    // XXX Not sure how to reproduce this....can we?  Maybe
+	    // something as simple as an external cycle would do it.
+	    error("1.0 compatibility mode was unable to determine"
+		  " proper relationships among externals; some errors"
+		  " about unknown tree dependencies may be spurious");
+	}
+	else
+	{
+	    mergeForests(forests, external_graph);
+	}
+    }
+
+    DependencyGraph backing_graph;
+    computeBackingGraph(forests, backing_graph);
+    std::list<std::string> const& all_forests = backing_graph.getSortedGraph();
+    for (std::list<std::string>::const_iterator iter = all_forests.begin();
+	 iter != all_forests.end(); ++iter)
+    {
+	validateForest(forests, *iter);
+    }
+}
+
+void
+Abuild::computeBackingGraph(BuildForest_map& forests,
+			    DependencyGraph& g)
+{
+    for (BuildForest_map::iterator forest_iter = forests.begin();
+	 forest_iter != forests.end(); ++forest_iter)
+    {
+	std::string const& path = (*forest_iter).first;
+	g.addItem(path);
+	BuildForest& forest = *((*forest_iter).second);
+	std::list<std::string> const& backing_areas = forest.getBackingAreas();
+	for (std::list<std::string>::const_iterator biter =
+		 backing_areas.begin();
+	     biter != backing_areas.end(); ++biter)
+	{
+	    g.addDependency(path, *biter);
+	}
+    }
+    // Even if there were errors, the build tree graph must always be
+    // consistent.  Abuild doesn't store invalid backing areas in the
+    // build tree structures.
+    assert(g.check());
+}
+
+void
+Abuild::traverseForests(BuildForest_map& forests,
+			DependencyGraph& external_graph,
+			std::string const& top_path,
+			std::set<std::string>& visiting,
+			std::string const& description)
 {
     if (visiting.count(top_path))
     {
@@ -1235,7 +1305,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
     std::set<std::string>& deleted_trees = forest->getDeletedTrees();
     std::set<std::string>& deleted_items = forest->getDeletedItems();
     verbose("traversing items for " + top_path);
-    traverseItems(*forest, top_path, dirs_with_externals,
+    traverseItems(*forest, external_graph, top_path, dirs_with_externals,
 		  backing_areas, deleted_trees, deleted_items);
     verbose("done traversing items for " + top_path);
 
@@ -1307,8 +1377,10 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 
 		verbose("traversing items for external " + ext_top +
 			", which is " + edecl + " from " + dir);
-		traverseItems(*forest, ext_top, dirs_with_externals,
-			      backing_areas, deleted_trees, deleted_items);
+		external_graph.addDependency(top_path, ext_top);
+		traverseItems(*forest, external_graph, ext_top,
+			      dirs_with_externals, backing_areas,
+			      deleted_trees, deleted_items);
 		verbose("done traversing items for external " + ext_top);
 	    }
 	}
@@ -1363,8 +1435,8 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		*iter = btop;
 		keep = true;
 		verbose("traversing backing area");
-		traverse(forests, *iter, visiting,
-			 "backing area of \"" + btop + "\"");
+		traverseForests(forests, external_graph, *iter, visiting,
+				"backing area of \"" + btop + "\"");
 		verbose("done traversing backing area");
 	    }
 
@@ -1378,15 +1450,178 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
     verbose("done with all backing areas of " + top_path);
 
     visiting.erase(top_path);
-
     forests[top_path] = forest;
-
-    validateForest(forests, top_path);
     verbose("done traversing forest from " + top_path);
 }
 
 void
-Abuild::traverseItems(BuildForest& forest, std::string const& top_path,
+Abuild::mergeForests(BuildForest_map& forests,
+		     DependencyGraph& external_graph)
+{
+    // XXX It would be better if we could figure this out earlier so
+    // we wouldn't have to repeat duplication detection and other
+    // logic.
+
+    std::map<std::string, std::string> forest_renames;
+    std::map<std::string, std::list<std::string> > forest_merges;
+
+    std::vector<DependencyGraph::ItemList> const& sets =
+	external_graph.getIndependentSets();
+    for (std::vector<DependencyGraph::ItemList>::const_iterator iter =
+	     sets.begin();
+	 iter != sets.end(); ++iter)
+    {
+	DependencyGraph::ItemList const& set = *iter;
+	std::list<std::string> merge;
+	for (DependencyGraph::ItemList::const_iterator iter =
+		 set.begin();
+	     iter != set.end(); ++iter)
+	{
+	    if (forests.count(*iter))
+	    {
+		merge.push_back(*iter);
+	    }
+	}
+	assert(! merge.empty());
+	if (merge.size() == 1)
+	{
+	    continue;
+	}
+	QTC::TC("abuild", "Abuild forest merge required");
+	std::string first = merge.front();
+	merge.pop_front();
+	forest_merges[first] = merge;
+	for (DependencyGraph::ItemList::iterator iter = merge.begin();
+	     iter != merge.end(); ++iter)
+	{
+	    std::string const& other = *iter;
+	    forest_renames[other] = first;
+	}
+    }
+
+    for (std::map<std::string, std::list<std::string> >::iterator i1 =
+	     forest_merges.begin();
+	 i1 != forest_merges.end(); ++i1)
+    {
+	std::string const& keep_dir = (*i1).first;
+	BuildForest& keep = *(forests[keep_dir]);
+
+	BuildTree_map& buildtrees = keep.getBuildTrees();
+	BuildItem_map& builditems = keep.getBuildItems();
+	std::list<std::string>& backing_areas = keep.getBackingAreas();
+	std::set<std::string>& deleted_trees = keep.getDeletedTrees();
+	std::set<std::string>& deleted_items = keep.getDeletedItems();
+
+	std::list<std::string> const& to_remove = (*i1).second;
+	for (std::list<std::string>::const_iterator i2 = to_remove.begin();
+	     i2 != to_remove.end(); ++i2)
+	{
+	    std::string const& remove_dir = *i2;
+	    BuildForest& remove = *(forests[remove_dir]);
+
+	    verbose("merging forest \"" + remove_dir + "\" into \"" +
+		    keep_dir);
+
+	    BuildTree_map& o_buildtrees = remove.getBuildTrees();
+	    BuildItem_map& o_builditems = remove.getBuildItems();
+	    std::list<std::string>& o_backing_areas = remove.getBackingAreas();
+	    std::set<std::string>& o_deleted_trees = remove.getDeletedTrees();
+	    std::set<std::string>& o_deleted_items = remove.getDeletedItems();
+
+	    for (BuildTree_map::iterator i3 = o_buildtrees.begin();
+		 i3 != o_buildtrees.end(); ++i3)
+	    {
+		std::string const& tree_name = (*i3).first;
+		BuildTree_ptr tree = (*i3).second;
+		if (buildtrees.count(tree_name))
+		{
+		    QTC::TC("abuild", "Abuild ERR tree clash during murge");
+		    error(tree->getLocation(),
+			  "another tree with the name \"" + tree_name +
+			  "\" exists");
+		    error(buildtrees[tree_name]->getLocation(),
+			  "here is the other tree");
+		}
+		else
+		{
+		    buildtrees[tree_name] = tree;
+		    tree->setForestRoot(keep_dir);
+		}
+	    }
+
+	    for (BuildItem_map::iterator i3 = o_builditems.begin();
+		 i3 != o_builditems.end(); ++i3)
+	    {
+		std::string const& item_name = (*i3).first;
+		BuildItem_ptr item = (*i3).second;
+		if (builditems.count(item_name))
+		{
+		    QTC::TC("abuild", "Abuild ERR item clash during murge");
+		    error(item->getLocation(),
+			  "another item with the name \"" + item_name +
+			  "\" exists");
+		    error(builditems[item_name]->getLocation(),
+			  "here is the other item");
+		}
+		else
+		{
+		    builditems[item_name] = item;
+		    item->setForestRoot(keep_dir);
+		}
+	    }
+
+	    backing_areas.insert(
+		backing_areas.end(),
+		o_backing_areas.begin(), o_backing_areas.end());
+	    deleted_trees.insert(
+		o_deleted_trees.begin(), o_deleted_trees.end());
+	    deleted_items.insert(
+		o_deleted_items.begin(), o_deleted_items.end());
+
+	    forests.erase(remove_dir);
+	}
+    }
+
+    for (BuildForest_map::iterator iter = forests.begin();
+	 iter != forests.end(); ++iter)
+    {
+	BuildForest& forest = *((*iter).second);
+	std::list<std::string>& backing_areas = forest.getBackingAreas();
+
+	// coalesce backing areas
+	std::set<std::string> ba_set;
+	std::list<std::string>::iterator iter = backing_areas.begin();
+	while (iter != backing_areas.end())
+	{
+	    std::list<std::string>::iterator next = iter;
+	    ++next;
+	    bool keep = false;
+	    std::string ba = *iter;
+	    if (forest_renames.count(ba))
+	    {
+		ba = forest_renames[ba];
+	    }
+	    if (ba_set.count(ba))
+	    {
+		// skip duplicate
+	    }
+	    else
+	    {
+		ba_set.insert(ba);
+		keep = true;
+	    }
+	    if (! keep)
+	    {
+		backing_areas.erase(iter, next);
+	    }
+	    iter = next;
+	}
+    }
+}
+
+void
+Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
+		      std::string const& top_path,
 		      std::list<std::string>& dirs_with_externals,
 		      std::list<std::string>& backing_areas,
 		      std::set<std::string>& deleted_trees,
@@ -1397,6 +1632,7 @@ Abuild::traverseItems(BuildForest& forest, std::string const& top_path,
 	QTC::TC("abuild", "Abuild forest has already been seen");
 	return;
     }
+    external_graph.addItem(top_path);
     this->items_traversed.insert(top_path);
 
     bool has_backing_area =
@@ -1596,8 +1832,7 @@ Abuild::registerBuildTree(BuildForest& forest,
 	QTC::TC("abuild", "Abuild ERR duplicate tree");
 	error(config->getLocation(),
 	      "another tree with the name \"" + tree_name + "\" has been"
-	      " found in this forest at \"" +
-	      buildtrees[tree_name]->getRootPath() + "\"");
+	      " found in this forest");
 	error(buildtrees[tree_name]->getLocation(),
 	      "here is the other tree");
     }
@@ -3241,24 +3476,7 @@ Abuild::dumpData(BuildForest_map& forests)
     // areas.  Output forests in order based on that graph.
 
     DependencyGraph g;
-    for (BuildForest_map::iterator forest_iter = forests.begin();
-	 forest_iter != forests.end(); ++forest_iter)
-    {
-	std::string const& path = (*forest_iter).first;
-	g.addItem(path);
-	BuildForest& forest = *((*forest_iter).second);
-	std::list<std::string> const& backing_areas = forest.getBackingAreas();
-	for (std::list<std::string>::const_iterator biter =
-		 backing_areas.begin();
-	     biter != backing_areas.end(); ++biter)
-	{
-	    g.addDependency(path, *biter);
-	}
-    }
-    // Even if there were errors, the build tree graph must always be
-    // consistent.  Abuild doesn't store invalid backing areas in the
-    // build tree structures.
-    assert(g.check());
+    computeBackingGraph(forests, g);
     std::list<std::string> const& all_forests = g.getSortedGraph();
 
     o << "<?xml version=\"1.0\"?>" << std::endl

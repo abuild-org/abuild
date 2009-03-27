@@ -30,6 +30,7 @@ class BuildTree
     std::list<std::string> const& getPlugins() const;
     std::list<std::string> const& getExpandedTreeDeps() const;
 
+    void setForestRoot(std::string const&);
     std::string const& getForestRoot() const;
     int getBackingDepth() const;
     void incrementBackingDepth();

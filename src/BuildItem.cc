@@ -141,6 +141,12 @@ BuildItem::getTreeName() const
     return this->tree_name;
 }
 
+void
+BuildItem::setForestRoot(std::string const& root)
+{
+    this->forest_root = root;
+}
+
 std::string const&
 BuildItem::getForestRoot() const
 {

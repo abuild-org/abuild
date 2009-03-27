@@ -62,10 +62,17 @@ class Abuild
 				   std::string const& external);
     std::string findTop(std::string const& start_dir,
 			std::string const& description);
-    void traverse(BuildForest_map&, std::string const& forest_top,
-		  std::set<std::string>& visiting,
-		  std::string const& description);
-    void traverseItems(BuildForest& forest, std::string const& top_path,
+    void traverse(BuildForest_map&, std::string const& forest_top);
+    void computeBackingGraph(BuildForest_map& forests,
+			     DependencyGraph& g);
+    void traverseForests(BuildForest_map&, DependencyGraph& external_graph,
+			 std::string const& forest_top,
+			 std::set<std::string>& visiting,
+			 std::string const& description);
+    void mergeForests(BuildForest_map& forests,
+		      DependencyGraph& external_graph);
+    void traverseItems(BuildForest& forest, DependencyGraph& external_graph,
+		       std::string const& top_path,
 		       std::list<std::string>& dirs_with_externals,
 		       std::list<std::string>& backing_areas,
 		       std::set<std::string>& deleted_trees,

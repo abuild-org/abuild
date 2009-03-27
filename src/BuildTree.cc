@@ -74,6 +74,12 @@ BuildTree::getExpandedTreeDeps() const
     return this->expanded_tree_deps;
 }
 
+void
+BuildTree::setForestRoot(std::string const& root)
+{
+    this->forest_root = root;
+}
+
 std::string const&
 BuildTree::getForestRoot() const
 {

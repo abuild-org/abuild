@@ -42,6 +42,7 @@ class BuildItem
     std::string const& getAbsolutePath() const;
 
     std::string const& getTreeName() const;
+    void setForestRoot(std::string const&);
     std::string const& getForestRoot() const;
     // Note: list does not include the item itself
     std::list<std::string> const& getExpandedDependencies() const;
