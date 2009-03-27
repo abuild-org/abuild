@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1">
+<abuild-data version="2">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -17,10 +17,15 @@
   <supported-trait name="PLUGINS-plugins"/>
   <supported-trait name="PROJ0-c1-ifc"/>
  </supported-traits>
- <build-trees>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+ >
   <build-tree
-   id="bt-1"
+   name="tree.2.-RND-"
    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -40,18 +45,18 @@
    </supported-traits>
    <build-item
     name="rules"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
-    external-depth="0"
     target-type="all"
-    is-plugin="0"
-    is-plugin-anywhere="1"
+    is-plugin="1"
    />
   </build-tree>
   <build-tree
-   id="bt-2"
+   name="tree.1.-RND-"
    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -70,19 +75,22 @@
     <supported-trait name="PLUGINS-plugins"/>
     <supported-trait name="PROJ0-c1-ifc"/>
    </supported-traits>
-   <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+   </expanded-tree-dependencies>
    <build-item
     name="c1"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
     backing-depth="0"
-    external-depth="0"
     target-type="platform-independent"
     is-plugin="0"
-    is-plugin-anywhere="0"
    >
     <platform-types>
      <platform-type name="indep"/>
@@ -91,16 +99,6 @@
      <platform name="indep"/>
     </buildable-platforms>
    </build-item>
-   <build-item
-    name="rules"
-    home-tree="bt-1"
-    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
-    external-depth="1"
-    target-type="all"
-    is-plugin="1"
-    is-plugin-anywhere="1"
-   />
   </build-tree>
- </build-trees>
+ </forest>
 </abuild-data>

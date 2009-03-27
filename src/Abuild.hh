@@ -89,7 +89,7 @@ class Abuild
 			  std::string const& action);
     void resolveTraits(BuildForest& forest);
     void checkPlugins(BuildForest& forest);
-    bool isPluginAnywhere(std::string const& item_name);
+    bool isPlugin(std::string const& item_name);
     void checkPlatformTypes(BuildForest& forest);
     void checkItemNames(BuildForest& forest);
     bool accessibleFrom(BuildItem_map& builditems,
@@ -288,10 +288,11 @@ class Abuild
     ItemConfig* this_config;
     unsigned int last_assigned_tree_number;
     std::map<std::string, std::string> assigned_tree_names;
+    std::set<std::string> items_traversed;
     PlatformData internal_platform_data;
     std::set<std::string> valid_traits;
     BuildItem_map buildset;
-    std::set<std::string> plugins_anywhere;
+    std::set<std::string> plugins;
 #ifdef _WIN32
     bool have_perl;
 #endif

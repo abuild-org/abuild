@@ -14,8 +14,7 @@ BuildItem::BuildItem(std::string const& item_name,
     tree_name(tree_name),
     forest_root(forest_root),
     backing_depth(0),
-    target_type(TargetType::tt_unknown),
-    plugin(false)
+    target_type(TargetType::tt_unknown)
 {
     // An item is always writable and always has backing depth 0
     // relative to its local build tree.
@@ -342,12 +341,6 @@ BuildItem::hasTraits(std::list<std::string> const& traits) const
 
 }
 
-bool
-BuildItem::isPlugin() const
-{
-    return this->plugin;
-}
-
 std::list<std::string> const&
 BuildItem::getPlugins() const
 {
@@ -463,13 +456,6 @@ BuildItem::setInterface(std::string const& platform,
 			boost::shared_ptr<Interface> interface)
 {
     this->interfaces[platform] = interface;
-}
-
-void
-BuildItem::setPlugin(bool val)
-{
-    // allowed for non-local build items
-    this->plugin = val;
 }
 
 void

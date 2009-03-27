@@ -62,7 +62,7 @@ Abuild ERR backing cycle 0
 Abuild ERR external not root 0
 Abuild ERR invalid backing file 0
 Abuild traverse backing without conf 0
-Abuild external in backing area 0
+Abuild external in backing area 1
 Abuild ERR can't resolve external 0
 Abuild ERR item multiple locations 0
 Abuild ERR no child config 0
@@ -286,7 +286,7 @@ Abuild ERR named item outside of tree 0
 ItemConfig ERR bad tree dep 0
 Abuild ERR duplicate tree 0
 Abuild ERR findTop from external 0
-Abuild external has already been seen 0
+Abuild forest has already been seen 0
 BackingConfig ERR no Abuild.conf 0
 Abuild ERR can't find backing top 0
 Abuild duplicate backing area 0
@@ -298,7 +298,6 @@ Abuild ERR depend on invisible item 0
 Abuild ERR plugin in invisible tree 0
 Abuild ERR build-also invisible item 0
 Abuild ERR invisible trait referent 0
-Abuild followed external's backing area 0
 Abuild ERR deleted item exists locally 0
 Abuild ERR deleting non-existent item 0
 Abuild ERR deleting non-existent tree 0
@@ -309,3 +308,4 @@ Abuild ERR loop getting assigned tree name 0
 Abuild inherit tree name from backing 0
 Abuild trying backing of backing 0
 Abuild replace item from deleted tree 0
+Abuild nested backing areas 0

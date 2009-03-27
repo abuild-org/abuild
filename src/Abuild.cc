@@ -1073,92 +1073,85 @@ Abuild::readConfig(std::string const& dir, std::string const& parent_dir)
 }
 
 ItemConfig*
-Abuild::readExternalConfig(std::string const& dir,
-			   std::string const& external)
+Abuild::readExternalConfig(std::string const& start_dir,
+			   std::string const& start_external)
 {
-    verbose("looking for external \"" + external + "\" of \"" + dir + "\"");
+    verbose("looking for external \"" + start_external + "\" of \"" +
+	    start_dir + "\"");
 
     ItemConfig* config = 0;
-    std::string suf;
-    if (! external.empty())
-    {
-	suf = "/" + external;
-    }
 
     std::set<std::string> seen;
-    std::list<std::string> candidates;
-    candidates.push_back(dir);
-    bool went_to_backing_area = false;
+    std::list<std::pair<std::string, std::string> > candidates;
+    candidates.push_back(std::make_pair(start_dir, start_external));
 
     while ((! candidates.empty()) && (config == 0))
     {
-	std::string candidate = candidates.front();
+	std::string dir = candidates.front().first;
+	std::string ext = candidates.front().second;
 	candidates.pop_front();
-	if (seen.count(candidate))
+	std::string fulldir = dir;
+	if (! ext.empty())
+	{
+	    fulldir += "/" + ext;
+	}
+	if (seen.count(fulldir))
 	{
 	    QTC::TC("abuild", "Abuild ERR readExternalConfig loop");
 	    error("loop detected trying to find " + ItemConfig::FILE_CONF +
-		  " for \"" + external + "\" relative to \"" + dir + "\"");
+		  " for \"" + start_external + "\" relative to \"" +
+		  start_dir + "\"");
 	    break;
 	}
 	else
 	{
-	    seen.insert(candidate);
+	    seen.insert(fulldir);
 	}
 
-	if (Util::isDirectory(candidate + suf))
+	verbose("inside tree \"" + dir + "\"");
+	verbose("checking directory \"" + fulldir + "\"");
+	if ((! ext.empty()) && Util::isDirectory(fulldir))
 	{
 	    // The external directory exists, so work relative to that
-	    // directory rather than our original one.  Don't worry
-	    // about adding candidate to "seen".  If there's a loop,
-	    // we'll catch it soon enough.
-	    candidate += suf;
-	    suf.clear();
+	    // directory rather than our original one.
+	    verbose("directory exists; switching context from"
+		    " original tree to this tree");
+	    dir = fulldir;
+	    ext.clear();
 	}
 
-	if (Util::isFile(candidate + suf + "/" + ItemConfig::FILE_CONF))
+	if (Util::isFile(fulldir + "/" + ItemConfig::FILE_CONF))
 	{
 	    // Simple case: there's an actual Abuild.conf here.
-	    config = readConfig(candidate + suf, "");
+	    config = readConfig(fulldir, "");
 	    verbose("found at \"" + config->getAbsolutePath() + "\"");
 	}
-	else if (Util::isFile(candidate + "/" + BackingConfig::FILE_BACKING))
+	else if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
 	{
 	    // There's an Abuild.backing but no Abuild.conf.  Traverse
 	    // the backing chain.  If the external exists, we're
 	    // traversing its backing chain.  Otherwise, we're
 	    // traversing the original directory's backing chain.
 	    QTC::TC("abuild", "Abuild backing without conf");
-	    verbose("checking backing areas of \"" + candidate + "\"");
+	    verbose("checking backing areas of \"" + dir + "\"");
 	    std::list<std::string> const& backing_areas =
-		readBacking(candidate)->getBackingAreas();
-	    for (std::list<std::string>::const_iterator iter =
-		     backing_areas.begin();
-		 iter != backing_areas.end(); ++iter)
-	    {
-		candidates.push_back(*iter + suf);
-	    }
+		readBacking(dir)->getBackingAreas();
 	    if (! backing_areas.empty())
 	    {
-		went_to_backing_area = true;
+		QTC::TC("abuild", "Abuild external in backing area",
+			(ext.empty() ? 0 : 1));
+		for (std::list<std::string>::const_iterator iter =
+			 backing_areas.begin();
+		     iter != backing_areas.end(); ++iter)
+		{
+		    candidates.push_back(std::make_pair(*iter, ext));
+		}
 	    }
-	}
-    }
-
-    if (config && went_to_backing_area)
-    {
-	if (suf.empty())
-	{
-	    QTC::TC("abuild", "Abuild followed external's backing area");
-	}
-	else
-	{
-	    QTC::TC("abuild", "Abuild external in backing area");
 	}
     }
 
     verbose("done looking for external \"" +
-	    external + "\" of \"" + dir + "\"");
+	    start_external + "\" of \"" + start_dir + "\"");
 
     return config;		// might be 0
 }
@@ -1248,12 +1241,11 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 
     if (this->compat_level.allow_1_0())
     {
-	std::set<std::string> forests_traversed;
-	forests_traversed.insert(top_path);
-
+	verbose("1.0-compatibility: checking for externals in " + top_path);
 	while (! dirs_with_externals.empty())
 	{
 	    std::string dir = dirs_with_externals.front();
+	    verbose("looking at externals of " + dir);
 	    dirs_with_externals.pop_front();
 	    ItemConfig* dconfig = readConfig(dir, "");
 	    std::list<std::string> const& externals = dconfig->getExternals();
@@ -1262,12 +1254,15 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		 eiter != externals.end(); ++eiter)
 	    {
 		std::string const& edecl = *eiter;
+		verbose("checking external " + edecl);
 		ItemConfig* econfig = readExternalConfig(dir, edecl);
 		if (econfig == 0)
 		{
+		    verbose("skipping unknown external " + edecl);
 		    continue;
 		}
-		std::string const& epath = econfig->getAbsolutePath();
+		std::string const& epath =
+		    Util::canonicalizePath(dir + "/" + edecl);
 		std::string file_conf =
 		    epath + "/" + ItemConfig::FILE_CONF;
 		std::string file_backing =
@@ -1279,6 +1274,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		    // No additional traversal required.  We've
 		    // already tried to resolve this in a backing area
 		    // and reported if we were unable to do so.
+		    verbose("skipping non-local external " + edecl);
 		    continue;
 		}
 
@@ -1290,6 +1286,8 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		    (! Util::isFile(file_conf)))
 		{
 		    QTC::TC("abuild", "Abuild traverse backing without conf");
+		    verbose("getting backing data from and then"
+			    " skipping backed external " + edecl);
 		    appendBackingData(
 			epath, backing_areas, deleted_trees, deleted_items);
 		    continue;
@@ -1307,13 +1305,6 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		    continue;
 		}
 
-		if (forests_traversed.count(ext_top))
-		{
-		    QTC::TC("abuild", "Abuild external has already been seen");
-		    continue;
-		}
-
-		forests_traversed.insert(ext_top);
 		verbose("traversing items for external " + ext_top +
 			", which is " + edecl + " from " + dir);
 		traverseItems(*forest, ext_top, dirs_with_externals,
@@ -1321,14 +1312,16 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 		verbose("done traversing items for external " + ext_top);
 	    }
 	}
+	verbose("done with externals");
     }
     else
     {
 	assert(dirs_with_externals.empty());
     }
 
+    verbose("checking for backing areas");
     // Normalize backing areas to filter out duplicates and resolve to
-    // forest roots.
+    // forest roots.  Traverse backing areas.
     { // private scope
 	std::set<std::string> seen;
 	std::list<std::string>::iterator iter = backing_areas.begin();
@@ -1336,32 +1329,53 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path,
 	{
 	    std::list<std::string>::iterator next = iter;
 	    ++next;
+	    verbose("checking for backing area " + *iter);
 	    std::string btop = findTop(
 		*iter, "backing area of \"" + top_path + "\"");
 	    // We've already verified that everything appending to
 	    // backing_areas has a valid top.
 	    assert(! btop.empty());
+	    if (*iter != btop)
+	    {
+		verbose("this is actually " + btop);
+	    }
+	    bool keep = false;
 	    if (seen.count(btop))
 	    {
+		verbose("this is a duplicate backing area; ignoring");
 		QTC::TC("abuild", "Abuild duplicate backing area");
-		backing_areas.erase(iter, next);
+	    }
+	    else if (this->items_traversed.count(btop))
+	    {
+		// If a -ext-> b, a -backs-> a', and b -backs-> b',
+		// then both a' and b' will seem like backing areas of
+		// a.  When we traverse a', we will also end up
+		// traversing the items of b'.  This makes b' part of
+		// a''s forest, and we don't want to traverse it
+		// again.
+		verbose("we've already traversed this;"
+			" it's probably an external of another backing area");
+		QTC::TC("abuild", "Abuild nested backing areas");
 	    }
 	    else
 	    {
 		seen.insert(btop);
 		*iter = btop;
+		keep = true;
+		verbose("traversing backing area");
+		traverse(forests, *iter, visiting,
+			 "backing area of \"" + btop + "\"");
+		verbose("done traversing backing area");
+	    }
+
+	    if (! keep)
+	    {
+		backing_areas.erase(iter, next);
 	    }
 	    iter = next;
 	}
     }
-
-    // Traverse backing areas
-    for (std::list<std::string>::iterator iter = backing_areas.begin();
-	 iter != backing_areas.end(); ++iter)
-    {
-	traverse(forests, *iter, visiting,
-		 "backing area of \"" + top_path + "\"");
-    }
+    verbose("done with all backing areas of " + top_path);
 
     visiting.erase(top_path);
 
@@ -1378,12 +1392,21 @@ Abuild::traverseItems(BuildForest& forest, std::string const& top_path,
 		      std::set<std::string>& deleted_trees,
 		      std::set<std::string>& deleted_items)
 {
+    if (this->items_traversed.count(top_path))
+    {
+	QTC::TC("abuild", "Abuild forest has already been seen");
+	return;
+    }
+    this->items_traversed.insert(top_path);
+
     bool has_backing_area =
 	Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING);
     if (has_backing_area)
     {
+	verbose("reading backing area data");
 	appendBackingData(
 	    top_path, backing_areas, deleted_trees, deleted_items);
+	verbose("done reading backing area data");
     }
 
     BuildItem_map& builditems = forest.getBuildItems();
@@ -1680,6 +1703,7 @@ Abuild::getAssignedTreeName(std::string const& dir,
 	    Util::intToString(++this->last_assigned_tree_number) +
 	    ".-" + Util::intToString(std::rand() % 9999) + "-";
 	this->assigned_tree_names[dir] = tree_name;
+	verbose("assigned tree name " + tree_name + " to " + dir);
     }
 
     visiting.erase(dir);
@@ -2042,28 +2066,21 @@ void
 Abuild::checkPlugins(BuildForest& forest)
 {
     // Make sure each plugin exists and lives in an accessible tree,
-    // and mark the item as a plugin just for this tree.
+    // and set each tree's plugin list.
 
     BuildItem_map& builditems = forest.getBuildItems();
     BuildTree_map& buildtrees = forest.getBuildTrees();
 
-    // First, clear the plugin flag for all build items.
-    for (BuildItem_map::iterator iter = builditems.begin();
-	 iter != builditems.end(); ++iter)
-    {
-	BuildItem& item = *((*iter).second);
-	item.setPlugin(false);
-    }
+    // tree -> plugins in that tree
+    std::map<std::string, std::set<std::string> > plugin_data;
 
-    // Next, set the plugin flag for any build item that is declared
-    // as a plugin in each tree, and check to make sure the tree is
-    // allowed to declare the item as a plugin.
     std::map<std::string, std::set<std::string> > const& access_table =
 	forest.getTreeAccessTable();
     for (BuildTree_map::iterator iter = buildtrees.begin();
 	 iter != buildtrees.end(); ++iter)
     {
 	std::string const& tree_name = (*iter).first;
+	plugin_data[tree_name].empty(); // force this entry to exist
 	BuildTree& tree = *((*iter).second);
 	std::set<std::string> const& allowed_trees =
 	    (*(access_table.find(tree_name))).second;
@@ -2092,8 +2109,9 @@ Abuild::checkPlugins(BuildForest& forest)
 		continue;
 	    }
 
-	    item.setPlugin(true);
-	    this->plugins_anywhere.insert(item_name);
+	    this->plugins.insert(item_name);
+	    plugin_data[tree_name].insert(item_name);
+
 	    bool item_error = false;
 	    // Although whether or not an item has dependencies is not
 	    // context-specific, whether or not an item is a plugin
@@ -2137,9 +2155,10 @@ Abuild::checkPlugins(BuildForest& forest)
 	}
     }
 
-    // Check to make sure no item depends on a plugin.  Also store the
-    // list of plugins each build item should see.  Do this only for
-    // items local to this forest.
+    // Check to make sure no item depends on an item that has been
+    // declared as a plugin for its tree.  Also store the list of
+    // plugins each build item should see.  Do this only for items
+    // local to this forest.
 
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
@@ -2149,6 +2168,13 @@ Abuild::checkPlugins(BuildForest& forest)
 	{
 	    continue;
 	}
+
+	// Store the list of plugins
+	std::string const& tree_name = item.getTreeName();
+	BuildTree& tree = *(buildtrees[tree_name]);
+	item.setPlugins(tree.getPlugins());
+
+	// Check dependencies
 	std::list<std::string> const& deps = item.getDeps();
 	for (std::list<std::string>::const_iterator dep_iter = deps.begin();
 	     dep_iter != deps.end(); ++dep_iter)
@@ -2158,26 +2184,24 @@ Abuild::checkPlugins(BuildForest& forest)
 	    // that later.
 	    if (builditems.count(dep_name) != 0)
 	    {
-		BuildItem& dep = *(builditems[dep_name]);
-		if (dep.isPlugin())
+		if (plugin_data[tree_name].count(dep_name))
 		{
 		    QTC::TC("abuild", "Abuild ERR item depends on plugin");
 		    error(item.getLocation(),
 			  "this item depends on \"" + dep_name + "\","
 			  " which is declared as a plugin");
+		    error(tree.getLocation(),
+			  "the dependency is declared as a plugin here");
 		}
 	    }
 	}
-
-	// Store the list of plugins
-	item.setPlugins(buildtrees[item.getTreeName()]->getPlugins());
     }
 }
 
 bool
-Abuild::isPluginAnywhere(std::string const& item)
+Abuild::isPlugin(std::string const& item)
 {
-    return (this->plugins_anywhere.count(item) != 0);
+    return (this->plugins.count(item) != 0);
 }
 
 void
@@ -3516,10 +3540,8 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     o << "    target-type=\""
       << TargetType::getName(item.getTargetType()) << "\""
       << std::endl
-      << "    is-plugin=\"" << (item.isPlugin() ? "1" : "0") << "\""
-      << std::endl
-      << "    is-plugin-anywhere=\""
-      << (isPluginAnywhere(name) ? "1" : "0") << "\""
+      << "    is-plugin=\""
+      << (isPlugin(name) ? "1" : "0") << "\""
       << std::endl;
     if (any_subelements)
     {
@@ -4188,7 +4210,7 @@ Abuild::buildBuildset()
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (isPluginAnywhere(item_name))
+	if (isPlugin(item_name))
 	{
 	    verbose("loading interface for plugin " + item_name);
 	    if (createPluginInterface(item_name, item))

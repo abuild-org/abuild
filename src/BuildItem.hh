@@ -65,7 +65,6 @@ class BuildItem
     Interface const& getInterface(std::string const& platform) const;
     // True iff item has all listed traits.  Returns true if list is empty.
     bool hasTraits(std::list<std::string> const& traits) const;
-    bool isPlugin() const;
     std::list<std::string> const& getPlugins() const;
     // Return a list of all items this item references, including itself
     std::set<std::string> getReferences() const;
@@ -89,7 +88,6 @@ class BuildItem
     void setShadowedDependencies(std::set<std::string> const&);
     void setInterface(std::string const& platform,
 		      boost::shared_ptr<Interface>);
-    void setPlugin(bool);
     void setPlugins(std::list<std::string> const&);
 
   private:
@@ -113,7 +111,6 @@ class BuildItem
     std::map<std::string, std::set<std::string> > shadowed_plugins;
     std::map<std::string, boost::shared_ptr<Interface> > interfaces;
     TargetType::target_type_e target_type;
-    bool plugin;		// plugin in the containing tree
     std::list<std::string> plugins;
 };
 
