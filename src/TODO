@@ -77,6 +77,17 @@ may be true of traversal as well.
 
 Still need to review code.
 
+See also "compatibility issues" below.  When all test cases pass
+except for dumpdata and list-platforms for things that are going to be
+upgraded, finish upgrade tool and upgrade test trees that aren't
+connected with traversal.  Be careful about the errors and
+backing-areas test suites.  Ideally, only abuild-traversal and
+possibly parts of abuild-errors should be left at 1.0.
+
+Then review TODO to figure out what from the revamped build trees,
+compatibility, and conversion tool should be moved into the
+documentation and what parts can just live as comments in the code.
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
