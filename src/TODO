@@ -62,6 +62,11 @@ list of backing areas.  This is what will be seen in dump-data.
 Make sure every time we skip a backing area, there is a verbose
 message.
 
+Test forest backing to itself both by having a new-style
+Abuild.backing that points into the tree and also by having an
+external that backs into another tree in the same forest.  We need to
+actually detect the case of a forest backing to itself.
+
 ----------------------------------------------------------------------
 
 Remaining failing test suites:
