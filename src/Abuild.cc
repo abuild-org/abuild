@@ -1694,6 +1694,16 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		    builditems[item_name]->getAbsolutePath();
 		if (dir == other_dir)
 		{
+		    // XXX This is not caused by a loop anymore.  This
+		    // can only happen if the item is encountered from
+		    // different parents, which would always be
+		    // accompanied by an intervening Abuild.conf.  We
+		    // should preserve this explanation and just use
+		    // dir == other_dir to suppress the duplication
+		    // message indicating that another error message
+		    // would have already been issued.  Same logic
+		    // applies to trees.
+
 		    QTC::TC("abuild", "Abuild ERR item traversal loop");
 		    error(builditems[item_name]->getLocation(),
 			  "loop detected while reading " +
@@ -1840,6 +1850,15 @@ Abuild::registerBuildTree(BuildForest& forest,
 
     if (buildtrees.count(tree_name))
     {
+	// XXX Do we want to distinguish same vs. different location
+	// as in the case of adding an item?  Is there a possibility
+	// of having the same tree be added more than once if the tree
+	// comes from the same location?  I think the only way would
+	// be if the tree root were encountered twice, which can only
+	// happen if there is another error, such as two different
+	// parents pointing to the same child which in turn always
+	// results in an error about an intermediate Abuild.conf.
+
 	QTC::TC("abuild", "Abuild ERR duplicate tree");
 	error(config->getLocation(),
 	      "another tree with the name \"" + tree_name + "\" has been"
