@@ -1907,6 +1907,8 @@ Abuild::addTreeToForest(BuildForest& forest, std::string const& tree_name,
 std::string
 Abuild::getAssignedTreeName(std::string const& dir)
 {
+    assert(this->compat_level.allow_1_0());
+
     if (this->assigned_tree_names.count(dir))
     {
 	QTC::TC("abuild", "Abuild previously assigned tree name");
@@ -1926,6 +1928,8 @@ std::string
 Abuild::getAssignedTreeName(std::string const& dir,
 			    std::set<std::string>& visiting)
 {
+    assert(this->compat_level.allow_1_0());
+
     // We check visitnig before calling recursively so we can create a
     // better error message.
     assert(! visiting.count(dir));
