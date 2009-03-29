@@ -1,53 +1,10 @@
 
-Create a separate function for coalescing backing areas.  Make sure
-the two places in the code where this is done are both able to use it.
-
 Cache findTop and readExternalConfig results for efficiency and
 brevity of verbose output.
 
-If A backs to B and C, and B and C are independent, it has to be an
-error of B and C both provide the same build item.  I think the logic
-is that if we see an item in a backing area and the item exists
-locally with backing depth 0, we are shadowing it.  If it exists with
-backing depth > 0 and it has the same path as one we already have,
-we're okay and need to reintroduce the "item multiple paths" coverage
-case.  This could happen if A backs to B and C both of which inherit
-the same item from shared backing area D.  If it has different paths,
-then we have a conflict, analogous to what we used to detect with a
-clash of an item in an external.
-
-In resolveFromBackingAreas, we need to sort and merge backing areas
-based on the backing area graph.  If A -> B, C and B -> C, we can drop
-backing area C.  Among other things, this prevents us from creating
-conflicts when B shadows an item from C and A shadows the same item
-from B.  (Add a coverage case for encountering an item with a backing
-depth > 1.)  This can't be done with getIndependentSets: if we have A
-and B -> C, we need both A and B but not C.  Since don't allow to
-backing areas to provide separate copies of the same item, the order
-in which we resolve from backing areas doesn't matter.  (This means
-that the only valid use case for multiple backing areas is when they
-are being used to pull in independent forests, though it also works if
-one backs to the other since the further back one will be pruned.)
-Our logic for figuring which backing areas to eliminate can be
-something like this:
-
-  sort backing areas using backing area graph
-  get sorted dependencies of the current forest
-  in reverse order:
-    skip if backing area is self
-    skip if backing area is in covered list
-    add all recursive dependencies of backing area to covered list
-
-At the end of this process, we have generated the minimal and final
-list of backing areas.  This is what will be seen in dump-data.
-
-Make sure every time we skip a backing area, there is a verbose
-message.
-
 Test forest backing to itself both by having a new-style
 Abuild.backing that points into the tree and also by having an
-external that backs into another tree in the same forest.  We need to
-actually detect the case of a forest backing to itself.
+external that backs into another tree in the same forest.
 
 ----------------------------------------------------------------------
 

@@ -311,3 +311,8 @@ Abuild nested backing areas 0
 Abuild forest merge required 0
 Abuild ERR backing area loop 0
 Abuild ERR external_graph failure 0
+Abuild ERR backs explicitly to self 0
+Abuild ERR backs implicitly to self 0
+Abuild skipping covered backing area 0
+Abuild backing depth > 1 0
+Abuild ERR item multiple backing areas 0

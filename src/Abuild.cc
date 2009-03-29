@@ -1414,7 +1414,26 @@ Abuild::traverseForests(BuildForest_map& forests,
 		verbose("this is actually " + btop);
 	    }
 	    bool keep = false;
-	    if (seen.count(btop))
+	    if (btop == top_path)
+	    {
+		// This is the most likely location for backing files,
+		// though they could have come from 1.0-style
+		// Abulid.backing files as well...
+		FileLocation l(
+		    top_path + "/" + BackingConfig::FILE_BACKING, 0, 0);
+		if (*iter == btop)
+		{
+		    QTC::TC("abuild", "Abuild ERR backs explicitly to self");
+		    error(l, "this forest lists itself as a backing area");
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild ERR backs implicitly to self");
+		    error(l, "backing area " + *iter +
+			  " belongs to this forest");
+		}
+	    }
+	    else if (seen.count(btop))
 	    {
 		verbose("this is a duplicate backing area; ignoring");
 		QTC::TC("abuild", "Abuild duplicate backing area");
@@ -1730,10 +1749,10 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
     BuildItem_map& builditems = forest.getBuildItems();
     if (builditems.count(item_name))
     {
-	std::string const& dir = item->getAbsolutePath();
-	std::string const& other_dir =
-	    builditems[item_name]->getAbsolutePath();
-	if (dir == other_dir)
+	FileLocation const& loc = item->getLocation();
+	FileLocation const& other_loc =
+	    builditems[item_name]->getLocation();
+	if (loc == other_loc)
 	{
 	    // This can only happen if the item is encountered from
 	    // different parents, which would always be accompanied by
@@ -1745,11 +1764,9 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
 	else
 	{
 	    QTC::TC("abuild", "Abuild ERR item multiple locations");
-	    error(FileLocation(dir + "/" + ItemConfig::FILE_CONF, 0, 0),
-		  "build item " + item_name +
+	    error(loc, "build item " + item_name +
 		  " appears in multiple locations");
-	    error(builditems[item_name]->getLocation(),
-		  "here is another location");
+	    error(other_loc, "here is another location");
 	}
     }
     else if (item->getTreeName().empty())
@@ -2128,7 +2145,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
     BuildForest& forest = *(forests[top_path]);
     BuildTree_map& buildtrees = forest.getBuildTrees();
     BuildItem_map& builditems = forest.getBuildItems();
-    std::list<std::string> const& backing_areas = forest.getBackingAreas();
+    std::list<std::string>& backing_areas = forest.getBackingAreas();
     std::set<std::string> const& trees_to_delete = forest.getDeletedTrees();
     std::set<std::string> const& items_to_delete = forest.getDeletedItems();
     std::set<std::string> trees_not_deleted = trees_to_delete;
@@ -2139,6 +2156,42 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
     // some Abuild.conf, but we're not going to keep track of the
     // origin of ever single item/tree deletion request.
     FileLocation location(top_path + "/" + BackingConfig::FILE_BACKING, 0, 0);
+
+    // If A backs to B and C and if B backs to C, we want to ignore
+    // backing area C of A and let A get C's items through B.  This
+    // helps to seeing duplicates needlessly.  We'll make this
+    // determination in a manner that allows us to preserve the order
+    // in which backing areas were specified to the maximum possible
+    // extent.
+    DependencyGraph backing_graph;
+    computeBackingGraph(forests, backing_graph);
+    std::set<std::string> covered;
+    for (std::list<std::string>::iterator iter = backing_areas.begin();
+	 iter != backing_areas.end(); ++iter)
+    {
+	std::list<std::string> deps =
+	    backing_graph.getSortedDependencies(*iter);
+	assert(deps.back() == *iter);
+	deps.pop_back();
+	covered.insert(deps.begin(), deps.end());
+    }
+
+    { // local scope
+	std::list<std::string>::iterator iter = backing_areas.begin();
+	while (iter != backing_areas.end())
+	{
+	    std::list<std::string>::iterator next = iter;
+	    ++next;
+	    if (covered.count(*iter))
+	    {
+		QTC::TC("abuild", "Abuild skipping covered backing area");
+		verbose("backing area " + *iter + " is being removed because"
+			" it is covered by another backing area");
+		backing_areas.erase(iter, next);
+	    }
+	    iter = next;
+	}
+    }
 
     // Copy trees and items from the backing areas.  Exclude any
     // deleted trees, deleted items, or items in deleted trees.
@@ -2215,7 +2268,28 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    }
 	    else if (builditems.count(item_name))
 	    {
-		QTC::TC("abuild", "Abuild override build item");
+		if (builditems[item_name]->isLocal())
+		{
+		    QTC::TC("abuild", "Abuild override build item");
+		}
+		else
+		{
+		    FileLocation const& loc = item.getLocation();
+		    FileLocation const& other_loc =
+			builditems[item_name]->getLocation();
+		    // It should be impossible for us to see the same
+		    // build item from multiple backing areas.  The
+		    // only way this should be able to happen would be
+		    // if one backing area dependend on the other, and
+		    // we've already detected and precluded that case
+		    // by checking "covered" above.  If this assertion
+		    // fails, there is probably a logic error either
+		    // there or in merging forests.
+		    assert(! (loc == other_loc));
+		    QTC::TC("abuild", "Abuild ERR item multiple backing areas");
+		    error(loc, "this item appears in multiple backing areas");
+		    error(other_loc, "here is another location for this item");
+		}
 	    }
 	    else
 	    {
@@ -2223,6 +2297,10 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		builditems[item_name].reset(new BuildItem(item));
 		BuildItem& new_item = *(builditems[item_name]);
 		new_item.incrementBackingDepth();
+		if (new_item.getBackingDepth() > 1)
+		{
+		    QTC::TC("abuild", "Abuild backing depth > 1");
+		}
 	    }
         }
     }
