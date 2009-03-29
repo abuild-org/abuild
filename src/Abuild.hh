@@ -317,6 +317,9 @@ class Abuild
 		     std::vector<std::string> > map_string_vec_string;
     typedef std::map<std::string, map_string_vec_string> shadowed_plugin_map;
     shadowed_plugin_map shadowed_plugins;
+    std::map<std::string, std::string> find_top_cache;
+    std::map<std::string,
+	     std::map<std::string, ItemConfig*> > read_external_config_cache;
 
     // Used by 1.0 compatibility mode only
     unsigned int last_assigned_tree_number;

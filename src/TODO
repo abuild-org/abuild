@@ -1,13 +1,4 @@
 
-Cache findTop and readExternalConfig results for efficiency and
-brevity of verbose output.
-
-Test forest backing to itself both by having a new-style
-Abuild.backing that points into the tree and also by having an
-external that backs into another tree in the same forest.
-
-----------------------------------------------------------------------
-
 Remaining failing test suites:
 
 abuild-backing-areas
@@ -18,6 +9,10 @@ abuild-traversal
 Work on backing-areas first.  It has some failures that are real
 failures and not just change to error messages and dump data.  This
 may be true of traversal as well.
+
+Test forest backing to itself both by having a new-style
+Abuild.backing that points into the tree and also by having an
+external that backs into another tree in the same forest.
 
 Still need to review code.
 

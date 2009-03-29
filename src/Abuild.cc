@@ -1076,6 +1076,11 @@ ItemConfig*
 Abuild::readExternalConfig(std::string const& start_dir,
 			   std::string const& start_external)
 {
+    if (read_external_config_cache[start_dir].count(start_external))
+    {
+	return read_external_config_cache[start_dir][start_external];
+    }
+
     verbose("looking for external \"" + start_external + "\" of \"" +
 	    start_dir + "\"");
 
@@ -1153,6 +1158,7 @@ Abuild::readExternalConfig(std::string const& start_dir,
     verbose("done looking for external \"" +
 	    start_external + "\" of \"" + start_dir + "\"");
 
+    read_external_config_cache[start_dir][start_external] = config;
     return config;		// might be 0
 }
 
@@ -1162,6 +1168,11 @@ Abuild::findTop(std::string const& start_dir,
 {
     // Find the directory that contains the root of the forest
     // containing the item with the given start directory.
+
+    if (find_top_cache.count(start_dir))
+    {
+	return find_top_cache[start_dir];
+    }
 
     std::string top;
     std::string dir = start_dir;
@@ -1201,6 +1212,7 @@ Abuild::findTop(std::string const& start_dir,
 	verbose("top-search: " + top + " is forest root");
     }
 
+    find_top_cache[start_dir] = top;
     return top;
 }
 
