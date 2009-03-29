@@ -94,7 +94,7 @@ abuild.mk BUILD_ITEM_RULES 0
 abuild.mk LOCAL_RULES 0
 abuild.mk platform-specific clean 0
 Abuild ERR no abuild.conf 0
-Abuild ERR item traversal loop 0
+Abuild item added twice 0
 Abuild ERR missing after-build 0
 Abuild good after-build 0
 Interface skip empty string 0
@@ -309,7 +309,5 @@ Abuild trying backing of backing 0
 Abuild replace item from deleted tree 0
 Abuild nested backing areas 0
 Abuild forest merge required 0
-Abuild ERR tree clash during merge 0
-Abuild ERR item clash during merge 0
 Abuild ERR backing area loop 0
 Abuild ERR external_graph failure 0

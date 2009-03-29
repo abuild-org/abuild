@@ -77,10 +77,14 @@ class Abuild
 		       std::list<std::string>& backing_areas,
 		       std::set<std::string>& deleted_trees,
 		       std::set<std::string>& deleted_items);
+    void addItemToForest(BuildForest& forest, std::string const& item_name,
+			 BuildItem_ptr item);
     std::string registerBuildTree(BuildForest& forest,
 				  std::string const& dir,
 				  ItemConfig* config,
 				  std::list<std::string>& dirs_with_externals);
+    void addTreeToForest(BuildForest& forest, std::string const& tree_name,
+			 BuildTree_ptr tree);
     std::string getAssignedTreeName(std::string const& dir);
     std::string getAssignedTreeName(std::string const& dir,
 				    std::set<std::string>& visiting);

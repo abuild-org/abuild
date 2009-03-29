@@ -1,24 +1,6 @@
 
-Recheck XXX comments, some of which add to the notes here.
-
-Remove forest root as a constructor argument for BuildItem and
-BuildTree.  Instead, call setForestRoot after adding to the forest,
-and use forest.getRootPath() to do it.
-
-Have functions to add BuildItem_ptr/BuildTree_ptr to a forest.  That
-function should do the above setForestRoot.  It should be called both
-by TraverseItems and by mergeForests.  The _ptr must be constructed
-outside and passed in.  This method can do the duplication checking.
-
 Create a separate function for coalescing backing areas.  Make sure
 the two places in the code where this is done are both able to use it.
-
-After creation of these functions, mergeForests should be very small
-and simple and be concerned only with figuring out which forests to
-move.  This should also simplify traverseItems.  Check
-registerBuildTree in all of this.  Also see if there is room to
-simplify the external traversal logic in traverseForest, possibly
-reducing the number of calls to readExternalConfig.
 
 Cache findTop and readExternalConfig results for efficiency and
 brevity of verbose output.

@@ -12,7 +12,6 @@ class BuildTree
   public:
     BuildTree(std::string const& name,
 	      std::string const& root_path,
-	      std::string const& forest_root,
 	      std::list<std::string> const& tree_deps,
 	      std::set<std::string> const& declared_traits,
 	      std::list<std::string> const& plugins,

@@ -17,7 +17,6 @@ class BuildItem
   public:
     BuildItem(std::string const& item_name,
 	      std::string const& tree_name,
-	      std::string const& forest_root,
 	      ItemConfig const* config);
 
     // Proxy methods to ItemConfig

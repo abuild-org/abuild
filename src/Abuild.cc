@@ -1326,12 +1326,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 	    {
 		std::string const& edecl = *eiter;
 		verbose("checking external " + edecl);
-		ItemConfig* econfig = readExternalConfig(dir, edecl);
-		if (econfig == 0)
-		{
-		    verbose("skipping unknown external " + edecl);
-		    continue;
-		}
+
 		std::string const& epath =
 		    Util::canonicalizePath(dir + "/" + edecl);
 		std::string file_conf =
@@ -1372,10 +1367,16 @@ Abuild::traverseForests(BuildForest_map& forests,
 		if (ext_top.empty())
 		{
 		    QTC::TC("abuild", "Abuild ERR findTop from external");
-		    // An error was already issued
+		    // An error was already issued by findTop
 		    continue;
 		}
 
+		// Traverse items in the external forest as if it were
+		// part of the forest for which this traverseForests
+		// method was called.  This effectively merges the
+		// external forest with the referencing forest.  We
+		// can't always catch all cases here.  See comments in
+		// mergeForests for additional notes.
 		verbose("traversing items for external " + ext_top +
 			", which is " + edecl + " from " + dir);
 		external_graph.addDependency(top_path, ext_top);
@@ -1461,13 +1462,28 @@ Abuild::mergeForests(BuildForest_map& forests,
 {
     assert(this->compat_level.allow_1_0());
 
-    // XXX It would be better if we could figure this out earlier so
-    // we wouldn't have to repeat duplication detection and other
-    // logic.
+    // If A backs to independent forests B and C, which in turn both
+    // reference common but independent external D, we can't tell that
+    // B, C, and D are all supposed to be part of the same forest
+    // until something, such as traversal of A, causes us to traverse
+    // both B and C.  In 1.0 compatibility mode, we don't know about
+    // externals until we are already finished calling traverseItems,
+    // so we are stuck merging forests after the fact.  The
+    // items_traversed set prevents us from initially adding any build
+    // item or tree to more than one forest, so the merging is
+    // relatively straightforward once we determine which forests have
+    // to be merged.
 
     std::map<std::string, std::string> forest_renames;
     std::map<std::string, std::list<std::string> > forest_merges;
 
+    // Figure out independent subsets of the graph formed by external
+    // relationships.  We only care about forests that we have
+    // previously considered to be forest roots.  (Remember that we
+    // are already grouping separate forests together as one in the
+    // case of externals.)  For any subset that contains more than one
+    // apparent forest root, we need to merge the forests in that
+    // subset.
     std::vector<DependencyGraph::ItemList> const& sets =
 	external_graph.getIndependentSets();
     for (std::vector<DependencyGraph::ItemList>::const_iterator iter =
@@ -1502,6 +1518,8 @@ Abuild::mergeForests(BuildForest_map& forests,
 	}
     }
 
+    // To merge forests, we just merge their trees, items, backing
+    // areas, and backing area data.
     for (std::map<std::string, std::list<std::string> >::iterator i1 =
 	     forest_merges.begin();
 	 i1 != forest_merges.end(); ++i1)
@@ -1509,8 +1527,6 @@ Abuild::mergeForests(BuildForest_map& forests,
 	std::string const& keep_dir = (*i1).first;
 	BuildForest& keep = *(forests[keep_dir]);
 
-	BuildTree_map& buildtrees = keep.getBuildTrees();
-	BuildItem_map& builditems = keep.getBuildItems();
 	std::list<std::string>& backing_areas = keep.getBackingAreas();
 	std::set<std::string>& deleted_trees = keep.getDeletedTrees();
 	std::set<std::string>& deleted_items = keep.getDeletedItems();
@@ -1536,20 +1552,7 @@ Abuild::mergeForests(BuildForest_map& forests,
 	    {
 		std::string const& tree_name = (*i3).first;
 		BuildTree_ptr tree = (*i3).second;
-		if (buildtrees.count(tree_name))
-		{
-		    QTC::TC("abuild", "Abuild ERR tree clash during merge");
-		    error(tree->getLocation(),
-			  "another tree with the name \"" + tree_name +
-			  "\" exists");
-		    error(buildtrees[tree_name]->getLocation(),
-			  "here is the other tree");
-		}
-		else
-		{
-		    buildtrees[tree_name] = tree;
-		    tree->setForestRoot(keep_dir);
-		}
+		addTreeToForest(keep, tree_name, tree);
 	    }
 
 	    for (BuildItem_map::iterator i3 = o_builditems.begin();
@@ -1557,20 +1560,7 @@ Abuild::mergeForests(BuildForest_map& forests,
 	    {
 		std::string const& item_name = (*i3).first;
 		BuildItem_ptr item = (*i3).second;
-		if (builditems.count(item_name))
-		{
-		    QTC::TC("abuild", "Abuild ERR item clash during merge");
-		    error(item->getLocation(),
-			  "another item with the name \"" + item_name +
-			  "\" exists");
-		    error(builditems[item_name]->getLocation(),
-			  "here is the other item");
-		}
-		else
-		{
-		    builditems[item_name] = item;
-		    item->setForestRoot(keep_dir);
-		}
+		addItemToForest(keep, item_name, item);
 	    }
 
 	    backing_areas.insert(
@@ -1651,8 +1641,6 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 	verbose("done reading backing area data");
     }
 
-    BuildItem_map& builditems = forest.getBuildItems();
-
     std::list<std::string> dirs;
     std::map<std::string, std::string> parent_dirs;
     std::map<std::string, std::string> dir_trees;
@@ -1688,56 +1676,10 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 	std::string item_name = config->getName();
         if (! item_name.empty())
         {
-            if (builditems.count(item_name))
-            {
-		std::string other_dir =
-		    builditems[item_name]->getAbsolutePath();
-		if (dir == other_dir)
-		{
-		    // XXX This is not caused by a loop anymore.  This
-		    // can only happen if the item is encountered from
-		    // different parents, which would always be
-		    // accompanied by an intervening Abuild.conf.  We
-		    // should preserve this explanation and just use
-		    // dir == other_dir to suppress the duplication
-		    // message indicating that another error message
-		    // would have already been issued.  Same logic
-		    // applies to trees.
-
-		    QTC::TC("abuild", "Abuild ERR item traversal loop");
-		    error(builditems[item_name]->getLocation(),
-			  "loop detected while reading " +
-			  ItemConfig::FILE_CONF + " files: build item " +
-			  item_name + " reached by multiple paths");
-		    continue;
-		}
-		else
-		{
-		    QTC::TC("abuild", "Abuild ERR item multiple locations");
-		    error(FileLocation(dir + "/" + ItemConfig::FILE_CONF, 0, 0),
-			  "build item " + item_name +
-			  " appears in multiple locations");
-		    error(builditems[item_name]->getLocation(),
-			  "here is another location");
-		}
-            }
-            else if (tree_name.empty())
-	    {
-		QTC::TC("abuild", "Abuild ERR named item outside of tree");
-		error(location,
-		      "named build items are not allowed outside of"
-		      " build trees");
-	    }
-	    else
-	    {
-		// We want to make sure that item->getTreeName will
-		// always be a valid tree, so only store the build
-		// item if everything checks out.
-		builditems[item_name].reset(
-		    new BuildItem(item_name, tree_name,
-				  forest.getRootPath(), config));
-            }
-        }
+	    BuildItem_ptr item(
+		new BuildItem(item_name, tree_name, config));
+	    addItemToForest(forest, item_name, item);
+	}
 
 	std::list<std::string> const& children = config->getChildren();
 	for (std::list<std::string>::const_iterator iter = children.begin();
@@ -1781,13 +1723,58 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
     }
 }
 
+void
+Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
+			BuildItem_ptr item)
+{
+    BuildItem_map& builditems = forest.getBuildItems();
+    if (builditems.count(item_name))
+    {
+	std::string const& dir = item->getAbsolutePath();
+	std::string const& other_dir =
+	    builditems[item_name]->getAbsolutePath();
+	if (dir == other_dir)
+	{
+	    // This can only happen if the item is encountered from
+	    // different parents, which would always be accompanied by
+	    // an intervening Abuild.conf.  Don't report this an error
+	    // so we avoid reporting the same condition with multiple
+	    // error messages.
+	    QTC::TC("abuild", "Abuild item added twice");
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild ERR item multiple locations");
+	    error(FileLocation(dir + "/" + ItemConfig::FILE_CONF, 0, 0),
+		  "build item " + item_name +
+		  " appears in multiple locations");
+	    error(builditems[item_name]->getLocation(),
+		  "here is another location");
+	}
+    }
+    else if (item->getTreeName().empty())
+    {
+	QTC::TC("abuild", "Abuild ERR named item outside of tree");
+	error(item->getLocation(),
+	      "named build items are not allowed outside of"
+	      " build trees");
+    }
+    else
+    {
+	// We want to make sure that item->getTreeName will always be
+	// a valid tree, so only store the build item if everything
+	// checks out.
+	item->setForestRoot(forest.getRootPath());
+	builditems[item_name] = item;
+    }
+}
+
 std::string
 Abuild::registerBuildTree(BuildForest& forest,
 			  std::string const& dir,
 			  ItemConfig* config,
 			  std::list<std::string>& dirs_with_externals)
 {
-    BuildTree_map& buildtrees = forest.getBuildTrees();
     std::string tree_name = config->getTreeName();
     std::list<std::string> tree_deps = config->getTreeDeps();
 
@@ -1848,33 +1835,44 @@ Abuild::registerBuildTree(BuildForest& forest,
 	assert(! tree_name.empty());
     }
 
+    BuildTree_ptr tree(
+	new BuildTree(tree_name, dir, tree_deps,
+		      config->getSupportedTraits(),
+		      config->getPlugins(),
+		      this->internal_platform_data));
+    addTreeToForest(forest, tree_name, tree);
+
+    return tree_name;
+}
+
+void
+Abuild::addTreeToForest(BuildForest& forest, std::string const& tree_name,
+			BuildTree_ptr tree)
+{
+    BuildTree_map& buildtrees = forest.getBuildTrees();
     if (buildtrees.count(tree_name))
     {
-	// XXX Do we want to distinguish same vs. different location
-	// as in the case of adding an item?  Is there a possibility
-	// of having the same tree be added more than once if the tree
-	// comes from the same location?  I think the only way would
-	// be if the tree root were encountered twice, which can only
-	// happen if there is another error, such as two different
-	// parents pointing to the same child which in turn always
-	// results in an error about an intermediate Abuild.conf.
-
-	QTC::TC("abuild", "Abuild ERR duplicate tree");
-	error(config->getLocation(),
-	      "another tree with the name \"" + tree_name + "\" has been"
-	      " found in this forest");
-	error(buildtrees[tree_name]->getLocation(),
-	      "here is the other tree");
+	if (tree->getRootPath() == buildtrees[tree_name]->getRootPath())
+	{
+	    // See comments in addItemToForest for an explanation of
+	    // when this can happen.  We ignore this here to avoid
+	    // having error messages for the same error.
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild ERR duplicate tree");
+	    error(tree->getLocation(),
+		  "another tree with the name \"" + tree_name + "\" has been"
+		  " found in this forest");
+	    error(buildtrees[tree_name]->getLocation(),
+		  "here is the other tree");
+	}
     }
     else
     {
-	buildtrees[tree_name].reset(
-	    new BuildTree(tree_name, dir, forest.getRootPath(), tree_deps,
-			  config->getSupportedTraits(),
-			  config->getPlugins(),
-			  this->internal_platform_data));
+	tree->setForestRoot(forest.getRootPath());
+	buildtrees[tree_name] = tree;
     }
-    return tree_name;
 }
 
 std::string
