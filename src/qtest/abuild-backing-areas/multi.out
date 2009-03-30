@@ -1,3 +1,7 @@
 abuild: common (abuild-<native>): all
 abuild: b (abuild-<native>): all
 abuild: a (abuild-<native>): all
+abuild: c (abuild-indep): all
+make: Entering directory `--topdir--/multi/c/abuild-indep'
+Hello from c.
+make: Leaving directory `--topdir--/multi/c/abuild-indep'
