@@ -34,16 +34,21 @@ class KeyVal
     // opened.  Otherwise, returns true if there were no errors.
     bool readFile();
 
+    std::string getPreferredEOL() const;
+
     // Rewrite the data to newfile.  For each element of key_changes,
     // replace any occurrences of map keys with the associated value.
     // For each element of replacements, replace the key and value
     // together with the value, appending whatever end of line
-    // character is on the original.  For keys in omissions, omit
-    // entirely.
+    // character is on the original.  For keys in deletions, omit
+    // entirely.  For keys in additions, add the key and value,
+    // terminating with whatever line terminator was used on the first
+    // line of the original file.
     void writeFile(char const* newfile,
 		   std::map<std::string, std::string> const& key_changes,
 		   std::map<std::string, std::string> const& replacements,
-		   std::set<std::string> const& omissions) const;
+		   std::set<std::string> const& deletions,
+		   std::map<std::string, std::string> const& additions) const;
 
     // Get a list of all keys.
     std::set<std::string> getKeys() const;
@@ -73,6 +78,7 @@ class KeyVal
 
     Error error;
     std::string filename;
+    std::string preferred_eol;
     std::set<std::string> keys;
     std::set<std::string> explicit_keys;
     std::map<std::string, std::string> defaults;

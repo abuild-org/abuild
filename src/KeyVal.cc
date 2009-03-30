@@ -15,6 +15,7 @@ KeyVal::KeyVal(char const* filename,
 	       std::map<std::string, std::string> const& defaults) :
     error("KeyVal"),
     filename(filename),
+    preferred_eol("\n"),
     keys(keys),
     defaults(defaults)
 {
@@ -44,6 +45,7 @@ KeyVal::readFile()
     boost::regex comment_line("\\s*#.*");
     boost::regex kv_line("(\\s*)([^\\s:]+)(\\s*:\\s*(.*?)(\\\\?)\\s*)");
     boost::regex content_re("\\s*(.*?)(\\\\?)\\s*");
+    boost::regex eol_re(".*?((?:\\r?\\n)?)");
     boost::smatch match;
 
     std::list<std::string> lines =
@@ -61,6 +63,16 @@ KeyVal::readFile()
 	std::string content;
 	bool continuation = false;
 	bool comment = false;
+
+	if (lineno == 1)
+	{
+	    // Get preferred EOL from first line
+	    assert(boost::regex_match(orig_line, match, eol_re));
+	    if (! match.str(1).empty())
+	    {
+		this->preferred_eol = match.str(1);
+	    }
+	}
 
 	// Comments are allowed even after a continuation line.
 	if (boost::regex_match(orig_line, match, comment_line))
@@ -187,11 +199,18 @@ KeyVal::readFile()
     return (this->error.numErrors() == 0);
 }
 
+std::string
+KeyVal::getPreferredEOL() const
+{
+    return this->preferred_eol;
+}
+
 void
 KeyVal::writeFile(char const* newfile,
 		  std::map<std::string, std::string> const& key_changes,
 		  std::map<std::string, std::string> const& replacements,
-		  std::set<std::string> const& omissions) const
+		  std::set<std::string> const& deletions,
+		  std::map<std::string, std::string> const& additions) const
 {
     boost::regex eol_re(".*?((?:\\r?\\n)?)");
     boost::smatch match;
@@ -203,6 +222,14 @@ KeyVal::writeFile(char const* newfile,
     if (! of.is_open())
     {
 	throw QEXC::System(std::string("create ") + newfile, errno);
+    }
+
+    for (std::map<std::string, std::string>::const_iterator iter =
+	     additions.begin();
+	 iter != additions.end(); ++iter)
+    {
+	std::string const& key = (*iter).first;
+	of << key << ": " << (*iter).second << this->preferred_eol;
     }
 
     for (std::vector<OrigData>::const_iterator iter = this->orig_data.begin();
@@ -219,7 +246,7 @@ KeyVal::writeFile(char const* newfile,
 	{
 	    change = key_changes.find(od.key);
 	    replacement = replacements.find(od.key);
-	    omit = (omissions.count(od.key) != 0);
+	    omit = (deletions.count(od.key) != 0);
 	}
 
 	if (omit)

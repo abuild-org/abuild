@@ -40,11 +40,13 @@ int main(int argc, char* argv[])
     std::map<std::string, std::string> replacements;
     replacements["pig"] = "small: whatever smalls say"; // opposite of pig
     std::set<std::string> omissions;
+    std::map<std::string, std::string> additions;
 
     if (std::string(filename) == "test9.in")
     {
 	keys.insert("sheep");
 	omissions.insert("sheep");
+	additions["h-monster"] = "grunt and rub face on carpet";
     }
 
     try
@@ -79,9 +81,11 @@ int main(int argc, char* argv[])
 	kv2.writeFile(newfile.c_str(),
 		      std::map<std::string, std::string>(),
 		      std::map<std::string, std::string>(),
-		      std::set<std::string>());
+		      std::set<std::string>(),
+		      std::map<std::string, std::string>());
 	newfile = std::string(filename) + ".wr2";
-	kv2.writeFile(newfile.c_str(), substitutions, replacements, omissions);
+	kv2.writeFile(newfile.c_str(), substitutions,
+		      replacements, omissions, additions);
     }
     catch (std::exception& e)
     {
