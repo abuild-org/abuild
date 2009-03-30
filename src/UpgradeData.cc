@@ -15,7 +15,6 @@ std::string const UpgradeData::PLACEHOLDER = "***";
 
 UpgradeData::UpgradeData(Error& error) :
     upgrade_required(false),
-    missing_treenames(false),
     error(error)
 {
     readUpgradeData();
@@ -169,6 +168,10 @@ UpgradeData::writeUpgradeData() const
 	     i2 != trees.end(); ++i2)
 	{
 	    std::string const& path = *i2;
+	    if (this->unnamed_trees.count(path))
+	    {
+		continue;
+	    }
 	    std::string name = PLACEHOLDER;
 	    if (names.count(path))
 	    {

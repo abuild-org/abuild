@@ -71,6 +71,7 @@ class Abuild
 			 std::string const& description);
     void mergeForests(BuildForest_map& forests,
 		      DependencyGraph& external_graph);
+    void removeEmptyTrees(BuildForest_map& forests);
     void traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		       std::string const& top_path,
 		       std::list<std::string>& dirs_with_externals,
@@ -227,7 +228,8 @@ class Abuild
     void initializeForests(
 	UpgradeData& ud,
 	std::vector<DependencyGraph::ItemList> const& forests);
-    void upgradeForests(UpgradeData& ud);
+    void allowUnnamedForestRoots(UpgradeData&);
+    void upgradeForests(UpgradeData&);
 
     static std::string const ABUILD_VERSION;
     static std::string const OUTPUT_DIR_PREFIX;

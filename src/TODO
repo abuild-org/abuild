@@ -1,10 +1,13 @@
 
+XXX run --upgrade-trees.  manually rename files for
+misc-classification.  Run again.  Top-level Abuild.conf-1_1 is bogus.
+Run --upgrade-trees from there.  Assertion failure.
+
 Remaining failing test suites:
 
 abuild-backing-areas
 abuild-errors
 abuild-examples
-abuild-traversal
 
 Work on backing-areas first.  It has some failures that are real
 failures and not just change to error messages and dump data.  This
@@ -88,6 +91,8 @@ release notes.
 
 Groovy Framework
 ================
+
+ * Cache rules once loaded to optimize performance
 
  * Find sun conventions on directory structure for _base.groovy
 

@@ -33,7 +33,7 @@ class UpgradeData
     // work data for abuild --upgrade-trees
     std::map<std::string, ItemConfig*> items;
     bool upgrade_required;
-    bool missing_treenames;
+    std::set<std::string> missing_treenames;
     std::map<std::string, std::list<std::string> > externals;
     std::map<std::string, std::list<std::string> > tree_deps;
     std::map<std::string, std::list<std::string> > backing_areas;
@@ -42,6 +42,8 @@ class UpgradeData
     std::map<std::string, std::string> item_tree_roots;
     std::map<std::string, std::string> tree_forest_roots;
     std::map<std::string, std::list<std::string> > forest_contents;
+    std::map<std::string, std::set<std::string> > tree_items;
+    std::set<std::string> unnamed_trees;
 
   private:
     void readUpgradeData();

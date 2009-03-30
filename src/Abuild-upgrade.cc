@@ -34,13 +34,13 @@ Abuild::upgradeTrees()
 	root_graph.getIndependentSets();
 
     validateProposedForests(ud, forests);
+    initializeForests(ud, forests);
+    allowUnnamedForestRoots(ud);
 
-    if (ud.missing_treenames)
+    if (! ud.missing_treenames.empty())
     {
 	error("some build trees have not been assigned names");
     }
-
-    initializeForests(ud, forests);
 
     ud.writeUpgradeData();
     info("upgrade data has been written to " +
@@ -106,12 +106,16 @@ Abuild::findBuildItems(UpgradeData& ud)
 		}
 		else if (! ud.tree_names.count(dir))
 		{
-		    ud.missing_treenames = true;
+		    ud.missing_treenames.insert(dir);
 		}
 	    }
 
 	    ud.items[dir] = config;
 	    ud.item_tree_roots[dir] = dir_trees[dir];
+	    if (! config->getName().empty())
+	    {
+		ud.tree_items[dir_trees[dir]].insert(dir);
+	    }
 	}
 
 	std::vector<std::string> entries = Util::getDirEntries(dir);
@@ -147,15 +151,33 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	 iter != ud.items.end(); ++iter)
     {
 	std::string const& dir = (*iter).first;
-	bool is_root = (*iter).second->isTreeRoot();
+	ItemConfig* config = (*iter).second;
+	bool is_root = config->isTreeRoot();
+	if (is_root || config->isForestRoot())
+	{
+	    g.addItem(dir);
+	}
 	if (! is_root)
 	{
 	    continue;
 	}
-	g.addItem(dir);
-	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
-	ItemConfig* config = readConfig(dir, "");
+	if (! config->isForestRoot())
+	{
+	    std::string forest_top =
+		findTop(Util::canonicalizePath(dir),
+			"tree found during upgrade");
+	    if (! forest_top.empty())
+	    {
+		forest_top = Util::absToRel(forest_top);
+	    }
+	    if ((forest_top != dir) &&
+		(ud.items.count(forest_top)))
+	    {
+		g.addDependency(forest_top, dir);
+	    }
+	}
 
+	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
 	bool has_backing = false;
 	if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
 	{
@@ -204,6 +226,10 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		    // The external points to a known tree root inside
 		    // our area of concern.
 		    g.addDependency(dir, epath);
+		    if (dep_tree_name.empty() && ud.tree_names.count(epath))
+		    {
+			dep_tree_name = ud.tree_names[epath];
+		    }
 		}
 		else if (econfig->isTreeRoot())
 		{
@@ -239,14 +265,6 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		error(location,
 		      "external " + edecl + " does not exist and cannot"
 		      " be resolved through a backing area");
-	    }
-
-	    if (dep_tree_name.empty())
-	    {
-		if (ud.tree_names.count(dir))
-		{
-		    dep_tree_name = ud.tree_names[dir];
-		}
 	    }
 
 	    if (dep_tree_name.empty())
@@ -384,6 +402,32 @@ Abuild::getForestRoot(std::list<std::string> const& forest)
 }
 
 void
+Abuild::allowUnnamedForestRoots(UpgradeData& ud)
+{
+    // High-level child-only items that serve no purpose other than to
+    // connect other trees together show up unnamed trees because 1.0
+    // compatibility mode recognizes them as roots.  We have to allow
+    // them to be unnamed.  This is the same case that is handled by
+    // removeEmptyTrees() in Abuild.cc.
+
+    for (std::map<std::string, std::list<std::string> >::const_iterator iter =
+	     ud.forest_contents.begin();
+	 iter != ud.forest_contents.end(); ++iter)
+    {
+	std::string const& forest_root = (*iter).first;
+	if ((ud.tree_items[forest_root].empty()) &&
+	    (ud.tree_names.count(forest_root) == 0) &&
+	    (ud.items.count(forest_root)) &&
+	    (ud.items[forest_root]->isChildOnly()))
+	{
+	    QTC::TC("abuild", "Abuild-upgrade ignore useless empty tree");
+	    ud.missing_treenames.erase(forest_root);
+	    ud.unnamed_trees.insert(forest_root);
+	}
+    }
+}
+
+void
 Abuild::upgradeForests(UpgradeData& ud)
 {
     // Initialize backing data for each forest.
@@ -486,9 +530,6 @@ Abuild::upgradeForests(UpgradeData& ud)
 	}
     }
 
-    // XXX This code doesn't handle pre-existing forest roots that
-    // aren't tree roots right.
-
     std::string const suffix = "-1_1";
     std::set<std::string> new_files;
 
@@ -573,12 +614,15 @@ Abuild::upgradeForests(UpgradeData& ud)
 	     backing_areas.begin();
 	 iter != backing_areas.end(); ++iter)
     {
-	std::string const& dir = (*iter).first;
 	std::list<std::string>& areas = (*iter).second;
+	if (areas.empty())
+	{
+	    continue;
+	}
+
+	std::string const& dir = (*iter).first;
 	std::set<std::string>& dt = deleted_trees[dir];
 	std::set<std::string>& di = deleted_items[dir];
-
-	assert(! areas.empty());
 
 	std::string newfile = dir + "/" + BackingConfig::FILE_BACKING;
 	new_files.insert(newfile);

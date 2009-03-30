@@ -266,8 +266,9 @@ ItemConfig::detectRoot()
 	this->is_root = false;
     }
 
-    if (this->parent_dir.empty() &&
-	(this->is_root || ((ek.size() == 1) && ek.count(k_CHILDREN))))
+    this->is_child_only = ((ek.size() == 1) && ek.count(k_CHILDREN));
+
+    if (this->parent_dir.empty() && (this->is_root || is_child_only))
     {
 	this->is_forest_root = true;
     }
@@ -1164,6 +1165,7 @@ ItemConfig::ItemConfig(
     parent_dir(parent_dir),
     is_root(false),
     is_forest_root(false),
+    is_child_only(false),
     deprecated(false)
 {
 }
@@ -1178,6 +1180,12 @@ bool
 ItemConfig::isForestRoot() const
 {
     return this->is_forest_root;
+}
+
+bool
+ItemConfig::isChildOnly() const
+{
+    return this->is_child_only;
 }
 
 bool
@@ -1367,14 +1375,153 @@ ItemConfig::getPlugins() const
 
 bool
 ItemConfig::upgradeConfig(std::string const& file,
-			  std::set<std::string> const& new_chilren,
+			  std::set<std::string> const& new_children,
 			  std::string const& tree_name,
 			  std::list<std::string> const& externals,
 			  std::list<std::string> const& new_tree_deps)
 {
     // 1.0 compatibility only
 
-    // XXX remember to preserve existing children and tree deps.
+    std::set<std::string> deletions;
+    std::vector<std::pair<std::string, std::string> > additions;
+    std::map<std::string, std::string> replacements;
+    std::map<std::string, std::string> key_changes;
 
-    return true;		// XXX
+    std::set<std::string> const& ek = this->kv.getExplicitKeys();
+
+    if (ek.count(k_THIS))
+    {
+	key_changes[k_THIS] = k_NAME;
+    }
+    if (ek.count(k_PARENT))
+    {
+	deletions.insert(k_PARENT);
+    }
+    if (ek.count(k_DELETED))
+    {
+	deletions.insert(k_DELETED);
+    }
+    if ((ek.count(k_TREENAME) == 0) && (! tree_name.empty()))
+    {
+	additions.push_back(std::make_pair(k_TREENAME, tree_name));
+    }
+    else
+    {
+	assert(this->tree_name == tree_name);
+    }
+
+    std::string sep = " \\" + this->kv.getPreferredEOL() + "    ";
+
+    // add new_tree_deps that aren't already present
+    std::set<std::string> seen;
+    for (std::list<std::string>::const_iterator iter = this->tree_deps.begin();
+	 iter != this->tree_deps.end(); ++iter)
+    {
+	seen.insert(*iter);
+    }
+    std::list<std::string> tree_deps_to_add;
+    for (std::list<std::string>::const_iterator iter = new_tree_deps.begin();
+	 iter != new_tree_deps.end(); ++iter)
+    {
+	if (! seen.count(*iter))
+	{
+	    tree_deps_to_add.push_back(*iter);
+	}
+    }
+    if (! tree_deps_to_add.empty())
+    {
+	if (this->tree_deps.empty())
+	{
+	    QTC::TC("abuild", "ItemConfig add tree_deps");
+	    additions.push_back(
+		std::make_pair(k_TREEDEPS,
+			       sep + Util::join(sep, tree_deps_to_add)));
+	}
+	else
+	{
+	    QTC::TC("abuild", "ItemConfig replace tree_deps");
+	    replacements[k_TREEDEPS] = sep +
+		Util::join(sep, this->tree_deps) + sep +
+		Util::join(sep, tree_deps_to_add);
+	}
+    }
+
+    // add new_children that aren't already present
+    seen.clear();
+    for (std::list<std::string>::const_iterator iter = this->children.begin();
+	 iter != this->children.end(); ++iter)
+    {
+	seen.insert(
+	    Util::absToRel(
+		Util::canonicalizePath(this->dir + "/" + *iter)));
+    }
+    std::list<std::string> children_to_add;
+    for (std::set<std::string>::const_iterator iter = new_children.begin();
+	 iter != new_children.end(); ++iter)
+    {
+	if (! seen.count(*iter))
+	{
+	    children_to_add.push_back(*iter);
+	}
+    }
+    if (! children_to_add.empty())
+    {
+	if (this->children.empty())
+	{
+	    QTC::TC("abuild", "ItemConfig add children");
+	    additions.push_back(
+		std::make_pair(
+		    k_CHILDREN,
+		    sep + Util::join(sep, children_to_add)));
+	}
+	else
+	{
+	    QTC::TC("abuild", "ItemConfig replace children");
+	    replacements[k_CHILDREN] = sep +
+		Util::join(sep, this->children) + sep +
+		Util::join(sep, children_to_add);
+	}
+    }
+
+    // replace externals
+    if (externals.empty())
+    {
+	if (ek.count(k_EXTERNAL))
+	{
+	    QTC::TC("abuild", "ItemConfig delete externals");
+	    deletions.insert(k_EXTERNAL);
+	}
+    }
+    else
+    {
+	assert(! this->externals.empty());
+	if (new_tree_deps.empty())
+	{
+	    // We must have preserved all the old externals.
+	    QTC::TC("abuild", "ItemConfig preserve externals");
+	}
+	else
+	{
+	    QTC::TC("abuild", "ItemConfig replace externals");
+	    replacements[k_EXTERNAL] = sep +
+		Util::join(sep, externals);
+	}
+    }
+
+    bool must_upgrade =
+	(! ((key_changes.empty() &&
+	     additions.empty() &&
+	     replacements.empty() &&
+	     deletions.empty())));
+
+    if (must_upgrade)
+    {
+	this->kv.writeFile(file.c_str(),
+			   key_changes,
+			   replacements,
+			   deletions,
+			   additions);
+    }
+
+    return must_upgrade;
 }

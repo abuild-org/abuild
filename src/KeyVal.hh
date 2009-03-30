@@ -44,11 +44,13 @@ class KeyVal
     // entirely.  For keys in additions, add the key and value,
     // terminating with whatever line terminator was used on the first
     // line of the original file.
-    void writeFile(char const* newfile,
-		   std::map<std::string, std::string> const& key_changes,
-		   std::map<std::string, std::string> const& replacements,
-		   std::set<std::string> const& deletions,
-		   std::map<std::string, std::string> const& additions) const;
+    void writeFile(
+	char const* newfile,
+	std::map<std::string, std::string> const& key_changes,
+	std::map<std::string, std::string> const& replacements,
+	std::set<std::string> const& deletions,
+	std::vector<std::pair<std::string, std::string> > const& additions)
+	const;
 
     // Get a list of all keys.
     std::set<std::string> getKeys() const;

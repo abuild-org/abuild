@@ -206,11 +206,12 @@ KeyVal::getPreferredEOL() const
 }
 
 void
-KeyVal::writeFile(char const* newfile,
-		  std::map<std::string, std::string> const& key_changes,
-		  std::map<std::string, std::string> const& replacements,
-		  std::set<std::string> const& deletions,
-		  std::map<std::string, std::string> const& additions) const
+KeyVal::writeFile(
+    char const* newfile,
+    std::map<std::string, std::string> const& key_changes,
+    std::map<std::string, std::string> const& replacements,
+    std::set<std::string> const& deletions,
+    std::vector<std::pair<std::string, std::string> > const& additions) const
 {
     boost::regex eol_re(".*?((?:\\r?\\n)?)");
     boost::smatch match;
@@ -224,8 +225,8 @@ KeyVal::writeFile(char const* newfile,
 	throw QEXC::System(std::string("create ") + newfile, errno);
     }
 
-    for (std::map<std::string, std::string>::const_iterator iter =
-	     additions.begin();
+    for (std::vector<std::pair<std::string, std::string> >::const_iterator
+	     iter = additions.begin();
 	 iter != additions.end(); ++iter)
     {
 	std::string const& key = (*iter).first;

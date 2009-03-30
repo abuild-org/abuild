@@ -975,7 +975,6 @@ Abuild::readConfigs()
     // additional discussion.
     BuildForest_map forests;
     traverse(forests, local_top);
-    assert(! this->local_tree.empty());
 
     // Compute the list of all known traits.  This routine also
     // validates to make sure that any traits specified on the command
@@ -1249,6 +1248,8 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 	{
 	    mergeForests(forests, external_graph);
 	}
+
+	removeEmptyTrees(forests);
     }
 
     DependencyGraph backing_graph;
@@ -1639,6 +1640,68 @@ Abuild::mergeForests(BuildForest_map& forests,
 		backing_areas.erase(iter, next);
 	    }
 	    iter = next;
+	}
+    }
+}
+
+void
+Abuild::removeEmptyTrees(BuildForest_map& forests)
+{
+    assert(this->compat_level.allow_1_0());
+
+    // Top-level child-only build items look like build tree roots
+    // with 1.0 compatibility turned on.  If any of our build trees
+    // are like this and have no items, remove them from the forest.
+    // Otherwise, we end up with assigned tree names on empty trees.
+    for (BuildForest_map::iterator iter = forests.begin();
+	 iter != forests.end(); ++iter)
+    {
+	BuildForest& forest = *((*iter).second);
+	std::set<std::string> to_delete;
+	BuildTree_map& buildtrees = forest.getBuildTrees();
+	for (BuildTree_map::iterator iter = buildtrees.begin();
+	     iter != buildtrees.end(); ++iter)
+	{
+	    std::string const& tree_name = (*iter).first;
+	    BuildTree& tree = *((*iter).second);
+	    ItemConfig* config = readConfig(tree.getRootPath(), "");
+	    if (config->isChildOnly())
+	    {
+		// We'll only delete this if it has no items and no
+		// one depends on it.
+		to_delete.insert(tree_name);
+	    }
+	}
+
+	for (BuildTree_map::iterator iter = buildtrees.begin();
+	     iter != buildtrees.end(); ++iter)
+	{
+	    BuildTree& tree = *((*iter).second);
+	    std::list<std::string> const& tree_deps = tree.getTreeDeps();
+	    for (std::list<std::string>::const_iterator iter =
+		     tree_deps.begin();
+		 iter != tree_deps.end(); ++iter)
+	    {
+		to_delete.erase(*iter);
+	    }
+	}
+
+	BuildItem_map& builditems = forest.getBuildItems();
+	for (BuildItem_map::iterator iter = builditems.begin();
+	     iter != builditems.end(); ++iter)
+	{
+	    BuildItem& item = *((*iter).second);
+	    to_delete.erase(item.getTreeName());
+	}
+
+	if (! to_delete.empty())
+	{
+	    QTC::TC("abuild", "Abuild delete unused empty top-level tree");
+	    for (std::set<std::string>::iterator iter = to_delete.begin();
+		 iter != to_delete.end(); ++iter)
+	    {
+		buildtrees.erase(*iter);
+	    }
 	}
     }
 }
@@ -4092,6 +4155,9 @@ Abuild::computeBuildset(BuildItem_map& builditems)
         }
         else if (set_name == b_LOCAL)
         {
+	    // XXX What do we want to do when this->local_tree is
+	    // empty?  This happens if you start in a high-level build
+	    // item that is not part of any tree.
             QTC::TC("abuild", "Abuild buildset local", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isInTree, _1,

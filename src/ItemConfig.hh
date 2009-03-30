@@ -63,6 +63,7 @@ class ItemConfig
 
     bool isTreeRoot() const;
     bool isForestRoot() const;
+    bool isChildOnly() const;
     bool usesDeprecatedFeatures() const;
     std::string const& getAbsolutePath() const;
     std::string const& getParentDir() const;
@@ -93,7 +94,7 @@ class ItemConfig
 
     // For 1.0 to 1.1 upgrade process
     bool upgradeConfig(std::string const& file,
-		       std::set<std::string> const& new_chilren,
+		       std::set<std::string> const& new_children,
 		       std::string const& tree_name,
 		       std::list<std::string> const& externals,
 		       std::list<std::string> const& new_tree_deps);
@@ -175,6 +176,7 @@ class ItemConfig
     std::string parent_dir;
     bool is_root;
     bool is_forest_root;
+    bool is_child_only;
     bool deprecated;
 
     // Information used during validation
