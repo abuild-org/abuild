@@ -3,5 +3,4 @@
 --topdir--/errors/integrity/f1/main/Abuild.conf: ERROR: some plugins declared by this forest are shadowed
 --topdir--/errors/integrity/f2/main/Abuild.conf: ERROR: this is the forest that contains the shadowing plugins
 --topdir--/errors/integrity/f2/main/ext/plugin/Abuild.conf: ERROR: here is the shadowing copy of plugin "plugin"
---topdir--/errors/integrity/f2/main/ext/plugin/Abuild.conf: ERROR: here is the shadowing copy of plugin "plugin"
 abuild: ERROR: errors detected; exiting

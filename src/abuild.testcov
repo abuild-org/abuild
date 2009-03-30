@@ -317,3 +317,8 @@ Abuild backing depth > 1 0
 Abuild ERR item multiple backing areas 0
 Abuild-upgrade ERR backed external 0
 Abuild-upgrade ERR invalid forest root 0
+Abuild-upgrade create new root Abuild.conf 0
+Abuild-upgrade add child 0
+Abuild-upgrade partial upgrade 0
+Abuild-upgrade write deleted-items 0
+Abuild-upgrade write deleted-trees 0

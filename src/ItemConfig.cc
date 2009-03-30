@@ -1364,3 +1364,17 @@ ItemConfig::getPlugins() const
 {
     return this->plugins;
 }
+
+bool
+ItemConfig::upgradeConfig(std::string const& file,
+			  std::set<std::string> const& new_chilren,
+			  std::string const& tree_name,
+			  std::list<std::string> const& externals,
+			  std::list<std::string> const& new_tree_deps)
+{
+    // 1.0 compatibility only
+
+    // XXX remember to preserve existing children and tree deps.
+
+    return true;		// XXX
+}

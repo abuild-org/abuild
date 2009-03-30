@@ -3,6 +3,7 @@
 #include <Abuild.hh>
 
 #include <assert.h>
+#include <fstream>
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
@@ -39,39 +40,19 @@ Abuild::upgradeTrees()
 	error("some build trees have not been assigned names");
     }
 
-    std::map<std::string, std::list<std::string> > forest_roots;
-    getForestRoots(ud, forests, forest_roots);
+    initializeForests(ud, forests);
 
+    ud.writeUpgradeData();
+    info("upgrade data has been written to " +
+	 UpgradeData::FILE_UPGRADE_DATA);
     if (this->error_handler.anyErrors())
     {
-	ud.writeUpgradeData(forest_roots);
-	info("upgrade data has been written to " +
-	     UpgradeData::FILE_UPGRADE_DATA);
 	info("please edit that file and rerun; for details, see"
 	     " \"Upgrading Build Trees from 1.0 to 1.1\""
 	     " in the user's manual");
     }
     exitIfErrors();
-
-    // XXX do upgrade
-
-    // XXX When writing, remember to preserve any existing tree deps
-
-    // XXX get backing data for each root in each forest; rename old
-    // backing files and write new one
-
-    // XXX Generate a report.  Alert to any cases where deprecated
-    // features were left behind.  This would mainly be for
-    // external-dirs that couldn't be translated to tree-deps.
-
-    // XXX Get forest root for each forest.  If there is no
-    // Abuild.conf in the forest root directory and if there is any
-    // tree in the forest for which the next higher Abuild.conf is
-    // above the forest root directory, then create a forest root
-    // Abuild.conf.  Its children will be updated normally with
-    // pointers to tree roots below it, except that it will have to be
-    // created instead of rewritten.
-
+    upgradeForests(ud);
     return true;
 }
 
@@ -79,12 +60,17 @@ void
 Abuild::findBuildItems(UpgradeData& ud)
 {
     CompatLevel cl(CompatLevel::cl_1_0);
+    std::map<std::string, std::string> parent_dirs;
+    std::map<std::string, std::string> dir_trees;
     std::list<std::string> dirs;
     dirs.push_back(".");
     while (! dirs.empty())
     {
 	std::string dir = dirs.front();
 	dirs.pop_front();
+	std::string parent = parent_dirs[dir];
+	std::string tree_root = dir_trees[parent];
+	dir_trees[dir] = tree_root; // may be overridden
 
 	if (ud.ignored_directories.count(Util::canonicalizePath(dir)))
 	{
@@ -99,9 +85,9 @@ Abuild::findBuildItems(UpgradeData& ud)
 		ud.upgrade_required = true;
 	    }
 	    bool is_root = config->isTreeRoot();
-	    ud.item_dirs[dir] = is_root;
 	    if (is_root)
 	    {
+		dir_trees[dir] = dir;
 		std::string treename = config->getTreeName();
 		if (! treename.empty())
 		{
@@ -123,6 +109,9 @@ Abuild::findBuildItems(UpgradeData& ud)
 		    ud.missing_treenames = true;
 		}
 	    }
+
+	    ud.items[dir] = config;
+	    ud.item_tree_roots[dir] = dir_trees[dir];
 	}
 
 	std::vector<std::string> entries = Util::getDirEntries(dir);
@@ -144,6 +133,7 @@ Abuild::findBuildItems(UpgradeData& ud)
 	    if (Util::isDirectory(fullpath))
 	    {
 		dirs.push_back(fullpath);
+		parent_dirs[fullpath] = dir;
 	    }
 	}
     }
@@ -152,12 +142,12 @@ Abuild::findBuildItems(UpgradeData& ud)
 void
 Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 {
-    for (std::map<std::string, bool>::const_iterator iter =
-	     ud.item_dirs.begin();
-	 iter != ud.item_dirs.end(); ++iter)
+    for (std::map<std::string, ItemConfig*>::const_iterator iter =
+	     ud.items.begin();
+	 iter != ud.items.end(); ++iter)
     {
 	std::string const& dir = (*iter).first;
-	bool is_root = (*iter).second;
+	bool is_root = (*iter).second->isTreeRoot();
 	if (! is_root)
 	{
 	    continue;
@@ -177,7 +167,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		 iter != backing_areas.end(); ++iter)
 	    {
 		std::string rel_backing = Util::absToRel(*iter);
-		if (ud.item_dirs.count(rel_backing))
+		if (ud.items.count(rel_backing))
 		{
 		    QTC::TC("abuild", "Abuild-upgrade ERR local backing");
 		    error(FileLocation(dir + "/" +
@@ -188,6 +178,11 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 			  " the backing area");
 		}
 	    }
+
+	    appendBackingData(dir,
+			      ud.backing_areas[dir],
+			      ud.deleted_trees[dir],
+			      ud.deleted_items[dir]);
 	}
 
 	std::list<std::string>& externals = ud.externals[dir];
@@ -202,9 +197,9 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    std::string dep_tree_name;
 	    if (econfig)
 	    {
-		std::string epath = econfig->getAbsolutePath();
+		std::string epath = Util::absToRel(econfig->getAbsolutePath());
 		dep_tree_name = econfig->getTreeName();
-		if (ud.item_dirs.count(epath) && ud.item_dirs[epath])
+		if (ud.items.count(epath) && ud.items[epath])
 		{
 		    // The external points to a known tree root inside
 		    // our area of concern.
@@ -244,6 +239,14 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 		error(location,
 		      "external " + edecl + " does not exist and cannot"
 		      " be resolved through a backing area");
+	    }
+
+	    if (dep_tree_name.empty())
+	    {
+		if (ud.tree_names.count(dir))
+		{
+		    dep_tree_name = ud.tree_names[dir];
+		}
 	    }
 
 	    if (dep_tree_name.empty())
@@ -325,10 +328,9 @@ Abuild::validateProposedForests(
 }
 
 void
-Abuild::getForestRoots(
+Abuild::initializeForests(
     UpgradeData& ud,
-    std::vector<DependencyGraph::ItemList> const& forests,
-    std::map<std::string, std::list<std::string> >& forest_roots)
+    std::vector<DependencyGraph::ItemList> const& forests)
 {
     for (std::vector<DependencyGraph::ItemList>::const_iterator iter =
 	     forests.begin();
@@ -347,7 +349,12 @@ Abuild::getForestRoots(
 	}
 	if (valid_root)
 	{
-	    forest_roots[root] = forest;
+	    ud.forest_contents[root] = forest;
+	    for (std::list<std::string>::const_iterator iter = forest.begin();
+		 iter != forest.end(); ++iter)
+	    {
+		ud.tree_forest_roots[*iter] = root;
+	    }
 	}
 	else
 	{
@@ -374,4 +381,245 @@ Abuild::getForestRoot(std::list<std::string> const& forest)
     }
     assert(Util::isDirUnder(result));
     return Util::absToRel(result);
+}
+
+void
+Abuild::upgradeForests(UpgradeData& ud)
+{
+    // Initialize backing data for each forest.
+    std::map<std::string, std::list<std::string> > backing_areas;
+    std::map<std::string, std::set<std::string> > deleted_trees;
+    std::map<std::string, std::set<std::string> > deleted_items;
+    std::set<std::string> obsolete_backing_dirs;
+    for (std::map<std::string, std::list<std::string> >::const_iterator iter =
+	     ud.forest_contents.begin();
+	 iter != ud.forest_contents.end(); ++iter)
+    {
+	std::string const& forest_root = (*iter).first;
+	appendBackingData(forest_root,
+			  backing_areas[forest_root],
+			  deleted_trees[forest_root],
+			  deleted_items[forest_root]);
+	std::list<std::string> const& tree_roots = (*iter).second;
+	for (std::list<std::string>::const_iterator iter = tree_roots.begin();
+	     iter != tree_roots.end(); ++iter)
+	{
+	    std::string const& dir = *iter;
+	    if (dir == forest_root)
+	    {
+		continue;
+	    }
+	    if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
+	    {
+		appendBackingData(dir,
+				  backing_areas[forest_root],
+				  deleted_trees[forest_root],
+				  deleted_items[forest_root]);
+		obsolete_backing_dirs.insert(dir);
+	    }
+	}
+    }
+
+    // Filter out duplicate backing areas
+    for (std::map<std::string, std::list<std::string> >::iterator iter =
+	     backing_areas.begin();
+	 iter != backing_areas.end(); ++iter)
+    {
+	std::list<std::string>& areas = (*iter).second;
+	std::set<std::string> seen;
+	std::list<std::string>::iterator i2 = areas.begin();
+	while (i2 != areas.end())
+	{
+	    std::list<std::string>::iterator next = i2;
+	    ++next;
+	    if (seen.count(*i2))
+	    {
+		areas.erase(i2, next);
+	    }
+	    else
+	    {
+		seen.insert(*i2);
+	    }
+	    i2 = next;
+	}
+    }
+
+    // Make a list of directories for which we will have to add
+    // elements to child-dirs.  If any element of this map is a
+    // directory that has no Abuild.conf file, we just create the
+    // Abuild.conf file.  This is a common case for new forest roots.
+    // For tree roots that are already the roots of their forests, no
+    // child-dirs have to be edited.
+    std::map<std::string, std::set<std::string> > children_to_add;
+    std::map<std::string, std::set<std::string> > children_to_create;
+
+    for (std::map<std::string, std::string>::iterator iter =
+	     ud.tree_forest_roots.begin();
+	 iter != ud.tree_forest_roots.end(); ++iter)
+    {
+	std::string const& tree_root = (*iter).first;
+	std::string const& forest_root = (*iter).second;
+	std::string path = tree_root;
+	while (path != forest_root)
+	{
+	    path = Util::dirname(path);
+	    if (ud.items.count(path))
+	    {
+		// If this item is part of a different forest, we have
+		// interleaved forests, which is precluded by checks
+		// in ItemConfig.
+		assert(ud.tree_forest_roots[
+			   ud.item_tree_roots[path]] == forest_root);
+		QTC::TC("abuild", "Abuild-upgrade add child");
+		children_to_add[path].insert(
+		    Util::absToRel(Util::canonicalizePath(tree_root),
+				   Util::canonicalizePath(path)));
+	    }
+	    else if (path == forest_root)
+	    {
+		QTC::TC("abuild", "Abuild-upgrade create new root Abuild.conf");
+		children_to_create[path].insert(
+		    Util::absToRel(Util::canonicalizePath(tree_root),
+				   Util::canonicalizePath(path)));
+	    }
+	    assert(path != Util::dirname(path));
+	}
+    }
+
+    // XXX This code doesn't handle pre-existing forest roots that
+    // aren't tree roots right.
+
+    std::string const suffix = "-1_1";
+    std::set<std::string> new_files;
+
+    // Create any new forest root items.
+    for (std::map<std::string, std::set<std::string> >::iterator iter =
+	     children_to_create.begin();
+	 iter != children_to_create.end(); ++iter)
+    {
+	std::string const& dir = (*iter).first;
+	std::set<std::string> const& children = (*iter).second;
+
+	std::string newfile = dir + "/" + ItemConfig::FILE_CONF;
+	new_files.insert(newfile);
+	newfile += suffix;
+	std::ofstream of(newfile.c_str(),
+			 std::ios_base::out |
+			 std::ios_base::trunc);
+	if (! of.is_open())
+	{
+	    throw QEXC::System(std::string("create ") + newfile, errno);
+	}
+
+	of << "child-dirs: \\" << std::endl;
+	for (std::set<std::string>::const_iterator iter = children.begin();
+	     iter != children.end(); ++iter)
+	{
+	    of << "    " << *iter;
+	    std::set<std::string>::const_iterator next = iter;
+	    ++next;
+	    if (next != children.end())
+	    {
+		of << " \\";
+	    }
+	    of << std::endl;
+	}
+
+	of.close();
+    }
+
+    // Rewrite all existing Abuild.conf files as needed.
+    for (std::map<std::string, ItemConfig*>::iterator iter = ud.items.begin();
+	 iter != ud.items.end(); ++iter)
+    {
+	std::string const& dir = (*iter).first;
+	ItemConfig* config = (*iter).second;
+
+	std::set<std::string> new_children;
+	if (children_to_add.count(dir))
+	{
+	    new_children = children_to_add[dir];
+	}
+
+	std::string tree_name;
+	std::list<std::string> externals;
+	std::list<std::string> tree_deps;
+
+	if (config->isTreeRoot())
+	{
+	    tree_name = ud.tree_names[dir];
+	    externals = ud.externals[dir];
+	    tree_deps = ud.tree_deps[dir];
+	}
+
+	if (! externals.empty())
+	{
+	    QTC::TC("abuild", "Abuild-upgrade partial upgrade");
+	    info("WARNING: " + dir + " contains some externals that"
+		 " could not be converted to tree-deps; it will be"
+		 " necessary to resolve these and rerun the upgrade process");
+	}
+
+	std::string newfile = dir + "/" + ItemConfig::FILE_CONF + suffix;
+	if (config->upgradeConfig(
+		newfile, new_children, tree_name, externals, tree_deps))
+	{
+	    new_files.insert(dir + "/" + ItemConfig::FILE_CONF);
+	}
+    }
+
+    // Write out new backing files
+    for (std::map<std::string, std::list<std::string> >::iterator iter =
+	     backing_areas.begin();
+	 iter != backing_areas.end(); ++iter)
+    {
+	std::string const& dir = (*iter).first;
+	std::list<std::string>& areas = (*iter).second;
+	std::set<std::string>& dt = deleted_trees[dir];
+	std::set<std::string>& di = deleted_items[dir];
+
+	assert(! areas.empty());
+
+	std::string newfile = dir + "/" + BackingConfig::FILE_BACKING;
+	new_files.insert(newfile);
+	newfile += suffix;
+	std::ofstream of(newfile.c_str(),
+			 std::ios_base::out |
+			 std::ios_base::trunc);
+	if (! of.is_open())
+	{
+	    throw QEXC::System(std::string("create ") + newfile, errno);
+	}
+
+	of << "backing-areas: \\" << std::endl;
+	for (std::list<std::string>::const_iterator iter = areas.begin();
+	     iter != areas.end(); ++iter)
+	{
+	    of << "    " << *iter;
+	    std::list<std::string>::const_iterator next = iter;
+	    ++next;
+	    if (next != areas.end())
+	    {
+		of << " \\";
+	    }
+	    of << std::endl;
+	}
+	if (! dt.empty())
+	{
+	    QTC::TC("abuild", "Abuild-upgrade write deleted-trees");
+	    of << "deleted-trees: " << Util::join(" ", dt) << std::endl;
+	}
+	if (! di.empty())
+	{
+	    QTC::TC("abuild", "Abuild-upgrade write deleted-items");
+	    of << "deleted-items: " << Util::join(" ", di) << std::endl;
+	}
+
+	of.close();
+    }
+
+    // XXX for each file in new_files, rename to old, rename new to
+    // it.  rename obsolete backing files
+
+    exitIfErrors();
 }

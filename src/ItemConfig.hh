@@ -91,6 +91,13 @@ class ItemConfig
     std::string const& getBuildFile() const;
     std::list<std::string> const& getPlugins() const;
 
+    // For 1.0 to 1.1 upgrade process
+    bool upgradeConfig(std::string const& file,
+		       std::set<std::string> const& new_chilren,
+		       std::string const& tree_name,
+		       std::list<std::string> const& externals,
+		       std::list<std::string> const& new_tree_deps);
+
   private:
     ItemConfig(ItemConfig const&);
     ItemConfig& operator=(ItemConfig const&);

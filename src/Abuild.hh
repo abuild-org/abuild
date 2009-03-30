@@ -224,10 +224,10 @@ class Abuild
 	UpgradeData&,
 	std::vector<DependencyGraph::ItemList> const& forests);
     std::string getForestRoot(std::list<std::string> const& forest);
-    void getForestRoots(
+    void initializeForests(
 	UpgradeData& ud,
-	std::vector<DependencyGraph::ItemList> const& forests,
-	std::map<std::string, std::list<std::string> >& forest_roots);
+	std::vector<DependencyGraph::ItemList> const& forests);
+    void upgradeForests(UpgradeData& ud);
 
     static std::string const ABUILD_VERSION;
     static std::string const OUTPUT_DIR_PREFIX;
