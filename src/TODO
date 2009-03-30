@@ -14,6 +14,8 @@ Test forest backing to itself both by having a new-style
 Abuild.backing that points into the tree and also by having an
 external that backs into another tree in the same forest.
 
+Make sure there are non-trivial multiple backing area tests.
+
 Still need to review code.
 
 See also "compatibility issues" below.  When all test cases pass

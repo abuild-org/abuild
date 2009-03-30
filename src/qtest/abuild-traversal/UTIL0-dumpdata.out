@@ -20,12 +20,14 @@
   <supported-trait name="UTIL0-util-int"/>
  </supported-traits>
  <forest
-  id=""
-  absolute-path=""
+  id="f-1"
+  absolute-path="--topdir--/1.0/forest0/UTIL0/util/tests/int"
  >
   <build-tree
-   id="bt-1"
+   name="tree.4.-RND-"
    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -45,16 +47,18 @@
    </supported-traits>
    <build-item
     name="rules"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
     backing-depth="0"
     target-type="all"
-    is-plugin="0"
+    is-plugin="1"
    />
   </build-tree>
   <build-tree
-   id="bt-2"
+   name="tree.2.-RND-"
    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -73,13 +77,18 @@
     <supported-trait name="PLUGINS-plugins"/>
     <supported-trait name="UTIL0-f1"/>
    </supported-traits>
-   <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="tree.4.-RND-"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="tree.4.-RND-"/>
+   </expanded-tree-dependencies>
    <build-item
     name="f1-a"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1/a"
     backing-depth="0"
     target-type="platform-independent"
@@ -94,7 +103,7 @@
    </build-item>
    <build-item
     name="f1-b"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1/b"
     backing-depth="0"
     target-type="platform-independent"
@@ -107,18 +116,12 @@
      <platform name="indep"/>
     </buildable-platforms>
    </build-item>
-   <build-item
-    name="rules"
-    home-tree="bt-1"
-    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
-    target-type="all"
-    is-plugin="1"
-   />
   </build-tree>
   <build-tree
-   id="bt-3"
+   name="tree.3.-RND-"
    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -137,13 +140,18 @@
     <supported-trait name="PLUGINS-plugins"/>
     <supported-trait name="UTIL0-f2"/>
    </supported-traits>
-   <external build-tree="bt-1"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="tree.4.-RND-"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="tree.4.-RND-"/>
+   </expanded-tree-dependencies>
    <build-item
     name="f2-a"
-    home-tree="bt-3"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2/a"
     backing-depth="0"
     target-type="platform-independent"
@@ -158,7 +166,7 @@
    </build-item>
    <build-item
     name="f2-b"
-    home-tree="bt-3"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2/b"
     backing-depth="0"
     target-type="platform-independent"
@@ -171,18 +179,12 @@
      <platform name="indep"/>
     </buildable-platforms>
    </build-item>
-   <build-item
-    name="rules"
-    home-tree="bt-1"
-    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
-    target-type="all"
-    is-plugin="1"
-   />
   </build-tree>
   <build-tree
-   id="bt-4"
+   name="tree.1.-RND-"
    absolute-path="--topdir--/1.0/forest0/UTIL0/util/tests/int"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -203,82 +205,21 @@
     <supported-trait name="UTIL0-f2"/>
     <supported-trait name="UTIL0-util-int"/>
    </supported-traits>
-   <external build-tree="bt-2"/>
-   <external build-tree="bt-3"/>
    <plugins>
     <plugin name="rules"/>
    </plugins>
-   <build-item
-    name="f1-a"
-    home-tree="bt-2"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1/a"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="f1-b"
-    home-tree="bt-2"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1/b"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="f2-a"
-    home-tree="bt-3"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2/a"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="f2-b"
-    home-tree="bt-3"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2/b"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="rules"
-    home-tree="bt-1"
-    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="0"
-    target-type="all"
-    is-plugin="1"
-   />
+   <declared-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+    <tree-dependency name="tree.3.-RND-"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="tree.4.-RND-"/>
+    <tree-dependency name="tree.2.-RND-"/>
+    <tree-dependency name="tree.3.-RND-"/>
+   </expanded-tree-dependencies>
    <build-item
     name="util-int"
-    home-tree="bt-4"
+    home-forest="f-1"
     absolute-path="--topdir--/1.0/forest0/UTIL0/util/tests/int"
     backing-depth="0"
     target-type="platform-independent"

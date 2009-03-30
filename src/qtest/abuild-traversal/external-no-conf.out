@@ -1,1 +1,2 @@
-abuild: ERROR: no Abuild.conf found in --topdir--/errors/ext-no-conf/a (external of --topdir--/errors/ext-no-conf)
+--topdir--/errors/ext-no-conf/Abuild.conf: ERROR: unable to locate or resolve external "a"
+abuild: ERROR: errors detected; exiting

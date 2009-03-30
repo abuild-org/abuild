@@ -1930,7 +1930,7 @@ Abuild::getAssignedTreeName(std::string const& dir,
 {
     assert(this->compat_level.allow_1_0());
 
-    // We check visitnig before calling recursively so we can create a
+    // We check visiting before calling recursively so we can create a
     // better error message.
     assert(! visiting.count(dir));
     visiting.insert(dir);
@@ -1981,7 +1981,7 @@ Abuild::getAssignedTreeName(std::string const& dir,
 		if (visiting.count(backing_area))
 		{
 		    QTC::TC("abuild", "Abuild ERR backing area loop");
-		    fatal("backing ares loop found for " + backing_area +
+		    fatal("backing area loop found for " + backing_area +
 			  ", a backing area of " + dir);
 		}
 		else
@@ -2059,7 +2059,7 @@ Abuild::checkTreeDependencies(BuildForest& forest)
 {
     // Make sure that there are no cycles or errors (references to
     // non-existent trees) in the dependency graph of build trees.
-    // This code is essentially identicasl to checkItemDependencies
+    // This code is essentially identical to checkItemDependencies
     // but with enough surface differences to be different code.
 
     // Create a dependency graph for all build trees in this forest.
@@ -2296,7 +2296,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		    // It should be impossible for us to see the same
 		    // build item from multiple backing areas.  The
 		    // only way this should be able to happen would be
-		    // if one backing area dependend on the other, and
+		    // if one backing area depends on the other, and
 		    // we've already detected and precluded that case
 		    // by checking "covered" above.  If this assertion
 		    // fails, there is probably a logic error either
@@ -2496,7 +2496,7 @@ Abuild::checkPlugins(BuildForest& forest)
 	    }
 
 	    // checkPlatformTypes() must have already been called.
-	    // Require all plguins to be build items of target type
+	    // Require all plugins to be build items of target type
 	    // "all".  This means that the don't build anything or
 	    // have an Abuild.interface file.
 	    if (item.getTargetType() != TargetType::tt_all)
@@ -4617,7 +4617,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 
     // The build graph is the real dependency graph that abuild
     // actually builds from.  Rather than being a simple dependency
-    // graph between items, as we constructed and verified eariler,
+    // graph between items, as we constructed and verified earlier,
     // this one is between item/platform pairs.
 
     // Each item has a a list of "buildable" platforms.  This is the
@@ -4645,7 +4645,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     // type.  The list of build platforms is initially selected from
     // the buildable platforms based on selection criteria (documented
     // elsewhere) and may be expanded to include any platforms that a
-    // reverse depenedency needs to build on.  For example, suppose A
+    // reverse dependency needs to build on.  For example, suppose A
     // depends on B, A can be built only with compiler c1, and B can
     // be built with c1 and c2.  If B would be built only with c2
     // based on the selection criteria, A's requirement of c1 would
@@ -4736,7 +4736,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	{
 	    // If we have declared a specific platform type with this
 	    // dependency, pick the best platform of that type from
-	    // the dependency's buildabhle platforms.  We have already
+	    // the dependency's buildable platforms.  We have already
 	    // verified (in checkDependencyPlatformTypes) that the
 	    // item is not of type all, that the dependency has this
 	    // platform type, and that the requested platform type is
@@ -4793,7 +4793,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// platform, create a link from the item on this
 		// platform to the dependency on the same platform.
 		// Note that if the dependency is of type "all", it
-		// implicity is buildable on all platforms.  We
+		// implicitly is buildable on all platforms.  We
 		// explicitly add the platform to the dependency's
 		// build platform list.  This is how opportunistic
 		// platform selection happens.
@@ -5044,7 +5044,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     // item here.  If we were actually to attempt to build this item,
     // we might build an item in a backing area with references to an
     // item in our local tree, which would be very bad.  If we were to
-    // just skip this item, then certain things the user execpted to
+    // just skip this item, then certain things the user expected to
     // get built would silently be ignored.
     assert(! build_item.hasShadowedReferences());
 
