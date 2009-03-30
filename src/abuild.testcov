@@ -268,7 +268,6 @@ UpgradeData orphan names 0
 BackingConfig ERR invalid backing file 0
 Abuild-upgrade ERR local backing 0
 Abuild backing without conf 0
-Abuild-upgrade skipping root with no conf 0
 Abuild-upgrade ERR external not root 0
 UpgradeData ERR tree not directory 0
 Abuild-upgrade ERR unknown external 0
@@ -316,3 +315,5 @@ Abuild ERR backs implicitly to self 0
 Abuild skipping covered backing area 0
 Abuild backing depth > 1 0
 Abuild ERR item multiple backing areas 0
+Abuild-upgrade ERR backed external 0
+Abuild-upgrade ERR invalid forest root 0

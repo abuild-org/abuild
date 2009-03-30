@@ -6,7 +6,6 @@
 // members.
 
 #include <string>
-#include <vector>
 #include <list>
 #include <set>
 #include <map>
@@ -21,7 +20,7 @@ class UpgradeData
 
     UpgradeData(Error& error);
     void writeUpgradeData(
-	std::vector<std::list<std::string> > const& forests) const;
+	std::map<std::string, std::list<std::string> > const& forests) const;
 
     // Data stored in configuration file.  All paths in the input file
     // are relative.  Internally, ignored_directories and

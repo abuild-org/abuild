@@ -3485,8 +3485,8 @@ Abuild::readBacking(std::string const& dir)
     if (backing_areas.empty())
     {
         QTC::TC("abuild", "Abuild ERR invalid backing file");
-        fatal(dir + "/" + BackingConfig::FILE_BACKING +
-	      ": unable to get backing area data");
+        error(FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
+	      "unable to get backing area data");
     }
     return backing;
 }

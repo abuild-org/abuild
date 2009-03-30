@@ -39,9 +39,12 @@ Abuild::upgradeTrees()
 	error("some build trees have not been assigned names");
     }
 
+    std::map<std::string, std::list<std::string> > forest_roots;
+    getForestRoots(ud, forests, forest_roots);
+
     if (this->error_handler.anyErrors())
     {
-	ud.writeUpgradeData(forests);
+	ud.writeUpgradeData(forest_roots);
 	info("upgrade data has been written to " +
 	     UpgradeData::FILE_UPGRADE_DATA);
 	info("please edit that file and rerun; for details, see"
@@ -53,6 +56,9 @@ Abuild::upgradeTrees()
     // XXX do upgrade
 
     // XXX When writing, remember to preserve any existing tree deps
+
+    // XXX get backing data for each root in each forest; rename old
+    // backing files and write new one
 
     // XXX Generate a report.  Alert to any cases where deprecated
     // features were left behind.  This would mainly be for
@@ -99,7 +105,8 @@ Abuild::findBuildItems(UpgradeData& ud)
 		std::string treename = config->getTreeName();
 		if (! treename.empty())
 		{
-		    if (ud.tree_names.count(dir))
+		    if (ud.tree_names.count(dir) &&
+			(treename != ud.tree_names[dir]))
 		    {
 			QTC::TC("abuild", "Abuild-upgrade ERR name mismatch");
 			error("the name assigned to the tree at \"" +
@@ -156,18 +163,13 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    continue;
 	}
 	g.addItem(dir);
-	if (! Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
-	{
-	    // This is a tree root with Abuild.backing but no
-	    // Abuild.conf.
-	    QTC::TC("abuild", "Abuild-upgrade skipping root with no conf");
-	    continue;
-	}
 	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
 	ItemConfig* config = readConfig(dir, "");
 
+	bool has_backing = false;
 	if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
 	{
+	    has_backing = true;
 	    std::list<std::string> const& backing_areas =
 		readBacking(dir)->getBackingAreas();
 	    for (std::list<std::string>::const_iterator iter =
@@ -197,36 +199,44 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	{
 	    std::string const& edecl = *eiter;
 	    ItemConfig* econfig = readExternalConfig(dir, edecl);
-	    std::string epath;
+	    std::string dep_tree_name;
 	    if (econfig)
 	    {
-		epath = econfig->getAbsolutePath();
-	    }
-	    std::string dep_tree_name;
-
-	    if (econfig && ud.item_dirs.count(epath) && ud.item_dirs[epath])
-	    {
-		// The external points to a known tree root inside our
-		// area of concern.
-
-		g.addDependency(dir, epath);
+		std::string epath = econfig->getAbsolutePath();
 		dep_tree_name = econfig->getTreeName();
-	    }
-	    else if (econfig && econfig->isTreeRoot())
-	    {
-		// The external is valid but falls outside of our area
-		// of interest.  It could be somewhere not below the
-		// current directory, in a pruned area, or resolved
-		// through a backing area.
-		dep_tree_name = econfig->getTreeName();
-	    }
-	    else if (econfig)
-	    {
-		QTC::TC("abuild", "Abuild-upgrade ERR external not root");
-		error(location,
-		      "external " + edecl + " (" + epath +
-		      " relative to current directory) is not"
-		      " a build tree root");
+		if (ud.item_dirs.count(epath) && ud.item_dirs[epath])
+		{
+		    // The external points to a known tree root inside
+		    // our area of concern.
+		    g.addDependency(dir, epath);
+		}
+		else if (econfig->isTreeRoot())
+		{
+		    // The external is valid but falls outside of our
+		    // area of interest.  It could be somewhere not
+		    // below the current directory, in a pruned area,
+		    // or resolved through a backing area.
+		    dep_tree_name = econfig->getTreeName();
+		    if (dep_tree_name.empty() &&
+			(! Util::isFile(dir + "/" + edecl + "/" +
+					ItemConfig::FILE_CONF)))
+		    {
+			QTC::TC("abuild", "Abuild-upgrade ERR backed external");
+			error(location, "this build item resolves external \"" +
+			      edecl + "\" using a backing area, and the"
+			      " backed external has not been upgraded; you"
+			      " must upgrade the backing area first in this"
+			      " case");
+		    }
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild-upgrade ERR external not root");
+		    error(location,
+			  "external " + edecl + " (" + epath +
+			  " relative to current directory) is not"
+			  " a build tree root");
+		}
 	    }
 	    else
 	    {
@@ -310,6 +320,41 @@ Abuild::validateProposedForests(
 			  tree + "\", is not a valid tree name");
 		}
 	    }
+	}
+    }
+}
+
+void
+Abuild::getForestRoots(
+    UpgradeData& ud,
+    std::vector<DependencyGraph::ItemList> const& forests,
+    std::map<std::string, std::list<std::string> >& forest_roots)
+{
+    for (std::vector<DependencyGraph::ItemList>::const_iterator iter =
+	     forests.begin();
+	 iter != forests.end(); ++iter)
+    {
+	DependencyGraph::ItemList const& forest = *iter;
+	std::string root = getForestRoot(forest);
+	bool valid_root = true;
+	if (Util::isFile(root + "/" + ItemConfig::FILE_CONF))
+	{
+	    ItemConfig* config = readConfig(root, "");
+	    if (! config->isForestRoot())
+	    {
+		valid_root = false;
+	    }
+	}
+	if (valid_root)
+	{
+	    forest_roots[root] = forest;
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild-upgrade ERR invalid forest root");
+	    error("wanted to use " + root + " as the root of a forest, but"
+		  " it already contains an " + ItemConfig::FILE_CONF +
+		  " and is not already a forest root");
 	}
     }
 }

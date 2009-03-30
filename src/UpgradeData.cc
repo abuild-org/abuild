@@ -135,7 +135,7 @@ UpgradeData::readUpgradeData()
 
 void
 UpgradeData::writeUpgradeData(
-    std::vector<std::list<std::string> > const& forests) const
+    std::map<std::string, std::list<std::string> > const& forests) const
 {
     std::string newfile = FILE_UPGRADE_DATA + ".new";
     std::ofstream of(newfile.c_str(),
@@ -157,13 +157,15 @@ UpgradeData::writeUpgradeData(
     }
 
     std::map<std::string, std::string> names = this->tree_names;
-    for (std::vector<std::list<std::string> >::const_iterator i1 =
+    for (std::map<std::string, std::list<std::string> >::const_iterator i1 =
 	     forests.begin();
 	 i1 != forests.end(); ++i1)
     {
 	of << std::endl;
 	of << "[forest]" << std::endl;
-	std::list<std::string> const& trees = *i1;
+	std::string const& root = (*i1).first;
+	of << "# root: " << root << std::endl;
+	std::list<std::string> const& trees = (*i1).second;
 	for (std::list<std::string>::const_iterator i2 = trees.begin();
 	     i2 != trees.end(); ++i2)
 	{
