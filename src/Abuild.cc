@@ -3348,15 +3348,24 @@ Abuild::reportIntegrityErrors(BuildForest_map& forests,
 		  "some plugins declared by this forest are shadowed");
 	    error(local_forest_location,
 		  "this is the forest that contains the shadowing plugins");
+	    std::set<FileLocation> reported;
 	    for (std::vector<std::string>::const_iterator p_iter =
 		     plugins.begin();
 		 p_iter != plugins.end(); ++p_iter)
 	    {
 		std::string const& plugin_name = *p_iter;
 		BuildItem& plugin = *(local_items[plugin_name]);
-		error(plugin.getLocation(),
-		      "here is the shadowing copy of plugin \"" +
-		      plugin_name + "\"");
+		if (! reported.count(plugin.getLocation()))
+		{
+		    // avoid reporting the same error more than once,
+		    // which can happen for plugins that shadow
+		    // something defined more than one backing area
+		    // away.
+		    reported.insert(plugin.getLocation());
+		    error(plugin.getLocation(),
+			  "here is the shadowing copy of plugin \"" +
+			  plugin_name + "\"");
+		}
 	    }
 	}
     }

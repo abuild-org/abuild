@@ -195,7 +195,10 @@ $td->runtest("missing backing config",
 
 cd("work/bad/6/main/product");
 
-$td->runtest("complex dependency errors",
+# XXX the conflict in external is no longer an error condition, but we
+# need to test the same basic condition with two conflicting backing
+# area.
+$td->runtest("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX complex dependency errors",
 	     {$td->COMMAND => "abuild --full-integrity",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/complex-dep-errors.out",
