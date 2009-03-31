@@ -149,6 +149,14 @@
     is-plugin="0"
    />
    <build-item
+    name="abda"
+    home-forest="f-1"
+    absolute-path="--topdir--/a/ab/abd/abda"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+   <build-item
     name="aha"
     home-forest="f-1"
     absolute-path="--topdir--/a/ah/aha"
