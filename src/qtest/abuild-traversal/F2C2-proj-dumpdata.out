@@ -30,7 +30,7 @@
  </supported-traits>
  <forest
   id="f-1"
-  absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
+  absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2"
  >
   <build-tree
    name="tree.8.-RND-"

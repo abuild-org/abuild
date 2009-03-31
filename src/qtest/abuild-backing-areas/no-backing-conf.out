@@ -1,1 +1,3 @@
-abuild: ERROR: no Abuild.conf found in --topdir--/bad/5/backing (backing area of --topdir--/bad/5/main)
+--topdir--/bad/5/main/Abuild.backing: ERROR: backing area "../backing" does not contain an Abuild.conf file
+--topdir--/bad/5/main/Abuild.backing: ERROR: unable to get backing area data
+abuild: ERROR: errors detected; exiting

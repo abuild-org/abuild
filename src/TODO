@@ -145,10 +145,12 @@ Groovy Framework
    abuild.runActions works.
 
 
-Compatibility Issues
+Compiler Verification
 ====================
 
- * Update compiler verification to work with compat level 1.1.
+ * Update compiler verification to work with compat level 1.1.  Test
+   compiler verification for verification of a compiler that requires
+   a plugin in another tree.
 
 
 

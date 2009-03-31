@@ -16,9 +16,12 @@ my $top = get_top();
 my $filters = get_filters();
 my $native_out = get_native_out();
 
+$ENV{'ABUILD_COMPAT_LEVEL'} = '1.1';
+
 # These tests exercise backing areas, traits as they inherit through
-# externals and backing areas (which they do only for trees that are
-# 100% resolved from backing areas), and plugins.
+# backed trees, and plugins.  We only test at compatibility level 1.1
+# here.  The traversal test tests backing areas at 1.0 and 1.1 level
+# compatibility.
 
 # Dependencies:
 #   product-bin -> product-lib common-lib2 common-lib3
@@ -64,7 +67,7 @@ validate_dump_data($td);
 $td->runtest("dump data",
 	     {$td->COMMAND => "abuild --dump-data",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/dumpdata-backed-external.out",
+	     {$td->FILE => "$top/dumpdata-backed-tree.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -97,23 +100,6 @@ $td->runtest("list traits",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/read-only/product");
-
-validate_dump_data($td);
-
-$td->runtest("dump data",
-	     {$td->COMMAND => "abuild --dump-data",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/dumpdata.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-$td->runtest("read-only build items 1",
-	     {$td->COMMAND => "abuild --build=all no-op",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/read-only.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
 cd("work/multi/product");
 
 validate_dump_data($td);
@@ -139,12 +125,26 @@ $td->runtest("multiple external paths",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/bad/1/common");
+cd("work/bad/1");
 
 $td->runtest("backing cycle",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild -C cycle/a",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/backing-cycle.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("backs explicitly to self",
+	     {$td->COMMAND => "abuild -C common",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backs-explicitly-to-self.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("backs implicitly to self",
+	     {$td->COMMAND => "abuild -C subdir",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backs-implicitly-to-self.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -195,10 +195,7 @@ $td->runtest("missing backing config",
 
 cd("work/bad/6/main/product");
 
-# XXX the conflict in external is no longer an error condition, but we
-# need to test the same basic condition with two conflicting backing
-# area.
-$td->runtest("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX complex dependency errors",
+$td->runtest("complex dependency errors",
 	     {$td->COMMAND => "abuild --full-integrity",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/complex-dep-errors.out",
@@ -242,4 +239,4 @@ $td->runtest("bad deletions and plugins",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(28);
+$td->report(27);

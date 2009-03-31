@@ -1,3 +1,4 @@
---topdir--/bad/2/common/Abuild.backing:1: ERROR: syntax error
---topdir--/bad/2/common/Abuild.backing:2: ERROR: syntax error
-abuild: ERROR: --topdir--/bad/2/common/Abuild.backing: unable to get backing area data
+--topdir--/bad/2/common/Abuild.backing:1: ERROR: invalid key something (ignored)
+--topdir--/bad/2/common/Abuild.backing: ERROR: no values for the following keys: backing-areas
+--topdir--/bad/2/common/Abuild.backing: ERROR: unable to get backing area data
+abuild: ERROR: errors detected; exiting

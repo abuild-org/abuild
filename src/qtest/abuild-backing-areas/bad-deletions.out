@@ -1,5 +1,4 @@
---topdir--/bad/8/product/Abuild.conf: ERROR: unable to delete item "common-lib1" because it is not in our direct backing chain
---topdir--/bad/8/product/Abuild.conf: ERROR: unable to delete non-existent build item "does-not-exist"
+--topdir--/bad/8/product/Abuild.backing: ERROR: item "does-not-exist" was marked for deletion but was not seen in a backing area
 --topdir--/bad/8/product/Abuild.conf: ERROR: item "product-lib" is declared as a plugin, but it has dependencies
 --topdir--/bad/8/product/Abuild.conf: ERROR: item "product-lib" is declared as a plugin, but it specifies other items to build
 --topdir--/bad/8/product/Abuild.conf: ERROR: item "product-lib" is declared as a plugin, but it has a build or non-plugin interface file
@@ -7,4 +6,5 @@
 --topdir--/bad/8/product/Abuild.conf: ERROR: plugin "does-not-exist" does not exist
 --topdir--/bad/8/product/new/Abuild.conf: ERROR: this item depends on "product-lib", which is declared as a plugin
 --topdir--/bad/8/product/Abuild.conf: ERROR: the dependency is declared as a plugin here
+--topdir--/shared/product/lib/Abuild.conf: ERROR: product-lib depends on unknown build item common-lib1
 abuild: ERROR: errors detected; exiting

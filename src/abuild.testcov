@@ -306,7 +306,6 @@ Abuild override build tree 0
 Abuild inherit tree name from backing 0
 Abuild trying backing of backing 0
 Abuild replace item from deleted tree 0
-Abuild nested backing areas 0
 Abuild forest merge required 0
 Abuild ERR backing area loop 0
 Abuild ERR external_graph failure 0
@@ -333,7 +332,6 @@ Abuild-upgrade ignore useless empty tree 0
 ItemConfig delete externals 0
 Abuild-upgrade get name from backing 0
 Abuild basic deprecation warning 0
-Abuild keeping redundant backing area 0
 Abuild ERR bad tree-based build set 0
 Abuild buildset deptrees 0
 Abuild clear local tree 0

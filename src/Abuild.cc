@@ -1295,7 +1295,10 @@ Abuild::reportExternalGraphErrors(DependencyGraph& g)
     // We only add the dependency to known roots, so unknowns could
     // happen only as a result of a programming error.  Error messages
     // above are to help with debugging.
-    assert(unknowns.empty());
+    if (! unknowns.empty())
+    {
+	fatal("INTERNAL ERROR: unknowns found in external graph");
+    }
 
     for (std::vector<DependencyGraph::ItemList>::iterator i1 =
 	     cycles.begin();
@@ -1505,23 +1508,6 @@ Abuild::traverseForests(BuildForest_map& forests,
 		verbose("this is a duplicate backing area; ignoring");
 		QTC::TC("abuild", "Abuild duplicate backing area");
 	    }
-	    else if (this->items_traversed.count(btop))
-	    {
-		// If a -ext-> b, a -backs-> a', and b -backs-> b',
-		// then both a' and b' will seem like backing areas of
-		// a.  When we traverse a', we will also end up
-		// traversing the items of b'.  This makes b' part of
-		// a''s forest, and we don't want to traverse it
-		// again.
-		if (forests.count(btop))
-		{
-		    QTC::TC("abuild", "Abuild keeping redundant backing area");
-		    keep = true;
-		}
-		verbose("we've already traversed this;"
-			" it's probably an external of another backing area");
-		QTC::TC("abuild", "Abuild nested backing areas");
-	    }
 	    else
 	    {
 		seen.insert(btop);
@@ -1601,8 +1587,8 @@ Abuild::mergeForests(BuildForest_map& forests,
 	    continue;
 	}
 	QTC::TC("abuild", "Abuild forest merge required");
-	std::string first = merge.front();
-	merge.pop_front();
+	std::string first = merge.back();
+	merge.pop_back();
 	forest_merges[first] = merge;
 	for (DependencyGraph::ItemList::iterator iter = merge.begin();
 	     iter != merge.end(); ++iter)
@@ -1672,6 +1658,7 @@ Abuild::mergeForests(BuildForest_map& forests,
     for (BuildForest_map::iterator iter = forests.begin();
 	 iter != forests.end(); ++iter)
     {
+	std::string const& root = (*iter).first;
 	BuildForest& forest = *((*iter).second);
 	std::list<std::string>& backing_areas = forest.getBackingAreas();
 
@@ -1686,6 +1673,9 @@ Abuild::mergeForests(BuildForest_map& forests,
 	    std::string ba = *iter;
 	    if (forest_renames.count(ba))
 	    {
+		verbose("in forest \"" + root +
+			"\", replacing backing area \"" +
+			ba + "\" with \"" + forest_renames[ba] + "\"");
 		ba = forest_renames[ba];
 	    }
 	    if (ba_set.count(ba))
@@ -1697,7 +1687,11 @@ Abuild::mergeForests(BuildForest_map& forests,
 		ba_set.insert(ba);
 		keep = true;
 	    }
-	    if (! keep)
+	    if (keep)
+	    {
+		*iter = ba;
+	    }
+	    else
 	    {
 		backing_areas.erase(iter, next);
 	    }
