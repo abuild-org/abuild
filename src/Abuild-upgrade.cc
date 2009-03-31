@@ -89,10 +89,15 @@ Abuild::findBuildItems(UpgradeData& ud)
 	    {
 		dir_trees[dir] = dir;
 		std::string treename = config->getTreeName();
-		// XXX should try to get name from backing area...see
-		// also econfig code with externals to see if we can
-		// combine....refactor getAssignedTreeName, which
-		// probably has the right logic already.
+		if (treename.empty() && (! ud.tree_names.count(dir)))
+		{
+		    treename = getAssignedTreeName(dir, true);
+		    if (! treename.empty())
+		    {
+			QTC::TC("abuild", "Abuild-upgrade get name from backing");
+			ud.tree_names[dir] = treename;
+		    }
+		}
 		if (! treename.empty())
 		{
 		    if (ud.tree_names.count(dir) &&

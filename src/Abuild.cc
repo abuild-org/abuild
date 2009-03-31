@@ -1968,7 +1968,8 @@ Abuild::addTreeToForest(BuildForest& forest, std::string const& tree_name,
 }
 
 std::string
-Abuild::getAssignedTreeName(std::string const& dir)
+Abuild::getAssignedTreeName(std::string const& dir,
+			    bool use_backing_name_only)
 {
     assert(this->compat_level.allow_1_0());
 
@@ -1984,12 +1985,13 @@ Abuild::getAssignedTreeName(std::string const& dir)
     // file.  This means we end up traversing the backing chain at
     // this point.
     std::set<std::string> visiting;
-    return getAssignedTreeName(dir, visiting);
+    return getAssignedTreeName(dir, visiting, use_backing_name_only);
 }
 
 std::string
 Abuild::getAssignedTreeName(std::string const& dir,
-			    std::set<std::string>& visiting)
+			    std::set<std::string>& visiting,
+			    bool use_backing_name_only)
 {
     assert(this->compat_level.allow_1_0());
 
@@ -2050,13 +2052,14 @@ Abuild::getAssignedTreeName(std::string const& dir,
 		else
 		{
 		    QTC::TC("abuild", "Abuild trying backing of backing");
-		    tree_name = getAssignedTreeName(backing_area, visiting);
+		    tree_name = getAssignedTreeName(
+			backing_area, visiting, use_backing_name_only);
 		}
 	    }
 	}
     }
 
-    if (tree_name.empty())
+    if (tree_name.empty() && (! use_backing_name_only))
     {
 	// If we got here, this tree doesn't have a backing area, so
 	// we'll have to generate a tree name.  The random number is

@@ -86,9 +86,11 @@ class Abuild
 				  std::list<std::string>& dirs_with_externals);
     void addTreeToForest(BuildForest& forest, std::string const& tree_name,
 			 BuildTree_ptr tree);
-    std::string getAssignedTreeName(std::string const& dir);
     std::string getAssignedTreeName(std::string const& dir,
-				    std::set<std::string>& visiting);
+				    bool use_backing_name_only = false);
+    std::string getAssignedTreeName(std::string const& dir,
+				    std::set<std::string>& visiting,
+				    bool use_backing_name_only);
     void validateForest(BuildForest_map& forests,
 			std::string const& top_path);
     void resolveFromBackingAreas(BuildForest_map& forests,
