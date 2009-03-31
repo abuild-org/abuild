@@ -1,4 +1,2 @@
-backing-areas: \
-    /home/jberkenb/source/abuild/abuild/doc/example/general/reference \
-    /home/jberkenb/source/abuild/abuild/doc/example/general/task
+backing-areas: ../task
 deleted-items: project-lib.extra

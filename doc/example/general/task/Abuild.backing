@@ -1,2 +1,1 @@
-backing-areas: \
-    /home/jberkenb/source/abuild/abuild/doc/example/general/reference
+backing-areas: ../reference
