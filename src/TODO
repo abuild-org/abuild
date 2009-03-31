@@ -1,14 +1,4 @@
 
-Remaining failing test suites:
-
-abuild-backing-areas
-abuild-errors
-abuild-examples
-
-Work on backing-areas first.  It has some failures that are real
-failures and not just change to error messages and dump data.  This
-may be true of traversal as well.
-
 Test forest backing to itself both by having a new-style
 Abuild.backing that points into the tree and also by having an
 external that backs into another tree in the same forest.
@@ -17,17 +7,12 @@ Make sure there are non-trivial multiple backing area tests.
 
 Still need to review code.
 
-See also "compatibility issues" below.  When all test cases pass
-except for dumpdata and list-platforms for things that are going to be
-upgraded, finish upgrade tool and upgrade test trees that aren't
-connected with traversal.  Be careful about the errors and
-backing-areas test suites.  Ideally, only abuild-traversal and
-possibly parts of abuild-errors should be left at 1.0.
-
 Then review TODO to figure out what from the revamped build trees,
 compatibility, and conversion tool should be moved into the
 documentation and what parts can just live as comments in the code.
 
+XXX Java out of memory problem with ant is reportedly fixed with
+1.5.0_12.
 
 === Changes Targeted for Version 1.1 ===
 

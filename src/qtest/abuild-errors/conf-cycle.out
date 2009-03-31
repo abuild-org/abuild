@@ -1,2 +1,3 @@
 --topdir--/a/aa/aae/Abuild.conf: ERROR: "parent-dir" must point up in the file system
-abuild: ERROR: unable to find top of local build forest; run with --verbose for details
+abuild: ERROR: unable to find top of build forest containing "--topdir--/a/aa/aae" (local forest); run with --verbose for details
+abuild: ERROR: unable to find root of local forest

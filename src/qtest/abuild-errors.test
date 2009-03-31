@@ -63,18 +63,9 @@ $td->runtest("parent/child problems",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/a/aa/aad/aada");
+cd("work/a/aa/aae");
 
-$td->runtest("childless parent",
-	     {$td->COMMAND => "abuild --build=all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/childless-parent.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/a/aa/aae/aaea");
-
-$td->runtest("Abuild.conf cycle",
+$td->runtest("parent points down",
 	     {$td->COMMAND => "abuild --build=all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/conf-cycle.out",
@@ -105,15 +96,6 @@ $td->runtest("bad build tree root config",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/bad-root-config.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/a/aa/aah/aaha");
-
-$td->runtest("bad parent config",
-	     {$td->COMMAND => "abuild",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/bad-parent-config.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -258,4 +240,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(26 + (in_windows() ? 0 : 1));
+$td->report(24 + (in_windows() ? 0 : 1));

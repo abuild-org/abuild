@@ -15,12 +15,14 @@ abuild-monitor: begin-dump-data
   </platform-type>
  </platform-data>
  <forest
-  id=""
-  absolute-path=""
+  id="f-1"
+  absolute-path="--topdir--/h"
  >
   <build-tree
-   id="bt-1"
+   name="tree.1.-RND-"
    absolute-path="--topdir--/h"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -37,7 +39,7 @@ abuild-monitor: begin-dump-data
    </platform-data>
    <build-item
     name="af-dep"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/h/dep"
     backing-depth="0"
     target-type="platform-independent"
@@ -52,7 +54,7 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="af"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/h"
     backing-depth="0"
     target-type="platform-independent"
@@ -73,7 +75,7 @@ abuild-monitor: begin-dump-data
    </build-item>
    <build-item
     name="af-rdep"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/h/rdep"
     backing-depth="0"
     target-type="platform-independent"
@@ -97,6 +99,20 @@ abuild-monitor: begin-dump-data
  </forest>
 </abuild-data>
 abuild-monitor: end-dump-data
+
+******************** abuild ********************
+WARNING: Build items/trees with deprecated 1.0 features were found.
+Consider upgrading your build trees, which you can do automatically by
+running
+
+  abuild --upgrade-trees
+
+from the appropriate location.
+
+For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
+the user's manual
+******************** abuild ********************
+
 abuild-monitor: state-change af-dep indep ready
 abuild-monitor: state-change af-rdep indep waiting
 abuild-monitor: state-change af indep waiting

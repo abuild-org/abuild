@@ -63,7 +63,8 @@ class Abuild
     std::string findTop(std::string const& start_dir,
 			std::string const& description);
     void traverse(BuildForest_map&, std::string const& forest_top);
-    void reportExternalGraphErrors(DependencyGraph& g);
+    void reportDirectoryGraphErrors(DependencyGraph& g,
+				    std::string const& description);
     void computeBackingGraph(BuildForest_map& forests,
 			     DependencyGraph& g);
     void traverseForests(BuildForest_map&, DependencyGraph& external_graph,

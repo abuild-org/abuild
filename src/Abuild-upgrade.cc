@@ -291,7 +291,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
     if (! g.check())
     {
 	QTC::TC("abuild", "Abuild-upgrade ERR tree-dep graph error");
-	reportExternalGraphErrors(g);
+	reportDirectoryGraphErrors(g, "external-dir");
 	exitIfErrors();
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<abuild-data version="1" errors="1">
+<abuild-data version="2" errors="1">
  <platform-data>
   <platform-type name="indep" target-type="platform-independent">
    <platform name="indep" selected="1"/>
@@ -18,12 +18,14 @@
   <supported-trait name="trait2"/>
  </supported-traits>
  <forest
-  id=""
-  absolute-path=""
+  id="f-1"
+  absolute-path="--topdir--"
  >
   <build-tree
-   id="bt-1"
+   name="main"
    absolute-path="--topdir--"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -44,7 +46,7 @@
    </supported-traits>
    <build-item
     name="a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a"
     backing-depth="0"
     target-type="all"
@@ -52,7 +54,7 @@
    />
    <build-item
     name="bb"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b/bb"
     backing-depth="0"
     target-type="all"
@@ -60,7 +62,7 @@
    />
    <build-item
     name="ca"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/ca"
     backing-depth="0"
     target-type="all"
@@ -72,7 +74,7 @@
    </build-item>
    <build-item
     name="cb"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/cb"
     backing-depth="0"
     target-type="all"
@@ -87,7 +89,7 @@
    </build-item>
    <build-item
     name="aa"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/aa"
     backing-depth="0"
     target-type="all"
@@ -105,7 +107,7 @@
    </build-item>
    <build-item
     name="ab"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ab"
     backing-depth="0"
     target-type="all"
@@ -132,7 +134,7 @@
    </build-item>
    <build-item
     name="aba"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ab/aba"
     backing-depth="0"
     target-type="all"
@@ -140,7 +142,7 @@
    />
    <build-item
     name="abb"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ab/abb"
     backing-depth="0"
     target-type="all"
@@ -148,7 +150,7 @@
    />
    <build-item
     name="aha"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/a/ah/aha"
     backing-depth="0"
     target-type="all"
@@ -156,7 +158,7 @@
    />
    <build-item
     name="b"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b"
     backing-depth="0"
     target-type="all"
@@ -164,7 +166,7 @@
    />
    <build-item
     name="ba"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/b/ba"
     backing-depth="0"
     target-type="all"
@@ -172,7 +174,7 @@
    />
    <build-item
     name="c d"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/cd"
     backing-depth="0"
     target-type="all"
@@ -184,7 +186,7 @@
    </build-item>
    <build-item
     name="cc.private"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/c/cc"
     backing-depth="0"
     target-type="all"
@@ -204,7 +206,7 @@
    </build-item>
    <build-item
     name="d"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d"
     backing-depth="0"
     target-type="all"
@@ -212,7 +214,7 @@
    />
    <build-item
     name="d.a.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/a/a"
     backing-depth="0"
     target-type="all"
@@ -224,7 +226,7 @@
    </build-item>
    <build-item
     name="d.b.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b/a"
     backing-depth="0"
     visible-to="d.b.*"
@@ -233,7 +235,7 @@
    />
    <build-item
     name="d.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/a"
     backing-depth="0"
     target-type="all"
@@ -262,7 +264,7 @@
    </build-item>
    <build-item
     name="d.b.a.a"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b/a/a"
     backing-depth="0"
     visible-to="d.b.*"
@@ -271,7 +273,7 @@
    />
    <build-item
     name="d.b"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b"
     backing-depth="0"
     visible-to="d.b.q.r.*"
@@ -289,7 +291,7 @@
    </build-item>
    <build-item
     name="d.b.b"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/d/b/b"
     backing-depth="0"
     visible-to="q.*"
@@ -298,7 +300,7 @@
    />
    <build-item
     name="root"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--"
     backing-depth="0"
     target-type="all"

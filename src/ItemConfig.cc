@@ -346,7 +346,9 @@ ItemConfig::checkRoot()
 {
     if (! this->is_forest_root)
     {
-	if (Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING))
+	bool has_backing_file =
+	    Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING);
+	if (has_backing_file)
 	{
 	    QTC::TC("abuild", "ItemConfig ERR Abuild.backing non-forest root");
 	    this->error.error(
@@ -354,11 +356,22 @@ ItemConfig::checkRoot()
 		BackingConfig::FILE_BACKING +
 		" file ignored for non forest-root build item");
 	}
-	if (this->compat_level.allow_1_0() && (! this->tree_name.empty()) &&
-	    checkKeyPresent(k_DELETED, "is ignored except in deprecated"
-			    " 1.0 build tree roots with no tree name"))
+	if (this->compat_level.allow_1_0())
 	{
-	    QTC::TC("abuild", "ItemConfig ERR deleted on non-1.0-root");
+	    if (this->is_root && this->tree_name.empty() && has_backing_file)
+	    {
+		QTC::TC("abuild", "ItemConfig allowing deprecated deleted");
+	    }
+	    else
+	    {
+		if (checkKeyPresent(k_DELETED,
+				    "is ignored except in deprecated"
+				    " 1.0 build tree roots with backing"
+				    " areas"))
+		{
+		    QTC::TC("abuild", "ItemConfig ERR deleted on non-1.0-root");
+		}
+	    }
 	}
     }
 
@@ -500,7 +513,8 @@ ItemConfig::checkChildren()
 	std::list<std::string>::iterator next = iter;
 	++next;
 	Util::stripTrailingSlash(*iter);
-	std::list<std::string> elements = Util::split('/', *iter);
+	std::string const& child = *iter;
+	std::list<std::string> elements = Util::split('/', child);
 	bool error_found = false;
 	for (std::list<std::string>::iterator eiter = elements.begin();
 	     eiter != elements.end(); ++eiter)
@@ -521,11 +535,11 @@ ItemConfig::checkChildren()
 	else
 	{
 	    bool has_symlinks = false;
-	    if (hasSymlinks(*iter))
+	    if (hasSymlinks(child))
 	    {
 		// Coverage check is below
 		this->error.error(this->location,
-				  "child directory \"" + *iter + "\" is a"
+				  "child directory \"" + child + "\" is a"
 				  " symbolic link or crosses a symbolic link");
 		has_symlinks = true;
 	    }
@@ -549,8 +563,8 @@ ItemConfig::checkChildren()
 		    this->error.error(
 			this->location,
 			"relative to this item, directory \"" + path + "\","
-			" which is between this item and one of its children,"
-			" contains " +
+			" which is between this item and child \"" + child +
+			"\" contains " +
 			FILE_CONF + "; interleaved " + FILE_CONF + " files are"
 			" not permitted");
 		}

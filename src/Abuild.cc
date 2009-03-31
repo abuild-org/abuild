@@ -1252,7 +1252,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 		  " proper relationships among externals; some errors"
 		  " about unknown tree dependencies may be spurious and"
 		  " may disappear after you fix tree dependency cycles");
-	    reportExternalGraphErrors(external_graph);
+	    reportDirectoryGraphErrors(external_graph, "external-dir");
 	}
 	else
 	{
@@ -1273,7 +1273,8 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 }
 
 void
-Abuild::reportExternalGraphErrors(DependencyGraph& g)
+Abuild::reportDirectoryGraphErrors(DependencyGraph& g,
+				   std::string const& description)
 {
     DependencyGraph::ItemMap unknowns;
     std::vector<DependencyGraph::ItemList> cycles;
@@ -1287,17 +1288,9 @@ Abuild::reportExternalGraphErrors(DependencyGraph& g)
 	for (std::list<std::string>::const_iterator i2 = deps.begin();
 	     i2 != deps.end(); ++i2)
 	{
-	    error("directory \"" + dir + "\" references unknown directory \"" +
-		  *i2 + "\"");
+	    error("directory \"" + dir + "\" references unknown " +
+		  description + " \"" + *i2 + "\"");
 	}
-    }
-
-    // We only add the dependency to known roots, so unknowns could
-    // happen only as a result of a programming error.  Error messages
-    // above are to help with debugging.
-    if (! unknowns.empty())
-    {
-	fatal("INTERNAL ERROR: unknowns found in external graph");
     }
 
     for (std::vector<DependencyGraph::ItemList>::iterator i1 =
@@ -1306,7 +1299,7 @@ Abuild::reportExternalGraphErrors(DependencyGraph& g)
     {
 	DependencyGraph::ItemList const& cycle = *i1;
 	error("the following trees are involved in"
-	      " an external-dirs cycle:");
+	      " a cycle (" + description + "):");
 	for (DependencyGraph::ItemList::const_iterator i2 = cycle.begin();
 	     i2 != cycle.end(); ++i2)
 	{
@@ -1337,7 +1330,11 @@ Abuild::computeBackingGraph(BuildForest_map& forests,
     // Even if there were errors, the build tree graph must always be
     // consistent.  Abuild doesn't store invalid backing areas in the
     // build tree structures.
-    assert(g.check());
+    if (! g.check())
+    {
+	reportDirectoryGraphErrors(g, "backing area");
+	fatal("unable to continue after backing area error");
+    }
 }
 
 void
@@ -1581,8 +1578,7 @@ Abuild::mergeForests(BuildForest_map& forests,
 		merge.push_back(*iter);
 	    }
 	}
-	assert(! merge.empty());
-	if (merge.size() == 1)
+	if (merge.size() <= 1)
 	{
 	    continue;
 	}
@@ -3260,8 +3256,16 @@ Abuild::checkTraits(BuildForest& forest)
 			  " refers to item " + referent_item +
 			  " which is private to another scope");
 		}
-		if (! checkAllowedTree(forest, item, *builditems[referent_item],
-				       "refer by trait to"))
+		if (builditems.count(referent_item) == 0)
+		{
+		    QTC::TC("abuild", "Abuild ERR invalid trait referent");
+		    error(location, "trait " + trait +
+			  " refers to item " + referent_item +
+			  " which does not exist");
+		}
+		else if (! checkAllowedTree(
+			     forest, item, *builditems[referent_item],
+			     "refer by trait to"))
 		{
 		    QTC::TC("abuild", "Abuild ERR invisible trait referent");
 		}
