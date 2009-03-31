@@ -137,7 +137,7 @@ class Abuild
 		       std::map<std::string, int>& forest_numbers);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& forest_numbers);
-    void computeBuildset(BuildItem_map& builditems);
+    void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);
     bool addBuildAlsoToBuildset(BuildItem_map& builditems);
@@ -247,6 +247,7 @@ class Abuild
     static std::string const FILE_DYNAMIC_GROOVY;
     static std::string const FILE_INTERFACE_DUMP;
     static std::string const b_ALL;
+    static std::string const b_DEPTREES;
     static std::string const b_LOCAL;
     static std::string const b_DESC;
     static std::string const b_DEPS;

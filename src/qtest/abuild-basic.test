@@ -414,8 +414,8 @@ $td->runtest("ccxx_debug",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("clean all",
-	     {$td->COMMAND => "abuild --clean=all",
+$td->runtest("clean deptrees",
+	     {$td->COMMAND => "abuild --clean=deptrees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/allclean0.out",
 	      $td->EXIT_STATUS => 0},

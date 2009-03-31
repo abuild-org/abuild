@@ -25,6 +25,7 @@ std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
 std::string const Abuild::FILE_DYNAMIC_GROOVY = ".ab-dynamic.groovy";
 std::string const Abuild::FILE_INTERFACE_DUMP = ".ab-interface-dump";
 std::string const Abuild::b_ALL = "all";
+std::string const Abuild::b_DEPTREES = "deptrees";
 std::string const Abuild::b_LOCAL = "local";
 std::string const Abuild::b_DESC = "desc";
 std::string const Abuild::b_DEPS = "deps";
@@ -92,6 +93,7 @@ bool
 Abuild::initializeStatics()
 {
     valid_buildsets.insert(b_ALL);
+    valid_buildsets.insert(b_DEPTREES);
     valid_buildsets.insert(b_LOCAL);
     valid_buildsets.insert(b_DESC);
     valid_buildsets.insert(b_DEPS);
@@ -1014,8 +1016,9 @@ Abuild::readConfigs()
     }
 
     BuildForest& local_forest = *(forests[local_top]);
+    BuildTree_map& buildtrees = local_forest.getBuildTrees();
     BuildItem_map& builditems = local_forest.getBuildItems();
-    computeBuildset(builditems);
+    computeBuildset(buildtrees, builditems);
 
     if (! this->full_integrity)
     {
@@ -1760,6 +1763,11 @@ Abuild::removeEmptyTrees(BuildForest_map& forests)
 		 iter != to_delete.end(); ++iter)
 	    {
 		buildtrees.erase(*iter);
+	    }
+	    if (to_delete.count(this->local_tree))
+	    {
+		QTC::TC("abuild", "Abuild clear local tree");
+		this->local_tree.clear();
 	    }
 	}
     }
@@ -4195,10 +4203,19 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 }
 
 void
-Abuild::computeBuildset(BuildItem_map& builditems)
+Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 {
     // Generate the build set.
     std::string const& this_name = this->this_config->getName();
+    BuildTree_ptr this_buildtree;
+    if (! this->local_tree.empty())
+    {
+        if (buildtrees.count(this->local_tree) == 0)
+        {
+            fatal("INTERNAL ERROR: the current build tree is not known");
+        }
+        this_buildtree = buildtrees[this->local_tree];
+    }
     BuildItem_ptr this_builditem;
     if (! this_name.empty())
     {
@@ -4221,7 +4238,15 @@ Abuild::computeBuildset(BuildItem_map& builditems)
     if (! set_name.empty())
     {
 	cleaning = (! this->cleanset_name.empty());
-	if (! this->buildset_named_items.empty())
+
+	if (this->local_tree.empty() &&
+	    ((set_name == b_DEPTREES) || (set_name == b_LOCAL)))
+	{
+	    QTC::TC("abuild", "Abuild ERR bad tree-based build set");
+	    error("build set " + set_name + " contains no items when"
+		  " the current build item is not part of any tree");
+	}
+	else if (! this->buildset_named_items.empty())
 	{
 	    std::set<std::string> named_items =
 		this->buildset_named_items;
@@ -4251,11 +4276,19 @@ Abuild::computeBuildset(BuildItem_map& builditems)
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isWritable, _1));
         }
+	else if (set_name == b_DEPTREES)
+        {
+            QTC::TC("abuild", "Abuild buildset deptrees", cleaning ? 1 : 0);
+	    std::set<std::string> trees;
+	    std::list<std::string> const& deptrees =
+		this_buildtree->getExpandedTreeDeps();
+	    trees.insert(deptrees.begin(), deptrees.end());
+	    trees.insert(this->local_tree);
+	    populateBuildset(builditems,
+			     boost::bind(&BuildItem::isInTrees, _1, trees));
+        }
         else if (set_name == b_LOCAL)
         {
-	    // XXX What do we want to do when this->local_tree is
-	    // empty?  This happens if you start in a high-level build
-	    // item that is not part of any tree.
             QTC::TC("abuild", "Abuild buildset local", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isInTree, _1,
@@ -6329,7 +6362,8 @@ Abuild::help()
     h("Build/Clean sets:");
     h("");
     h("  all               all buildable/cleanable items in writable build trees");
-    h("  local             all items in the local build tree without its externals");
+    h("  deptrees          all items in the local tree and its full tree-deps chain");
+    h("  local             all items in the local build tree");
     h("  desc              all items at or below the current directory");
     h("  descending        alias for desc");
     h("  down              alias for desc");

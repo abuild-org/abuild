@@ -48,6 +48,7 @@ class BuildItem
     unsigned int getBackingDepth() const;
     bool isLocal() const;
     bool isInTree(std::string const& tree) const;
+    bool isInTrees(std::set<std::string> const& trees) const;
     std::set<std::string> const& getShadowedDependencies() const;
     std::map<std::string, std::set<std::string> > const&
     getShadowedPlugins() const;

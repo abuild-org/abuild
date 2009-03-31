@@ -14,12 +14,14 @@
   </platform-type>
  </platform-data>
  <forest
-  id=""
-  absolute-path=""
+  id="f-1"
+  absolute-path="--topdir--/native-compiler"
  >
   <build-tree
-   id="bt-1"
+   name="native-compiler"
    absolute-path="--topdir--/native-compiler"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -42,7 +44,7 @@
    </plugins>
    <build-item
     name="lib"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/native-compiler/lib"
     backing-depth="0"
     target-type="object-code"
@@ -62,7 +64,7 @@
    </build-item>
    <build-item
     name="plugin.compiler"
-    home-tree="bt-1"
+    home-forest="f-1"
     absolute-path="--topdir--/native-compiler/compiler"
     backing-depth="0"
     target-type="all"
@@ -70,8 +72,10 @@
    />
   </build-tree>
   <build-tree
-   id="bt-2"
+   name="outside"
    absolute-path="--topdir--/native-compiler/outside"
+   home-forest="f-1"
+   backing-depth="0"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
@@ -86,30 +90,15 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
-   <external build-tree="bt-1"/>
-   <build-item
-    name="lib"
-    home-tree="bt-1"
-    absolute-path="--topdir--/native-compiler/lib"
-    backing-depth="0"
-    target-type="object-code"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="native"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="<native>"/>
-     <platform name="<native>.debug"/>
-     <platform name="<native>.release"/>
-     <platform name="<native-os-data>.qcc"/>
-     <platform name="<native-os-data>.qcc.debug"/>
-     <platform name="<native-os-data>.qcc.release"/>
-    </buildable-platforms>
-   </build-item>
+   <declared-tree-dependencies>
+    <tree-dependency name="native-compiler"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="native-compiler"/>
+   </expanded-tree-dependencies>
    <build-item
     name="outside"
-    home-tree="bt-2"
+    home-forest="f-1"
     absolute-path="--topdir--/native-compiler/outside"
     backing-depth="0"
     target-type="object-code"
@@ -130,14 +119,6 @@
      <platform name="<native>.release"/>
     </buildable-platforms>
    </build-item>
-   <build-item
-    name="plugin.compiler"
-    home-tree="bt-1"
-    absolute-path="--topdir--/native-compiler/compiler"
-    backing-depth="0"
-    target-type="all"
-    is-plugin="0"
-   />
   </build-tree>
  </forest>
 </abuild-data>

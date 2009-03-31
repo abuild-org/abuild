@@ -28,6 +28,8 @@ my $native_out = get_native_out();
 
 setup($td, "../../../doc/example");
 
+$ENV{'ABUILD_COMPAT_LEVEL'} = '1.1';
+
 cd("work/basic/cxx-program");
 
 $td->runtest("c++ program",
@@ -74,247 +76,262 @@ if ($test_java)
 		 $td->NORMALIZE_NEWLINES);
 }
 
-cd("work/general/reference/common");
-
-# Demonstrate the build order without building anything.  The output
-# of this test case appears literally in the documentation and is
-# referred to by name.
-$td->runtest("no-op in reference common",
-	     {$td->COMMAND => "abuild --build=local no-op",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-no-op.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("no-op with release",
-	     {$td->COMMAND =>
-		  "abuild --build=desc no-op -p native:option=release",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-no-op-release.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("no-op with release again",
-	     {$td->COMMAND =>
-		  "ABUILD_PLATFORM_SELECTORS='platform=*.*.*.*.release'" .
-		  " abuild -b descending no-op",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-no-op-release.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("no-op with all options",
-	     {$td->COMMAND => "abuild --build=down no-op -p native:option='*'",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-no-op-all-options.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("invalid platform selector",
-	     {$td->COMMAND => "abuild --build=desc no-op -p option='*.*'"},
-	     {$td->FILE => "$top/bad-platform-selector.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("build reference common",
-	     {$td->COMMAND => "abuild -b desc check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-sleep 1;
-my $now = time;
-utime $now, $now, "lib3/src/CommonLib3.cpp" or die;
-
-$td->runtest("test-only reference common",
-	     {$td->COMMAND => "abuild -b desc test-only",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-test-only.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("check reference common",
-	     {$td->COMMAND => "abuild -b desc check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-check2.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/general/reference/project/main/src");
-
-$td->runtest("no-op in reference project-main",
-	     {$td->COMMAND => "abuild --build=current no-op",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-project-main-no-op.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("check in reference project-main",
-	     {$td->COMMAND =>
-		  "abuild --build=current --apply-targets-to-deps check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-project-main-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("trait-based test in reference project-main",
-	     {$td->COMMAND => "abuild --with-deps" .
-		  " --related-by-traits tester check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-project-main-trait-test.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/general/reference/derived");
-
-$td->runtest("check for derived",
-	     {$td->COMMAND => "abuild --build=desc check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-derived-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-# same output as --clean=local
-$td->runtest("clean desc",
-	     {$td->COMMAND => "abuild --clean=desc",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-derived-clean-local.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean local",
-	     {$td->COMMAND => "abuild --clean=local",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-derived-clean-local.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean all",
-	     {$td->COMMAND => "abuild --clean=all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-derived-clean.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean local in common",
-	     {$td->COMMAND => "abuild --clean=local -C ../common",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-common-clean-local.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("rebuild local",
-	     {$td->COMMAND =>
-		  "abuild --build=local --apply-targets-to-deps check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-derived-check2-local.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("rebuild all",
-	     {$td->COMMAND => "abuild --build=all check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/reference-derived-check2.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/general/task/project");
-
-$td->runtest("task branch no-op",
-	     {$td->COMMAND => "abuild --build=all no-op",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/task-project-no-op.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("test task branch",
-	     {$td->COMMAND => "abuild --build=all check",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/task-project-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/general/task/project/main/src");
-
-$td->runtest("trait-based task test",
-	     {$td->COMMAND => "abuild --with-deps check".
-		  " --related-by-traits tester",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/task-trait-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/general/user/derived");
-
-validate_dump_data($td);
-
-$td->runtest("dump data with flags and traits",
-	     {$td->COMMAND => "abuild --dump-data",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/flagstraits-dumpdata.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean all in user branch",
-	     {$td->COMMAND => "abuild --clean=all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/user-derived-clean-all.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("clean local in user branch",
-	     {$td->COMMAND => "abuild -c all",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/user-derived-clean-local.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("buildset all user branch",
-	     {$td->COMMAND => "abuild --build=all no-op",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/user-derived-all-no-op.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("check user branch and dump interfaces",
-	     {$td->COMMAND => "abuild --build=all check --dump-interfaces",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/user-derived-all-check.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/general");
-
-$td->runtest("check .ab-interface-dump* files",
-	     {$td->COMMAND =>
-		  "find . -type f -name .ab-interface\\* -print" .
-		  " | LANG=C sort",
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/interface-dump-files.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-if (have_xmllint())
+foreach my $compat (qw(1.0 1.1))
 {
-    $td->runtest("validate .ab-interface-dump* files",
-		 {$td->COMMAND =>
-		      "find . -type f -name .ab-interface\\* -exec" .
-		      " xmllint --noout --dtdvalid" .
-		      " $top/../../interface_dump.dtd {} \\;"},
-		 {$td->STRING => "",
+    $ENV{'ABUILD_COMPAT_LEVEL'} = $compat;
+    cd("work/general/reference/common");
+
+    # Demonstrate the build order without building anything.  The output
+    # of this test case appears literally in the documentation and is
+    # referred to by name.
+    $td->runtest("no-op in reference common",
+		 {$td->COMMAND => "abuild --build=local no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-no-op.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
-}
-else
-{
-    $td->runtest("skip validating .ab-interface-dump* files",
+
+    $td->runtest("no-op with release",
 		 {$td->COMMAND =>
-		      "find . -type f -name .ab-interface\\* -exec" .
-		      " cat {} \\; > /dev/null"},
-		 {$td->STRING => "",
+		      "abuild --build=desc no-op -p native:option=release",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-no-op-release.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("no-op with release again",
+		 {$td->COMMAND =>
+		      "ABUILD_PLATFORM_SELECTORS='platform=*.*.*.*.release'" .
+		      " abuild -b descending no-op",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-no-op-release.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("no-op with all options",
+		 {$td->COMMAND =>
+		      "abuild --build=down no-op -p native:option='*'",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-no-op-all-options.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("invalid platform selector",
+		 {$td->COMMAND => "abuild --build=desc no-op -p option='*.*'"},
+		 {$td->FILE => "$top/bad-platform-selector.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("build reference common",
+		 {$td->COMMAND => "abuild -b desc check",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    sleep 1;
+    my $now = time;
+    utime $now, $now, "lib3/src/CommonLib3.cpp" or die;
+
+    $td->runtest("test-only reference common",
+		 {$td->COMMAND => "abuild -b desc test-only",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-test-only.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("check reference common",
+		 {$td->COMMAND => "abuild -b desc check",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-check2.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general/reference/project/main/src");
+
+    $td->runtest("no-op in reference project-main",
+		 {$td->COMMAND => "abuild --build=current no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-project-main-no-op.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("check in reference project-main",
+		 {$td->COMMAND =>
+		      "abuild --build=current --apply-targets-to-deps check",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-project-main-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("trait-based test in reference project-main",
+		 {$td->COMMAND => "abuild --with-deps" .
+		      " --related-by-traits tester check",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-project-main-trait-test.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general/reference/derived");
+
+    $td->runtest("check for derived",
+		 {$td->COMMAND => "abuild --build=desc check",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-derived-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    # same output as --clean=local
+    $td->runtest("clean desc",
+		 {$td->COMMAND => "abuild --clean=desc",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-derived-clean-local.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean local",
+		 {$td->COMMAND => "abuild --clean=local",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-derived-clean-local.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean all",
+		 {$td->COMMAND => "abuild --clean=all",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-derived-clean.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean local in common",
+		 {$td->COMMAND => "abuild --clean=local -C ../common",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-clean-local.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("rebuild local",
+		 {$td->COMMAND =>
+		      "abuild --build=local --apply-targets-to-deps check",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-derived-check2-local.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("rebuild all",
+		 {$td->COMMAND => "abuild --build=all check",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-derived-check2.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general/task/project");
+
+    $td->runtest("task branch no-op",
+		 {$td->COMMAND => "abuild --build=all no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/task-project-no-op.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("test task branch",
+		 {$td->COMMAND => "abuild --build=all check",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/task-project-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general/task/project/main/src");
+
+    $td->runtest("trait-based task test",
+		 {$td->COMMAND => "abuild --with-deps check".
+		      " --related-by-traits tester",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/task-trait-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general/user/derived");
+
+    validate_dump_data($td);
+
+    $td->runtest("dump data with flags and traits",
+		 {$td->COMMAND => "abuild --dump-data",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/flagstraits-dumpdata.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean all in user branch",
+		 {$td->COMMAND => "abuild --clean=all",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-derived-clean-all.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean local in user branch",
+		 {$td->COMMAND => "abuild -c all",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-derived-clean-local.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("buildset all user branch",
+		 {$td->COMMAND => "abuild --build=all no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-derived-all-no-op.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("check user branch and dump interfaces",
+		 {$td->COMMAND => "abuild --build=all check --dump-interfaces",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-derived-all-check.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general");
+
+    $td->runtest("check .ab-interface-dump* files",
+		 {$td->COMMAND =>
+		      "find . -type f -name .ab-interface\\* -print" .
+		      " | LANG=C sort",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/interface-dump-files.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    if (have_xmllint())
+    {
+	$td->runtest("validate .ab-interface-dump* files",
+		     {$td->COMMAND =>
+			  "find . -type f -name .ab-interface\\* -exec" .
+			  " xmllint --noout --dtdvalid" .
+			  " $top/../../interface_dump.dtd {} \\;"},
+		     {$td->STRING => "",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+    else
+    {
+	$td->runtest("skip validating .ab-interface-dump* files",
+		     {$td->COMMAND =>
+			  "find . -type f -name .ab-interface\\* -exec" .
+			  " cat {} \\; > /dev/null"},
+		     {$td->STRING => "",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+
+    foreach my $dir (qw(reference task user))
+    {
+	$td->runtest("clean up in $dir",
+		     {$td->COMMAND => "abuild -C $dir -c all",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/cleanup-$dir.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
 }
 
 cd("work/auto-from-variable/program");
@@ -498,7 +515,7 @@ $td->runtest("run other bin target",
 cd("work/plugin/other");
 
 $td->runtest("clean plugins",
-	     {$td->COMMAND => "abuild -c all",
+	     {$td->COMMAND => "abuild -c deptrees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/plugin-clean.out",
 	      $td->EXIT_STATUS => 0},
@@ -724,7 +741,7 @@ if (! in_windows())
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(73 +
+$td->report(108 +
 	    (in_windows() ? 0 : 1) +
 	    ($test_java ? 7 : 0) +
 	    ($have_whole_archive ? 2 : 1));

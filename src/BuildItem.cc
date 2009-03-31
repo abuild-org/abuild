@@ -175,6 +175,12 @@ BuildItem::isInTree(std::string const& tree) const
     return (this->tree_name == tree);
 }
 
+bool
+BuildItem::isInTrees(std::set<std::string> const& trees) const
+{
+    return (trees.count(this->tree_name) != 0);
+}
+
 std::map<std::string, std::set<std::string> > const&
 BuildItem::getShadowedPlugins() const
 {

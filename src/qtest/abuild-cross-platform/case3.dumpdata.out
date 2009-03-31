@@ -18,7 +18,7 @@
   absolute-path="--topdir--/case3"
  >
   <build-tree
-   name="tree.1.-RND-"
+   name="case3"
    absolute-path="--topdir--/case3"
    home-forest="f-1"
    backing-depth="0"

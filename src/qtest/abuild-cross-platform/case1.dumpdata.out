@@ -15,10 +15,10 @@
  </platform-data>
  <forest
   id="f-1"
-  absolute-path="--topdir--/case1"
+  absolute-path="--topdir--"
  >
   <build-tree
-   name="tree.2.-RND-"
+   name="rules"
    absolute-path="--topdir--/rules"
    home-forest="f-1"
    backing-depth="0"
@@ -46,7 +46,7 @@
    />
   </build-tree>
   <build-tree
-   name="tree.1.-RND-"
+   name="case1"
    absolute-path="--topdir--/case1"
    home-forest="f-1"
    backing-depth="0"
@@ -65,10 +65,10 @@
     </platform-type>
    </platform-data>
    <declared-tree-dependencies>
-    <tree-dependency name="tree.2.-RND-"/>
+    <tree-dependency name="rules"/>
    </declared-tree-dependencies>
    <expanded-tree-dependencies>
-    <tree-dependency name="tree.2.-RND-"/>
+    <tree-dependency name="rules"/>
    </expanded-tree-dependencies>
    <build-item
     name="03-object-code"

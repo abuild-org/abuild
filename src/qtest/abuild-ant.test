@@ -68,7 +68,7 @@ else
 cd("work/basic/other-executable");
 
 $td->runtest("ant",
-	     {$td->COMMAND => "abuild --build=all test",
+	     {$td->COMMAND => "abuild --build=deptrees test",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/basic.out",
 	      $td->EXIT_STATUS => 0},
@@ -80,14 +80,14 @@ utime $now, $now, "../library/src/java/com/example/library/Library.java"
     or die;
 
 $td->runtest("ant test-only",
-	     {$td->COMMAND => "abuild --build=all test-only",
+	     {$td->COMMAND => "abuild --build=deptrees test-only",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/test-only.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("ant recheck",
-	     {$td->COMMAND => "abuild --build=all test",
+	     {$td->COMMAND => "abuild --build=deptrees test",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/basic2.out",
 	      $td->EXIT_STATUS => 0},

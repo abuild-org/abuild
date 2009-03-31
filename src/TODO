@@ -15,9 +15,6 @@ external that backs into another tree in the same forest.
 
 Make sure there are non-trivial multiple backing area tests.
 
-Use traversal test suite to test various cases of partially upgraded
-forests.
-
 Still need to review code.
 
 See also "compatibility issues" below.  When all test cases pass
@@ -84,6 +81,10 @@ release notes.
    really worked, but in the past, the result would most likely have
    been something about a parent/child mismatch.
 
+ * Added build set "deptrees" to mean all build trees in the tree-deps
+   chain, including the current build tree.  This build set would
+   build what "all" builds in 1.0.
+
 
 Groovy Framework
 ================
@@ -149,10 +150,6 @@ Compatibility Issues
 
  * Update compiler verification to work with compat level 1.1.
 
- * Upgrade all examples to 1.1.  Set up abuild-examples test suite to
-   run twice: once with compat level 1.1 and once with compat level
-   1.0.  This helps to exercise that 1.0 compatibility stuff doesn't
-   get in the way when not needed.
 
 
 Core Changes
@@ -176,13 +173,6 @@ Core Changes
 
  * Change build set "all" to mean all known build items in all trees
    in the forest.
-
- * Add build set "reachable-trees" to mean all build trees in the
-   tree-deps chain, including the current build tree.  This build set
-   would build what "all" builds in 1.0.
-
- * Add build set "tree-deps" to mean all build trees that are
-   tree-deps (recursively) but not the current build tree.
 
  * Add flag --with-rdeps to add to the build set all items anywhere in
    the forest that have items in the initial build set in their

@@ -1,0 +1,6 @@
+abuild: cleaning project-lib in project/lib
+abuild: cleaning project-lib.extra in project/lib/extra
+abuild: cleaning project-lib.src in project/lib/src
+abuild: cleaning project-lib.test in project/lib/test
+abuild: cleaning project-main in project/main
+abuild: cleaning project-main.src in project/main/src
