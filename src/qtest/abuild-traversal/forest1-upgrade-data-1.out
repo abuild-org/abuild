@@ -1,0 +1,10 @@
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+
+[forest]
+# root: F2C2
+F2C2/proj/c2: ***
+F2C2/util/f2: ***
+F2C2/proj/c2/impl: ***
+F2C2/proj/tests/int: ***
+F2C2/util/tests/int: ***

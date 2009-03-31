@@ -14,19 +14,24 @@
   </platform-type>
  </platform-data>
  <supported-traits>
-  <supported-trait name="F2C2-f2"/>
-  <supported-trait name="F2C2-util-int"/>
   <supported-trait name="PLUGINS-plugins"/>
+  <supported-trait name="PROJ0-c1"/>
+  <supported-trait name="PROJ0-c1-ifc"/>
+  <supported-trait name="PROJ0-c1-impl"/>
+  <supported-trait name="PROJ0-c2"/>
+  <supported-trait name="PROJ0-c2-ifc"/>
+  <supported-trait name="PROJ0-c2-impl"/>
+  <supported-trait name="PROJ0-proj-int"/>
   <supported-trait name="UTIL0-f1"/>
   <supported-trait name="UTIL0-f2"/>
   <supported-trait name="UTIL0-util-int"/>
  </supported-traits>
  <forest
   id="f-1"
-  absolute-path="--topdir--/1.0/forest0/UTIL0/util/tests/int"
+  absolute-path="--topdir--/1.0/forest0"
  >
   <build-tree
-   name="tree.4.-RND-"
+   name="plugins"
    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
    home-forest="f-1"
    backing-depth="0"
@@ -57,7 +62,359 @@
    />
   </build-tree>
   <build-tree
-   name="tree.2.-RND-"
+   name="c1-ifc"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+   </supported-traits>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="plugins"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="c1"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/ifc"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="c1"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+   </supported-traits>
+   <declared-tree-dependencies>
+    <tree-dependency name="c1-ifc"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+    <tree-dependency name="c1-ifc"/>
+   </expanded-tree-dependencies>
+  </build-tree>
+  <build-tree
+   name="c1-impl"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c1-impl"/>
+   </supported-traits>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="c1"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+    <tree-dependency name="c1-ifc"/>
+    <tree-dependency name="c1"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="c1-a"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/a"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c1-b"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c1/impl/b"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="c2-ifc"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="plugins"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="c2"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/ifc"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="c2"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c2"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+   </supported-traits>
+   <declared-tree-dependencies>
+    <tree-dependency name="c2-ifc"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+    <tree-dependency name="c2-ifc"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="c2-extra"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/orig"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+  </build-tree>
+  <build-tree
+   name="c2-impl"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c2"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+    <supported-trait name="PROJ0-c2-impl"/>
+   </supported-traits>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="c2"/>
+    <tree-dependency name="c1"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+    <tree-dependency name="c2-ifc"/>
+    <tree-dependency name="c2"/>
+    <tree-dependency name="c1-ifc"/>
+    <tree-dependency name="c1"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="c2-a"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/a"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="f2-c"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/f2-c"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="c2-b"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+     <dependency name="f2-c"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c2"/>
+     <dependency name="f2-c"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="f1"
    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1"
    home-forest="f-1"
    backing-depth="0"
@@ -83,10 +440,10 @@
     <plugin name="rules"/>
    </plugins>
    <declared-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
+    <tree-dependency name="plugins"/>
    </declared-tree-dependencies>
    <expanded-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
+    <tree-dependency name="plugins"/>
    </expanded-tree-dependencies>
    <build-item
     name="f1-a"
@@ -120,7 +477,7 @@
    </build-item>
   </build-tree>
   <build-tree
-   name="tree.3.-RND-"
+   name="f2"
    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2"
    home-forest="f-1"
    backing-depth="0"
@@ -146,10 +503,10 @@
     <plugin name="rules"/>
    </plugins>
    <declared-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
+    <tree-dependency name="plugins"/>
    </declared-tree-dependencies>
    <expanded-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
+    <tree-dependency name="plugins"/>
    </expanded-tree-dependencies>
    <build-item
     name="f2-a"
@@ -183,7 +540,83 @@
    </build-item>
   </build-tree>
   <build-tree
-   name="tree.1.-RND-"
+   name="proj-int"
+   absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="PLUGINS-plugins"/>
+    <supported-trait name="PROJ0-c1"/>
+    <supported-trait name="PROJ0-c1-ifc"/>
+    <supported-trait name="PROJ0-c1-impl"/>
+    <supported-trait name="PROJ0-c2"/>
+    <supported-trait name="PROJ0-c2-ifc"/>
+    <supported-trait name="PROJ0-c2-impl"/>
+    <supported-trait name="PROJ0-proj-int"/>
+   </supported-traits>
+   <plugins>
+    <plugin name="rules"/>
+   </plugins>
+   <declared-tree-dependencies>
+    <tree-dependency name="c1-impl"/>
+    <tree-dependency name="c2-impl"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="plugins"/>
+    <tree-dependency name="c1-ifc"/>
+    <tree-dependency name="c1"/>
+    <tree-dependency name="c1-impl"/>
+    <tree-dependency name="c2-ifc"/>
+    <tree-dependency name="c2"/>
+    <tree-dependency name="c2-impl"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="proj-int"
+    home-forest="f-1"
+    absolute-path="--topdir--/1.0/forest0/PROJ0/proj/tests/int"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="c1-a"/>
+     <dependency name="c1-b"/>
+     <dependency name="c2-a"/>
+     <dependency name="c2-b"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="c1"/>
+     <dependency name="c1-a"/>
+     <dependency name="c1-b"/>
+     <dependency name="c2"/>
+     <dependency name="c2-a"/>
+     <dependency name="f2-c"/>
+     <dependency name="c2-b"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="util-int"
    absolute-path="--topdir--/1.0/forest0/UTIL0/util/tests/int"
    home-forest="f-1"
    backing-depth="0"
@@ -211,13 +644,13 @@
     <plugin name="rules"/>
    </plugins>
    <declared-tree-dependencies>
-    <tree-dependency name="tree.2.-RND-"/>
-    <tree-dependency name="tree.3.-RND-"/>
+    <tree-dependency name="f1"/>
+    <tree-dependency name="f2"/>
    </declared-tree-dependencies>
    <expanded-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
-    <tree-dependency name="tree.2.-RND-"/>
-    <tree-dependency name="tree.3.-RND-"/>
+    <tree-dependency name="plugins"/>
+    <tree-dependency name="f1"/>
+    <tree-dependency name="f2"/>
    </expanded-tree-dependencies>
    <build-item
     name="util-int"
@@ -238,251 +671,6 @@
      <dependency name="f1-b"/>
      <dependency name="f2-a"/>
      <dependency name="f2-b"/>
-    </expanded-dependencies>
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-  </build-tree>
- </forest>
- <forest
-  id="f-2"
-  absolute-path="--topdir--/1.0/forest1/F2C2/util/tests/int"
- >
-  <backing-area forest="f-1"/>
-  <build-tree
-   name="tree.4.-RND-"
-   absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-   home-forest="f-1"
-   backing-depth="1"
-  >
-   <platform-data>
-    <platform-type name="indep" target-type="platform-independent">
-     <platform name="indep" selected="1"/>
-    </platform-type>
-    <platform-type name="native" target-type="object-code">
-     <platform name="<native>" selected="1"/>
-     <platform name="<native>.debug" selected="0"/>
-     <platform name="<native>.release" selected="0"/>
-    </platform-type>
-    <platform-type name="java" target-type="java">
-     <platform name="java" selected="1"/>
-    </platform-type>
-   </platform-data>
-   <supported-traits>
-    <supported-trait name="PLUGINS-plugins"/>
-   </supported-traits>
-   <build-item
-    name="rules"
-    home-forest="f-1"
-    absolute-path="--topdir--/1.0/forest0/PLUGINS/plugins"
-    backing-depth="1"
-    target-type="all"
-    is-plugin="1"
-   />
-  </build-tree>
-  <build-tree
-   name="tree.2.-RND-"
-   absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1"
-   home-forest="f-1"
-   backing-depth="1"
-  >
-   <platform-data>
-    <platform-type name="indep" target-type="platform-independent">
-     <platform name="indep" selected="1"/>
-    </platform-type>
-    <platform-type name="native" target-type="object-code">
-     <platform name="<native>" selected="1"/>
-     <platform name="<native>.debug" selected="0"/>
-     <platform name="<native>.release" selected="0"/>
-    </platform-type>
-    <platform-type name="java" target-type="java">
-     <platform name="java" selected="1"/>
-    </platform-type>
-   </platform-data>
-   <supported-traits>
-    <supported-trait name="PLUGINS-plugins"/>
-    <supported-trait name="UTIL0-f1"/>
-   </supported-traits>
-   <plugins>
-    <plugin name="rules"/>
-   </plugins>
-   <declared-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
-   </declared-tree-dependencies>
-   <expanded-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
-   </expanded-tree-dependencies>
-   <build-item
-    name="f1-a"
-    home-forest="f-1"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1/a"
-    backing-depth="1"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="f1-b"
-    home-forest="f-1"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f1/b"
-    backing-depth="1"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-  </build-tree>
-  <build-tree
-   name="tree.3.-RND-"
-   absolute-path="--topdir--/1.0/forest1/F2C2/util/f2"
-   home-forest="f-2"
-   backing-depth="0"
-  >
-   <platform-data>
-    <platform-type name="indep" target-type="platform-independent">
-     <platform name="indep" selected="1"/>
-    </platform-type>
-    <platform-type name="native" target-type="object-code">
-     <platform name="<native>" selected="1"/>
-     <platform name="<native>.debug" selected="0"/>
-     <platform name="<native>.release" selected="0"/>
-    </platform-type>
-    <platform-type name="java" target-type="java">
-     <platform name="java" selected="1"/>
-    </platform-type>
-   </platform-data>
-   <supported-traits>
-    <supported-trait name="F2C2-f2"/>
-    <supported-trait name="PLUGINS-plugins"/>
-   </supported-traits>
-   <plugins>
-    <plugin name="rules"/>
-   </plugins>
-   <declared-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
-   </declared-tree-dependencies>
-   <expanded-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
-   </expanded-tree-dependencies>
-   <build-item
-    name="f2-a"
-    home-forest="f-1"
-    absolute-path="--topdir--/1.0/forest0/UTIL0/util/f2/a"
-    backing-depth="1"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="f2-b"
-    home-forest="f-2"
-    absolute-path="--topdir--/1.0/forest1/F2C2/util/f2/b"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-   <build-item
-    name="f2-c"
-    home-forest="f-2"
-    absolute-path="--topdir--/1.0/forest1/F2C2/util/f2/c"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <platform-types>
-     <platform-type name="indep"/>
-    </platform-types>
-    <buildable-platforms>
-     <platform name="indep"/>
-    </buildable-platforms>
-   </build-item>
-  </build-tree>
-  <build-tree
-   name="tree.1.-RND-"
-   absolute-path="--topdir--/1.0/forest1/F2C2/util/tests/int"
-   home-forest="f-2"
-   backing-depth="0"
-  >
-   <platform-data>
-    <platform-type name="indep" target-type="platform-independent">
-     <platform name="indep" selected="1"/>
-    </platform-type>
-    <platform-type name="native" target-type="object-code">
-     <platform name="<native>" selected="1"/>
-     <platform name="<native>.debug" selected="0"/>
-     <platform name="<native>.release" selected="0"/>
-    </platform-type>
-    <platform-type name="java" target-type="java">
-     <platform name="java" selected="1"/>
-    </platform-type>
-   </platform-data>
-   <supported-traits>
-    <supported-trait name="F2C2-f2"/>
-    <supported-trait name="F2C2-util-int"/>
-    <supported-trait name="PLUGINS-plugins"/>
-    <supported-trait name="UTIL0-f1"/>
-   </supported-traits>
-   <plugins>
-    <plugin name="rules"/>
-   </plugins>
-   <declared-tree-dependencies>
-    <tree-dependency name="tree.2.-RND-"/>
-    <tree-dependency name="tree.3.-RND-"/>
-   </declared-tree-dependencies>
-   <expanded-tree-dependencies>
-    <tree-dependency name="tree.4.-RND-"/>
-    <tree-dependency name="tree.2.-RND-"/>
-    <tree-dependency name="tree.3.-RND-"/>
-   </expanded-tree-dependencies>
-   <build-item
-    name="util-int"
-    home-forest="f-2"
-    absolute-path="--topdir--/1.0/forest1/F2C2/util/tests/int"
-    backing-depth="0"
-    target-type="platform-independent"
-    is-plugin="0"
-   >
-    <declared-dependencies>
-     <dependency name="f1-a"/>
-     <dependency name="f1-b"/>
-     <dependency name="f2-a"/>
-     <dependency name="f2-b"/>
-     <dependency name="f2-c"/>
-    </declared-dependencies>
-    <expanded-dependencies>
-     <dependency name="f1-a"/>
-     <dependency name="f1-b"/>
-     <dependency name="f2-a"/>
-     <dependency name="f2-b"/>
-     <dependency name="f2-c"/>
     </expanded-dependencies>
     <platform-types>
      <platform-type name="indep"/>

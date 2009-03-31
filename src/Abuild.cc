@@ -1249,6 +1249,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 		  " proper relationships among externals; some errors"
 		  " about unknown tree dependencies may be spurious and"
 		  " may disappear after you fix tree dependency cycles");
+	    reportExternalGraphErrors(external_graph);
 	}
 	else
 	{
@@ -1267,6 +1268,47 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 	validateForest(forests, *iter);
     }
 }
+
+void
+Abuild::reportExternalGraphErrors(DependencyGraph& g)
+{
+    DependencyGraph::ItemMap unknowns;
+    std::vector<DependencyGraph::ItemList> cycles;
+    g.getErrors(unknowns, cycles);
+
+    for (DependencyGraph::ItemMap::iterator i1 = unknowns.begin();
+	 i1 != unknowns.end(); ++i1)
+    {
+	std::string const& dir = (*i1).first;
+	std::list<std::string> const& deps = (*i1).second;
+	for (std::list<std::string>::const_iterator i2 = deps.begin();
+	     i2 != deps.end(); ++i2)
+	{
+	    error("directory \"" + dir + "\" references unknown directory \"" +
+		  *i2 + "\"");
+	}
+    }
+
+    // We only add the dependency to known roots, so unknowns could
+    // happen only as a result of a programming error.  Error messages
+    // above are to help with debugging.
+    assert(unknowns.empty());
+
+    for (std::vector<DependencyGraph::ItemList>::iterator i1 =
+	     cycles.begin();
+	 i1 != cycles.end(); ++i1)
+    {
+	DependencyGraph::ItemList const& cycle = *i1;
+	error("the following trees are involved in"
+	      " an external-dirs cycle:");
+	for (DependencyGraph::ItemList::const_iterator i2 = cycle.begin();
+	     i2 != cycle.end(); ++i2)
+	{
+	    error("  " + *i2);
+	}
+    }
+}
+
 
 void
 Abuild::computeBackingGraph(BuildForest_map& forests,
@@ -1398,7 +1440,10 @@ Abuild::traverseForests(BuildForest_map& forests,
 		// mergeForests for additional notes.
 		verbose("traversing items for external " + ext_top +
 			", which is " + edecl + " from " + dir);
-		external_graph.addDependency(top_path, ext_top);
+		if (epath == ext_top)
+		{
+		    external_graph.addDependency(top_path, ext_top);
+		}
 		traverseItems(*forest, external_graph, ext_top,
 			      dirs_with_externals, backing_areas,
 			      deleted_trees, deleted_items);
@@ -2131,15 +2176,6 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     verbose("build tree " + top_path + ": validating");
 
     BuildForest& forest = *(forests[top_path]);
-
-    // XXX Where are we going to issue deprecation warnings?  We
-    // probably don't want to bother with warnings for unresolvable
-    // external-dirs.  We should basically report deprecation warnings
-    // whenever it would be possible to improve the situation by
-    // running abuild --upgrade-trees.
-
-    // XXX Where are we going to mark build items read only based on
-    // paths?
 
     // Many of these checks have side effects.  The order of these
     // checks is very sensitive as some checks depend upon side
@@ -5468,7 +5504,7 @@ Abuild::dumpInterface(std::string const& item_platform,
 	return;
     }
 
-    if (! build_item.isWritable())
+    if (! build_item.isWritable()) // XXX
     {
 	QTC::TC("abuild", "Abuild dumpInterface ignoring read-only build item");
 	return;
@@ -5556,7 +5592,7 @@ Abuild::buildItem(std::string const& item_name,
 		  std::string const& item_platform,
 		  BuildItem& build_item)
 {
-    if (! build_item.isWritable())
+    if (! build_item.isWritable()) // XXX
     {
 	// Assume that this item has previously been built
 	// successfully.
@@ -6120,7 +6156,7 @@ Abuild::cleanBuildset()
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (item.isWritable())
+	if (item.isWritable())	// XXX
 	{
 	    cleanPath(item_name, item.getAbsolutePath());
 	}
@@ -6421,6 +6457,8 @@ Abuild::suggestUpgrade()
     this->logger.logInfo("running");
     this->logger.logInfo("");
     this->logger.logInfo("  " + this->whoami + " --upgrade-trees");
+    this->logger.logInfo("");
+    this->logger.logInfo("from the appropriate location.");
     this->logger.logInfo("");
     this->logger.logInfo("For details, please see \"Upgrading Build"
 			 " Trees from 1.0 to 1.1\" in");

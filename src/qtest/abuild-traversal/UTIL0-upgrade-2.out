@@ -1,0 +1,13 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: WARNING: util/f1 contains some externals that could not be converted to tree-deps; it will be necessary to resolve these and rerun the upgrade process
+abuild: WARNING: util/f2 contains some externals that could not be converted to tree-deps; it will be necessary to resolve these and rerun the upgrade process
+abuild: created util/Abuild.conf
+abuild: replaced util/f1/Abuild.conf
+abuild: replaced util/f1/a/Abuild.conf
+abuild: replaced util/f1/b/Abuild.conf
+abuild: replaced util/f2/Abuild.conf
+abuild: replaced util/f2/a/Abuild.conf
+abuild: replaced util/f2/b/Abuild.conf
+abuild: replaced util/tests/int/Abuild.conf

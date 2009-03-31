@@ -1,3 +1,6 @@
+--topdir--/1.0/forest0/PROJ0/proj/tests/int/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
+--topdir--/1.0/forest0/PROJ0/proj/c2/impl/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../c1" of "--topdir--/1.0/forest0/PROJ0/proj/c2/impl" points to an named tree in an upgraded build area
+--topdir--/1.0/forest0/PROJ0/proj/c2/ifc/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../../../PLUGINS/plugins" of "--topdir--/1.0/forest0/PROJ0/proj/c2/ifc" points to an named tree in an upgraded build area
 
 ******************** abuild ********************
 WARNING: Build items/trees with deprecated 1.0 features were found.
@@ -45,8 +48,33 @@ make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b/abuild-ind
 IFC1: PROJ0-c1-ifc PROJ0-c2-ifc PROJ0-f2-c-ifc
 IMPL1: PROJ0-f2-c-impl PROJ0-c2-b-impl
 make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/c2/impl/b/abuild-indep'
+abuild: f1-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f1/a/abuild-indep'
+IFC1: UTIL0-f1-a-ifc
+IMPL1: UTIL0-f1-a-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f1/a/abuild-indep'
+abuild: f1-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f1/b/abuild-indep'
+IFC1: UTIL0-f1-b-ifc
+IMPL1: UTIL0-f1-b-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f1/b/abuild-indep'
+abuild: f2-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f2/a/abuild-indep'
+IFC1: UTIL0-f2-a-ifc
+IMPL1: UTIL0-f2-a-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f2/a/abuild-indep'
+abuild: f2-b (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/f2/b/abuild-indep'
+IFC1: UTIL0-f2-b-ifc
+IMPL1: UTIL0-f2-b-impl
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/f2/b/abuild-indep'
 abuild: proj-int (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/tests/int/abuild-indep'
 IFC1: PROJ0-c1-ifc PROJ0-c2-ifc PROJ0-f2-c-ifc
 IMPL1: PROJ0-c1-a-impl PROJ0-c1-b-impl PROJ0-c2-a-impl PROJ0-f2-c-impl PROJ0-c2-b-impl PROJ0-proj-int
 make: Leaving directory `--topdir--/1.0/forest0/PROJ0/proj/tests/int/abuild-indep'
+abuild: util-int (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/tests/int/abuild-indep'
+IFC1: UTIL0-f1-a-ifc UTIL0-f1-b-ifc UTIL0-f2-a-ifc UTIL0-f2-b-ifc
+IMPL1: UTIL0-f1-a-impl UTIL0-f1-b-impl UTIL0-f2-a-impl UTIL0-f2-b-impl UTIL0-util-int
+make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/tests/int/abuild-indep'

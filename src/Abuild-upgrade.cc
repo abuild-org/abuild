@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <fstream>
+#include <boost/filesystem.hpp>
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
@@ -289,28 +290,8 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 
     if (! g.check())
     {
-	DependencyGraph::ItemMap unknowns;
-	std::vector<DependencyGraph::ItemList> cycles;
-	g.getErrors(unknowns, cycles);
-	// We only add the dependency to known roots, so unknowns
-	// could happen only as a result of a programming error.
-	assert(unknowns.empty());
-
-	QTC::TC("abuild", "Abuild-upgrade ERR tree-dep cycle");
-	for (std::vector<DependencyGraph::ItemList>::iterator i1 =
-		 cycles.begin();
-	     i1 != cycles.end(); ++i1)
-	{
-	    DependencyGraph::ItemList const& cycle = *i1;
-	    error("the following trees are involved in"
-		  " an external-dirs cycle:");
-	    for (DependencyGraph::ItemList::const_iterator i2 = cycle.begin();
-		 i2 != cycle.end(); ++i2)
-	    {
-		error("  " + *i2);
-	    }
-	}
-
+	QTC::TC("abuild", "Abuild-upgrade ERR tree-dep graph error");
+	reportExternalGraphErrors(g);
 	exitIfErrors();
     }
 }
@@ -423,15 +404,21 @@ Abuild::allowUnnamedForestRoots(UpgradeData& ud)
 	     ud.forest_contents.begin();
 	 iter != ud.forest_contents.end(); ++iter)
     {
-	std::string const& forest_root = (*iter).first;
-	if ((ud.tree_items[forest_root].empty()) &&
-	    (ud.tree_names.count(forest_root) == 0) &&
-	    (ud.items.count(forest_root)) &&
-	    (ud.items[forest_root]->isChildOnly()))
+	std::list<std::string> const& forest_items = (*iter).second;
+	for (std::list<std::string>::const_iterator iter = forest_items.begin();
+	     iter != forest_items.end(); ++iter)
 	{
-	    QTC::TC("abuild", "Abuild-upgrade ignore useless empty tree");
-	    ud.missing_treenames.erase(forest_root);
-	    ud.unnamed_trees.insert(forest_root);
+	    std::string const& root = *iter;
+	    if ((ud.tree_items[root].empty()) &&
+		(ud.tree_names.count(root) == 0) &&
+		(ud.items.count(root)) &&
+		(ud.items[root]->isForestRoot()) &&
+		(ud.items[root]->isChildOnly()))
+	    {
+		QTC::TC("abuild", "Abuild-upgrade ignore useless empty tree");
+		ud.missing_treenames.erase(root);
+		ud.unnamed_trees.insert(root);
+	    }
 	}
     }
 }
@@ -439,11 +426,12 @@ Abuild::allowUnnamedForestRoots(UpgradeData& ud)
 void
 Abuild::upgradeForests(UpgradeData& ud)
 {
+    std::set<std::string> changed_files;
+
     // Initialize backing data for each forest.
     std::map<std::string, std::list<std::string> > backing_areas;
     std::map<std::string, std::set<std::string> > deleted_trees;
     std::map<std::string, std::set<std::string> > deleted_items;
-    std::set<std::string> obsolete_backing_dirs;
     for (std::map<std::string, std::list<std::string> >::const_iterator iter =
 	     ud.forest_contents.begin();
 	 iter != ud.forest_contents.end(); ++iter)
@@ -462,13 +450,14 @@ Abuild::upgradeForests(UpgradeData& ud)
 	    {
 		continue;
 	    }
-	    if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
+	    std::string backing_file = dir + "/" + BackingConfig::FILE_BACKING;
+	    if (Util::isFile(backing_file))
 	    {
 		appendBackingData(dir,
 				  backing_areas[forest_root],
 				  deleted_trees[forest_root],
 				  deleted_items[forest_root]);
-		obsolete_backing_dirs.insert(dir);
+		changed_files.insert(backing_file);
 	    }
 	}
     }
@@ -531,7 +520,8 @@ Abuild::upgradeForests(UpgradeData& ud)
 	    }
 	    else if (path == forest_root)
 	    {
-		QTC::TC("abuild", "Abuild-upgrade create new root Abuild.conf");
+		QTC::TC("abuild", "Abuild-upgrade create new root Abuild.conf",
+			(forest_root == "." ? 0 : 1));
 		children_to_create[path].insert(
 		    Util::absToRel(Util::canonicalizePath(tree_root),
 				   Util::canonicalizePath(path)));
@@ -541,8 +531,7 @@ Abuild::upgradeForests(UpgradeData& ud)
 	}
     }
 
-    std::string const suffix = "-1_1";
-    std::set<std::string> new_files;
+    std::string const new_suffix = "-1_1";
 
     // Create any new forest root items.
     for (std::map<std::string, std::set<std::string> >::iterator iter =
@@ -553,8 +542,8 @@ Abuild::upgradeForests(UpgradeData& ud)
 	std::set<std::string> const& children = (*iter).second;
 
 	std::string newfile = dir + "/" + ItemConfig::FILE_CONF;
-	new_files.insert(newfile);
-	newfile += suffix;
+	changed_files.insert(newfile);
+	newfile += new_suffix;
 	std::ofstream of(newfile.c_str(),
 			 std::ios_base::out |
 			 std::ios_base::trunc);
@@ -612,11 +601,11 @@ Abuild::upgradeForests(UpgradeData& ud)
 		 " necessary to resolve these and rerun the upgrade process");
 	}
 
-	std::string newfile = dir + "/" + ItemConfig::FILE_CONF + suffix;
+	std::string newfile = dir + "/" + ItemConfig::FILE_CONF + new_suffix;
 	if (config->upgradeConfig(
 		newfile, new_children, tree_name, externals, tree_deps))
 	{
-	    new_files.insert(dir + "/" + ItemConfig::FILE_CONF);
+	    changed_files.insert(dir + "/" + ItemConfig::FILE_CONF);
 	}
     }
 
@@ -636,8 +625,8 @@ Abuild::upgradeForests(UpgradeData& ud)
 	std::set<std::string>& di = deleted_items[dir];
 
 	std::string newfile = dir + "/" + BackingConfig::FILE_BACKING;
-	new_files.insert(newfile);
-	newfile += suffix;
+	changed_files.insert(newfile);
+	newfile += new_suffix;
 	std::ofstream of(newfile.c_str(),
 			 std::ios_base::out |
 			 std::ios_base::trunc);
@@ -673,8 +662,40 @@ Abuild::upgradeForests(UpgradeData& ud)
 	of.close();
     }
 
-    // XXX for each file in new_files, rename to old, rename new to
-    // it.  rename obsolete backing files
+    std::string const old_suffix = "-1_0";
+    for (std::set<std::string>::iterator iter = changed_files.begin();
+	 iter != changed_files.end(); ++iter)
+    {
+	std::string const& file = *iter;
+	bool old_exists = Util::isFile(file);
+	bool new_exists = Util::isFile(file + new_suffix);
+	std::string action;
+	if (old_exists)
+	{
+	    if (Util::isFile(file + old_suffix))
+	    {
+		boost::filesystem::remove(file + old_suffix);
+	    }
+	    boost::filesystem::rename(file, file + old_suffix);
+	    if (new_exists)
+	    {
+		action = "replaced";
+	    }
+	    else
+	    {
+		action = "removed";
+	    }
+	}
+	if (new_exists)
+	{
+	    boost::filesystem::rename(file + new_suffix, file);
+	    if (! old_exists)
+	    {
+		action = "created";
+	    }
+	}
+	info(action + " " + file);
+    }
 
     exitIfErrors();
 }

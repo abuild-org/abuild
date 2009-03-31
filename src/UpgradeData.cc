@@ -122,6 +122,7 @@ UpgradeData::readUpgradeData()
 	    else
 	    {
 		QTC::TC("abuild", "UpgradeData ERR invalid treename");
+		this->error.error(location, "invalid tree name");
 	    }
 	}
 	else

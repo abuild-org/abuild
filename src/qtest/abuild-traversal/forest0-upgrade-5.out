@@ -1,0 +1,12 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: replaced ./Abuild.conf
+abuild: replaced PROJ0/proj/c2/Abuild.conf
+abuild: replaced PROJ0/proj/c2/ifc/Abuild.conf
+abuild: replaced PROJ0/proj/c2/impl/Abuild.conf
+abuild: replaced PROJ0/proj/c2/impl/a/Abuild.conf
+abuild: replaced PROJ0/proj/c2/impl/b/Abuild.conf
+abuild: replaced PROJ0/proj/c2/impl/f2-c/Abuild.conf
+abuild: replaced PROJ0/proj/c2/orig/Abuild.conf
+abuild: replaced PROJ0/proj/tests/int/Abuild.conf

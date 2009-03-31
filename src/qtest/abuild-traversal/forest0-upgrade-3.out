@@ -1,0 +1,14 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: WARNING: PROJ0/proj/tests/int contains some externals that could not be converted to tree-deps; it will be necessary to resolve these and rerun the upgrade process
+abuild: created ./Abuild.conf
+abuild: replaced PLUGINS/plugins/Abuild.conf
+abuild: replaced PROJ0/proj/c1/Abuild.conf
+abuild: replaced PROJ0/proj/c1/ifc/Abuild.conf
+abuild: replaced PROJ0/proj/c1/impl/Abuild.conf
+abuild: replaced PROJ0/proj/c1/impl/a/Abuild.conf
+abuild: replaced PROJ0/proj/c1/impl/b/Abuild.conf
+abuild: replaced PROJ0/proj/tests/int/Abuild.conf
+abuild: replaced UTIL0/util/f1/Abuild.conf
+abuild: replaced UTIL0/util/f2/Abuild.conf

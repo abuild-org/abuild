@@ -1,0 +1,9 @@
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+
+[forest]
+# root: util
+util/f1: f1
+util/f2: f2
+util/tests/int: util-int
+util/tests: orphan

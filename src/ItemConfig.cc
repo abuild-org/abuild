@@ -1432,7 +1432,7 @@ ItemConfig::upgradeConfig(std::string const& file,
     }
     if (! tree_deps_to_add.empty())
     {
-	std::string tr = sep;
+	std::string tr = k_TREEDEPS + ":" + sep;
 	if (! this->tree_deps.empty())
 	{
 	    tr += Util::join(sep, this->tree_deps) + sep;
@@ -1446,7 +1446,7 @@ ItemConfig::upgradeConfig(std::string const& file,
 	else
 	{
 	    QTC::TC("abuild", "ItemConfig add tree_deps");
-	    additions.push_back(k_TREEDEPS + ": " + tr);
+	    additions.push_back(tr);
 	}
     }
 
@@ -1468,7 +1468,7 @@ ItemConfig::upgradeConfig(std::string const& file,
     }
     if (! children_to_add.empty())
     {
-	std::string ch = sep;
+	std::string ch = k_CHILDREN + ":" + sep;
 	if (! this->children.empty())
 	{
 	    ch += Util::join(sep, this->children) + sep;
@@ -1482,7 +1482,7 @@ ItemConfig::upgradeConfig(std::string const& file,
 	else
 	{
 	    QTC::TC("abuild", "ItemConfig add children");
-	    additions.push_back(k_CHILDREN + ": " + ch);
+	    additions.push_back(ch);
 	}
     }
 
@@ -1506,7 +1506,7 @@ ItemConfig::upgradeConfig(std::string const& file,
 	else
 	{
 	    QTC::TC("abuild", "ItemConfig replace externals");
-	    replacements[k_EXTERNAL] = sep +
+	    replacements[k_EXTERNAL] = k_EXTERNAL + ":" + sep +
 		Util::join(sep, externals);
 	}
     }

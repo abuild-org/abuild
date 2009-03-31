@@ -6,6 +6,8 @@ running
 
   abuild --upgrade-trees
 
+from the appropriate location.
+
 For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
@@ -15,8 +17,13 @@ make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
 IFC1: F2C2-f2-b-ifc
 IMPL1: F2C2-f2-b-impl
 make: Leaving directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
+abuild: f2-c (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/c/abuild-indep'
+IFC1: F2C2-f2-c-ifc
+IMPL1: F2C2-f2-c-impl
+make: Leaving directory `--topdir--/1.0/forest1/F2C2/util/f2/c/abuild-indep'
 abuild: util-int (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest1/F2C2/util/tests/int/abuild-indep'
-IFC1: UTIL0-f1-a-ifc UTIL0-f1-b-ifc UTIL0-f2-a-ifc F2C2-f2-b-ifc
-IMPL1: UTIL0-f1-a-impl UTIL0-f1-b-impl UTIL0-f2-a-impl F2C2-f2-b-impl F2C2-util-int
+IFC1: UTIL0-f1-a-ifc UTIL0-f1-b-ifc UTIL0-f2-a-ifc F2C2-f2-b-ifc F2C2-f2-c-ifc
+IMPL1: UTIL0-f1-a-impl UTIL0-f1-b-impl UTIL0-f2-a-impl F2C2-f2-b-impl F2C2-f2-c-impl F2C2-util-int
 make: Leaving directory `--topdir--/1.0/forest1/F2C2/util/tests/int/abuild-indep'

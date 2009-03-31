@@ -3,6 +3,7 @@
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
+use File::Copy;
 
 require TestDriver;
 require abuild_test_utils;
@@ -17,7 +18,7 @@ my $filters = get_filters();
 my $native_out = get_native_out();
 
 # These tests the traversal algorithm and the various issues
-# surrounding 1.0 to 1.1 changes.
+# surrounding 1.0 to 1.1 changes.  They also test the upgrade process.
 
 # We create a rather elaborate scenario that tries to exercise the
 # traversal system as fully as possible.  The easiest way to explain
@@ -185,16 +186,126 @@ check_tree("F2C2 proj", "forest1/F2C2/proj/tests/int", "F2C2-proj");
 check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
 check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
 
+# Test upgrade
+
+cd("work/1.0/forest1");
+
+$td->runtest("unresolved backed externals",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest1-upgrade-1.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/forest1-upgrade-data-1.out"});
+
+cd("work/1.0/forest0/UTIL0");
+
+$td->runtest("partial upgrade pass 1",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/UTIL0-upgrade-1.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/UTIL0-upgrade-data-1.out"});
+
+copy("$top/UTIL0-upgrade-data-errors.in", "abuild.upgrade-data") or die;
+$td->runtest("upgrade-data errors",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/UTIL0-upgrade-errors.out",
+	      $td->EXIT_STATUS => 2});
+
+copy("$top/UTIL0-upgrade-data-2.in", "abuild.upgrade-data") or die;
+$td->runtest("successful partial upgrade",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/UTIL0-upgrade-2.out",
+	      $td->EXIT_STATUS => 0});
+
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/UTIL0-upgrade-data-2.out"});
+
+cd("work/1.0");
+
+check_tree("UTIL0 all", "forest0/UTIL0/util/tests/int", "UTIL0-u1");
+
+cd("work/1.0/forest0");
+
+$td->runtest("all but c2 pass 1",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-1.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/forest0-upgrade-data-1.out"});
+copy("$top/forest0-upgrade-data-2.in", "abuild.upgrade-data") or die;
+$td->runtest("all but c2 pass 2",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-2.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/forest0-upgrade-data-2.out"});
+copy("$top/forest0-upgrade-data-3.in", "abuild.upgrade-data") or die;
+$td->runtest("all but c2",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-3.out",
+	      $td->EXIT_STATUS => 0});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/forest0-upgrade-data-3.in"}); # unchanged
+
+cd("work/1.0");
+check_tree("forest0 all", "forest0", "forest0-u1");
+
+cd("work/1.0/forest0");
+unlink "abuild.upgrade-data" or die;
+
+$td->runtest("rest of forest0 pass 1",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-4.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/forest0-upgrade-data-4.out"});
+copy("$top/forest0-upgrade-data-5.in", "abuild.upgrade-data") or die;
+$td->runtest("rest of forest0",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-5.out",
+	      $td->EXIT_STATUS => 0});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/forest0-upgrade-data-5.in"}); # unchanged
+
+cd("work/1.0");
+check_tree("forest0 all", "forest0", "forest0-u2");
+
+cd("work/1.0/forest0");
+unlink "abuild.upgrade-data" or die;
+$td->runtest("no upgrade required",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-6.out",
+	      $td->EXIT_STATUS => 0});
+
 check_work_accessed($td);
 
-$td->report(20);
+$td->report(44);
 
 sub check_tree
 {
     my ($description, $path, $out) = @_;
 
     $td->runtest($description,
-		 {$td->COMMAND => "abuild -C $path -d",
+		 {$td->COMMAND => "abuild -C $path -b all",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/$out.out",
 		  $td->EXIT_STATUS => 0},

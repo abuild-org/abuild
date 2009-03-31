@@ -1,0 +1,16 @@
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+
+[forest]
+# root: .
+PLUGINS/plugins: plugins
+PROJ0/proj/c1: c1
+PROJ0/proj/c1/ifc: c1-ifc
+PROJ0/proj/c1/impl: c1-impl
+PROJ0/proj/c2/ifc: c2-ifc
+PROJ0/proj/c2: c2
+PROJ0/proj/c2/impl: c2-impl
+PROJ0/proj/tests/int: proj-int
+UTIL0/util/f1: f1
+UTIL0/util/f2: f2
+UTIL0/util/tests/int: util-int

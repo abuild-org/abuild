@@ -1,0 +1,16 @@
+syntax error
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+not-there
+
+[unknown-section]
+
+[forest]
+# root: util
+util/f1: f1
+util/f1: f1b
+util/f2: f2 invalid
+util/tests/int: util-int
+util/tests: tests
+util/tests/oink: not-there
+util/tests/int/Abuild.conf: file

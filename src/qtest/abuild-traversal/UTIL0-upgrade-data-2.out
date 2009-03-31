@@ -1,0 +1,14 @@
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+
+[forest]
+# root: util
+util/f1: f1
+util/f2: f2
+util/tests/int: util-int
+
+[orphan-trees]
+# The following trees were previously assigned names but no longer appear
+# to exist.  If you don't need them anymore, you may remove them
+# from thsi file.
+util/tests: orphan

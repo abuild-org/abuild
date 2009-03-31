@@ -1,0 +1,8 @@
+abuild.upgrade-data:1: ERROR: expected section marker
+abuild.upgrade-data:4: ERROR: path "not-there" is not a directory
+abuild.upgrade-data:6: ERROR: unknown section unknown-section
+abuild.upgrade-data:11: ERROR: duplicate name for path "util/f1"
+abuild.upgrade-data:12: ERROR: invalid tree name
+abuild.upgrade-data:15: ERROR: path "util/tests/oink" is not a directory
+abuild.upgrade-data:16: ERROR: path "util/tests/int/Abuild.conf" is not a directory
+abuild: ERROR: errors detected; exiting
