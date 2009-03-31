@@ -120,15 +120,6 @@ my $native_out = get_native_out();
 
 setup($td);
 
-cd("work/1.0");
-
-check_tree("isolated tree", "forest0/PROJ0/proj/c1/ifc", "PROJ0-c1-ifc");
-check_tree("PROJ0 all", "forest0/PROJ0/proj/tests/int", "PROJ0");
-check_tree("UTIL0 all", "forest0/UTIL0/util/tests/int", "UTIL0");
-check_tree("F2C2 proj", "forest1/F2C2/proj/tests/int", "F2C2-proj");
-check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
-check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
-
 # errors
 
 cd("work/errors/cycle");
@@ -182,6 +173,17 @@ $td->runtest("shadowed deps and plugins",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/integrity.out",
 	      $td->EXIT_STATUS => 2});
+
+# Traverse a 1.0-style tree with complex externals and backing areas.
+
+cd("work/1.0");
+
+check_tree("isolated tree", "forest0/PROJ0/proj/c1/ifc", "PROJ0-c1-ifc");
+check_tree("PROJ0 all", "forest0/PROJ0/proj/tests/int", "PROJ0");
+check_tree("UTIL0 all", "forest0/UTIL0/util/tests/int", "UTIL0");
+check_tree("F2C2 proj", "forest1/F2C2/proj/tests/int", "F2C2-proj");
+check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
+check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
 
 check_work_accessed($td);
 

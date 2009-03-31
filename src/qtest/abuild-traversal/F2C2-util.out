@@ -1,3 +1,15 @@
+
+******************** abuild ********************
+WARNING: Build items/trees with deprecated 1.0 features were found.
+Consider upgrading your build trees, which you can do automatically by
+running
+
+  abuild --upgrade-trees
+
+For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
+the user's manual
+******************** abuild ********************
+
 abuild: f2-b (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
 IFC1: F2C2-f2-b-ifc

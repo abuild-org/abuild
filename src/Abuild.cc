@@ -70,6 +70,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     have_perl(false),
 #endif
     last_assigned_tree_number(0),
+    suggest_upgrade(false),
     logger(*(Logger::getInstance()))
 {
     Error::setErrorCallback(
@@ -201,6 +202,11 @@ Abuild::runInternal()
     }
 
     exitIfErrors();
+
+    if (this->compat_level.allow_1_0())
+    {
+	suggestUpgrade();
+    }
 
     boost::shared_ptr<boost::posix_time::time_duration> build_time;
     bool okay = true;
@@ -1738,6 +1744,8 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
     std::list<std::string> dirs;
     std::map<std::string, std::string> parent_dirs;
     std::map<std::string, std::string> dir_trees;
+    std::map<std::string, std::string> dir_tree_roots; // 1.0-compat
+    std::set<std::string> upgraded_tree_roots;	       // 1.0-compat
     dirs.push_back(top_path);
     while (! dirs.empty())
     {
@@ -1752,16 +1760,46 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 	FileLocation location = config->getLocation();
 
 	std::string tree_name;
+	std::string tree_root;	// 1.0-compat
 	if (dir_trees.count(parent_dir))
 	{
 	    tree_name = dir_trees[parent_dir];
+	    if (this->compat_level.allow_1_0())
+	    {
+		tree_root = dir_tree_roots[parent_dir];
+	    }
 	}
 	if (config->isTreeRoot())
 	{
 	    tree_name = registerBuildTree(forest, dir,
 					  config, dirs_with_externals);
+	    if (this->compat_level.allow_1_0())
+	    {
+		tree_root = dir;
+		if (! config->getTreeName().empty())
+		{
+		    upgraded_tree_roots.insert(dir);
+		}
+	    }
 	}
 	dir_trees[dir] = tree_name;
+	if (this->compat_level.allow_1_0())
+	{
+	    dir_tree_roots[dir] = tree_root;
+	    if (config->usesDeprecatedFeatures())
+	    {
+		this->suggest_upgrade = true;
+		if (upgraded_tree_roots.count(tree_root))
+		{
+		    QTC::TC("abuild", "Abuild basic deprecation warning");
+		    deprecate("1.1", config->getLocation(),
+			      "this file uses deprecated features, and"
+			      " this build item belongs to a tree that"
+			      " has already been upgraded");
+		}
+	    }
+	}
+
 	if (dir == this->this_config_dir)
 	{
 	    this->local_tree = tree_name;
@@ -1898,6 +1936,15 @@ Abuild::registerBuildTree(BuildForest& forest,
 		    if (ext_tree_name.empty())
 		    {
 			ext_tree_name = getAssignedTreeName(epath);
+		    }
+		    else
+		    {
+			this->suggest_upgrade = true;
+			deprecate("1.1", config->getLocation(),
+				  "external \"" + edecl +
+				  "\" of \"" + dir + "\" points to"
+				  " an named tree in an upgraded"
+				  " build area");
 		    }
 		    tree_deps.push_back(ext_tree_name);
 		}
@@ -3553,6 +3600,10 @@ Abuild::readBacking(std::string const& dir)
         QTC::TC("abuild", "Abuild ERR invalid backing file");
         error(FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
 	      "unable to get backing area data");
+    }
+    if (backing->isDeprecated())
+    {
+	this->suggest_upgrade = true;
     }
     return backing;
 }
@@ -6336,6 +6387,47 @@ void
 Abuild::error(FileLocation const& location, std::string const& msg)
 {
     this->error_handler.error(location, msg);
+}
+
+void
+Abuild::deprecate(std::string const& version, std::string const& msg)
+{
+    deprecate(version, FileLocation(), msg);
+}
+
+void
+Abuild::deprecate(std::string const& version,
+		  FileLocation const& location, std::string const& msg)
+{
+    this->error_handler.deprecate(version, location, msg);
+}
+
+void
+Abuild::suggestUpgrade()
+{
+    assert(this->compat_level.allow_1_0());
+    if (! this->suggest_upgrade)
+    {
+	return;
+    }
+
+    this->logger.logInfo("");
+    this->logger.logInfo("******************** " + this->whoami +
+			 " ********************");
+    this->logger.logInfo("WARNING: Build items/trees with"
+			 " deprecated 1.0 features were found.");
+    this->logger.logInfo("Consider upgrading your build trees,"
+			 " which you can do automatically by");
+    this->logger.logInfo("running");
+    this->logger.logInfo("");
+    this->logger.logInfo("  " + this->whoami + " --upgrade-trees");
+    this->logger.logInfo("");
+    this->logger.logInfo("For details, please see \"Upgrading Build"
+			 " Trees from 1.0 to 1.1\" in");
+    this->logger.logInfo("the user's manual");
+    this->logger.logInfo("******************** " + this->whoami +
+			 " ********************");
+    this->logger.logInfo("");
 }
 
 void

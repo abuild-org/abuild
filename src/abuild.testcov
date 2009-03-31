@@ -332,3 +332,4 @@ Abuild delete unused empty top-level tree 0
 Abuild-upgrade ignore useless empty tree 0
 ItemConfig delete externals 0
 Abuild-upgrade get name from backing 0
+Abuild basic deprecation warning 0

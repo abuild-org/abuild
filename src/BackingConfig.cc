@@ -150,7 +150,6 @@ BackingConfig::readOldFormat()
 
     if (this->deprecated)
     {
-	// XXX report somewhere
 	return true;
     }
 

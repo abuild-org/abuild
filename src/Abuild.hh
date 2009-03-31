@@ -217,6 +217,12 @@ class Abuild
     void monitorErrorCallback(std::string const& msg);
     void error(std::string const& msg);
     void error(FileLocation const&, std::string const& msg);
+    void deprecate(std::string const& version,
+		   std::string const& msg);
+    void deprecate(std::string const& version,
+		   FileLocation const& location,
+		   std::string const& msg);
+    void suggestUpgrade();
     void fatal(std::string const& msg);
 
     // methods in Abuild-upgrade.cc
@@ -333,6 +339,7 @@ class Abuild
     unsigned int last_assigned_tree_number;
     std::map<std::string, std::string> assigned_tree_names;
     std::set<std::string> items_traversed;
+    bool suggest_upgrade;
 
     Logger& logger;
 };
