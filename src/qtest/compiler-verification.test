@@ -19,6 +19,8 @@ my $platform_native = get_native_platform();
 
 cleanup();
 
+$ENV{'ABUILD_COMPAT_LEVEL'} = '1.1';
+
 # Test compiler verification program
 mkdir "work", 0777;
 cd("work");
