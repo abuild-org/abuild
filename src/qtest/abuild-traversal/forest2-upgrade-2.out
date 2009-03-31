@@ -1,0 +1,23 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: created C3/proj/Abuild.backing
+abuild: created C3/proj/Abuild.conf
+abuild: removed C3/proj/c1/Abuild.backing
+abuild: replaced C3/proj/c1/Abuild.conf
+abuild: removed C3/proj/c1/impl/Abuild.backing
+abuild: replaced C3/proj/c1/impl/Abuild.conf
+abuild: replaced C3/proj/c1/impl/a/Abuild.conf
+abuild: removed C3/proj/c2/Abuild.backing
+abuild: replaced C3/proj/c2/Abuild.conf
+abuild: removed C3/proj/c2/impl/Abuild.backing
+abuild: replaced C3/proj/c2/impl/Abuild.conf
+abuild: replaced C3/proj/c2/impl/b/Abuild.conf
+abuild: replaced C3/proj/c2/repl/Abuild.conf
+abuild: replaced C3/proj/c3/Abuild.conf
+abuild: replaced C3/proj/c3/ifc/Abuild.conf
+abuild: replaced C3/proj/c3/impl/Abuild.conf
+abuild: replaced C3/proj/c3/impl/a/Abuild.conf
+abuild: replaced C3/proj/c3/impl/b/Abuild.conf
+abuild: removed C3/proj/tests/int/Abuild.backing
+abuild: replaced C3/proj/tests/int/Abuild.conf

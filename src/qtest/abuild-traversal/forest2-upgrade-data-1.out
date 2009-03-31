@@ -1,0 +1,13 @@
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+
+[forest]
+# root: C3/proj
+C3/proj/c1: c1
+C3/proj/c1/impl: c1-impl
+C3/proj/c2: c2
+C3/proj/c2/impl: c2-impl
+C3/proj/c3/ifc: ***
+C3/proj/c3: ***
+C3/proj/c3/impl: ***
+C3/proj/tests/int: proj-int

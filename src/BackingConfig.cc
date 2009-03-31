@@ -39,6 +39,7 @@ BackingConfig::readBacking(Error& error_handler,
 			   CompatLevel const& compat_level,
 			   std::string const& dir)
 {
+    initializeStatics();
     if (cache.count(dir))
     {
 	return cache[dir].get();

@@ -1510,6 +1510,11 @@ Abuild::traverseForests(BuildForest_map& forests,
 		// traversing the items of b'.  This makes b' part of
 		// a''s forest, and we don't want to traverse it
 		// again.
+		if (forests.count(btop))
+		{
+		    QTC::TC("abuild", "Abuild keeping redundant backing area");
+		    keep = true;
+		}
 		verbose("we've already traversed this;"
 			" it's probably an external of another backing area");
 		QTC::TC("abuild", "Abuild nested backing areas");
@@ -1517,15 +1522,18 @@ Abuild::traverseForests(BuildForest_map& forests,
 	    else
 	    {
 		seen.insert(btop);
-		*iter = btop;
 		keep = true;
 		verbose("traversing backing area");
-		traverseForests(forests, external_graph, *iter, visiting,
-				"backing area of \"" + btop + "\"");
+		traverseForests(forests, external_graph, btop, visiting,
+				"backing area of \"" + top_path + "\"");
 		verbose("done traversing backing area");
 	    }
 
-	    if (! keep)
+	    if (keep)
+	    {
+		*iter = btop;
+	    }
+	    else
 	    {
 		backing_areas.erase(iter, next);
 	    }

@@ -1,0 +1,19 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: created F2C2/Abuild.backing
+abuild: created F2C2/Abuild.conf
+abuild: removed F2C2/proj/c2/Abuild.backing
+abuild: replaced F2C2/proj/c2/Abuild.conf
+abuild: removed F2C2/proj/c2/impl/Abuild.backing
+abuild: replaced F2C2/proj/c2/impl/Abuild.conf
+abuild: replaced F2C2/proj/c2/impl/a/Abuild.conf
+abuild: replaced F2C2/proj/c2/impl/b/Abuild.conf
+abuild: removed F2C2/proj/tests/int/Abuild.backing
+abuild: replaced F2C2/proj/tests/int/Abuild.conf
+abuild: removed F2C2/util/f2/Abuild.backing
+abuild: replaced F2C2/util/f2/Abuild.conf
+abuild: replaced F2C2/util/f2/b/Abuild.conf
+abuild: replaced F2C2/util/f2/c/Abuild.conf
+abuild: removed F2C2/util/tests/int/Abuild.backing
+abuild: replaced F2C2/util/tests/int/Abuild.conf

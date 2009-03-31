@@ -462,11 +462,13 @@ Abuild::upgradeForests(UpgradeData& ud)
 	}
     }
 
-    // Filter out duplicate backing areas
+    // Filter out duplicate backing areas, and replace each with top
+    // of forest
     for (std::map<std::string, std::list<std::string> >::iterator iter =
 	     backing_areas.begin();
 	 iter != backing_areas.end(); ++iter)
     {
+	std::string const& root = (*iter).first;
 	std::list<std::string>& areas = (*iter).second;
 	std::set<std::string> seen;
 	std::list<std::string>::iterator i2 = areas.begin();
@@ -474,6 +476,7 @@ Abuild::upgradeForests(UpgradeData& ud)
 	{
 	    std::list<std::string>::iterator next = i2;
 	    ++next;
+	    *i2 = findTop(*i2, "backing area of " + root);
 	    if (seen.count(*i2))
 	    {
 		areas.erase(i2, next);
@@ -530,6 +533,8 @@ Abuild::upgradeForests(UpgradeData& ud)
 	    assert(path != Util::dirname(path));
 	}
     }
+
+    exitIfErrors();
 
     std::string const new_suffix = "-1_1";
 
