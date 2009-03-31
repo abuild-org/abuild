@@ -89,6 +89,10 @@ Abuild::findBuildItems(UpgradeData& ud)
 	    {
 		dir_trees[dir] = dir;
 		std::string treename = config->getTreeName();
+		// XXX should try to get name from backing area...see
+		// also econfig code with externals to see if we can
+		// combine....refactor getAssignedTreeName, which
+		// probably has the right logic already.
 		if (! treename.empty())
 		{
 		    if (ud.tree_names.count(dir) &&
@@ -518,6 +522,7 @@ Abuild::upgradeForests(UpgradeData& ud)
 		children_to_add[path].insert(
 		    Util::absToRel(Util::canonicalizePath(tree_root),
 				   Util::canonicalizePath(path)));
+		break;
 	    }
 	    else if (path == forest_root)
 	    {
@@ -525,6 +530,7 @@ Abuild::upgradeForests(UpgradeData& ud)
 		children_to_create[path].insert(
 		    Util::absToRel(Util::canonicalizePath(tree_root),
 				   Util::canonicalizePath(path)));
+		break;
 	    }
 	    assert(path != Util::dirname(path));
 	}

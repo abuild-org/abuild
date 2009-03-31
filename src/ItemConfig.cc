@@ -278,7 +278,9 @@ void
 ItemConfig::checkDeprecated()
 {
     std::set<std::string> const& ek = this->kv.getExplicitKeys();
-    if (this->is_root && (! ek.count(k_TREENAME)))
+    if (this->is_root &&
+	(! (this->is_child_only && this->is_forest_root)) &&
+	(! ek.count(k_TREENAME)))
     {
 	QTC::TC("abuild", "ItemConfig root without tree-name");
 	this->deprecated = true;
@@ -1383,7 +1385,7 @@ ItemConfig::upgradeConfig(std::string const& file,
     // 1.0 compatibility only
 
     std::set<std::string> deletions;
-    std::vector<std::pair<std::string, std::string> > additions;
+    std::vector<std::string> additions;
     std::map<std::string, std::string> replacements;
     std::map<std::string, std::string> key_changes;
 
@@ -1403,7 +1405,7 @@ ItemConfig::upgradeConfig(std::string const& file,
     }
     if ((ek.count(k_TREENAME) == 0) && (! tree_name.empty()))
     {
-	additions.push_back(std::make_pair(k_TREENAME, tree_name));
+	additions.push_back(k_TREENAME + ": " + tree_name);
     }
     else
     {
@@ -1430,19 +1432,21 @@ ItemConfig::upgradeConfig(std::string const& file,
     }
     if (! tree_deps_to_add.empty())
     {
-	if (this->tree_deps.empty())
+	std::string tr = sep;
+	if (! this->tree_deps.empty())
 	{
-	    QTC::TC("abuild", "ItemConfig add tree_deps");
-	    additions.push_back(
-		std::make_pair(k_TREEDEPS,
-			       sep + Util::join(sep, tree_deps_to_add)));
+	    tr += Util::join(sep, this->tree_deps) + sep;
+	}
+	tr += Util::join(sep, tree_deps_to_add);
+	if (ek.count(k_TREEDEPS))
+	{
+	    QTC::TC("abuild", "ItemConfig replace tree_deps");
+	    replacements[k_TREEDEPS] = tr;
 	}
 	else
 	{
-	    QTC::TC("abuild", "ItemConfig replace tree_deps");
-	    replacements[k_TREEDEPS] = sep +
-		Util::join(sep, this->tree_deps) + sep +
-		Util::join(sep, tree_deps_to_add);
+	    QTC::TC("abuild", "ItemConfig add tree_deps");
+	    additions.push_back(k_TREEDEPS + ": " + tr);
 	}
     }
 
@@ -1451,35 +1455,34 @@ ItemConfig::upgradeConfig(std::string const& file,
     for (std::list<std::string>::const_iterator iter = this->children.begin();
 	 iter != this->children.end(); ++iter)
     {
-	seen.insert(
-	    Util::absToRel(
-		Util::canonicalizePath(this->dir + "/" + *iter)));
+	seen.insert(Util::canonicalizePath(this->dir + "/" + *iter));
     }
     std::list<std::string> children_to_add;
     for (std::set<std::string>::const_iterator iter = new_children.begin();
 	 iter != new_children.end(); ++iter)
     {
-	if (! seen.count(*iter))
+	if (! seen.count(Util::canonicalizePath(this->dir + "/" + *iter)))
 	{
 	    children_to_add.push_back(*iter);
 	}
     }
     if (! children_to_add.empty())
     {
-	if (this->children.empty())
+	std::string ch = sep;
+	if (! this->children.empty())
 	{
-	    QTC::TC("abuild", "ItemConfig add children");
-	    additions.push_back(
-		std::make_pair(
-		    k_CHILDREN,
-		    sep + Util::join(sep, children_to_add)));
+	    ch += Util::join(sep, this->children) + sep;
+	}
+	ch += Util::join(sep, children_to_add);
+	if (ek.count(k_CHILDREN))
+	{
+	    QTC::TC("abuild", "ItemConfig replace children");
+	    replacements[k_CHILDREN] = ch;
 	}
 	else
 	{
-	    QTC::TC("abuild", "ItemConfig replace children");
-	    replacements[k_CHILDREN] = sep +
-		Util::join(sep, this->children) + sep +
-		Util::join(sep, children_to_add);
+	    QTC::TC("abuild", "ItemConfig add children");
+	    additions.push_back(k_CHILDREN + ": " + ch);
 	}
     }
 

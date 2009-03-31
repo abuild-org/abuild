@@ -1,8 +1,4 @@
 
-XXX run --upgrade-trees.  manually rename files for
-misc-classification.  Run again.  Top-level Abuild.conf-1_1 is bogus.
-Run --upgrade-trees from there.  Assertion failure.
-
 Remaining failing test suites:
 
 abuild-backing-areas

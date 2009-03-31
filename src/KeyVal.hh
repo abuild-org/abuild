@@ -39,18 +39,18 @@ class KeyVal
     // Rewrite the data to newfile.  For each element of key_changes,
     // replace any occurrences of map keys with the associated value.
     // For each element of replacements, replace the key and value
-    // together with the value, appending whatever end of line
-    // character is on the original.  For keys in deletions, omit
-    // entirely.  For keys in additions, add the key and value,
-    // terminating with whatever line terminator was used on the first
-    // line of the original file.
+    // together with the value (which must include any replacement
+    // key), appending whatever end of line character is on the
+    // original.  For keys in deletions, omit entirely.  For values in
+    // additions, just add them to the file, terminating with whatever
+    // line terminator was used on the first line of the original
+    // file.
     void writeFile(
 	char const* newfile,
 	std::map<std::string, std::string> const& key_changes,
 	std::map<std::string, std::string> const& replacements,
 	std::set<std::string> const& deletions,
-	std::vector<std::pair<std::string, std::string> > const& additions)
-	const;
+	std::vector<std::string> const& additions) const;
 
     // Get a list of all keys.
     std::set<std::string> getKeys() const;

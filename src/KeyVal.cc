@@ -211,7 +211,7 @@ KeyVal::writeFile(
     std::map<std::string, std::string> const& key_changes,
     std::map<std::string, std::string> const& replacements,
     std::set<std::string> const& deletions,
-    std::vector<std::pair<std::string, std::string> > const& additions) const
+    std::vector<std::string> const& additions) const
 {
     boost::regex eol_re(".*?((?:\\r?\\n)?)");
     boost::smatch match;
@@ -225,12 +225,10 @@ KeyVal::writeFile(
 	throw QEXC::System(std::string("create ") + newfile, errno);
     }
 
-    for (std::vector<std::pair<std::string, std::string> >::const_iterator
-	     iter = additions.begin();
+    for (std::vector<std::string>::const_iterator iter = additions.begin();
 	 iter != additions.end(); ++iter)
     {
-	std::string const& key = (*iter).first;
-	of << key << ": " << (*iter).second << this->preferred_eol;
+	of << *iter << this->preferred_eol;
     }
 
     for (std::vector<OrigData>::const_iterator iter = this->orig_data.begin();
