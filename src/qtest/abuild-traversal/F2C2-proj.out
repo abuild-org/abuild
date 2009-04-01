@@ -17,16 +17,16 @@ make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
 IFC1: F2C2-f2-b-ifc
 IMPL1: F2C2-f2-b-impl
 make: Leaving directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
-abuild: c2-a (abuild-indep): all
-make: Entering directory `--topdir--/1.0/forest1/F2C2/proj/c2/impl/a/abuild-indep'
-IFC1: PROJ0-c1-ifc PROJ0-c2-ifc F2C2-f2-b-ifc
-IMPL1: F2C2-f2-b-impl F2C2-c2-a-impl
-make: Leaving directory `--topdir--/1.0/forest1/F2C2/proj/c2/impl/a/abuild-indep'
 abuild: f2-c (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/c/abuild-indep'
 IFC1: F2C2-f2-c-ifc
 IMPL1: F2C2-f2-c-impl
 make: Leaving directory `--topdir--/1.0/forest1/F2C2/util/f2/c/abuild-indep'
+abuild: c2-a (abuild-indep): all
+make: Entering directory `--topdir--/1.0/forest1/F2C2/proj/c2/impl/a/abuild-indep'
+IFC1: PROJ0-c1-ifc PROJ0-c2-ifc F2C2-f2-b-ifc
+IMPL1: F2C2-f2-b-impl F2C2-c2-a-impl
+make: Leaving directory `--topdir--/1.0/forest1/F2C2/proj/c2/impl/a/abuild-indep'
 abuild: c2-b (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest1/F2C2/proj/c2/impl/b/abuild-indep'
 IFC1: PROJ0-c1-ifc PROJ0-c2-ifc F2C2-f2-c-ifc

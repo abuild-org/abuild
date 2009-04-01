@@ -1,6 +1,4 @@
 
-Do refactoring of item/platform pair for sorting
-
 Then review TODO to figure out what from the revamped build trees,
 compatibility, and conversion tool should be moved into the
 documentation and what parts can just live as comments in the code.
@@ -68,6 +66,13 @@ release notes.
  * Added build set "deptrees" to mean all build trees in the tree-deps
    chain, including the current build tree.  This build set would
    build what "all" builds in 1.0.
+
+ * Default build ordering has changed so that tree ordering is used
+   before item ordering in the sort.  This means that if tree A
+   declares tree B as a tree dependency (or uses it as an external)
+   all of A's build items will build before any of B's build items (in
+   a single-threaded build).  Build ordering is always determined by
+   build item dependencies.
 
 
 Groovy Framework
@@ -383,32 +388,6 @@ Usability Improvements
    --dump-data option will always be available for providing full
    information, but providing a more human-readable format for
    commonly needed information will help.
-
- * Abuild 1.0's build ordering is created by doing a stable
-   topological sort on an alphabetical list of build items.  Instead
-   of starting with a straight alphabetical list, have the starting
-   list group build items by build tree.  To create the starting list,
-   first topologically sort the alphabetical list of trees, and then
-   alphabetically sort build items within each tree.  When this list
-   is topologically sorted, it should result in build items from the
-   same tree being built together (in a single-threaded build), and
-   will generally result in items with higher visibility being built
-   earlier in the process.  Also, make sure the : separator between
-   build item and platform doesn't mess up sorting.  In 1.0, "item"
-   sorts after "item2" because the strings being compared are
-   item:platform and item2:platform, and : sorts after numbers.
-
-   Both of these items can be achieved by having build graph nodes be
-   of the form "prefix item platform" with space as the separator.
-   The "prefix" field is a fixed-width, zero-filled, numeric prefix
-   corresponding to the tree name and assigned in sorted order.  We
-   should parse and unparse the build graph node names in one place,
-   and we should change all functions (other than the one directly
-   called by DependencyRunner) that take a build graph node to take an
-   item and a platform as separate arguments.  Do the refactoring
-   first including adding a test for the item/item2 sort.  Then, once
-   everything is good, change the sort order to be sensitive to tree
-   ordering.
 
  * Consider adding a new special-case target "help" that would provide
    help in a manner that does not require invoking a back end.  This

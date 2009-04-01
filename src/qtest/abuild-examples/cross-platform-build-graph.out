@@ -1,6 +1,6 @@
-lib!<native> -> <none>
-calculate!<native> -> lib!<native>
-lib!<native>.release -> <none>
-calculate!<native>.release -> lib!<native>.release
-codegen!indep -> calculate!<native>.release lib!<native>.release
-prog!<native> -> codegen!indep calculate!<native>.release lib!<native>.release
+1!lib!<native> -> <none>
+1!calculate!<native> -> 1!lib!<native>
+1!lib!<native>.release -> <none>
+1!calculate!<native>.release -> 1!lib!<native>.release
+1!codegen!indep -> 1!calculate!<native>.release 1!lib!<native>.release
+1!prog!<native> -> 1!codegen!indep 1!calculate!<native>.release 1!lib!<native>.release

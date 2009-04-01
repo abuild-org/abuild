@@ -12,10 +12,12 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/shared_array.hpp>
 #include <fstream>
 #include <sstream>
 #include <algorithm>
 #include <cstdlib>
+#include <cstdio>
 #include <assert.h>
 
 std::string const Abuild::ABUILD_VERSION = "1.1.a4";
@@ -1041,8 +1043,8 @@ Abuild::readConfigs()
     }
 
     // Construct a list of build item names in reverse dependency
-    // order.  This list is used during construction of the build
-    // graph.
+    // order (leaves of the dependency tree last).  This list is used
+    // during construction of the build graph.
     std::list<std::string> const& sorted_items =
 	local_forest.getSortedItemNames();
     for (std::list<std::string>::const_reverse_iterator iter =
@@ -1055,6 +1057,8 @@ Abuild::readConfigs()
 	    this->buildset_reverse_order.push_back(item_name);
 	}
     }
+
+    computeTreePrefixes(local_forest.getSortedTreeNames());
 
     // A false return means that we should continue processing.
     return false;
@@ -4232,6 +4236,38 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     }
 }
 
+void
+Abuild::computeTreePrefixes(std::list<std::string> const& tree_names)
+{
+    // Assign a prefix for each tree such that prefixes sort lexically
+    // in the same order as trees sort topologically.  We use this for
+    // creating build graph nodes in a way that improves the build
+    // ordering when multiple trees are involved.  It's harmless to
+    // have entries in this map for trees that don't actually
+    // participate in the build.  Create zero-filled, fixed length,
+    // numeric prefixes for each tree.
+
+    unsigned int maxval = tree_names.size();
+    unsigned int ndigits = 1;
+    unsigned int upper = 10;
+    while (maxval >= upper)
+    {
+	upper *= 10;
+	++ndigits;
+    }
+    boost::shared_array<char> t_ptr(new char[ndigits + 1]);
+    char* t = t_ptr.get();
+    int count = 0;
+    for (std::list<std::string>::const_iterator iter = tree_names.begin();
+	 iter != tree_names.end(); ++iter)
+    {
+	std::string const& tree_name = *iter;
+	++count;
+	std::sprintf(t, "%0*d", ndigits, count);
+	this->buildgraph_tree_prefixes[tree_name] = t;
+    }
+}
+
 bool
 Abuild::isBuildItemWritable(BuildItem const& item)
 {
@@ -5087,7 +5123,11 @@ Abuild::createBuildGraphNode(std::string const& item_name,
 {
     // Use ! as a separator because it lexically sorts before
     // everything except space, and using space is inconvenient.
-    return item_name + "!" + platform;
+    assert(this->buildset.count(item_name));
+    std::string const& item_tree = this->buildset[item_name]->getTreeName();
+    assert(this->buildgraph_tree_prefixes.count(item_tree));
+    return this->buildgraph_tree_prefixes[item_tree] + "!" +
+	item_name + "!" + platform;
 }
 
 void
@@ -5095,7 +5135,7 @@ Abuild::parseBuildGraphNode(std::string const& node,
 			    std::string& item_name,
 			    std::string& platform)
 {
-    boost::regex builder_re("([^!]+)!([^!]+)");
+    boost::regex builder_re("[^!]+!([^!]+)!([^!]+)");
     boost::smatch match;
     assert(boost::regex_match(node, match, builder_re));
     item_name = match[1].str();

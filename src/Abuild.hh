@@ -138,6 +138,7 @@ class Abuild
 		       std::map<std::string, int>& forest_numbers);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& forest_numbers);
+    void computeTreePrefixes(std::list<std::string> const& tree_names);
     bool isBuildItemWritable(BuildItem const& item);
     bool isBuildItemPtrWritable(BuildItem const* item);
     void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
@@ -333,6 +334,7 @@ class Abuild
     DependencyGraph build_graph;
     boost::shared_ptr<Interface> base_interface;
     std::vector<std::string> buildset_reverse_order;
+    std::map<std::string, std::string> buildgraph_tree_prefixes;
     std::vector<std::string> failed_builds;
 
     // (forest, other_forest) -> [plugin, ...]

@@ -1,9 +1,9 @@
-04-java!java -> <none>
-04-indep!indep -> <none>
-03-all!java -> 04-indep!indep 04-java!java
-02-all!java -> 03-all!java 04-indep!indep 04-java!java
-01-java!java -> 02-all!java 03-all!java 04-indep!indep 04-java!java
-04-object-code!<native> -> <none>
-03-all!<native> -> 04-indep!indep 04-object-code!<native>
-02-all!<native> -> 03-all!<native> 04-indep!indep 04-object-code!<native>
-01-object-code!<native> -> 02-all!<native> 03-all!<native> 04-indep!indep 04-object-code!<native>
+1!04-java!java -> <none>
+1!04-indep!indep -> <none>
+1!03-all!java -> 1!04-indep!indep 1!04-java!java
+1!02-all!java -> 1!03-all!java 1!04-indep!indep 1!04-java!java
+1!01-java!java -> 1!02-all!java 1!03-all!java 1!04-indep!indep 1!04-java!java
+1!04-object-code!<native> -> <none>
+1!03-all!<native> -> 1!04-indep!indep 1!04-object-code!<native>
+1!02-all!<native> -> 1!03-all!<native> 1!04-indep!indep 1!04-object-code!<native>
+1!01-object-code!<native> -> 1!02-all!<native> 1!03-all!<native> 1!04-indep!indep 1!04-object-code!<native>

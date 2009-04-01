@@ -17,9 +17,9 @@ abuild: e.global (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.multi (abuild-<native>): all
 abuild: e.multi (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.shlib2 (abuild-zz_os.cpu.toolset.echo): all
+abuild: root (abuild-indep): all
 abuild: ext (abuild-<native>): all
 make: Entering directory `--topdir--/ext/abuild-<native>'
 Compiling ../ext.cc as C++
 Creating ext executable
 make: Leaving directory `--topdir--/ext/abuild-<native>'
-abuild: root (abuild-indep): all
