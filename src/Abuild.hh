@@ -148,7 +148,6 @@ class Abuild
     void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);
-    bool isAnyBuildItem(BuildItem const*);
     bool addBuildAlsoToBuildset(BuildItem_map& builditems);
     bool buildBuildset();
     bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);

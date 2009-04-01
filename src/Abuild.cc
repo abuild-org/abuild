@@ -4513,7 +4513,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         {
             QTC::TC("abuild", "Abuild buildset all", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
-			     boost::bind(&Abuild::isAnyBuildItem, this, _1));
+			     boost::bind(&BuildItem::isLocal, _1));
         }
 	else if (set_name == b_DEPTREES)
         {
@@ -4789,12 +4789,6 @@ Abuild::populateBuildset(BuildItem_map& builditems,
 	    this->buildset[item_name] = item_ptr;
 	}
     }
-}
-
-bool
-Abuild::isAnyBuildItem(BuildItem const*)
-{
-    return true;
 }
 
 bool
