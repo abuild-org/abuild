@@ -1,0 +1,7 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: replaced ./Abuild.backing
+abuild: replaced ./Abuild.conf
+abuild: removed t2/Abuild.backing
+abuild: replaced t2/Abuild.conf

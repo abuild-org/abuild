@@ -1,3 +1,4 @@
-backing-areas: ../a ../c
+# duplicate backing area
+backing-areas: ../a ../c ../a
 deleted-trees: b1
 deleted-items: c1

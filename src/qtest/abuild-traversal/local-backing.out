@@ -1,0 +1,7 @@
+abuild: searching for build items...
+abuild: analyzing...
+main/Abuild.backing: ERROR: backing area "--topdir--/deleted-trees/backing" falls within the area being upgraded; rerun abuild from a lower directory or exclude the backing area
+main/t2/Abuild.backing: ERROR: backing area "--topdir--/deleted-trees/backing/t2" falls within the area being upgraded; rerun abuild from a lower directory or exclude the backing area
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: please edit that file and rerun; for details, see "Upgrading Build Trees from 1.0 to 1.1" in the user's manual
+abuild: ERROR: errors detected; exiting

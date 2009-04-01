@@ -320,6 +320,34 @@
    </build-item>
   </build-tree>
   <build-tree
+   name="a1"
+   absolute-path="--topdir--/multi/a/a1"
+   home-forest="f-3"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="a1"
+    home-forest="f-3"
+    absolute-path="--topdir--/multi/a/a1"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+  </build-tree>
+  <build-tree
    name="b1"
    absolute-path="--topdir--/multi/b/b1"
    home-forest="f-2"
@@ -548,6 +576,42 @@
      <platform name="<native>.release"/>
     </buildable-platforms>
    </build-item>
+  </build-tree>
+  <build-tree
+   name="a1"
+   absolute-path="--topdir--/multi/product/a1"
+   home-forest="f-5"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="a1"
+    home-forest="f-3"
+    absolute-path="--topdir--/multi/a/a1"
+    backing-depth="1"
+    target-type="all"
+    is-plugin="0"
+   />
+   <build-item
+    name="a2"
+    home-forest="f-5"
+    absolute-path="--topdir--/multi/product/a1"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
   </build-tree>
   <build-tree
    name="c"

@@ -1,0 +1,7 @@
+[ignored-directories]
+# Place one directory to ignore while scanning on each line.
+
+[forest]
+# root: .
+t2: t2
+.: top

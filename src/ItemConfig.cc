@@ -344,33 +344,31 @@ ItemConfig::checkUnnamed()
 void
 ItemConfig::checkRoot()
 {
-    if (! this->is_forest_root)
+    bool has_backing_file =
+	Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING);
+    if (has_backing_file && (! this->is_forest_root))
     {
-	bool has_backing_file =
-	    Util::isFile(this->dir + "/" + BackingConfig::FILE_BACKING);
-	if (has_backing_file)
+	QTC::TC("abuild", "ItemConfig ERR Abuild.backing non-forest root");
+	this->error.error(
+	    FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
+	    BackingConfig::FILE_BACKING +
+	    " file ignored for non forest-root build item");
+    }
+    if (this->compat_level.allow_1_0())
+    {
+	if (this->is_root && this->is_forest_root &&
+	    this->tree_name.empty() && has_backing_file)
 	{
-	    QTC::TC("abuild", "ItemConfig ERR Abuild.backing non-forest root");
-	    this->error.error(
-		FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
-		BackingConfig::FILE_BACKING +
-		" file ignored for non forest-root build item");
+	    QTC::TC("abuild", "ItemConfig allowing deprecated deleted");
 	}
-	if (this->compat_level.allow_1_0())
+	else
 	{
-	    if (this->is_root && this->tree_name.empty() && has_backing_file)
+	    if (checkKeyPresent(k_DELETED,
+				"is ignored except in deprecated"
+				" 1.0 build tree roots with backing"
+				" areas"))
 	    {
-		QTC::TC("abuild", "ItemConfig allowing deprecated deleted");
-	    }
-	    else
-	    {
-		if (checkKeyPresent(k_DELETED,
-				    "is ignored except in deprecated"
-				    " 1.0 build tree roots with backing"
-				    " areas"))
-		{
-		    QTC::TC("abuild", "ItemConfig ERR deleted on non-1.0-root");
-		}
+		QTC::TC("abuild", "ItemConfig ERR deleted on non-1.0-root");
 	    }
 	}
     }

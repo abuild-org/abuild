@@ -239,7 +239,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	    {
 		std::string epath = Util::absToRel(econfig->getAbsolutePath());
 		dep_tree_name = econfig->getTreeName();
-		if (ud.items.count(epath) && ud.items[epath])
+		if (ud.items.count(epath) && ud.items[epath]->isTreeRoot())
 		{
 		    // The external points to a known tree root inside
 		    // our area of concern.

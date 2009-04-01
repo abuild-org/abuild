@@ -2398,14 +2398,14 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		trees_not_deleted.erase(tree_name);
 		if (buildtrees.count(tree_name))
 		{
-		    QTC::TC("abuild", "Abuild ERR deleted tree exists locally");
-		    error(location,
-			  "tree \"" + tree_name + "\" is marked for"
-			  " deletion, but it appears locally in this"
-			  " forest");
-		    error(buildtrees[tree_name]->getLocation(),
-			  "here is the location of the tree in"
-			  " this forest");
+		    // This is not an error.  If you want to replace
+		    // one tree with another one with the same name,
+		    // that's fine as deleting the tree also prevents
+		    // copying the old tree's items.  With items, it's
+		    // different -- replacing an item is sufficient to
+		    // get rid of the old one.  You don't have t do
+		    // delete it too.
+		    QTC::TC("abuild", "Abuild deleted tree exists locally");
 		}
 	    }
 	    else if (buildtrees.count(tree_name))

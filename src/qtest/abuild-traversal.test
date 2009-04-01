@@ -143,12 +143,33 @@ $td->runtest("backed external cycle",
 	     {$td->FILE => "$top/backed-external-cycle.out",
 	      $td->EXIT_STATUS => 2});
 
+cd("work/errors/cycle");
+
+$td->runtest("backing area loop",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/backing-area-loop.out",
+	      $td->EXIT_STATUS => 2});
+
+copy("$top/external-cycle.in", "abuild.upgrade-data") or die;
+
+$td->runtest("upgrade external cycle",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-cycle-upgrade.out",
+	      $td->EXIT_STATUS => 2});
+
 cd("work/errors/ext-not-root");
 
 $td->runtest("external not root",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-not-root.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("upgrade",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-not-root-upgrade.out",
 	      $td->EXIT_STATUS => 2});
 
 cd("work/errors/ext-no-conf");
@@ -159,12 +180,17 @@ $td->runtest("external lacks conf",
 	     {$td->FILE => "$top/external-no-conf.out",
 	      $td->EXIT_STATUS => 2});
 
-cd("work/errors/ext-not-found");
+cd("work/errors/ext-not-found/a");
 
 $td->runtest("can't resolve external",
-	     {$td->COMMAND => "abuild -C a",
+	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-not-found.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("upgrade",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-not-found-upgrade.out",
 	      $td->EXIT_STATUS => 2});
 
 cd("work/errors/integrity");
@@ -183,6 +209,14 @@ $td->runtest("external backs into forest",
 	     {$td->FILE => "$top/back-to-self.out",
 	      $td->EXIT_STATUS => 2});
 
+cd("work/errors/bad-root");
+
+$td->runtest("bad forest root",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-forest-root.out",
+	      $td->EXIT_STATUS => 2});
+
 # Traverse a 1.0-style tree with complex externals and backing areas.
 
 cd("work/1.0");
@@ -195,7 +229,6 @@ check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
 check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
 
 # Test upgrade
-
 
 cd("work/1.0/forest0/PROJ0/proj/c1/impl/a");
 
@@ -268,6 +301,12 @@ $td->runtest("all but c2 pass 2",
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
 	     {$td->FILE => "$top/forest0-upgrade-data-2.out"});
+copy("$top/forest0-upgrade-data-errors.in", "abuild.upgrade-data") or die;
+$td->runtest("upgrade data errors",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/forest0-upgrade-errors.out",
+	      $td->EXIT_STATUS => 2});
 copy("$top/forest0-upgrade-data-3.in", "abuild.upgrade-data") or die;
 $td->runtest("all but c2",
 	     {$td->COMMAND => "abuild --upgrade-trees",
@@ -350,9 +389,33 @@ foreach my $v (qw(1.0 1.1))
     check_tree("forest2 all", "forest2/C3/proj", "forest2-u1");
 }
 
+# Check additional cases that can't start with a pure 1.0 forest.
+
+cd("work/deleted-trees");
+
+$td->runtest("local backing area",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/local-backing.out",
+	      $td->EXIT_STATUS => 2});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/local-backing-upgrade-data.out"});
+
+cd("work/deleted-trees/main");
+
+$td->runtest("deleted trees",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/deleted-trees.out",
+	      $td->EXIT_STATUS => 0});
+$td->runtest("check upgrade data",
+	     {$td->FILE => "abuild.upgrade-data"},
+	     {$td->FILE => "$top/deleted-trees-upgrade-data.out"});
+
 check_work_accessed($td);
 
-$td->report(62);
+$td->report(72);
 
 sub check_tree
 {

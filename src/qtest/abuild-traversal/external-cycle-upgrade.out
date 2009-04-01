@@ -1,0 +1,6 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: ERROR: the following trees are involved in a cycle (external-dir):
+abuild: ERROR:   c
+abuild: ERROR:   d
+abuild: ERROR: errors detected; exiting

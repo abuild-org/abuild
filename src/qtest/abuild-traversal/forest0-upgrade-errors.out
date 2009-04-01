@@ -1,0 +1,8 @@
+abuild: searching for build items...
+abuild: ERROR: the name assigned to the tree at "UTIL0/util/f1" in the upgrade data file ("f11") differs from the tree's actual name ("f1"); ignoring information from the upgrade data file
+abuild: analyzing...
+abuild: ERROR: tree name "c1!invalid", assigned to "PROJ0/proj/c1", is not a valid tree name
+abuild: ERROR: tree name "c1-ifc" has been assigned to "PROJ0/proj/c1/impl" and also to "PROJ0/proj/c1/ifc"
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: please edit that file and rerun; for details, see "Upgrading Build Trees from 1.0 to 1.1" in the user's manual
+abuild: ERROR: errors detected; exiting
