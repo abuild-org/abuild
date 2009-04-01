@@ -1,0 +1,12 @@
+--topdir--/wrong-tree/junk/Abuild.conf: ERROR: "parent-dir" points to a directory that does not contain Abuild.conf
+abuild: ERROR: unable to find top of build forest containing "--topdir--/wrong-tree/junk" (backing area "--topdir--/wrong-tree/junk" from "--topdir--/wrong-tree/main/Abuild.backing"); run with --verbose for details
+--topdir--/wrong-tree/main/Abuild.backing: ERROR: unable to determine top of forest containing backing area "--topdir--/wrong-tree/junk"
+--topdir--/wrong-tree/backing/t1/Abuild.conf: ERROR: this tree may not declare item "i2" as a plugin because because its tree does not depend on "i2"'s tree ("t2")
+--topdir--/wrong-tree/backing/t1/Abuild.conf: ERROR: build item "i1" may not request build of build item "i2" because "i1"'s tree ("t1") does not depend on "i2"'s tree ("t2")
+--topdir--/wrong-tree/backing/t1/Abuild.conf: ERROR: build item "i1" may not depend on build item "i2" because "i1"'s tree ("t1") does not depend on "i2"'s tree ("t2")
+--topdir--/wrong-tree/backing/t1/Abuild.conf: ERROR: build item "i1" may not refer by trait to build item "i2" because "i1"'s tree ("t1") does not depend on "i2"'s tree ("t2")
+--topdir--/wrong-tree/main/Abuild.backing: ERROR: item "i2" is marked for deletion, but it appears locally in this forest
+--topdir--/wrong-tree/main/Abuild.conf: ERROR: here is the location of the item in this forest
+--topdir--/wrong-tree/main/Abuild.backing: ERROR: tree "does-not-exist" was marked for deletion but was not seen in a backing area
+--topdir--/wrong-tree/main/Abuild.backing: ERROR: item "t2" was marked for deletion but was not seen in a backing area
+abuild: ERROR: errors detected; exiting

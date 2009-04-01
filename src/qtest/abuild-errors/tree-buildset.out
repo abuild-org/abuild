@@ -1,0 +1,2 @@
+abuild: ERROR: build set "local" is invalid when the current build item is not part of any tree
+abuild: ERROR: errors detected; exiting

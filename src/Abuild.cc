@@ -1110,7 +1110,14 @@ Abuild::readExternalConfig(std::string const& start_dir,
 	}
 	if (seen.count(fulldir))
 	{
-	    QTC::TC("abuild", "Abuild ERR readExternalConfig loop");
+	    // No coverage case -- I believe this is precluded by
+	    // BackingConfig.cc disallowing a the case of backing area
+	    // that doesn't have an Abuild.conf.  Since this code only
+	    // follows the Abuild.backing file when the Abuild.conf
+	    // file is not found, we would need a loop formed by
+	    // Abuild.backing alone files to get here, and such a loop
+	    // will be short-circuited by the check in
+	    // BackingConfig.cc.
 	    error("loop detected trying to find " + ItemConfig::FILE_CONF +
 		  " for \"" + start_external + "\" relative to \"" +
 		  start_dir + "\"");
@@ -1940,7 +1947,7 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
 	QTC::TC("abuild", "Abuild ERR named item outside of tree");
 	error(item->getLocation(),
 	      "named build items are not allowed outside of"
-	      " build trees");
+	      " named build trees");
     }
     else
     {
@@ -2191,13 +2198,13 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     // effects of other operations having been completed.
     resolveFromBackingAreas(forests, top_path);
     checkTreeDependencies(forest);
-    checkTreeAccess(forest);
     resolveTraits(forest);
     checkPlatformTypes(forest);
     checkPlugins(forest);
     checkItemNames(forest);
     checkBuildAlso(forest);
     checkItemDependencies(forest);
+    checkDepTreeAccess(forest);
     updatePlatformTypes(forest);
     checkDependencyPlatformTypes(forest);
     checkFlags(forest);
@@ -2511,7 +2518,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 }
 
 void
-Abuild::checkTreeAccess(BuildForest& forest)
+Abuild::checkDepTreeAccess(BuildForest& forest)
 {
     // Check to make sure no item references an item in a tree that
     // its tree does not depend on
@@ -2521,6 +2528,13 @@ Abuild::checkTreeAccess(BuildForest& forest)
 	 iter != builditems.end(); ++iter)
     {
 	BuildItem& item = *((*iter).second);
+	if (! item.isLocal())
+	{
+	    // If item is not local, it was checked in its home
+	    // forest.  If it depends on items in the local tree,
+	    // that's a different error and will be reported as such.
+	    continue;
+	}
 	std::list<std::string> const& alldeps = item.getExpandedDependencies();
 	for (std::list<std::string>::const_iterator diter = alldeps.begin();
 	     diter != alldeps.end(); ++diter)
@@ -2615,6 +2629,10 @@ Abuild::checkPlugins(BuildForest& forest)
 	std::string const& tree_name = (*iter).first;
 	plugin_data[tree_name].empty(); // force this entry to exist
 	BuildTree& tree = *((*iter).second);
+	if (! tree.isLocal())
+	{
+	    continue;
+	}
 	std::set<std::string> const& allowed_trees =
 	    (*(access_table.find(tree_name))).second;
 	std::list<std::string> const& plugins = tree.getPlugins();
@@ -2867,6 +2885,10 @@ Abuild::checkBuildAlso(BuildForest& forest)
 	 iter != builditems.end(); ++iter)
     {
 	BuildItem& item = *((*iter).second);
+	if (! item.isLocal())
+	{
+	    continue;
+	}
 	std::string const& item_name = (*iter).first;
 	FileLocation const& item_location = item.getLocation();
 
@@ -4257,7 +4279,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    ((set_name == b_DEPTREES) || (set_name == b_LOCAL)))
 	{
 	    QTC::TC("abuild", "Abuild ERR bad tree-based build set");
-	    error("build set " + set_name + " contains no items when"
+	    error("build set \"" + set_name + "\" is invalid when"
 		  " the current build item is not part of any tree");
 	}
 	else if (! this->buildset_named_items.empty())

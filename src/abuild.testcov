@@ -274,7 +274,6 @@ Abuild-upgrade ERR unknown external 0
 ItemConfig ERR build tree invalid name 0
 Abuild-upgrade ERR name mismatch 0
 Abuild-upgrade ERR tree-dep graph error 0
-Abuild ERR readExternalConfig loop 0
 ItemConfig ERR tree-deps on non-root 0
 Abuild-upgrade ERR duplicate name 0
 Abuild-upgrade ERR invalid name 0

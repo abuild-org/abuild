@@ -32,6 +32,7 @@ class BuildTree
     void setForestRoot(std::string const&);
     std::string const& getForestRoot() const;
     int getBackingDepth() const;
+    bool isLocal() const;
     void incrementBackingDepth();
     void setExpandedTreeDeps(std::list<std::string> const&);
 

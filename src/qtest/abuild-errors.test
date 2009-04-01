@@ -204,6 +204,42 @@ $td->runtest("abuild dependency errors",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/wrong-tree/main");
+
+$td->runtest("tree access errors",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/tree-access-errors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/tree-buildset");
+
+$td->runtest("invalid tree buildset",
+	     {$td->COMMAND => "abuild -b local",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/tree-buildset.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/not-in-tree");
+
+$td->runtest("named item not in tree",
+	     {$td->COMMAND => "abuild --compat-level=1.1",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/named-item-not-in-tree.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+cd("work/external/main");
+
+$td->runtest("external with no top",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/external-no-top.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 # To actually bump into the root directory while finding the top of
 # the tree, we need to create a directory outside of the abuild source
 # tree.  Otherwise, abuild's own Abuild.conf will block us.
@@ -240,4 +276,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(24 + (in_windows() ? 0 : 1));
+$td->report(28 + (in_windows() ? 0 : 1));

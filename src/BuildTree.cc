@@ -90,6 +90,12 @@ BuildTree::getBackingDepth() const
     return this->backing_depth;
 }
 
+bool
+BuildTree::isLocal() const
+{
+    return (this->backing_depth == 0);
+}
+
 void
 BuildTree::incrementBackingDepth()
 {

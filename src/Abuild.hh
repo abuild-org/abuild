@@ -98,7 +98,6 @@ class Abuild
     void resolveFromBackingAreas(BuildForest_map& forests,
 				 std::string const& top_path);
     void checkTreeDependencies(BuildForest& forest);
-    void checkTreeAccess(BuildForest& forest);
     bool checkAllowedTree(BuildForest& forest,
 			  BuildItem& referrer,
 			  BuildItem& referent,
@@ -113,6 +112,7 @@ class Abuild
 			std::string const& accessee);
     void checkBuildAlso(BuildForest& forest);
     void checkItemDependencies(BuildForest& forest);
+    void checkDepTreeAccess(BuildForest& forest);
     void updatePlatformTypes(BuildForest& forest);
     void checkDependencyPlatformTypes(BuildForest& forest);
     void checkFlags(BuildForest& forest);
