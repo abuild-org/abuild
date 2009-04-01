@@ -15,7 +15,7 @@ class Backend implements GroovyBackend
     def targets
 
     def loader = new GroovyClassLoader()
-    static Map<File,Class> classCache = [:]
+    static Map<File, Class> classCache = [:]
 
     private BuildState buildState
     private AntBuilder ant
