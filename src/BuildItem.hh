@@ -61,7 +61,6 @@ class BuildItem
     TargetType::target_type_e getTargetType() const;
     bool isNamed(std::set<std::string>& item_names) const;
     bool matchesPattern(boost::regex& pattern) const;
-    bool isWritable() const;
     bool isAtOrBelowPath(std::string const& path) const;
     bool hasShadowedReferences() const;
     Interface const& getInterface(std::string const& platform) const;

@@ -1,14 +1,14 @@
 
 Do refactoring of item/platform pair for sorting
 
-Still need to review code.
-
 Then review TODO to figure out what from the revamped build trees,
 compatibility, and conversion tool should be moved into the
 documentation and what parts can just live as comments in the code.
 
 XXX Java out of memory problem with ant is reportedly fixed with
 1.5.0_12.
+
+Next: -ro, -rw
 
 === Changes Targeted for Version 1.1 ===
 

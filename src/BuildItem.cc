@@ -308,15 +308,6 @@ BuildItem::matchesPattern(boost::regex& pattern) const
 }
 
 bool
-BuildItem::isWritable() const
-{
-    // XXX This has to go.  Move logic about whether a build item is
-    // writable or not into abuild proper where it can look at ro/rw
-    // paths.  It must also look at backing depth.
-    return (this->backing_depth == 0);
-}
-
-bool
 BuildItem::isAtOrBelowPath(std::string const& path) const
 {
     std::string const& absolute_path = getAbsolutePath();

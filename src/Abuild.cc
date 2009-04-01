@@ -267,7 +267,6 @@ Abuild::runInternal()
     return okay;
 }
 
-
 void
 Abuild::getThisPlatform()
 {
@@ -1314,7 +1313,6 @@ Abuild::reportDirectoryGraphErrors(DependencyGraph& g,
 	}
     }
 }
-
 
 void
 Abuild::computeBackingGraph(BuildForest_map& forests,
@@ -2973,7 +2971,6 @@ Abuild::accessibleFrom(BuildItem_map& builditems,
     return accessible;
 }
 
-
 void
 Abuild::checkItemDependencies(BuildForest& forest)
 {
@@ -4238,6 +4235,20 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     }
 }
 
+bool
+Abuild::isBuildItemWritable(BuildItem const& item)
+{
+    // XXX also check ro/rw paths
+    return (item.getBackingDepth() == 0);
+}
+
+bool
+Abuild::isBuildItemPtrWritable(BuildItem const* item)
+{
+    // Needed for populateBuildset
+    return isBuildItemWritable(*item);
+}
+
 void
 Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 {
@@ -4310,7 +4321,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         {
             QTC::TC("abuild", "Abuild buildset all", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
-			     boost::bind(&BuildItem::isWritable, _1));
+			     boost::bind(&Abuild::isBuildItemPtrWritable,
+					 this, _1));
         }
 	else if (set_name == b_DEPTREES)
         {
@@ -5581,7 +5593,7 @@ Abuild::dumpInterface(std::string const& item_platform,
 	return;
     }
 
-    if (! build_item.isWritable()) // XXX
+    if (! isBuildItemWritable(build_item))
     {
 	QTC::TC("abuild", "Abuild dumpInterface ignoring read-only build item");
 	return;
@@ -5669,7 +5681,7 @@ Abuild::buildItem(std::string const& item_name,
 		  std::string const& item_platform,
 		  BuildItem& build_item)
 {
-    if (! build_item.isWritable()) // XXX
+    if (! isBuildItemWritable(build_item))
     {
 	// Assume that this item has previously been built
 	// successfully.
@@ -6233,7 +6245,7 @@ Abuild::cleanBuildset()
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (item.isWritable())	// XXX
+	if (isBuildItemWritable(item))
 	{
 	    cleanPath(item_name, item.getAbsolutePath());
 	}
@@ -6459,7 +6471,6 @@ Abuild::exitIfErrors()
 	fatal("errors detected; exiting");
     }
 }
-
 
 void
 Abuild::info(std::string const& msg)

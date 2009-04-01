@@ -138,6 +138,8 @@ class Abuild
 		       std::map<std::string, int>& forest_numbers);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& forest_numbers);
+    bool isBuildItemWritable(BuildItem const& item);
+    bool isBuildItemPtrWritable(BuildItem const* item);
     void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);
@@ -338,7 +340,9 @@ class Abuild
     std::map<std::string,
 	     std::map<std::string, ItemConfig*> > read_external_config_cache;
 
-    // Used by 1.0 compatibility mode only
+    // Used by 1.0 compatibility mode only.  When removing 1.0
+    // compatibility code, search for "compat" to make sure all
+    // comments, local variables, etc., are found.
     unsigned int last_assigned_tree_number;
     std::map<std::string, std::string> assigned_tree_names;
     std::set<std::string> items_traversed;
