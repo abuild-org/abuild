@@ -129,19 +129,22 @@ $td->runtest("backing cycle",
 	     {$td->COMMAND => "abuild -C a",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/backing-cycle.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("external cycle",
 	     {$td->COMMAND => "abuild -C c",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-cycle.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("backed external cycle",
 	     {$td->COMMAND => "abuild -C e",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/backed-external-cycle.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/cycle");
 
@@ -149,7 +152,8 @@ $td->runtest("backing area loop",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/backing-area-loop.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 copy("$top/external-cycle.in", "abuild.upgrade-data") or die;
 
@@ -157,7 +161,8 @@ $td->runtest("upgrade external cycle",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-cycle-upgrade.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/ext-not-root");
 
@@ -165,12 +170,14 @@ $td->runtest("external not root",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-not-root.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("upgrade",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-not-root-upgrade.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/ext-no-conf");
 
@@ -178,7 +185,8 @@ $td->runtest("external lacks conf",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-no-conf.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/ext-not-found/a");
 
@@ -186,12 +194,14 @@ $td->runtest("can't resolve external",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-not-found.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("upgrade",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/external-not-found-upgrade.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/integrity");
 
@@ -199,7 +209,8 @@ $td->runtest("shadowed deps and plugins",
 	     {$td->COMMAND => "abuild -C f2/main -b all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/integrity.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/back-to-self/t1");
 
@@ -207,7 +218,8 @@ $td->runtest("external backs into forest",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/back-to-self.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/errors/bad-root");
 
@@ -215,7 +227,8 @@ $td->runtest("bad forest root",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/bad-forest-root.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 # Traverse a 1.0-style tree with complex externals and backing areas.
 
@@ -236,7 +249,8 @@ $td->runtest("start too low",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/upgrade-too-low.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0/forest1");
 
@@ -244,10 +258,12 @@ $td->runtest("unresolved backed externals",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest1-upgrade-1.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest1-upgrade-data-1.out"});
+	     {$td->FILE => "$top/forest1-upgrade-data-1.out"},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0/forest0/UTIL0");
 
@@ -255,28 +271,33 @@ $td->runtest("partial upgrade pass 1",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/UTIL0-upgrade-1.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/UTIL0-upgrade-data-1.out"});
+	     {$td->FILE => "$top/UTIL0-upgrade-data-1.out"},
+	     $td->NORMALIZE_NEWLINES);
 
 copy("$top/UTIL0-upgrade-data-errors.in", "abuild.upgrade-data") or die;
 $td->runtest("upgrade-data errors",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/UTIL0-upgrade-errors.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 
 copy("$top/UTIL0-upgrade-data-2.in", "abuild.upgrade-data") or die;
 $td->runtest("successful partial upgrade",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/UTIL0-upgrade-2.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/UTIL0-upgrade-data-2.out"});
+	     {$td->FILE => "$top/UTIL0-upgrade-data-2.out"},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0");
 
@@ -288,34 +309,41 @@ $td->runtest("all but c2 pass 1",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-1.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest0-upgrade-data-1.out"});
+	     {$td->FILE => "$top/forest0-upgrade-data-1.out"},
+	     $td->NORMALIZE_NEWLINES);
 copy("$top/forest0-upgrade-data-2.in", "abuild.upgrade-data") or die;
 $td->runtest("all but c2 pass 2",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-2.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest0-upgrade-data-2.out"});
+	     {$td->FILE => "$top/forest0-upgrade-data-2.out"},
+	     $td->NORMALIZE_NEWLINES);
 copy("$top/forest0-upgrade-data-errors.in", "abuild.upgrade-data") or die;
 $td->runtest("upgrade data errors",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-errors.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 copy("$top/forest0-upgrade-data-3.in", "abuild.upgrade-data") or die;
 $td->runtest("all but c2",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-3.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest0-upgrade-data-3.in"}); # unchanged
+	     {$td->FILE => "$top/forest0-upgrade-data-3.in"}, # unchanged
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0");
 check_tree("forest0 all", "forest0", "forest0-u1");
@@ -327,19 +355,23 @@ $td->runtest("rest of forest0 pass 1",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-4.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest0-upgrade-data-4.out"});
+	     {$td->FILE => "$top/forest0-upgrade-data-4.out"},
+	     $td->NORMALIZE_NEWLINES);
 copy("$top/forest0-upgrade-data-5.in", "abuild.upgrade-data") or die;
 $td->runtest("rest of forest0",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-5.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest0-upgrade-data-5.in"}); # unchanged
+	     {$td->FILE => "$top/forest0-upgrade-data-5.in"}, # unchanged
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0/forest0");
 unlink "abuild.upgrade-data" or die;
@@ -347,36 +379,43 @@ $td->runtest("no upgrade required",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest0-upgrade-6.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0/forest1");
 $td->runtest("forest1",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest1-upgrade-2.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest1-upgrade-data-2.out"});
+	     {$td->FILE => "$top/forest1-upgrade-data-2.out"},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/1.0/forest2");
 $td->runtest("forest2 pass 1",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest2-upgrade-1.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest2-upgrade-data-1.out"});
+	     {$td->FILE => "$top/forest2-upgrade-data-1.out"},
+	     $td->NORMALIZE_NEWLINES);
 copy("$top/forest2-upgrade-data-2.in", "abuild.upgrade-data") or die;
 $td->runtest("forest2",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/forest2-upgrade-2.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/forest2-upgrade-data-2.in"}); # unchanged
+	     {$td->FILE => "$top/forest2-upgrade-data-2.in"}, # unchanged
+	     $td->NORMALIZE_NEWLINES);
 
 # Check trees after upgrading.
 
@@ -397,10 +436,12 @@ $td->runtest("local backing area",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/local-backing.out",
-	      $td->EXIT_STATUS => 2});
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/local-backing-upgrade-data.out"});
+	     {$td->FILE => "$top/local-backing-upgrade-data.out"},
+	     $td->NORMALIZE_NEWLINES);
 
 cd("work/deleted-trees/main");
 
@@ -408,10 +449,12 @@ $td->runtest("deleted trees",
 	     {$td->COMMAND => "abuild --upgrade-trees",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/deleted-trees.out",
-	      $td->EXIT_STATUS => 0});
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("check upgrade data",
 	     {$td->FILE => "abuild.upgrade-data"},
-	     {$td->FILE => "$top/deleted-trees-upgrade-data.out"});
+	     {$td->FILE => "$top/deleted-trees-upgrade-data.out"},
+	     $td->NORMALIZE_NEWLINES);
 
 check_work_accessed($td);
 
