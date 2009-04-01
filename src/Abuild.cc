@@ -1666,13 +1666,13 @@ Abuild::mergeForests(BuildForest_map& forests,
 
 	// coalesce backing areas
 	std::set<std::string> ba_set;
-	std::list<std::string>::iterator iter = backing_areas.begin();
-	while (iter != backing_areas.end())
+	std::list<std::string>::iterator i2 = backing_areas.begin();
+	while (i2 != backing_areas.end())
 	{
-	    std::list<std::string>::iterator next = iter;
+	    std::list<std::string>::iterator next = i2;
 	    ++next;
 	    bool keep = false;
-	    std::string ba = *iter;
+	    std::string ba = *i2;
 	    if (forest_renames.count(ba))
 	    {
 		verbose("in forest \"" + root +
@@ -1691,13 +1691,13 @@ Abuild::mergeForests(BuildForest_map& forests,
 	    }
 	    if (keep)
 	    {
-		*iter = ba;
+		*i2 = ba;
 	    }
 	    else
 	    {
-		backing_areas.erase(iter, next);
+		backing_areas.erase(i2, next);
 	    }
-	    iter = next;
+	    i2 = next;
 	}
     }
 }
