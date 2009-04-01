@@ -167,7 +167,6 @@ Compiler Verification
    a plugin in another tree.
 
 
-
 Core Changes
 ============
 
@@ -262,6 +261,7 @@ Core Changes
       of platform-specific dependencies and platform conditionals.
 
  * Drop internal "clean" targets and update documentation.
+
 
 Documentation
 =============
