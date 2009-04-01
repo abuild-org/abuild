@@ -346,6 +346,14 @@
     target-type="all"
     is-plugin="0"
    />
+   <build-item
+    name="a3"
+    home-forest="f-3"
+    absolute-path="--topdir--/multi/a/a1/a3"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
   </build-tree>
   <build-tree
    name="b1"
@@ -433,6 +441,7 @@
   <backing-area forest="f-3"/>
   <backing-area forest="f-4"/>
   <deleted-trees>
+   <deleted-tree name="a1"/>
    <deleted-tree name="b1"/>
   </deleted-trees>
   <deleted-items>
@@ -596,14 +605,6 @@
      <platform name="java" selected="1"/>
     </platform-type>
    </platform-data>
-   <build-item
-    name="a1"
-    home-forest="f-3"
-    absolute-path="--topdir--/multi/a/a1"
-    backing-depth="1"
-    target-type="all"
-    is-plugin="0"
-   />
    <build-item
     name="a2"
     home-forest="f-5"
