@@ -556,16 +556,16 @@ abuild-monitor: state-change bc indep ready
 abuild-monitor: state-change ca <native> ready
 abuild-monitor: state-change cb <native> waiting
 abuild-monitor: state-change cc indep ready
-abuild-monitor: state-change d.a.a indep ready
 abuild-monitor: state-change d.a indep waiting
+abuild-monitor: state-change d.a.a indep ready
 abuild-monitor: state-change d.b.a indep ready
 abuild-monitor: state-change e.bin zz_os.cpu.toolset.echo waiting
 abuild-monitor: state-change e.global zz_os.cpu.toolset.echo ready
 abuild-monitor: state-change e.lib zz_os.cpu.toolset.echo ready
 abuild-monitor: state-change e.multi <native> ready
 abuild-monitor: state-change e.multi zz_os.cpu.toolset.echo ready
-abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo waiting
 abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo waiting
+abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo waiting
 abuild-monitor: state-change root indep ready
 abuild-monitor: state-change bb indep running
 abuild-monitor: targets bb indep all
@@ -801,8 +801,8 @@ contents of bin-bin2:
 end contents of bin-bin2
 make: Leaving directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo'
 abuild-monitor: state-change e.lib zz_os.cpu.toolset.echo completed
-abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo ready
 abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo ready
+abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo ready
 abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo running
 abuild-monitor: targets e.shlib zz_os.cpu.toolset.echo all
 abuild: e.shlib (abuild-zz_os.cpu.toolset.echo): all

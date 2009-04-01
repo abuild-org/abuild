@@ -63,26 +63,6 @@ war:
 
 BUILD SUCCESSFUL
 Total time: <time>
-abuild: ear-example.local-jar (abuild-java): all
-Buildfile: --abuild.xml--
-
-init:
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/empty
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/classes
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/dist
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/java
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/resources
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/web
-    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/conf
-
--do-compile:
-    [javac] Compiling 1 source file to --topdir--/archive-types/ear/local-jar/abuild-java/classes
-
--jar-without-main-class:
-      [jar] Building jar: --topdir--/archive-types/ear/local-jar/abuild-java/dist/ear-code.jar
-
-BUILD SUCCESSFUL
-Total time: <time>
 abuild: war-example (abuild-java): all
 Buildfile: --abuild.xml--
 
@@ -104,6 +84,26 @@ init:
 
 war:
       [war] Building war: --topdir--/archive-types/war/abuild-java/dist/war-example.war
+
+BUILD SUCCESSFUL
+Total time: <time>
+abuild: ear-example.local-jar (abuild-java): all
+Buildfile: --abuild.xml--
+
+init:
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/empty
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/classes
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/dist
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/java
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/resources
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/web
+    [mkdir] Created dir: --topdir--/archive-types/ear/local-jar/abuild-java/src/conf
+
+-do-compile:
+    [javac] Compiling 1 source file to --topdir--/archive-types/ear/local-jar/abuild-java/classes
+
+-jar-without-main-class:
+      [jar] Building jar: --topdir--/archive-types/ear/local-jar/abuild-java/dist/ear-code.jar
 
 BUILD SUCCESSFUL
 Total time: <time>

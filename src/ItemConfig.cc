@@ -45,8 +45,9 @@ std::string const ItemConfig::k_PLUGINS = "plugins";
 //  * Space: make code and Abuild.conf parsing use space-separated
 //    lists of build items
 //
-//  * Colon: a single colon is used to separate the build item from
-//    the platform in the build graph nodes
+//  * Exclamation point: a single exclamation point is used to
+//    separate the build item from the platform in the build graph
+//    nodes
 //
 // Carefully consider the implications of adding new legal characters
 // to the names of build items.  As currently specified, build item

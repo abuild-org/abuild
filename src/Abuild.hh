@@ -146,6 +146,11 @@ class Abuild
     bool addBuildAlsoToBuildset(BuildItem_map& builditems);
     bool buildBuildset();
     bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);
+    std::string createBuildGraphNode(std::string const& item_name,
+				     std::string const& platform);
+    void parseBuildGraphNode(std::string const& node,
+			     std::string& item_name,
+			     std::string& platform);
     void findGnuMakeInPath();
     void findJava();
     bool isThisItemThisPlatform(std::string const& name,
@@ -261,7 +266,6 @@ class Abuild
     static std::string const s_NO_OP;
     static std::string const PLUGIN_PLATFORM;
     static std::string const FILE_PLUGIN_INTERFACE;
-    static std::string const BUILDER_RE;
     static std::set<std::string> special_targets;
     static std::list<std::string> default_targets;
 

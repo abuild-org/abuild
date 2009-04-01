@@ -37,7 +37,6 @@ std::string const Abuild::s_NO_OP = "no-op";
 // PLUGIN_PLATFORM can't match a real platform name.
 std::string const Abuild::PLUGIN_PLATFORM = "plugin";
 std::string const Abuild::FILE_PLUGIN_INTERFACE = "plugin.interface";
-std::string const Abuild::BUILDER_RE = "([^:]+):([^:]+)";
 std::set<std::string> Abuild::special_targets;
 std::list<std::string> Abuild::default_targets;
 
@@ -242,16 +241,14 @@ Abuild::runInternal()
     if (! okay)
     {
 	error("at least one build failure occurred; summary follows");
-	boost::regex builder_re(BUILDER_RE);
-	boost::smatch match;
 	assert(! this->failed_builds.empty());
 	for (std::vector<std::string>::iterator iter =
 		 this->failed_builds.begin();
 	     iter != this->failed_builds.end(); ++iter)
 	{
-	    assert(boost::regex_match(*iter, match, builder_re));
-	    std::string item_name = match[1].str();
-	    std::string item_platform = match[2].str();
+	    std::string item_name;
+	    std::string item_platform;
+	    parseBuildGraphNode(*iter, item_name, item_platform);
 	    error("build failure: " + item_name + " on platform " +
 		  item_platform);
 	}
@@ -4970,7 +4967,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	// platform since colon is an invalid character for both items
 	// and platform identifiers.  This ensures that the resulting
 	// string will be unambiguous.
-	this->build_graph.addItem(item_name + ":" + *bp_iter);
+	this->build_graph.addItem(createBuildGraphNode(item_name, *bp_iter));
     }
 
     for (std::list<std::string>::const_iterator dep_iter =
@@ -5018,7 +5015,8 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	     bp_iter != build_platforms.end(); ++bp_iter)
 	{
 	    std::string const& item_platform = *bp_iter;
-	    std::string platform_item = item_name + ":" + item_platform;
+	    std::string platform_item =
+		createBuildGraphNode(item_name, item_platform);
 
 	    if (dep_type == TargetType::tt_platform_independent)
 	    {
@@ -5028,7 +5026,8 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 			((item_platform == PlatformData::PLATFORM_INDEP)
 			 ? 0 : 1));
 		this->build_graph.addDependency(
-		    platform_item, dep + ":" + PlatformData::PLATFORM_INDEP);
+		    platform_item, createBuildGraphNode(
+			dep, PlatformData::PLATFORM_INDEP));
 	    }
 	    else if (! override_platform.empty())
 	    {
@@ -5038,7 +5037,8 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		QTC::TC("abuild", "Abuild override platform");
 		dep_item.addBuildPlatform(override_platform);
 		this->build_graph.addDependency(
-		    platform_item, dep + ":" + override_platform);
+		    platform_item, createBuildGraphNode(
+			dep, override_platform));
 	    }
 	    else if ((dep_type == TargetType::tt_all) ||
 		     (dep_platforms.count(item_platform)))
@@ -5055,7 +5055,8 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 			((dep_type == TargetType::tt_all) ? 0 : 1));
 		dep_item.addBuildPlatform(item_platform);
 		this->build_graph.addDependency(
-		    platform_item, dep + ":" + item_platform);
+		    platform_item, createBuildGraphNode(
+			dep, item_platform));
 	    }
 	    else if (item_type == TargetType::tt_all)
 	    {
@@ -5078,6 +5079,27 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     }
 
     return true;
+}
+
+std::string
+Abuild::createBuildGraphNode(std::string const& item_name,
+			     std::string const& platform)
+{
+    // Use ! as a separator because it lexically sorts before
+    // everything except space, and using space is inconvenient.
+    return item_name + "!" + platform;
+}
+
+void
+Abuild::parseBuildGraphNode(std::string const& node,
+			    std::string& item_name,
+			    std::string& platform)
+{
+    boost::regex builder_re("([^!]+)!([^!]+)");
+    boost::smatch match;
+    assert(boost::regex_match(node, match, builder_re));
+    item_name = match[1].str();
+    platform = match[2].str();
 }
 
 void
@@ -5286,10 +5308,9 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     // failed builder_string to the failed_builds list.
 
     boost::smatch match;
-    boost::regex builder_re(BUILDER_RE);
-    assert(boost::regex_match(builder_string, match, builder_re));
-    std::string item_name = match[1].str();
-    std::string item_platform = match[2].str();
+    std::string item_name;
+    std::string item_platform;
+    parseBuildGraphNode(builder_string, item_name, item_platform);
     BuildItem& build_item = *(this->buildset[item_name]);
 
     // If we are trying to build an item with shadowed dependencies or
@@ -5392,10 +5413,9 @@ Abuild::stateChangeCallback(std::string const& builder_string,
 			    item_filter_t filter)
 {
     boost::smatch match;
-    boost::regex builder_re(BUILDER_RE);
-    assert(boost::regex_match(builder_string, match, builder_re));
-    std::string item_name = match[1].str();
-    std::string item_platform = match[2].str();
+    std::string item_name;
+    std::string item_platform;
+    parseBuildGraphNode(builder_string, item_name, item_platform);
     std::string item_state = DependencyEvaluator::unparseState(state);
     monitorOutput("state-change " +
 		  item_name + " " + item_platform + " " + item_state);
@@ -5438,14 +5458,12 @@ Abuild::createItemInterface(std::string const& builder_string,
     // include the interfaces of our indirect dependencies.
     std::list<std::string> const& deps =
 	this->build_graph.getDirectDependencies(builder_string);
-    boost::regex builder_re(BUILDER_RE);
     for (std::list<std::string>::const_iterator iter = deps.begin();
 	 iter != deps.end(); ++iter)
     {
-	boost::smatch match;
-	assert(boost::regex_match(*iter, match, builder_re));
-	std::string dep_name = match[1].str();
-	std::string dep_platform = match[2].str();
+	std::string dep_name;
+	std::string dep_platform;
+	parseBuildGraphNode(*iter, dep_name, dep_platform);
 
 	BuildItem& dep_item = *(this->buildset[dep_name]);
 	verbose("importing interface for dependency " + dep_name);

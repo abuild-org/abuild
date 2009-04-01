@@ -28,37 +28,6 @@ abuild: executable.entry (abuild-java): test
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/executable/entry/abuild-java/classes
     [mkdir] Created dir: --topdir--/mixed-classification/public/executable/entry/abuild-java/dist
       [jar] Building jar: --topdir--/mixed-classification/public/executable/entry/abuild-java/dist/executable-entry.jar
-abuild: processor.sensitive (abuild-java): test
-    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/processor/abuild-java/classes
-    [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/processor/abuild-java/classes
-    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/processor/abuild-java/dist
-      [jar] Building jar: --topdir--/mixed-classification/sensitive/processor/abuild-java/dist/processor.jar
-abuild: executable.sensitive (abuild-java): test
-    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/classes
-    [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/executable/abuild-java/classes
-    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/dist
-      [jar] Building jar: --topdir--/mixed-classification/sensitive/executable/abuild-java/dist/executable.jar
-     [exec] 
-     [exec] *********************************
-     [exec] STARTING TESTS on ---timestamp---
-     [exec] *********************************
-     [exec] 
-     [exec] 
-     [exec] Running ../qtest/executable.test
-     [exec] sensitive  1 (normal case)                         ... PASSED
-     [exec] 
-     [exec] Overall test suite                                 ... PASSED
-     [exec] 
-     [exec] TESTS COMPLETE.  Summary:
-     [exec] 
-     [exec] Total tests: 1
-     [exec] Passes: 1
-     [exec] Failures: 0
-     [exec] Unexpected Passes: 0
-     [exec] Expected Failures: 0
-     [exec] Missing Tests: 0
-     [exec] Extra Tests: 0
-     [exec] 
 abuild: processor (abuild-java): test
     [mkdir] Created dir: --topdir--/mixed-classification/public/processor/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/mixed-classification/public/processor/abuild-java/classes
@@ -77,6 +46,37 @@ abuild: executable (abuild-java): test
      [exec] 
      [exec] Running ../qtest/executable.test
      [exec] public  1 (normal case)                            ... PASSED
+     [exec] 
+     [exec] Overall test suite                                 ... PASSED
+     [exec] 
+     [exec] TESTS COMPLETE.  Summary:
+     [exec] 
+     [exec] Total tests: 1
+     [exec] Passes: 1
+     [exec] Failures: 0
+     [exec] Unexpected Passes: 0
+     [exec] Expected Failures: 0
+     [exec] Missing Tests: 0
+     [exec] Extra Tests: 0
+     [exec] 
+abuild: processor.sensitive (abuild-java): test
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/processor/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/processor/abuild-java/classes
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/processor/abuild-java/dist
+      [jar] Building jar: --topdir--/mixed-classification/sensitive/processor/abuild-java/dist/processor.jar
+abuild: executable.sensitive (abuild-java): test
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/mixed-classification/sensitive/executable/abuild-java/classes
+    [mkdir] Created dir: --topdir--/mixed-classification/sensitive/executable/abuild-java/dist
+      [jar] Building jar: --topdir--/mixed-classification/sensitive/executable/abuild-java/dist/executable.jar
+     [exec] 
+     [exec] *********************************
+     [exec] STARTING TESTS on ---timestamp---
+     [exec] *********************************
+     [exec] 
+     [exec] 
+     [exec] Running ../qtest/executable.test
+     [exec] sensitive  1 (normal case)                         ... PASSED
      [exec] 
      [exec] Overall test suite                                 ... PASSED
      [exec] 

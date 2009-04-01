@@ -113,9 +113,9 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild-monitor: state-change af indep waiting
 abuild-monitor: state-change af-dep indep ready
 abuild-monitor: state-change af-rdep indep waiting
-abuild-monitor: state-change af indep waiting
 abuild-monitor: state-change af-dep indep running
 abuild-monitor: targets af-dep indep all
 abuild: af-dep (abuild-indep): all
