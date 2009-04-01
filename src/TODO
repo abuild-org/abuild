@@ -1,7 +1,4 @@
 
-XXX Java out of memory problem with ant is reportedly fixed with
-1.5.0_12.
-
 Next: -ro, -rw
 
 === Changes Targeted for Version 1.1 ===
@@ -50,14 +47,13 @@ release notes.
    environment variable in addition to the command line argument.  The
    command line argument takes precedence.
 
- * Document somewhere that, when converting, abuild will be happier if
-   you don't change this to name on trees whose roots don't have
-   tree-name.
-
  * Having a child-dirs entry be a symbolic link or cross a symbolic
    link now results in an explicit error message.  This has never
    really worked, but in the past, the result would most likely have
    been something about a parent/child mismatch.
+
+ * Changed build set "all" to mean all known build items in all trees
+   in the forest.
 
  * Added build set "deptrees" to mean all build trees in the tree-deps
    chain, including the current build tree.  This build set would
@@ -72,12 +68,12 @@ release notes.
 
  * Replaced "this" with "name"
 
+ * The value of parent-dir is completely ignored other than to check
+   it enough to make sure that ignoring it doesn't change anything.
+
  * Require trees to be named.  Replace externals with subtrees.
    Eliminate absolute path and read-only externals, but provide an
    alternative to read-only externals for the desired functionality.
-
- * Change build set "all" to mean all known build items in all trees
-   in the forest.
 
  * Move "deleted-items" key from root Abuild.conf to Abuild.backing.
    Also add a "deleted-trees" key.  New Abuild.backing format:
@@ -90,9 +86,20 @@ release notes.
    backing areas, they must be disjoint (i.e., they must not both
    supply the same item or tree).
 
+ * Implemented abuild --upgrade-trees.  You should not attempt to
+   upgrade trees manually.  Although abuild will work fine with mixed
+   1.0/1.1 trees, you will get a lot more warnings and possibly
+   incorrect results in some cases (though no such cases are known) if
+   you partially upgrade your trees.  There is A LOT to keep track of
+   when upgrading your trees.  You are much better off letting abuild
+   do it for you.
+
 
 Groovy Framework
 ================
+
+ * Java out of memory problem with ant is reportedly fixed with
+   1.5.0_12.
 
  * Find sun conventions on directory structure for _base.groovy
 
@@ -159,9 +166,6 @@ Compiler Verification
 
 Core Changes
 ============
-
- * Implement an optional 1.0-compatibility mode.  See "Compatibility"
-   below.
 
  * When abuild is run with no arguments, its default behavior will be
    to act as if --with-deps had been specified.  A new flag
