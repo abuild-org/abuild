@@ -2416,7 +2416,22 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    }
 	    else if (buildtrees.count(tree_name))
 	    {
-		QTC::TC("abuild", "Abuild override build tree");
+		if (buildtrees[tree_name]->isLocal())
+		{
+		    QTC::TC("abuild", "Abuild override build tree");
+		}
+		else
+		{
+		    FileLocation const& loc = tree.getLocation();
+		    FileLocation const& other_loc =
+			buildtrees[tree_name]->getLocation();
+		    // See comment near this same check for build
+		    // items for why this assertion pass.
+		    assert(! (loc == other_loc));
+		    QTC::TC("abuild", "Abuild ERR tree multiple backing areas");
+		    error(loc, "this tree appears in multiple backing areas");
+		    error(other_loc, "here is another location for this tree");
+		}
 	    }
 	    else
 	    {

@@ -338,3 +338,4 @@ ItemConfig allowing deprecated deleted 0
 Abuild ERR invalid trait referent 0
 Abuild-upgrade ERR start below root 0
 Abuild multiple backing areas 0
+Abuild ERR tree multiple backing areas 0

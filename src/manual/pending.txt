@@ -27,10 +27,17 @@ Here is an outline of the basic process:
 
  * Rerun "abuild --upgrade-trees".  Once abuild has all the
    information it needs, it will perform the upgrade by rewriting any
-   Abuild.conf that needs to be rewritten.  The original file will be
-   renamed to Abuild-1.0.conf.  When you are satisfied with the
-   upgrade, you can delete the Abuild-1.0.conf files, as those files
-   are not used by abuild under any circumstances.
+   Abuild.conf or Abuild.backing that needs to be rewritten.  The
+   original file will be renamed to Abuild.conf-1_0 or
+   Abuild.backing-1_0.  When you are satisfied with the upgrade, you
+   can delete the *-1_0 files, as those files are not used by abuild
+   under any circumstance.
+
+Generally, if you have a backing area, you should upgrade the backing
+area first.  If your backing areas are set up properly and you have
+not added any new trees in your area, the upgrade of the backing area
+may work without any intervention, as abuild will use the backing area
+to figure out tree names for trees that are backed.
 
 
 Information You Will Need
@@ -52,8 +59,6 @@ file.
 The "abuild.upgrade-data" File Format
 -------------------------------------
 
-XXX HERE
-
 QUICK START
 
  * For each directory whose contents you wish to (recursively) ignore,
@@ -69,20 +74,23 @@ QUICK START
 DETAILS
 
 This is a configuration file used to assist abuild --upgrade-trees.
-The main body of the file begins after the line containing the word
-"BEGIN" on a line by itself.  Everything prior to that point is
-documentation on how to use this file.  There is no comment syntax in
-this file.  (XXX Yes there is, but comments aren't preserved.)  When
-abuild --upgrade-trees is run, it will rewrite this file.  It will
-preserve any information that has been filled in, but it will not
-otherwise preserve format or layout.
+Every time abuild --upgrade-trees is run, it will replace this file,
+so any comments or formatting changes you make will be lost.  Any
+tree names you assign will be preserved.
 
-This file is divided into sections.  Each section is opened with a
-line of the form
+The abuild.upgrade-data file consists of sections Each section is
+opened with a line of the form
 
 [section-name]
 
 where "section-name" is replaced by one of the valid section names.
+
+There are three sections: one [ignored-directories] lists directories
+that will be skipped during the upgrade, any number of [forest]
+sections list all the trees abuild finds to be in a given forest, and
+an optional [orphan-trees] section is used to hang onto names
+previously assigned to any trees that no longer appear in a known
+forest.
 
 The "abuild --upgrade-trees" command recursively scans the current
 directory looking for Abuild.conf files.  It reads every Abuild.conf
@@ -102,9 +110,14 @@ files that are not connected to the rest of the trees.  You should
 examine the list of forests carefully to determine whether there are
 stray files that you wish to remove.
 
+The "abuild --upgrade-trees" functionality fully supports partially
+upgraded trees.  It is okay to upgrade forests that have a mixture of
+1.0-style and 1.1-style trees in them.  This means you do not have
+upgrade your trees all at the same time.
+
 If there are directories below the current directory that you wish to
 ignore during the conversion process, list them in the
-[ignored-directories] section as described in "QUICK START" above.
+[ignored-directories] section.
 
 In each forest that abuild discovers, it will require a name for each
 tree.  If the tree already has a name, that name will appear filled in
@@ -113,11 +126,10 @@ below.  Otherwise, the place-holder '***' will appear.
 In some cases, there may be a tree that you are not ready to upgrade,
 perhaps because that tree is still being used by a project that hasn't
 yet upgraded its version of abuild.  In that case, you may list the
-path to the root of the tree, again relative to the current directory,
-in the [do-not-upgrade] section.  You must also remove it from the
-forest in which it appeared.  You may also place paths to trees that
-are either inside ignored directories or are located outside of the
-current directory in [do-not-upgrade].
+path to the root of the tree in the [ignored-directories] section.
+You do not need to remove it from the [forest] section in which it
+appears; abuild will remove it from there automatically next time it
+writes the file.
 
 Abuild is able to perform the actual upgrade when all of the following
 conditions are met:
@@ -133,32 +145,596 @@ conditions are met:
    assigned to it.
 
  * Every tree that abuild finds during its scan as well as every
-   external-dirs entry referenced by those trees appears either in a
-   [forest] section or in the [do-not-upgrade].
+   external-dirs entry referenced by those trees appears in a [forest]
+   section and has a name assigned to it.
 
-When abuild performs the upgrade, it does the following 
+Abuild is usually able to upgrade forests with backing areas, but it
+will not do so if any externals resolve to 1.0-style trees in backing
+areas.  In that case, you must upgrade the backing area first.  You
+should generally do this anyway.
 
 
-XXXX
+Rationale for Changing Build Tree Structure
+===========================================
+
+A principal failing in abuild 1.0 stems from the use of paths to
+specify the locations of external build trees -- "external-dirs" is
+used to convey both dependency and location information.  This is
+against a fundamental design principle of abuild and must be
+corrected.  Another serious problem is the interaction between
+backing areas and externals: setting up backing areas for trees
+with lots of externals is complex to the point of being
+impractical.
+
+Projects that desire certain parts of their trees to be potentially
+compile-time independent from other parts have to break things into
+multiple trees and use externals.  This sometimes results in build
+areas consisting of many more trees than I envisioned in my
+original design.  (I had originally envisioned externals as being a
+rarely-used feature, primarily intended for supporting builds at
+multiple classification levels or supporting central libraries of
+reusable build items.)
+
+Consider first the case of externals without backing areas.  If
+there are multiple build trees with complex "external"
+relationships between them, then there is an implicit build
+"forest" consisting of multiple build trees which must be organized
+relative to each other in a particular way.  Knowledge of this
+relative organization of trees is not represented in any one place
+but rather is distributed through all the root Abuild.conf files,
+usually with considerable but non-obvious duplication of knowledge
+(exactly the situation abuild's name-based organization was
+designed to avoid).  For example, if A, B, C, and D are build trees
+whose roots are under a common parent, you could have a situation
+in which A declares ../B and ../C as externals and B declares ../D
+as an external.  There is no single place where A, B, C, and D are
+even all mentioned, yet abuild will require them to all be in the
+same directory.  This situation becomes much worse when build trees
+are at different levels -- the same tree may be referred to by
+multiple different relative paths.  This creates great confusion,
+and makes it very to move a tree around or even find who is
+referencing a particular tree.
+
+When backing areas are added to the mix, the problem is further
+compounded.  If a build tree contains other external build trees
+nested inside of it, use of a backing area with the parent tree, in
+practice, requires use of a specific backing area on the child
+tree, especially when externals need to be resolved from a backing
+area.  Consider this arrangement of build trees:
+
+   A       F
+ / | \    /
+B  C  D  G
+|
+E
+
+with the following external relationships:
+
+E -> C, D
+D -> G
+
+Suppose you have a backing area forest containing A and F, and a
+local build area containing only A.  In this case, in the local A,
+it is necessary to have backing areas for E, C, and D in, and they
+all have to point to the right locations under A's backing area.
+In addition to that, people remain generally in the dark about how
+externals are resolved through backing areas.  It's
+(understandably) hard for people to understand the idea that a
+relative path expressed in an Abuild.conf file may be resolve
+relative to another directory that is listed in an Abuild.backing
+file.
+
+In defense of the original design, when abuild was a simple perl
+script that used "make" to do most of its work, this made the
+initial implementation very easy -- abuild just replaced the tree
+top path with the backing area path and re-invoked itself.
+However, given the current state of abuild's evolution and an
+understanding of how these features are actually used, it is
+obvious that the current implementation is no longer tenable.
+
+It is clear that build trees deserve to be named entities, and that
+just as is true with build items, the location of any given tree
+must appear in only one place within a build area.  It is also
+clear that use of backing areas when multiple trees are involved is
+too cumbersome to be practical.
+
+
+Revamped Build Tree Structure
+=============================
+
+Introduce the concept of a "build forest".  A build forest is a
+collection of related build trees that are physically located under a
+common root.  Build forests already exist with abuild 1.0, but they
+are not an explicit entity.
+
+Eliminate the parent-dir key.  Build item X's parent directory is the
+next higher directory, if any, whose Abuild.conf lists X's directory
+in its child-dirs key.  We must enforce that child-dirs may not
+contain .. in any path element, and that there are no intervening
+Abuild.conf files between a parent and child Abuild.conf.
+
+Require build tree root Abuild.conf files to include a "tree-name" key
+which provides the name of the build tree.  Any Abuild.conf file may
+contain a tree-name key.  This makes it the root of a subtree, which
+functions very much as externals do in abuild 1.0.  Subtrees are
+hooked into the forest like any other build item: through a
+higher-level directory's child-dirs key.
+
+Eliminate the external-dirs key.  Introduce in its place a "tree-deps"
+key which takes a list of tree names rather than tree paths.  Since we
+have no longer have the concept of externals, we no longer have the
+concept of read-only externals.  To support the pattern of building a
+tree without building any of the other subtrees that it uses, users
+must specify -ro-path or -rw-path on the command line at build time.
+Absolute path externals also disappear, but they were a bad idea to
+begin with.
+
+Allow Abuild.backing files only at forest roots, and allow multiple
+backing areas.  Introduce a new Abuild.backing syntax in which one or
+more backing areas may be specified in a backing-areas keyword, as in
+
+  backing-areas: /path/to/ba1 /path/to/ba2
+
+Backing areas as searched in the order in which they appear, and in a
+depth-first fashion.  The normal integrity guarantee still applies.
+
+[DONE] Disallow build item directories from being symbolic links.
+When a symbolic link is detected, suggest for people to use a backing
+area instead.  This is more practical with support for multiple
+backing areas.
+
+Traits, supported flags, and plugins behave with respect to subtrees
+in 1.1 just as they behaved with respect to externals in 1.0.  This
+means that it is still necessary to repeat plugin declaration lists
+for each subtree.  Although this is somewhat unfortunate, it makes it
+possible to have reasonable semantics when building an isolated
+subtree outside of the context of a backing area.
+
+Example:
+
+  OLD:
+
+   Top-level Abuild.conf files in each leaf below.  No way to know of
+   all build trees or their relative positions without visiting each
+   root.  No way to get list of build tree roots other than exhaustive
+   search.
+
+   top                  (no Abuild.conf)
+   |
+   |-- common           root Abuild.conf; no externals
+   |
+   |-- proj1
+   |   |
+   |   |-- interface
+   |   |   |
+   |   |   |-- comp1    external-dirs: ../../../common
+   |   |   |
+   |   |   `-- comp2    external-dirs: ../../../common
+   |   |
+   |   `-- private
+   |       |
+   |       |-- comp1    external-dirs: ../../interface/comp1
+   |       |
+   |       `-- comp2    external-dirs: ../../interface/comp2 ../comp1
+   |
+   `-- proj2
+       |
+       |-- common       external-dirs: ../../common
+       |
+       |-- comp1        external-dirs: ../common
+       |
+       `-- comp2        external-dirs: ../comp1
+
+  Note that ../../common from proj2/common is the same as
+  ../../../common from proj1/interface/comp1 and different from
+  ../common in proj2/comp1.
+
+
+  NEW:
+
+   Top-level Abuild.conf file in top directory; subtrees are hooked in
+   with child-dirs just like any other subdirectory.
+
+   top                  tree-name: top
+   |
+   |-- common           tree-name: common
+   |
+   |-- proj1
+   |   |
+   |   |-- interface
+   |   |   |
+   |   |   |-- comp1    tree-name: proj1-comp1; tree-deps: common
+   |   |   |
+   |   |   `-- comp2    tree-name: proj1-comp2; tree-deps: common
+   |   |
+   |   `-- private
+   |       |
+   |       |-- comp1    tree-name: proj1-comp1-impl; tree-deps: proj1-comp1
+   |       |
+   |       `-- comp2    tree-name: proj1-comp2-impl;
+   |                    tree-deps: proj1-comp2 proj1-comp1
+   `-- proj2
+       |
+       |-- common       tree-name: proj2-common; tree-deps: common
+       |
+       |-- comp1        tree-name: proj2-comp1; tree-deps: proj2-common
+       |
+       `-- comp2        tree-name: proj2-comp2; tree-deps: proj2-comp1
 
 
 
-BEGIN
+Traversal algorithm (approximate since the real algorithm will have
+compatibility stuff in it):
 
-[ignored-directories]
+ * Find the root of the current build forest.
 
-[do-not-upgrade]
+   English:
 
-[forest]
-path: name
-...
+   Keep walking up the file system looking for directories containing
+   Abuild.conf.  If you find one such that there is no higher
+   Abuild.conf or the next higher one doesn't reference it as a child,
+   and if this Abuild.conf file has a tree-name key or contains no
+   keys other than child-dirs, it is the forest root.
 
-[forest]
-path: name
-...
+   Pseudocode:
 
-[orphan-names]
-# for previous names that no longer fit anywhere
-path: name
+   cur_build_item = this directory
+   forest_top = nil
+
+   do until end search
+     if cur_build_item's Abuild.conf contains tree-name key OR
+           cur_build_item's Abuild.conf contains only child-dirs
+        forest_top = cur_build_item
+     parent_build_item = next higher Abuild.conf
+     if parent_build_item exists and has child pointing to cur_build_item
+        cur_build_item = parent_build_item
+     else
+        if forest_top == cur_build_item
+           this is found forest root
+	   end search
+        else
+           forest_top = nil
+           error: unable to find top of build forest
+
+   Note that if a parent Abuild.conf is found but it doesn't have a
+   child-dirs key that points to the child build item, and if the
+   child build item is a build tree root, the search stops, and there
+   is no error or warning reported.  This is a normal case of a
+   separate, independent tree nested inside another tree.  Examples of
+   when you might have this would include test suites that create
+   build trees (such as abuild's own test suite) or instances in which
+   abuild may be used to build third-party software distributions
+   nested within something that contains Abuild.conf files.  If this
+   tree was supposed to be connected into higher trees and was not,
+   there will probably be unresolved tree-deps or deps values.
+
+ * If the root of the forest does not contain an Abuild.backing, then
+   this is an unbacked forest.  If it does contain an Abuild.backing
+   file, ensure that each backing area points to a tree root (not
+   necessarily a forest root).  In that case, search for the backing
+   tree's forest root.  Continue until an unbacked forest is found.
+   Traverse the unbacked forest (as described below).
+
+   Note that we impose no restrictions on whether the backing area
+   points to the same tree or even to a backing forest that contains
+   the same tree.  This makes it possible to add an entirely new
+   subtree in a work area that backs to some other area, and then to
+   have the backing area later get included inside of a higher-level
+   tree without impacting the work area.  This also means that cases
+   where we might have used read-only, absolute-path externals in
+   abuild 1.0 would now work with multiple backing areas in abuild
+   1.1.
+
+ * Traverse the build forest.
+
+     traverse:
+
+     if current item has a tree-name key
+        set cur_tree to name of tree
+     store current build item in cur_tree
+     for each dir in child-dirs
+        ensure that dir has no path elements equal to ".."
+        if dir has more than one path element
+           ensure that no intermediate directories have Abuild.conf
+        traverse recursively from dir
+
+ * Verify that each tree in the forest is uniquely named
+
+ * Copy build items from the backing area forests that are absent from
+   the local forest into the local list.  Exclude build items that are
+   listed as deleted or that belong to trees that are listed as
+   deleted in the Abuild.backing file.
+
+ * Make sure that the graph implied by the tree-deps key is an
+   error-free directed acyclic graph.  Do not do checks to ensure that
+   is bipartite with respect to backing area traversal; save this
+   check for the build item level.  This makes it possible to sparsely
+   shadow a build tree for the purpose of adding items to it.
+
+   Implementation note: use DependencyGraph.  when we see a new tree
+   root, add the node.  When we see a tree-deps, add a dependency.
+
+ * Check dependencies and build item references (but do not report
+   errors) for the whole forest rather than doing it separately for
+   each build item and copying build items around.  (We only copy
+   build items from backing areas, not subtrees.)  Just disallow
+   resolution of any build item name in a tree not declared as used.
+   This makes it possible to issue error messages akin to "A is not
+   allowed to depend on B since A-tree has not declared B-tree as in
+   its tree-used key."
+
+ * If in full integrity mode, report all dependency and integrity
+   errors.  Otherwise, report errors only for subtrees relevant to the
+   current build.
+
+Need to flesh out an example that includes both searchlight and
+lh3-style trees.
+
+
+Compatibility
+=============
+
+Starting with version 1.1, abuild runs with a compatibility level
+equal to x.y where x.y is a released major/minor version.  In version
+1.1, the only valid compatibility levels are 1.0 and 1.1.  When abuild
+is running at compatibility level x.y, backward compatibility is
+disabled for features deprecated at or before version x.y.  For
+example, at compatibility level 1.0, abuild will recognize the "this"
+keyword in Abuild.conf, issue a deprecation warning, and treat it as
+if it were "name".  At compatibility level 1.1, abuild will not
+recognize the "this" key at all.
+
+The default compatibility level is 1.0.  At the present time, there is
+no expectation of supporting compatibility levels more than one minor
+release old, but this general capability level framework would make
+that possible if it were desired.
+
+When abuild recognizes feature from a version between the
+compatibility level and the current version, it will issue a
+deprecation warning.  Abuild can be run in a mode in which deprecation
+warnings are treated as errors.  There will be no option for
+suppressing deprecation warnings.
+
+Compatibility mode will work by having abuild map a 1.0 structure into
+the internal representation of a 1.1 structure.  Compatibility does
+not apply to the command-line invocation of abuild, but only to
+Abuild.conf and other build files.  There are some corner cases where
+abuild will possibly fail in compatibility mode, such as with
+interleaved build items (parent and child dirs skipping over each
+other) or backing areas that point to different backing forests, but
+the goal is for all "normal" abuild 1.0 trees to create the same
+builds with 1.1 as with 1.0.
+
+With pure abuild 1.1, a build item is a build tree root iff it has a
+tree-name key.  In pure abuild 1.0, a build item was a build tree root
+iff it did not have parent-dir key.  In 1.1 operating at 1.0
+compatibility level, the logic is somewhat more complex.  See comments
+in ItemConfig::isTreeRoot() for details on how the determination is made.
+
+Note that a build item with only a child-dirs key in its Abuild.conf
+can be a forest root even if it is not a tree root.
+
+Here is the full traversal algorithm, including compatibility support.
+
+  # Find forest top.
+
+  forest_top = nil
+  candidate_top = nil
+  cur_build_item = this directory
+
+  do until end search
+     if cur_build_item looks like a root (as determined above) OR
+           cur_build_item's Abuild.conf contains only child-dirs
+        candidate_top = cur_build_item
+     parent_build_item = next higher Abuild.conf
+     if parent_build_item exists and has child pointing to cur_build_item
+        cur_build_item = parent_build_item
+     else
+        if candidate_top == cur_build_item
+           forest_root = candidate_top
+           end search
+        else
+           error: unable to find top of build forest
+
+# XXXXXX ABOVE THIS POINT IS CODED AND TESTED.
+
+  # Find backing areas
+
+  read any Abuild.backing file in the same directory as forest_top
+  if in compatibility mode
+     traverse graph formed by external-dirs pointers to locate all
+        1.0 roots
+     if Abuild.backing file exists, issue deprecation warning, read
+     it, and store in a list
+
+  traverse backing areas in order with forest root backing file first
+     and then other backing areas as discovered
+
+  traverse local items by doing a depth-first traversal following
+     child-dirs pointers and, if in compatibility mode, then following
+     external-dirs pointers
+
+XXX Deprecation warnings on old trees: detect if any build item in a
+tree uses deprecated features.  This includes both using deprecated
+keys and also being a root and not having tree-name.  If that happens
+for any item in the tree, issue a single deprecation warning that
+points to the user to abuild --upgrade-trees.  Something like
+
+  The build tree whose root build item is located at X uses deprecated
+  features.  When you are ready to upgrade this build tree, you can
+  use "abuild --upgrade-trees" to do most of the work.  Please see the
+  section in the abuild user's manual entitled "Upgrading Build Trees
+  from 1.0 to 1.1" for details.
+
+If the root of the tree has tree-name, provide more information.  This
+may indicate a partially upgraded tree or someone accidentally using
+an old key.
+
+
+The build_tree structure changes a bit.  Rather than having a single
+list for each tree, we'll have a single list for the forest.  This is
+described in the revamped build tree section above.
+
+Note that the traversal of a typical 1.0 build tree will happen in a
+slightly different order.  In particular, consider this case:
+
+  A -ext-> B
+  A -backs-> A'
+  B -backs-> B'
+  A' -ext-> B'
+
+In 1.0, traversal would be in the order B', A', B, A.  In 1.1, it will
+be A', B', A, B.
+
+During traversal, if we see an Abuild.backing file in any directory
+with an Abuild.conf other than those from which we have already
+processed the file, report an error message.  This means that, in
+compatibility mode, we will not get error messages for Abuild.backing
+files in 1.0 roots, but in all cases, we will get error messages for
+any other rogue Abuild.backing files.
+
+During traversal, in compatibility mode, we will need to read 1.0
+Abuild.conf files as if they were 1.1 files.  The following mapping is
+used when reading Abuild.conf files.  In all cases, a deprecation
+warning is issued when any mapping rule is applied.
+
+ * If "this" is seen:
+
+    - If "name" is also seen, error
+
+    - Else treat "this" as name
+
+ * If "parent-dir" is seen:
+
+    - If there are any Abuild.conf between here and the parent, error
+
+    - Else if parent does not point to us as child, error
+
+    - Else give a warning about parent-dir and ignore
+
+ * If "deleted-items" is seen, give a warning, and treat it as if we
+   had read it out of an Abuild.backing file.
+
+ * If this is a root build item and there is no "tree-name" key,
+   generate a tree name.  If the tree has a backing area, use the name
+   of the backing area tree.  Otherwise, generate a name of the form
+   _tree.<rnd>.<nnn> where <rnd> is a random number (to prevent anyone
+   from referencing these tree names anywhere) and nnn is a sequential
+   number incremented each time we see a new tree.
+
+ * If external-dirs is encountered:
+
+    - If the external is read-only, if no -ro-path or -rw-path flags
+      were given on the command line, act as if its path had been
+      specified with -ro-path.  This is also slightly different since
+      any subtrees would be treated as read-only by -ro-path and not
+      be a read-only external.  If any -ro-path or -rw-path arguments
+      were given, indicate that the -ro flag is ignored and that build
+      items' read-only status is being determined by the -ro-path and
+      -rw-path arguments.
+
+    - Handle the external-dirs as if it were a tree-deps, generating a
+      name for the destination tree if it doesn't already have one
+      (either explicitly or as a result of an earlier name
+      generation).
+
+In addition to the above, we can easily recognize a 1.0 Abuild.backing
+file and treat it as if it were a 1.1 file.  We only do this when the
+Abuild.backing file is in a directory that appears to contain a 1.0
+root, which can, in turn, happen only in compatibility mode.
+
+In all of the above, remember that external-dirs can still appear in a
+1.1 root build item if it points to an external tree that has not yet
+been converted, and that 1.0 root can have an external-dirs that
+points to a 1.1 tree.
+
+
+1.0 to 1.1 Conversion Tool
+==========================
+
+The conversion tool is implemented inside of abuild proper so that we
+have the benefit of the real Abuild.conf parser (ItemConfig) and the
+DependencyGraph object.
+
+Usage: abuild --upgrade-trees
+
+If abuild.upgrade-data exists, read it.  It can contain two pieces of
+information: a mapping from paths (relative to current directory) to
+tree names, and a list of directories to ignore.  The string *** is
+used as a place holder for names of trees that we don't know.
 
 ----
+[ignore-directories]
+# place the names of directories specified relative to the current
+# directory, one per line, that you wish to not traverse while
+# searching for trees to upgrade.
+relative-path
+relative-path
+...
+
+[forest]
+path: name
+...
+
+[forest]
+path: name
+...
+
+...
+----
+
+Traverse file system reading all Abuild.conf files.  Keep track of
+which items are roots and which items have errors.
+
+Use DependencyGraph to create a dependency of all build tree roots.
+
+Exit if errors
+
+Analyze the dependency graph to identify independent subsets, each of
+which is considered its own forest.
+
+XXX Need to identify forest roots.  The forest root is the lowest
+directory that is above all the tree roots in the forest.  It is an
+error if there are any Abuild.conf files in any intervening directory
+between a forest root and any of the trees in the forest.
+
+Rewrite abuild.upgrade-data, preserving any previous prune directories
+and tree names, with all tree names arranged in forests.  For any tree
+for which no name was known, write *** as a place-holder.
+
+If any trees had unknown names, tell user to edit abuild.upgrade-data,
+and exit.
+
+Otherwise, for every Abuild.conf that needs to be rewritten, write
+Abuild-1.1.conf.
+
+When completely finished, if all went well, for each rewritten file,
+rename Abuild.conf to Abuild-1.0.conf and rename Abuild-1.1.conf to
+Abuild.conf.
+
+Converting Abuild.conf files:
+
+ * For root files
+
+    - add tree-name
+
+    - if next Abuild.conf up belongs to a tree in the same forest,
+      append to (or create) its child-dirs.
+
+    - external-dirs: delete or replace with whatever externals are
+      left
+
+    - tree-deps: add or append to whatever tree-deps were already
+      there and are not redundant with what we have
+
+ * this -> name
+
+ * parent-dir: remove
+
+ * deleted: remove and store; will be used when we rewrite
+   Abuild.backing files.
+
+Converting Abuild.backing files:
+
+ * XXX fill in...process is more or less described in compatibility
+   section.
