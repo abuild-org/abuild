@@ -337,3 +337,5 @@ Abuild buildset deptrees 1
 Abuild clear local tree 0
 ItemConfig allowing deprecated deleted 0
 Abuild ERR invalid trait referent 0
+Abuild-upgrade ERR start below root 0
+Abuild multiple backing areas 0

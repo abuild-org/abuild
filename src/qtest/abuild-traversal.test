@@ -175,6 +175,14 @@ $td->runtest("shadowed deps and plugins",
 	     {$td->FILE => "$top/integrity.out",
 	      $td->EXIT_STATUS => 2});
 
+cd("work/errors/back-to-self/t1");
+
+$td->runtest("external backs into forest",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/back-to-self.out",
+	      $td->EXIT_STATUS => 2});
+
 # Traverse a 1.0-style tree with complex externals and backing areas.
 
 cd("work/1.0");
@@ -187,6 +195,15 @@ check_tree("F2C2 util", "forest1/F2C2/util/tests/int", "F2C2-util");
 check_tree("C3 all", "forest2/C3/proj/tests/int", "C3-proj");
 
 # Test upgrade
+
+
+cd("work/1.0/forest0/PROJ0/proj/c1/impl/a");
+
+$td->runtest("start too low",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/upgrade-too-low.out",
+	      $td->EXIT_STATUS => 2});
 
 cd("work/1.0/forest1");
 
@@ -335,7 +352,7 @@ foreach my $v (qw(1.0 1.1))
 
 check_work_accessed($td);
 
-$td->report(60);
+$td->report(62);
 
 sub check_tree
 {

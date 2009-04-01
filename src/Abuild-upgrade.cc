@@ -19,6 +19,14 @@ Abuild::upgradeTrees()
     UpgradeData ud(this->error_handler);
     exitIfErrors();
 
+    if (Util::isFile(ItemConfig::FILE_CONF) &&
+	(! readConfig(".", "")->isForestRoot()))
+    {
+	QTC::TC("abuild", "Abuild-upgrade ERR start below root");
+	fatal("the current directory appears to be inside a build tree;"
+	      " you must start at or above the root of a tree");
+    }
+
     info("searching for build items...");
     findBuildItems(ud);
     if (! ud.upgrade_required)
@@ -463,7 +471,11 @@ Abuild::upgradeForests(UpgradeData& ud)
     }
 
     // Filter out duplicate backing areas, and replace each with top
-    // of forest
+    // of forest.  Do not attempt to remove covered backing areas
+    // (backing areas that are backed to by other backing areas) since
+    // that could be the result of an intentional configuration or a
+    // transient situation.  See comments in resolveFromBackingAreas
+    // for details.
     for (std::map<std::string, std::list<std::string> >::iterator iter =
 	     backing_areas.begin();
 	 iter != backing_areas.end(); ++iter)

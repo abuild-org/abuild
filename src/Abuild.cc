@@ -1752,6 +1752,8 @@ Abuild::removeEmptyTrees(BuildForest_map& forests)
 	    for (std::set<std::string>::iterator iter = to_delete.begin();
 		 iter != to_delete.end(); ++iter)
 	    {
+		verbose("tree name " + *iter + " was assigned to an unused,"
+			" child-only item; removing unneeded tree");
 		buildtrees.erase(*iter);
 	    }
 	    if (to_delete.count(this->local_tree))
@@ -2103,7 +2105,8 @@ Abuild::getAssignedTreeName(std::string const& dir,
     if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
     {
 	BackingConfig* backing = readBacking(dir);
-	if (backing->isDeprecated())
+	if (backing->isDeprecated() &&
+	    (! backing->getBackingAreas().empty()))
 	{
 	    // This is an old-style backing area.  It must point to a
 	    // tree root which is presumably the root of the
@@ -2355,6 +2358,15 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    ++next;
 	    if (covered.count(*iter))
 	    {
+		// It is not necessary to tell the user about this.
+		// The user might have done this on purpose to
+		// indicate a desire to back from the first backing
+		// area's backing area even if the first one is later
+		// reconfigured, or it may be a remnant from before
+		// one of the backing areas pointed to the other.  As
+		// we are able to work around this safely and the
+		// situation is not harmful, issuing a warning would
+		// just be an annoyance.
 		QTC::TC("abuild", "Abuild skipping covered backing area");
 		verbose("backing area " + *iter + " is being removed because"
 			" it is covered by another backing area");
@@ -2362,6 +2374,10 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    }
 	    iter = next;
 	}
+    }
+    if (backing_areas.size() > 1)
+    {
+	QTC::TC("abuild", "Abuild multiple backing areas");
     }
 
     // Copy trees and items from the backing areas.  Exclude any

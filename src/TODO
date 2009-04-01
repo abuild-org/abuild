@@ -1,15 +1,4 @@
 
-XXX merge 1182-1183 into java branch
-
-   src/java-support/src/java/org/abuild/groovy/Backend.groovy
-   src/TODO
-
-Test forest backing to itself both by having a new-style
-Abuild.backing that points into the tree and also by having an
-external that backs into another tree in the same forest.
-
-Make sure there are non-trivial multiple backing area tests.
-
 Still need to review code.
 
 Then review TODO to figure out what from the revamped build trees,
@@ -48,6 +37,9 @@ release notes.
  * Documentation for new features (other than groovy framework) is
    being placed in src/manual/pending.txt until it is integrated into
    the documentation.
+
+ * In groovy backend, cache loading of rules for a significant
+   performance boost
 
  * NON-COMPATIBLE CHANGES TO EXTERNALS:
 

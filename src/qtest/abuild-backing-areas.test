@@ -111,15 +111,8 @@ $td->runtest("dump data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("build multi/c",
-	     {$td->COMMAND => "abuild -C ../c",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/multi-c.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("multiple external paths",
-	     {$td->COMMAND => "abuild --build=deps",
+$td->runtest("multiple backing areas",
+	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/multi.out",
 	      $td->EXIT_STATUS => 0},
@@ -239,4 +232,4 @@ $td->runtest("bad deletions and plugins",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(27);
+$td->report(26);
