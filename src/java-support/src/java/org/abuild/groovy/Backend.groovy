@@ -15,6 +15,7 @@ class Backend implements GroovyBackend
     def targets
 
     def loader = new GroovyClassLoader()
+    static Map<File,Class> classCache = [:]
 
     private BuildState buildState
     private AntBuilder ant
@@ -160,7 +161,11 @@ class Backend implements GroovyBackend
         }
         try
         {
-            Class groovyClass = loader.parseClass(file)
+            if (! this.classCache.containsKey(file))
+            {
+                this.classCache[file] = loader.parseClass(file)
+            }
+            Class groovyClass = this.classCache[file]
             if (groovyClass)
             {
                 GroovyObject groovyObject = groovyClass.newInstance()

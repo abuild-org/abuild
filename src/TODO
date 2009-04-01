@@ -1,4 +1,9 @@
 
+XXX merge 1182 into java branch
+
+   src/java-support/src/java/org/abuild/groovy/Backend.groovy
+   src/TODO
+
 Test forest backing to itself both by having a new-style
 Abuild.backing that points into the tree and also by having an
 external that backs into another tree in the same forest.
@@ -73,8 +78,6 @@ release notes.
 
 Groovy Framework
 ================
-
- * Cache rules once loaded to optimize performance
 
  * Find sun conventions on directory structure for _base.groovy
 
