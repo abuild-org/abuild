@@ -1,0 +1,5 @@
+abuild: cleaning echo in echo
+abuild: cleaning p in p
+abuild: cleaning q in p/q
+abuild: cleaning r in p/q/r
+abuild: cleaning top in .

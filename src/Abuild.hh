@@ -50,6 +50,11 @@ class Abuild
     bool runInternal();
     void getThisPlatform();
     void parseArgv();
+    void checkRoRwPaths();
+    void checkValidPaths(std::set<std::string>& paths);
+    bool anyFirstNotUnderSomeSecond(
+	std::set<std::string> const& first,
+	std::set<std::string> const& second);
     std::string findConf();
     void checkBuildsetName(std::string const& kind, std::string& name);
     void initializePlatforms();
@@ -140,10 +145,10 @@ class Abuild
 		       std::map<std::string, int>& forest_numbers);
     void computeTreePrefixes(std::list<std::string> const& tree_names);
     bool isBuildItemWritable(BuildItem const& item);
-    bool isBuildItemPtrWritable(BuildItem const* item);
     void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);
+    bool isAnyBuildItem(BuildItem const*);
     bool addBuildAlsoToBuildset(BuildItem_map& builditems);
     bool buildBuildset();
     bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);
@@ -308,6 +313,9 @@ class Abuild
     std::map<std::string, PlatformSelector> platform_selectors;
     std::set<std::string> clean_platforms;
     CompatLevel compat_level;
+    std::set<std::string> ro_paths;
+    std::set<std::string> rw_paths;
+    bool default_writable;
     bool local_build;
 
     // Other data

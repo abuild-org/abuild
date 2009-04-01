@@ -4,6 +4,56 @@ the manual.
 
 ----------------------------------------------------------------------
 
+Read-only Build Items
+=====================
+
+In abuild 1.1, read-only externals are no longer supported, and there
+is no mechanism for giving tree-deps similar semantics.  Instead, a
+much more flexible and unambiguous mechanism has been provided for
+controlling which build items are writable.
+
+The --ro-path=dir and --rw-path=dir command line options to tell
+abuild to treat some or all build items as read only based on path.
+This is a more robust approach than using read-only externals for
+preventing cross-tree builds when they are not desired.  Consider
+these trees:
+
+      A
+    / | \
+   B  C  D
+
+If B and D both have C as a tree dependency and are independent
+from each other, you might want to build C first and then have both
+B and D built in parallel while treating C as read only.  This
+would provide a way to do that.
+
+For another example, suppose A has a read-only external pointing to B,
+and B has a read-only external pointing to a subtree somewhere under
+A.  When A does a descending build, part of itself will be read only
+because of the external in B.  Even then, this behavior is subject to
+the order in which externals are listed.  All in all, read-only
+externals were a bad idea.
+
+Both --ro-path=dir and --rw-path=dir may appear multiple times.  If
+only --ro-path appears, build items are writable by default.  If only
+--rw-path appears, build items are read-only by default.  If both
+appear, then either every --ro-path must be a path under some
+--rw-path (in which case build items are read-only by default) or
+every --rw-path must be path under some --ro-path (in which case build
+items are writable by default).  These rules make it possible to
+unambiguously create any combination of read-only/writable build items
+without having the order of the arguments matter.
+
+Paths may be absolute or relative.  Relative paths are resolved
+relative to the starting directory of abuild (after any -C is
+evaluated).
+
+When determining whether a build item is read only, the
+determination is made based on the lowest directory in the path to
+the item for which a read/write status is specified.  If none is
+found, the default is used.
+
+
 Upgrading Build Trees from 1.0 to 1.1
 =====================================
 
@@ -265,7 +315,7 @@ key which takes a list of tree names rather than tree paths.  Since we
 have no longer have the concept of externals, we no longer have the
 concept of read-only externals.  To support the pattern of building a
 tree without building any of the other subtrees that it uses, users
-must specify -ro-path or -rw-path on the command line at build time.
+must specify --ro-path or --rw-path on the command line at build time.
 Absolute path externals also disappear, but they were a bad idea to
 begin with.
 

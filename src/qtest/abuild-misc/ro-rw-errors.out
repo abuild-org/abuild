@@ -1,0 +1,3 @@
+abuild: ERROR: ro/rw path "w" does not exist or is not a directory
+abuild: ERROR: when both --ro-path and --rw-path are specified, EITHER each ro path must be under some rw path OR each rw path must be under some ro path
+abuild: ERROR: errors detected; exiting

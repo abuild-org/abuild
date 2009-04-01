@@ -65,6 +65,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     dump_interfaces(false),
     apply_targets_to_deps(false),
     compat_level(CompatLevel::cl_1_0),
+    default_writable(true),
     local_build(false),
     error_handler(whoami),
     this_config(0),
@@ -291,6 +292,7 @@ Abuild::parseArgv()
     boost::regex cleanset_re("--clean=(\\S+)");
     boost::regex define_re("([^-][^=]*)=(.*)");
     boost::regex compat_re("--compat-level=(\\d+\\.\\d+)");
+    boost::regex rorwpath_re("--r([ow])-path=(.+)");
 
     boost::smatch match;
 
@@ -490,6 +492,22 @@ Abuild::parseArgv()
 	{
 	    compat_level_version = match.str(1);
 	}
+	else if (boost::regex_match(arg, match, rorwpath_re))
+	{
+	    std::string which = match.str(1);
+	    std::string path = match.str(2);
+	    // Do not attempt to check or canonicalize path -- we have
+	    // to chdir from -C first.
+	    if (which == "o")
+	    {
+		this->ro_paths.insert(path);
+	    }
+	    else
+	    {
+		assert(which == "w");
+		this->rw_paths.insert(path);
+	    }
+	}
 	else if ((! arg.empty()) && (arg[0] == '-'))
 	{
 	    usage("invalid option " + arg);
@@ -532,6 +550,9 @@ Abuild::parseArgv()
 	Util::setCurrentDirectory(this->start_dir);
     }
     this->current_directory = Util::getCurrentDirectory();
+
+    // called after changing directories
+    checkRoRwPaths();
 
     getThisPlatform();
 
@@ -669,6 +690,112 @@ Abuild::parseArgv()
     {
 	this->targets = default_targets;
     }
+}
+
+void
+Abuild::checkRoRwPaths()
+{
+    if (this->ro_paths.empty() && this->rw_paths.empty())
+    {
+	return;
+    }
+
+    if (! this->start_dir.empty())
+    {
+	QTC::TC("abuild", "Abuild ro/rw path with start dir");
+    }
+
+    checkValidPaths(this->ro_paths);
+    checkValidPaths(this->rw_paths);
+
+    if (this->ro_paths.empty())
+    {
+	QTC::TC("abuild", "Abuild only rw paths");
+	this->default_writable = false;
+	return;
+    }
+
+    if (this->rw_paths.empty())
+    {
+	QTC::TC("abuild", "Abuild only ro paths");
+	this->default_writable = true;
+	return;
+    }
+
+    bool any_ro_not_under_some_rw =
+	anyFirstNotUnderSomeSecond(this->ro_paths, this->rw_paths);
+    bool any_rw_not_under_some_ro =
+	anyFirstNotUnderSomeSecond(this->rw_paths, this->ro_paths);
+
+    if (any_ro_not_under_some_rw && any_rw_not_under_some_ro)
+    {
+	QTC::TC("abuild", "Abuild ERR crossing ro/rw paths");
+	error("when both --ro-path and --rw-path are specified, EITHER"
+	      " each ro path must be under some rw path OR"
+	      " each rw path must be under some ro path");
+	return;
+    }
+
+    if (! any_rw_not_under_some_ro)
+    {
+	QTC::TC("abuild", "Abuild ro on top");
+	this->default_writable = true;
+    }
+    else
+    {
+	assert(! any_ro_not_under_some_rw);
+	QTC::TC("abuild", "Abuild rw on top");
+	this->default_writable = false;
+    }
+}
+
+void
+Abuild::checkValidPaths(std::set<std::string>& paths)
+{
+    std::set<std::string> work;
+    for (std::set<std::string>::iterator iter = paths.begin();
+	 iter != paths.end(); ++iter)
+    {
+	std::string const& path = *iter;
+	if (Util::isDirectory(path))
+	{
+	    work.insert(Util::canonicalizePath(path));
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild ERR invalid ro/rw path");
+	    error("ro/rw path \"" + path + "\" does not exist"
+		  " or is not a directory");
+	}
+    }
+    paths = work;
+}
+
+bool
+Abuild::anyFirstNotUnderSomeSecond(std::set<std::string> const& first,
+				   std::set<std::string> const& second)
+{
+    bool any_not_under_some = false;
+    for (std::set<std::string>::const_iterator f = first.begin();
+	 f != first.end(); ++f)
+    {
+	bool under_some = false;
+	for (std::set<std::string>::const_iterator s = second.begin();
+	     s != second.end(); ++s)
+	{
+	    if (Util::isDirUnder(*f, *s))
+	    {
+		under_some = true;
+		break;
+	    }
+	}
+	if (! under_some)
+	{
+	    any_not_under_some = true;
+	    break;
+	}
+    }
+    return any_not_under_some;
 }
 
 void
@@ -4286,15 +4413,32 @@ Abuild::computeTreePrefixes(std::list<std::string> const& tree_names)
 bool
 Abuild::isBuildItemWritable(BuildItem const& item)
 {
-    // XXX also check ro/rw paths
-    return (item.getBackingDepth() == 0);
-}
+    if (item.getBackingDepth() > 0)
+    {
+	return false;
+    }
+    std::string path = item.getAbsolutePath();
+    while (true)
+    {
+	if (this->ro_paths.count(path))
+	{
+	    return false;
+	}
+	if (this->rw_paths.count(path))
+	{
+	    return true;
+	}
+	std::string next = Util::dirname(path);
+	if (path == next)
+	{
+	    return this->default_writable;
+	}
+	path = next;
+    }
 
-bool
-Abuild::isBuildItemPtrWritable(BuildItem const* item)
-{
-    // Needed for populateBuildset
-    return isBuildItemWritable(*item);
+    // can't get here
+    assert(false);
+    return false;
 }
 
 void
@@ -4369,8 +4513,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         {
             QTC::TC("abuild", "Abuild buildset all", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
-			     boost::bind(&Abuild::isBuildItemPtrWritable,
-					 this, _1));
+			     boost::bind(&Abuild::isAnyBuildItem, this, _1));
         }
 	else if (set_name == b_DEPTREES)
         {
@@ -4646,6 +4789,12 @@ Abuild::populateBuildset(BuildItem_map& builditems,
 	    this->buildset[item_name] = item_ptr;
 	}
     }
+}
+
+bool
+Abuild::isAnyBuildItem(BuildItem const*)
+{
+    return true;
 }
 
 bool
@@ -5538,6 +5687,13 @@ Abuild::createItemInterface(std::string const& builder_string,
     FileLocation internal("[internal: " + builder_string + "]", 0, 0);
     assignInterfaceVariable(_interface,
 			    internal, "ABUILD_THIS", build_item.getName(),
+			    Interface::a_override, status);
+    assignInterfaceVariable(_interface,
+			    internal, "ABUILD_ITEM_NAME", build_item.getName(),
+			    Interface::a_override, status);
+    assignInterfaceVariable(_interface,
+			    internal, "ABUILD_TREE_NAME",
+			    build_item.getTreeName(),
 			    Interface::a_override, status);
     assignInterfaceVariable(_interface,
 			    internal, "ABUILD_TARGET_TYPE",
@@ -6475,10 +6631,30 @@ Abuild::help()
     h("  --related-by-traits trait[,trait,...]  add to the build set all items that");
     h("                    relate to any item already in the build set by all of");
     h("                    the named traits");
+    h("  --ro-path=dir     repeatable: treat everything under dir as read only");
+    h("  --rw-path=dir     repeatable: treat everything under dir as writable");
     h("  --silent          suppress most non-error output");
     h("  --upgrade-trees   run special mode to upgrade build trees");
     h("  --verbose         generate more detailed output");
     h("  --with-deps | -d  short-hand for --build=current");
+    h("");
+    h("--ro-path/--rw-path:");
+    h("");
+    h("  When neither --ro-path nor --rw-path are specified, non-backed build");
+    h("  items are writable by default.  (Build items are always read-only in");
+    h("  backing areas.)");
+    h("");
+    h("  If --ro-path appears without --rw-path, anything under any specified");
+    h("  directory is read-only, and everything else is writable.");
+    h("  If --rw-path appears without --ro-path, anything under any specified");
+    h("  directory is writable, and everything else is read-only.");
+    h("");
+    h("  If --ro-path and --rw-path are both specified, then EITHER each");
+    h("  --ro-path directory must be under some --rw-path directory OR each");
+    h("  --rw-path directory must be under some --ro-path directory.  If the");
+    h("  --rw-path directories are \"on top\", build items are read-only by");
+    h("  default.  If the --ro-path directories are \"on top\", then build items");
+    h("  are writable by default.");
     h("");
     h("Build/Clean sets:");
     h("");

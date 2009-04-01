@@ -1,0 +1,28 @@
+abuild: a (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/a/abuild-indep'
+ro-rw a
+make: Leaving directory `--topdir--/ro-rw-path/a/abuild-indep'
+abuild: b (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/a/b/abuild-indep'
+ro-rw b
+make: Leaving directory `--topdir--/ro-rw-path/a/b/abuild-indep'
+abuild: c (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/a/b/c/abuild-indep'
+ro-rw c
+make: Leaving directory `--topdir--/ro-rw-path/a/b/c/abuild-indep'
+abuild: p (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/p/abuild-indep'
+ro-rw p
+make: Leaving directory `--topdir--/ro-rw-path/p/abuild-indep'
+abuild: q (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/p/q/abuild-indep'
+ro-rw q
+make: Leaving directory `--topdir--/ro-rw-path/p/q/abuild-indep'
+abuild: r (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/p/q/r/abuild-indep'
+ro-rw r
+make: Leaving directory `--topdir--/ro-rw-path/p/q/r/abuild-indep'
+abuild: top (abuild-indep): all
+make: Entering directory `--topdir--/ro-rw-path/abuild-indep'
+ro-rw top
+make: Leaving directory `--topdir--/ro-rw-path/abuild-indep'

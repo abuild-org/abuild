@@ -339,3 +339,10 @@ Abuild ERR invalid trait referent 0
 Abuild-upgrade ERR start below root 0
 Abuild multiple backing areas 0
 Abuild ERR tree multiple backing areas 0
+Abuild ro/rw path with start dir 0
+Abuild ERR crossing ro/rw paths 0
+Abuild only rw paths 0
+Abuild ro on top 0
+Abuild rw on top 0
+Abuild ERR invalid ro/rw path 0
+Abuild only ro paths 0

@@ -43,6 +43,9 @@ release notes.
     - external-dirs may no longer be symbolic links nor may they cross
       symbolic links.
 
+    - the -ro flag for externals is ignored; use -ro-path or -rw-path
+      instead
+
  * Compatibility level can be set with the ABUILD_COMPAT_LEVEL
    environment variable in addition to the command line argument.  The
    command line argument takes precedence.
@@ -94,6 +97,9 @@ release notes.
    when upgrading your trees.  You are much better off letting abuild
    do it for you.
 
+ * New interface variables ABUILD_ITEM_NAME and ABUILD_TREE_NAME
+
+ * --ro-path, --rw-path
 
 Groovy Framework
 ================
@@ -191,15 +197,24 @@ Core Changes
    B and D built in parallel while treating C as read only.  This
    would provide a way to do that.
 
-   Both -ro-path and -rw-path may appear multiple times, but they may
-   not both appear.  If neither -ro-path nor -rw-path is specified,
-   everything is read/write.  If -ro-path is specified, everything not
-   listed in -ro-path is read/write.  If -rw-path is specified,
-   everything not specified with -rw-path is read-only.
+   Both -ro-path and -rw-path may appear multiple times.  If only
+   -ro-path appears, build items are writable by default.  If only
+   -rw-path appears, build items are read-only by default.  If both
+   appear, then either every -ro-path must be a path under some
+   -rw-path (in which case build items are read-only by default) or
+   every -rw-path must be path under some -ro-path (in which case
+   build items are writable by default).  These rules make it possible
+   to unambiguously create any combination of read-only/writable build
+   items without having the order of the arguments matter.
 
    Paths may be absolute or relative.  Relative paths are resolved
    relative to the starting directory of abuild (after any -C is
    evaluated).
+
+   When determining whether a build item is read only, the
+   determination is made based on the lowest directory in the path to
+   the item for which a read/write status is specified.  If none is
+   found, the default is used.
 
  * Implement two forms of conditional dependencies:
 
@@ -542,6 +557,9 @@ abuild to build a plugin before executing its list_platforms file.
 Consider carefully how explicit targets should apply to plugins.  As
 currently coded, --apply-targets-to-deps will result in explicit
 targets being applied to plugins.
+
+Think about how buildable plugins interact with read only paths and
+backing areas.
 
 
 Building Abuild

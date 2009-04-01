@@ -110,6 +110,61 @@ $td->runtest("non-recursive interface variable",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/ro-rw-path");
+
+$td->runtest("ro-rw-path: none specified",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ro-rw-default.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("ro-rw-path: ro only",
+	     {$td->COMMAND => "abuild -b all --ro-path=a",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ro-a.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("ro-rw-path: clean ro only",
+	     {$td->COMMAND => "abuild -c all --ro-path=a",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ro-a-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("ro-rw-path: rw only",
+	     {$td->COMMAND => "abuild -b all --rw-path=p/q",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/rw-p-q.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("ro-rw-path: clean rw only",
+	     {$td->COMMAND => "abuild -c all --rw-path=p/q",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/rw-p-q-clean.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+cd("work");
+$td->runtest("ro-rw-path: ro on top",
+	     {$td->COMMAND => "abuild -b all -C ro-rw-path" .
+		  " --ro-path=a --rw-path=a/b --ro-path=a/b/c",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ro-a-rw-b-ro-c.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("ro-rw-path: rw on top",
+	     {$td->COMMAND => "abuild -b all -C ro-rw-path" .
+		  " --rw-path=p --ro-path=p/q --rw-path=a/b/c",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/rw-p-ro-q-rw-c.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("ro-rw-path: errors",
+	     {$td->COMMAND => "abuild -b all -C ro-rw-path" .
+		  " --rw-path=p --ro-path=a --rw-path=w",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/ro-rw-errors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(11);
+$td->report(19);

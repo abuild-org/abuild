@@ -1,0 +1,2 @@
+all::
+	@$(PRINT) $(ABUILD_TREE_NAME) $(ABUILD_ITEM_NAME)
