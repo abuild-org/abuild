@@ -4685,7 +4685,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      Additionally, we have set this build tree's backing area to
      <filename>../../reference/project</filename> so that it would
      resolve any missing build items or externals to that location:
-     <?example general/task/project/Abuild.backing?>
+     <!-- ?example general/task/project/Abuild.backing? -->
      Note that, although we used a relative path for our backing area
      in this example, we would ordinarily set our backing area to an
      absolute path.  We use a relative path here only so that the
@@ -4807,7 +4807,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      our <filename>user</filename> branch has to back to
      <filename>reference</filename>.  Here is
      <filename>user/common/Abuild.backing</filename>:
-     <?example general/user/common/Abuild.backing?>
+     <!-- ?example general/user/common/Abuild.backing? -->
      For a diagram of the user build trees, see <xref
      linkend="fig.general-user"/>.
      <figure id="fig.general-user">
