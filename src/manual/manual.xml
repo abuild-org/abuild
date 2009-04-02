@@ -16670,64 +16670,6 @@ Y = $(X)
    </para>
    <variablelist>
     <varlistentry>
-     <term>undefined variable checks</term>
-     <listitem>
-      <para>
-       The way we check for undefined variables in rules files makes
-       undefined variable warnings get executed even when running
-       debugging targets or help targets such as
-       <command>rules-help</command> or
-       <command>interfaces-help</command>.  It might be better to have
-       a standard location for rules documentation so that &abuild; can
-       display it directly without actually including rules.  Perhaps
-       the help targets could be come special targets handled directly
-       by &abuild; (as are the <varname>no-op</varname> and
-       <varname>clean</varname> targets).
-      </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>weak support for test coverage</term>
-     <listitem>
-      <para>
-       The <application>qtest</application> test framework, which is
-       integrated with &abuild;, has support for test coverage.  It
-       requires that the <varname>TC_SRCS</varname> environment
-       variable be initialized with a list of source files to check.
-       Right now, users must code this by hand by putting an
-       <literal>export TC_SRCS = ...</literal> command in their
-       <filename>Abuild.mk</filename> files.  This is somewhat
-       error-prone and seems like something &abuild; should handle
-       automatically.  The problem is that it is very common for one
-       build item to be testing another build item, and there's no
-       clean way for a build item to export its source list.  In
-       practice, this isn't such a big deal because test suites that
-       include coverage support must have intimate knowledge of the
-       source code.  As long as we use
-       <varname>$(abDIR_build-item)</varname> variables to refer to
-       the directory that contains the source files, we're probably
-       not in such bad shape.
-      </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>no <application>JUnit</application> examples</term>
-     <listitem>
-      <para>
-       At this time, our Java examples with test suites have
-       <application>qtest</application>-based test suites.  It would
-       be preferable for us to show
-       <application>JUnit</application>-based test suites instead or
-       as well, but we don't have a good mechanism at present of doing
-       this since <application>JUnit</application> is not bundled with
-       &abuild;.  Build trees that use
-       <application>JUnit</application> must include support for it on
-       their own, most easily as a plugin that adds the appropriate
-       JUnit jar file to <varname>abuild.classpath.external</varname>.
-      </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
      <term>dependence on Cygwin for <application>make</application> on
      Windows</term>
      <listitem>

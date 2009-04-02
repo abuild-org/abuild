@@ -36,13 +36,18 @@ release notes.
 
     - -winpath is no longer a valid option to external-dirs.
 
-    - absolute path externals are no longer supported.
+    - Absolute path externals are no longer supported.
 
     - external-dirs may no longer be symbolic links nor may they cross
-      symbolic links.
+      symbolic links.  If you are relying on symbolic links to
+      externals, you can probably use externals that do nothing but
+      point to other externals instead.  Also, abuild 1.1 supports
+      multiple backing areas, which might provide another solution.
 
-    - the -ro flag for externals is ignored; use -ro-path or -rw-path
-      instead
+    - The -ro flag for externals is ignored; use -ro-path or -rw-path
+      instead.  It's also possible that some uses of read-only
+      externals could be replaced with backing areas instead,
+      especially since multiple backing areas are now supported.
 
  * Compatibility level can be set with the ABUILD_COMPAT_LEVEL
    environment variable in addition to the command line argument.  The
@@ -201,22 +206,6 @@ Core Changes
    as an optional dependency.  This variable will be true iff the
    build item exists.
 
- * Make cross-platform dependencies obey platform selectors.  The
-   rationale for not doing this was that the command-line and
-   environment should not affect the shape of the build graph, but
-   this is a myth anyway.  People can always run with DFLAGS=-g or
-   NO_XLC=1.  If a specific compiler or option is required, it can be
-   specified explicitly with the platform-specifier in the
-   dependency.  This implies additional requirements:
-
-    - Make sure "-platform native:option=" works to specify no option
-
-    - Make sure it is possible to express "I want the version of X
-      built with compiler A on platform P but the default compiler
-      everywhere else."  This can probably be done with a combination
-      of platform-specific dependencies and platform conditionals.
-
-
 
 Documentation
 =============
@@ -317,8 +306,9 @@ Usability Improvements
 Plugins
 =======
 
- * Support buildable plugins with platform type "indep".  See
-   "Buildable Plugins" below.
+ * Create an example of plugins that have to be preconfigured.
+   Examples would include a generic UNIX compiler plugin.  This can
+   probably be done without making any changes to the plugin system.
 
 
 Abuild Contrib
@@ -329,13 +319,29 @@ Abuild Contrib
  * Make sure any compiler plugins included with abuild contrib have
    the 1.0.2 fixes integrated into them.
 
- * Include a generic UNIX compiler buildable plugin
+ * Include a generic UNIX compiler configurable plugin for which the
+   user can set up the compliation commands using autoconf.
 
- * Consider including a libtool buildable plugin
+ * Consider including a libtool configurable plugin.
 
 
 Platform Issues
 ===============
+
+ * Make cross-platform dependencies obey platform selectors.  The
+   rationale for not doing this was that the command-line and
+   environment should not affect the shape of the build graph, but
+   this is a myth anyway.  People can always run with DFLAGS=-g or
+   NO_XLC=1.  If a specific compiler or option is required, it can be
+   specified explicitly with the platform-specifier in the
+   dependency.  This implies additional requirements:
+
+    - Make sure "-platform native:option=" works to specify no option
+
+    - Make sure it is possible to express "I want the version of X
+      built with compiler A on platform P but the default compiler
+      everywhere else."  This can probably be done with a combination
+      of platform-specific dependencies and platform conditionals.
 
  * Allow platforms, but not platform types, to flow "backward" across
    tree dependencies.  Specifically, consider the following:
@@ -465,61 +471,6 @@ the special failure build item used to implement recovery from certain
 types of cycle errors should be explicit.
 
 
-Buildable Plugins
-=================
-
-There are a number of potential uses for plugins that can't presently
-be realized because plugins have to be completely static.  For
-example, it would be useful to be able to create a generic UNIX
-compiler plugin that must be configured using autoconf by the user
-before starting to build or that would use autoconf or libtool to
-figure out certain flags, such as the proper flags to create shared
-libraries.  Buildable plugins could also be used to force certain
-steps to be performed early in a build, such as checking for proper
-environment variable settings or making architectural checks on
-dependency rules that go beyond what can be enforced through abuild's
-internal mechanisms.
-
-Making plugins buildable implies that abuild has to build plugins
-before anyone might use them.  Since plugins are loaded in declaration
-order in each tree, this results in declaration order implying some
-kind of dependency-like relationship.  To determine build order, make
-a dependency graph among buildable plugins where a dependency is
-created from each plugin to its immediate predecessor in the build
-order.  This is done for each tree.  If there are any cycles (caused
-by buildable plugins being loaded in different orders across different
-trees), it is an error.  If not, the first phase of the build is to
-build plugins.
-
-Since plugins are loaded in declaration order in each tree, this
-approach guarantees that buildable plugins are built before other
-plugins that may reference them.  One could argue that such logic
-should be applied to all plugins since it is possible for plugins
-to interact, but I would argue that this would create unnecessary
-constraints.  If one plugin really requires another plugin, one
-should first rethink whether the plugins are being used sensibly,
-and if they really are, then the plugin should just check for the
-existence of a variable/property defined by the other plugin.  The
-case of buildable plugins is a little different because a plugin
-may not even work before it is built.
-
-If we require buildable plugins to have platform type "indep", then
-it's probably also okay for plugin.interface files to have after-build
-files, something that is currently disallowed since plugins are
-instantiated for each possible platform.
-
-In order to make it possible for the outcome of a plugin's build step
-to influence what platforms it provides, it will be necessary for
-abuild to build a plugin before executing its list_platforms file.
-
-Consider carefully how explicit targets should apply to plugins.  As
-currently coded, --apply-targets-to-deps will result in explicit
-targets being applied to plugins.
-
-Think about how buildable plugins interact with read only paths and
-backing areas.
-
-
 Building Abuild
 ===============
 
@@ -533,8 +484,8 @@ Building Abuild
    for sample boost autoconf code.
 
    It might be possible to make this work properly when abuild is
-   building itself by having a buildable plugin that checks to make
-   sure configure has been run.  Bootstrapping makefile can fail if
+   building itself by having a plugin that checks to make sure
+   configure has been run.  Bootstrapping makefile can fail if
    configure hasn't been run.
 
 ----------------------------------------------------------------------
@@ -556,7 +507,10 @@ Windows Issues
    gnuwin32 rather than cygwin, along with supporting ActivePerl, but
    this has major implications since qtest doesn't currently work
    without cygwin, not to mention the fact that the test suite makes
-   free use of unix constructs.
+   free use of unix constructs.  I believe this problem is also a
+   contributor to the lack of good mingw support, and is certainly
+   the cause of builds not being able to work properly with files
+   spanning multiple drive letters.
 
  * gen_deps: rewrite in C++ so that it doesn't force a runtime
    dependency on perl.  It should be a fallback for cases when
@@ -721,65 +675,3 @@ See also "Known Limitations" in the documentation.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
-
- * It might be useful to have abuild recognize certain error
-   conditions currently reported as global as instead being specific
-   to a given build item, but this would be a high-risk change that
-   has some of its own disadvantages.
-
-   The idea would be to detect errors currently reported as global
-   and, instead of having them prevent any builds from happening, have
-   them just block builds of the specific items they pertain to.  This
-   would make it possible, for example, to have a --build=desc work
-   properly if there are dependency errors, cycles, or other similar
-   types of errors on build items that are not related to the portion
-   of the tree being built.
-
-   Exmaple error conditions that could be handled in this way include
-   depending on an unknown item, participating in a dependency cycle,
-   referencing an unknown item in a trait, referencing an unknown flag
-   for another item, having an invalid platform-specific dependency,
-   etc.  An implementation strategy for doing this would be to have a
-   buildError method that takes an item name and platform string, with
-   an empty platform string indicating an error that would apply to
-   all platform instantiations for the item.  Abuild would report the
-   error but not increment the global error count, thus preventing
-   exitIfErrors from exiting.  It would also store fact that an error
-   was associated with the specific build item and/or build
-   item/platform pair.  During the build of the item, if any
-   non-platform-specific errors or if an error for the specific
-   item/platform had been issued, the build for that item would be
-   skipped.
-
-   The above change, as described, would be straightforward to
-   implement, but there are two siginificant issues:
-
-    - This change would allow certain error conditions that really do
-      have to get fixed from being purposely ignored or even
-      accidentally overlooked for a longer period of time.  This goes
-      against the idea of abuild trying to force early detection and
-      correction of errors.
-
-    - The code as currently implemented performs numerous validations.
-      Once call to exitIfErrors has been made, subsequent code assumes
-      all previous validations have succeeded.  For any current error
-      condition that would be changed to a buildError, the rest of the
-      code would have to be carefully inspected to ensure that prior
-      assumptions have not become invalid.  This would be a shame
-      since the early validation of certain error conditions helps to
-      reduce the complexity of the abuild code.
-
-   Consider the implications, especially of the second point.  Build
-   graph construction code assumes that all platform information and
-   dependency information stored in a build item is valid, and that
-   information is accessed in a read-only fashion from the build
-   item's config data.  This means that we either have to add checks
-   throughout the code to make sure any dependency we retrieve is
-   valid or else we need to remove a dependency from the list of
-   dependencies.  The former would complicate the code and make it
-   more fragile, not to mention the fact that the test suite doesn't
-   cover any such cases now since they are prevented from happening.
-   The latter would also have disadvantages.  For example, it would no
-   longer be possible to use --dump-data to locate build items that
-   depend on a particular unknown build item or otherwise to help
-   clean up errors of this type.
