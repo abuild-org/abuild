@@ -1143,11 +1143,10 @@ Util::getDirEntries(std::string const& path)
 	while (! done)
 	{
 	    std::string name = filedata.cFileName;
-	    if ((name == ".") || (name == ".."))
+	    if (! ((name == ".") || (name == "..")))
 	    {
-		continue;
+		entries.push_back(name);
 	    }
-	    entries.push_back(name);
 	    if (! FindNextFile(fhandle, &filedata))
 	    {
 		if (GetLastError() == ERROR_NO_MORE_FILES)
