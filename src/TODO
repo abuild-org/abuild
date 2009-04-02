@@ -99,6 +99,15 @@ release notes.
 
  * --ro-path, --rw-path
 
+ * Removed all "clean" targets supplied by backends.  Abuild now
+   internally handles clean even when run from an output directory.
+
+ * When abuild is run with no arguments, its default behavior will be
+   to act as if --with-deps had been specified.  A new flag
+   "--no-deps" can be used for the case in which one should build just
+   the item with no dependencies.
+
+
 Groovy Framework
 ================
 
@@ -170,48 +179,10 @@ Compiler Verification
 Core Changes
 ============
 
- * When abuild is run with no arguments, its default behavior will be
-   to act as if --with-deps had been specified.  A new flag
-   "--no-deps" can be used for the case in which one should build just
-   the item with no dependencies.
-
  * Add flag --with-rdeps to add to the build set all items anywhere in
    the forest that have items in the initial build set in their
    expanded dependency chains.  (Note that is recursive by nature: if
    A depends on X and B depends on A, then B also depends on X.)
-
- * Add -ro-path and -rw-path options to tell abuild to treat some or
-   all build items as read only based on path.  This should provide a
-   more robust approach than using read-only externals for preventing
-   cross-tree builds when they are not desired.  Consider these trees:
-
-         A
-       / | \
-      B  C  D
-
-   If B and D both have C as a tree dependency and are independent
-   from each other, you might want to build C first and then have both
-   B and D built in parallel while treating C as read only.  This
-   would provide a way to do that.
-
-   Both -ro-path and -rw-path may appear multiple times.  If only
-   -ro-path appears, build items are writable by default.  If only
-   -rw-path appears, build items are read-only by default.  If both
-   appear, then either every -ro-path must be a path under some
-   -rw-path (in which case build items are read-only by default) or
-   every -rw-path must be path under some -ro-path (in which case
-   build items are writable by default).  These rules make it possible
-   to unambiguously create any combination of read-only/writable build
-   items without having the order of the arguments matter.
-
-   Paths may be absolute or relative.  Relative paths are resolved
-   relative to the starting directory of abuild (after any -C is
-   evaluated).
-
-   When determining whether a build item is read only, the
-   determination is made based on the lowest directory in the path to
-   the item for which a read/write status is specified.  If none is
-   found, the default is used.
 
  * Implement two forms of conditional dependencies:
 
@@ -230,21 +201,6 @@ Core Changes
    as an optional dependency.  This variable will be true iff the
    build item exists.
 
- * Create a "replaces" keyword that would be used to indicate that a
-   build item is a replacement for one or more other build items.  Any
-   values for the replaces key would not be allowed to exist on their
-   own.  Any references to them in Abuild.conf files would be treated
-   as references to the new build items.  This is stronger than using
-   deps to make the old name depend on the new name and also
-   eliminates the need to create build items whose only purpose is to
-   depend on their replacements.
-
- * It would be good if errors in a part of the collection of build
-   trees that are not relevant to you don't impact your build.  For
-   example, if a forest contains A, B, and C and your build contains
-   no items from C, then integrity errors in C should be ignored
-   unless --full-integrity is specified.  (Do we already to this?)
-
  * Make cross-platform dependencies obey platform selectors.  The
    rationale for not doing this was that the command-line and
    environment should not affect the shape of the build graph, but
@@ -260,7 +216,6 @@ Core Changes
       everywhere else."  This can probably be done with a combination
       of platform-specific dependencies and platform conditionals.
 
- * Drop internal "clean" targets and update documentation.
 
 
 Documentation
@@ -369,7 +324,7 @@ Plugins
 Abuild Contrib
 ==============
 
- * Upgrade all contributed build items to use abuild 1.1 files.
+ * Fix deprecation warnings (Rules.mk) in pkg-config.
 
  * Make sure any compiler plugins included with abuild contrib have
    the 1.0.2 fixes integrated into them.

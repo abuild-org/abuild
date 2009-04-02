@@ -101,7 +101,7 @@ $td->runtest("check moo",
 cd("work/c/cb");
 
 $td->runtest("check preprocessor",
-	     {$td->COMMAND => "abuild CB1.i CB2.i CB3.i",
+	     {$td->COMMAND => "abuild --no-deps CB1.i CB2.i CB3.i",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/preprocess.out",
 	      $td->EXIT_STATUS => 0},
@@ -172,7 +172,7 @@ $td->runtest("rebuild e",
 cd("work/e/bin");
 
 $td->runtest("e.bin with all platforms",
-	     {$td->COMMAND => "abuild --with-deps -p all",
+	     {$td->COMMAND => "abuild -p all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/e-p-all.out",
 	      $td->EXIT_STATUS => 0},
@@ -181,7 +181,7 @@ $td->runtest("e.bin with all platforms",
 cd("work/e/multi");
 
 $td->runtest("e.multi with all platforms",
-	     {$td->COMMAND => "abuild --with-deps -p all",
+	     {$td->COMMAND => "abuild -p all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/e-multi-p-all.out",
 	      $td->EXIT_STATUS => 0},
@@ -401,14 +401,14 @@ $td->runtest("dependencies",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("single-build item build",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/all0.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("ccxx_debug",
-	     {$td->COMMAND => "abuild ccxx_debug",
+	     {$td->COMMAND => "abuild --no-deps ccxx_debug",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/ccxx-debug.out",
 	      $td->EXIT_STATUS => 0},
@@ -499,7 +499,7 @@ $td->runtest("no more .ab-dyanmic.mk files",
 cd("work/a");
 
 $td->runtest("unnamed directory",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->STRING =>
 		  "abuild: nothing to build in this directory\n",

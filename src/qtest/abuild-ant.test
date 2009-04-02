@@ -159,7 +159,7 @@ $td->runtest("other ear contents",
 cd("work/basic/alternative");
 
 $td->runtest("alternative ant support",
-	     {$td->COMMAND => "abuild run",
+	     {$td->COMMAND => "abuild --no-deps run",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/alternative-ant.out",
 	      $td->EXIT_STATUS => 0},

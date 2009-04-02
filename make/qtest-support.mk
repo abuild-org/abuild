@@ -12,9 +12,6 @@ check test:: all
 test-only::
 	$(run_qtest)
 
-clean::
-	$(RM) test.log qtest.log qtest-results.xml *.cov_out
-
 else
 
 check test:: all ;

@@ -29,12 +29,6 @@ include .ab-dynamic.mk
 # Global setup, utility functions
 include $(abMK)/global.mk
 
-# Provide a "clean" target that gets run from inside an output
-# directory.
-clean::
-	@: $(call QTC.TC,abuild,abuild.mk platform-specific clean,0)
-	$(RM) .ab-dynamic.mk
-
 # Determine the compiler toolchain, if applicable
 ifeq ($(ABUILD_TARGET_TYPE), object-code)
 CCXX_TOOLCHAIN = $(ABUILD_PLATFORM_COMPILER)

@@ -222,6 +222,7 @@ class Abuild
     void flushLogIfSingleThreaded();
     void cleanBuildset();
     void cleanPath(std::string const& item_name, std::string const& dir);
+    void cleanOutputDir();
     void help();
     void usage(std::string const& msg);
     void exitIfErrors();

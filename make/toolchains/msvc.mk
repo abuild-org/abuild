@@ -92,6 +92,3 @@ define make_shlib
 			-outputresource:$(call shlibname,$(7))\;2; \
 	fi
 endef
-
-clean::
-	$(RM) *.pdb *.exe *.ilk *.manifest

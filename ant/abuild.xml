@@ -819,9 +819,4 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
   <run-hooks name="other"/>
  </target>
 
- <target name="clean">
-  <delete dir="${abuild.private.dir.classes}"/>
-  <delete dir="${abuild.private.dir.dist}"/>
- </target>
-
 </project>

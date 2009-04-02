@@ -249,7 +249,7 @@ open(F, ">$dir/Abuild.conf") or die;
 print F "this: hello\n";
 close(F);
 $td->runtest("find root looking for top",
-	     {$td->COMMAND => "abuild -C $windir",
+	     {$td->COMMAND => "abuild --no-deps -C $windir",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/found-root.out",
 	      $td->EXIT_STATUS => 0},

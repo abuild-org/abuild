@@ -79,8 +79,9 @@ if (! in_windows())
 {
     # Windows doesn't allow us to have a DLL with unresolved symbols.
 
+    # Leave --make in here
     $td->runtest("build shared1 without static",
-		 {$td->COMMAND => "abuild --make SKIP_LINK=1",
+		 {$td->COMMAND => "abuild --no-deps --make SKIP_LINK=1",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/shared1-build.out",
 		  $td->EXIT_STATUS => 0},
@@ -89,7 +90,7 @@ if (! in_windows())
     cd("work/prog1");
     # prog1 can't link because static was not linked into shared1
     $td->runtest("link failure on prog1",
-		 {$td->COMMAND => "abuild --monitored",
+		 {$td->COMMAND => "abuild --no-deps --monitored",
 		  $td->FILTER =>
 		      "perl $filters/filter-abuild.pl | grep '^abuild-monitor: '"},
 		 {$td->FILE => "$top/prog1-link-failure.out",
@@ -105,7 +106,7 @@ if (! in_windows())
 }
 
 $td->runtest("build shared1 with static",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/shared1-build.out",
 	      $td->EXIT_STATUS => 0},
@@ -155,7 +156,7 @@ $td->runtest("build static with shared1-alt",
 cd("work/shared1-alt");
 
 $td->runtest("build shared1-alt",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/shared1-alt-build.out",
 	      $td->EXIT_STATUS => 0},
@@ -201,7 +202,7 @@ $td->runtest("build static with shared2",
 cd("work/shared2");
 
 $td->runtest("build shared2",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/shared2-build.out",
 	      $td->EXIT_STATUS => 0},
@@ -229,7 +230,7 @@ $td->runtest("run prog2 with shared2",
 cd("work/prog3");
 
 $td->runtest("build prog3",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/prog3-build.out",
 	      $td->EXIT_STATUS => 0},
@@ -259,13 +260,13 @@ if (! in_windows())
     cd("work/shared2");
 
     $td->runtest("clean shared2",
-		 {$td->COMMAND => "abuild clean"},
+		 {$td->COMMAND => "abuild --no-deps clean"},
 		 {$td->STRING => "abuild: cleaning in .\n",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("build shared2 without static",
-		 {$td->COMMAND => "abuild SKIP_LINK=1",
+		 {$td->COMMAND => "abuild --no-deps SKIP_LINK=1",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/shared2-build.out",
 		  $td->EXIT_STATUS => 0},
@@ -305,7 +306,7 @@ $td->runtest("build static with prog4",
 cd("work/prog4");
 
 $td->runtest("build prog4",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/prog4-build.out",
 	      $td->EXIT_STATUS => 0},

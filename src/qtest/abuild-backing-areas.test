@@ -214,7 +214,7 @@ $td->runtest("local integrity",
 cd("work/bad/7/main/product");
 
 $td->runtest("irrelevant integrity errors",
-	     {$td->COMMAND => "abuild",
+	     {$td->COMMAND => "abuild --no-deps",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->STRING =>
 		  "abuild: nothing to build in this directory\n",

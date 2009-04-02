@@ -402,7 +402,7 @@ $td->runtest("opaque wrapper",
 cd("work/opaque-wrapper/client");
 
 $td->runtest("opaque wrapper ccxx_debug",
-	     {$td->COMMAND => "abuild ccxx_debug",
+	     {$td->COMMAND => "abuild --no-deps ccxx_debug",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/opaque-wrapper-ccxx_debug.out",
 	      $td->EXIT_STATUS => 0},
@@ -418,7 +418,7 @@ $td->runtest("cross-platform dependency",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("ccxx_debug",
-	     {$td->COMMAND => "abuild ccxx_debug",
+	     {$td->COMMAND => "abuild --no-deps ccxx_debug",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/cross-platform-ccxx_debug.out",
 	      $td->EXIT_STATUS => 0},

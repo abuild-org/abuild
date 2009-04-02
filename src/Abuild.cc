@@ -217,7 +217,14 @@ Abuild::runInternal()
     if (this->special_target == s_CLEAN)
     {
         QTC::TC("abuild", "Abuild clean");
-        cleanPath("", this->current_directory);
+	if (! this->this_platform.empty())
+	{
+	    cleanOutputDir();
+	}
+	else
+	{
+	    cleanPath("", this->current_directory);
+	}
     }
     else if (! this->cleanset_name.empty())
     {
@@ -311,6 +318,7 @@ Abuild::parseArgv()
     }
 
     bool with_deps = false;
+    bool no_deps = false;
     char** argp = &argv[1];
     while (*argp)
     {
@@ -438,6 +446,10 @@ Abuild::parseArgv()
 	{
 	    with_deps = true;
 	}
+	else if (arg == "--no-deps")
+	{
+	    no_deps = true;
+	}
 	else if (arg == "--apply-targets-to-deps")
 	{
 	    this->apply_targets_to_deps = true;
@@ -556,12 +568,25 @@ Abuild::parseArgv()
 
     getThisPlatform();
 
+    if (no_deps)
+    {
+	if (with_deps ||
+	    (! (this->buildset_name.empty() &&
+		this->cleanset_name.empty())))
+	{
+	    usage("--no-deps may not be used with"
+		  " --with-deps, --build, or --clean");
+	}
+	QTC::TC("abuild", "Abuild no_deps");
+    }
+
     if (with_deps)
     {
 	if (! (this->buildset_name.empty() &&
 	       this->cleanset_name.empty()))
 	{
-	    usage("--with-deps may not be used with --build or --clean");
+	    usage("--with-deps may not be used with"
+		  " --no-deps, --build, or --clean");
 	}
 	QTC::TC("abuild", "Abuild with_deps");
 	this->buildset_name = b_CURRENT;
@@ -574,6 +599,7 @@ Abuild::parseArgv()
     if ((this->dump_data || this->list_traits) &&
 	(! (this->cleanset_name.empty() &&
 	    this->buildset_name.empty() &&
+	    (! no_deps) &&
 	    this->targets.empty())))
     {
 	usage("--dump-data and --list-traits may not be combined with"
@@ -602,12 +628,21 @@ Abuild::parseArgv()
     }
     else if (! this->special_target.empty())
     {
-	// already known cleanset_name is undefined
+	// already known cleanset_name is empty
 	if (! this->targets.empty())
 	{
 	    usage("\"" + this->special_target + "\" may not be combined"
 		  " with any other targets");
 	}
+    }
+
+    if ((! no_deps) &&
+	(this->buildset_name.empty() && this->cleanset_name.empty() &&
+	 this->this_platform.empty()))
+    {
+	QTC::TC("abuild", "Abuild build current by default");
+	this->buildset_name = b_CURRENT;
+	with_deps = true;
     }
 
     if (this->buildset_name.empty() && this->cleanset_name.empty())
@@ -630,14 +665,13 @@ Abuild::parseArgv()
     {
 	if (this->special_target == s_CLEAN)
 	{
-	    // Special case: allow clean to be passed to backend when
-	    // run from an output directory.
-	    this->targets.push_back(this->special_target);
-	    this->special_target.clear();
+	    // Special case: allow clean to be run from an output
+	    // directory.
+	    QTC::TC("abuild", "Abuild clean from output directory");
 	}
-	if (! (this->special_target.empty() &&
-	       this->buildset_name.empty() &&
-	       this->cleanset_name.empty()))
+	else if (! (this->special_target.empty() &&
+		    this->buildset_name.empty() &&
+		    this->cleanset_name.empty()))
 	{
 	    fatal("special targets, build sets, and clean sets may not be"
 		  " specified when running inside an output directory");
@@ -6555,6 +6589,36 @@ Abuild::cleanPath(std::string const& item_name, std::string const& dir)
 }
 
 void
+Abuild::cleanOutputDir()
+{
+    assert(! this->this_platform.empty());
+    assert(Util::isFile(".abuild"));
+    if (! this->silent)
+    {
+	info("cleaning output directory");
+    }
+
+    std::vector<std::string> entries = Util::getDirEntries(".");
+    for (std::vector<std::string>::iterator iter = entries.begin();
+	 iter != entries.end(); ++iter)
+    {
+	std::string const& entry = *iter;
+	if (entry == ".abuild")
+	{
+	    continue;
+	}
+	try
+	{
+	    Util::removeFileRecursively(entry);
+	}
+	catch(QEXC::General& e)
+	{
+	    error(e.what());
+	}
+    }
+}
+
+void
 Abuild::help()
 {
     boost::function<void(std::string const&)> h =
@@ -6621,6 +6685,7 @@ Abuild::help()
     h("  -n                pass no-op flag to backend");
     h("  --no-dep-failures   when used with -k, attempt to build items even when");
     h("                    one or more of their dependencies have failed");
+    h("  --no-deps         build only the current item without its dependencies");
     h("  --only-with-traits trait[,trait,...]   remove all items from build set");
     h("                    that do not have all of the named traits");
     h("  --platform-selector selector |       specify a platform selector");
@@ -6634,7 +6699,7 @@ Abuild::help()
     h("  --silent          suppress most non-error output");
     h("  --upgrade-trees   run special mode to upgrade build trees");
     h("  --verbose         generate more detailed output");
-    h("  --with-deps | -d  short-hand for --build=current");
+    h("  --with-deps | -d  short-hand for --build=current; on by default");
     h("");
     h("--ro-path/--rw-path:");
     h("");
@@ -6688,9 +6753,8 @@ Abuild::help()
     h("");
     h("Any criterion component may be '*'.");
     h("");
-    h("The special targets \"clean\" and \"no-op\" are not passed to make or");
-    h("ant (unless run from an output subdirectory) and may not be combined");
-    h("with any other targets.");
+    h("The special targets \"clean\" and \"no-op\" are not passed to the");
+    h("backend build tools and may not be combined with any other targets.");
     h("");
     h("The target \"rules-help\" will print help information about what");
     h("Abuild.mk variables can be set for any rules defined in the RULES");

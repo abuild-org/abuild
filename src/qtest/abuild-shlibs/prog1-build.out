@@ -1,3 +1,5 @@
+abuild: static (abuild-<native>): all
+abuild: shared1 (abuild-<native>): all
 abuild: prog1 (abuild-<native>): all
 make: Entering directory `--topdir--/prog1/abuild-<native>'
 Compiling ../prog1.cc as C++

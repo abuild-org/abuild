@@ -1143,6 +1143,10 @@ Util::getDirEntries(std::string const& path)
 	while (! done)
 	{
 	    std::string name = filedata.cFileName;
+	    if ((name == ".") || (name == ".."))
+	    {
+		continue;
+	    }
 	    entries.push_back(name);
 	    if (! FindNextFile(fhandle, &filedata))
 	    {
@@ -1172,6 +1176,10 @@ Util::getDirEntries(std::string const& path)
 	while ((dir_entry = readdir(dir)) != NULL)
 	{
 	    std::string name = dir_entry->d_name;
+	    if ((name == ".") || (name == ".."))
+	    {
+		continue;
+	    }
 	    entries.push_back(name);
 	}
     }
@@ -1191,11 +1199,7 @@ Util::removeFileRecursively(std::string const& path)
 	     iter != entries.end(); ++iter)
 	{
 	    std::string const& name = *iter;
-	    if (! ((name == ".") || (name == "..")))
-	    {
-		std::string fullpath = path + "/" + name;
-		removeFileRecursively(fullpath);
-	    }
+	    removeFileRecursively(path + "/" + name);
 	}
 
 #ifdef _WIN32

@@ -1,1 +1,1 @@
-abuild: aa (abuild-<native>): clean
+abuild: cleaning output directory
