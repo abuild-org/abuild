@@ -260,8 +260,10 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 			error(location, "this build item resolves external \"" +
 			      edecl + "\" using a backing area, and the"
 			      " backed external has not been upgraded; you"
-			      " must upgrade the backing area first in this"
-			      " case");
+			      " must either upgrade the backing area"
+			      " or create the external (which may have its"
+			      " own" + BackingConfig::FILE_BACKING +
+			      " file) locally");
 		    }
 		}
 		else
