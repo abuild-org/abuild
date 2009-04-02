@@ -200,8 +200,16 @@ conditions are met:
 
 Abuild is usually able to upgrade forests with backing areas, but it
 will not do so if any externals resolve to 1.0-style trees in backing
-areas.  In that case, you must upgrade the backing area first.  You
-should generally do this anyway.
+areas.  In that case, you must either upgrade the backing area or make
+the external resolve locally.  You can make the external local by just
+creating a directory and populating it with an Abuild.conf and an
+Abuild.backing.  The reason for this restriction is that abuild will
+not read the Abuild.backing file of an upgraded tree root that is not
+at the root of a forest.  This means that abuild would no longer be
+able to resolve the external in the backing area.  Generally, when
+possible, it is best to upgrade your backing area first anyway since
+upgrades to forests with upgraded backing areas often require no
+manual intervention.
 
 
 Rationale for Changing Build Tree Structure
