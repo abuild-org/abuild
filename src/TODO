@@ -1,4 +1,6 @@
 
+XXX next: platform issues, then help system.
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -174,7 +176,7 @@ Groovy Framework
 
 
 Compiler Verification
-====================
+=====================
 
  * Update compiler verification to work with compat level 1.1.  Test
    compiler verification for verification of a compiler that requires
@@ -328,6 +330,26 @@ Abuild Contrib
 Platform Issues
 ===============
 
+ * Allow platforms, but not platform types, to flow "backward" across
+   tree dependencies.  Specifically, consider the following:
+
+   A: platform type T1, available platforms p1, p2
+   B: platform type T1, available platforms p1
+   A -> B
+
+   Allow B to build on platform p2 even if that platform is defined in
+   a tree that B doesn't declare as a dependency.  Even allow this if
+   the platform that defines p2 is defined in a tree that depends on
+   B's tree.
+
+   Basic approach: keep PlatformData at the forest level.  To load, go
+   through trees in sorted order keeping track of which plugins we've
+   loaded and what platform types they provide.  We call
+   loadPlatformData only once per plugin.  Trees still get lists of
+   platform types.  In this way, we get the list of platforms
+   associated with each platform type from the forest, but we get the
+   list of platform types from the trees.
+
  * Make cross-platform dependencies obey platform selectors.  The
    rationale for not doing this was that the command-line and
    environment should not affect the shape of the build graph, but
@@ -343,27 +365,14 @@ Platform Issues
       everywhere else."  This can probably be done with a combination
       of platform-specific dependencies and platform conditionals.
 
- * Allow platforms, but not platform types, to flow "backward" across
-   tree dependencies.  Specifically, consider the following:
-
-   A: platform type T1, available platforms p1, p2
-   B: platform type T1, available platforms p1
-   A -> B
-
-   Allow B to build on platform p2 even if that platform is defined in
-   a tree that B doesn't declare as a dependency.  Even allow this if
-   the platform that defines p2 is defined in a tree that depends on
-   B's tree.
-
  * Pass information about the native os, cpu, and toolset to
    list_platforms.  See comment in Abuild::loadPlatformData before
    invocation of list_platforms.
 
- * If possible, remove the temporary ABUILD_FORCE_32BIT hack or make
-   it permanent.  Search for FORCE32 in the code.  The only references
-   are in private/bin/get_native_platform_data and
-   make/toolchains/gcc.mk.  For a description, see release notes in
-   the documentation.
+ * Make ABUILD_FORCE_32BIT permanent and add ABUILD_FORCE_64BIT as
+   well.  Search for FORCE32 in the code.  The only references are in
+   private/bin/get_native_platform_data and make/toolchains/gcc.mk.
+   For a description, see release notes in the documentation.
 
  * Implement platform conditionals, described below.
 
