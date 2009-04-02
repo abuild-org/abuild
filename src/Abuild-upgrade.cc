@@ -142,10 +142,6 @@ Abuild::findBuildItems(UpgradeData& ud)
 	     iter != entries.end(); ++iter)
 	{
 	    std::string const& entry = *iter;
-	    if ((entry == ".") || (entry == ".."))
-	    {
-		continue;
-	    }
 	    std::string fullpath;
 	    if (dir != ".")
 	    {
