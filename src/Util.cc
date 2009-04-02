@@ -1175,11 +1175,10 @@ Util::getDirEntries(std::string const& path)
 	while ((dir_entry = readdir(dir)) != NULL)
 	{
 	    std::string name = dir_entry->d_name;
-	    if ((name == ".") || (name == ".."))
+	    if (! ((name == ".") || (name == "..")))
 	    {
-		continue;
+		entries.push_back(name);
 	    }
-	    entries.push_back(name);
 	}
     }
     closedir(dir);
