@@ -1611,6 +1611,10 @@ Abuild::traverseForests(BuildForest_map& forests,
 	    assert(! btop.empty());
 	    if (*iter != btop)
 	    {
+		if (! this->suggest_upgrade)
+		{
+		    QTC::TC("abuild", "Abuild backing area points below root");
+		}
 		verbose("this is actually " + btop);
 	    }
 	    bool keep = false;

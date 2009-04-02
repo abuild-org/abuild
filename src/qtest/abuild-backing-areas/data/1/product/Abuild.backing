@@ -1,1 +1,2 @@
-backing-areas: ../../other/2
+# backing area points below root of forest, which is okay
+backing-areas: ../../other/2/product

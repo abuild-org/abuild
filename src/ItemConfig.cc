@@ -322,23 +322,30 @@ ItemConfig::checkUnnamed()
 
     if (checkKeyPresent(k_BUILD_ALSO, msg))
     {
-	QTC::TC("abuild", "ItemConfig ERR build-also without this");
+	QTC::TC("abuild", "ItemConfig ERR build-also without name");
     }
     if (checkKeyPresent(k_DEPS, msg))
     {
-	QTC::TC("abuild", "ItemConfig ERR deps without this");
+	QTC::TC("abuild", "ItemConfig ERR deps without name");
     }
     if (checkKeyPresent(k_PLATFORM, msg))
     {
-	QTC::TC("abuild", "ItemConfig ERR platform-types without this");
+	QTC::TC("abuild", "ItemConfig ERR platform-types without name");
     }
     if (checkKeyPresent(k_SUPPORTED_FLAGS, msg))
     {
-	QTC::TC("abuild", "ItemConfig ERR supported-flags without this");
+	QTC::TC("abuild", "ItemConfig ERR supported-flags without name");
     }
     if (checkKeyPresent(k_TRAITS, msg))
     {
-	QTC::TC("abuild", "ItemConfig ERR traits without this");
+	QTC::TC("abuild", "ItemConfig ERR traits without name");
+    }
+    if (checkKeyPresent(k_DESCRIPTION, msg))
+    {
+	// Since we don't store unnamed build items, there's no point
+	// in allowing a description.  People can put comments in
+	// instead.
+	QTC::TC("abuild", "ItemConfig ERR description without name");
     }
 }
 
@@ -814,7 +821,7 @@ ItemConfig::checkPlatforms()
     {
 	if (this->name.empty())
 	{
-	    QTC::TC("abuild", "ItemConfig ERR config files without this");
+	    QTC::TC("abuild", "ItemConfig ERR config files without name");
 	    this->error.error(this->location,
 			      "build and interface files are not "
 			      "permitted for unnamed build items");

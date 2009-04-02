@@ -22,6 +22,7 @@
 --topdir--/a/ad/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
 --topdir--/a/ag/Abuild.conf: ERROR: "supported-flags" is not permitted for unnamed build items
 --topdir--/a/ag/Abuild.conf: ERROR: "traits" is not permitted for unnamed build items
+--topdir--/a/ag/Abuild.conf: ERROR: "description" is not permitted for unnamed build items
 --topdir--/a/ag/Abuild.backing: ERROR: Abuild.backing file ignored for non forest-root build item
 --topdir--/a/ag/Abuild.conf: ERROR: "deleted" is ignored except in deprecated 1.0 build tree roots with backing areas
 --topdir--/a/ag/Abuild.conf: ERROR: "tree-deps" may only appear in a root build item

@@ -307,6 +307,11 @@ Documentation
    platform-dependent values (like pathnames, etc.) are in fact
    platform-dependent.
 
+ * Mention that we don't support descrpition for unnamed build items,
+   including nameless tree roots, because we don't store anything
+   about unnamed build items.  If you want a description in your tree
+   root, give it a name.  Comments are allowed anywhere.
+
 
 Usability Improvements
 ======================
