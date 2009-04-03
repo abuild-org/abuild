@@ -3,4 +3,4 @@
 # never be loaded manually by the user.
 #
 
-include $(call load_plugin,toolchains/$(CCXX_TOOLCHAIN))
+include $(call load_toolchain,$(CCXX_TOOLCHAIN))

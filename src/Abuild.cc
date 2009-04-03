@@ -6104,6 +6104,43 @@ Abuild::getRulePaths(std::string const& item_name,
     return result;
 }
 
+std::list<std::string>
+Abuild::getToolchainPaths(std::string const& item_name,
+			  BuildItem& build_item,
+			  std::string const& dir,
+			  bool relative)
+{
+    // Generate a list of paths from which we should attempt to load
+    // toolchains.  This is the toolchains directory for every plugin
+    // that has one as well as the built-in toolchains directory.
+
+    std::list<std::string> result;
+
+    // Internal directories are absolute unconditionally.  Note that
+    // we can't move toolchains out of "make" without breaking any
+    // existing compiler toolchain that loads unix_compiler.mk or any
+    // of the other built-in ones.
+    result.push_back(this->abuild_top + "/make/toolchains");
+
+    std::list<std::string> const& plugins = build_item.getPlugins();
+    for (std::list<std::string>::const_iterator iter = plugins.begin();
+	 iter != plugins.end(); ++iter)
+    {
+	std::string candidate =
+	    this->buildset[*iter]->getAbsolutePath() + "/toolchains";
+	if (Util::isDirectory(candidate))
+	{
+	    if (relative)
+	    {
+		candidate = Util::absToRel(candidate, dir);
+	    }
+	    result.push_back(candidate);
+	}
+    }
+
+    return result;
+}
+
 bool
 Abuild::invoke_gmake(std::string const& item_name,
 		     std::string const& item_platform,
@@ -6160,6 +6197,18 @@ Abuild::invoke_gmake(std::string const& item_name,
     mk << "ABUILD_RULE_PATHS :=";
     for (std::list<std::string>::iterator iter = rule_paths.begin();
 	 iter != rule_paths.end(); ++iter)
+    {
+	mk << " " << *iter;
+    }
+    mk << "\n";
+
+    // Generate a list of paths from which we should attempt to load
+    // toolchains.
+    std::list<std::string> toolchain_paths =
+	getToolchainPaths(item_name, build_item, dir, true);
+    mk << "ABUILD_TOOLCHAIN_PATHS :=";
+    for (std::list<std::string>::iterator iter = toolchain_paths.begin();
+	 iter != toolchain_paths.end(); ++iter)
     {
 	mk << " " << *iter;
     }

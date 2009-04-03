@@ -191,10 +191,16 @@ class Abuild
 			 std::string const& item_platform,
 			 BuildItem& build_item,
 			 InterfaceParser& parser);
-    std::list<std::string> getRulePaths(std::string const& item_name,
-					BuildItem& build_item,
-					std::string const& dir,
-					bool relative);
+    std::list<std::string> getRulePaths(
+	std::string const& item_name,
+	BuildItem& build_item,
+	std::string const& dir,
+	bool relative);
+    std::list<std::string> getToolchainPaths(
+	std::string const& item_name,
+	BuildItem& build_item,
+	std::string const& dir,
+	bool relative);
     bool invoke_gmake(std::string const& item_name,
 		      std::string const& item_platform,
 		      BuildItem& build_item,
