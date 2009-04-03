@@ -5133,7 +5133,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     // be built with c1 and c2.  If B would be built only with c2
     // based on the selection criteria, A's requirement of c1 would
     // cause B to also be built with c1.  We refer to this as
-    // "opportunistic platform selection."  In order for this to work
+    // "as-needed platform selection."  In order for this to work
     // properly, we must be able to have analysis of a particular item
     // for build graph insertion be able to modify that item's
     // dependencies.  This is the reason that we have to add items to
@@ -5281,11 +5281,16 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// Note that if the dependency is of type "all", it
 		// implicitly is buildable on all platforms.  We
 		// explicitly add the platform to the dependency's
-		// build platform list.  This is how opportunistic
+		// build platform list.  This is how as-needed
 		// platform selection happens.
 		QTC::TC("abuild", "Abuild A:p -> B:p",
 			((dep_type == TargetType::tt_all) ? 0 : 1));
-		dep_item.addBuildPlatform(item_platform);
+		if (dep_item.getBuildPlatforms().count(item_platform) == 0)
+		{
+		    QTC::TC("abuild", "Abuild as-needed platform selection",
+			    ((dep_type == TargetType::tt_all) ? 0 : 1));
+		    dep_item.addBuildPlatform(item_platform);
+		}
 		this->build_graph.addDependency(
 		    platform_item, createBuildGraphNode(
 			dep, item_platform));

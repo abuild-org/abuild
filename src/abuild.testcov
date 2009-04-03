@@ -350,3 +350,4 @@ Abuild backing area points below root 0
 Abuild no_deps 0
 Abuild build current by default 0
 Abuild clean from output directory 0
+Abuild as-needed platform selection 1

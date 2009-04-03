@@ -44,10 +44,9 @@ $td->runtest("build-item-rules compat level 1.1",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/hook-build-items");
 if ($test_java)
 {
-    cd("work/hook-build-items");
-
     $td->runtest("hook-build-items",
 		 {$td->COMMAND => "abuild -b all -k",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -68,6 +67,10 @@ if ($test_java)
 		 {$td->FILE => "$top/hook-build-items-1_1.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    system("(tar cf - . | cat > /dev/null)");
 }
 
 cd("work/link-shlibs");
