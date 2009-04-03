@@ -586,6 +586,14 @@ life even before private/bin/get_native_platform_data is called.
 Java Problems
 =============
 
+ * Wrapper generation for both groovy and ant creates
+   platform-specific files in the abuild-java directory.  The wrapper
+   is platform-specific because Windows and UNIX need different
+   scripts because of different path formats.  Even if they didn't,
+   the wrapper may have system-specific paths in it.  This means that
+   doing a of a java item on Windows and running the test suite on
+   UNIX, or vice versa, may not work properly.
+
  * Reconsider using depends task for compile in abuild.xml.
 
  * Our default java compile rule doesn't notice if a .java file was
