@@ -5150,13 +5150,13 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     // the build sets of all their reverse dependencies.
 
     // The logic of setting up the build graph is quite subtle, and
-    // although the code itself is fairly, simple, there are actually
-    // quite a number of cases.  Each node in the build graph is a
-    // string of the form item_name:platform.  For every item i and
-    // every platform p in its build platforms, we add the node i:p to
-    // the build graph.  We create a dependency from A:p1 to B:p2 in
-    // the build graph whenever A's build on p1 depends on B's build
-    // on p2.
+    // although the code itself is fairly simple, there are actually
+    // quite a number of cases.  For purposes of discussion, suppose
+    // each node in the build graph is a string of the form
+    // item_name:platform.  For every item i and every platform p in
+    // its build platforms, we add the node i:p to the build graph.
+    // We create a dependency from A:p1 to B:p2 in the build graph
+    // whenever A's build on p1 depends on B's build on p2.
 
     // In the normal case of A:p1 -> B:p2, p1 = p2.  There are two
     // exceptions to this rule:
@@ -5195,10 +5195,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	 bp_iter != build_platforms.end(); ++bp_iter)
     {
 	// For each build platform, add the item/platform pair to the
-	// build graph.  Use a colon to separate the item from the
-	// platform since colon is an invalid character for both items
-	// and platform identifiers.  This ensures that the resulting
-	// string will be unambiguous.
+	// build graph.
 	this->build_graph.addItem(createBuildGraphNode(item_name, *bp_iter));
     }
 
@@ -5217,6 +5214,36 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	std::string override_platform;
 	if (! dep_platform_type.empty())
 	{
+	    if (ps)
+	    {
+		QTC::TC("abuild", "Abuild platform dependency with selector");
+	    }
+	    else
+	    {
+		// If the dependency was declared with a platform type
+		// only and no selector, see if the user specified any
+		// general selectors.
+		if (this->platform_selectors.count(dep_platform_type))
+		{
+		    QTC::TC("abuild", "Abuild specific platform selector");
+		    ps = &(this->platform_selectors[dep_platform_type]);
+		}
+		else if (this->platform_selectors.count(PlatformSelector::ANY))
+		{
+		    QTC::TC("abuild", "Abuild default platform selector");
+		    ps = &(this->platform_selectors[PlatformSelector::ANY]);
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild no platform selector");
+		}
+		if (ps && ps->isSkip())
+		{
+		    QTC::TC("abuild", "Abuild ignoring skip selector");
+		    ps = 0;
+		}
+	    }
+
 	    // If we have declared a specific platform type with this
 	    // dependency, pick the best platform of that type from
 	    // the dependency's buildable platforms.  We have already

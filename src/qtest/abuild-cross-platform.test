@@ -153,6 +153,33 @@ $td->runtest("dump data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/case4");
+
+foreach my $d (['none', 'none', ''],
+	       ['all-default', 'all default',
+		'-p native:default -p other:default'],
+	       ['native-debug', 'native debug',
+		'-p native:option=debug'],
+	       ['all-debug', 'all debug',
+		'-p option=debug'],
+	       ['all-empty-native-release', 'all empty, native release',
+		'-p option= -p native:option=release'],
+	       ['all-debug-native-release', 'all debug, native release',
+		'-p option=debug -p native:option=release'],
+	       ['all-debug-native-default', 'all debug, native default',
+		'-p option=debug -p native:default'],
+	       ['other-debug', 'other debug',
+		'-p other:option=debug'])
+{
+    my ($out, $description, $selectors) = @$d;
+    $td->runtest($description,
+		 {$td->COMMAND => "abuild --dump-build-graph -b all $selectors",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/case4.$out.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(18);
+$td->report(26);

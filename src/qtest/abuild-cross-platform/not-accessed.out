@@ -9,3 +9,9 @@ work/case2/01-object-code/Abuild.mk
 work/case2/04-indep/Abuild.mk
 work/case2/04-java/Abuild.mk
 work/case2/04-object-code/Abuild.mk
+work/case4/a/Abuild.mk
+work/case4/b/Abuild.mk
+work/case4/c/Abuild.mk
+work/case4/d/Abuild.mk
+work/case4/e/Abuild.mk
+work/case4/item/Abuild.mk

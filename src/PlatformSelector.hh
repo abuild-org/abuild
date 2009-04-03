@@ -14,6 +14,7 @@ class PlatformSelector
     // returning true iff it is valid.
     bool initialize(std::string const& str);
     bool isSkip() const;
+    bool isDefault() const;
     std::string const& getPlatformType() const;
 
     // Matcher(first_platform, platform_selector)(platform) returns
@@ -49,6 +50,7 @@ class PlatformSelector
 			       std::string& option);
 
     bool skip;
+    bool dfault;
     std::string platform_type;
     std::string os;
     std::string cpu;

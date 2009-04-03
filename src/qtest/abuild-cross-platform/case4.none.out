@@ -1,0 +1,8 @@
+1!item!<native> -> <none>
+1!a!indep -> 1!item!<native>
+1!b!indep -> 1!item!<native>
+1!c!indep -> 1!item!<native>
+1!item!<native>.release -> <none>
+1!d!indep -> 1!item!<native>.release
+1!item!zz_os.cpu.toolset.other -> <none>
+1!e!zz_os.cpu.toolset.other -> 1!item!zz_os.cpu.toolset.other

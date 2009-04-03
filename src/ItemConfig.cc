@@ -1287,7 +1287,6 @@ ItemConfig::getDepPlatformType(std::string const& dep,
     {
 	if (this->dep_platform_selectors.count(dep) != 0)
 	{
-	    // may be null
 	    selector = (*this->dep_platform_selectors.find(dep)).second.get();
 	}
 	return (*this->dep_platform_types.find(dep)).second;

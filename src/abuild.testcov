@@ -175,7 +175,7 @@ Abuild override platform 0
 Abuild A:p -> B:p 1
 Abuild ABUILD_PLATFORM_SELECTORS 0
 Abuild ERR invalid platform selector 0
-PlatformSelector option 0
+PlatformSelector option 1
 PlatformSelector skip 0
 PlatformSelector all 0
 PlatformSelector platform 4 0
@@ -351,3 +351,9 @@ Abuild no_deps 0
 Abuild build current by default 0
 Abuild clean from output directory 0
 Abuild as-needed platform selection 1
+Abuild platform dependency with selector 0
+Abuild specific platform selector 0
+Abuild default platform selector 0
+Abuild no platform selector 0
+Abuild ignoring skip selector 0
+PlatformSelector default 0

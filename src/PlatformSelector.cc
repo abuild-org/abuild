@@ -9,7 +9,8 @@
 std::string const PlatformSelector::ANY = "*";
 
 PlatformSelector::PlatformSelector() :
-    skip(false)
+    skip(false),
+    dfault(false)
 {
 }
 
@@ -17,6 +18,12 @@ PlatformSelector::Matcher::Matcher(std::string const& first_platform,
 				   PlatformSelector const& p) :
     p(p)
 {
+    // A platform selector that is "default" means that you should not
+    // use the platform selector to perform matches but instead use
+    // the default.  Creating a matcher with a p that is default is a
+    // programming error.
+    assert(! p.isDefault());
+
     std::string ignore;
     // The first platform is used to get the defaults for all
     // non-optional fields.  The option field is optional, so an empty
@@ -63,12 +70,13 @@ PlatformSelector::initialize(std::string const& str)
     static std::string component4or5 =
 	component + "\\." + component + "\\." + component + "\\." +
 	component1or2;
-    static std::string option_re = "option=" + component;
+    static std::string option_re = "option=(?:" + component + ")?";
     static std::string compiler_re = "compiler=" + component1or2;
     static std::string platform_re = "platform=" + component4or5;
     boost::regex selector_re(
 	"(?:([a-zA-Z0-9_-]+):)?" // platform type
-	"(all|skip|" + option_re + "|" + compiler_re + "|" + platform_re + ")");
+	"(all|skip|default|" +
+	option_re + "|" + compiler_re + "|" + platform_re + ")");
 
     boost::smatch match;
 
@@ -96,6 +104,18 @@ PlatformSelector::initialize(std::string const& str)
 	    this->skip = true;
 	}
     }
+    else if (selector == "default")
+    {
+	if (this->platform_type == ANY)
+	{
+	    okay = false;
+	}
+	else
+	{
+	    QTC::TC("abuild", "PlatformSelector default");
+	    this->dfault = true;
+	}
+    }
     else if (selector == "all")
     {
 	QTC::TC("abuild", "PlatformSelector all");
@@ -113,8 +133,9 @@ PlatformSelector::initialize(std::string const& str)
 	std::string pattern = fields.back();
 	if (specifier == "option")
 	{
-	    QTC::TC("abuild", "PlatformSelector option");
 	    this->option = pattern;
+	    QTC::TC("abuild", "PlatformSelector option",
+		    this->option.empty() ? 0 : 1);
 	}
 	else if (specifier == "compiler")
 	{
@@ -160,6 +181,12 @@ bool
 PlatformSelector::isSkip() const
 {
     return this->skip;
+}
+
+bool
+PlatformSelector::isDefault() const
+{
+    return this->dfault;
 }
 
 std::string const&

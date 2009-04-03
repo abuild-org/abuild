@@ -201,7 +201,7 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 	    else
 	    {
 		bool any_selected = false;
-		if (ps)
+		if (ps && (! ps->isDefault()))
 		{
 		    // If we have selection criteria, mark each
 		    // matching platform.  We must do this after the

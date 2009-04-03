@@ -248,7 +248,7 @@ BuildItem::getBestPlatformForType(std::string platform_type,
 				  PlatformSelector const* ps) const
 {
     std::string result;
-    if (ps)
+    if (ps && (ps->getPlatformType() != PlatformSelector::ANY))
     {
 	platform_type = ps->getPlatformType();
     }
@@ -258,7 +258,7 @@ BuildItem::getBestPlatformForType(std::string platform_type,
 	    (*(this->platform_types.find(platform_type))).second;
 	if (! platforms.empty())
 	{
-	    if (ps)
+	    if (ps && (! ps->isDefault()))
 	    {
 		PlatformSelector::Matcher m(platforms[0], *ps);
 		for (std::vector<std::string>::const_iterator iter =
