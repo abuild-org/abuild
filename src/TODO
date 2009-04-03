@@ -332,25 +332,11 @@ Abuild Contrib
 Platform Issues
 ===============
 
- * Allow platforms, but not platform types, to flow "backward" across
-   tree dependencies.  Specifically, consider the following:
-
-   A: platform type T1, available platforms p1, p2
-   B: platform type T1, available platforms p1
-   A -> B
-
-   Allow B to build on platform p2 even if that platform is defined in
-   a tree that B doesn't declare as a dependency.  Even allow this if
-   the platform that defines p2 is defined in a tree that depends on
-   B's tree.
-
-   Basic approach: keep PlatformData at the forest level.  To load, go
-   through trees in sorted order keeping track of which plugins we've
-   loaded and what platform types they provide.  We call
-   loadPlatformData only once per plugin.  Trees still get lists of
-   platform types.  In this way, we get the list of platforms
-   associated with each platform type from the forest, but we get the
-   list of platform types from the trees.
+ * Provide a mechanism to create global platform type/platform build
+   items.  They work like platform/platform type plugins except that
+   they are loaded directly into abuild's internal platform_data.
+   Their paths also have to be made available to make for loading
+   toolchains.
 
  * Make cross-platform dependencies obey platform selectors.  The
    rationale for not doing this was that the command-line and
