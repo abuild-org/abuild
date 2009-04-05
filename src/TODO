@@ -3,6 +3,11 @@ XXX next: platform issues, then help system.
 
 XXX coverage fails with ABUILD_NO_JAVA
 
+XXX from windows, groovy invokes perl
+Q:/source/qtest/bin/qtest-driver, resulting in dirname($dirname)
+causing load of TestDriver.pm and QTC.pm to fail.  Why does this at
+happen at home and not at work?
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
