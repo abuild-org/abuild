@@ -34,6 +34,14 @@ abuild.addTargetClosure('test-only') {
                         if (m)
                         {
                             interpreter = new File(m.group(1)).name
+                            if (interpreter == 'env')
+                            {
+                                m = firstline =~ /env (\S+)/
+                                if (m)
+                                {
+                                    interpreter = m.group(1)
+                                }
+                            }
                             driver = candidate.absolutePath
                         }
                     }
