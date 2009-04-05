@@ -13,7 +13,7 @@ conditional1:67:3: ERROR: assigning to unknown variable seen12
 conditional1:71:3: ERROR: assigning to unknown variable seen13
 conditional1:75:3: ERROR: assigning to unknown variable seen14
 conditional1:81:11: ERROR: unknown function seen15
-conditional1:89:18: ERROR: invalid regular expression 
+conditional1:89:18: ERROR: invalid regular expression **
 conditional1:105:21: ERROR: this argument must be a string
 conditional1:109:14: ERROR: this argument may not be a function
 conditional1:109:18: ERROR: variable str is not a boolean scalar

@@ -86,7 +86,7 @@ else
 endif
 
 # seen16
-if (matches(asdf,))
+if (matches(asdf,**))
   notseen = x
 endif
 
