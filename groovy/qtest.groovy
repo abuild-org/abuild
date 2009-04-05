@@ -52,6 +52,8 @@ abuild.addTargetClosure('test-only') {
                 }
             }
 
+            // Perl, especially cygwin perl, needs /, not \ in a path.
+            driver = driver.replaceAll('\\\\', '/');
             if (interpreter)
             {
                 command = interpreter
