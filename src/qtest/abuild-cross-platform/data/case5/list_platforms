@@ -15,10 +15,10 @@ while (@ARGV)
     if ($arg eq '--native-data')
     {
 	die "invalid invocation of list_platforms" unless @ARGV >= 3;
+	$os = shift(@ARGV);
+	$cpu = shift(@ARGV);
+	$toolset = shift(@ARGV);
     }
-    $os = shift(@ARGV);
-    $cpu = shift(@ARGV);
-    $toolset = shift(@ARGV);
 }
 
 # Exercise passing of --native-data to list_platforms
