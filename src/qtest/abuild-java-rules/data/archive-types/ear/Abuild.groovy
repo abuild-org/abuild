@@ -6,7 +6,8 @@ parameters {
     java.jarName = unsigned.name
     java.earName = 'ear-example.ear'
     java.appxml = 'application.xml'
-    java.copyJars << {
+    java.packageJar << [:]
+    java.packageJar << {
         ant.copy('file': unsigned.absolutePath,
                  'tofile': signed.absolutePath)
     }

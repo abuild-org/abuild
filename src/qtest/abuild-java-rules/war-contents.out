@@ -10,4 +10,5 @@ WEB-INF/jboss-web.xml
 WEB-INF/lib/
 WEB-INF/lib/jar-example.jar
 WEB-INF/web.xml
+filex
 index.txt

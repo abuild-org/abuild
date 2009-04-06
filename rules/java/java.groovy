@@ -151,7 +151,7 @@ class JavaRules
         def mainclass = attributes.remove('mainclass')
         def manifestClassPath = attributes.remove('manifestclasspath')
         def extramanifestkeys = attributes.remove('extramanifestkeys')
-        def otherfiles = attributes.remove('otherfiles')
+        def filesToPackage = attributes.remove('filestopackage')
 
         // Take only last path element for each manifest class path
         manifestClassPath = manifestClassPath.collect { new File(it).name }
@@ -170,7 +170,7 @@ class JavaRules
         ant.jar(jarAttrs) {
             metainfdirs.each { metainf('dir': it) }
             filesets.each { fileset('dir': it) }
-            otherfiles?.each {
+            filesToPackage?.each {
                 File f = new File(it)
                 if (! f.isAbsolute())
                 {
@@ -217,46 +217,33 @@ class JavaRules
         abuild.runActions('java.packageJar', this.&packageJar, defaultAttrs)
     }
 
-    def copyJars(Map attributes)
-    {
-        def jarsToCopy = attributes.remove('jars')
-        if (! jarsToCopy)
-        {
-            return
-        }
-        def copydir = new File(attributes.remove('copydir'))
-        ant.mkdir('dir': copydir)
-        def dist = getPathVariable('dist')
-        jarsToCopy.each {
-            def src = new File(it)
-            if (src.name =~ /(?i:\.jar)$/)
-            {
-                def dest = new File(copydir, src.name)
-                ant.copy('file': src.absolutePath,
-                         'tofile': dest.absolutePath)
-            }
-        }
-    }
-
-    def copyJarsTarget()
-    {
-        def defaultAttrs = [
-            'jars': abuild.resolveAsList('java.jarsToCopy'),
-            'copydir': getPathVariable('copiedJars')
-        ]
-
-        abuild.runActions('java.copyJars', this.&copyJars, defaultAttrs)
-    }
-
     def signJars(Map attributes)
     {
         def alias = attributes.remove('alias')
         def storepass = attributes.remove('storepass')
-        def signdir = attributes.remove('signdir')
 
-        if (! (alias && storepass && (new File(signdir).isDirectory())))
+        if (! (alias && storepass))
         {
             return
+        }
+
+        def jarsToSign = attributes.remove('jarstosign')
+        def signdir = new File(attributes.remove('signdir'))
+        if (! (jarsToSign || signdir.isDirectory()))
+        {
+            return
+        }
+
+        ant.mkdir('dir': signdir)
+        jarsToSign.each {
+            def src = new File(it)
+            if ((src.parent != signdir.absolutePath) &&
+                (src.name =~ /(?i:\.jar)$/))
+            {
+                def dest = new File(signdir, src.name)
+                ant.copy('file': src.absolutePath,
+                         'tofile': dest.absolutePath)
+            }
         }
 
         def keystore = attributes.remove('keystore')
@@ -279,8 +266,9 @@ class JavaRules
         {
             signjarAttrs['keypass'] = keypass
         }
+
         ant.signjar(signjarAttrs) {
-            fileset('dir': signdir, 'includes': includes)
+            fileset('dir': signdir.absolutePath, 'includes': includes)
         }
     }
 
@@ -288,31 +276,34 @@ class JavaRules
     {
         def defaultAttrs = [
             'includes': '*.jar',
-            'signdir': getPathVariable('copiedJars'),
+            'signdir': getPathVariable('signedJars'),
+            'jarstosign' : abuild.resolve('java.jarsToSign'),
             'alias': abuild.resolve('java.sign.alias'),
             'storepass': abuild.resolve('java.sign.storepass'),
             'keystore': abuild.resolve('java.sign.keystore'),
             'keypass': abuild.resolve('java.sign.keypass'),
-            'lazy': 'true'
+            'lazy': true
         ]
 
         abuild.runActions('java.signJars', this.&signJars, defaultAttrs)
     }
 
-    def packageRar(Map attributes)
+    def packageHighLevelArchive(Map attributes)
     {
-        packageJarGeneral(attributes, 'rarname')
+        packageJarGeneral(attributes, 'highlevelarchivename')
     }
 
-    def packageRarTarget()
+    def packageHighLevelArchiveTarget()
     {
         def defaultAttrs = [
-            'rarname': abuild.resolveAsString('java.rarName'),
-            'otherfiles' : defaultPackageClassPath,
+            'highlevelarchivename':
+                abuild.resolveAsString('java.highLevelArchiveName'),
+            'filestopackage' : defaultPackageClassPath,
         ]
         archiveAttributes.each { k, v -> defaultAttrs[k] = v }
 
-        abuild.runActions('java.packageRar', this.&packageRar, defaultAttrs)
+        abuild.runActions('java.packageHighLevelArchive',
+                          this.&packageHighLevelArchive, defaultAttrs)
     }
 
     def packageWar(Map attributes)
@@ -336,13 +327,14 @@ class JavaRules
         resourcesdirs << attributes.remove('classesdir')
         def webdirs = attributes.remove('webdirs')
         webdirs.addAll(attributes.remove('extrawebdirs'))
-        webdirs << getPathVariable('copiedJars')
+        webdirs << getPathVariable('signedJars')
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
         def extramanifestkeys = attributes.remove('extramanifestkeys')
         def webinfdirs = attributes.remove('webinfdirs')
         webinfdirs.addAll(attributes.remove('extrawebinfdirs'))
         def libfiles = attributes.remove('libfiles')
+        def filesToPackage = attributes.remove('filestopackage')
 
         // Filter out non-existent directories
         resourcesdirs = resourcesdirs.grep { new File(it).isDirectory() }
@@ -365,6 +357,18 @@ class JavaRules
                     new File("${distdir}/${warname}").absolutePath)
                 {
                     lib('file': f.absolutePath)
+                }
+            }
+            filesToPackage?.each {
+                File f = new File(it)
+                if (! f.isAbsolute())
+                {
+                    f = new File(abuild.sourceDirectory, it)
+                }
+                if (f.absolutePath !=
+                    new File("${distdir}/${warname}").absolutePath)
+                {
+                    fileset('file': f.absolutePath)
                 }
             }
             manifest {
@@ -413,7 +417,7 @@ class JavaRules
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
         def extramanifestkeys = attributes.remove('extramanifestkeys')
-        def otherfiles = attributes.remove('otherfiles')
+        def filesToPackage = attributes.remove('filestopackage')
 
         // Filter out non-existent directories
         resourcesdirs = resourcesdirs.grep { new File(it).isDirectory() }
@@ -426,7 +430,7 @@ class JavaRules
         ant.ear(earAttrs) {
             metainfdirs.each { metainf('dir': it) }
             resourcesdirs.each { fileset('dir': it) }
-            otherfiles.each {
+            filesToPackage.each {
                 File f = new File(it)
                 if (! f.isAbsolute())
                 {
@@ -452,7 +456,7 @@ class JavaRules
             'earname': abuild.resolveAsString('java.earName'),
             'appxml': abuild.resolveAsString('java.appxml'),
             'distdir': getPathVariable('dist'),
-            'otherfiles' : defaultPackageClassPath,
+            'filestopackage' : defaultPackageClassPath,
         ]
         archiveAttributes.each { k, v -> defaultAttrs[k] = v }
         defaultAttrs.remove('classesdir')
@@ -490,35 +494,7 @@ class JavaRules
         def javadocAttrs = attributes
         javadocAttrs['sourcepath'] = srcdirs.join(pathSep)
         javadocAttrs['classpath'] = attributes['classpath'].join(pathSep)
-        def linkPaths = constructLinkPaths(attributes['destdir'])
-        ant.javadoc(javadocAttrs) {
-            linkPaths.each() {
-                linkPath ->
-                link('href' : linkPath)
-            }
-        }
-    }
-
-    private List<String> constructLinkPaths(String destinationDir)
-    {
-        def javadocPaths = []
-        abuild.itemPaths.each() {
-            item, path ->
-            File javadocPath = new File("$path/abuild-java/doc")
-            if (javadocPath.isDirectory())
-            {
-                ant.echo("Build item has javadocs:" +
-                         " ($item, ${javadocPath.path})")
-
-                javadocPaths.add(Util.absToRel(destinationDir, javadocPath))
-            }
-            else
-            {
-                ant.echo("Build item has no javadocs:" +
-                         " ($item, $path")
-            }
-        }
-        return javadocPaths
+        ant.javadoc(javadocAttrs)
     }
 
     def wrapper(Map attributes)
@@ -652,15 +628,14 @@ abuild.configureTarget('compile', 'deps' : ['generate'],
                        javaRules.&compileTarget)
 abuild.configureTarget('package-jar', 'deps' : ['compile'],
                        javaRules.&packageJarTarget)
-abuild.configureTarget('copy-jars', 'deps' : ['package-jar'],
-                       javaRules.&copyJarsTarget)
-abuild.configureTarget('sign-jars', 'deps' : ['copy-jars'],
+abuild.configureTarget('sign-jars', 'deps' : ['package-jar'],
                        javaRules.&signJarsTarget)
-abuild.configureTarget('package-rar', 'deps' : ['sign-jars'],
-                       javaRules.&packageRarTarget)
-abuild.configureTarget('package-war', 'deps' : ['package-rar'],
+abuild.configureTarget('package-highlevelarchive', 'deps' : ['sign-jars'],
+                       javaRules.&packageHighLevelArchiveTarget)
+abuild.configureTarget('package-war', 'deps' : ['sign-jars'],
                        javaRules.&packageWarTarget)
-abuild.configureTarget('package-ear', 'deps' : ['package-war'],
+abuild.configureTarget('package-ear', 'deps' : ['package-highlevelarchive',
+                           'package-war'],
                        javaRules.&packageEarTarget)
 abuild.configureTarget('javadoc', 'deps' : ['compile'],
                        javaRules.&javadocTarget)

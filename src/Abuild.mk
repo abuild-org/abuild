@@ -140,7 +140,7 @@ export TC_SRCS := \
 	$(wildcard $(SRCDIR)/../groovy/*.groovy) \
 	$(wildcard $(SRCDIR)/java-support/src/java/org/abuild/*.java) \
 	$(wildcard $(SRCDIR)/java-support/src/java/org/abuild/*/*.java) \
-	$(wildcard $(SRCDIR)/java-support/src/java/org/abuild/*/*.groovy)
+	$(wildcard $(SRCDIR)/java-support/src/groovy/org/abuild/*/*.groovy)
 
 RULES := ccxx
 LOCAL_RULES := local-rules.mk

@@ -3,6 +3,7 @@
 import org.codehaus.groovy.control.CompilationFailedException
 
 File srcDir = new File("java-support/src/java")
+File groovySrcDir = new File("java-support/src/groovy")
 if (! srcDir.isDirectory())
 {
     System.err.println "You must run this script from the abuild src directory"
@@ -61,7 +62,7 @@ ant.javac('deprecation': 'yes',
 }
 ant.groovyc('destdir': classesDir,
             'classpath': classesDir,
-            'srcdir': srcDir.absolutePath)
+            'srcdir': groovySrcDir.absolutePath)
 ant.jar('destfile': distDir + '/abuild-java-support.jar',
         'basedir': classesDir,
         'includes': '**/*.class')

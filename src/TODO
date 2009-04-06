@@ -1,38 +1,3 @@
-rar -> high level archive
-otherfiles -> files to package.. have this for war also
-
-right now, we exlcuded classesdir from ear but not high levle
-archive.  potentially confusing...  leave it in high level archive
-just to keep consistency with jar.  if you want to create a rar with a
-local jar built in the same build item, you will have to take explicit
-action to avoid having the class files packaged in both places.
-
-If you can put class files in an ear, the packageEar method should
-loko for classesdir, but we will have it be empty by default.  Maybe
-high level archive should be the same....
-
-copyJars: desitnation directory shoudl be todir, not copydir
-
-java.dir.copiedJars => java.dir.signedJars
-java.jarsToSign
-
-get rid of copyJars
-
-signJars has a parameter that contains a list of remote jars to copy
-and sign.  jarsToSign
-
-Document smoewhere that lazy jar signing is true by default in order
-to have idempotent builds
-
-exercise javadoc in test suite
-
-need to figure out what desired junit and javadoc behavior should
-be... should be able to support multiple testsuite
-
-remind Joe to send link to abuild ant build that does junit tests
-against multiple classes without using testsuite.
-
-----------------------------------------------------------------------
 
 XXX next: msvc fixes or help system
 
@@ -217,18 +182,16 @@ Groovy Framework
  * Java out of memory problem with ant is reportedly fixed with
    1.5.0_12.  Actually, it still happens with 1.5.0_15.
 
- * Find sun conventions on directory structure for _base.groovy
-
  * Update rules/java/java_help.txt
 
- * No specific mechanism (like plugin.groovy) is provided for
-   pre-initialization of parameters to be used by build item-supplied
-   rules.  This facility does not exist on the make side either, and
-   it has never been missed.  If code generators really need this
-   facility, they can set interface variables.  Note that parameters {
-   interface.variable << 'new-val' } does actually work as of 1.1.a3.
+ * Document smoewhere that lazy jar signing is true by default in
+   order to have idempotent builds
 
-   OKAY: document and move on.
+ * Need to figure out what desired junit and javadoc behavior should
+   be.  Maybe junit should be able to support multiple testsuites?
+
+ * Exercise javadoc in test suite.  Use
+   abuild-java-rules/data/jars/simple.
 
 
 Compiler Verification

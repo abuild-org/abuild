@@ -6,9 +6,9 @@ abuild: jar-example (abuild-java): all
 abuild: client-war-example (abuild-java): all
     [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/archive-types/client-war/abuild-java/classes
-    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/copied-jars
-     [copy] Copying 1 file to --topdir--/archive-types/client-war/abuild-java/copied-jars
-  [signjar] Signing JAR: --topdir--/archive-types/client-war/abuild-java/copied-jars/jar-example.jar to --topdir--/archive-types/client-war/abuild-java/copied-jars/jar-example.jar as abuild-testsuite
+    [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/signed-jars
+     [copy] Copying 1 file to --topdir--/archive-types/client-war/abuild-java/signed-jars
+  [signjar] Signing JAR: --topdir--/archive-types/client-war/abuild-java/signed-jars/jar-example.jar to --topdir--/archive-types/client-war/abuild-java/signed-jars/jar-example.jar as abuild-testsuite
   [signjar] Enter Passphrase for keystore: Enter key password for abuild-testsuite: 
     [mkdir] Created dir: --topdir--/archive-types/client-war/abuild-java/dist
       [war] Building war: --topdir--/archive-types/client-war/abuild-java/dist/client-war-example.war
