@@ -464,6 +464,22 @@ class JavaRules
         abuild.runActions('java.packageEar', this.&packageEar, defaultAttrs)
     }
 
+    def javadoc(Map attributes)
+    {
+        def srcdirs = attributes.remove('srcdirs')
+        srcdirs.addAll(attributes.remove('extrasrcdirs'))
+        srcdirs = srcdirs.grep { dir -> new File(dir).isDirectory() }
+        if (! srcdirs)
+        {
+            return
+        }
+
+        def javadocAttrs = attributes
+        javadocAttrs['sourcepath'] = srcdirs.join(pathSep)
+        javadocAttrs['classpath'] = attributes['classpath'].join(pathSep)
+        ant.javadoc(javadocAttrs)
+    }
+
     def javadocTarget()
     {
         def title = abuild.resolveAsString('java.javadocTitle')
@@ -479,22 +495,6 @@ class JavaRules
         ]
 
         abuild.runActions('java.javadoc', this.&javadoc, defaultAttrs)
-    }
-
-    def javadoc(Map attributes)
-    {
-        def srcdirs = attributes.remove('srcdirs')
-        srcdirs.addAll(attributes.remove('extrasrcdirs'))
-        srcdirs = srcdirs.grep { dir -> new File(dir).isDirectory() }
-        if (! srcdirs)
-        {
-            return
-        }
-
-        def javadocAttrs = attributes
-        javadocAttrs['sourcepath'] = srcdirs.join(pathSep)
-        javadocAttrs['classpath'] = attributes['classpath'].join(pathSep)
-        ant.javadoc(javadocAttrs)
     }
 
     def wrapper(Map attributes)
