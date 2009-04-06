@@ -2052,7 +2052,7 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		    QTC::TC("abuild", "Abuild ERR global plugin not in global tree");
 		    error(config->getLocation(),
 			  "this item's tree, \"" + tree_name +
-			  "\" must be have the global-treedep attribute"
+			  "\" must be have the global-tree-dep attribute"
 			  " in order for this item to be a global plugin");
 		    if (buildtrees.count(tree_name))
 		    {
