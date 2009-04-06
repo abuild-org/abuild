@@ -1051,13 +1051,13 @@ ItemConfig::checkAttributes()
 	 iter != attrs.end(); ++iter)
     {
 	std::string const& attr = *iter;
-	if (attr == "global-treedep")
+	if (attr == "global-tree-dep")
 	{
 	    if (this->tree_name.empty())
 	    {
-		QTC::TC("abuild", "ItemConfig ERR global-treedep non-root");
+		QTC::TC("abuild", "ItemConfig ERR global-tree-dep non-root");
 		this->error.error(this->location,
-				  "the \"global-treedep\" attribute may only"
+				  "the \"global-tree-dep\" attribute may only"
 				  " be applied to root build items of named"
 				  " trees");
 	    }

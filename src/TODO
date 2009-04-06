@@ -144,23 +144,24 @@ release notes.
 
  * Introduce new Abuild.conf key "attributes", which can be used to
    assign specific attributes to a build item.  Two attributes are
-   initially supported "global-treedep", and "global-plugin".
+   initially supported "global-tree-dep", and "global-plugin".
 
-   The "global-treedep" attribute may be set for a root build item of
+   The "global-tree-dep" attribute may be set for a root build item of
    a named tree.  When set, the tree is implicitly made a tree
    dependency of all trees (other than itself).  As such, trees with
-   the global-treedep attribute may not themselves declare tree
+   the global-tree-dep attribute may not themselves declare tree
    dependencies since any such dependencies would be in a cycle
    involving the global tree dependency.
 
    The "global-plugin" attribute may be declared to any build item
-   that is inside a tree with the "global-treedep" attribute and which
-   meets all of the qualifications of being a plugin.  Such build
-   items are implicitly added to the list of plugins for all build
-   trees.  At present, global plugins are checked with each build tree
-   as if they were explicitly declared as a plugin in each tree.
-   Therefore, certain error messages may be repeated for each tree.
-   The error messages themselves indicate this in some instances.
+   that is inside a tree with the "global-tree-dep" attribute and
+   which meets all of the qualifications of being a plugin.  Such
+   build items are implicitly added to the list of plugins for all
+   build trees.  At present, global plugins are checked with each
+   build tree as if they were explicitly declared as a plugin in each
+   tree.  Therefore, certain error messages may be repeated for each
+   tree.  The error messages themselves indicate this in some
+   instances.
 
    These are both powerful features that should be used with caution.
    In general, it is better for trees to decide on their own which
