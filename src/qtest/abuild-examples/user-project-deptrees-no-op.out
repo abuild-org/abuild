@@ -1,0 +1,4 @@
+abuild: common-lib1.src (abuild-<native>): no-op
+abuild: common-lib1.test (abuild-<native>): no-op
+abuild: project-lib.src (abuild-<native>): no-op
+abuild: project-lib.test (abuild-<native>): no-op

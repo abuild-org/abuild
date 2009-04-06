@@ -19,6 +19,7 @@ use File::Copy;
 use File::Basename;
 use File::Temp 'tempdir';
 use File::Path;
+use IO::File;
 
 my ($top, $abuild_top, $filters, $atimes_updated, $have_xmllint);
 my ($test_java, $test_junit, $jar, $java);
@@ -253,6 +254,22 @@ sub prepend_runtime_pathvar
 	$result .= ":" . $old_value;
     }
     "$runtime_var=\"$result\" ";
+}
+
+sub fake_qtc
+{
+    my ($td, $regexp) = @_;
+    my $scope = $ENV{'TC_SCOPE'} || return;
+    my $filename = $ENV{'TC_FILENAME'} || return;
+    my $src = dirname($td->get_start_dir());
+    my $in = new IO::File("<$src/$scope.testcov") or die;
+    my $out = new IO::File(">>$filename") or die;
+    while (<$in>)
+    {
+	print $out $_ if m/$regexp/;
+    }
+    $out->close();
+    $in->close();
 }
 
 # Setup functions

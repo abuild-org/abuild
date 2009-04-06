@@ -251,6 +251,29 @@ foreach my $compat (qw(1.0 1.1))
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
+    cd("work/general/user/project");
+
+    $td->runtest("buildset all user branch",
+		 {$td->COMMAND => "abuild --build=all no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-project-all-no-op.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("buildset deptrees user branch",
+		 {$td->COMMAND => "abuild --build=deptrees no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-project-deptrees-no-op.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("buildset local user branch",
+		 {$td->COMMAND => "abuild --build=local no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/user-project-local-no-op.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
     cd("work/general/user/derived");
 
     validate_dump_data($td);
@@ -741,7 +764,7 @@ if (! in_windows())
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(108 +
+$td->report(114 +
 	    (in_windows() ? 0 : 1) +
 	    ($test_java ? 7 : 0) +
 	    ($have_whole_archive ? 2 : 1));

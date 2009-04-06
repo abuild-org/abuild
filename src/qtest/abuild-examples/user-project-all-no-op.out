@@ -1,0 +1,7 @@
+abuild: common-lib1.src (abuild-<native>): no-op
+abuild: common-lib1.test (abuild-<native>): no-op
+abuild: project-lib.src (abuild-<native>): no-op
+abuild: project-lib.test (abuild-<native>): no-op
+abuild: world-peace.autoconf (abuild-<native>): no-op
+abuild: world-peace.stub (abuild-<native>): no-op
+abuild: derived-main.src (abuild-<native>): no-op

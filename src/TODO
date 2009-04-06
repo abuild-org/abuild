@@ -1,8 +1,6 @@
 
 XXX next: platform issues, then help system.
 
-XXX coverage fails with ABUILD_NO_JAVA
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -149,7 +147,7 @@ Groovy Framework
 ================
 
  * Java out of memory problem with ant is reportedly fixed with
-   1.5.0_12.
+   1.5.0_12.  Actually, it still happens with 1.5.0_15.
 
  * Find sun conventions on directory structure for _base.groovy
 

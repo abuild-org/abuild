@@ -18,8 +18,11 @@ my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 
 if (! $test_java)
 {
-    $td->notify("skipping groovy tests");
-    $td->report(0);
+    $td->runtest("skipping groovy tests",
+		 {$td->STRING => "skip"},
+		 {$td->STRING => "skip"});
+    fake_qtc($td, '^(JavaBuilder|groovy)');
+    $td->report(1);
     exit 0;
 }
 
