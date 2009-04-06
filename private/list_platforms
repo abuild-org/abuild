@@ -13,7 +13,7 @@ my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
 # object-code platforms are os.cpu.toolset.compiler.
 
 my $windows = 0;
-if ((@ARGV == 1) && ($ARGV[0] eq '--windows'))
+if (grep { $_ eq '--windows' } @ARGV)
 {
     $windows = 1;
 }

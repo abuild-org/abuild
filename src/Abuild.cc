@@ -1025,11 +1025,9 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 #ifdef _WIN32
 	cmd = "perl " + cmd + " --windows";
 #endif
-	// Perhaps we should pass native_{os,cpu,toolset} to
-	// list_platforms somehow either via arguments or environment
-	// variables.  Environment variables might be easier, but our
-	// getProgramOutput implementation doesn't allow them to be
-	// passed at the moment.
+	// Pass native os/cpu/toolset data to list_platforms.
+	cmd += " --native-data " + this->native_os + " " +
+	    this->native_cpu + " " + this->native_toolset;
 	FileLocation location(list_platforms, 0, 0);
 	std::string platform_data_output = Util::getProgramOutput(cmd);
 	std::istringstream in(platform_data_output);

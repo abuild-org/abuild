@@ -1,0 +1,8 @@
+forest --topdir--/case5
+  tree case5
+    platform type native
+      platform <native-os-data>.c2; built by default: yes
+      platform <native-os-data>.c1; built by default: no
+      platform <native>; built by default: no
+      platform <native>.debug; built by default: no
+      platform <native>.release; built by default: no

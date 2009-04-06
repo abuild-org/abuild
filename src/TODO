@@ -169,6 +169,11 @@ release notes.
    addition of new compiler plugins or plugins that check project-wide
    policy, where use of global plugins may be advisable.
 
+ * Pass information about the native os, cpu, and toolset to
+   list_platforms.  list_platforms is now invoked as
+
+   list_platforms [ --windows ] --native-data os cpu toolset
+
 
 Groovy Framework
 ================
@@ -387,10 +392,6 @@ Abuild Contrib
 
 Platform Issues
 ===============
-
- * Pass information about the native os, cpu, and toolset to
-   list_platforms.  See comment in Abuild::loadPlatformData before
-   invocation of list_platforms.
 
  * Make ABUILD_FORCE_32BIT permanent and add ABUILD_FORCE_64BIT as
    well.  Search for FORCE32 in the code.  The only references are in

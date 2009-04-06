@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+my $os = undef;
+my $cpu = undef;
+my $toolset = undef;
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '--native-data')
+    {
+	die "invalid invocation of list_platforms" unless @ARGV >= 3;
+    }
+    $os = shift(@ARGV);
+    $cpu = shift(@ARGV);
+    $toolset = shift(@ARGV);
+}
+
+# Exercise passing of --native-data to list_platforms
+print "native-compiler c1\n";
+print "platform $os.$cpu.$toolset.c2 -type native\n";

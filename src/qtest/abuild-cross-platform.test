@@ -180,6 +180,15 @@ foreach my $d (['none', 'none', ''],
 		 $td->NORMALIZE_NEWLINES);
 }
 
+cd("work/case5");
+
+$td->runtest("list_platforms --native-data",
+	     {$td->COMMAND => "abuild --list-platforms",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case5.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(26);
+$td->report(27);
