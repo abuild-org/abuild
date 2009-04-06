@@ -357,3 +357,11 @@ Abuild default platform selector 0
 Abuild no platform selector 0
 Abuild ignoring skip selector 0
 PlatformSelector default 0
+ItemConfig ERR global-plugin unnamed 0
+ItemConfig ERR global-treedep non-root 0
+ItemConfig ERR invalid attribute 0
+Abuild ERR global plugin not in global tree 0
+Abuild ERR global tree-dep with tree deps 0
+Abuild ERR error for global plugin 0
+Abuild add global plugin 0
+Abuild add global tree dep 0

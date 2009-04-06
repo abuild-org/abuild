@@ -1,5 +1,6 @@
 #include <BuildTree.hh>
 #include <ItemConfig.hh>
+#include <Util.hh>
 
 BuildTree::BuildTree(std::string const& name,
 		     std::string const& root_path,
@@ -110,4 +111,18 @@ BuildTree::setExpandedTreeDeps(std::list<std::string> const& exp)
     {
 	this->expanded_tree_deps.pop_back();
     }
+}
+
+void
+BuildTree::addTreeDeps(std::set<std::string> const& orig_extra_tree_deps)
+{
+    std::set<std::string> extra_tree_deps = orig_extra_tree_deps;
+    extra_tree_deps.erase(this->name);
+    Util::appendNonMembers(this->tree_deps, extra_tree_deps);
+}
+
+void
+BuildTree::addPlugins(std::set<std::string> const& extra_plugins)
+{
+    Util::appendNonMembers(this->plugins, extra_plugins);
 }

@@ -8,4 +8,5 @@ work/c/Abuild.mk
 work/e/backing/c/Abuild.mk
 work/e/main/c/Abuild.mk
 work/e/other/a/Abuild.mk
+work/globals/t3/g3/Abuild.interface
 work/h/rdep/Abuild.mk

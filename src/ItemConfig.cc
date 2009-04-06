@@ -35,6 +35,7 @@ std::string const ItemConfig::k_SUPPORTED_FLAGS = "supported-flags";
 std::string const ItemConfig::k_SUPPORTED_TRAITS = "supported-traits";
 std::string const ItemConfig::k_TRAITS = "traits";
 std::string const ItemConfig::k_PLUGINS = "plugins";
+std::string const ItemConfig::k_ATTRIBUTES = "attributes";
 
 // The following characters may never appear in build item names:
 //
@@ -91,6 +92,7 @@ void ItemConfig::initializeStatics(CompatLevel const& compat_level)
     valid_keys[k_SUPPORTED_TRAITS] = "";
     valid_keys[k_TRAITS] = "";
     valid_keys[k_PLUGINS] = "";
+    valid_keys[k_ATTRIBUTES] = "";
 
     statics_initialized = true;
 }
@@ -163,6 +165,7 @@ ItemConfig::validate()
     checkTraits();
     checkDeleted();
     checkPlugins();
+    checkAttributes();
 
     // no validation required for description
     this->description = this->kv.getVal(k_DESCRIPTION);
@@ -845,7 +848,8 @@ ItemConfig::checkPlatforms()
 	}
     }
 
-    if (checkDuplicates(o_platform_types, this->platform_types, "platform type"))
+    if (checkDuplicates(o_platform_types, this->platform_types,
+			"platform type"))
     {
 	QTC::TC("abuild", "ItemConfig ERR duplicate platform type");
     }
@@ -1035,6 +1039,53 @@ ItemConfig::checkPlugins()
     if (checkDuplicates(this->plugins, s_plugins, "plugin"))
     {
 	QTC::TC("abuild", "ItemConfig ERR duplicate plugins item");
+    }
+}
+
+void
+ItemConfig::checkAttributes()
+{
+    std::list<std::string> attrs =
+	Util::splitBySpace(this->kv.getVal(k_ATTRIBUTES));
+    for (std::list<std::string>::iterator iter = attrs.begin();
+	 iter != attrs.end(); ++iter)
+    {
+	std::string const& attr = *iter;
+	if (attr == "global-treedep")
+	{
+	    if (this->tree_name.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR global-treedep non-root");
+		this->error.error(this->location,
+				  "the \"global-treedep\" attribute may only"
+				  " be applied to root build items of named"
+				  " trees");
+	    }
+	    else
+	    {
+		this->attributes.setGlobalTreeDep(true);
+	    }
+	}
+	else if (attr == "global-plugin")
+	{
+	    if (this->name.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR global-plugin unnamed");
+		this->error.error(this->location,
+				  "the \"global-plugin\" attribute may only"
+				  " be applied to named build items");
+	    }
+	    else
+	    {
+		this->attributes.setGlobalPlugin(true);
+	    }
+	}
+	else
+	{
+	    QTC::TC("abuild", "ItemConfig ERR invalid attribute");
+	    this->error.error(this->location,
+			      "unknown attribute \"" + attr + "\"");
+	}
     }
 }
 
@@ -1392,6 +1443,18 @@ std::list<std::string> const&
 ItemConfig::getPlugins() const
 {
     return this->plugins;
+}
+
+bool
+ItemConfig::isGlobalTreeDep() const
+{
+    return this->attributes.getGlobalTreeDep();
+}
+
+bool
+ItemConfig::isGlobalPlugin() const
+{
+    return this->attributes.getGlobalPlugin();
 }
 
 bool

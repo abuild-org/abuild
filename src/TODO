@@ -142,6 +142,33 @@ release notes.
 
    abuild -p option=debug -p native:option=
 
+ * Introduce new Abuild.conf key "attributes", which can be used to
+   assign specific attributes to a build item.  Two attributes are
+   initially supported "global-treedep", and "global-plugin".
+
+   The "global-treedep" attribute may be set for a root build item of
+   a named tree.  When set, the tree is implicitly made a tree
+   dependency of all trees (other than itself).  As such, trees with
+   the global-treedep attribute may not themselves declare tree
+   dependencies since any such dependencies would be in a cycle
+   involving the global tree dependency.
+
+   The "global-plugin" attribute may be declared to any build item
+   that is inside a tree with the "global-treedep" attribute and which
+   meets all of the qualifications of being a plugin.  Such build
+   items are implicitly added to the list of plugins for all build
+   trees.  At present, global plugins are checked with each build tree
+   as if they were explicitly declared as a plugin in each tree.
+   Therefore, certain error messages may be repeated for each tree.
+   The error messages themselves indicate this in some instances.
+
+   These are both powerful features that should be used with caution.
+   In general, it is better for trees to decide on their own which
+   items are going to be plugins and which trees they are going to
+   depend on.  However, there are certain instances, such as the
+   addition of new compiler plugins or plugins that check project-wide
+   policy, where use of global plugins may be advisable.
+
 
 Groovy Framework
 ================
@@ -339,6 +366,8 @@ Plugins
  * Create an example of plugins that have to be preconfigured.
    Examples would include a generic UNIX compiler plugin.  This can
    probably be done without making any changes to the plugin system.
+   The generic UNIX compiler plugin may also make a good example of
+   using a global plugin.
 
 
 Abuild Contrib
@@ -358,26 +387,6 @@ Abuild Contrib
 
 Platform Issues
 ===============
-
- * Provide a mechanism to create global platform type/platform build
-   items.  They work like platform/platform type plugins except that
-   they are loaded directly into abuild's internal platform_data or
-   perhaps into some forest-specific platform_data so that this can
-   work properly with backing areas.  Their paths also have to be made
-   available to make for loading toolchains.  When testing, case4 of
-   cross-platform can have its "other" plugin replaced by a global
-   platform plugin (in addition to whatever examples are provided).
-
-   One challenge is how the build item should declare itself to be a
-   global platform item and what kinds of checks should be performed.
-   We would definitely want to impose all the restrictions imposed on
-   plugins on this type of item, and we would also have to ensure that
-   such an item is not declared as a plugin.
-
-   One idea would be to have some kind of "global: platform-supplier"
-   indicator in Abuild.conf, but that's very clumsy.
-
-   Try using this to implement a generic UNIX compiler platform.
 
  * Pass information about the native os, cpu, and toolset to
    list_platforms.  See comment in Abuild::loadPlatformData before

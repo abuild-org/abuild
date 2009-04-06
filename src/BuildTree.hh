@@ -36,6 +36,9 @@ class BuildTree
     void incrementBackingDepth();
     void setExpandedTreeDeps(std::list<std::string> const&);
 
+    void addTreeDeps(std::set<std::string> const& extra_tree_deps);
+    void addPlugins(std::set<std::string> const& extra_plugins);
+
   private:
     std::string name;
     std::string root_path;

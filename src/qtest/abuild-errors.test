@@ -240,6 +240,15 @@ $td->runtest("external with no top",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/globals");
+
+$td->runtest("global plugins",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/globals.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 # To actually bump into the root directory while finding the top of
 # the tree, we need to create a directory outside of the abuild source
 # tree.  Otherwise, abuild's own Abuild.conf will block us.
@@ -276,4 +285,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(28 + (in_windows() ? 0 : 1));
+$td->report(29 + (in_windows() ? 0 : 1));

@@ -16,6 +16,7 @@
 #include <FlagData.hh>
 #include <TraitData.hh>
 #include <PlatformSelector.hh>
+#include <BuildItemAttributes.hh>
 
 class Error;
 class CompatLevel;
@@ -57,6 +58,7 @@ class ItemConfig
     static std::string const k_SUPPORTED_TRAITS;
     static std::string const k_TRAITS;
     static std::string const k_PLUGINS;
+    static std::string const k_ATTRIBUTES;
     static std::string const ITEM_NAME_RE;
     static std::string const PARENT_RE;
     static std::map<std::string, std::string> valid_keys;
@@ -91,6 +93,8 @@ class ItemConfig
     bool hasAntBuild() const;
     std::string const& getBuildFile() const;
     std::list<std::string> const& getPlugins() const;
+    bool isGlobalTreeDep() const;
+    bool isGlobalPlugin() const;
 
     // For 1.0 to 1.1 upgrade process
     bool upgradeConfig(std::string const& file,
@@ -143,6 +147,7 @@ class ItemConfig
     void checkTraits();
     void checkDeleted();
     void checkPlugins();
+    void checkAttributes();
 
     bool validName(std::string const& name, std::string const& description);
 
@@ -202,6 +207,7 @@ class ItemConfig
     std::map<std::string, std::string> dep_platform_types;
     std::map<std::string,
 	     boost::shared_ptr<PlatformSelector> > dep_platform_selectors;
+    BuildItemAttributes attributes;
 };
 
 #endif // __ITEMCONFIG_HH__

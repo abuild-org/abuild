@@ -9,6 +9,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <set>
 #include <map>
 
 namespace Util
@@ -81,6 +82,12 @@ namespace Util
     {
 	return join(sep, items.begin(), items.end());
     }
+
+
+    // Append to the list each element of the set that is not already
+    // in the list.
+    void appendNonMembers(std::list<std::string>& list,
+			  std::set<std::string> const& set);
 
     // Return a list of lines from the given file.  All newline
     // terminators are removed unless otherwised specified.

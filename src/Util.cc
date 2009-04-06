@@ -172,6 +172,23 @@ Util::splitBySpace(std::string const& input)
     return result;
 }
 
+void
+Util::appendNonMembers(std::list<std::string>& list,
+		       std::set<std::string> const& set)
+{
+    std::set<std::string> existing;
+    existing.insert(list.begin(), list.end());
+    for (std::set<std::string>::const_iterator iter = set.begin();
+	 iter != set.end(); ++iter)
+    {
+	if (! existing.count(*iter))
+	{
+	    existing.insert(*iter);
+	    list.push_back(*iter);
+	}
+    }
+}
+
 std::list<std::string>
 Util::readLinesFromFile(std::string const& filename, bool strip_newlines)
 {

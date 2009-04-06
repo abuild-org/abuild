@@ -71,3 +71,39 @@ BuildForest::getSortedItemNames() const
 {
     return this->sorted_item_names;
 }
+
+void
+BuildForest::addGlobalTreeDep(std::string const& tree_name)
+{
+    this->global_treedeps.insert(tree_name);
+}
+
+std::set<std::string>&
+BuildForest::getGlobalTreeDeps()
+{
+    return this->global_treedeps;
+}
+
+void
+BuildForest::addGlobalPlugin(std::string const& item_name)
+{
+    this->global_plugins.insert(item_name);
+}
+
+std::set<std::string>&
+BuildForest::getGlobalPlugins()
+{
+    return this->global_plugins;
+}
+
+void
+BuildForest::propagateGlobals()
+{
+    for (BuildTree_map::iterator iter = this->build_trees.begin();
+	 iter != this->build_trees.end(); ++iter)
+    {
+	BuildTree& tree = *((*iter).second);
+	tree.addTreeDeps(this->global_treedeps);
+	tree.addPlugins(this->global_plugins);
+    }
+}

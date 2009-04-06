@@ -1777,6 +1777,8 @@ Abuild::mergeForests(BuildForest_map& forests,
 	std::list<std::string>& backing_areas = keep.getBackingAreas();
 	std::set<std::string>& deleted_trees = keep.getDeletedTrees();
 	std::set<std::string>& deleted_items = keep.getDeletedItems();
+	std::set<std::string>& global_treedeps = keep.getGlobalTreeDeps();
+	std::set<std::string>& global_plugins = keep.getGlobalPlugins();
 
 	std::list<std::string> const& to_remove = (*i1).second;
 	for (std::list<std::string>::const_iterator i2 = to_remove.begin();
@@ -1793,6 +1795,10 @@ Abuild::mergeForests(BuildForest_map& forests,
 	    std::list<std::string>& o_backing_areas = remove.getBackingAreas();
 	    std::set<std::string>& o_deleted_trees = remove.getDeletedTrees();
 	    std::set<std::string>& o_deleted_items = remove.getDeletedItems();
+	    std::set<std::string>& o_global_treedeps =
+		remove.getGlobalTreeDeps();
+	    std::set<std::string>& o_global_plugins =
+		remove.getGlobalPlugins();
 
 	    for (BuildTree_map::iterator i3 = o_buildtrees.begin();
 		 i3 != o_buildtrees.end(); ++i3)
@@ -1817,6 +1823,10 @@ Abuild::mergeForests(BuildForest_map& forests,
 		o_deleted_trees.begin(), o_deleted_trees.end());
 	    deleted_items.insert(
 		o_deleted_items.begin(), o_deleted_items.end());
+	    global_treedeps.insert(
+		o_global_treedeps.begin(), o_global_treedeps.end());
+	    global_plugins.insert(
+		o_global_plugins.begin(), o_global_plugins.end());
 
 	    forests.erase(remove_dir);
 	}
@@ -1944,6 +1954,8 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		      std::set<std::string>& deleted_trees,
 		      std::set<std::string>& deleted_items)
 {
+    BuildTree_map& buildtrees = forest.getBuildTrees();
+
     if (this->compat_level.allow_1_0())
     {
 	if (this->items_traversed.count(top_path))
@@ -2035,6 +2047,27 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 	    BuildItem_ptr item(
 		new BuildItem(item_name, tree_name, config));
 	    addItemToForest(forest, item_name, item);
+	    if (config->isGlobalPlugin())
+	    {
+		if (forest.getGlobalTreeDeps().count(tree_name) == 0)
+		{
+		    QTC::TC("abuild", "Abuild ERR global plugin not in global tree");
+		    error(config->getLocation(),
+			  "this item's tree, \"" + tree_name +
+			  "\" must be have the global-treedep attribute"
+			  " in order for this item to be a global plugin");
+		    if (buildtrees.count(tree_name))
+		    {
+			error(buildtrees[tree_name]->getLocation(),
+			      "here is the tree that contains this item");
+		    }
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild add global plugin");
+		    forest.addGlobalPlugin(item_name);
+		}
+	    }
 	}
 
 	std::list<std::string> const& children = config->getChildren();
@@ -2204,6 +2237,21 @@ Abuild::registerBuildTree(BuildForest& forest,
 		      config->getPlugins(),
 		      this->internal_platform_data));
     addTreeToForest(forest, tree_name, tree);
+    if (config->isGlobalTreeDep())
+    {
+	if (tree_deps.empty())
+	{
+	    QTC::TC("abuild", "Abuild add global tree dep");
+	    forest.addGlobalTreeDep(tree_name);
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild ERR global tree-dep with tree deps");
+	    error(config->getLocation(),
+		  "a tree with tree dependencies may not declare itself"
+		  " to be a global tree dependency");
+	}
+    }
 
     return tree_name;
 }
@@ -2360,6 +2408,7 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     // Many of these checks have side effects.  The order of these
     // checks is very sensitive as some checks depend upon side
     // effects of other operations having been completed.
+    forest.propagateGlobals();
     resolveFromBackingAreas(forests, top_path);
     checkTreeDependencies(forest);
     resolveTraits(forest);
@@ -2796,7 +2845,7 @@ Abuild::checkPlugins(BuildForest& forest)
 
     BuildItem_map& builditems = forest.getBuildItems();
     BuildTree_map& buildtrees = forest.getBuildTrees();
-
+    std::set<std::string> const& global_plugins = forest.getGlobalPlugins();
     // tree -> plugins in that tree
     std::map<std::string, std::set<std::string> > plugin_data;
 
@@ -2881,6 +2930,26 @@ Abuild::checkPlugins(BuildForest& forest)
 		error(item.getLocation(),
 		      "here is \"" + item_name + "\"'s " +
 		      ItemConfig::FILE_CONF);
+		if (global_plugins.count(item_name))
+		{
+		    // This is a very unfortunate situation, but it's
+		    // probably not worth coding around it.  If
+		    // someone botches up with a global plugin by
+		    // giving it dependencies, build-also, or other
+		    // things that cause errors above, they will see a
+		    // whole bunch of errors right away and will
+		    // probably understand what caused them.  Trying
+		    // to repeat all these checks separately for
+		    // global plugins would needlessly complicate the
+		    // code for a rather obscure error condition.
+		    QTC::TC("abuild", "Abuild ERR error for global plugin");
+		    error(item.getLocation(),
+			  "NOTE: this item declares itself as a global plugin,"
+			  " so some of the above error messages may be"
+			  " repeated for every tree, including those"
+			  " that do not explicitly declare the item"
+			  " to be a plugin");
+		}
 	    }
 	}
     }
@@ -2920,8 +2989,16 @@ Abuild::checkPlugins(BuildForest& forest)
 		    error(item.getLocation(),
 			  "this item depends on \"" + dep_name + "\","
 			  " which is declared as a plugin");
-		    error(tree.getLocation(),
-			  "the dependency is declared as a plugin here");
+		    if (global_plugins.count(dep_name))
+		    {
+			error(builditems[dep_name]->getLocation(),
+			      "the dependency is declared as a global plugin");
+		    }
+		    else
+		    {
+			error(tree.getLocation(),
+			      "the dependency is declared as a plugin here");
+		    }
 		}
 	    }
 	}

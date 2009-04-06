@@ -33,11 +33,21 @@ class BuildForest
     void setSortedItemNames(std::list<std::string> const& sorted_items);
     std::list<std::string> const& getSortedItemNames() const;
 
+    void addGlobalTreeDep(std::string const& tree_name);
+    std::set<std::string>& getGlobalTreeDeps();
+    void addGlobalPlugin(std::string const& item_name);
+    std::set<std::string>& getGlobalPlugins();
+
+    void propagateGlobals();
+
   private:
     BuildForest(BuildForest const&);
     BuildForest& operator=(BuildForest const&);
 
     std::string root_path;
+
+    // When adding fields to BuildForest, remember to handle them in
+    // Abuild::mergeForests.
 
     BuildItem_map build_items;
     BuildTree_map build_trees;
@@ -48,6 +58,9 @@ class BuildForest
     std::map<std::string, std::set<std::string> > tree_access_table;
     std::list<std::string> sorted_tree_names;
     std::list<std::string> sorted_item_names;
+
+    std::set<std::string> global_treedeps;
+    std::set<std::string> global_plugins;
 };
 
 #endif // __BUILDFOREST_HH__
