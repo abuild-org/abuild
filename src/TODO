@@ -1,23 +1,8 @@
 
-XXX next: msvc fixes or help system
-
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
 ======================
-
-
- _________________________________
-/vv Changes made on Java Branch vv\
------------------------------------
-
-
-
-___________________________________
-\^^ Changes made on Java Branch ^^/
- ---------------------------------
-
-
 
 Remember to keep deprecated features list up-to-date.  Add the
 following:
@@ -176,6 +161,65 @@ release notes.
    list_platforms [ --windows ] --native-data os cpu toolset
 
 
+MSVC toolchain
+==============
+
+ * According to Microsoft, we should always be using /Zi.  We need to
+   revisit all the arguments passed to msvc to see what they really
+   mean and to figure out which to use in release and debug modes.
+
+   # /Zi enables all debugging information.
+   DFLAGS ?= /Zi
+   OFLAGS ?= /O2
+   # /Wall is impractical with msvc because too many system headers
+   # generate warnings.
+   WFLAGS ?=
+
+   ifeq ($(words $(DFLAGS)), 0)
+   THREAD_FLAGS = /MD
+   else
+   THREAD_FLAGS = /MDd
+   endif
+
+   CC = cl /Gy /EHsc /nologo $(THREAD_FLAGS)
+   CCPP = $(CC) /E
+   CXX = $(CC) /TP /GR
+   CXXPP = $(CXX) /E
+
+   /Zi
+   /O2
+   /MD
+   /MDd
+   /Gy
+   /EHsc
+
+   /E
+   /TP /GR
+
+ * To build for .NET, we need to pass /clr rather than /EHsc to msvc.
+   /EHsc is hard-coded into $(CC) right now.  We need to fix msvc.mk
+   to make it easier to override these flags.  When going back through
+   all flags to see what they do, create variables that can be
+   overridden based on function.
+
+
+Help system
+===========
+
+ * Consider adding a new special-case target "help" that would provide
+   help in a manner that does not require invoking a back end.  This
+   should remove the serious problems with rules-help and
+   interface-help, and should get around the problem of trying to echo
+   help information from a build file.  This would work by having
+   abuild automatically display certain internal help files and build
+   item-provided help files.  Most likely, abuild would just display
+   all the help files provided by other build items that impact your
+   build (dependents, plugins, rule/hook build items, etc.) as well as
+   internal help files.  Help files, including internal ones, should
+   provide a list of variables that can be set or read, what they
+   mean, and how to use them.
+
+
 Groovy Framework
 ================
 
@@ -293,19 +337,6 @@ Usability Improvements
    information, but providing a more human-readable format for
    commonly needed information will help.
 
- * Consider adding a new special-case target "help" that would provide
-   help in a manner that does not require invoking a back end.  This
-   should remove the serious problems with rules-help and
-   interface-help, and should get around the problem of trying to echo
-   help information from a build file.  This would work by having
-   abuild automatically display certain internal help files and build
-   item-provided help files.  Most likely, abuild would just display
-   all the help files provided by other build items that impact your
-   build (dependents, plugins, rule/hook build items, etc.) as well as
-   internal help files.  Help files, including internal ones, should
-   provide a list of variables that can be set or read, what they
-   mean, and how to use them.
-
  * Make sure abuild --help references the build/clean set list from
    the --build and --clean argument description, and make sure there
    is a reference to the platform selector information from the
@@ -383,44 +414,6 @@ Changes to "make" Code
    are out of date.  That way, checkouts from the version control
    system can work even when the CM system does not preserve
    modification times.
-
- * According to Microsoft, we should always be using /Zi.  We need to
-   revisit all the arguments passed to msvc to see what they really
-   mean and to figure out which to use in release and debug modes.
-
-   # /Zi enables all debugging information.
-   DFLAGS ?= /Zi
-   OFLAGS ?= /O2
-   # /Wall is impractical with msvc because too many system headers
-   # generate warnings.
-   WFLAGS ?=
-
-   ifeq ($(words $(DFLAGS)), 0)
-   THREAD_FLAGS = /MD
-   else
-   THREAD_FLAGS = /MDd
-   endif
-
-   CC = cl /Gy /EHsc /nologo $(THREAD_FLAGS)
-   CCPP = $(CC) /E
-   CXX = $(CC) /TP /GR
-   CXXPP = $(CXX) /E
-
-   /Zi
-   /O2
-   /MD
-   /MDd
-   /Gy
-   /EHsc
-
-   /E
-   /TP /GR
-
- * To build for .NET, we need to pass /clr rather than /EHsc to msvc.
-   /EHsc is hard-coded into $(CC) right now.  We need to fix msvc.mk
-   to make it easier to override these flags.  When going back through
-   all flags to see what they do, create variables that can be
-   overridden based on function.
 
 
 Platform Conditionals
