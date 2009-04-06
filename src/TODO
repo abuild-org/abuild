@@ -1,5 +1,5 @@
 
-XXX next: platform issues, then help system.
+XXX next: msvc fixes or help system
 
 === Changes Targeted for Version 1.1 ===
 
@@ -394,12 +394,10 @@ Abuild Contrib
 Platform Issues
 ===============
 
- * Make ABUILD_FORCE_32BIT permanent and add ABUILD_FORCE_64BIT as
-   well.  Search for FORCE32 in the code.  The only references are in
-   private/bin/get_native_platform_data and make/toolchains/gcc.mk.
-   For a description, see release notes in the documentation.
-
- * Implement platform conditionals, described below.
+ * Consider Deprecating ABUILD_FORCE_32BIT and adding
+   ABUILD_FORCE_WORDSIZE={32,64}.  Search for FORCE32 in the code.
+   The only references are in private/bin/get_native_platform_data and
+   make/toolchains/gcc.mk.
 
 
 Changes to "make" Code
@@ -428,6 +426,34 @@ Changes to "make" Code
  * According to Microsoft, we should always be using /Zi.  We need to
    revisit all the arguments passed to msvc to see what they really
    mean and to figure out which to use in release and debug modes.
+
+   # /Zi enables all debugging information.
+   DFLAGS ?= /Zi
+   OFLAGS ?= /O2
+   # /Wall is impractical with msvc because too many system headers
+   # generate warnings.
+   WFLAGS ?=
+
+   ifeq ($(words $(DFLAGS)), 0)
+   THREAD_FLAGS = /MD
+   else
+   THREAD_FLAGS = /MDd
+   endif
+
+   CC = cl /Gy /EHsc /nologo $(THREAD_FLAGS)
+   CCPP = $(CC) /E
+   CXX = $(CC) /TP /GR
+   CXXPP = $(CXX) /E
+
+   /Zi
+   /O2
+   /MD
+   /MDd
+   /Gy
+   /EHsc
+
+   /E
+   /TP /GR
 
  * To build for .NET, we need to pass /clr rather than /EHsc to msvc.
    /EHsc is hard-coded into $(CC) right now.  We need to fix msvc.mk
