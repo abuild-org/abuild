@@ -1,3 +1,38 @@
+rar -> high level archive
+otherfiles -> files to package.. have this for war also
+
+right now, we exlcuded classesdir from ear but not high levle
+archive.  potentially confusing...  leave it in high level archive
+just to keep consistency with jar.  if you want to create a rar with a
+local jar built in the same build item, you will have to take explicit
+action to avoid having the class files packaged in both places.
+
+If you can put class files in an ear, the packageEar method should
+loko for classesdir, but we will have it be empty by default.  Maybe
+high level archive should be the same....
+
+copyJars: desitnation directory shoudl be todir, not copydir
+
+java.dir.copiedJars => java.dir.signedJars
+java.jarsToSign
+
+get rid of copyJars
+
+signJars has a parameter that contains a list of remote jars to copy
+and sign.  jarsToSign
+
+Document smoewhere that lazy jar signing is true by default in order
+to have idempotent builds
+
+exercise javadoc in test suite
+
+need to figure out what desired junit and javadoc behavior should
+be... should be able to support multiple testsuite
+
+remind Joe to send link to abuild ant build that does junit tests
+against multiple classes without using testsuite.
+
+----------------------------------------------------------------------
 
 XXX next: msvc fixes or help system
 
@@ -186,39 +221,6 @@ Groovy Framework
 
  * Update rules/java/java_help.txt
 
- * Consider whether we should embed it junit.  If so, which version?
-   Groovy embeds 3.8.2.  Current is 4.5.  Right now, you must have
-   some version of junit in your classpath for the junit tasks in the
-   java rules (or ant code) to work.  This seems okay to me since it
-   avoids the need to worry about abuild's integrated junit taking
-   precedence over a user-provided version.
-
- * There is no way to specify separate includes and excludes for the
-   various filesets inside of jar, war, or ear.  I can think of three
-   possible solutions:
-
-    - Don't bother supporting this.  People can always put their own
-      closures in abuild.packageJar if they want this.  Besides, we
-      have enough different directories that we use that there are
-      plenty of other approaches.
-
-    - Allow the map entries passed to java.packageJar (etc.) to be
-      either directories or maps.  If an entry is a map, it is treated
-      as arguments to fileset.
-
-    - Have a parameter that maps directories to includes and excludes.
-      This is a little more obscure than the previous option, but it
-      enables customization of the contents of standard directories
-      without having to resort to using java.packageJar and copying
-      names of standard directories around.
-
-   Which way we goes probably depends on how much this functionality
-   is needed.  I personally feel that doing selective includes and
-   excludes for creating jars makes things unnecessarily obtuse, but
-   I've seen lots of examples of people doing things like creating
-   test jars that include all files and non-test jars that exclude
-   Test*.class.
-
  * No specific mechanism (like plugin.groovy) is provided for
    pre-initialization of parameters to be used by build item-supplied
    rules.  This facility does not exist on the make side either, and
@@ -226,14 +228,7 @@ Groovy Framework
    facility, they can set interface variables.  Note that parameters {
    interface.variable << 'new-val' } does actually work as of 1.1.a3.
 
- * Consider providing a way to "decorate" targets by adding closures
-   to be run before and after.  A pre-target closure would be run
-   after all dependencies were satisfied and before any of the
-   target's closures.  A post-target closure would be run after.
-   Alternatively, perhaps we should provide a mechanism for prepending
-   rather than appending a target closure, which might ave the same
-   effect.  This may no longer be necessary with the way
-   abuild.runActions works.
+   OKAY: document and move on.
 
 
 Compiler Verification
@@ -272,6 +267,9 @@ Core Changes
 
 Documentation
 =============
+
+ * Mention somewhere that people can copy jars into abuild's lib
+   directory if I want that to be something people do...
 
  * Incorporate manual/groovy-framework.txt and manual/pending.txt.
 
