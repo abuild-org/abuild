@@ -4822,7 +4822,12 @@ Abuild::populateBuildset(BuildItem_map& builditems,
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem_ptr item_ptr = (*iter).second;
-	if (pred(item_ptr.get()) && item_ptr->hasTraits(this->only_with_traits))
+	// We exclude backed build items from initial population of
+	// build set, though they will be added, if needed, to satisfy
+	// dependencies.  This helps to reduce extraneous integrity
+	// errors when not running in full integrity mode.
+	if (pred(item_ptr.get()) && item_ptr->isLocal() &&
+	    item_ptr->hasTraits(this->only_with_traits))
 	{
 	    this->buildset[item_name] = item_ptr;
 	}
