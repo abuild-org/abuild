@@ -6,8 +6,8 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "1.1.a4">
-<!ENTITY lastreleased "March 19, 2009">
+<!ENTITY swversion "1.1.a5">
+<!ENTITY lastreleased "April 7, 2009">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13692,6 +13692,646 @@ Y = $(X)
     the documentation.
    </para>
    <variablelist>
+<!-- template for release notes
+
+    <varlistentry>
+     <term>VERSION: DATE</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Deprecated Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           ...
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         HEADING
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         HEADING
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+
+ end template -->
+
+    <varlistentry>
+     <term>1.1.a5: April 7, 2009</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Non-compatible changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Absolute path externals are no longer supported.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>--winpath</option> option to externals has been
+           removed.  Without absolute path externals, it is no longer
+           needed.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Externals may no longer be symbolic links nor may they
+           cross symbolic links.  If you were relying on symbolically
+           linked externals before, you can instead create dummy
+           directories with <filename>Abuild.backing</filename> files
+           or with their own externals pointing to the real location.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Read-only externals are no longer supported.  Use of the
+           <option>-ro</option> flag generates a deprecation warning
+           and is ignored.  Instead, if you need to make parts of your
+           build tree read-only, use <option>--ro-path</option> or
+           <option>--rw-path</option> (described below).  This gives
+           you much greater and more precise control over what is
+           read-only than read-only externals did.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Child directories (specified with
+           <property>child-dirs</property>) may no longer be nor may
+           they cross symbolic links.  Most likely, this would not
+           have worked in previous versions either, but &abuild; now
+           specifically checks for this case.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When <property>parent-dir</property> appears, it must point
+           up, and <property>child-dirs</property> values must point
+           down in the file system.  &ldquo;Interleaved&rdquo; build
+           items are no longer permitted.  There must be no
+           <filename>Abuild.conf</filename> files in any directories
+           between a parent directory and its child build items.  In
+           practice, the chances of ever finding a build tree that
+           doesn't already obey these restrictions are very low, and
+           any configuration that fails to follow these guidelines
+           would have been very confusing, so this change is not
+           likely to be noticed.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Deprecated Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Use of read-only externals generates a deprecation warning,
+           but in fact, it's more than deprecated&mdash;it's entirely
+           ignored.  The deprecation warning indicates that use of
+           <option>-ro</option> could potentially become an error in a
+           post-1.1 &abuild; release.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Use of <property>external-dirs</property> to point to a
+           build tree that has been upgraded to use 1.1 syntax will
+           generate a deprecation warning.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Use of <property>this</property>,
+           <property>deleted</property>, or
+           <property>parent-dir</property> in
+           <filename>Abuild.conf</filename>, or having a tree root
+           that does not include the <property>tree-name</property>
+           key will generate a single warning suggesting that you
+           should upgrade your build trees using <command>abuild
+           --upgrade-trees</command>.  The specific locations of the
+           deprecated features is not reported.  This is to discourage
+           attempts to manually upgrade trees.  The upgrade process is
+           complex, and all the complexities are managed automatically
+           by <command>abuild --upgrade-trees</command>.  In general,
+           &abuild; tries to avoid suggesting that you run an upgrade
+           if it concludes that the upgrade will not be able to do
+           anything.  Detailed documentation of the upgrade process
+           will be included in the manual prior to the final 1.1
+           release.  In the interim, see
+           <filename>src/manual/pending.txt</filename> in the source
+           distribution.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Use of <filename>Abuild.backing</filename> files below the
+           root of the build forest (defined) below is deprecated.  A
+           new syntax for <filename>Abuild.backing</filename> files
+           has been introduced and is also described below.  Use of
+           the old format is deprecated.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The interface variable <varname>ABUILD_THIS</varname> is
+           deprecated and has been replaced by
+           <varname>ABUILD_ITEM_NAME</varname>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Pending Documentation
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Documentation for significant new features that have not
+           yet been incorporated into the manual now appear in the
+           file <filename>src/manual/pending.txt</filename>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Groovy Framework Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Compiled rules files are now cached, resulting in a
+           significant performance improvement.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When the <filename>groovy</filename> rules are used, groovy
+           sources are now expected to be in
+           <filename>src/groovy</filename> instead of
+           <filename>src/java</filename>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <command>package-rar</command> target has been replaced
+           with <command>package-high-level-archive</command>.
+           Various parameter and attribute names have been updated for
+           consistency.  The <filename>java</filename> rules should
+           now be considered in a soft freeze for version 1.1.
+           Non-compatible changes can still be made for cosmetic
+           reasons or to fix minor problems, but the rules should be
+           in pretty close to final form.  Generation of javadoc and
+           junit testing may still change more significantly.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Compatibility Mode
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Compatibility level can be set using the
+           <envar>ABUILD_COMPAT_LEVEL</envar> environment variable in
+           addition to use the <option>--compat-level</option> command
+           line argument.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         New Build Tree Structure
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           We introduce the term <emphasis>build forest</emphasis> to
+           refer to the collection of all the build trees that are
+           built together.  The 1.1 concept of build forests roughly
+           corresponds to an &abuild; 1.0 build tree with all of its
+           externals.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           This version of &abuild; includes a new build tree
+           structure.  The highlights of this structure are named
+           build trees, name-based tree dependencies instead of
+           externals, multiple backing areas, improved build ordering,
+           and removal for the need of
+           <property>parent-dir</property>.
+          </para>
+          <para>
+           With the exception of the non-compatible changes listed
+           above, &abuild; will continue to recognize the old build
+           tree structure and will internally map it to the new
+           structure by assigning randomly generated names to build
+           trees.  If &abuild; finds deprecated 1.0 features while
+           traversing the build tree, it will notify the user that the
+           trees can be upgraded with the <command>abuild
+           --upgrade-trees</command> command.  Needless to say, if you
+           are trying to use the same build tree under both versions
+           1.0 and 1.1 (during a transition period), you should hold
+           off on performing your upgrades.  Upgraded trees will not
+           be recognized by &abuild; 1.0.
+          </para>
+          <para>
+           Here is a brief summary of changes in the new build tree
+           structure.  The items in the list below apply when &abuild;
+           is operating at compatibility level 1.1.  As described
+           above, &abuild; will still accept 1.0-style trees that do
+           not conform to the statements in this list.
+           <itemizedlist>
+            <listitem>
+             <para>
+              The <property>this</property> key has been replaced with
+              <property>name</property>.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              Build trees are required to be named.  Root build items
+              must contain a key called <property>tree-name</property>
+              which gives the name of the tree.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              Rather than using the deprecated
+              <property>external-dirs</property> key to indicate by
+              path a one-way dependency on another build tree, use
+              <property>tree-deps</property> to indicate this
+              dependency using the <emphasis>name</emphasis> of the
+              other build tree.  This removes &abuild;&nbsp;1.0's
+              flawed use of paths for this purpose.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              The value of <property>parent-dir</property> is no
+              longer used during traversal, and use of
+              <property>parent-dir</property> is deprecated.  If
+              <property>parent-dir</property> appears, &abuild; will
+              issue an error if it points to a place other than what
+              &abuild; would determine to be the parent of the build
+              item.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              It is permissible to have
+              <filename>Abuild.conf</filename> files above the roots
+              of all your build trees that contain only
+              <filename>child-dirs</filename> keys.  These files, in
+              addition to build tree root files, may be roots of the
+              entire forest of build trees.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              New interface variables
+              <varname>ABUILD_ITEM_NAME</varname> and
+              <varname>ABUILD_TREE_NAME</varname> have been
+              introduced.  These variables contain the value of the
+              current build item name and its containing tree.  The
+              <varname>ABUILD_ITEM_NAME</varname> variable replaces
+              the deprecated <varname>ABUILD_THIS</varname> variable.
+             </para>
+            </listitem>
+           </itemizedlist>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The way backing areas work has been significantly
+           improved.  As in the case of the new build tree structure,
+           &abuild; will continue to recognize 1.0-style
+           <filename>Abuild.backing</filename> files when running in
+           1.0 compatibility mode (the default).  The following
+           changes have been made to backing areas:
+           <itemizedlist>
+            <listitem>
+             <para>
+              Backing areas are at the forest level, not at the tree
+              level.  When &abuild; 1.1 is used, any given development
+              effort requires only a single
+              <filename>Abuild.backing</filename> file, and that file
+              will be located at the root of the forest.  In 1.0
+              compatibility mode, &abuild; will still use information
+              from old style <filename>Abuild.backing</filename> files
+              at the roots of trees in the forest, though such files
+              are considered deprecated.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              <filename>Abuild.backing</filename> files are now
+              key/value pairs like <filename>Abuild.conf</filename>
+              files.  Valid keys are
+              <property>backing-areas</property>,
+              <property>deleted-trees</property>, and
+              <property>deleted-items</property>.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              The paths to your backing areas are specified as the
+              value to the <property>backing-areas</property> key in
+              <filename>Abuild.backing</filename>.  You may now have
+              multiple backing areas.  &Abuild; will issue an error if
+              unrelated backing areas try to supply build items or
+              build trees with the same name.  (If one of your backing
+              areas backs to another one of your backing areas,
+              &abuild; will notice this case and handle it
+              appropriately.)
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              The <property>deleted</property> key is no longer valid
+              in <filename>Abuild.conf</filename>.  Instead, use the
+              <property>deleted-items</property> key in
+              <filename>Abuild.backing</filename>.  In 1.0
+              compatibility mode, &abuild; will still read the
+              information from the <filename>Abuild.conf</filename>
+              file and treat it as if it had been read from an
+              <filename>Abuild.backing</filename> file.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              It is possible to suppress inheritance of entire trees
+              from backing ares using the
+              <property>deleted-trees</property> key in
+              <filename>Abuild.backing</filename>.
+             </para>
+            </listitem>
+           </itemizedlist>
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Command Invocation Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Build set <command>all</command> builds all items in all
+           known trees as before, but with the new build structure,
+           this may include trees that were not previously included.
+           In particular, &abuild; now knows about all trees in the
+           forest, not just those that are tree dependencies of the
+           current build item.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The new build set <command>deptrees</command> builds all
+           items in the current tree and all its tree dependencies.
+           It has the same semantics as <command>all</command> had in
+           &abuild; 1.0, and does the same thing as
+           <command>all</command> in 1.0-compatibility mode.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           New arguments <option>--ro-path</option> and
+           <option>--rw-path</option> have been added.  These replace
+           read-only externals as the way to make parts of the local
+           build forest read-only.  See discussion in
+           <filename>src/manual/pending.txt</filename> for details.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           New option <option>--no-deps</option> is described below.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Build Behavior Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           When &abuild; is run with no build set arguments,
+           <option>--with-deps</option> is enabled by default.  In
+           order to build a build item <emphasis>without</emphasis>
+           its dependencies (effectively assuming that the
+           dependencies are up to date), run &abuild; with the
+           <option>--no-deps</option> option.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Removed all <command>clean</command> targets previously
+           provided by backends.  In older versions of &abuild;, the
+           <command>clean</command> target was passed to the backend
+           under the special case of &abuild; being invoked from
+           inside the output directory.  Now &abuild; implements the
+           <command>clean</command> target internally for that case.
+           &Abuild; always has and continues to implement
+           <command>clean</command> internally for invocations that
+           are not in an output directory.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; always has and continues to guarantee that it will
+           build all dependencies of an item before it builds the
+           item.  Previous versions of &abuild; would rearrange an
+           initial build that built all items alphabetically,
+           deviating from that order only to satisfy dependencies.
+           &Abuild; now uses, as an initial ordering, build items
+           sorted alphabetically within trees, with trees sorted in
+           dependency order.  In other words, if tree
+           <filename>A</filename> declares a tree dependency on tree
+           <filename>B</filename>, then &abuild; will build all items
+           in <filename>A</filename> before building any build items
+           in <filename>B</filename>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Platform Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Platform-specific dependencies now obey user-supplied
+           platform selectors.  The rationale for not doing this
+           before was that the command-line and environment should not
+           affect the shape of the build graph, but that's not really
+           a good reason since this is a myth anyway.  People can
+           always run with <option>DFLAGS=-g</option> or set an
+           environment variable used by a specific platform plugin's
+           <command>list_platforms</command> script to suppress the
+           platform.  If a specific compiler or option is required, it
+           can be specified explicitly with the platform-specifier in
+           the dependency.
+          </para>
+          <para>
+           To explicitly disregard user-supplied platform selectors,
+           it is possible to specify "default" as the platform
+           selector, as in
+
+           <programlisting>deps: item -platform=platform-type:default
+</programlisting>
+          </para>
+          <para>
+           It is also possible to specify an explicitly empty option,
+           as in
+
+           <programlisting>deps: item -platform=platform-type:option=
+</programlisting>
+          </para>
+          <para>
+           Both the empty option and <type>default</type> platform
+           selector are available on the command-line as well, making
+           it possible to run
+
+           <programlisting>abuild -p option=debug -p native:default
+</programlisting>
+           or
+
+           <programlisting>abuild -p option=debug -p native:option=
+</programlisting>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; now passes information about the native platform
+           to all <command>list_platforms</command> programs, which
+           are supplied by plugins that are offering support for new
+           compilers.  <command>list_platforms</command> is now
+           invoked as follows:
+
+           <programlisting>list_platforms [ --windows ] --native-data <replaceable>os</replaceable> <replaceable>cpu</replaceable> <replaceable>toolset</replaceable>
+</programlisting>
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; now supports global plugins.  This is implemented
+           through introduction of a new, general-purpose key in
+           <filename>Abuild.conf</filename>:
+           <property>attributes</property>.  This key can be used to
+           flag certain build items as having specific properties that
+           &abuild; recognizes.  At present, only two attributes are
+           recognized:
+           <itemizedlist>
+            <listitem>
+             <para>
+              <property>global-tree-dep</property>: This attribute may
+              be assigned to any root build item of an explicitly
+              named tree.  Such a tree may not have any tree
+              dependencies of its own and is implicitly treated as if
+              it were declared as a tree dependency by all other
+              trees.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              <property>global-plugin</property>: This attribute may
+              be assigned to any build item that otherwise meets the
+              qualifications for being a plugin.  It must reside in a
+              tree with the <property>global-tree-dep</property>
+              attribute.  This item will then be treated as if it had
+              been explicitly listed as a plugin for all build trees.
+              This is a very powerful feature which must used with
+              care.  Good uses for it might include implementing
+              project-wide checks, such as making sure appropriate
+              environment variables are set or appropriate dependency
+              rules are followed, or for adding new platforms or
+              platform types that may be used by all build items in a
+              forest.  Care should be taken to avoid introducing
+              global plugins that wider consequences than you might
+              initially expect.  Global plugins should generally be
+              coded in such a way that their impact can be disabled in
+              some way.
+             </para>
+            </listitem>
+           </itemizedlist>
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Implemented <command>abuild --upgrade-trees</command>.  You
+           should use this command to upgrade your build trees rather
+           than attempting to upgrade your trees manually.  Although
+           abuild will work fine with mixed 1.0/1.1 trees, you will
+           get a lot more warnings and possibly incorrect results in
+           some cases (though no such cases are known) if you
+           partially upgrade your trees.  There is <emphasis>a
+           lot</emphasis> to keep track of when upgrading your trees.
+           You are much better off letting abuild do it for you.
+           Documentation on the upgrade process, for the time being,
+           can be found in
+           <filename>src/manual/pending.txt</filename>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.a4: March 19, 2009</term>
      <listitem>

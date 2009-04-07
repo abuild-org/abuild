@@ -1,6 +1,3 @@
- * XXX Would be nice to deprecate ABUILD_THIS interface variable.
-   Doing so would require changes to Interface or InterfaceParser to
-   support the idea of deprecated variables.
 
 === Changes Targeted for Version 1.1 ===
 
@@ -15,100 +12,7 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * Changed build set "all" to mean all known build items in all trees
-   in the forest.
-
- * Added build set "deptrees" to mean all build trees in the tree-deps
-   chain, including the current build tree.  This build set would
-   build what "all" builds in 1.0.
-
- * Default build ordering has changed so that tree ordering is used
-   before item ordering in the sort.  This means that if tree A
-   declares tree B as a tree dependency (or uses it as an external)
-   all of A's build items will build before any of B's build items (in
-   a single-threaded build).  Build ordering is always determined by
-   build item dependencies.
-
- * Implemented abuild --upgrade-trees.  You should not attempt to
-   upgrade trees manually.  Although abuild will work fine with mixed
-   1.0/1.1 trees, you will get a lot more warnings and possibly
-   incorrect results in some cases (though no such cases are known) if
-   you partially upgrade your trees.  There is A LOT to keep track of
-   when upgrading your trees.  You are much better off letting abuild
-   do it for you.
-
- * New interface variables ABUILD_ITEM_NAME and ABUILD_TREE_NAME
-
- * --ro-path, --rw-path
-
- * Removed all "clean" targets supplied by backends.  Abuild now
-   internally handles clean even when run from an output directory.
-
- * When abuild is run with no arguments, its default behavior will be
-   to act as if --with-deps had been specified.  A new flag
-   "--no-deps" can be used for the case in which one should build just
-   the item with no dependencies.
-
- * Platform-specific dependencies obey user-supplied platform
-   selectors.  The rationale for not doing this before was that the
-   command-line and environment should not affect the shape of the
-   build graph, but that's not really a good reason since this is a
-   myth anyway.  People can always run with DFLAGS=-g or set an
-   environment variable used by a specific platform plugin's
-   list_platforms script to suppress the platform.  If a specific
-   compiler or option is required, it can be specified explicitly with
-   the platform-specifier in the dependency.
-
-   To explicitly disregard user-supplied platform selectors, it is
-   possible to specify "default" as the platform selector, as in
-
-   deps: item -platform=platform-type:default
-
-   It is also possible to specify an explicitly empty option, as in
-
-   deps: item -platform=platform-type:option=
-
-   Both the empty option and "default" platform selector are available
-   on the command-line as well, making it possible to run
-
-   abuild -p option=debug -p native:default
-
-   or
-
-   abuild -p option=debug -p native:option=
-
- * Introduce new Abuild.conf key "attributes", which can be used to
-   assign specific attributes to a build item.  Two attributes are
-   initially supported "global-tree-dep", and "global-plugin".
-
-   The "global-tree-dep" attribute may be set for a root build item of
-   a named tree.  When set, the tree is implicitly made a tree
-   dependency of all trees (other than itself).  As such, trees with
-   the global-tree-dep attribute may not themselves declare tree
-   dependencies since any such dependencies would be in a cycle
-   involving the global tree dependency.
-
-   The "global-plugin" attribute may be declared to any build item
-   that is inside a tree with the "global-tree-dep" attribute and
-   which meets all of the qualifications of being a plugin.  Such
-   build items are implicitly added to the list of plugins for all
-   build trees.  At present, global plugins are checked with each
-   build tree as if they were explicitly declared as a plugin in each
-   tree.  Therefore, certain error messages may be repeated for each
-   tree.  The error messages themselves indicate this in some
-   instances.
-
-   These are both powerful features that should be used with caution.
-   In general, it is better for trees to decide on their own which
-   items are going to be plugins and which trees they are going to
-   depend on.  However, there are certain instances, such as the
-   addition of new compiler plugins or plugins that check project-wide
-   policy, where use of global plugins may be advisable.
-
- * Pass information about the native os, cpu, and toolset to
-   list_platforms.  list_platforms is now invoked as
-
-   list_platforms [ --windows ] --native-data os cpu toolset
+ * ...
 
 
 MSVC toolchain
