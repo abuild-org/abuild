@@ -262,7 +262,7 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 			      " backed external has not been upgraded; you"
 			      " must either upgrade the backing area"
 			      " or create the external (which may have its"
-			      " own" + BackingConfig::FILE_BACKING +
+			      " own " + BackingConfig::FILE_BACKING +
 			      " file) locally");
 		    }
 		}

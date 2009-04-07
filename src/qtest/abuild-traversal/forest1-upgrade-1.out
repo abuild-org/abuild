@@ -1,10 +1,10 @@
 abuild: searching for build items...
 abuild: analyzing...
-F2C2/proj/c2/Abuild.conf: ERROR: this build item resolves external "ifc" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its ownAbuild.backing file) locally
-F2C2/proj/c2/impl/Abuild.conf: ERROR: this build item resolves external "../../c1" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its ownAbuild.backing file) locally
-F2C2/proj/tests/int/Abuild.conf: ERROR: this build item resolves external "../../c1/impl" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its ownAbuild.backing file) locally
-F2C2/util/f2/Abuild.conf: ERROR: this build item resolves external "../../../PLUGINS/plugins" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its ownAbuild.backing file) locally
-F2C2/util/tests/int/Abuild.conf: ERROR: this build item resolves external "../../f1" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its ownAbuild.backing file) locally
+F2C2/proj/c2/Abuild.conf: ERROR: this build item resolves external "ifc" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its own Abuild.backing file) locally
+F2C2/proj/c2/impl/Abuild.conf: ERROR: this build item resolves external "../../c1" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its own Abuild.backing file) locally
+F2C2/proj/tests/int/Abuild.conf: ERROR: this build item resolves external "../../c1/impl" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its own Abuild.backing file) locally
+F2C2/util/f2/Abuild.conf: ERROR: this build item resolves external "../../../PLUGINS/plugins" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its own Abuild.backing file) locally
+F2C2/util/tests/int/Abuild.conf: ERROR: this build item resolves external "../../f1" using a backing area, and the backed external has not been upgraded; you must either upgrade the backing area or create the external (which may have its own Abuild.backing file) locally
 abuild: ERROR: some build trees have not been assigned names
 abuild: upgrade data has been written to abuild.upgrade-data
 abuild: please edit that file and rerun; for details, see "Upgrading Build Trees from 1.0 to 1.1" in the user's manual
