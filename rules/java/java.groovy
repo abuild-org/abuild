@@ -630,11 +630,11 @@ abuild.configureTarget('package-jar', 'deps' : ['compile'],
                        javaRules.&packageJarTarget)
 abuild.configureTarget('sign-jars', 'deps' : ['package-jar'],
                        javaRules.&signJarsTarget)
-abuild.configureTarget('package-highlevelarchive', 'deps' : ['sign-jars'],
+abuild.configureTarget('package-high-level-archive', 'deps' : ['sign-jars'],
                        javaRules.&packageHighLevelArchiveTarget)
 abuild.configureTarget('package-war', 'deps' : ['sign-jars'],
                        javaRules.&packageWarTarget)
-abuild.configureTarget('package-ear', 'deps' : ['package-highlevelarchive',
+abuild.configureTarget('package-ear', 'deps' : ['package-high-level-archive',
                            'package-war'],
                        javaRules.&packageEarTarget)
 abuild.configureTarget('javadoc', 'deps' : ['compile'],
