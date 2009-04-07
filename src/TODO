@@ -1,3 +1,6 @@
+ * XXX Would be nice to deprecate ABUILD_THIS interface variable.
+   Doing so would require changes to Interface or InterfaceParser to
+   support the idea of deprecated variables.
 
 === Changes Targeted for Version 1.1 ===
 
@@ -12,39 +15,6 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * Documentation for new features (other than groovy framework) is
-   being placed in src/manual/pending.txt until it is integrated into
-   the documentation.
-
- * In groovy backend, cache loading of rules for a significant
-   performance boost
-
- * NON-COMPATIBLE CHANGES TO EXTERNALS:
-
-    - -winpath is no longer a valid option to external-dirs.
-
-    - Absolute path externals are no longer supported.
-
-    - external-dirs may no longer be symbolic links nor may they cross
-      symbolic links.  If you are relying on symbolic links to
-      externals, you can probably use externals that do nothing but
-      point to other externals instead.  Also, abuild 1.1 supports
-      multiple backing areas, which might provide another solution.
-
-    - The -ro flag for externals is ignored; use -ro-path or -rw-path
-      instead.  It's also possible that some uses of read-only
-      externals could be replaced with backing areas instead,
-      especially since multiple backing areas are now supported.
-
- * Compatibility level can be set with the ABUILD_COMPAT_LEVEL
-   environment variable in addition to the command line argument.  The
-   command line argument takes precedence.
-
- * Having a child-dirs entry be a symbolic link or cross a symbolic
-   link now results in an explicit error message.  This has never
-   really worked, but in the past, the result would most likely have
-   been something about a parent/child mismatch.
-
  * Changed build set "all" to mean all known build items in all trees
    in the forest.
 
@@ -58,26 +28,6 @@ release notes.
    all of A's build items will build before any of B's build items (in
    a single-threaded build).  Build ordering is always determined by
    build item dependencies.
-
- * Replaced "this" with "name"
-
- * The value of parent-dir is completely ignored other than to check
-   it enough to make sure that ignoring it doesn't change anything.
-
- * Require trees to be named.  Replace externals with subtrees.
-   Eliminate absolute path and read-only externals, but provide an
-   alternative to read-only externals for the desired functionality.
-
- * Move "deleted-items" key from root Abuild.conf to Abuild.backing.
-   Also add a "deleted-trees" key.  New Abuild.backing format:
-
-     backing-areas: /path/to/backing/area
-     deleted-trees: trees not to shadow
-     deleted-items: items not to shadow
-
- * Support multiple backing areas.  If there are multiple, independent
-   backing areas, they must be disjoint (i.e., they must not both
-   supply the same item or tree).
 
  * Implemented abuild --upgrade-trees.  You should not attempt to
    upgrade trees manually.  Although abuild will work fine with mixed
@@ -159,9 +109,6 @@ release notes.
    list_platforms.  list_platforms is now invoked as
 
    list_platforms [ --windows ] --native-data os cpu toolset
-
- * Groovy changes: package-rar has become package-high-level-archive,
-   some parameters and attributes have been renamed.
 
 
 MSVC toolchain

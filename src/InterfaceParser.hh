@@ -44,6 +44,9 @@ class InterfaceParser: public Parser
 		    std::string const& local_dir);
     virtual ~InterfaceParser();
 
+    static void addDeprecatedVariable(std::string const& version,
+				      std::string const& varname);
+
     // Parse a file.  Returns true if there were no errors.
     bool parse(std::string const& filename, bool allow_after_build);
 
@@ -190,6 +193,7 @@ class InterfaceParser: public Parser
 			FileLocation const&,
 			std::vector<nt_Argument const*> const&,
 			bool& /* function_true */)> function_evaluators;
+    static std::map<std::string, std::string> deprecated_variables;
 
     YYSTYPE* yydata;
     InterfaceLexer lexer;

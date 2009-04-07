@@ -20,7 +20,7 @@
 #include <cstdio>
 #include <assert.h>
 
-std::string const Abuild::ABUILD_VERSION = "1.1.a4+";
+std::string const Abuild::ABUILD_VERSION = "1.1.a5";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
@@ -542,6 +542,7 @@ Abuild::parseArgv()
     if (compat_level_version == "1.0")
     {
 	this->compat_level.setLevel(CompatLevel::cl_1_0);
+	InterfaceParser::addDeprecatedVariable("1.1", "ABUILD_THIS");
     }
     else if (compat_level_version == "1.1")
     {
@@ -5145,6 +5146,15 @@ Abuild::buildBuildset()
 	fatal("errors detected in base interface file");
     }
     this->base_interface = base_parser.getInterface();
+    if (this->compat_level.allow_1_0())
+    {
+	this->base_interface->declareVariable(
+	    FileLocation("-internal-compat-", 1, 0),
+	    "ABUILD_THIS",
+	    Interface::s_recursive,
+	    Interface::t_string,
+	    Interface::l_scalar);
+    }
 
     // Load interfaces for each plugin.
     bool plugin_interface_errors = false;
@@ -5863,9 +5873,12 @@ Abuild::createItemInterface(std::string const& builder_string,
 
     Interface& _interface = *(parser.getInterface());
     FileLocation internal("[internal: " + builder_string + "]", 0, 0);
-    assignInterfaceVariable(_interface,
-			    internal, "ABUILD_THIS", build_item.getName(),
-			    Interface::a_override, status);
+    if (this->compat_level.allow_1_0())
+    {
+	assignInterfaceVariable(_interface,
+				internal, "ABUILD_THIS", build_item.getName(),
+				Interface::a_override, status);
+    }
     assignInterfaceVariable(_interface,
 			    internal, "ABUILD_ITEM_NAME", build_item.getName(),
 			    Interface::a_override, status);

@@ -1,0 +1,6 @@
+--topdir--/interface-variables/Abuild.interface:1:12: *** DEPRECATION WARNING *** (abuild version 1.1): variable "ABUILD_THIS" is deprecated
+--topdir--/interface-variables/Abuild.interface:2:28: *** DEPRECATION WARNING *** (abuild version 1.1): variable "ABUILD_THIS" is deprecated
+abuild: interface (abuild-indep): all
+make: Entering directory `--topdir--/interface-variables/abuild-indep'
+interface
+make: Leaving directory `--topdir--/interface-variables/abuild-indep'

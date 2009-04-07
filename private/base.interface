@@ -8,7 +8,6 @@ target-type all
 
 declare ABUILD_STDOUT_IS_TTY boolean
 
-declare ABUILD_THIS string
 declare ABUILD_ITEM_NAME string
 declare ABUILD_TREE_NAME string
 declare ABUILD_TARGET_TYPE string

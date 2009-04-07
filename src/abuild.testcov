@@ -365,3 +365,4 @@ Abuild ERR error for global plugin 0
 Abuild add global plugin 0
 Abuild add global tree dep 0
 Abuild item in unnamed root 0
+InterfaceParser use deprecated variable 0
