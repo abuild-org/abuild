@@ -225,10 +225,17 @@ $td->runtest("invalid tree buildset",
 cd("work/not-in-tree");
 
 $td->runtest("named item not in tree",
-	     {$td->COMMAND => "abuild --compat-level=1.1",
+	     {$td->COMMAND => "abuild --compat-level=1.1 -b all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/named-item-not-in-tree.out",
 	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("named item not in tree",
+	     {$td->COMMAND => "abuild --compat-level=1.0 -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/named-item-not-in-tree-compat.out",
+	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
 cd("work/external/main");
@@ -285,4 +292,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(29 + (in_windows() ? 0 : 1));
+$td->report(30 + (in_windows() ? 0 : 1));

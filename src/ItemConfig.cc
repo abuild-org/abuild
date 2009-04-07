@@ -281,6 +281,12 @@ ItemConfig::detectRoot()
 void
 ItemConfig::checkDeprecated()
 {
+    // Note: presence of explicit keys doesn't automatically cause
+    // deprecated to be set.  Abuild.cc does its own checks for
+    // externals that point to upgraded trees.  This helps warning
+    // people about deprecated features when there is no possible
+    // remedy.
+
     std::set<std::string> const& ek = this->kv.getExplicitKeys();
     if (this->is_root &&
 	(! (this->is_child_only && this->is_forest_root)) &&
@@ -297,11 +303,6 @@ ItemConfig::checkDeprecated()
     if (ek.count(k_PARENT))
     {
 	QTC::TC("abuild", "ItemConfig has parent-dir");
-	this->deprecated = true;
-    }
-    if (ek.count(k_EXTERNAL))
-    {
-	QTC::TC("abuild", "ItemConfig has external-dirs");
 	this->deprecated = true;
     }
     if (ek.count(k_DELETED))

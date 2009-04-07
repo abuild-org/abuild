@@ -1250,6 +1250,7 @@ Abuild::readExternalConfig(std::string const& start_dir,
 
     verbose("looking for external \"" + start_external + "\" of \"" +
 	    start_dir + "\"");
+    incrementVerboseIndent();
 
     ItemConfig* config = 0;
 
@@ -1329,6 +1330,7 @@ Abuild::readExternalConfig(std::string const& start_dir,
 	}
     }
 
+    decrementVerboseIndent();
     verbose("done looking for external \"" +
 	    start_external + "\" of \"" + start_dir + "\"");
 
@@ -1353,6 +1355,7 @@ Abuild::findTop(std::string const& start_dir,
 
     verbose("looking for top of build forest \"" + description + "\"");
 
+    incrementVerboseIndent();
     while (true)
     {
 	verbose("top-search: checking " + dir);
@@ -1373,6 +1376,7 @@ Abuild::findTop(std::string const& start_dir,
 	    dir = parent_dir;
 	}
     }
+    decrementVerboseIndent();
 
     if (top.empty())
     {
@@ -1527,6 +1531,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 
     // DO NOT RETURN BELOW THIS POINT until after we remove top_path
     // from visiting.
+    incrementVerboseIndent();
     visiting.insert(top_path);
 
     BuildForest_ptr forest(new BuildForest(top_path));
@@ -1534,14 +1539,13 @@ Abuild::traverseForests(BuildForest_map& forests,
     std::list<std::string>& backing_areas = forest->getBackingAreas();
     std::set<std::string>& deleted_trees = forest->getDeletedTrees();
     std::set<std::string>& deleted_items = forest->getDeletedItems();
-    verbose("traversing items for " + top_path);
     traverseItems(*forest, external_graph, top_path, dirs_with_externals,
 		  backing_areas, deleted_trees, deleted_items);
-    verbose("done traversing items for " + top_path);
 
     if (this->compat_level.allow_1_0())
     {
 	verbose("1.0-compatibility: checking for externals in " + top_path);
+	incrementVerboseIndent();
 	while (! dirs_with_externals.empty())
 	{
 	    std::string dir = dirs_with_externals.front();
@@ -1618,6 +1622,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 		verbose("done traversing items for external " + ext_top);
 	    }
 	}
+	decrementVerboseIndent();
 	verbose("done with externals");
     }
     else
@@ -1626,6 +1631,7 @@ Abuild::traverseForests(BuildForest_map& forests,
     }
 
     verbose("checking for backing areas");
+    incrementVerboseIndent();
     // Normalize backing areas to filter out duplicates and resolve to
     // forest roots.  Traverse backing areas.
     { // private scope
@@ -1695,10 +1701,12 @@ Abuild::traverseForests(BuildForest_map& forests,
 	    iter = next;
 	}
     }
+    decrementVerboseIndent();
     verbose("done with all backing areas of " + top_path);
 
     visiting.erase(top_path);
     forests[top_path] = forest;
+    decrementVerboseIndent();
     verbose("done traversing forest from " + top_path);
 }
 
@@ -1965,6 +1973,9 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 	this->items_traversed.insert(top_path);
     }
 
+    verbose("traversing items for " + top_path);
+    incrementVerboseIndent();
+
     bool has_backing_area =
 	Util::isFile(top_path + "/" + BackingConfig::FILE_BACKING);
     if (has_backing_area)
@@ -2108,12 +2119,16 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
             }
         }
     }
+
+    decrementVerboseIndent();
+    verbose("done traversing items for " + top_path);
 }
 
 void
 Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
 			BuildItem_ptr item)
 {
+    BuildTree_map& buildtrees = forest.getBuildTrees();
     BuildItem_map& builditems = forest.getBuildItems();
     if (builditems.count(item_name))
     {
@@ -2146,6 +2161,25 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
     }
     else
     {
+	if (this->compat_level.allow_1_0())
+	{
+	    std::string const& tree_name = item->getTreeName();
+	    BuildTree& tree = *(buildtrees[tree_name]);
+	    std::string const& root_path = tree.getRootPath();
+	    if (Util::isFile(root_path + "/" + ItemConfig::FILE_CONF))
+	    {
+		ItemConfig* tree_config = readConfig(root_path, "");
+		if (tree_config->getTreeName().empty())
+		{
+		    if (! this->suggest_upgrade)
+		    {
+			QTC::TC("abuild", "Abuild item in unnamed root");
+			this->suggest_upgrade = true;
+		    }
+		}
+	    }
+	}
+
 	// We want to make sure that item->getTreeName will always be
 	// a valid tree, so only store the build item if everything
 	// checks out.
@@ -6951,11 +6985,24 @@ Abuild::info(std::string const& msg)
 }
 
 void
+Abuild::incrementVerboseIndent()
+{
+    this->verbose_indent += " ";
+}
+
+void
+Abuild::decrementVerboseIndent()
+{
+    this->verbose_indent.erase(this->verbose_indent.length() - 1);
+}
+
+void
 Abuild::verbose(std::string const& msg)
 {
     if (this->verbose_mode)
     {
-	this->logger.logInfo(this->whoami + ": (verbose) " + msg);
+	this->logger.logInfo(this->whoami + ": (verbose) " +
+			     this->verbose_indent + msg);
     }
 }
 

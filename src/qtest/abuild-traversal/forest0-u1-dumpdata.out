@@ -1,4 +1,3 @@
---topdir--/1.0/forest0/PROJ0/proj/tests/int/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/1.0/forest0/PROJ0/proj/c2/impl/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../c1" of "--topdir--/1.0/forest0/PROJ0/proj/c2/impl" points to an named tree in an upgraded build area
 --topdir--/1.0/forest0/PROJ0/proj/c2/ifc/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../../../PLUGINS/plugins" of "--topdir--/1.0/forest0/PROJ0/proj/c2/ifc" points to an named tree in an upgraded build area
 <?xml version="1.0"?>

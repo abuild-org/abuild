@@ -12,7 +12,6 @@
 --topdir--/a/ab/Abuild.conf: ERROR: invalid dependency !heh!
 --topdir--/a/ab/Abuild.conf: ERROR: visible-to not permitted for public build items
 --topdir--/a/ab/Abuild.conf: ERROR: flag names may contain only alphanumeric characters, underscores, periods, and dashes
---topdir--/a/ab/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/a/ac/Abuild.conf:1: ERROR: invalid key that (ignored)
 --topdir--/a/ac/Abuild.conf:2: ERROR: syntax error
 --topdir--/a/ac/Abuild.conf: ERROR: file ended with continuation line
@@ -51,7 +50,6 @@
 --topdir--/d/b/Abuild.conf: ERROR: visible-to value must be * or an ancestor scope higher than this item's default scope
 --topdir--/a/ab/aba/Abuild.conf: ERROR: "external-dirs" may only appear in a root build item
 --topdir--/a/ab/aba/Abuild.conf: ERROR: absolute path externals are no longer supported
---topdir--/a/ab/aba/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/a/ab/abb/Abuild.conf: ERROR: relative to this item, directory "..", which is between this item and its parent, contains Abuild.conf; interleaved Abuild.conf files are not permitted
 --topdir--/a/ab/abb/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/a/ab/abd/abda/Abuild.conf: ERROR: "parent-dir" points to a directory that does not contain Abuild.conf

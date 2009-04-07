@@ -252,7 +252,6 @@ ItemConfig skipping dir in parent search 0
 ItemConfig ERR this and name 0
 ItemConfig root without tree-name 0
 ItemConfig has parent-dir 0
-ItemConfig has external-dirs 0
 ItemConfig has this 0
 ItemConfig has deleted 0
 ItemConfig ERR external symlink 0
@@ -365,3 +364,4 @@ Abuild ERR global tree-dep with tree deps 0
 Abuild ERR error for global plugin 0
 Abuild add global plugin 0
 Abuild add global tree dep 0
+Abuild item in unnamed root 0

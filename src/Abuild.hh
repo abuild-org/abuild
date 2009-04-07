@@ -233,6 +233,8 @@ class Abuild
     void usage(std::string const& msg);
     void exitIfErrors();
     void info(std::string const& msg);
+    void incrementVerboseIndent();
+    void decrementVerboseIndent();
     void verbose(std::string const& msg);
     void monitorOutput(std::string const& msg);
     void monitorErrorCallback(std::string const& msg);
@@ -350,6 +352,7 @@ class Abuild
     std::vector<std::string> buildset_reverse_order;
     std::map<std::string, std::string> buildgraph_tree_prefixes;
     std::vector<std::string> failed_builds;
+    std::string verbose_indent;
 
     // (forest, other_forest) -> [plugin, ...]
     typedef std::map<std::string,
