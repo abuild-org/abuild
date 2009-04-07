@@ -160,6 +160,9 @@ release notes.
 
    list_platforms [ --windows ] --native-data os cpu toolset
 
+ * Groovy changes: package-rar has become package-high-level-archive,
+   some parameters and attributes have been renamed.
+
 
 MSVC toolchain
 ==============
