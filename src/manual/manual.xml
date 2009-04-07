@@ -13874,7 +13874,11 @@ Y = $(X)
           <para>
            The interface variable <varname>ABUILD_THIS</varname> is
            deprecated and has been replaced by
-           <varname>ABUILD_ITEM_NAME</varname>.
+           <varname>ABUILD_ITEM_NAME</varname>.  Note that &abuild; is
+           not able to detect use of <varname>$(ABUILD_THIS)</varname>
+           in Makefile fragments.  It will, however, warn about them
+           when they are used in <filename>Abuild.interface</filename>
+           files.
           </para>
          </listitem>
         </itemizedlist>

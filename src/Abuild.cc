@@ -5146,6 +5146,7 @@ Abuild::buildBuildset()
 	fatal("errors detected in base interface file");
     }
     this->base_interface = base_parser.getInterface();
+    this->base_interface->setTargetType(TargetType::tt_all);
     if (this->compat_level.allow_1_0())
     {
 	this->base_interface->declareVariable(

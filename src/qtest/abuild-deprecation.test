@@ -95,7 +95,7 @@ $td->runtest("interface variables compat level 1.1",
 	     {$td->COMMAND => "abuild --compat-level=1.1",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/interface-variables-1_1.out",
-	      $td->EXIT_STATUS => 0},
+	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("interface variables",

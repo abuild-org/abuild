@@ -1,4 +1,4 @@
 all::
 	@echo ''
-	@echo '*** $(ABUILD_THIS) ***'
+	@echo '*** $(ABUILD_ITEM_NAME) ***'
 	@echo ''

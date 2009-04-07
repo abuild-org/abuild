@@ -125,6 +125,13 @@ Core Changes
    as an optional dependency.  This variable will be true iff the
    build item exists.
 
+   Most likely method of implementation would have to abuild notice a
+   missing optional dependency when constructing the dependency graph
+   (and just not call addDependency).  This would go for both items
+   and trees.  We should also ignore trait referent items to absent
+   optional dependencies.  In all cases, the optional-ness of a
+   dependency is checked based on the current build item.  It is not
+   recursive.
 
 Documentation
 =============
