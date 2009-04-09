@@ -1,5 +1,9 @@
 AC_PREREQ(2.59)
 AC_INIT([boost-autoconf],0)
+dnl  A more customary way to do this in abuild would be to generate an
+dnl  abuild interface after-build file rather than a makefile
+dnl  fragment, but we generate a makefile fragment here for
+dnl  bootstrapping purposes.
 AC_CONFIG_FILES([autoconf-bootstrap.mk])
 AC_PROG_CC
 AC_PROG_CXX
