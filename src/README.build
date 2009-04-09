@@ -64,10 +64,12 @@ versions will also work.  If this environment variable is not set, the
 test suite will issue a warning and skip the JUnit tests.
 
 If your boost libraries are not installed in the default location, you
-may need to set BOOST_INCLUDES and/or BOOST_LIBDIRS to the locations
-of the header files and libraries.  If your boost libraries require a
-suffix (-lboost_thread-xyz), then you need to set BOOST_LIB_SUFFIX to
-the suffix (-xyz).
+may need to set BOOST_TOP to a location that has a boost installation.
+The build process will attempt to find a suitable version of boost
+there by looking for $BOOST_TOP/include/boost-<version> and
+$BOOST_TOP/lib.  If your boost installation includes support for
+multiple compilers, abuild may guess wrong which one to use.  In this
+case, you may need to override the value of BOOST_LIB_SUFFIX.
 
 
 UNIX BUILD
