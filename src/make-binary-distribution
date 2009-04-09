@@ -252,7 +252,7 @@ if ($test_mkdist && (-f "$abuild_outdir/abuild" ||
 }
 else
 {
-    run("make -f Makefile.bootstrap");
+    run("make -f Makefile.bootstrap ABUILD_SKIP_WERROR=1");
 }
 my $abuild = getcwd() . "/$abuild_outdir/abuild";
 my $actual_version = `$abuild --version`;

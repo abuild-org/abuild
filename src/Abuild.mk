@@ -1,18 +1,6 @@
-ifdef BOOST_INCLUDES
-INCLUDES += $(BOOST_INCLUDES)
-endif
-ifdef BOOST_LIBDIRS
-LIBDIRS += $(BOOST_LIBDIRS)
-endif
-BOOST_LIB_SUFFIX ?=
 # MSVC doesn't require explicitly naming of boost libraries
 ifneq ($(CCXX_TOOLCHAIN), msvc)
 LIBS += $(foreach L,thread regex system filesystem date_time,boost_$(L)$(BOOST_LIB_SUFFIX))
-endif
-ifneq ($(ABUILD_PLATFORM_OS),windows)
-ifneq ($(ABUILD_PLATFORM_OS),darwin)
-LIBS += pthread
-endif
 endif
 
 ifdef ABUILD_STATIC
@@ -20,8 +8,10 @@ ifdef ABUILD_STATIC
 XLINKFLAGS += -static
 endif
 
-ifeq ($(CCXX_TOOLCHAIN), gcc)
-WFLAGS += -Werror
+ifndef ABUILD_SKIP_WERROR
+ ifeq ($(CCXX_TOOLCHAIN), gcc)
+ WFLAGS += -Werror
+ endif
 endif
 
 ifeq ($(CCXX_TOOLCHAIN), msvc)
