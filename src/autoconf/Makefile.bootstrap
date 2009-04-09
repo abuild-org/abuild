@@ -1,0 +1,4 @@
+# -*- makefile-gmake -*-
+
+override ABUILD_TOP := $(shell dirname $(shell dirname `pwd`))
+include ../Makefile.bootstrap

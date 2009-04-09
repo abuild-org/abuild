@@ -1,4 +1,4 @@
-AUTOFILES := autoconf.interface
+AUTOFILES := autoconf-bootstrap.mk
 CONFIGURE_ARGS :=
 ifeq ($(ABUILD_PLATFORM_COMPILER),msvc)
   CONFIGURE_ARGS += --with-msvc

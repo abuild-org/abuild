@@ -1,6 +1,6 @@
 AC_PREREQ(2.59)
 AC_INIT([boost-autoconf],0)
-AC_CONFIG_FILES([autoconf.interface])
+AC_CONFIG_FILES([autoconf-bootstrap.mk])
 AC_PROG_CC
 AC_PROG_CXX
 

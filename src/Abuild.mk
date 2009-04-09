@@ -1,3 +1,14 @@
+# Ordinarily, the abuild-autoconf build item would create an interface
+# file that would be loaded automatically by virtue of our dependency
+# on that build item.  However, to make this work for both
+# bootstrapping and building with abuild, we generate a makefile
+# fragment and included it instead.
+
+../autoconf/abuild-$(ABUILD_PLATFORM)/autoconf-bootstrap.mk:
+	($(MAKE) -C ../autoconf -f Makefile.bootstrap)
+
+include ../autoconf/abuild-$(ABUILD_PLATFORM)/autoconf-bootstrap.mk
+
 # MSVC doesn't require explicitly naming of boost libraries
 ifneq ($(CCXX_TOOLCHAIN), msvc)
 LIBS += $(foreach L,thread regex system filesystem date_time,boost_$(L)$(BOOST_LIB_SUFFIX))
