@@ -12,7 +12,11 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ...
+ * Simplify handling of boost for bootstrapping.  There's now an
+   autoconf build item that figures out boost libraries, requiring
+   only BOOST_TOP to be set if you are looking for boost in a
+   nonstandard location, and also deals with pthread and socket
+   libraries and -DBOOST_SP_USE_PTHREADS if needed.
 
 
 MSVC toolchain
@@ -357,9 +361,7 @@ Then consider packaging auto-srcs with abuild sources.  Check on
 debian to see if this works with the latest flex.  Consider making the
 re-entrant scanner switch, made possible by controlling the flex and
 bison files provided that there is an autoconf check for the right
-versions of flex and bison.  See
-~/source/work-software/argon/third-party-support/boost for sample
-boost autoconf code.
+versions of flex and bison.
 
 ----------------------------------------------------------------------
 
