@@ -44,15 +44,30 @@ MSVC toolchain
    CXX = $(CC) /TP /GR
    CXXPP = $(CXX) /E
 
-   /Zi
-   /O2
-   /MD
-   /MDd
-   /Gy
-   /EHsc
+   /Zi -- generate debugging information and store in .pdb
+   /O2  -- fast code
+   /MD -- multithreaded DLL using MSVCRT (dynamic runtime)
+   /MDd -- debugging multithreaded DLL using MSVCRTd
+   /Gy -- enable function level linking
 
-   /E
-   /TP /GR
+   /EHsc -- synchronous exception handling, extern "C" never throws exceptions
+   /clr -- common language runtime: needed for .NET
+
+   Note that /EHsc and /clr are mutually exclusive.  /clr
+   automatically enables /EHa, which is asynchronous exception
+   handling.
+
+   /E -- generate preprocessor information
+   /TP -- C++
+   /GR -- enable RTTI
+
+   This article: http://msdn.microsoft.com/en-us/library/xe4t6fc1.aspx
+   explains that /Zi, which implies /DEBUG, adds debugging information
+   to the .pdb file and not to the .obj files.  It does turn off
+   certain optimizations.  We use /Zi in both debug and release mode
+   (XXX make that true) because, without /Zi, there are some
+   additional problems with long paths.  This was suggested to us by
+   Microsoft technical support.
 
  * To build for .NET, we need to pass /clr rather than /EHsc to msvc.
    /EHsc is hard-coded into $(CC) right now.  We need to fix msvc.mk
