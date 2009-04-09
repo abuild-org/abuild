@@ -353,19 +353,34 @@ compiler everywhere else."  Try to work that in.
 Building Abuild
 ===============
 
- * Consider creating a ./configure that finds boost libraries and
-   deals properly with pthread.  Then consider packaging auto-srcs
-   with abuild sources.  Check on debian to see if this works with the
-   latest flex.  Consider making the re-entrant scanner switch, made
-   possible by controlling the flex and bison files provided that
-   there is an autoconf check for the right versions of flex and
-   bison.  See ~/source/work-software/argon/third-party-support/boost
-   for sample boost autoconf code.
+Consider creating a ./configure that finds boost libraries and deals
+properly with pthread.  Then consider packaging auto-srcs with abuild
+sources.  Check on debian to see if this works with the latest flex.
+Consider making the re-entrant scanner switch, made possible by
+controlling the flex and bison files provided that there is an
+autoconf check for the right versions of flex and bison.  See
+~/source/work-software/argon/third-party-support/boost for sample
+boost autoconf code.
 
-   It might be possible to make this work properly when abuild is
-   building itself by having a plugin that checks to make sure
-   configure has been run.  Bootstrapping makefile can fail if
-   configure hasn't been run.
+It might be possible to make this work properly when abuild is
+building itself by having a plugin that checks to make sure configure
+has been run.  Bootstrapping makefile can fail if configure hasn't
+been run.
+
+Other things to keep in mind:
+
+ * On Solaris 8 (at least), it is necessary to add
+
+    -D_REENTRANT -DBOOST_SP_USE_PTHREADS
+
+   to XCPPFLAGS.
+
+ * Solaris has additional libraries you need to link with for
+   networking.
+
+Ideally, we need a trylink that can link successfully with all the
+boost libraries abuild uses.
+
 
 ----------------------------------------------------------------------
 
