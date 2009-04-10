@@ -57,21 +57,17 @@ MSVC_MANAGEMENT_FLAGS = /EHsc
 
 MSVC_RUNTIME_FLAG = /MD
 
+# End users should not change MSVC_RUNTIME_SUFFIX
+MSVC_RUNTIME_SUFFIX = d
 ifeq ($(ABUILD_PLATFORM_OPTION), debug)
 OFLAGS =
 endif
 ifeq ($(ABUILD_PLATFORM_OPTION), release)
 DFLAGS =
-endif
-
-# End users should not change MSVC_RUNTIME_SUFFIX
-ifeq ($(words $(DFLAGS)), 0)
 MSVC_RUNTIME_SUFFIX =
-else
-MSVC_RUNTIME_SUFFIX = d
 endif
 
-CC = cl $(MSVC_GLOBAL_FLAGS) $(MSVC_RUNTIME_FLAG)$(MSVC_RUNTIME_SUFFIX)
+CC = cl $(MSVC_GLOBAL_FLAGS) $(MSVC_MANAGEMENT_FLAGS) $(MSVC_RUNTIME_FLAG)$(MSVC_RUNTIME_SUFFIX)
 CCPP = $(CC) /E
 # /TP forces C++; /GR enables RTTI (runtime type identification)
 CXX = $(CC) /TP /GR
