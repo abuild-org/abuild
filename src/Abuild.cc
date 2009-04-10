@@ -4139,6 +4139,10 @@ Abuild::dumpData(BuildForest_map& forests)
 	std::list<std::string> const& backing_areas = forest.getBackingAreas();
 	std::set<std::string> const& deleted_trees = forest.getDeletedTrees();
 	std::set<std::string> const& deleted_items = forest.getDeletedItems();
+	std::set<std::string> const& global_tree_deps =
+	    forest.getGlobalTreeDeps();
+	std::set<std::string> const& global_plugins =
+	    forest.getGlobalPlugins();
 
 	o << " <forest" << std::endl
 	  << "  id=\"f-" << cur_forest << "\"" << std::endl
@@ -4174,6 +4178,30 @@ Abuild::dumpData(BuildForest_map& forests)
 		o << "   <deleted-item name=\"" + *iter + "\"/>" << std::endl;
 	    }
 	    o << "  </deleted-items>" << std::endl;
+	}
+	if (! global_tree_deps.empty())
+	{
+	    o << "  <global-tree-dependencies>" << std::endl;
+	    for (std::set<std::string>::const_iterator iter =
+		     global_tree_deps.begin();
+		 iter != global_tree_deps.end(); ++iter)
+	    {
+		o << "   <tree-dependency name=\"" + *iter + "\"/>"
+		  << std::endl;
+	    }
+	    o << "  </global-tree-dependencies>" << std::endl;
+	}
+	if (! global_plugins.empty())
+	{
+	    o << "  <global-plugins>" << std::endl;
+	    for (std::set<std::string>::const_iterator iter =
+		     global_plugins.begin();
+		 iter != global_plugins.end(); ++iter)
+	    {
+		o << "   <plugin name=\"" + *iter + "\"/>"
+		  << std::endl;
+	    }
+	    o << "  </global-plugins>" << std::endl;
 	}
 
 	std::list<std::string> const& sorted_trees =

@@ -88,8 +88,9 @@
 <!--  on this if it is helpful.  This constraint is satisfied      -->
 <!--  even with the errors attribute of the top-level element is   -->
 <!--  set.                                                         -->
-<!ELEMENT forest (backing-area*, deleted-trees?,
-                  deleted-items?, build-tree+)>
+<!ELEMENT forest (backing-area*, deleted-trees?, deleted-items?,
+                  global-tree-dependencies?, global-plugins?,
+                  build-tree+)>
 <!ATTLIST forest
   id             ID      #REQUIRED
   absolute-path  CDATA   #REQUIRED
@@ -115,6 +116,15 @@
 <!ATTLIST deleted-item
   name           CDATA   #REQUIRED
 >
+
+<!--  The global-tree-dependencies element contains a list of the  -->
+<!--  names of trees that are declared as global tree              -->
+<!--  dependencies in the forest.                                  -->
+<!ELEMENT global-tree-dependencies (tree-dependency+)>
+
+<!--  The global-plugins element contains a list of all plugins    -->
+<!--  that are declared as global in the forest.                   -->
+<!ELEMENT global-plugins (plugin+)>
 
 <!--  One build-tree element appears for each build tree.          -->
 <!--  build-trees are output in dependency order such that no      -->

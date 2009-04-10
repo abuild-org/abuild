@@ -180,6 +180,17 @@ foreach my $d (['none', 'none', ''],
 		 $td->NORMALIZE_NEWLINES);
 }
 
+# dumpdata to exercise global-tree-deps and global-plugins
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case4.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+validate_dump_data($td);
+
 cd("work/case5");
 
 $td->runtest("list_platforms --native-data",
@@ -191,4 +202,4 @@ $td->runtest("list_platforms --native-data",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(27);
+$td->report(29);
