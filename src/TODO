@@ -18,62 +18,9 @@ release notes.
    nonstandard location, and also deals with pthread and socket
    libraries and -DBOOST_SP_USE_PTHREADS if needed.
 
-
-MSVC toolchain
-==============
-
- * According to Microsoft, we should always be using /Zi.  We need to
-   revisit all the arguments passed to msvc to see what they really
-   mean and to figure out which to use in release and debug modes.
-
-   # /Zi enables all debugging information.
-   DFLAGS ?= /Zi
-   OFLAGS ?= /O2
-   # /Wall is impractical with msvc because too many system headers
-   # generate warnings.
-   WFLAGS ?=
-
-   ifeq ($(words $(DFLAGS)), 0)
-   THREAD_FLAGS = /MD
-   else
-   THREAD_FLAGS = /MDd
-   endif
-
-   CC = cl /Gy /EHsc /nologo $(THREAD_FLAGS)
-   CCPP = $(CC) /E
-   CXX = $(CC) /TP /GR
-   CXXPP = $(CXX) /E
-
-   /Zi -- generate debugging information and store in .pdb
-   /O2  -- fast code
-   /MD -- multithreaded DLL using MSVCRT (dynamic runtime)
-   /MDd -- debugging multithreaded DLL using MSVCRTd
-   /Gy -- enable function level linking
-
-   /EHsc -- synchronous exception handling, extern "C" never throws exceptions
-   /clr -- common language runtime: needed for .NET
-
-   Note that /EHsc and /clr are mutually exclusive.  /clr
-   automatically enables /EHa, which is asynchronous exception
-   handling.
-
-   /E -- generate preprocessor information
-   /TP -- C++
-   /GR -- enable RTTI
-
-   This article: http://msdn.microsoft.com/en-us/library/xe4t6fc1.aspx
-   explains that /Zi, which implies /DEBUG, adds debugging information
-   to the .pdb file and not to the .obj files.  It does turn off
-   certain optimizations.  We use /Zi in both debug and release mode
-   (XXX make that true) because, without /Zi, there are some
-   additional problems with long paths.  This was suggested to us by
-   Microsoft technical support.
-
- * To build for .NET, we need to pass /clr rather than /EHsc to msvc.
-   /EHsc is hard-coded into $(CC) right now.  We need to fix msvc.mk
-   to make it easier to override these flags.  When going back through
-   all flags to see what they do, create variables that can be
-   overridden based on function.
+ * msvc: set up MSVC_RUNTIME_FLAG, MSVC_MANAGEMENT_FLAGS, and
+   MSVC_GLOBAL_FLAGS to make it easier to customize the behavior of
+   msvc.
 
 
 Help system
@@ -203,6 +150,10 @@ Documentation
    including nameless tree roots, because we don't store anything
    about unnamed build items.  If you want a description in your tree
    root, give it a name.  Comments are allowed anywhere.
+
+ * For msvc toolchain, document MSVC_GLOBAL_FLAGS,
+   MSVC_MANAGEMENT_FLAGS, and MSVC_RUNTIME_FLAG (not FLAGS).  See
+   comments in msvc.mk.
 
 
 Usability Improvements

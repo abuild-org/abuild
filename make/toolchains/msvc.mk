@@ -17,12 +17,45 @@ define shlibname
 $(1).dll
 endef
 
-# /Zi enables all debugging information.
-DFLAGS ?= /Zi
+# General-purpose flags supported by all compiler toolchains
+DFLAGS ?=
+# /O2 is for generation of faster code.  Other options are available
+# for different types of optimization.
 OFLAGS ?= /O2
 # /Wall is impractical with msvc because too many system headers
 # generate warnings.
 WFLAGS ?=
+
+# MSVC-specific flags
+
+# /Zi enables debugging and causes debugging information to be written
+# to the .pdb file.  We have observed that cl has trouble with long
+# path names when invoked without /Zi.  Microsoft support suggests
+# that we should use /Zi for all builds, including release builds.
+# See http://msdn.microsoft.com/en-us/library/xe4t6fc1.aspx for
+# additional discussion.
+
+# /Gy enables function-level linking.
+
+# /nologo suppresses printing of the Visual C++ banner in the output
+# of every compilation.
+
+MSVC_GLOBAL_FLAGS = /Zi /Gy /nologo
+
+# /EHsc enables synchronous exception handling and assumes that
+# functions declared extern "C" will not throw exceptions.  To compile
+# for .NET, use /clr instead of /EHsc.
+
+MSVC_MANAGEMENT_FLAGS = /EHsc
+
+# /MD causes executables and DLLs to be linked against a dynamically
+# loaded, multithreaded, runtime environment.  Programs built this way
+# will require MSVCRT.dll (or, if debugging is used via /MDd,
+# MSVCRTD.dll) at runtime.  Note that MSVCRT.dll is redistributable,
+# but MSVCRTD.dll is not.  You could also set MSVC_RUNTIME_FLAG
+# to /MT for a static, multithreaded runtime environment.
+
+MSVC_RUNTIME_FLAG = /MD
 
 ifeq ($(ABUILD_PLATFORM_OPTION), debug)
 OFLAGS =
@@ -31,14 +64,16 @@ ifeq ($(ABUILD_PLATFORM_OPTION), release)
 DFLAGS =
 endif
 
+# End users should not change MSVC_RUNTIME_SUFFIX
 ifeq ($(words $(DFLAGS)), 0)
-THREAD_FLAGS = /MD
+MSVC_RUNTIME_SUFFIX =
 else
-THREAD_FLAGS = /MDd
+MSVC_RUNTIME_SUFFIX = d
 endif
 
-CC = cl /Gy /EHsc /nologo $(THREAD_FLAGS)
+CC = cl $(MSVC_GLOBAL_FLAGS) $(MSVC_RUNTIME_FLAG)$(MSVC_RUNTIME_SUFFIX)
 CCPP = $(CC) /E
+# /TP forces C++; /GR enables RTTI (runtime type identification)
 CXX = $(CC) /TP /GR
 CXXPP = $(CXX) /E
 
