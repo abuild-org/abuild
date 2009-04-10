@@ -1,0 +1,15 @@
+abuild: msvc (abuild-<native>): all
+make: Entering directory `--topdir--/msvc/abuild-<native>'
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/msvc/abuild-<native>'
+abuild: msvc (abuild-<native>.debug): all
+make: Entering directory `--topdir--/msvc/abuild-<native>.debug'
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/msvc/abuild-<native>.debug'
+abuild: msvc (abuild-<native>.release): all
+make: Entering directory `--topdir--/msvc/abuild-<native>.release'
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/msvc/abuild-<native>.release'

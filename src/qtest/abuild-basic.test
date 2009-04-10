@@ -15,12 +15,17 @@ test_setup();
 my $top = get_top();
 my $filters = get_filters();
 my $native_out = get_native_out();
+my $platform_native = get_native_platform();
 
 # This test suite tests build sets, clean sets, different behavior in
 # and out of platform directories, platform selectors, and other basic
 # functionality.  It also exercises the ccxx rules.
 
 setup($td);
+
+my $msvc = ($platform_native =~ m/\.msvc$/);
+
+cd("work/msvc");
 
 cd("work");
 
@@ -531,6 +536,47 @@ $td->runtest("descendants",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+if ($msvc)
+{
+    foreach my $d (['normal', 'normal', ''],
+		   ['static', 'static runtime', 'MSVC_RUNTIME_FLAG=/MT'],
+		   ['net', '.NET', 'MSVC_MANAGEMENT_FLAGS=/clr'])
+    {
+	my ($out, $description, $args) = @$d;
+	$td->runtest("msvc: all options ($description)",
+		     {$td->COMMAND => "abuild -p option='*' $args",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/msvc-build.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+	foreach my $suf ('', '.debug', '.release')
+	{
+	    $td->runtest("run from <native>$suf",
+			 {$td->COMMAND => "$native_out$suf/main"},
+			 {$td->STRING => "threw 5\n", $td->EXIT_STATUS => 0},
+			 $td->NORMALIZE_NEWLINES);
+	    $td->runtest("checking DLL dependencies",
+			 {$td->COMMAND =>
+			      "dumpbin /dependents $native_out$suf/main.exe",
+			  $td->FILTER => "perl $top/filter-dumpbin.pl"},
+			 {$td->FILE => "$top/msvc.dumpbin.$out$suf.out",
+			  $td->EXIT_STATUS => 0},
+			 $td->NORMALIZE_NEWLINES);
+	}
+	$td->runtest("clean",
+		     {$td->COMMAND => "abuild clean",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->STRING => "abuild: cleaning in .\n",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+}
+else
+{
+    # force files to be accessed
+    system("(tar cf - . | cat > /dev/null)");
+}
+
 check_work_accessed($td);
 
-$td->report(72);
+$td->report(72 + ($msvc ? 24 : 0));
