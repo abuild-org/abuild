@@ -177,6 +177,10 @@ Usability Improvements
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
 
+ * See if we can provide an option to indent all of abuild's non-error
+   output.  Ideally, this should capture output from backends as
+   well...
+
  * Provide a way to get --dump-data's into a relational database.
    Ideally, we shouldn't have to link with sqlite.  Maybe have an
    option that causes --dump-data to generate a script file that can

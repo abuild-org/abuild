@@ -67,7 +67,8 @@ If your boost libraries are not installed in the default location, you
 may need to set BOOST_TOP to a location that has a boost installation.
 The build process will attempt to find a suitable version of boost
 there by looking for $BOOST_TOP/include/boost-<version> and
-$BOOST_TOP/lib.  If your boost installation includes support for
+$BOOST_TOP/lib.  On Windows, BOOST_TOP should use forward slash (/) as
+the path separator.  If your boost installation includes support for
 multiple compilers, abuild may guess wrong which one to use.  In this
 case, you may need to override the value of BOOST_LIB_SUFFIX.
 
@@ -90,6 +91,10 @@ To build on Windows, perform the following steps:
 
  * have Visual C++ environment variables and path set (by running the
    batch file provided with Visual C++)
+
+ * Set the BOOST_TOP envirionment variable to the location of your
+   boost installation as a Windows absolute path using forward slash
+   (/) rather than backslash (\) as the path separator
 
  * Determine the name of the platform directory by running
    ../private/bin/bootstrap_native_platform If you are on a 32-bit
