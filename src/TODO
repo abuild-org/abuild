@@ -48,7 +48,7 @@ Groovy Framework
 
  * Update rules/java/java_help.txt
 
- * Document smoewhere that lazy jar signing is true by default in
+ * Document somewhere that lazy jar signing is true by default in
    order to have idempotent builds
 
  * Need to figure out what desired junit and javadoc behavior should
