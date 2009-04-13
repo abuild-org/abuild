@@ -368,3 +368,8 @@ Abuild item in unnamed root 0
 InterfaceParser use deprecated variable 0
 Abuild expand by rdeps 0
 Abuild non-trivial rdep expansion 0
+ItemConfig ERR optional without treedep 0
+ItemConfig ERR optional without dep 0
+Abuild skipping optional tree dependency 0
+Abuild skipping optional dependency 0
+BuildItem remove dependency 0

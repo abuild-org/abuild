@@ -13,6 +13,7 @@ class FlagData
     std::set<std::string> getNames() const;
     bool hasFlags(std::string const& name) const;
     std::set<std::string> const& getFlags(std::string const& name) const;
+    void removeItem(std::string const& name);
 
   private:
     // name -> [ flag, ... ]

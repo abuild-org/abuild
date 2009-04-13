@@ -1,0 +1,7 @@
+declare a_deps list string append
+if ($(ABUILD_HAVE_OPTIONAL_DEP_b))
+  a_deps = b
+endif
+if ($(ABUILD_HAVE_OPTIONAL_DEP_c))
+  a_deps = c
+endif

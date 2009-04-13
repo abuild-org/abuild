@@ -10,8 +10,6 @@
 #include <ItemConfig.hh>
 #include <boost/regex.hpp>
 
-class TraitData;
-
 class BuildItem
 {
   public:
@@ -24,12 +22,9 @@ class BuildItem
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
     std::list<std::string> const& getBuildAlso() const;
-    std::list<std::string> const& getDeps() const;
     std::string const& getDepPlatformType(std::string const&) const;
     std::string const& getDepPlatformType(
 	std::string const&, PlatformSelector const*&) const;
-    FlagData const& getFlagData() const;
-    TraitData const& getTraitData() const;
     bool supportsFlag(std::string const& flag) const;
     std::set<std::string> const& getSupportedFlags() const;
     std::string const& getVisibleTo() const;
@@ -39,7 +34,11 @@ class BuildItem
     bool hasAntBuild() const;
     std::string const& getBuildFile() const;
     std::string const& getAbsolutePath() const;
+    std::set<std::string> const& getOptionalDeps() const;
 
+    std::list<std::string> const& getDeps() const;
+    FlagData const& getFlagData() const;
+    TraitData const& getTraitData() const;
     std::string const& getTreeName() const;
     void setForestRoot(std::string const&);
     std::string const& getForestRoot() const;
@@ -69,8 +68,10 @@ class BuildItem
     std::list<std::string> const& getPlugins() const;
     // Return a list of all items this item references, including itself
     std::set<std::string> getReferences() const;
+    std::map<std::string, bool> const& getOptionalDependencyPresence() const;
 
     void incrementBackingDepth();
+    void setOptionalDependencyPresence(std::string const& item, bool);
     void addShadowedPlugin(std::string const& local_tree,
 			   std::string const& remote_tree);
     void setPlatformTypes(std::set<std::string> const& platform_types);
@@ -101,6 +102,10 @@ class BuildItem
 
     std::string item_name;
     ItemConfig const* config;         // memory managed by ItemConfig
+    std::list<std::string> deps;
+    FlagData flag_data;
+    TraitData trait_data;
+    std::map<std::string, bool> optional_dep_presence;
     std::string tree_name;	      // containing tree
     std::string forest_root;	      // containing forest
     unsigned int backing_depth;	      // 0 in local build tree and externals

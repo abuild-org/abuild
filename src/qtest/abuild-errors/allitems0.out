@@ -5,6 +5,7 @@
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
 --topdir--/a/ab/Abuild.conf: ERROR: "external-dirs" may only appear in a root build item
 --topdir--/a/ab/Abuild.conf: ERROR: invalid build-also build item name !oops!
+--topdir--/a/ab/Abuild.conf: ERROR: -optional is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf: ERROR: flag -flag=moo is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf: ERROR: platform declaration -platform=oink is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf: ERROR: a platform has already been declared for dependency b.private
@@ -61,10 +62,10 @@
 --topdir--/d/a/Abuild.conf: ERROR: platforms in different target types may not be mixed
 --topdir--/a/ab/Abuild.conf: ERROR: ab may not depend on b.private because it is private to another scope
 --topdir--/d/a/Abuild.conf: ERROR: d.a may not depend on d.b.a because it is private to another scope
---topdir--/a/ab/Abuild.conf: ERROR: ab requests building of unknown build item does-not-exist
 --topdir--/a/ab/Abuild.conf: ERROR: ab depends on unknown build item b.private
 --topdir--/c/ca/Abuild.conf: ERROR: ca depends on unknown build item cc
 --topdir--/c/cc/Abuild.conf: ERROR: cc.private depends on unknown build item cc
+--topdir--/a/ab/Abuild.conf: ERROR: ab requests building of unknown build item does-not-exist
 --topdir--/d/a/Abuild.conf: ERROR: d.a may not specify flag oink for dependency d.a.a because d.a.a does not support that flag
 --topdir--/a/ab/Abuild.conf: ERROR: trait trait1 refers to item b.private which is private to another scope
 --topdir--/a/ab/Abuild.conf: ERROR: trait trait1 refers to item b.private which does not exist

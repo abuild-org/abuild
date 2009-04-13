@@ -4,6 +4,7 @@
 --topdir--/a/aa/aag/aaga/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
 --topdir--/a/aa/aag/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "aaga" of "--topdir--/a/aa/aag" points to an named tree in an upgraded build area
 --topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: build tree names may contain only alphanumeric characters, underscores, periods, and dashes
+--topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: -optional is not preceded by a build tree name
 --topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: invalid tree dependency don't
 --topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: invalid tree dependency so.
 --topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: invalid tree dependency you?

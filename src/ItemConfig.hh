@@ -77,6 +77,8 @@ class ItemConfig
     std::list<std::string> const& getBuildAlso() const;
     std::list<std::string> const& getDeps() const;
     std::list<std::string> const& getTreeDeps() const;
+    std::set<std::string> const& getOptionalDeps() const;
+    std::set<std::string> const& getOptionalTreeDeps() const;
     std::string const& getDepPlatformType(std::string const& dep,
 					  PlatformSelector const*& ps) const;
     FlagData const& getFlagData() const;
@@ -208,6 +210,8 @@ class ItemConfig
     std::map<std::string,
 	     boost::shared_ptr<PlatformSelector> > dep_platform_selectors;
     BuildItemAttributes attributes;
+    std::set<std::string> optional_deps;
+    std::set<std::string> optional_tree_deps;
 };
 
 #endif // __ITEMCONFIG_HH__

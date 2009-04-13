@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<abuild-data version="2">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <supported-traits>
+  <supported-trait name="user"/>
+ </supported-traits>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--/optional-deps"
+ >
+  <build-tree
+   name="t2"
+   absolute-path="--topdir--/optional-deps/t2"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="b"
+    home-forest="f-1"
+    absolute-path="--topdir--/optional-deps/t2/b"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+    <supported-flags>
+     <supported-flag name="bflag"/>
+    </supported-flags>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="t3"
+   absolute-path="--topdir--/optional-deps/t3"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="c"
+    home-forest="f-1"
+    absolute-path="--topdir--/optional-deps/t3/c"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+    <supported-flags>
+     <supported-flag name="cflag"/>
+    </supported-flags>
+   </build-item>
+  </build-tree>
+  <build-tree
+   name="t1"
+   absolute-path="--topdir--/optional-deps/t1"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <supported-traits>
+    <supported-trait name="user"/>
+   </supported-traits>
+   <declared-tree-dependencies>
+    <tree-dependency name="t2"/>
+    <tree-dependency name="t3"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="t2"/>
+    <tree-dependency name="t3"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="a"
+    home-forest="f-1"
+    absolute-path="--topdir--/optional-deps/t1/a"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="b">
+      <flag name="bflag"/>
+     </dependency>
+     <dependency name="c">
+      <flag name="cflag"/>
+     </dependency>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="b"/>
+     <dependency name="c"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+    <traits>
+     <trait name="user">
+      <trait-referent name="b"/>
+      <trait-referent name="c"/>
+     </trait>
+    </traits>
+   </build-item>
+  </build-tree>
+ </forest>
+</abuild-data>

@@ -13,6 +13,7 @@ class BuildTree
     BuildTree(std::string const& name,
 	      std::string const& root_path,
 	      std::list<std::string> const& tree_deps,
+	      std::set<std::string> const& optional_tree_deps,
 	      std::set<std::string> const& declared_traits,
 	      std::list<std::string> const& plugins,
 	      PlatformData const& platform_data);
@@ -28,6 +29,8 @@ class BuildTree
     std::set<std::string> const& getSupportedTraits() const;
     std::list<std::string> const& getPlugins() const;
     std::list<std::string> const& getExpandedTreeDeps() const;
+    std::set<std::string> const& getOptionalTreeDeps() const;
+    std::set<std::string> const& getOmittedTreeDeps() const;
 
     void setForestRoot(std::string const&);
     std::string const& getForestRoot() const;
@@ -35,6 +38,7 @@ class BuildTree
     bool isLocal() const;
     void incrementBackingDepth();
     void setExpandedTreeDeps(std::list<std::string> const&);
+    void removeTreeDep(std::string const& item);
 
     void addTreeDeps(std::set<std::string> const& extra_tree_deps);
     void addPlugins(std::set<std::string> const& extra_plugins);
@@ -46,6 +50,8 @@ class BuildTree
     FileLocation location;
     std::list<std::string> tree_deps;
     std::list<std::string> expanded_tree_deps;
+    std::set<std::string> optional_tree_deps;
+    std::set<std::string> omitted_tree_deps;
     std::set<std::string> supported_traits;
     std::list<std::string> plugins;
     PlatformData platform_data;

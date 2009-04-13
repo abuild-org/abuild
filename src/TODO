@@ -1,4 +1,7 @@
 
+XXX about to implement ability for build item to forget everything it
+knows about missing optional dependencies....
+
 === Changes Targeted for Version 1.1 ===
 
 Notes for Next Release
@@ -26,6 +29,39 @@ release notes.
    the forest that have items in the initial build set in their
    expanded dependency chains.  (Note that is recursive by nature: if
    A depends on X and B depends on A, then B also depends on X.)
+
+ * Implement two forms of conditional dependencies:
+
+    - tree-deps: tree-name -optional
+    - deps: item -optional
+
+   In the case of optional tree dependencies, abuild will not complain
+   if the specified tree dependency is not found.
+
+   In case of optional item dependencies, abuild will not complain if
+   the specified item dependency is not found.  Additionally, the
+   optional item will be ignored when it appears as a trait referent
+   item in the build item that declares it as optional.  Additionally,
+   for every build item that is declared as an optional dependency, a
+   local (non-inheriting) boolean interface variable called
+   ABUILD_HAVE_OPTIONAL_DEP_item is created an initialized to true if
+   the item exists and to false otherwise.  This makes it possible for
+   a build item to test in its Abuild.interface or backend build file
+   for whether the dependency has been satisfied.
+
+   Note that, in both cases, when an optional dependency does not
+   exist, abuild removes it from the dependency list of the item that
+   declared it.  The effect of declaring an optional dependency (or
+   tree dependency) is local to the item that makes the declaration.
+   In other words, if two build items declare a dependency on a third
+   item and only one of the declares it as optional, it is an error if
+   the third item doesn't exist, but that error will only be reported
+   for the item that did not declare its dependency to be optional.
+
+   When an optional item dependency or tree dependency is to an item
+   or tree that is not found, the name of the item or tree is listed
+   in <optional-tree-dependencies> or <optional-dependencies> in the
+   dumpdata output.
 
 
 Help system
@@ -70,34 +106,6 @@ Compiler Verification
    compiler verification for verification of a compiler that requires
    a plugin in another tree.
 
-
-Core Changes
-============
-
- * Implement two forms of conditional dependencies:
-
-    - deps: item -optional
-    - tree-deps: tree-name -optional
-
-   In the first case, abuild will not complain if a given dependency
-   is not found.  Some mechanism will be provided that will enable a
-   build item to test in its Abuild.interface file (and therefore in
-   its Abuild.mk or Abuild-ant.properties file) whether an optional
-   dependency is satisfied.  In the second case, abuild will not
-   complain if a given tree is not found.
-
-   A new boolean interface variable (analogous to abDIR_build-item)
-   will be defined for each build item that exists or that is declared
-   as an optional dependency.  This variable will be true iff the
-   build item exists.
-
-   Most likely method of implementation would have to abuild notice a
-   missing optional dependency when constructing the dependency graph
-   (and just not call addDependency).  This would go for both items
-   and trees.  We should also ignore trait referent items to absent
-   optional dependencies.  In all cases, the optional-ness of a
-   dependency is checked based on the current build item.  It is not
-   recursive.
 
 Documentation
 =============

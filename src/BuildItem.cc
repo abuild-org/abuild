@@ -3,6 +3,7 @@
 #include <Util.hh>
 #include <QTC.hh>
 #include <QEXC.hh>
+#include <assert.h>
 #include <boost/regex.hpp>
 
 BuildItem::BuildItem(std::string const& item_name,
@@ -10,6 +11,9 @@ BuildItem::BuildItem(std::string const& item_name,
 		     ItemConfig const* config) :
     item_name(item_name),
     config(config),
+    deps(config->getDeps()),
+    flag_data(config->getFlagData()),
+    trait_data(config->getTraitData()),
     tree_name(tree_name),
     backing_depth(0),
     target_type(TargetType::tt_unknown)
@@ -47,12 +51,6 @@ BuildItem::getBuildAlso() const
     return this->config->getBuildAlso();
 }
 
-std::list<std::string> const&
-BuildItem::getDeps() const
-{
-    return this->config->getDeps();
-}
-
 std::string const&
 BuildItem::getDepPlatformType(std::string const& dep) const
 {
@@ -65,18 +63,6 @@ BuildItem::getDepPlatformType(std::string const& dep,
 			      PlatformSelector const*& ps) const
 {
     return this->config->getDepPlatformType(dep, ps);
-}
-
-FlagData const&
-BuildItem::getFlagData() const
-{
-    return this->config->getFlagData();
-}
-
-TraitData const&
-BuildItem::getTraitData() const
-{
-    return this->config->getTraitData();
 }
 
 bool
@@ -131,6 +117,30 @@ std::string const&
 BuildItem::getAbsolutePath() const
 {
     return this->config->getAbsolutePath();
+}
+
+std::set<std::string> const&
+BuildItem::getOptionalDeps() const
+{
+    return this->config->getOptionalDeps();
+}
+
+std::list<std::string> const&
+BuildItem::getDeps() const
+{
+    return this->deps;
+}
+
+FlagData const&
+BuildItem::getFlagData() const
+{
+    return this->flag_data;
+}
+
+TraitData const&
+BuildItem::getTraitData() const
+{
+    return this->trait_data;
 }
 
 std::string const&
@@ -382,10 +392,33 @@ BuildItem::getReferences() const
     return references;
 }
 
+std::map<std::string, bool> const&
+BuildItem::getOptionalDependencyPresence() const
+{
+    return this->optional_dep_presence;
+}
+
 void
 BuildItem::incrementBackingDepth()
 {
     ++this->backing_depth;
+}
+
+void
+BuildItem::setOptionalDependencyPresence(std::string const& item,
+					 bool present)
+{
+    this->optional_dep_presence[item] = present;
+    if (! present)
+    {
+	// Make this item forget everything it knows about this
+	// dependency.  Must be called before setExpandedDependencies.
+	assert(this->expanded_dependencies.empty());
+	QTC::TC("abuild", "BuildItem remove dependency");
+	this->deps.remove(item);
+	this->flag_data.removeItem(item);
+	this->trait_data.removeItem(item);
+    }
 }
 
 void

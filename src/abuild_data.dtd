@@ -137,6 +137,7 @@
 <!ELEMENT build-tree (platform-data, supported-traits?, plugins?,
                       declared-tree-dependencies?,
                       expanded-tree-dependencies?,
+                      omitted-tree-dependencies?,
                       build-item+)>
 <!ATTLIST build-tree
   name           CDATA   #REQUIRED
@@ -164,6 +165,11 @@
 <!--  depends on C, A's expanded-tree-dependencies contains C,     -->
 <!--  and then B.                                                  -->
 <!ELEMENT expanded-tree-dependencies (tree-dependency+)>
+
+<!--  omitted-tree-dependencies contains the list of tree          -->
+<!--  dependencies that were declared optional and were not        -->
+<!--  present.                                                     -->
+<!ELEMENT omitted-tree-dependencies (tree-dependency+)>
 
 <!--  The tree-dependency element represents a single tree         -->
 <!--  dependency.                                                  -->
@@ -212,7 +218,7 @@
 <!--  one tree                                                     -->
 
 <!ELEMENT build-item (build-also-items?, declared-dependencies?,
-                      expanded-dependencies?,
+                      expanded-dependencies?, omitted-dependencies?,
                       platform-types?, buildable-platforms?,
                       supported-flags?, traits?)>
 <!ATTLIST build-item
@@ -250,6 +256,14 @@
 <!--  Note that flags appear only with direct dependencies, so     -->
 <!--  nested dependencies here will never have flag attributes.    -->
 <!ELEMENT expanded-dependencies (dependency+)>
+
+<!--  omitted-dependencies contains the names of any dependencies  -->
+<!--  that were declared "optional" and that do not exist.  Such   -->
+<!--  items are not listed in declared-dependencies or             -->
+<!--  expanded-dependencies.  Additionally, if they were listed    -->
+<!--  as referent items on any traits, they will have been         -->
+<!--  removed from there as well.                                  -->
+<!ELEMENT omitted-dependencies (dependency+)>
 
 <!--  The dependency element represents a single dependency.  For  -->
 <!--  direct dependencies declared with flags, the dependency      -->

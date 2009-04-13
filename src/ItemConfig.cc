@@ -687,6 +687,19 @@ ItemConfig::checkDeps()
 		    this->dep_platform_types[last_dep] = dep_platform_type;
 		}
 	    }
+	    else if (*iter == "-optional")
+	    {
+		if (last_dep.empty())
+		{
+		    QTC::TC("abuild", "ItemConfig ERR optional without dep");
+		    this->error.error(this->location, "-optional"
+				      " is not preceded by a build item name");
+		}
+		else
+		{
+		    this->optional_deps.insert(last_dep);
+		}
+	    }
 	    else
 	    {
 		QTC::TC("abuild", "ItemConfig ERR bad dep");
@@ -713,11 +726,31 @@ ItemConfig::checkTreeDeps()
     {
 	std::list<std::string>::iterator next = iter;
 	++next;
-	if (! boost::regex_match(*iter, match, item_name_re))
+	if (boost::regex_match(*iter, match, item_name_re))
 	{
-	    QTC::TC("abuild", "ItemConfig ERR bad tree dep");
-	    this->error.error(this->location,
-			      "invalid tree dependency " + *iter);
+	    last_dep = *iter;
+	}
+	else
+	{
+	    if (*iter == "-optional")
+	    {
+		if (last_dep.empty())
+		{
+		    QTC::TC("abuild", "ItemConfig ERR optional without treedep");
+		    this->error.error(this->location, "-optional"
+				      " is not preceded by a build tree name");
+		}
+		else
+		{
+		    this->optional_tree_deps.insert(last_dep);
+		}
+	    }
+	    else
+	    {
+		QTC::TC("abuild", "ItemConfig ERR bad tree dep");
+		this->error.error(this->location,
+				  "invalid tree dependency " + *iter);
+	    }
 	    this->tree_deps.erase(iter, next);
 	}
 	iter = next;
@@ -1326,6 +1359,18 @@ std::list<std::string> const&
 ItemConfig::getTreeDeps() const
 {
     return this->tree_deps;
+}
+
+std::set<std::string> const&
+ItemConfig::getOptionalDeps() const
+{
+    return this->optional_deps;
+}
+
+std::set<std::string> const&
+ItemConfig::getOptionalTreeDeps() const
+{
+    return this->optional_tree_deps;
 }
 
 std::string const&

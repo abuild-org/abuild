@@ -43,3 +43,9 @@ FlagData::getFlags(std::string const& name) const
     assert(hasFlags(name));
     return (*(this->flag_data.find(name))).second;
 }
+
+void
+FlagData::removeItem(std::string const& name)
+{
+    this->flag_data.erase(name);
+}

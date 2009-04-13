@@ -2278,6 +2278,7 @@ Abuild::registerBuildTree(BuildForest& forest,
 
     BuildTree_ptr tree(
 	new BuildTree(tree_name, dir, tree_deps,
+		      config->getOptionalTreeDeps(),
 		      config->getSupportedTraits(),
 		      config->getPlugins(),
 		      this->internal_platform_data));
@@ -2460,8 +2461,8 @@ Abuild::validateForest(BuildForest_map& forests, std::string const& top_path)
     checkPlatformTypes(forest);
     checkPlugins(forest);
     checkItemNames(forest);
-    checkBuildAlso(forest);
     checkItemDependencies(forest);
+    checkBuildAlso(forest);
     checkDepTreeAccess(forest);
     updatePlatformTypes(forest);
     checkDependencyPlatformTypes(forest);
@@ -2495,12 +2496,25 @@ Abuild::checkTreeDependencies(BuildForest& forest)
     {
 	std::string const& tree_name = (*iter).first;
 	BuildTree& tree = *((*iter).second);
+	std::set<std::string> const& optional_tree_deps =
+	    tree.getOptionalTreeDeps();
 	g.addItem(tree_name);
-	std::list<std::string> const& dependencies = tree.getTreeDeps();
+	// dependencies is a copy, not a const reference, to tree
+	// dependencies so we don't modify it (through removeTreeDep)
+	// while iterating through it.
+	std::list<std::string> dependencies = tree.getTreeDeps();
 	for (std::list<std::string>::const_iterator i2 = dependencies.begin();
 	     i2 != dependencies.end(); ++i2)
         {
-            g.addDependency(tree_name, *i2);
+	    std::string const& tree_dep = *i2;
+	    if (optional_tree_deps.count(tree_dep) &&
+		buildtrees.count(tree_dep) == 0)
+	    {
+		QTC::TC("abuild", "Abuild skipping optional tree dependency");
+		tree.removeTreeDep(tree_dep);
+		continue;
+	    }
+	    g.addDependency(tree_name, tree_dep);
         }
     }
 
@@ -3287,12 +3301,28 @@ Abuild::checkItemDependencies(BuildForest& forest)
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
+	std::set<std::string> const& optional_deps = item.getOptionalDeps();
 	g.addItem(item_name);
-	std::list<std::string> const& dependencies = item.getDeps();
-	for (std::list<std::string>::const_iterator i2 = dependencies.begin();
+	// dependencies is a copy, not a const reference, since our
+	// calls to item.setOptionalDependencyPresence will
+	// potentially modify the item's dependency list, and we don't
+	// want to be interating through it at the time.
+	std::list<std::string> dependencies = item.getDeps();
+	for (std::list<std::string>::iterator i2 = dependencies.begin();
 	     i2 != dependencies.end(); ++i2)
         {
-            g.addDependency(item_name, *i2);
+	    std::string const& dep = *i2;
+	    if (optional_deps.count(dep))
+	    {
+		bool present = (builditems.count(dep) != 0);
+		item.setOptionalDependencyPresence(dep, present);
+		if (! present)
+		{
+		    QTC::TC("abuild", "Abuild skipping optional dependency");
+		    continue;
+		}
+	    }
+	    g.addDependency(item_name, dep);
         }
     }
 
@@ -4298,6 +4328,7 @@ Abuild::dumpBuildTree(BuildTree& tree, std::string const& tree_name,
     std::list<std::string> const& plugins = tree.getPlugins();
     std::list<std::string> const& deps = tree.getTreeDeps();
     std::list<std::string> const& alldeps = tree.getExpandedTreeDeps();
+    std::set<std::string> const& omitted_deps = tree.getOmittedTreeDeps();
 
     assert(forest_numbers.count(tree.getForestRoot()));
 
@@ -4351,6 +4382,16 @@ Abuild::dumpBuildTree(BuildTree& tree, std::string const& tree_name,
 	}
 	o << "   </expanded-tree-dependencies>" << std::endl;
     }
+    if (! omitted_deps.empty())
+    {
+	o << "   <omitted-tree-dependencies>" << std::endl;
+	for (std::set<std::string>::const_iterator iter = omitted_deps.begin();
+	     iter != omitted_deps.end(); ++iter)
+	{
+	    o << "    <tree-dependency name=\"" << *iter << "\"/>" << std::endl;
+	}
+	o << "   </omitted-tree-dependencies>" << std::endl;
+    }
 
     std::list<std::string> const& sorted_items =
 	forest.getSortedItemNames();
@@ -4385,6 +4426,7 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 	item.getDeps();
     std::list<std::string> const& expanded_dependencies =
 	item.getExpandedDependencies();
+    std::set<std::string> omitted_dependencies;
     std::set<std::string> const& platform_types =
 	item.getPlatformTypes();
     std::set<std::string> const& buildable_platforms =
@@ -4393,10 +4435,24 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 	item.getSupportedFlags();
     TraitData::trait_data_t const& traits =
 	item.getTraitData().getTraitData();
+
+    std::map<std::string, bool> const& optional_dep_presence =
+	item.getOptionalDependencyPresence();
+    for (std::map<std::string, bool>::const_iterator iter =
+	     optional_dep_presence.begin();
+	 iter != optional_dep_presence.end(); ++iter)
+    {
+	if (! (*iter).second)
+	{
+	    omitted_dependencies.insert((*iter).first);
+	}
+    }
+
     bool any_subelements =
 	(! (build_also.empty() &&
 	    declared_dependencies.empty() &&
 	    expanded_dependencies.empty() &&
+	    omitted_dependencies.empty() &&
 	    platform_types.empty() &&
 	    buildable_platforms.empty() &&
 	    supported_flags.empty() &&
@@ -4492,6 +4548,18 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 		  << std::endl;
 	    }
 	    o << "    </expanded-dependencies>" << std::endl;
+	}
+	if (! omitted_dependencies.empty())
+	{
+	    o << "    <omitted-dependencies>" << std::endl;
+	    for (std::set<std::string>::const_iterator dep_iter =
+		     omitted_dependencies.begin();
+		 dep_iter != omitted_dependencies.end(); ++dep_iter)
+	    {
+		o << "     <dependency name=\"" << *dep_iter << "\"/>"
+		  << std::endl;
+	    }
+	    o << "    </omitted-dependencies>" << std::endl;
 	}
 	if (! platform_types.empty())
 	{
@@ -5233,12 +5301,15 @@ Abuild::buildBuildset()
     this->base_interface->setTargetType(TargetType::tt_all);
     if (this->compat_level.allow_1_0())
     {
-	this->base_interface->declareVariable(
-	    FileLocation("-internal-compat-", 1, 0),
-	    "ABUILD_THIS",
-	    Interface::s_recursive,
-	    Interface::t_string,
-	    Interface::l_scalar);
+	if (! this->base_interface->declareVariable(
+		FileLocation("-internal-compat-", 1, 0),
+		"ABUILD_THIS",
+		Interface::s_recursive,
+		Interface::t_string,
+		Interface::l_scalar))
+	{
+	    fatal("error declaring ABUILD_THIS");
+	}
     }
 
     // Load interfaces for each plugin.
@@ -6037,6 +6108,25 @@ Abuild::createItemInterface(std::string const& builder_string,
 			    internal, "ABUILD_PLATFORM_OPTION",
 			    platform_option, Interface::a_override, status);
 
+    // Create local variables for any optional dependencies indicating
+    // whether or not they are present.
+    std::map<std::string, bool> const& optional_deps =
+	build_item.getOptionalDependencyPresence();
+    for (std::map<std::string, bool>::const_iterator iter =
+	     optional_deps.begin();
+	 iter != optional_deps.end(); ++iter)
+    {
+	std::string const& dep = (*iter).first;
+	std::string present = ((*iter).second ? "1" : "0");
+	std::string var = "ABUILD_HAVE_OPTIONAL_DEP_" + dep;
+	declareInterfaceVariable(
+	    _interface, internal, var,
+	    Interface::s_local, Interface::t_boolean, Interface::l_scalar,
+	    status);
+	assignInterfaceVariable(
+	    _interface, internal, var, present, Interface::a_normal, status);
+    }
+
     // Read our own interface file, if any.
     std::string interface_file =
 	build_item.getAbsolutePath() + "/" + ItemConfig::FILE_INTERFACE;
@@ -6120,6 +6210,22 @@ Abuild::dumpInterface(std::string const& item_platform,
     _interface.dump(of);
 
     of.close();
+}
+
+void
+Abuild::declareInterfaceVariable(Interface& _interface,
+				 FileLocation const& location,
+				 std::string const& variable_name,
+				 Interface::scope_e scope,
+				 Interface::type_e type,
+				 Interface::list_e list_type,
+				 bool& status)
+{
+    if (! _interface.declareVariable(
+	    location, variable_name, scope, type, list_type))
+    {
+	status = false;
+    }
 }
 
 void

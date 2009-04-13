@@ -182,6 +182,12 @@ class Abuild
     void dumpInterface(std::string const& item_platform,
 		       BuildItem& build_item,
 		       std::string const& suffix = "");
+    void declareInterfaceVariable(Interface&, FileLocation const&,
+				  std::string const& variable_name,
+				  Interface::scope_e scope,
+				  Interface::type_e type,
+				  Interface::list_e list_type,
+				  bool& status);
     void assignInterfaceVariable(Interface&, FileLocation const&,
 				 std::string const& variable_name,
 				 std::string const& value,

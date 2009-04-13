@@ -1,10 +1,12 @@
 #include <BuildTree.hh>
 #include <ItemConfig.hh>
 #include <Util.hh>
+#include <assert.h>
 
 BuildTree::BuildTree(std::string const& name,
 		     std::string const& root_path,
 		     std::list<std::string> const& tree_deps,
+		     std::set<std::string> const& optional_tree_deps,
 		     std::set<std::string> const& declared_traits,
 		     std::list<std::string> const& plugins,
 		     PlatformData const& platform_data) :
@@ -12,6 +14,7 @@ BuildTree::BuildTree(std::string const& name,
     root_path(root_path),
     location(root_path + "/" + ItemConfig::FILE_CONF, 0, 0),
     tree_deps(tree_deps),
+    optional_tree_deps(optional_tree_deps),
     supported_traits(declared_traits),
     plugins(plugins),
     platform_data(platform_data),
@@ -73,6 +76,18 @@ BuildTree::getExpandedTreeDeps() const
     return this->expanded_tree_deps;
 }
 
+std::set<std::string> const&
+BuildTree::getOptionalTreeDeps() const
+{
+    return this->optional_tree_deps;
+}
+
+std::set<std::string> const&
+BuildTree::getOmittedTreeDeps() const
+{
+    return this->omitted_tree_deps;
+}
+
 void
 BuildTree::setForestRoot(std::string const& root)
 {
@@ -111,6 +126,15 @@ BuildTree::setExpandedTreeDeps(std::list<std::string> const& exp)
     {
 	this->expanded_tree_deps.pop_back();
     }
+}
+
+void
+BuildTree::removeTreeDep(std::string const& item)
+{
+    // must be called before setExpandedTreeDeps
+    assert(this->expanded_tree_deps.empty());
+    this->tree_deps.remove(item);
+    this->omitted_tree_deps.insert(item);
 }
 
 void

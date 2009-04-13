@@ -3,6 +3,7 @@
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
+use File::Copy;
 
 require TestDriver;
 require abuild_test_utils;
@@ -143,6 +144,7 @@ $td->runtest("ro-rw-path: clean rw only",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 cd("work");
+
 $td->runtest("ro-rw-path: ro on top",
 	     {$td->COMMAND => "abuild -b all -C ro-rw-path" .
 		  " --ro-path=a --rw-path=a/b --ro-path=a/b/c",
@@ -165,6 +167,29 @@ $td->runtest("ro-rw-path: errors",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/optional-deps");
+
+for (my $i = 1; $i <= 2; ++$i)
+{
+    my $suf = ($i == 1 ? "no-t3" : "t3");
+
+    $td->runtest("optional deps ($suf)",
+		 {$td->COMMAND => "abuild -C t1/a",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/optional-$suf.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("dumpdata",
+		 {$td->COMMAND => "abuild --dump-data",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/optional-$suf-dumpdata.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    validate_dump_data($td);
+
+    copy("Abuild-with-t3.conf", "Abuild.conf") or die;
+}
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(19);
+$td->report(25);

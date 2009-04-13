@@ -31,3 +31,13 @@ TraitData::getTraitData() const
 {
     return this->trait_data;
 }
+
+void
+TraitData::removeItem(std::string const& item)
+{
+    for (trait_data_t::iterator iter = this->trait_data.begin();
+	 iter != this->trait_data.end(); ++iter)
+    {
+	(*iter).second.erase(item);
+    }
+}
