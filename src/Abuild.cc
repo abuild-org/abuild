@@ -64,6 +64,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     monitored(false),
     dump_interfaces(false),
     apply_targets_to_deps(false),
+    with_rdeps(false),
     compat_level(CompatLevel::cl_1_0),
     default_writable(true),
     local_build(false),
@@ -450,6 +451,10 @@ Abuild::parseArgv()
 	{
 	    no_deps = true;
 	}
+	else if (arg == "--with-rdeps")
+	{
+	    this->with_rdeps = true;
+	}
 	else if (arg == "--apply-targets-to-deps")
 	{
 	    this->apply_targets_to_deps = true;
@@ -571,12 +576,12 @@ Abuild::parseArgv()
 
     if (no_deps)
     {
-	if (with_deps ||
+	if (with_deps || with_rdeps ||
 	    (! (this->buildset_name.empty() &&
 		this->cleanset_name.empty())))
 	{
 	    usage("--no-deps may not be used with"
-		  " --with-deps, --build, or --clean");
+		  " --with-deps, --with-rdeps, --build, or --clean");
 	}
 	QTC::TC("abuild", "Abuild no_deps");
     }
@@ -600,6 +605,7 @@ Abuild::parseArgv()
     if ((this->dump_data || this->list_traits) &&
 	(! (this->cleanset_name.empty() &&
 	    this->buildset_name.empty() &&
+	    (! this->with_rdeps) &&
 	    (! no_deps) &&
 	    this->targets.empty())))
     {
@@ -611,20 +617,22 @@ Abuild::parseArgv()
     {
 	if ((! this->buildset_name.empty()) ||
 	    (! this->targets.empty()) ||
-	    (! this->special_target.empty()))
+	    (! this->special_target.empty()) ||
+	    this->with_rdeps)
 	{
 	    usage("--clean may not be combined with --build, --with-deps,"
-		  " or targets");
+		  " --with-rdeps, or targets");
 	}
     }
     else if (this->special_target == s_CLEAN)
     {
 	// already known cleanset_name is empty
 	if ((! this->buildset_name.empty()) ||
-	    (! this->targets.empty()))
+	    (! this->targets.empty()) ||
+	    this->with_rdeps)
 	{
 	    usage("\"clean\" may not be combined with --build, --with-deps,"
-		  " or other targets");
+		  " --with-rdeps, or other targets");
 	}
     }
     else if (! this->special_target.empty())
@@ -654,6 +662,10 @@ Abuild::parseArgv()
 	{
 	    usage("--only-with-traits and --related-by-traits may"
 		  " not be used without a build set or --with-deps");
+	}
+	if (this->with_rdeps)
+	{
+	    usage("--with-rdeps may not be used without a build set");
 	}
     }
 
@@ -4776,7 +4788,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
     // set to the build set if we are building.  If we are cleaning,
     // we only do this when the --apply-targets-to-deps option is
     // specified.
-    bool add_dependencies = (! cleaning) || this->apply_targets_to_deps;
+    bool add_dependencies =
+	(! cleaning) || this->apply_targets_to_deps || this->with_rdeps;
 
     // Expand the build set to include dependencies of all items in
     // the build set.  If we are also expanding because of expand
@@ -4795,6 +4808,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
     while (expanding)
     {
 	expanding = false;
+
 	if (add_dependencies)
 	{
 	    std::set<std::string> to_add;
@@ -4817,6 +4831,47 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 		if (this->buildset.count(*iter) == 0)
 		{
 		    QTC::TC("abuild", "Abuild non-trivial dep expansion");
+		    expanding = true;
+		    this->buildset[*iter] = builditems[*iter];
+		}
+	    }
+	}
+
+	if (this->with_rdeps)
+	{
+	    QTC::TC("abuild", "Abuild expand by rdeps");
+
+	    // Add to the build set any item that has a dependency on
+	    // any item already in the build set.
+	    std::set<std::string> to_add;
+	    // For each item, ...
+	    for (BuildItem_map::iterator iter = builditems.begin();
+		 iter != builditems.end(); ++iter)
+	    {
+		std::string const& item_name = (*iter).first;
+		BuildItem& item = *((*iter).second);
+		// get the list of dependencies. ...
+		std::list<std::string> const& deps =
+		    item.getDeps();
+		// For each dependency, ...
+		for (std::list<std::string>::const_iterator diter =
+			 deps.begin();
+		     diter != deps.end(); ++diter)
+		{
+		    // see if the dependency is already in the build
+		    // set.  If so, add the item.
+		    if (this->buildset.count(*diter))
+		    {
+			to_add.insert(item_name);
+		    }
+		}
+	    }
+	    for (std::set<std::string>::iterator iter = to_add.begin();
+		 iter != to_add.end(); ++iter)
+	    {
+		if (this->buildset.count(*iter) == 0)
+		{
+		    QTC::TC("abuild", "Abuild non-trivial rdep expansion");
 		    expanding = true;
 		    this->buildset[*iter] = builditems[*iter];
 		}
@@ -4901,6 +4956,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 		}
 	    }
 	}
+
 	if (addBuildAlsoToBuildset(builditems))
 	{
 	    QTC::TC("abuild", "Abuild additional build-also expansion");
@@ -6937,6 +6993,8 @@ Abuild::help()
     h("  --upgrade-trees   run special mode to upgrade build trees");
     h("  --verbose         generate more detailed output");
     h("  --with-deps | -d  short-hand for --build=current; on by default");
+    h("  --with-rdeps      expand build set with reverse dependencies of all");
+    h("                    items in the build set");
     h("");
     h("--ro-path/--rw-path:");
     h("");

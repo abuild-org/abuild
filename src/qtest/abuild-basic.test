@@ -281,6 +281,15 @@ $td->runtest("bad pattern",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/c/ca");
+
+$td->runtest("rdeps",
+	     {$td->COMMAND => "abuild --with-rdeps no-op",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/with-rdeps.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/a/aa/$native_out");
 
 $td->runtest("check moo existence",
@@ -579,4 +588,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(72 + ($msvc ? 24 : 0));
+$td->report(73 + ($msvc ? 24 : 0));

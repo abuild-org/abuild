@@ -22,6 +22,11 @@ release notes.
    MSVC_GLOBAL_FLAGS to make it easier to customize the behavior of
    msvc.
 
+ * Add flag --with-rdeps to add to the build set all items anywhere in
+   the forest that have items in the initial build set in their
+   expanded dependency chains.  (Note that is recursive by nature: if
+   A depends on X and B depends on A, then B also depends on X.)
+
 
 Help system
 ===========
@@ -68,11 +73,6 @@ Compiler Verification
 
 Core Changes
 ============
-
- * Add flag --with-rdeps to add to the build set all items anywhere in
-   the forest that have items in the initial build set in their
-   expanded dependency chains.  (Note that is recursive by nature: if
-   A depends on X and B depends on A, then B also depends on X.)
 
  * Implement two forms of conditional dependencies:
 
