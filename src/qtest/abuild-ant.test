@@ -251,10 +251,10 @@ $td->runtest("no ANT_HOME or JAVA_HOME",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/target-from-hook/user");
+cd("work/missing-hook-file/user");
 
-$td->runtest("new target with hook",
-	     {$td->COMMAND => "abuild hookything",
+$td->runtest("missing hook file",
+	     {$td->COMMAND => "abuild local",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/new-target.out",
 	      $td->EXIT_STATUS => 0},

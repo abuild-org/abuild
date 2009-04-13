@@ -1,0 +1,5 @@
+<project name="local">
+ <target name="local">
+  <echo message="This is a local target."/>
+ </target>
+</project>

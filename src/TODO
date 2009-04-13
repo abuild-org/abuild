@@ -34,6 +34,18 @@ release notes.
 
    Details in manual/pending.txt.
 
+ * Ant framework: no longer import hook files.  This caused had
+   unintended side effects that are distractions from migration from
+   ant to groovy.  This means it is once again not possible to add new
+   targets in ant-hooks.xml or plugin-ant.xml files.  The only known
+   incompatibility between the 1.0 and 1.1 ant frameworks is that, in
+   1.1, all ant builds are run from a single JVM whose current
+   directory is abuild's current directory, where in 1.0, abuild ran
+   ant from the build item output directory.  This usually doesn't
+   matter, but it could potentially break some custom tasks that don't
+   deal resolve relative paths as relative to ${basedir} as they
+   should.
+
 
 Help system
 ===========

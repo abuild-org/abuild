@@ -1,5 +1,0 @@
-<project name="local">
- <target name="-hook">
-  <echo message="This is another hook hook."/>
- </target>
-</project>

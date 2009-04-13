@@ -189,13 +189,6 @@
 
  <!--  Load Abuild build files                                     -->
  <property file="${abuild.private.dir.item}/Abuild-ant.properties"/>
-
- <!--
-   Import all hook files including any specified local-buildfile.  We
-   can only import from the top level, so use groovy to generate a
-   load file and then load it.  Also, store a list files from which we
-   should run hooks.
-  -->
  <if>
   <and>
    <isset property="abuild.use-local-hooks"/>
@@ -205,17 +198,21 @@
    <deprecate version="1.1" message="abuild.use-local-hooks is no longer needed; abuild now always behaves as if this is set"/>
   </then>
  </if>
+
+ <if>
+  <isset property="abuild.local-buildfile"/>
+  <then>
+   <import file="${abuild.private.dir.item}/${abuild.local-buildfile}"/>
+  </then>
+ </if>
+
  <groovy><![CDATA[
     def basedir = properties['basedir']
-    def out = new File("${basedir}/load.xml")
     def files = []
     // Plugins: load plugin-ant.xml in each path
     properties['abuild.plugins']?.split(/,\s*/).each {
         files << new File("${it}/plugin-ant.xml")
     }
-    // Since plugin-ant.xml files are optional, filter out the ones
-    // that don't exist.
-    files = files.grep { it.isFile() }
 
     // Hook build items: load ant-hooks.xml in each build item
     def hookBuildItems = properties['abuild.hook-build-items']
@@ -230,21 +227,14 @@
                           properties['abuild.local-buildfile'])
     }
 
-    // Create a project to import them
-    out.write('''<?xml version="1.0"?>
-<project name="_load">
-''')
-    files.each {
-        out.append("<import file=\"${it.path}\"/>\n");
-    }
-    out.append("</project>\n");
+    // Filter out files that don't exist.
+    files = files.grep { it.isFile() }
 
     // Save the list of hook files and also the ant builder for later
     project.addReference('abuild.ant.hook-files', files)
     project.addReference('abuild.ant.AntBuilder', ant)
   ]]>
  </groovy>
- <import file="${basedir}/load.xml"/>
 
  <condition property="ant.build.javac.target"
             value="${abuild.java-target-version}">

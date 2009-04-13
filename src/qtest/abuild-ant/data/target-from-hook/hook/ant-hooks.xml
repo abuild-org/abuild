@@ -1,9 +1,0 @@
-<project name="hook">
- <target name="hookything">
-  <echo message="This is a new target."/>
-  <run-hooks name="hook"/>
- </target>
- <target name="-hook">
-  <echo message="This is a hook hook."/>
- </target>
-</project>
