@@ -483,3 +483,38 @@ In all of the above, remember that external-dirs can still appear in a
 1.1 root build item if it points to an external tree that has not yet
 been converted, and that 1.0 root can have an external-dirs that
 points to a 1.1 tree.
+
+----------------------------------------------------------------------
+
+Optional Dependencies
+
+ * tree-deps: tree-name -optional
+ * deps: item -optional
+
+In the case of optional tree dependencies, abuild will not complain if
+the specified tree dependency is not found.
+
+In case of optional item dependencies, abuild will not complain if the
+specified item dependency is not found.  Additionally, the optional
+item will be ignored when it appears as a trait referent item in the
+build item that declares it as optional.  Additionally, for every
+build item that is declared as an optional dependency, a local
+(non-inheriting) boolean interface variable called
+ABUILD_HAVE_OPTIONAL_DEP_item is created an initialized to true if the
+item exists and to false otherwise.  This makes it possible for a
+build item to test in its Abuild.interface or backend build file for
+whether the dependency has been satisfied.
+
+Note that, in both cases, when an optional dependency does not exist,
+abuild removes it from the dependency list of the item that declared
+it.  The effect of declaring an optional dependency (or tree
+dependency) is local to the item that makes the declaration.  In other
+words, if two build items declare a dependency on a third item and
+only one of the declares it as optional, it is an error if the third
+item doesn't exist, but that error will only be reported for the item
+that did not declare its dependency to be optional.
+
+When an optional item dependency or tree dependency is to an item or
+tree that is not found, the name of the item or tree is listed in
+<optional-tree-dependencies> or <optional-dependencies> in the
+dumpdata output.
