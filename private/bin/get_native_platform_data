@@ -122,6 +122,7 @@ sub get_platform_components_unix
         }
         elsif (read_dist_file("/etc/debian_version", \$release))
         {
+	    $release =~ s/^(\d+\.\d+).*?$/$1/;
 	    $toolset = "deb$release";
 	}
 	else
