@@ -136,6 +136,19 @@ Usability Improvements
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
 
+ * Consider capturing the output of the backend so that we can
+   de-interleave output when running parallel builds (or mark each
+   line of output with the build item/platform data), separate error
+   from informational output, etc.  It is possible to create pipe-like
+   handles with CreatePipe in Windows and to use them to initialize
+   hStdInput, hStdOutput, and hStdError fields of the startupinfo
+   parameter to CreateProcess.  There is an example at
+   http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
+   There is also some kind of Win32 Job API used by the perl
+   Win32::Job classes (CreateJobObject).  This may provide a better
+   solution than our current CTRL-C handling.  See if boost provides
+   anything that could do this.
+
  * See if we can provide an option to indent all of abuild's non-error
    output.  Ideally, this should capture output from backends as
    well...
@@ -217,79 +230,6 @@ Changes to "make" Code
    the cached ones.
 
 
-Platform Conditionals
-=====================
-
-(This item is low priority for 1.1.)
-
-The goal is to support some kind of platform-based conditional
-dependency while preserving the fundamental design goal of having a
-static build graph.  We will support this only for build items of type
-native.  Here's how it would work:
-
- * Native build items can specify some kind of platform-based
-   inclusion/exclusion rules in Abuild.conf.  Maybe we'll add keywords
-   build-if-platform-matches and build-unless-platform-matches, each
-   of which takes arguments of the form a.b.c.d.  Each field can be a
-   fixed string or * and is matched against the corresponding field of
-   the platform identifier.  If both keywords appear, platform strings
-   have to satisfy both.  For example,
-
-   build-if-platform-matches: linux.*.*.gcc *.*.*.xlc
-   build-unless-platform-matches: windows.*.*.*
-
-   would mean to build on linux with gcc and everywhere except windows
-   on xlc.
-
- * Abuild will first construct and validate the build graph
-   disregarding platform restrictions.  This ensures that the build
-   graph can't be invalid for some combination of available platforms
-   and not for others.
-
- * Once the build graph is validated, abuild will traverse the build
-   graph again and prune the graph at each node whose platform doesn't
-   satisfy the platform restrictions.
-
-There are several possible implications to think through.  What
-happens with build items that get built "as needed" to satisfy
-platform constraints but then are no longer needed after pruning?  It
-may be that we have to create two build graphs, one that disregards
-platform restrictions and one that doesn't.  The second build graph
-should always be a proper subset of the first one, so there should be
-no possibility of errors existing in the second one.
-
-But actually, it's worse than that.  What about items that get added
-to the build set just to satisfy dependencies that are no longer
-required?  Do we want those?  It's like we have to mark build items as
-explicit or implicit and then prune any unreferenced implicit items
-after paying attention to platform restrictions.
-
-Consider native build items:
-
-a: b c
-b: d
-
-b is 'windows only'
-
-When doing abuild -d from a on a non-windows platform, we only want to
-build a and c, but when doing abuild -b all on a non-windows platform,
-we want a, c, and d.  In the first case, d is an implicit member of
-the build set, and in the second case, d is an explicit member.  For
-the build graph, we can mark things as explicit if they are explicit
-items on selected platforms.  Explicit items on as-needed platforms
-are implicit.  To detect unreferenced implicit members, we could
-traverse the pruned build graph starting from each explicit node and
-mark things as seen when we encounter them.  Then, anything that's not
-seen can be removed.  We'll need to test cases with platform-specific
-dependencies to make sure the logic is sound.  Also consider whether
-the special failure build item used to implement recovery from certain
-types of cycle errors should be explicit.
-
-It would also be nice if this could enable us to express "I want the
-version of X built with compiler A on platform P but the default
-compiler everywhere else."  Try to work that in.
-
-
 Building Abuild
 ===============
 
@@ -360,6 +300,79 @@ life even before private/bin/get_native_platform_data is called.
    building 32-bit code on a 64-bit system.  Adding -m32 doesn't
    really do it because why should have you
    linux.x86_64.rhel51.gcc.m32 be the same as linux.ix86.rhel51.gcc?
+
+
+Platform Conditionals
+=====================
+
+There are some problems with this proposal...
+
+The goal is to support some kind of platform-based conditional
+dependency while preserving the fundamental design goal of having a
+static build graph.  We will support this only for build items of type
+native.  Here's how it would work:
+
+ * Native build items can specify some kind of platform-based
+   inclusion/exclusion rules in Abuild.conf.  Maybe we'll add keywords
+   build-if-platform-matches and build-unless-platform-matches, each
+   of which takes arguments of the form a.b.c.d.  Each field can be a
+   fixed string or * and is matched against the corresponding field of
+   the platform identifier.  If both keywords appear, platform strings
+   have to satisfy both.  For example,
+
+   build-if-platform-matches: linux.*.*.gcc *.*.*.xlc
+   build-unless-platform-matches: windows.*.*.*
+
+   would mean to build on linux with gcc and everywhere except windows
+   on xlc.
+
+ * Abuild will first construct and validate the build graph
+   disregarding platform restrictions.  This ensures that the build
+   graph can't be invalid for some combination of available platforms
+   and not for others.
+
+ * Once the build graph is validated, abuild will traverse the build
+   graph again and prune the graph at each node whose platform doesn't
+   satisfy the platform restrictions.
+
+There are several possible implications to think through.  What
+happens with build items that get built "as needed" to satisfy
+platform constraints but then are no longer needed after pruning?  It
+may be that we have to create two build graphs, one that disregards
+platform restrictions and one that doesn't.  The second build graph
+should always be a proper subset of the first one, so there should be
+no possibility of errors existing in the second one.
+
+But actually, it's worse than that.  What about items that get added
+to the build set just to satisfy dependencies that are no longer
+required?  Do we want those?  It's like we have to mark build items as
+explicit or implicit and then prune any unreferenced implicit items
+after paying attention to platform restrictions.
+
+Consider native build items:
+
+a: b c
+b: d
+
+b is 'windows only'
+
+When doing abuild -d from a on a non-windows platform, we only want to
+build a and c, but when doing abuild -b all on a non-windows platform,
+we want a, c, and d.  In the first case, d is an implicit member of
+the build set, and in the second case, d is an explicit member.  For
+the build graph, we can mark things as explicit if they are explicit
+items on selected platforms.  Explicit items on as-needed platforms
+are implicit.  To detect unreferenced implicit members, we could
+traverse the pruned build graph starting from each explicit node and
+mark things as seen when we encounter them.  Then, anything that's not
+seen can be removed.  We'll need to test cases with platform-specific
+dependencies to make sure the logic is sound.  Also consider whether
+the special failure build item used to implement recovery from certain
+types of cycle errors should be explicit.
+
+It would also be nice if this could enable us to express "I want the
+version of X built with compiler A on platform P but the default
+compiler everywhere else."  Try to work that in.
 
 
 Java Problems
@@ -444,19 +457,6 @@ See also "Known Limitations" in the documentation.
  * It would be nice if there were a mechanism for providing
    documentation on traits so that --list-traits could tell the user
    how each trait was intended to be used.
-
- * Consider capturing the output of the backend so that we can
-   de-interleave output when running parallel builds (or mark each
-   line of output with the build item/platform data), separate error
-   from informational output, etc.  It is possible to create pipe-like
-   handles with CreatePipe in Windows and to use them to initialize
-   hStdInput, hStdOutput, and hStdError fields of the startupinfo
-   parameter to CreateProcess.  There is an example at
-   http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
-   There is also some kind of Win32 Job API used by the perl
-   Win32::Job classes (CreateJobObject).  This may provide a better
-   solution than our current CTRL-C handling.  See if boost provides
-   anything that could do this.
 
  * Clean up ~/source/examples/java/native/abuild and use as JNI
    example
