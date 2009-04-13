@@ -6,8 +6,8 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "1.1.a5">
-<!ENTITY lastreleased "April 7, 2009">
+<!ENTITY swversion "1.1.a6">
+<!ENTITY lastreleased "April 13, 2009">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13750,6 +13750,126 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.a6: April 13, 2009</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Ant framework
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Reverting an earlier change, &abuild; will no longer import
+           <filename>ant-hooks.xml</filename> or
+           <filename>plugin-ant.xml</filename> files.  This
+           enhancement to the ant framework had unintended side
+           effects that broke some existing builds.  As the goal is to
+           move from the ant framework to the Groovy framework, we
+           wish to avoid any needless distractions caused by changes
+           to the ant framework.  This means that it is once again no
+           longer possible to add targets in hook files.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Both item dependencies and tree dependencies can be made
+           optional by adding the <option>-optional</option> flag to
+           them in <filename>Abuild.conf</filename>.  Optional
+           dependencies are ignored if the items referenced do not
+           exist.  For details, see
+           <filename>src/manual/pending.txt</filename>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           New command-line argument <option>--with-rdeps</option>
+           causes expansion of the build set to include reverse
+           dependencies of all items in the build set.  Running
+           <command>abuild --with-rdeps</command> in a build item's
+           directory would cause all items that depend on it, directly
+           or indirectly, to be built.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Visual C++ Toolchain Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           New make variables have been added for increasing the
+           flexibility of configuring Visual C++.
+           <itemizedlist>
+            <listitem>
+             <para>
+              <varname>MSVC_RUNTIME_FLAGS</varname>: set to
+              <option>/MD</option> by default, which causes the
+              executable to dependent on Microsoft runtime DLLs.  By
+              setting this to <option>/MT</option>, it is possible to
+              create executables that statically link with the runtime
+              environment.  A trailing
+              &ldquo;<option>d</option>&rdquo; is automatically
+              appended when building debugging executables or
+              libraries.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              <varname>MSVC_MANAGEMENT_FLAGS</varname>: set to
+              <option>/EHsc</option> by default, which enables
+              synchronous exception handling and assumes
+              &ldquo;C&rdquo; functions do not throw exceptions.  By
+              setting this to <option>/clr</option>, it is possible to
+              build programs that work with the .NET framework.
+             </para>
+            </listitem>
+            <listitem>
+             <para>
+              <varname>MSVC_GLOBAL_FLAGS</varname>: contains flags
+              that are passed globally to all compilation commands.
+              Users will seldom have to modify this.  For details, see
+              comments in
+              <filename>make/toolchains/msvc.mk</filename>.
+             </para>
+            </listitem>
+           </itemizedlist>
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Building &Abuild;
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; does a better job of detecting the appropriate
+           libraries for networking, threading, and boost.  In
+           particular, when using a custom installation of boost, it
+           is necessary only to set <varname>BOOST_TOP</varname> to
+           the location of the boost installation.  &Abuild;'s build
+           will automatically figure out includes, library paths,
+           preprocessor settings, and library naming conventions.  For
+           details, see <filename>src/README.build</filename>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.a5: April 7, 2009</term>
      <listitem>

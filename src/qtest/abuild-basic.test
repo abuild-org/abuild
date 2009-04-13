@@ -548,7 +548,7 @@ cd("work/msvc");
 if ($msvc)
 {
     foreach my $d (['normal', 'normal', ''],
-		   ['static', 'static runtime', 'MSVC_RUNTIME_FLAG=/MT'],
+		   ['static', 'static runtime', 'MSVC_RUNTIME_FLAGS=/MT'],
 		   ['net', '.NET', 'MSVC_MANAGEMENT_FLAGS=/clr'])
     {
 	my ($out, $description, $args) = @$d;

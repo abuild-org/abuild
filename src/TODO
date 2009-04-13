@@ -12,39 +12,7 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * Simplify handling of boost for bootstrapping the build of abuild
-   itself.  There's now an autoconf build item that figures out boost
-   libraries, requiring only BOOST_TOP to be set if you are looking
-   for boost in a nonstandard location, and also deals with pthread
-   and socket libraries and -DBOOST_SP_USE_PTHREADS if needed.
-
- * msvc: set up MSVC_RUNTIME_FLAG, MSVC_MANAGEMENT_FLAGS, and
-   MSVC_GLOBAL_FLAGS to make it easier to customize the behavior of
-   msvc.
-
- * Add flag --with-rdeps to add to the build set all items anywhere in
-   the forest that have items in the initial build set in their
-   expanded dependency chains.  (Note that is recursive by nature: if
-   A depends on X and B depends on A, then B also depends on X.)
-
- * Implement optional dependencies:
-
-    - tree-deps: tree-name -optional
-    - deps: item -optional
-
-   Details in manual/pending.txt.
-
- * Ant framework: no longer import hook files.  This caused had
-   unintended side effects that are distractions from migration from
-   ant to groovy.  This means it is once again not possible to add new
-   targets in ant-hooks.xml or plugin-ant.xml files.  The only known
-   incompatibility between the 1.0 and 1.1 ant frameworks is that, in
-   1.1, all ant builds are run from a single JVM whose current
-   directory is abuild's current directory, where in 1.0, abuild ran
-   ant from the build item output directory.  This usually doesn't
-   matter, but it could potentially break some custom tasks that don't
-   deal resolve relative paths as relative to ${basedir} as they
-   should.
+ * ...
 
 
 Help system
@@ -143,8 +111,8 @@ Documentation
    root, give it a name.  Comments are allowed anywhere.
 
  * For msvc toolchain, document MSVC_GLOBAL_FLAGS,
-   MSVC_MANAGEMENT_FLAGS, and MSVC_RUNTIME_FLAG (not FLAGS).  See
-   comments in msvc.mk.
+   MSVC_MANAGEMENT_FLAGS, and MSVC_RUNTIME_FLAGS.  See comments in
+   msvc.mk.
 
 
 Usability Improvements
@@ -172,10 +140,10 @@ Usability Improvements
    output.  Ideally, this should capture output from backends as
    well...
 
- * Provide a way to get --dump-data's into a relational database.
-   Ideally, we shouldn't have to link with sqlite.  Maybe have an
-   option that causes --dump-data to generate a script file that can
-   be used with sqlite3 rather than generating XML data.
+ * Provide a way to get --dump-data's output into a relational
+   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
+   have an option that causes --dump-data to generate a script file
+   that can be used with sqlite3 rather than generating XML data.
    Alternatively, we can create xsl/perl code that loads directly into
    a sqlite database or that creates the input file.  It's probably
    okay if we create the SQL such that an erroneous dumpdata won't

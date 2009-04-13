@@ -52,10 +52,10 @@ MSVC_MANAGEMENT_FLAGS = /EHsc
 # loaded, multithreaded, runtime environment.  Programs built this way
 # will require MSVCRT.dll (or, if debugging is used via /MDd,
 # MSVCRTD.dll) at runtime.  Note that MSVCRT.dll is redistributable,
-# but MSVCRTD.dll is not.  You could also set MSVC_RUNTIME_FLAG
+# but MSVCRTD.dll is not.  You could also set MSVC_RUNTIME_FLAGS
 # to /MT for a static, multithreaded runtime environment.
 
-MSVC_RUNTIME_FLAG = /MD
+MSVC_RUNTIME_FLAGS = /MD
 
 # End users should not change MSVC_RUNTIME_SUFFIX
 MSVC_RUNTIME_SUFFIX = d
@@ -67,7 +67,7 @@ DFLAGS =
 MSVC_RUNTIME_SUFFIX =
 endif
 
-CC = cl $(MSVC_GLOBAL_FLAGS) $(MSVC_MANAGEMENT_FLAGS) $(MSVC_RUNTIME_FLAG)$(MSVC_RUNTIME_SUFFIX)
+CC = cl $(MSVC_GLOBAL_FLAGS) $(MSVC_MANAGEMENT_FLAGS) $(MSVC_RUNTIME_FLAGS)$(MSVC_RUNTIME_SUFFIX)
 CCPP = $(CC) /E
 # /TP forces C++; /GR enables RTTI (runtime type identification)
 CXX = $(CC) /TP /GR
