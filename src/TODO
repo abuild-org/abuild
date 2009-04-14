@@ -12,7 +12,8 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ...
+ * add flag --find item-name or --find tree:tree-name to print the
+   location of the given build item or build tree.
 
 
 Help system

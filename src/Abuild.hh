@@ -313,6 +313,7 @@ class Abuild
     bool list_traits;
     bool list_platforms;
     bool dump_data;
+    std::string to_find;
     bool dump_build_graph;
     bool verbose_mode;
     bool silent;

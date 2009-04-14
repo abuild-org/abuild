@@ -552,6 +552,14 @@ Abuild::parseArgv()
 	{
 	    this->dump_data = true;
 	}
+	else if (arg == "--find")
+	{
+	    if (! *argp)
+	    {
+		usage("--find requires an argument");
+	    }
+	    this->to_find = *argp++;
+	}
 
 	// Invalid options and targets....
 
@@ -619,7 +627,8 @@ Abuild::parseArgv()
 	    usage("--no-deps may not be used with a build set");
 	}
 
-	if (this->dump_data || this->list_platforms || this->list_traits)
+	if (this->dump_data || this->list_platforms || this->list_traits ||
+	    (! this->to_find.empty()))
 	{
 	    usage("query options may not be used with a build set");
 	}
@@ -1206,6 +1215,38 @@ Abuild::readConfigs()
     BuildForest& local_forest = *(forests[local_top]);
     BuildTree_map& buildtrees = local_forest.getBuildTrees();
     BuildItem_map& builditems = local_forest.getBuildItems();
+
+    if (! this->to_find.empty())
+    {
+	if (this->to_find.find("tree:") == 0)
+	{
+	    std::string tree = this->to_find.substr(5);
+	    if (buildtrees.count(tree))
+	    {
+		std::cout << "tree " << tree << ": "
+			  << buildtrees[tree]->getRootPath() << std::endl;
+	    }
+	    else
+	    {
+		std::cout << "tree " << tree << " is unknown" << std::endl;
+	    }
+	}
+	else
+	{
+	    std::string const& item = this->to_find;
+	    if (builditems.count(item))
+	    {
+		std::cout << "item " << item << ": "
+			  << builditems[item]->getAbsolutePath() << std::endl;
+	    }
+	    else
+	    {
+		std::cout << "item " << item << " is unknown" << std::endl;
+	    }
+	}
+	return true;
+    }
+
     computeBuildset(buildtrees, builditems);
 
     if (! this->full_integrity)
@@ -7087,6 +7128,8 @@ Abuild::help()
     h("  -e | --emacs      pass the -e flags to ant and also set a property");
     h("                    telling our ant build file that we are running in");
     h("                    emacs mode.");
+    h("  --find { item-name | tree:tree-name}    print the location of build item");
+    h("                    item-name or build tree tree-name");
     h("  --find-conf       look above the current directory to find a directory");
     h("                    that contains Abuild.conf and run abuild from there");
     h("  --full-integrity  check integrity for all items, not just items being built");

@@ -31,6 +31,30 @@ $td->runtest("dump data",
 	     {$td->FILE => "$top/dumpdata.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
+$td->runtest("find item",
+	     {$td->COMMAND => "abuild --find ca",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/find-item.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("find tree",
+	     {$td->COMMAND => "abuild --find tree:basic",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/find-tree.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("bad find item",
+	     {$td->COMMAND => "abuild --find oink",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-find-item.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("bad find tree",
+	     {$td->COMMAND => "abuild --find tree:moo",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-find-tree.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
 $td->runtest("list traits",
 	     {$td->COMMAND => "abuild --list-traits"},
 	     {$td->FILE => "$top/list-traits.out",
@@ -588,4 +612,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(73 + ($msvc ? 24 : 0));
+$td->report(78 + ($msvc ? 24 : 0));
