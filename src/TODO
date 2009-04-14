@@ -19,18 +19,30 @@ release notes.
 Help system
 ===========
 
- * Consider adding a new special-case target "help" that would provide
-   help in a manner that does not require invoking a back end.  This
-   should remove the serious problems with rules-help and
-   interface-help, and should get around the problem of trying to echo
-   help information from a build file.  This would work by having
-   abuild automatically display certain internal help files and build
-   item-provided help files.  Most likely, abuild would just display
-   all the help files provided by other build items that impact your
-   build (dependents, plugins, rule/hook build items, etc.) as well as
-   internal help files.  Help files, including internal ones, should
-   provide a list of variables that can be set or read, what they
-   mean, and how to use them.
+Allow --help or --help topic as options to abuild.
+
+Specifying --help by itself should provide a very short usage synopsis
+with pointers to other uses for the help system.  Then other topics
+will show different information.  Topics:
+
+ * options: show summary of command line options
+
+ * buildsets: list available build sets and describe them
+
+ * platforms: talk about platform selectors
+
+ * .... check current --help output for other ideas
+
+We also need topics to do the following:
+
+ * show the names (tree, item) of all items that offer rules
+
+ * show the help text for all items referenced (plugin/dep) by the
+   current build item
+
+ * eliminate rules-help, interface-help, ...
+
+ * available interface variables
 
 
 Groovy Framework
@@ -236,6 +248,14 @@ Building Abuild
 
 Package auto-srcs with abuild sources if autogeneration make
 enhancement is done.
+
+Miscellaneous
+=============
+
+We may want to rethink deprecation of ABUILD_THIS and deprecation of
+interface variables in general since we can't actually issue a warning
+for their use in backend build files.  In other words, they will
+disappear without warning if we remove compatibility support.
 
 ----------------------------------------------------------------------
 
