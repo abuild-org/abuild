@@ -612,4 +612,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(78 + ($msvc ? 24 : 0));
+$td->report(77 + ($msvc ? 24 : 0));
