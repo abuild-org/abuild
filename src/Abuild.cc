@@ -305,7 +305,6 @@ Abuild::parseArgv()
     boost::smatch match;
 
     std::list<std::string> platform_selector_strings;
-    std::list<std::string> clean_platform_strings;
     std::string platform_selector_env;
     if (Util::getEnv("ABUILD_PLATFORM_SELECTORS", &platform_selector_env))
     {
@@ -318,15 +317,44 @@ Abuild::parseArgv()
 	compat_level_version = "1.0";
     }
 
-    bool with_deps = false;
+    std::list<std::string> clean_platform_strings;
     bool no_deps = false;
+
+    // Abuild has several operational modes:
+    //
+    //  * Build with build set
+    //
+    //  * Build without build set
+    //
+    //  * Query
+    //
+    // We parse arguments and then make sure we are not being pushed
+    // into more than one mode of operation.
+
     char** argp = &argv[1];
     while (*argp)
     {
 	std::string arg = *argp++;
+
+	// Look at arguments that don't affect and aren't affected by
+	// the operational mode.  Some of these have no effect if we
+	// are not building, but specifying them is not an error.
+
 	if (boost::regex_match(arg, match, define_re))
 	{
 	    this->defines[match.str(1)] = match.str(2);
+	}
+	else if (arg == "-C")
+	{
+	    if (! *argp)
+	    {
+		usage("-C requires an argument");
+	    }
+	    this->start_dir = *argp++;
+	}
+	else if (arg == "--find-conf")
+	{
+	    this->start_dir = findConf();
 	}
 	else if (boost::regex_match(arg, match, jobs_re))
 	{
@@ -364,24 +392,94 @@ Abuild::parseArgv()
 	{
 	    this->java_builder_args.push_back("-e");
 	}
-	else if (arg == "-C")
-	{
-	    if (! *argp)
-	    {
-		usage("-C requires an argument");
-	    }
-	    this->start_dir = *argp++;
-	}
-	else if (arg == "--find-conf")
-	{
-	    this->start_dir = findConf();
-	}
 	else if (arg == "--make")
 	{
 	    while (*argp)
 	    {
 		this->make_args.push_back(*argp++);
 	    }
+	}
+	else if ((arg == "--platform-selector") || (arg == "-p"))
+	{
+	    if (! *argp)
+	    {
+		usage("--platform-selector requires an argument");
+	    }
+	    platform_selector_strings.push_back(*argp++);
+	}
+	else if (arg == "--clean-platforms")
+	{
+	    if (! *argp)
+	    {
+		usage("--clean-platforms requires an argument");
+	    }
+	    clean_platform_strings.push_back(*argp++);
+	}
+	else if (arg == "--full-integrity")
+	{
+	    this->full_integrity = true;
+	}
+	else if (arg == "--deprecation-is-error")
+	{
+	    this->make_args.push_back("ABUILD_DEPRECATE_IS_ERROR=1");
+	    this->java_builder_args.push_back("-de");
+	    Error::setDeprecationIsError(true);
+	}
+	else if (arg == "--verbose")
+	{
+	    this->make_args.push_back("ABUILD_VERBOSE=1");
+	    this->java_builder_args.push_back("-v");
+	    this->verbose_mode = true;
+	}
+	else if (arg == "--silent")
+	{
+	    this->make_args.push_back("ABUILD_SILENT=1");
+	    this->java_builder_args.push_back("-q");
+	    this->silent = true;
+	}
+	else if (arg == "--monitored")
+	{
+	    this->monitored = true;
+	}
+	else if (arg == "--dump-interfaces")
+	{
+	    this->dump_interfaces = true;
+	}
+	else if (boost::regex_match(arg, match, compat_re))
+	{
+	    compat_level_version = match.str(1);
+	}
+	else if (boost::regex_match(arg, match, rorwpath_re))
+	{
+	    std::string which = match.str(1);
+	    std::string path = match.str(2);
+	    // Do not attempt to check or canonicalize path -- we have
+	    // to chdir from -C first.
+	    if (which == "o")
+	    {
+		this->ro_paths.insert(path);
+	    }
+	    else
+	    {
+		assert(which == "w");
+		this->rw_paths.insert(path);
+	    }
+	}
+
+	// Check for arguments that imply build/clean without build
+	// set
+
+	else if (arg == "--no-deps")
+	{
+	    no_deps = true;
+	}
+
+	// Check for arguments that imply build/clean with build set
+
+	else if ((arg == "--with-deps") || (arg == "-d"))
+	{
+	    QTC::TC("abuild", "Abuild with_deps");
+	    this->buildset_name = b_CURRENT;
 	}
 	else if (boost::regex_match(arg, match, buildset_re))
 	{
@@ -427,30 +525,6 @@ Abuild::parseArgv()
 	    }
 	    this->related_by_traits = Util::split(',', *argp++);
 	}
-	else if ((arg == "--platform-selector") || (arg == "-p"))
-	{
-	    if (! *argp)
-	    {
-		usage("--platform-selector requires an argument");
-	    }
-	    platform_selector_strings.push_back(*argp++);
-	}
-	else if (arg == "--clean-platforms")
-	{
-	    if (! *argp)
-	    {
-		usage("--clean-platforms requires an argument");
-	    }
-	    clean_platform_strings.push_back(*argp++);
-	}
-	else if ((arg == "--with-deps") || (arg == "-d"))
-	{
-	    with_deps = true;
-	}
-	else if (arg == "--no-deps")
-	{
-	    no_deps = true;
-	}
 	else if (arg == "--with-rdeps")
 	{
 	    this->with_rdeps = true;
@@ -459,10 +533,13 @@ Abuild::parseArgv()
 	{
 	    this->apply_targets_to_deps = true;
 	}
-	else if (arg == "--full-integrity")
+	else if (arg == "--dump-build-graph")
 	{
-	    this->full_integrity = true;
+	    this->dump_build_graph = true;
 	}
+
+	// Check for arguments that are for general queries
+
 	else if (arg == "--list-traits")
 	{
 	    this->list_traits = true;
@@ -471,60 +548,13 @@ Abuild::parseArgv()
 	{
 	    this->list_platforms = true;
 	}
-	else if (arg == "--deprecation-is-error")
-	{
-	    this->make_args.push_back("ABUILD_DEPRECATE_IS_ERROR=1");
-	    this->java_builder_args.push_back("-de");
-	    Error::setDeprecationIsError(true);
-	}
 	else if (arg == "--dump-data")
 	{
 	    this->dump_data = true;
 	}
-	else if (arg == "--dump-build-graph")
-	{
-	    this->dump_build_graph = true;
-	}
-	else if (arg == "--verbose")
-	{
-	    this->make_args.push_back("ABUILD_VERBOSE=1");
-	    this->java_builder_args.push_back("-v");
-	    this->verbose_mode = true;
-	}
-	else if (arg == "--silent")
-	{
-	    this->make_args.push_back("ABUILD_SILENT=1");
-	    this->java_builder_args.push_back("-q");
-	    this->silent = true;
-	}
-	else if (arg == "--monitored")
-	{
-	    this->monitored = true;
-	}
-	else if (arg == "--dump-interfaces")
-	{
-	    this->dump_interfaces = true;
-	}
-	else if (boost::regex_match(arg, match, compat_re))
-	{
-	    compat_level_version = match.str(1);
-	}
-	else if (boost::regex_match(arg, match, rorwpath_re))
-	{
-	    std::string which = match.str(1);
-	    std::string path = match.str(2);
-	    // Do not attempt to check or canonicalize path -- we have
-	    // to chdir from -C first.
-	    if (which == "o")
-	    {
-		this->ro_paths.insert(path);
-	    }
-	    else
-	    {
-		assert(which == "w");
-		this->rw_paths.insert(path);
-	    }
-	}
+
+	// Invalid options and targets....
+
 	else if ((! arg.empty()) && (arg[0] == '-'))
 	{
 	    usage("invalid option " + arg);
@@ -543,6 +573,20 @@ Abuild::parseArgv()
 	}
     }
 
+    // If an alternative start directory was specified, chdir to it
+    // before we ever access any of the user's files.
+    if (! this->start_dir.empty())
+    {
+	// Throws an exception on failure
+	Util::setCurrentDirectory(this->start_dir);
+    }
+    this->current_directory = Util::getCurrentDirectory();
+
+    // Must be called before full validation of arguments since
+    // certain things are valid or not valid based on whether we're in
+    // an output directory
+    getThisPlatform();
+
     // Compatability level
     if (compat_level_version == "1.0")
     {
@@ -560,59 +604,55 @@ Abuild::parseArgv()
 	usage("invalid compatibility level " + compat_level_version);
     }
 
-    // If an alternative start directory was specified, chdir to it
-    // before we ever access any of the user's files.
-    if (! this->start_dir.empty())
-    {
-	// Throws an exception on failure
-	Util::setCurrentDirectory(this->start_dir);
-    }
-    this->current_directory = Util::getCurrentDirectory();
-
     // called after changing directories
     checkRoRwPaths();
 
-    getThisPlatform();
+    // Check for mutually exclusive options.
 
-    if (no_deps)
+    bool explicit_buildset = (! (this->buildset_name.empty() &&
+				 this->cleanset_name.empty()));
+
+    if (explicit_buildset)
     {
-	if (with_deps || with_rdeps ||
-	    (! (this->buildset_name.empty() &&
-		this->cleanset_name.empty())))
+	if (no_deps)
 	{
-	    usage("--no-deps may not be used with"
-		  " --with-deps, --with-rdeps, --build, or --clean");
+	    usage("--no-deps may not be used with a build set");
 	}
-	QTC::TC("abuild", "Abuild no_deps");
+
+	if (this->dump_data || this->list_platforms || this->list_traits)
+	{
+	    usage("query options may not be used with a build set");
+	}
     }
 
-    if (with_deps)
+    // Once we've ensured that we're not doing anything that is not
+    // allowed with a build set, enable build set "current" by
+    // default.
+    bool have_buildset = explicit_buildset;
+    if ((! (no_deps || explicit_buildset || (special_target == s_CLEAN))) &&
+	this->this_platform.empty())
     {
-	if (! (this->buildset_name.empty() &&
-	       this->cleanset_name.empty()))
-	{
-	    usage("--with-deps may not be used with"
-		  " --no-deps, --build, or --clean");
-	}
-	QTC::TC("abuild", "Abuild with_deps");
+	have_buildset = true;
+	QTC::TC("abuild", "Abuild build current by default");
 	this->buildset_name = b_CURRENT;
     }
 
-    // Perform additional validation of the command-line arguments to
-    // make sure we haven't specified --build with --clean or other
-    // mutually exclusive options.
-
-    if ((this->dump_data || this->list_traits) &&
-	(! (this->cleanset_name.empty() &&
-	    this->buildset_name.empty() &&
-	    (! this->with_rdeps) &&
-	    (! no_deps) &&
-	    this->targets.empty())))
+    if (! have_buildset)
     {
-	usage("--dump-data and --list-traits may not be combined with"
-	      " build sets or targets");
+	this->local_build = true;
+	if (! (this->only_with_traits.empty() &&
+	       this->related_by_traits.empty()))
+	{
+	    usage("--only-with-traits and --related-by-traits may"
+		  " not be used without a build set");
+	}
+	if (this->with_rdeps)
+	{
+	    usage("--with-rdeps may not be used without a build set");
+	}
     }
 
+    // Make sure we're not trying to clean and build at the same time.
     if (! this->cleanset_name.empty())
     {
 	if ((! this->buildset_name.empty()) ||
@@ -645,35 +685,6 @@ Abuild::parseArgv()
 	}
     }
 
-    if ((! no_deps) &&
-	(this->buildset_name.empty() && this->cleanset_name.empty() &&
-	 this->this_platform.empty()))
-    {
-	QTC::TC("abuild", "Abuild build current by default");
-	this->buildset_name = b_CURRENT;
-	with_deps = true;
-    }
-
-    if (this->buildset_name.empty() && this->cleanset_name.empty())
-    {
-	this->local_build = true;
-	if (! (this->only_with_traits.empty() &&
-	       this->related_by_traits.empty()))
-	{
-	    usage("--only-with-traits and --related-by-traits may"
-		  " not be used without a build set or --with-deps");
-	}
-	if (this->with_rdeps)
-	{
-	    usage("--with-rdeps may not be used without a build set");
-	}
-    }
-
-    if (! (this->only_with_traits.empty() && this->related_by_traits.empty()))
-    {
-	QTC::TC("abuild", "Abuild category et_traits", with_deps ? 0 : 1);
-    }
-
     if (! this->this_platform.empty())
     {
 	if (this->special_target == s_CLEAN)
@@ -686,7 +697,7 @@ Abuild::parseArgv()
 		    this->buildset_name.empty() &&
 		    this->cleanset_name.empty()))
 	{
-	    fatal("special targets, build sets, and clean sets may not be"
+	    usage("special targets, build sets, and clean sets may not be"
 		  " specified when running inside an output directory");
 	}
     }
@@ -736,6 +747,13 @@ Abuild::parseArgv()
     if (this->targets.empty())
     {
 	this->targets = default_targets;
+    }
+
+    // Put significant option coverage cases after any potential exit
+    // from incorrect usage....
+    if (no_deps)
+    {
+	QTC::TC("abuild", "Abuild no_deps");
     }
 }
 

@@ -138,7 +138,6 @@ Abuild ERR inaccessible trait referent 0
 Abuild listTraits with no traits 0
 Abuild listTraits 0
 Abuild expand by trait 1
-Abuild category et_traits 1
 Abuild ERR unknown trait 0
 ItemConfig ERR duplicate platform type 0
 ItemConfig ERR deleted on non-1.0-root 0
