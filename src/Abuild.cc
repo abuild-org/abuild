@@ -1235,8 +1235,10 @@ Abuild::readConfigs()
 	    std::string const& item = this->to_find;
 	    if (builditems.count(item))
 	    {
-		std::cout << "item " << item << ": "
-			  << builditems[item]->getAbsolutePath() << std::endl;
+		std::cout << "item " << item
+			  << " (in tree " << builditems[item]->getTreeName()
+			  << "): " << builditems[item]->getAbsolutePath()
+			  << std::endl;
 	    }
 	    else
 	    {
