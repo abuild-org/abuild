@@ -9,6 +9,6 @@ use strict;
 # output.
 foreach my $o (".release", ".debug", "")
 {
-    print "platform zz_os.cpu.toolset.echo$o -type echo\n";
+    print "platform zz_os.cpu.toolset.echo$o -type echotype\n";
 }
-print "platform -lowpri zz_os.cpu.toolset.echo.lowpri -type echo\n";
+print "platform -lowpri zz_os.cpu.toolset.echo.lowpri -type echotype\n";

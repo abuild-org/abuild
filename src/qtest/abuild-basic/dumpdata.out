@@ -27,7 +27,7 @@
     <platform-type name="indep" target-type="platform-independent">
      <platform name="indep" selected="1"/>
     </platform-type>
-    <platform-type name="echo" target-type="object-code">
+    <platform-type name="echotype" target-type="object-code">
      <platform name="zz_os.cpu.toolset.echo" selected="1"/>
      <platform name="zz_os.cpu.toolset.echo.debug" selected="0"/>
      <platform name="zz_os.cpu.toolset.echo.release" selected="0"/>
@@ -333,7 +333,7 @@
     is-plugin="0"
    >
     <platform-types>
-     <platform-type name="echo"/>
+     <platform-type name="echotype"/>
     </platform-types>
     <buildable-platforms>
      <platform name="zz_os.cpu.toolset.echo"/>
@@ -357,7 +357,7 @@
      <dependency name="e.lib"/>
     </expanded-dependencies>
     <platform-types>
-     <platform-type name="echo"/>
+     <platform-type name="echotype"/>
     </platform-types>
     <buildable-platforms>
      <platform name="zz_os.cpu.toolset.echo"/>
@@ -383,7 +383,7 @@
      <dependency name="e.shlib"/>
     </expanded-dependencies>
     <platform-types>
-     <platform-type name="echo"/>
+     <platform-type name="echotype"/>
     </platform-types>
     <buildable-platforms>
      <platform name="zz_os.cpu.toolset.echo"/>
@@ -401,7 +401,7 @@
     is-plugin="0"
    >
     <platform-types>
-     <platform-type name="echo"/>
+     <platform-type name="echotype"/>
     </platform-types>
     <buildable-platforms>
      <platform name="zz_os.cpu.toolset.echo"/>
@@ -419,7 +419,7 @@
     is-plugin="0"
    >
     <platform-types>
-     <platform-type name="echo"/>
+     <platform-type name="echotype"/>
      <platform-type name="native"/>
     </platform-types>
     <buildable-platforms>
@@ -447,7 +447,7 @@
      <dependency name="e.lib"/>
     </expanded-dependencies>
     <platform-types>
-     <platform-type name="echo"/>
+     <platform-type name="echotype"/>
     </platform-types>
     <buildable-platforms>
      <platform name="zz_os.cpu.toolset.echo"/>

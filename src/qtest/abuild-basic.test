@@ -21,6 +21,10 @@ my $platform_native = get_native_platform();
 # and out of platform directories, platform selectors, and other basic
 # functionality.  It also exercises the ccxx rules.
 
+# This build tree's echo plugin is also used to exercise
+# verify-compiler for cross compilers.  This test suite's data
+# directory is referenced from the compiler-verification test suite.
+
 setup($td);
 
 cd("work");
@@ -230,8 +234,8 @@ $td->runtest("all items when up-to-date",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("no echo platform type",
-	     {$td->COMMAND => "abuild --build=local -p echo:skip",
+$td->runtest("no echotype platform type",
+	     {$td->COMMAND => "abuild --build=local -p echotype:skip",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/allitems3.out",
 	      $td->EXIT_STATUS => 0},
@@ -252,7 +256,7 @@ $td->runtest("empty with no native",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("no object-code platform types",
-	     {$td->COMMAND => "ABUILD_PLATFORM_SELECTORS=echo:skip" .
+	     {$td->COMMAND => "ABUILD_PLATFORM_SELECTORS=echotype:skip" .
 		  " abuild -b local --platform-selector native:skip",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/allitems5.out",
@@ -261,7 +265,7 @@ $td->runtest("no object-code platform types",
 
 $td->runtest("no object-code platform types",
 	     {$td->COMMAND =>
-		  "ABUILD_PLATFORM_SELECTORS='echo:skip native:skip'" .
+		  "ABUILD_PLATFORM_SELECTORS='echotype:skip native:skip'" .
 		  " abuild -b local",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/allitems5.out",

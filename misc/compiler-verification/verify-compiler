@@ -46,6 +46,7 @@ my $shlib_runtime_variable = $in_windows ? 'PATH' : 'LD_LIBRARY_PATH';
 
 my $platform_type = 'native';
 my $plugin_tree_location = "";
+my $plugin_tree_name = "";
 my $plugin_name = "";
 my $compiler = "";
 my $verbose = "";
@@ -53,10 +54,15 @@ my $verbose = "";
 while (@ARGV)
 {
     my $arg = shift(@ARGV);
-    if ($arg eq '--plugin-tree')
+    if ($arg eq '--plugin-tree-location')
     {
 	usage() unless @ARGV;
 	$plugin_tree_location = abs_path(shift(@ARGV));
+    }
+    elsif ($arg eq '--plugin-tree-name')
+    {
+	usage() unless @ARGV;
+	$plugin_tree_name = shift(@ARGV);
     }
     elsif ($arg eq '--plugin-name')
     {
@@ -143,6 +149,14 @@ my $orig_tree = "$dirname/tree";
 find({wanted => \&find_files, no_chdir => 1}, $orig_tree);
 shift(@files);
 
+my $use_external_dirs = 0;
+if ($plugin_tree_location && (! $plugin_tree_name))
+{
+    notice("WARNING: tree location specified without tree name");
+    notice("Using deprecated external-dirs to access plugin tree");
+    $use_external_dirs = 1;
+}
+
 notice("CREATING BUILD TREE");
 foreach my $src (@files)
 {
@@ -166,13 +180,25 @@ foreach my $src (@files)
 	    }
 	    if ($plugin_tree_location)
 	    {
-		mkdir "$tmpdir/plugin-tree", 0777;
-		my $backing = "$tmpdir/plugin-tree/Abuild.backing";
-		open(B, ">$backing") or
-		    die "$whoami: can't create $backing: $!\n";
-		print B "$plugin_tree_location\n";
-		close(B);
-		print OUT "external-dirs: plugin-tree\n";
+		if ($use_external_dirs)
+		{
+		    mkdir "$tmpdir/plugin-tree", 0777;
+		    my $backing = "$tmpdir/plugin-tree/Abuild.backing";
+		    open(B, ">$backing") or
+			die "$whoami: can't create $backing: $!\n";
+		    print B "$plugin_tree_location\n";
+		    close(B);
+		    print OUT "external-dirs: plugin-tree\n";
+		}
+		else
+		{
+		    my $backing = "$tmpdir/Abuild.backing";
+		    open(B, ">$backing") or
+			die "$whoami: can't create $backing: $!\n";
+		    print B "backing-areas: $plugin_tree_location\n";
+		    close(B);
+		    print OUT "tree-deps: $plugin_tree_name\n";
+		}
 		if ($plugin_name)
 		{
 		    print OUT "plugins: $plugin_name\n";
@@ -244,8 +270,10 @@ my $abuild_out = undef;
     }
 }
 
+my $cross = 'no';
 if ($platform_type ne 'native')
 {
+    $cross = 'yes';
     ask("NON-NATIVE COMPILER");
     print "You will be asked to run programs at various times during this test.
 In each case, the executable target is \"main\" and is located in
@@ -283,21 +311,22 @@ $expected2";
 # The first build should build everything.
 safe_copy("Abuild.mk-1", "Abuild.mk");
 notice("RUNNING INITIAL BUILD");
-check_build("abuild -d",
+check_build("abuild",
 	    [],
 	    [qw(A.cc B.cc X.cc Y.cc Z.cc main.cc other.cc)],
 	    [qw(A B X Y Z main)],
-	    ["printf yes", "exception yes"]);
+	    ["for printf yes", "for exception yes",
+	     "whether we are cross compiling $cross"]);
 check_prog($expected1);
 
 # When up to date, the build should build nothing.
 notice("REBUILD WHEN UP TO DATE");
-check_build("abuild -d", [], [], [], []);
+check_build("abuild", [], [], [], []);
 
 # If we remove a source file, everything should relink
 safe_copy("Abuild.mk-2", "Abuild.mk");
 notice("RUNNING BUILD AFTER REMOVING SOURCE");
-check_build("abuild -d", ["object files"], [], [qw(Y Z main)], []);
+check_build("abuild", ["object files"], [], [qw(Y Z main)], []);
 check_prog($expected2);
 
 # After moving X.hh, anything that uses X.hh should recompile and
@@ -305,11 +334,11 @@ check_prog($expected2);
 # relink.
 safe_rename("../incl1/X.hh", "../incl2/X.hh");
 notice("RUNNING BUILD AFTER MOVING HEADER");
-check_build("abuild -d", [], [qw(X.cc main.cc)], [qw(X Z main)], []);
+check_build("abuild", [], [qw(X.cc main.cc)], [qw(X Z main)], []);
 check_prog($expected2);
 
 notice("REBUILD WHEN UP TO DATE");
-check_build("abuild -d", [], [], [], []);
+check_build("abuild", [], [], [], []);
 
 if ($failures)
 {
@@ -374,7 +403,7 @@ sub check_build
 		push(@errors, "extraneous creation of $t");
 	    }
 	}
-	elsif (m/^checking for (\S+)\.\.\.\s*(\S+)/)
+	elsif (m/^checking (.+)\.\.\.\s*(\S+)/)
 	{
 	    my $check_for = "$1 $2";
 	    if (exists $checking{$check_for})
@@ -542,7 +571,8 @@ sub usage
 {
     die "
 Usage: $whoami options
-  --plugin-tree path                 absolute path of tree with compiler plugin
+  --plugin-tree-location path        absolute path of tree with compiler plugin
+  --plugin-tree-name tree-name       name of tree containing compiler plugin
   --plugin-name plugin-name          name of compiler plugin
   --platform-type platform-type      platform type to test
   --compiler compiler[.option]       compiler to test
@@ -561,6 +591,12 @@ $whoami creates a temporary directory in the directory from which it
 is invoked.  By default, it deletes the directory when it is finished.
 If you wish to run abuild manually in the directory, invoke this
 program with the --save-tree option.
+
+If --plugin-tree-location is given without --plugin-tree-native, this
+program will create a deprecated build tree that uses a 1.0-compatible
+backed external to access the plugin's tree.  This makes it possible
+to use verify-compiler from abuild version 1.1 to verify a compiler
+defined in a tree that has not been upgraded.
 
 ";
 }

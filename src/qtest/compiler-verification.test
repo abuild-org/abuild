@@ -24,6 +24,7 @@ $ENV{'ABUILD_COMPAT_LEVEL'} = '1.1';
 # Test compiler verification program
 mkdir "work", 0777;
 cd("work");
+
 $td->runtest("compiler verification",
 	     {$td->COMMAND =>
 		  "$abuild_top/misc/compiler-verification/verify-compiler",
@@ -73,6 +74,53 @@ if (in_windows())
     }
 }
 
+if ($platform_native !~ m/[^\.]+\.[^\.]+\.[^\.]+\.([^\.]+)/)
+{
+    die "unable to parse native platform\n";
+}
+my $native_compiler = $1;
+
+$td->runtest("native compiler plugin",
+	     {$td->COMMAND =>
+		  "QRW_COMPILER=$native_compiler" .
+		  " $abuild_top/misc/compiler-verification/verify-compiler" .
+		  " --plugin-tree-location $top/plugins" .
+		  " --plugin-tree-name compiler-plugins" .
+		  " --plugin-name native" .
+		  " --compiler qrw",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/native-plugin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("cross compiler plugin",
+	     {$td->COMMAND =>
+		  "$abuild_top/misc/compiler-verification/verify-compiler" .
+		  " </dev/null" .
+		  " --plugin-tree-location $top/../abuild-basic/data" .
+		  " --plugin-tree-name basic" .
+		  " --plugin-name plugin.echo" .
+		  " --platform-type echotype" .
+		  " --compiler echo",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/echo-plugin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("1.0 compatibility",
+	     {$td->COMMAND =>
+		  "ABUILD_COMPAT_LEVEL=1.0" .
+		  " $abuild_top/misc/compiler-verification/verify-compiler" .
+		  " </dev/null" .
+		  " --plugin-tree-location $top/../abuild-basic/data" .
+		  " --plugin-name plugin.echo" .
+		  " --platform-type echotype" .
+		  " --compiler echo",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/echo-plugin-1.0.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cleanup();
 
-$td->report(1 + (in_windows() ? 1 : 0));
+$td->report(4 + (in_windows() ? 1 : 0));

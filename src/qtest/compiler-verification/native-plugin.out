@@ -1,0 +1,108 @@
+
+===> CREATING BUILD TREE <===
+
+
+===> RUNNING INITIAL BUILD <===
+
+abuild: a (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/a/abuild-<native-os-data>.qrw'
+Compiling ../A.cc as C++
+Creating A library
+make: Leaving directory `--topdir--/.verify-tmp/a/abuild-<native-os-data>.qrw'
+abuild: auto (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/autoconf/abuild-<native-os-data>.qrw'
+[autoconf output suppressed]
+make: Leaving directory `--topdir--/.verify-tmp/autoconf/abuild-<native-os-data>.qrw'
+abuild: b (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/b/abuild-<native-os-data>.qrw'
+Compiling ../B.cc as C++
+Creating B shared library
+make: Leaving directory `--topdir--/.verify-tmp/b/abuild-<native-os-data>.qrw'
+abuild: x (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/x/abuild-<native-os-data>.qrw'
+Compiling ../X.cc as C++
+Creating X library
+make: Leaving directory `--topdir--/.verify-tmp/x/abuild-<native-os-data>.qrw'
+abuild: src (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.qrw'
+Compiling ../Y.cc as C++
+Creating Y library
+Compiling ../Z.cc as C++
+Creating Z shared library
+Compiling ../main.cc as C++
+Compiling ../other.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.qrw'
+
+===> BUILD OKAY <===
+
+
+===> PROGRAM OUTPUT OKAY <===
+
+
+===> REBUILD WHEN UP TO DATE <===
+
+abuild: a (abuild-<native-os-data>.qrw): all
+abuild: auto (abuild-<native-os-data>.qrw): all
+abuild: b (abuild-<native-os-data>.qrw): all
+abuild: x (abuild-<native-os-data>.qrw): all
+abuild: src (abuild-<native-os-data>.qrw): all
+
+===> BUILD OKAY <===
+
+
+===> RUNNING BUILD AFTER REMOVING SOURCE <===
+
+abuild: a (abuild-<native-os-data>.qrw): all
+abuild: auto (abuild-<native-os-data>.qrw): all
+abuild: b (abuild-<native-os-data>.qrw): all
+abuild: x (abuild-<native-os-data>.qrw): all
+abuild: src (abuild-<native-os-data>.qrw): all
+Removing extraneous dep files
+Extra object files found: removing libraries and binaries
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.qrw'
+Creating Y library
+Creating Z shared library
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.qrw'
+
+===> BUILD OKAY <===
+
+
+===> PROGRAM OUTPUT OKAY <===
+
+
+===> RUNNING BUILD AFTER MOVING HEADER <===
+
+abuild: a (abuild-<native-os-data>.qrw): all
+abuild: auto (abuild-<native-os-data>.qrw): all
+abuild: b (abuild-<native-os-data>.qrw): all
+abuild: x (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/x/abuild-<native-os-data>.qrw'
+Compiling ../X.cc as C++
+Creating X library
+make: Leaving directory `--topdir--/.verify-tmp/x/abuild-<native-os-data>.qrw'
+abuild: src (abuild-<native-os-data>.qrw): all
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.qrw'
+Creating Z shared library
+Compiling ../main.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.qrw'
+
+===> BUILD OKAY <===
+
+
+===> PROGRAM OUTPUT OKAY <===
+
+
+===> REBUILD WHEN UP TO DATE <===
+
+abuild: a (abuild-<native-os-data>.qrw): all
+abuild: auto (abuild-<native-os-data>.qrw): all
+abuild: b (abuild-<native-os-data>.qrw): all
+abuild: x (abuild-<native-os-data>.qrw): all
+abuild: src (abuild-<native-os-data>.qrw): all
+
+===> BUILD OKAY <===
+
+ALL CASES PASSED

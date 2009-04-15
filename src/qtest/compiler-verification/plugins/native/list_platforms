@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
+#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+
+if (! exists $ENV{'QRW_COMPILER'})
+{
+    exit 0;
+}
+print "native-compiler qrw\n";

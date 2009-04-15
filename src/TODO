@@ -23,10 +23,6 @@ release notes.
 Next
 ====
 
- * Update compiler verification to work with compat level 1.1.  Test
-   compiler verification for verification of a compiler that requires
-   a plugin in another tree.
-
  * Figure out how to capture output, separating stdout from stderr,
    and preserving whether output is a tty.
 

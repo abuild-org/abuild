@@ -3140,6 +3140,10 @@ Abuild::checkPlatformTypes(BuildForest& forest)
 	 iter != buildtrees.end(); ++iter)
     {
 	BuildTree& tree = *((*iter).second);
+	if (! tree.isLocal())
+	{
+	    continue;
+	}
 	PlatformData& platform_data = tree.getPlatformData();
 
 	// Load any additional platform data from our plugins
