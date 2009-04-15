@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+print "platform zz_os.cpu.toolset.xcc -type crosstype\n";

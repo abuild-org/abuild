@@ -6,11 +6,11 @@
 
 You will be asked to run programs at various times during this test.
 In each case, the executable target is "main" and is located in
-.verify-tmp/src/abuild-zz_os.cpu.toolset.echo.
+.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc.
 
 The program requires two shared libraries: "Z", which can be found in the
 same directory as "main", and "B", which is located in
-.verify-tmp/b/abuild-zz_os.cpu.toolset.echo.
+.verify-tmp/b/abuild-zz_os.cpu.toolset.xcc.
 
 The program itself should contain the symbols A::hello() and
 X::hello().  If Other::Other() is in the expected output, it should
@@ -24,433 +24,37 @@ Hit return to continue.
 
 ===> RUNNING INITIAL BUILD <===
 
-abuild: a (abuild-zz_os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset.echo'
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-   ../A.cc A.lo A.dep
+abuild: a (abuild-zz_os.cpu.toolset.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset.xcc'
 Compiling ../A.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic: 1
-make-obj flags: -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-
-make-obj src: ../A.cc
-make-obj obj: A.lo
-contents of A.lo:
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-end contents of A.lo
 Creating A library
-make-lib objects: A.lo
-make-lib lib: lib-A
-contents of lib-A:
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-end contents of lib-A
-make: Leaving directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset.echo'
-abuild: auto (abuild-zz_os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/.verify-tmp/autoconf/abuild-zz_os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset.xcc'
+abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/autoconf/abuild-zz_os.cpu.toolset.xcc'
 [autoconf output suppressed]
-make: Leaving directory `--topdir--/.verify-tmp/autoconf/abuild-zz_os.cpu.toolset.echo'
-abuild: b (abuild-zz_os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/.verify-tmp/b/abuild-zz_os.cpu.toolset.echo'
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../incl2 -include- .. -include- . -dflags- -oflags- -wflags-   ../B.cc B.lo B.dep
+make: Leaving directory `--topdir--/.verify-tmp/autoconf/abuild-zz_os.cpu.toolset.xcc'
+abuild: b (abuild-zz_os.cpu.toolset.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/b/abuild-zz_os.cpu.toolset.xcc'
 Compiling ../B.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic: 1
-make-obj flags: -include- ../../incl2 -include- .. -include- . -dflags- -oflags- -wflags-
-make-obj src: ../B.cc
-make-obj obj: B.lo
-contents of B.lo:
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-end contents of B.lo
 Creating B shared library
-make-shlib: linker: echo LINK_cxx
-make-shlib: compiler-flags: -dflags- -oflags- -wflags-
-make-shlib: link-flags:
-make-shlib: objects: B.lo
-make-shlib: lib-dirs: .
-make-shlib: libs:
-make-shlib: shlib: shlib-B.1.2.3
-contents of shlib-B.1.2.3:
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-end contents of shlib-B.1.2.3
-make: Leaving directory `--topdir--/.verify-tmp/b/abuild-zz_os.cpu.toolset.echo'
-abuild: x (abuild-zz_os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/.verify-tmp/x/abuild-zz_os.cpu.toolset.echo'
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-   ../X.cc X.lo X.dep
+make: Leaving directory `--topdir--/.verify-tmp/b/abuild-zz_os.cpu.toolset.xcc'
+abuild: x (abuild-zz_os.cpu.toolset.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/x/abuild-zz_os.cpu.toolset.xcc'
 Compiling ../X.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic: 1
-make-obj flags: -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-
-make-obj src: ../X.cc
-make-obj obj: X.lo
-contents of X.lo:
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-end contents of X.lo
 Creating X library
-make-lib objects: X.lo
-make-lib lib: lib-X
-contents of lib-X:
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-end contents of lib-X
-make: Leaving directory `--topdir--/.verify-tmp/x/abuild-zz_os.cpu.toolset.echo'
-abuild: src (abuild-zz_os.cpu.toolset.echo): all
-make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.echo'
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-   ../Y.cc Y.lo Y.dep
+make: Leaving directory `--topdir--/.verify-tmp/x/abuild-zz_os.cpu.toolset.xcc'
+abuild: src (abuild-zz_os.cpu.toolset.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 Compiling ../Y.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic: 1
-make-obj flags: -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-
-make-obj src: ../Y.cc
-make-obj obj: Y.lo
-contents of Y.lo:
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-end contents of Y.lo
 Creating Y library
-make-lib objects: Y.lo
-make-lib lib: lib-Y
-contents of lib-Y:
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-end contents of lib-Y
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-   ../Z.cc Z.lo Z.dep
 Compiling ../Z.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic: 1
-make-obj flags: -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-
-make-obj src: ../Z.cc
-make-obj obj: Z.lo
-contents of Z.lo:
-#include <Z.hh>
-#include <Y.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void Z::hello()
-{
-    Y::hello();
-    std::cout << "Hello from Z" << std::endl;
-}
-end contents of Z.lo
 Creating Z shared library
-make-shlib: linker: echo LINK_cxx
-make-shlib: compiler-flags: -dflags- -oflags- -wflags-
-make-shlib: link-flags:
-make-shlib: objects: Z.lo
-make-shlib: lib-dirs: . ../../x/abuild-zz_os.cpu.toolset.echo ../../b/abuild-zz_os.cpu.toolset.echo ../../a/abuild-zz_os.cpu.toolset.echo
-make-shlib: libs: Y X B A
-make-shlib: shlib: shlib-Z.1.2.3
-contents of shlib-Z.1.2.3:
-** shlib Z **
-#include <Z.hh>
-#include <Y.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void Z::hello()
-{
-    Y::hello();
-    std::cout << "Hello from Z" << std::endl;
-}
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-** end of shlib Z **
-end contents of shlib-Z.1.2.3
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-  -DD1/=0 -DD2/=1 ../main.cc main.o main.dep
 Compiling ../main.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic:
-make-obj flags: -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags- -DD1=0 -DD2=1
-make-obj src: ../main.cc
-make-obj obj: main.o
-contents of main.o:
-#include <A.hh>
-#include <B.hh>
-#include <X.hh>
-#include <Z.hh>
-#include <verify-config.h>
-#include <iostream>
-
-int main()
-{
-#ifdef HAVE_PRINTF
-    std::cout << "have printf: " << D1 << std::endl;
-#endif
-#ifdef HAVE_EXCEPTION
-    std::cout << "have exception: " << D2 << std::endl;
-#endif
-    A::hello();
-    B::hello();
-    X::hello();
-    Z::hello();
-    return 0;
-}
-end contents of main.o
-CCXX_GEN_DEPS echo PREPROCESS_cxx -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-   ../other.cc other.o other.dep
 Compiling ../other.cc as C++
-make-obj compiler: echo COMPILE_cxx
-make-obj pic:
-make-obj flags: -include- ../../autoconf/abuild-zz_os.cpu.toolset.echo -include- ../../incl2 -include- ../../incl1 -include- .. -include- . -dflags- -oflags- -wflags-
-make-obj src: ../other.cc
-make-obj obj: other.o
-contents of other.o:
-#include <iostream>
-
-class Other
-{
-  public:
-    Other();
-};
-
-static Other o;
-
-Other::Other()
-{
-    std::cout << "Other::Other()" << std::endl;
-}
-end contents of other.o
 Creating main executable
-make-bin: linker: echo LINK_cxx
-make-bin: compiler-flags: -dflags- -oflags- -wflags-
-make-bin: link-flags:
-make-bin: objects: main.o other.o
-make-bin: lib-dirs: . ../../x/abuild-zz_os.cpu.toolset.echo ../../b/abuild-zz_os.cpu.toolset.echo ../../a/abuild-zz_os.cpu.toolset.echo
-make-bin: libs: Y Z X B A
-make-bin: bin: bin-main
-contents of bin-main:
-** bin main **
-#include <A.hh>
-#include <B.hh>
-#include <X.hh>
-#include <Z.hh>
-#include <verify-config.h>
-#include <iostream>
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 
-int main()
-{
-#ifdef HAVE_PRINTF
-    std::cout << "have printf: " << D1 << std::endl;
-#endif
-#ifdef HAVE_EXCEPTION
-    std::cout << "have exception: " << D2 << std::endl;
-#endif
-    A::hello();
-    B::hello();
-    X::hello();
-    Z::hello();
-    return 0;
-}
-#include <iostream>
-
-class Other
-{
-  public:
-    Other();
-};
-
-static Other o;
-
-Other::Other()
-{
-    std::cout << "Other::Other()" << std::endl;
-}
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-** shlib Z **
-#include <Z.hh>
-#include <Y.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void Z::hello()
-{
-    Y::hello();
-    std::cout << "Hello from Z" << std::endl;
-}
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-** end of shlib Z **
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-** end of bin main **
-end contents of bin-main
-make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.echo'
-
-===> BUILD INCORRECT <===
-
-missing autoconf check result "for printf yes"
+===> BUILD OKAY <===
 
 
 ===> CHECK PROGRAM OUTPUT <===
@@ -469,227 +73,28 @@ Hit return to continue.
 
 ===> REBUILD WHEN UP TO DATE <===
 
-abuild: a (abuild-zz_os.cpu.toolset.echo): all
-abuild: auto (abuild-zz_os.cpu.toolset.echo): all
-abuild: b (abuild-zz_os.cpu.toolset.echo): all
-abuild: x (abuild-zz_os.cpu.toolset.echo): all
-abuild: src (abuild-zz_os.cpu.toolset.echo): all
+abuild: a (abuild-zz_os.cpu.toolset.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 
 ===> BUILD OKAY <===
 
 
 ===> RUNNING BUILD AFTER REMOVING SOURCE <===
 
-abuild: a (abuild-zz_os.cpu.toolset.echo): all
-abuild: auto (abuild-zz_os.cpu.toolset.echo): all
-abuild: b (abuild-zz_os.cpu.toolset.echo): all
-abuild: x (abuild-zz_os.cpu.toolset.echo): all
-abuild: src (abuild-zz_os.cpu.toolset.echo): all
+abuild: a (abuild-zz_os.cpu.toolset.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 Extra object files found: removing libraries and binaries
-make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.echo'
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 Creating Y library
-make-lib objects: Y.lo
-make-lib lib: lib-Y
-contents of lib-Y:
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-end contents of lib-Y
 Creating Z shared library
-make-shlib: linker: echo LINK_cxx
-make-shlib: compiler-flags: -dflags- -oflags- -wflags-
-make-shlib: link-flags:
-make-shlib: objects: Z.lo
-make-shlib: lib-dirs: . ../../x/abuild-zz_os.cpu.toolset.echo ../../b/abuild-zz_os.cpu.toolset.echo ../../a/abuild-zz_os.cpu.toolset.echo
-make-shlib: libs: Y X B A
-make-shlib: shlib: shlib-Z.1.2.3
-contents of shlib-Z.1.2.3:
-** shlib Z **
-#include <Z.hh>
-#include <Y.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void Z::hello()
-{
-    Y::hello();
-    std::cout << "Hello from Z" << std::endl;
-}
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-** end of shlib Z **
-end contents of shlib-Z.1.2.3
 Creating main executable
-make-bin: linker: echo LINK_cxx
-make-bin: compiler-flags: -dflags- -oflags- -wflags-
-make-bin: link-flags:
-make-bin: objects: main.o
-make-bin: lib-dirs: . ../../x/abuild-zz_os.cpu.toolset.echo ../../b/abuild-zz_os.cpu.toolset.echo ../../a/abuild-zz_os.cpu.toolset.echo
-make-bin: libs: Y Z X B A
-make-bin: bin: bin-main
-contents of bin-main:
-** bin main **
-#include <A.hh>
-#include <B.hh>
-#include <X.hh>
-#include <Z.hh>
-#include <verify-config.h>
-#include <iostream>
-
-int main()
-{
-#ifdef HAVE_PRINTF
-    std::cout << "have printf: " << D1 << std::endl;
-#endif
-#ifdef HAVE_EXCEPTION
-    std::cout << "have exception: " << D2 << std::endl;
-#endif
-    A::hello();
-    B::hello();
-    X::hello();
-    Z::hello();
-    return 0;
-}
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-** shlib Z **
-#include <Z.hh>
-#include <Y.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void Z::hello()
-{
-    Y::hello();
-    std::cout << "Hello from Z" << std::endl;
-}
-** lib Y **
-#include <Y.hh>
-#include <iostream>
-
-void Y::hello()
-{
-    std::cout << "Hello from Y" << std::endl;
-}
-** end of lib Y **
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-** end of shlib Z **
-** lib X **
-#include <X.hh>
-#include <iostream>
-
-void X::hello()
-{
-    std::cout << "Hello from X" << std::endl;
-}
-** end of lib X **
-** shlib B **
-#include <B.hh>
-#include <iostream>
-
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-void B::hello()
-{
-    std::cout << "Hello from B" << std::endl;
-}
-** end of shlib B **
-** lib A **
-#include <A.hh>
-#include <iostream>
-
-void A::hello()
-{
-    std::cout << "Hello from A" << std::endl;
-}
-** end of lib A **
-** end of bin main **
-end contents of bin-main
-make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.echo'
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 
 ===> BUILD OKAY <===
 
@@ -709,11 +114,11 @@ Hit return to continue.
 
 ===> RUNNING BUILD AFTER MOVING HEADER <===
 
-abuild: a (abuild-zz_os.cpu.toolset.echo): all
-abuild: auto (abuild-zz_os.cpu.toolset.echo): all
-abuild: b (abuild-zz_os.cpu.toolset.echo): all
-abuild: x (abuild-zz_os.cpu.toolset.echo): all
-abuild: src (abuild-zz_os.cpu.toolset.echo): all
+abuild: a (abuild-zz_os.cpu.toolset.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 
 ===> BUILD INCORRECT <===
 
@@ -739,12 +144,12 @@ Hit return to continue.
 
 ===> REBUILD WHEN UP TO DATE <===
 
-abuild: a (abuild-zz_os.cpu.toolset.echo): all
-abuild: auto (abuild-zz_os.cpu.toolset.echo): all
-abuild: b (abuild-zz_os.cpu.toolset.echo): all
-abuild: x (abuild-zz_os.cpu.toolset.echo): all
-abuild: src (abuild-zz_os.cpu.toolset.echo): all
+abuild: a (abuild-zz_os.cpu.toolset.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 
 ===> BUILD OKAY <===
 
-FAILURES: 2
+FAILURES: 1

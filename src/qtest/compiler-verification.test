@@ -98,13 +98,13 @@ $td->runtest("cross compiler plugin",
 	     {$td->COMMAND =>
 		  "$abuild_top/misc/compiler-verification/verify-compiler" .
 		  " </dev/null" .
-		  " --plugin-tree-location $top/../abuild-basic/data" .
-		  " --plugin-tree-name basic" .
-		  " --plugin-name plugin.echo" .
-		  " --platform-type echotype" .
-		  " --compiler echo",
+		  " --plugin-tree-location $top/plugins" .
+		  " --plugin-tree-name compiler-plugins" .
+		  " --plugin-name cross" .
+		  " --platform-type crosstype" .
+		  " --compiler xcc",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/echo-plugin.out",
+	     {$td->FILE => "$top/cross-compiler-plugin.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -113,12 +113,12 @@ $td->runtest("1.0 compatibility",
 		  "ABUILD_COMPAT_LEVEL=1.0" .
 		  " $abuild_top/misc/compiler-verification/verify-compiler" .
 		  " </dev/null" .
-		  " --plugin-tree-location $top/../abuild-basic/data" .
-		  " --plugin-name plugin.echo" .
-		  " --platform-type echotype" .
-		  " --compiler echo",
+		  " --plugin-tree-location $top/plugins" .
+		  " --plugin-name cross" .
+		  " --platform-type crosstype" .
+		  " --compiler xcc",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/echo-plugin-1.0.out",
+	     {$td->FILE => "$top/cross-compiler-plugin-1.0.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

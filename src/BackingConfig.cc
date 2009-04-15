@@ -103,7 +103,15 @@ BackingConfig::validate()
 	    *iter = this->dir + "/" + *iter;
 	}
 	*iter = Util::canonicalizePath(*iter);
-	if (! Util::isFile(*iter + "/" + ItemConfig::FILE_CONF))
+	bool keep = true;
+	if (! Util::isDirectory(*iter))
+	{
+	    QTC::TC("abuild", "BackingConfig ERR backing area doesn't exist");
+	    this->error.error(this->location,
+			      "backing area \"" + decl + "\" does not exist");
+	    keep = false;
+	}
+	else if (! Util::isFile(*iter + "/" + ItemConfig::FILE_CONF))
 	{
 	    // Abuild 1.0 would have allowed Abuild.backing to point a
 	    // directory containing only Abuild.backing, but we don't
@@ -112,6 +120,10 @@ BackingConfig::validate()
 	    this->error.error(this->location,
 			      "backing area \"" + decl + "\" does not contain"
 			      " an " + ItemConfig::FILE_CONF + " file");
+	    keep = false;
+	}
+	if (! keep)
+	{
 	    backing_areas.erase(iter, next);
 	}
 	iter = next;
