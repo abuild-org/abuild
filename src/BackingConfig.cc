@@ -156,7 +156,8 @@ BackingConfig::readOldFormat()
 	std::string line = lines.front();
 	// A colon early in the line might be the result of a windows
 	// absolute path rather than a key/value separator...
-	if (line.find(':') <= 2)
+	std::string::size_type pos = line.find(':');
+	if ((pos == std::string::npos) || (pos <= 2))
 	{
 	    backing_areas.push_back(line);
 	    this->deprecated = true;
