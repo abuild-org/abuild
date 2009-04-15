@@ -7,7 +7,11 @@ Notes for Next Release
 Remember to keep deprecated features list up-to-date.  Add the
 following:
 
- * ...
+ * ABUILD_THIS is no longer deprecated.  We can't really deprecate an
+   interface variable because there's no way to detect or warn for the
+   use of a specific variable in backend configuration files.  People
+   should use ABUILD_ITEM_NAME instead of ABUILD_THIS, but the
+   ABUILD_THIS variable will stick around.
 
 These changes have already been made and need to make it into the
 release notes.
@@ -18,11 +22,6 @@ release notes.
 
 Next
 ====
-
- * Remove concept of deprecated interface variables.  Move ABUILD_THIS
-   back to base.interface with a comment explaining why we can't
-   deprecate interface variables (you can't easily detect and report
-   their use in backend configuration files).
 
  * Update compiler verification to work with compat level 1.1.  Test
    compiler verification for verification of a compiler that requires

@@ -1,5 +1,0 @@
---topdir--/interface-variables/Abuild.interface:1:12: ERROR: unknown variable ABUILD_THIS
---topdir--/interface-variables/Abuild.interface:1:12: ERROR: this argument must be a string
-abuild: interface (abuild-indep): build failed
-abuild: ERROR: at least one build failure occurred; summary follows
-abuild: ERROR: build failure: interface on platform indep

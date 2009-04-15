@@ -89,22 +89,6 @@ $td->runtest("LINK_SHLIBS",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/interface-variables");
-
-$td->runtest("interface variables compat level 1.1",
-	     {$td->COMMAND => "abuild --compat-level=1.1",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/interface-variables-1_1.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("interface variables",
-	     {$td->COMMAND => "abuild",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/interface-variables.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
 check_work_accessed($td);
 
-$td->report(8 + ($test_java ? 3 : 0));
+$td->report(6 + ($test_java ? 3 : 0));

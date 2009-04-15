@@ -4,6 +4,16 @@
 
 target-type all
 
+# Obsolete variables
+
+# People should use ABUILD_ITEM_NAME instead of ABUILD_THIS.  We can't
+# really deprecate interface variables because, although we can detect
+# their use within the interface system, we can't generally detect or
+# report their use by backend configuration files.  As such,
+# ABUILD_THIS will likely stay around indefinitely, though it should
+# get just passing mention in the documentation.
+declare ABUILD_THIS string
+
 # Global information
 
 declare ABUILD_STDOUT_IS_TTY boolean

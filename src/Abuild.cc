@@ -599,7 +599,6 @@ Abuild::parseArgv()
     if (compat_level_version == "1.0")
     {
 	this->compat_level.setLevel(CompatLevel::cl_1_0);
-	InterfaceParser::addDeprecatedVariable("1.1", "ABUILD_THIS");
     }
     else if (compat_level_version == "1.1")
     {
@@ -5358,18 +5357,6 @@ Abuild::buildBuildset()
     }
     this->base_interface = base_parser.getInterface();
     this->base_interface->setTargetType(TargetType::tt_all);
-    if (this->compat_level.allow_1_0())
-    {
-	if (! this->base_interface->declareVariable(
-		FileLocation("-internal-compat-", 1, 0),
-		"ABUILD_THIS",
-		Interface::s_recursive,
-		Interface::t_string,
-		Interface::l_scalar))
-	{
-	    fatal("error declaring ABUILD_THIS");
-	}
-    }
 
     // Load interfaces for each plugin.
     bool plugin_interface_errors = false;
@@ -6088,12 +6075,14 @@ Abuild::createItemInterface(std::string const& builder_string,
 
     Interface& _interface = *(parser.getInterface());
     FileLocation internal("[internal: " + builder_string + "]", 0, 0);
-    if (this->compat_level.allow_1_0())
-    {
-	assignInterfaceVariable(_interface,
-				internal, "ABUILD_THIS", build_item.getName(),
-				Interface::a_override, status);
-    }
+
+    // We keep ABUILD_THIS around since we have no way of detecting or
+    // warning for its use in backend configuration files and
+    // therefore can't easily deprecate it.
+    assignInterfaceVariable(_interface,
+			    internal, "ABUILD_THIS", build_item.getName(),
+			    Interface::a_override, status);
+
     assignInterfaceVariable(_interface,
 			    internal, "ABUILD_ITEM_NAME", build_item.getName(),
 			    Interface::a_override, status);

@@ -364,7 +364,6 @@ Abuild ERR error for global plugin 0
 Abuild add global plugin 0
 Abuild add global tree dep 0
 Abuild item in unnamed root 0
-InterfaceParser use deprecated variable 0
 Abuild expand by rdeps 0
 Abuild non-trivial rdep expansion 0
 ItemConfig ERR optional without treedep 0

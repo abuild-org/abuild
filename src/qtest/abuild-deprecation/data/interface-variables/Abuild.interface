@@ -1,3 +1,0 @@
-if (equals($(ABUILD_THIS),$(ABUILD_ITEM_NAME)))
-  declare X local string = $(ABUILD_THIS)
-endif

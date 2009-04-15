@@ -13,8 +13,6 @@ std::map<std::string,
 	     std::vector<nt_Argument const*> const&,
 	     bool&)> InterfaceParser::function_evaluators;
 
-std::map<std::string, std::string> InterfaceParser::deprecated_variables;
-
 extern int interfacedebug;
 
 void interfaceerror(InterfaceParser*, char *)
@@ -68,13 +66,6 @@ InterfaceParser::InterfaceParser(std::string const& item_name,
 
     this->_interface.reset(new Interface(item_name, item_platform,
 					 error_handler, local_dir));
-}
-
-void
-InterfaceParser::addDeprecatedVariable(std::string const& version,
-				       std::string const& varname)
-{
-    deprecated_variables[varname] = version;
 }
 
 bool
@@ -889,13 +880,6 @@ InterfaceParser::withVariable(
 {
     bool result = false;
     std::string variable_name = getVariableName(token);
-    if (deprecated_variables.count(variable_name))
-    {
-	QTC::TC("abuild", "InterfaceParser use deprecated variable");
-	this->error_handler.deprecate(
-	    deprecated_variables[variable_name], token->getLocation(),
-	    "variable \"" + variable_name + "\" is deprecated");
-    }
     Interface::VariableInfo info;
     if (this->_interface->getVariable(variable_name, info))
     {
