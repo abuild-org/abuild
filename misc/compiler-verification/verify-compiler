@@ -58,6 +58,11 @@ while (@ARGV)
     {
 	usage() unless @ARGV;
 	$plugin_tree_location = abs_path(shift(@ARGV));
+	if ($^O eq 'cygwin')
+	{
+	    chop($plugin_tree_location = `cygpath -w $plugin_tree_location`);
+	    $plugin_tree_location =~ s,\\,/,g;
+	}
     }
     elsif ($arg eq '--plugin-tree-name')
     {
