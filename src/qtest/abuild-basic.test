@@ -21,10 +21,6 @@ my $platform_native = get_native_platform();
 # and out of platform directories, platform selectors, and other basic
 # functionality.  It also exercises the ccxx rules.
 
-# This build tree's echo plugin is also used to exercise
-# verify-compiler for cross compilers.  This test suite's data
-# directory is referenced from the compiler-verification test suite.
-
 setup($td);
 
 cd("work");
