@@ -8,6 +8,7 @@ my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
 
 my $out = undef;
 my $c = 0;
+my $obj = undef;
 while (@ARGV)
 {
     my $arg = shift(@ARGV);
@@ -24,13 +25,44 @@ while (@ARGV)
     }
     elsif ($arg =~ m/(.*)\.c(c|pp)?$/)
     {
-	if (! defined $out)
+	if (! defined $obj)
 	{
-	    $out = "$1.o";
+	    $obj = "$1.o";
+	}
+	if (open(F,"<$arg"))
+	{
+	    # This is fragile.  We are trying to fake out autoconf
+	    # here.  This could break if autoconf generates
+	    # significantly different test code in configure, which is
+	    # not all that likely.
+	    while (<F>)
+	    {
+		# This appears in the file that tests whether we are
+		# using gcc.  We want autoconf to decide that we are
+		# not using gcc.
+		if (m/#ifndef\s+__GNUC__/)
+		{
+		    exit 2;
+		}
+		# This appears in the test for the preprocessor.
+		# configure wants the preprocessor to exit if a
+		# non-existent header file is referenced.
+		if (m/ac_nonexistent.h/)
+		{
+		    exit 2;
+		}
+	    }
+	    close(F);
 	}
     }
 }
+
+if ($c && (! defined $out) && (defined $obj))
+{
+    $out = $obj;
+}
 $out = 'a.out' unless defined $out;
 open(O, ">$out");
-print O "#out\n";
+print O "exit 1\n";
 close(O);
+chmod 0777, $out;
