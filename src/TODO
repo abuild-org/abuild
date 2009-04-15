@@ -16,6 +16,41 @@ release notes.
    location of the given build item or build tree.
 
 
+Next
+====
+
+ * Remove concept of deprecated interface variables.  Move ABUILD_THIS
+   back to base.interface with a comment explaining why we can't
+   deprecate interface variables (you can't easily detect and report
+   their use in backend configuration files).
+
+ * Update compiler verification to work with compat level 1.1.  Test
+   compiler verification for verification of a compiler that requires
+   a plugin in another tree.
+
+ * Figure out how to capture output, separating stdout from stderr,
+   and preserving whether output is a tty.
+
+ * Implement new help system.
+
+ * Consider capturing the output of the backend so that we can
+   de-interleave output when running parallel builds (or mark each
+   line of output with the build item/platform data), separate error
+   from informational output, etc.  It is possible to create pipe-like
+   handles with CreatePipe in Windows and to use them to initialize
+   hStdInput, hStdOutput, and hStdError fields of the startupinfo
+   parameter to CreateProcess.  There is an example at
+   http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
+   There is also some kind of Win32 Job API used by the perl
+   Win32::Job classes (CreateJobObject).  This may provide a better
+   solution than our current CTRL-C handling.  See if boost provides
+   anything that could do this.
+
+ * See if we can provide an option to indent all of abuild's non-error
+   output.  Ideally, this should capture output from backends as
+   well...
+
+
 Help system
 ===========
 
@@ -48,14 +83,6 @@ We also need topics to do the following:
 Groovy Framework
 ================
 
- * Java out of memory problem with ant is reportedly fixed with
-   1.5.0_12.  Actually, it still happens with 1.5.0_15.
-
- * Update rules/java/java_help.txt
-
- * Document somewhere that lazy jar signing is true by default in
-   order to have idempotent builds
-
  * Need to figure out what desired junit and javadoc behavior should
    be.  Maybe junit should be able to support multiple testsuites?
 
@@ -63,12 +90,98 @@ Groovy Framework
    abuild-java-rules/data/jars/simple.
 
 
-Compiler Verification
-=====================
+Information Extraction
+======================
 
- * Update compiler verification to work with compat level 1.1.  Test
-   compiler verification for verification of a compiler that requires
-   a plugin in another tree.
+ * Provide arguments for querying abuild's state, such as listing all
+   trees with locations and dependencies, summarizing the state of all
+   plugin information (which items are plugins in any tree, which tree
+   provides the plugin, and which trees use the plugin), etc.  The
+   --dump-data option will always be available for providing full
+   information, but providing a more human-readable format for
+   commonly needed information will help.  Or maybe provide some
+   sample xslt scripts to the above.
+
+ * Provide a way to get --dump-data's output into a relational
+   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
+   have an option that causes --dump-data to generate a script file
+   that can be used with sqlite3 rather than generating XML data.
+   Alternatively, we can create xsl/perl code that loads directly into
+   a sqlite database or that creates the input file.  It's probably
+   okay if we create the SQL such that an erroneous dumpdata won't
+   load.  For example, the SQL can enforce uniqueness and referential
+   integrity constraints even though they may not be satisfied when
+   there are errors.
+
+
+Miscellaneous
+=============
+
+ * Need a better solution for files that are automatically generated
+   by optional tools.  Abuild itself could use this for flex/bison
+   files.  We could also use it for cases like xbinder where
+   generating the files requires a special license.  We need a clean
+   way to handle the following:
+
+    - Regeneration of the files if they are out of date and the tools
+      are available.
+
+    - Use of cached files if they are not out of date.
+
+    - Error if the files are out of date and the tools are not
+      available.
+
+   This implies, at least for these cases, some kind of checksum-based
+   method (rather than using modification times) to tell whether files
+   are out of date.  That way, checkouts from the version control
+   system can work even when the CM system does not preserve
+   modification times.
+
+   One way to handle this would be to have a general-purpose wrapper
+   around a code generator that would be told the names of input and
+   output files and the command to generate them.  If the cached input
+   files matched the actual ones, it would just copy the cached output
+   files.  Otherwise, it would regenerate and, if successful, replace
+   the cached ones.
+
+   Package auto-srcs with abuild sources if autogeneration make
+   enhancement is done.
+
+ * Consider Deprecating ABUILD_FORCE_32BIT and adding
+   ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding
+   ABUILD_FORCE_64BIT and verifying that both can't be set.  Search
+   for FORCE32 in the code.  The only references are in
+   private/bin/get_native_platform_data and make/toolchains/gcc.mk.
+
+ * Incorporate as much of abuild-lint as possible or otherwise include
+   abuild-lint in the distribution.
+
+ * Test qtest coverage from abuild test suite.  Relatively low
+   priority since abuild's test suite itself uses coverage, so
+   abuild's qtest coverage support is exercised every time the abuild
+   test suite is run.  (It's just that you might not notice if it
+   weren't there.)
+
+ * Consider having --silent invoke make with --no-print-directory.
+   Check all calls to info to see which ones should be suppressed when
+   abuild is invoked with --silent.  Or add a notice() that prints
+   even when silent and make info suppress output when silent.  Then
+   see which infos can be changed to notices and which ones can have
+   if silent stuff around it removed.
+
+
+Abuild Contrib
+==============
+
+ * Fix deprecation warnings (Rules.mk) in pkg-config.
+
+ * Make sure any compiler plugins included with abuild contrib have
+   the 1.0.2 fixes integrated into them.
+
+ * Include a generic UNIX compiler configurable plugin for which the
+   user can set up the compliation commands using autoconf.
+
+ * Consider including a libtool configurable plugin.
 
 
 Documentation
@@ -127,135 +240,11 @@ Documentation
    MSVC_MANAGEMENT_FLAGS, and MSVC_RUNTIME_FLAGS.  See comments in
    msvc.mk.
 
+ * Update rules/java/java_help.txt
 
-Usability Improvements
-======================
+ * Groovy framework: document somewhere that lazy jar signing is true
+   by default in order to have idempotent builds
 
- * Provide arguments for querying abuild's state, such as locating
-   build items (perhaps with pattern matching), listing all trees with
-   locations and dependencies, summarizing the state of all plugin
-   information (which items are plugins in any tree, which tree
-   provides the plugin, and which trees use the plugin), etc.  The
-   --dump-data option will always be available for providing full
-   information, but providing a more human-readable format for
-   commonly needed information will help.
-
- * Make sure abuild --help references the build/clean set list from
-   the --build and --clean argument description, and make sure there
-   is a reference to the platform selector information from the
-   --platform-selector argument description.  Also divide the output
-   clearly into OPTIONS and TARGETS.
-
- * Incorporate as much of abuild-lint as possible or otherwise include
-   abuild-lint in the distribution.
-
- * Consider capturing the output of the backend so that we can
-   de-interleave output when running parallel builds (or mark each
-   line of output with the build item/platform data), separate error
-   from informational output, etc.  It is possible to create pipe-like
-   handles with CreatePipe in Windows and to use them to initialize
-   hStdInput, hStdOutput, and hStdError fields of the startupinfo
-   parameter to CreateProcess.  There is an example at
-   http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
-   There is also some kind of Win32 Job API used by the perl
-   Win32::Job classes (CreateJobObject).  This may provide a better
-   solution than our current CTRL-C handling.  See if boost provides
-   anything that could do this.
-
- * See if we can provide an option to indent all of abuild's non-error
-   output.  Ideally, this should capture output from backends as
-   well...
-
- * Provide a way to get --dump-data's output into a relational
-   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
-   have an option that causes --dump-data to generate a script file
-   that can be used with sqlite3 rather than generating XML data.
-   Alternatively, we can create xsl/perl code that loads directly into
-   a sqlite database or that creates the input file.  It's probably
-   okay if we create the SQL such that an erroneous dumpdata won't
-   load.  For example, the SQL can enforce uniqueness and referential
-   integrity constraints even though they may not be satisfied when
-   there are errors.
-
-
-Plugins
-=======
-
- * Create an example of plugins that have to be preconfigured.
-   Examples would include a generic UNIX compiler plugin.  This can
-   probably be done without making any changes to the plugin system.
-   The generic UNIX compiler plugin may also make a good example of
-   using a global plugin.
-
-
-Abuild Contrib
-==============
-
- * Fix deprecation warnings (Rules.mk) in pkg-config.
-
- * Make sure any compiler plugins included with abuild contrib have
-   the 1.0.2 fixes integrated into them.
-
- * Include a generic UNIX compiler configurable plugin for which the
-   user can set up the compliation commands using autoconf.  Or maybe
-   this could be implemented using a global platform build item.
-
- * Consider including a libtool configurable plugin.
-
-
-Platform Issues
-===============
-
- * Consider Deprecating ABUILD_FORCE_32BIT and adding
-   ABUILD_FORCE_WORDSIZE={32,64}.  Search for FORCE32 in the code.
-   The only references are in private/bin/get_native_platform_data and
-   make/toolchains/gcc.mk.
-
-
-Changes to "make" Code
-======================
-
- * Need a better solution for files that are automatically generated
-   by optional tools.  Abuild itself could use this for flex/bison
-   files.  We could also use it for cases like xbinder where
-   generating the files requires a special license.  We need a clean
-   way to handle the following:
-
-    - Regeneration of the files if they are out of date and the tools
-      are available.
-
-    - Use of cached files if they are not out of date.
-
-    - Error if the files are out of date and the tools are not
-      available.
-
-   This implies, at least for these cases, some kind of checksum-based
-   method (rather than using modification times) to tell whether files
-   are out of date.  That way, checkouts from the version control
-   system can work even when the CM system does not preserve
-   modification times.
-
-   One way to handle this would be to have a general-purpose wrapper
-   around a code generator that would be told the names of input and
-   output files and the command to generate them.  If the cached input
-   files matched the actual ones, it would just copy the cached output
-   files.  Otherwise, it would regenerate and, if successful, replace
-   the cached ones.
-
-
-Building Abuild
-===============
-
-Package auto-srcs with abuild sources if autogeneration make
-enhancement is done.
-
-Miscellaneous
-=============
-
-We may want to rethink deprecation of ABUILD_THIS and deprecation of
-interface variables in general since we can't actually issue a warning
-for their use in backend build files.  In other words, they will
-disappear without warning if we remove compatibility support.
 
 ----------------------------------------------------------------------
 
@@ -442,19 +431,9 @@ Issues, Enhancement Ideas
 
 See also "Known Limitations" in the documentation.
 
- * Test qtest coverage from abuild test suite.  Relatively low
-   priority since abuild's test suite itself uses coverage, so
-   abuild's qtest coverage support is exercised every time the abuild
-   test suite is run.  (It's just that you might not notice if it
-   weren't there.)
-
  * Think about implementing a dependency analyzer that would look at
    first-level includes to figure out what the correct list of direct
    dependencies should be.
-
- * Consider having --silent invoke make with --no-print-directory.  If
-   we do this, we should follow build item failure with a message that
-   contains the name, path, and platform of whatever failed.
 
  * Consider having an abuild template generator that can run if no
    Abuild.conf or other files are present.  This would spit out
@@ -512,3 +491,6 @@ See also "Known Limitations" in the documentation.
 
  * Cass Dalton reports that he sometimes gets "resource busy" errors
    when running autoconf with --make-jobs.
+
+ * Java out of memory problem with ant is reportedly fixed with
+   1.5.0_12.  Actually, it still happens with 1.5.0_15.
