@@ -36,6 +36,8 @@ std::set<std::string> Abuild::valid_buildsets;
 std::map<std::string, std::string> Abuild::buildset_aliases;
 std::string const Abuild::s_CLEAN = "clean";
 std::string const Abuild::s_NO_OP = "no-op";
+std::string const Abuild::h_HELP = "help";
+std::string const Abuild::h_RULES = "rules";
 // PLUGIN_PLATFORM can't match a real platform name.
 std::string const Abuild::PLUGIN_PLATFORM = "plugin";
 std::string const Abuild::FILE_PLUGIN_INTERFACE = "plugin.interface";
@@ -135,12 +137,11 @@ Abuild::runInternal()
     // Handle a few arguments that short-circuit normal operation.
     if (this->argc == 2)
     {
-	bool exit_now = false;
+	boost::function<void(std::string const&)> l =
+	    boost::bind(&Logger::logInfo, &(this->logger), _1);
 	std::string first_arg = argv[1];
 	if ((first_arg == "-V") || (first_arg == "--version"))
 	{
-	    boost::function<void(std::string const&)> l =
-		boost::bind(&Logger::logInfo, &(this->logger), _1);
 	    l(this->whoami + " version " + ABUILD_VERSION);
 	    l("");
 	    l("Copyright (c) 2007-2009 Jay Berkenbilt, Argon ST");
@@ -148,16 +149,18 @@ Abuild::runInternal()
 	    l("the Artistic License which may be found in the source and binary");
 	    l("distributions.  It is provided \"as is\" without express or");
 	    l("implied warranty.");
-	    exit_now = true;
+	    return true;
 	}
 	else if ((first_arg == "-H") || (first_arg == "--help"))
 	{
-	    help();
-	    exit_now = true;
-	}
-
-	if (exit_now)
-	{
+	    l("");
+	    l("Help is available on a variety of topics.");
+	    l("");
+	    l("For a usage summary, run " + this->whoami + " --help usage");
+	    l("");
+	    l("For a list of topics and information about the help system, run");
+	    l(this->whoami + " --help help");
+	    l("");
 	    return true;
 	}
     }
@@ -196,6 +199,11 @@ Abuild::runInternal()
 
     parseArgv();
     exitIfErrors();
+
+    if (generalHelp())
+    {
+	return true;
+    }
 
     initializePlatforms();
     exitIfErrors();
@@ -343,6 +351,14 @@ Abuild::parseArgv()
 	if (boost::regex_match(arg, match, define_re))
 	{
 	    this->defines[match.str(1)] = match.str(2);
+	}
+	else if ((arg == "-H") || (arg == "--help"))
+	{
+	    if (! *argp)
+	    {
+		usage("invalid --help invocation");
+	    }
+	    this->help_topic = *argp++;
 	}
 	else if (arg == "-C")
 	{
@@ -627,9 +643,9 @@ Abuild::parseArgv()
 	}
 
 	if (this->dump_data || this->list_platforms || this->list_traits ||
-	    (! this->to_find.empty()))
+	    (! this->help_topic.empty()) || (! this->to_find.empty()))
 	{
-	    usage("query options may not be used with a build set");
+	    usage("help/query options may not be used with a build set");
 	}
     }
 
@@ -1245,6 +1261,12 @@ Abuild::readConfigs()
 		std::cout << "item " << item << " is unknown" << std::endl;
 	    }
 	}
+	return true;
+    }
+
+    if (this->help_topic == h_RULES)
+    {
+	notice("XXX would present help on rules here");
 	return true;
     }
 
@@ -7066,133 +7088,100 @@ Abuild::cleanOutputDir()
     }
 }
 
-void
-Abuild::help()
+bool
+Abuild::generalHelp()
 {
+    // Return true if we have provided help.
+    if (this->help_topic.empty() ||
+	(this->help_topic == h_RULES))
+    {
+	return false;
+    }
+
+    boost::regex text_re("(.*)\\.txt");
+    boost::regex description_re("## description: (.*?)\\s*");
+    boost::smatch match;
+
+    std::string helpdir = this->abuild_top + "/help";
+    std::vector<std::string> entries = Util::getDirEntries(helpdir);
+    std::map<std::string, std::string> topics;
+    for (std::vector<std::string>::iterator iter = entries.begin();
+	 iter != entries.end(); ++iter)
+    {
+	if (boost::regex_match(*iter, match, text_re))
+	{
+	    std::string topic = match.str(1);
+	    std::string filename = helpdir + "/" + *iter;
+	    std::ifstream in(filename.c_str());
+	    if (! in.is_open())
+	    {
+		throw QEXC::System("unable to open file " + filename, errno);
+	    }
+	    std::string firstline;
+	    std::getline(in, firstline);
+	    in.close();
+
+	    std::string description;
+	    if (boost::regex_match(firstline, match, description_re))
+	    {
+		description = match.str(1);
+	    }
+
+	    topics[topic] = description;
+	}
+    }
+    if (topics.count(this->help_topic))
+    {
+	readHelpFile(helpdir + "/" + this->help_topic + ".txt");
+	return true;
+    }
+
+    if (this->help_topic != h_HELP)
+    {
+	usage("invalid help topic " + this->help_topic);
+    }
+
+    // Describe the help system
+
+    topics[h_HELP] = "the help system (this topic)";
+    topics[h_RULES] = "rules available to the current build item";
+
     boost::function<void(std::string const&)> h =
 	boost::bind(&Logger::logInfo, &(this->logger), _1);
 
-    // This guide helps keep message to 80 columns.
+    h("");
+    h("To request help on a specific topic, run \"" +
+      this->whoami + " --help topic\".");
+    h("Help is available on the following topics:");
+    h("");
+    for (std::map<std::string, std::string>::iterator iter = topics.begin();
+	 iter != topics.end(); ++iter)
+    {
+	std::string line = "  " + (*iter).first;
+	if (! (*iter).second.empty())
+	{
+	    line += ": " + (*iter).second;
+	}
+	h(line);
+    }
+    h("");
 
-    //0        1         2         3         4         5         6         7         8
-    //12345678901234567890123456789012345678901234567890123456789012345678901234567890
+    return true;
+}
 
-    h("");
-    h("Usage: " + whoami + " [options] [defines] [targets]");
-    h("");
-    h("This help message provides a brief synopsis of supported arguments.");
-    h("Please see abuild's documentation for additional details.");
-    h("");
-    h("Options, defines, and targets may appear in any order.  Any argument that");
-    h("starts with \"-\" is treated as an option.");
-    h("");
-    h("Any option not starting with - that contains an = is treated as a variable");
-    h("definition, with the variable name being everything prior to the first =.");
-    h("These are passed as variables to make, properties to ant, keys in");
-    h("abuild.defines for groovy.");
-    h("");
-    h("If no targets are specified, the \"all\" target is built.");
-    h("");
-    h("OPTIONS");
-    h("");
-    h("  -H | --help       print help message and exit");
-    h("  -V | --version    print abuild's version number and exit");
-    h("");
-    h("  --apply-targets-to-deps   apply explicit targets to dependencies as well;");
-    h("                    when cleaning with a clean set, expand to include");
-    h("                    dependencies");
-    h("  --build=set |     specify a build set; see below for a list of valid sets");
-    h("    -b set");
-    h("  -C start-dir      change directories to start-dir before running");
-    h("  --clean=set |     specify a clean set; see below for a list of valid sets");
-    h("    -c set");
-    h("  --clean-platforms pattern   when cleaning, only remove platforms that");
-    h("                    match the given shell-style filename pattern");
-    h("  --compat-level=x.y       disable backward compatible for constructs that");
-    h("                    were deprecated at or before version x.y");
-    h("  --deprecation-is-error   treat deprecation warnings as errors");
-    h("  --dump-build-graph  dump abuild's internal build graph");
-    h("  --dump-data       dump abuild's data to stdout and build no targets");
-    h("  --dump-interfaces   write details about items' interfaces to files");
-    h("                    in the output directory");
-    h("  -e | --emacs      pass the -e flags to ant and also set a property");
-    h("                    telling our ant build file that we are running in");
-    h("                    emacs mode.");
-    h("  --find { item-name | tree:tree-name}    print the location of build item");
-    h("                    item-name or build tree tree-name");
-    h("  --find-conf       look above the current directory to find a directory");
-    h("                    that contains Abuild.conf and run abuild from there");
-    h("  --full-integrity  check integrity for all items, not just items being built");
-    h("  --jobs=n | -jn    build up to n build items in parallel");
-    h("  --keep-going |    don't stop when a build item fails; also tells backend");
-    h("    -k              not to stop on failure");
-    h("  --list-platforms  list all object-code platforms");
-    h("  --list-traits     list all known traits");
-    h("  --make-jobs[=n]   passes the -j flag to make allowing each make to use");
-    h("                    up to n jobs; omit n to let it use as many as it can");
-    h("  --make            pass all remaining arguments to make");
-    h("  --monitored       run in monitored mode");
-    h("  -n                pass no-op flag to backend");
-    h("  --no-dep-failures   when used with -k, attempt to build items even when");
-    h("                    one or more of their dependencies have failed");
-    h("  --no-deps         build only the current item without its dependencies");
-    h("  --only-with-traits trait[,trait,...]   remove all items from build set");
-    h("                    that do not have all of the named traits");
-    h("  --platform-selector selector |       specify a platform selector");
-    h("    -p selector     for object-code platforms; see below");
-    h("  --print-abuild-top  print the path to the top of the abuild installation");
-    h("  --related-by-traits trait[,trait,...]  add to the build set all items that");
-    h("                    relate to any item already in the build set by all of");
-    h("                    the named traits");
-    h("  --ro-path=dir     repeatable: treat everything under dir as read only");
-    h("  --rw-path=dir     repeatable: treat everything under dir as writable");
-    h("  --silent          suppress most non-error output");
-    h("  --upgrade-trees   run special mode to upgrade build trees");
-    h("  --verbose         generate more detailed output");
-    h("  --with-deps | -d  short-hand for --build=current; on by default");
-    h("  --with-rdeps      expand build set with reverse dependencies of all");
-    h("                    items in the build set");
-    h("");
-    h("BUILD/CLEAN SETS");
-    h("");
-    h("  all               all buildable/cleanable items in writable build trees");
-    h("  deptrees          all items in the local tree and its full tree-deps chain");
-    h("  local             all items in the local build tree");
-    h("  desc              all items at or below the current directory");
-    h("  descending        alias for desc");
-    h("  down              alias for desc");
-    h("  deps              all expanded dependencies of the current item");
-    h("  current           the current item");
-    h("  name:name,...     items with the given names");
-    h("  pattern:regex     items whose names match the given regular expression");
-    h("");
-    h("  When building (as opposed to cleaning), all build sets automatically");
-    h("  include dependencies that are satisfied in writable build trees.");
-    h("");
-    h("PLATFORM SELECTORS");
-    h("");
-    h("  Platform selectors may be specified with --platform-selector and in the");
-    h("  ABUILD_PLATFORM_SELECTORS environment variable.  A platform selector is");
-    h("  of this form:");
-    h("");
-    h("    [platform-type:]match-criterion");
-    h("");
-    h("  A match-criterion may be on the following:");
-    h("");
-    h("    option=<option>");
-    h("    compiler=<compiler>[.<option>]");
-    h("    platform=<os>.<cpu>.<toolset>.<compiler>[.<option>]");
-    h("    all");
-    h("    skip");
-    h("");
-    h("  Any criterion component may be '*'.");
-    h("");
-    h("TARGETS");
-    h("");
-    h("  The special targets \"clean\" and \"no-op\" are not passed to the");
-    h("  backend build tools and may not be combined with any other targets.");
-    h("  Other targets are passed directly to the backends.");
-    h("");
+void
+Abuild::readHelpFile(std::string const& filename)
+{
+    std::list<std::string> lines = Util::readLinesFromFile(filename);
+    for (std::list<std::string>::iterator iter = lines.begin();
+	 iter != lines.end(); ++iter)
+    {
+	if ((*iter).find("#") == 0)
+	{
+	    continue;
+	}
+	this->logger.logInfo(*iter);
+    }
 }
 
 void
@@ -7202,7 +7191,8 @@ Abuild::usage(std::string const& msg)
     {
 	error(msg);
     }
-    fatal("run " + this->whoami + " --help for help");
+    fatal("run \"" + this->whoami + " --help\" or \"" +
+	  this->whoami + " --help usage\" for help");
 }
 
 void

@@ -1,0 +1,6 @@
+## description: help file format
+
+The abuild help system reads various help files.  Help files are just
+text files.  Lines beginning with # are stripped before displaying the
+file contents to the user.
+

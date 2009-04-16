@@ -467,6 +467,7 @@ $td->runtest("no more .ab-dyanmic.mk files",
 
 cd("work/c/cb");
 
+#XXXX-HELP
 $td->runtest("rules help",
 	     {$td->COMMAND => "abuild rules-help"},
 	     {$td->REGEXP => 'Help for users of RULES=ccxx',

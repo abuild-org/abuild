@@ -1,2 +1,2 @@
 abuild: ERROR: invalid regular expression C++
-abuild: ERROR: run abuild --help for help
+abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

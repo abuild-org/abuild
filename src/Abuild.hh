@@ -235,7 +235,8 @@ class Abuild
     void cleanBuildset();
     void cleanPath(std::string const& item_name, std::string const& dir);
     void cleanOutputDir();
-    void help();
+    bool generalHelp();
+    void readHelpFile(std::string const& filename);
     void usage(std::string const& msg);
     void exitIfErrors();
     void info(std::string const& msg);
@@ -285,6 +286,8 @@ class Abuild
     static std::map<std::string, std::string> buildset_aliases;
     static std::string const s_CLEAN;
     static std::string const s_NO_OP;
+    static std::string const h_HELP;
+    static std::string const h_RULES;
     static std::string const PLUGIN_PLATFORM;
     static std::string const FILE_PLUGIN_INTERFACE;
     static std::set<std::string> special_targets;
@@ -299,6 +302,7 @@ class Abuild
     // Parameters determined from the command line or at startup
     std::string whoami;
     bool stdout_is_tty;
+    std::string help_topic;
     unsigned int max_workers;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;

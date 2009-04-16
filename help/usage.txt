@@ -1,0 +1,117 @@
+## description: abuild command invocation
+
+Usage: abuild [options] [defines] [targets]
+
+This help message provides a brief synopsis of supported arguments.
+Please see abuild's documentation for additional details.
+
+Options, defines, and targets may appear in any order.  Any argument that
+starts with "-" is treated as an option.
+
+Any option not starting with - that contains an = is treated as a variable
+definition, with the variable name being everything prior to the first =.
+These are passed as variables to make, properties to ant, keys in
+abuild.defines for groovy.
+
+If no targets are specified, the "all" target is built.
+
+OPTIONS
+
+  -H | --help       print help message and exit
+  -V | --version    print abuild's version number and exit
+
+  --apply-targets-to-deps   apply explicit targets to dependencies as well;
+                    when cleaning with a clean set, expand to include
+                    dependencies
+  --build=set |     specify a build set; see below for a list of valid sets
+    -b set
+  -C start-dir      change directories to start-dir before running
+  --clean=set |     specify a clean set; see below for a list of valid sets
+    -c set
+  --clean-platforms pattern   when cleaning, only remove platforms that
+                    match the given shell-style filename pattern
+  --compat-level=x.y       disable backward compatible for constructs that
+                    were deprecated at or before version x.y
+  --deprecation-is-error   treat deprecation warnings as errors
+  --dump-build-graph  dump abuild's internal build graph
+  --dump-data       dump abuild's data to stdout and build no targets
+  --dump-interfaces   write details about items' interfaces to files
+                    in the output directory
+  -e | --emacs      pass the -e flags to ant and also set a property
+                    telling our ant build file that we are running in
+                    emacs mode.
+  --find { item-name | tree:tree-name}    print the location of build item
+                    item-name or build tree tree-name
+  --find-conf       look above the current directory to find a directory
+                    that contains Abuild.conf and run abuild from there
+  --full-integrity  check integrity for all items, not just items being built
+  --jobs=n | -jn    build up to n build items in parallel
+  --keep-going |    don't stop when a build item fails; also tells backend
+    -k              not to stop on failure
+  --list-platforms  list all object-code platforms
+  --list-traits     list all known traits
+  --make-jobs[=n]   passes the -j flag to make allowing each make to use
+                    up to n jobs; omit n to let it use as many as it can
+  --make            pass all remaining arguments to make
+  --monitored       run in monitored mode
+  -n                pass no-op flag to backend
+  --no-dep-failures   when used with -k, attempt to build items even when
+                    one or more of their dependencies have failed
+  --no-deps         build only the current item without its dependencies
+  --only-with-traits trait[,trait,...]   remove all items from build set
+                    that do not have all of the named traits
+  --platform-selector selector |       specify a platform selector
+    -p selector     for object-code platforms; see below
+  --print-abuild-top  print the path to the top of the abuild installation
+  --related-by-traits trait[,trait,...]  add to the build set all items that
+                    relate to any item already in the build set by all of
+                    the named traits
+  --ro-path=dir     repeatable: treat everything under dir as read only
+  --rw-path=dir     repeatable: treat everything under dir as writable
+  --silent          suppress most non-error output
+  --upgrade-trees   run special mode to upgrade build trees
+  --verbose         generate more detailed output
+  --with-deps | -d  short-hand for --build=current; on by default
+  --with-rdeps      expand build set with reverse dependencies of all
+                    items in the build set
+
+BUILD/CLEAN SETS
+
+  all               all buildable/cleanable items in writable build trees
+  deptrees          all items in the local tree and its full tree-deps chain
+  local             all items in the local build tree
+  desc              all items at or below the current directory
+  descending        alias for desc
+  down              alias for desc
+  deps              all expanded dependencies of the current item
+  current           the current item
+  name:name,...     items with the given names
+  pattern:regex     items whose names match the given regular expression
+
+  When building (as opposed to cleaning), all build sets automatically
+  include dependencies that are satisfied in writable build trees.
+
+PLATFORM SELECTORS
+
+  Platform selectors may be specified with --platform-selector and in the
+  ABUILD_PLATFORM_SELECTORS environment variable.  A platform selector is
+  of this form:
+
+    [platform-type:]match-criterion
+
+  A match-criterion may be on the following:
+
+    option=<option>
+    compiler=<compiler>[.<option>]
+    platform=<os>.<cpu>.<toolset>.<compiler>[.<option>]
+    all
+    skip
+
+  Any criterion component may be '*'.
+
+TARGETS
+
+  The special targets "clean" and "no-op" are not passed to the
+  backend build tools and may not be combined with any other targets.
+  Other targets are passed directly to the backends.
+

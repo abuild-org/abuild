@@ -5,6 +5,7 @@
 #
 # Please see the help targets below for details on using these rules.
 
+#XXXX-HELP
 rules-help::
 	@echo
 	@echo "** Help for users of RULES=autoconf **"

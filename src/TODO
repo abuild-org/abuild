@@ -36,6 +36,14 @@ Help system
 
 Allow --help or --help topic as options to abuild.
 
+Search for XXXX-HELP everywhere and also look at all files that have
+help in their names.  This should cover all files that need serious
+work.  When done, run this rgrep:
+
+find . -type f -print0 -o \( -name .svn -o -name 'abuild-*' -o -name manual \) -prune | xargs -0 -e grep -nH -w -e help
+
+to look for other potential cases.
+
 Specifying --help by itself should provide a very short usage synopsis
 with pointers to other uses for the help system.  Then other topics
 will show different information.  Topics:

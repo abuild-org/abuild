@@ -3,6 +3,7 @@
 # have passed it on the command line.
 export CALCULATE
 
+#XXXX-HELP
 rules-help::
 	@echo Set NUMBERS to the name of a file that contains a list of
 	@echo numbers, one per line, to pass to the generator.  The file

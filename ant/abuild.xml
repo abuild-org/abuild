@@ -301,6 +301,7 @@
 
  <!--  Help targets                                                -->
 
+ <!--XXXX-HELP-->
  <filterchain id="help-filter">
   <linecontainsregexp negate="true">
    <regexp pattern="^#"/>

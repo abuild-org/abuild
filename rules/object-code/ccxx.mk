@@ -124,6 +124,7 @@
 
 # ---------------
 
+#XXXX-HELP
 rules-help::
 	@cat $(ABUILD_TOP)/rules/object-code/ccxx-rules-help.txt
 

@@ -1,6 +1,7 @@
 # Our rules-help target will be run when the user runs abuild
 # rules-help if they include this build item in BUILD_ITEM_RULES.
 
+#XXXX-HELP
 rules-help::
 	@echo
 	@echo "** Help for users of BUILD_ITEM_RULES=derived-code-generator **"
