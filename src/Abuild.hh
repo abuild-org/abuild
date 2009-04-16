@@ -239,6 +239,7 @@ class Abuild
     void usage(std::string const& msg);
     void exitIfErrors();
     void info(std::string const& msg);
+    void notice(std::string const& msg);
     void incrementVerboseIndent();
     void decrementVerboseIndent();
     void verbose(std::string const& msg);

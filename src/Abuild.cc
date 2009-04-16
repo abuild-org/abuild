@@ -1270,7 +1270,7 @@ Abuild::readConfigs()
 	this->buildset.empty())
     {
 	QTC::TC("abuild", "Abuild empty build set");
-	info("build set contains no items");
+	notice("build set contains no items");
 	return true;
     }
 
@@ -5210,7 +5210,7 @@ Abuild::buildBuildset()
 	 (! this_config->hasBuildFile())))
     {
         QTC::TC("abuild", "Abuild no local build");
-        info("nothing to build in this directory");
+        notice("nothing to build in this directory");
         return true;
     }
 
@@ -6000,7 +6000,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 
     if (! status)
     {
-        info(item_name + " (" + output_dir + "): build failed");
+        notice(item_name + " (" + output_dir + "): build failed");
 	this->failed_builds.push_back(builder_string);
     }
 
@@ -6359,10 +6359,7 @@ Abuild::buildItem(std::string const& item_name,
     if (this->special_target == s_NO_OP)
     {
         QTC::TC("abuild", "Abuild no-op");
-        if (! this->silent)
-        {
-            info(item_name + " (" + output_dir + "): " + this->special_target);
-	}
+	info(item_name + " (" + output_dir + "): " + this->special_target);
 	return true;
     }
 
@@ -6378,12 +6375,9 @@ Abuild::buildItem(std::string const& item_name,
     monitorOutput("targets " +
 		  item_name + " " + item_platform + " " +
 		  Util::join(" ", backend_targets));
-    if (! this->silent)
-    {
-        info(item_name + " (" + output_dir + "): " +
-	     Util::join(" ", backend_targets) +
-	     (this->verbose_mode ? " in " + rel_output_dir : ""));
-    }
+    info(item_name + " (" + output_dir + "): " +
+	 Util::join(" ", backend_targets) +
+	 (this->verbose_mode ? " in " + rel_output_dir : ""));
 
     bool result = false;
 
@@ -6656,6 +6650,10 @@ Abuild::invoke_gmake(std::string const& item_name,
     make_argv.push_back("-rR");
     make_argv.push_back("ABUILD_TOP=" + this->abuild_top);
     make_argv.push_back("--warn-undefined-variables");
+    if (this->silent)
+    {
+	make_argv.push_back("--no-print-directory");
+    }
     make_argv.insert(make_argv.end(),
 		     this->make_args.begin(), this->make_args.end());
     for (std::map<std::string, std::string>::iterator iter =
@@ -7046,10 +7044,7 @@ Abuild::cleanOutputDir()
 {
     assert(! this->this_platform.empty());
     assert(Util::isFile(".abuild"));
-    if (! this->silent)
-    {
-	info("cleaning output directory");
-    }
+    info("cleaning output directory");
 
     std::vector<std::string> entries = Util::getDirEntries(".");
     for (std::vector<std::string>::iterator iter = entries.begin();
@@ -7221,6 +7216,15 @@ Abuild::exitIfErrors()
 
 void
 Abuild::info(std::string const& msg)
+{
+    if (! this->silent)
+    {
+	this->logger.logInfo(this->whoami + ": " + msg);
+    }
+}
+
+void
+Abuild::notice(std::string const& msg)
 {
     this->logger.logInfo(this->whoami + ": " + msg);
 }

@@ -19,31 +19,16 @@ release notes.
  * add flag --find item-name or --find tree:tree-name to print the
    location of the given build item or build tree.
 
+ * abuild is slightly quieter with --silent than it used to be
+
+ * bug fix: abuild properly detects and gives an error for an attempt
+   to assign multiple words to a scalar interface variable
 
 Next
 ====
 
- * Figure out how to capture output, separating stdout from stderr,
-   and preserving whether output is a tty.
-
  * Implement new help system.
 
- * Consider capturing the output of the backend so that we can
-   de-interleave output when running parallel builds (or mark each
-   line of output with the build item/platform data), separate error
-   from informational output, etc.  It is possible to create pipe-like
-   handles with CreatePipe in Windows and to use them to initialize
-   hStdInput, hStdOutput, and hStdError fields of the startupinfo
-   parameter to CreateProcess.  There is an example at
-   http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
-   There is also some kind of Win32 Job API used by the perl
-   Win32::Job classes (CreateJobObject).  This may provide a better
-   solution than our current CTRL-C handling.  See if boost provides
-   anything that could do this.
-
- * See if we can provide an option to indent all of abuild's non-error
-   output.  Ideally, this should capture output from backends as
-   well...
 
 
 Help system
@@ -156,13 +141,6 @@ Miscellaneous
    abuild's qtest coverage support is exercised every time the abuild
    test suite is run.  (It's just that you might not notice if it
    weren't there.)
-
- * Consider having --silent invoke make with --no-print-directory.
-   Check all calls to info to see which ones should be suppressed when
-   abuild is invoked with --silent.  Or add a notice() that prints
-   even when silent and make info suppress output when silent.  Then
-   see which infos can be changed to notices and which ones can have
-   if silent stuff around it removed.
 
 
 Abuild Contrib
@@ -419,6 +397,53 @@ Known Bugs
    running qtest from ant on Windows, qtest correctly generates the
    ansi color codes, but they don't get displayed right through ant,
    at least in cygwin.
+
+
+Capture of Backend Output
+=========================
+
+There have been a number of ideas about improving abuild's output,
+such as de-interleaving build outputs for multithreaded builds,
+prefixing output lines with the name/platform of the item being built,
+indenting all non-error output so that error output only is
+left-justified, etc.
+
+There are a number of roadblocks that make this difficult.  For one
+thing, java builds are all run from a single process with different
+threads possibly all generating output.  Some of this output might be
+generated with direct prints to stdout or stderr and, as such, cannot
+be separated by which build item they are running on behalf of.  It
+would potentially be possible to isolate output from each make
+invocation or to isolate all java output together.  It would be
+possible to sort java output by build item if we ran a separate java
+builder for each potential simultaneous build (creating a number equal
+to the number of build threads), but this seems like excessive
+overhead and complication just to filter output for a multithreaded
+build.
+
+It seems to be very difficult to emulate the behavior of a command
+writing to a tty in a portable fashion, especially in Windows.  It so
+happens that make doesn't buffer its output, so running it through a
+pipe works fine, but this is not necessarily the case for things it
+invokes.  There's also the question of what to do with stdin.  There
+are some interactive test suites, for example, that want access to
+stdin, and it would be a shame if running through abuild disabled
+this functionality.
+
+General separation of stdout and stderr could probably be achieved
+with a stand-alone program.  That program may not even have to be
+portable -- it would just be usable on those platforms for which the
+functionality exists.
+
+If we did want to capture backend output, here are some notes.  It is
+possible to create pipe-like handles with CreatePipe in Windows and to
+use them to initialize hStdInput, hStdOutput, and hStdError fields of
+the startupinfo parameter to CreateProcess.  There is an example at
+http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
+There is also some kind of Win32 Job API used by the perl Win32::Job
+classes (CreateJobObject).  This may provide a better solution than
+our current CTRL-C handling.  As of version boost version 1.38, there
+is nothing in boost that can do this.
 
 
 Issues, Enhancement Ideas
