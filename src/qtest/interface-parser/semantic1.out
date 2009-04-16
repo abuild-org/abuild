@@ -13,6 +13,7 @@ semantic1:51:14: ERROR: unknown environment variable NO_SUCH_VARIABLE
 semantic1:53:7: ERROR: resetting unknown variable UNKNOWN
 semantic1:54:10: ERROR: unknown variable UNKNOWN
 semantic1:55:6: ERROR: flag unknown-flag is not supported by this build item
+semantic1:57:22: ERROR: multiple words may not be assigned to scalar variable sc1
 parse(semantic1): failure
 dumping interface semantic1
   a: string, target type object-code = 
@@ -20,6 +21,7 @@ dumping interface semantic1
   c: boolean, target type object-code = 1
   d: filename, target type object-code = --CWD--/a
   e: list filename prepend, target type object-code: uninitialized
+  sc1: string, target type object-code = 1 2 3
   after-build files:
     --CWD--/something.interface
     --CWD--/a

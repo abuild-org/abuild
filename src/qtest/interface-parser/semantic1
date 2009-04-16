@@ -53,3 +53,5 @@ override a = $(ENV:NO_SUCH_VARIABLE)
 reset UNKNOWN
 no-reset UNKNOWN
 flag unknown-flag override a = x
+
+declare sc1 string = 1 2 3

@@ -235,6 +235,16 @@ Interface::assignVariable(FileLocation const& location,
 	    }
 	}
 
+	if ((var.list_type == l_scalar) &&
+	    (! (values.empty() || (values.size() == 1))))
+	{
+	    QTC::TC("abuild", "Interface ERR multiword scalar");
+	    status = false;
+	    error.error(location,
+			"multiple words may not be assigned"
+			" to scalar variable " + variable_name);
+	}
+
 	// Check and, if needed, adjust each value based on the type.
 	for (std::deque<std::string>::iterator iter = values.begin();
 	     iter != values.end(); ++iter)
