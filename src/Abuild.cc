@@ -38,6 +38,9 @@ std::string const Abuild::s_CLEAN = "clean";
 std::string const Abuild::s_NO_OP = "no-op";
 std::string const Abuild::h_HELP = "help";
 std::string const Abuild::h_RULES = "rules";
+std::string const Abuild::hr_LIST = "list";
+std::string const Abuild::hr_RULE = "rule:";
+std::string const Abuild::hr_TOOLCHAIN = "toolchain:";
 // PLUGIN_PLATFORM can't match a real platform name.
 std::string const Abuild::PLUGIN_PLATFORM = "plugin";
 std::string const Abuild::FILE_PLUGIN_INTERFACE = "plugin.interface";
@@ -359,6 +362,14 @@ Abuild::parseArgv()
 		usage("invalid --help invocation");
 	    }
 	    this->help_topic = *argp++;
+	    if (this->help_topic == h_RULES)
+	    {
+		if (! *argp)
+		{
+		    usage("invalid --help rules invocation");
+		}
+		this->rules_help_topic = *argp++;
+	    }
 	}
 	else if (arg == "-C")
 	{
@@ -1264,9 +1275,9 @@ Abuild::readConfigs()
 	return true;
     }
 
-    if (this->help_topic == h_RULES)
+    if (! this->rules_help_topic.empty())
     {
-	notice("XXX would present help on rules here");
+	rulesHelp(local_forest);
 	return true;
     }
 
@@ -6488,35 +6499,62 @@ Abuild::getRulePaths(std::string const& item_name,
     }
     candidate_paths.push_back(build_item.getAbsolutePath());
 
-    std::list<std::string> result;
-    std::string const& target_type =
-	TargetType::getName(build_item.getTargetType());
+    TargetType::target_type_e target_type = build_item.getTargetType();
 
-    // Internal directories are absolute unconditionally.
-    result.push_back(this->abuild_top + "/rules/" + target_type);
-    result.push_back(this->abuild_top + "/rules/all");
-
-    std::string dirs[2];
-
+    std::list<std::string> dirs;
     for (std::list<std::string>::iterator iter = candidate_paths.begin();
 	 iter != candidate_paths.end(); ++iter)
     {
-	dirs[0] = *iter + "/rules/" + target_type;
-	dirs[1] = *iter + "/rules/all";
-	for (unsigned int i = 0; i < 2; ++i)
+	appendRulePaths(dirs, *iter, target_type);
+    }
+
+    // Internal directories are absolute unconditionally.
+    std::list<std::string> result;
+    appendRulePaths(result, this->abuild_top, target_type);
+
+    for (std::list<std::string>::iterator iter = dirs.begin();
+	 iter != dirs.end(); ++iter)
+    {
+	if (relative)
 	{
-	    if (Util::isDirectory(dirs[i]))
+	    result.push_back(Util::absToRel(*iter, dir));
+	}
+	else
+	{
+	    result.push_back(*iter);
+	}
+    }
+    return result;
+}
+
+void
+Abuild::appendRulePaths(std::list<std::string>& rules_dirs,
+			std::string const& dir,
+			TargetType::target_type_e desired_type)
+{
+    std::string const& rules_dir = dir + "/rules/";
+
+    static TargetType::target_type_e types[4] = {
+	TargetType::tt_platform_independent,
+	TargetType::tt_object_code,
+	TargetType::tt_java,
+	TargetType::tt_all
+    };
+
+    for (unsigned int i = 0; i < 4; ++i)
+    {
+	if ((types[i] == TargetType::tt_all) ||
+	    (desired_type == TargetType::tt_all) ||
+	    (types[i] == desired_type))
+	{
+	    std::string const& type_string = TargetType::getName(types[i]);
+	    std::string candidate = rules_dir + type_string;
+	    if (Util::isDirectory(candidate))
 	    {
-		if (relative)
-		{
-		    dirs[i] = Util::absToRel(dirs[i], dir);
-		}
-		result.push_back(dirs[i]);
+		rules_dirs.push_back(candidate);
 	    }
 	}
     }
-
-    return result;
 }
 
 std::list<std::string>
@@ -6529,31 +6567,47 @@ Abuild::getToolchainPaths(std::string const& item_name,
     // toolchains.  This is the toolchains directory for every plugin
     // that has one as well as the built-in toolchains directory.
 
+    std::list<std::string> dirs;
+    std::list<std::string> const& plugins = build_item.getPlugins();
+    for (std::list<std::string>::const_iterator iter = plugins.begin();
+	 iter != plugins.end(); ++iter)
+    {
+	appendToolchainPaths(dirs, this->buildset[*iter]->getAbsolutePath());
+    }
+
     std::list<std::string> result;
 
     // Internal directories are absolute unconditionally.  Note that
     // we can't move toolchains out of "make" without breaking any
     // existing compiler toolchain that loads unix_compiler.mk or any
     // of the other built-in ones.
-    result.push_back(this->abuild_top + "/make/toolchains");
+    appendToolchainPaths(result, this->abuild_top + "/make");
 
-    std::list<std::string> const& plugins = build_item.getPlugins();
-    for (std::list<std::string>::const_iterator iter = plugins.begin();
-	 iter != plugins.end(); ++iter)
+    for (std::list<std::string>::iterator iter = dirs.begin();
+	 iter != dirs.end(); ++iter)
     {
-	std::string candidate =
-	    this->buildset[*iter]->getAbsolutePath() + "/toolchains";
-	if (Util::isDirectory(candidate))
+	if (relative)
 	{
-	    if (relative)
-	    {
-		candidate = Util::absToRel(candidate, dir);
-	    }
-	    result.push_back(candidate);
+	    result.push_back(Util::absToRel(*iter, dir));
+	}
+	else
+	{
+	    result.push_back(*iter);
 	}
     }
 
     return result;
+}
+
+void
+Abuild::appendToolchainPaths(std::list<std::string>& toolchain_dirs,
+			     std::string const& dir)
+{
+    std::string candidate = dir + "/toolchains";
+    if (Util::isDirectory(candidate))
+    {
+	toolchain_dirs.push_back(candidate);
+    }
 }
 
 bool
@@ -7092,10 +7146,19 @@ bool
 Abuild::generalHelp()
 {
     // Return true if we have provided help.
-    if (this->help_topic.empty() ||
-	(this->help_topic == h_RULES))
+    if (this->help_topic.empty())
     {
 	return false;
+    }
+
+    if (this->help_topic == h_RULES)
+    {
+	if ((this->rules_help_topic == hr_LIST) ||
+	    (this->rules_help_topic.find(hr_RULE) == 0) ||
+	    (this->rules_help_topic.find(hr_TOOLCHAIN) == 0))
+	{
+	    return false;
+	}
     }
 
     boost::regex text_re("(.*)\\.txt");
@@ -7136,18 +7199,29 @@ Abuild::generalHelp()
 	return true;
     }
 
+    boost::function<void(std::string const&)> h =
+	boost::bind(&Logger::logInfo, &(this->logger), _1);
+
     if (this->help_topic != h_HELP)
     {
-	usage("invalid help topic " + this->help_topic);
+	h("");
+	if (this->help_topic == h_RULES)
+	{
+	    QTC::TC("abuild", "Abuild ERR bad rules help topic");
+	    h("Invalid rules help topic \"" + this->rules_help_topic + "\"");
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild ERR bad help topic");
+	    h("Invalid help topic \"" + this->help_topic + "\"");
+	}
+	// fall through to description of help system
     }
 
     // Describe the help system
 
     topics[h_HELP] = "the help system (this topic)";
-    topics[h_RULES] = "rules available to the current build item";
-
-    boost::function<void(std::string const&)> h =
-	boost::bind(&Logger::logInfo, &(this->logger), _1);
+    topics[h_RULES] = "rule-specific help (see below)";
 
     h("");
     h("To request help on a specific topic, run \"" +
@@ -7165,6 +7239,14 @@ Abuild::generalHelp()
 	h(line);
     }
     h("");
+    h("Help is also available on built-in and user-supplied rules.  To request");
+    h("help on rules, run \"" + this->whoami + " --help " + h_RULES + " topic");
+    h("The following rules topics are available:");
+    h("");
+    h("  list: show all items for which rule help is available");
+    h("  rule:rulename: show help on rule \"rulename\"");
+    h("  toolchain:toolchainname: show help on toolchain \"toolchainname\"");
+    h("");
 
     return true;
 }
@@ -7181,6 +7263,275 @@ Abuild::readHelpFile(std::string const& filename)
 	    continue;
 	}
 	this->logger.logInfo(*iter);
+    }
+}
+
+void
+Abuild::rulesHelp(BuildForest& forest)
+{
+    // Note that this function may be called on a build forest with
+    // dependency/integrity errors.
+
+    BuildItem_map& builditems = forest.getBuildItems();
+    std::string const& this_name = this->this_config->getName();
+    BuildItem_ptr this_builditem;
+    if ((! this_name.empty()) && builditems.count(this_name))
+    {
+        this_builditem = builditems[this_name];
+    }
+    QTC::TC("abuild", "Abuild rules help with/without build item",
+	    this_builditem.get() ? 0 : 1);
+
+    std::set<std::string> references;
+    if (this_builditem.get())
+    {
+	references = this_builditem->getReferences();
+    }
+
+    // Create a table of available topics.
+
+    static int const tt_toolchain = 0; // tt = topic type
+    static int const tt_rule = 1;
+    std::vector<HelpTopic_map> topics(2);
+
+    appendToolchainHelpTopics(topics[tt_toolchain], "",
+			      this->abuild_top + "/make");
+    appendRuleHelpTopics(topics[tt_rule], "", this->abuild_top);
+
+    for (BuildItem_map::iterator iter = builditems.begin();
+	 iter != builditems.end(); ++iter)
+    {
+	BuildItem& item = *((*iter).second);
+	std::string item_name =
+	    (*iter).first + " (from tree " + item.getTreeName() + ")";
+	std::string const& item_dir = item.getAbsolutePath();
+
+	appendToolchainHelpTopics(topics[tt_toolchain], item_name, item_dir);
+	appendRuleHelpTopics(topics[tt_rule], item_name, item_dir);
+    }
+
+    // Special case: remove data for built-in "_base" rules.
+    topics[tt_rule].erase("_base");
+
+    std::string toolchain;
+    std::string rule;
+    if (this->rules_help_topic.find(hr_TOOLCHAIN) == 0)
+    {
+	toolchain = this->rules_help_topic.substr(hr_TOOLCHAIN.length());
+    }
+    else if (this->rules_help_topic.find(hr_RULE) == 0)
+    {
+	rule = this->rules_help_topic.substr(hr_RULE.length());
+    }
+
+    boost::function<void(std::string const&)> h =
+	boost::bind(&Logger::logInfo, &(this->logger), _1);
+
+    if (showHelpFiles(topics[tt_toolchain], "toolchain", toolchain) ||
+	showHelpFiles(topics[tt_rule], "rule", rule))
+    {
+	return;
+    }
+
+    h("");
+    h("Run \"" + this->whoami + " --help " + h_RULES + " " +
+      hr_RULE + "rulename\" for help on a specific rule.");
+    h("Run \"" + this->whoami + " --help " + h_RULES + " " +
+      hr_TOOLCHAIN + "rulename\" for help on a specific toolchain.");
+    h("");
+    h("When an item below is show to be available, it means that either it is");
+    h("built in, or that the build item that provides the functionality is in your");
+    h("dependency chain or is a plugin that is active for your build item.");
+
+    listHelpTopics(topics[tt_toolchain], "toolchains", references);
+    listHelpTopics(topics[tt_rule], "rules", references);
+}
+
+void
+Abuild::appendToolchainHelpTopics(HelpTopic_map& topics,
+				  std::string const& item_name,
+				  std::string const& dir)
+{
+    std::list<std::string> dirs;
+    appendToolchainPaths(dirs, dir);
+    for (std::list<std::string>::iterator iter = dirs.begin();
+	 iter != dirs.end(); ++iter)
+    {
+	appendHelpTopics(topics, item_name, TargetType::tt_object_code, *iter);
+    }
+}
+
+void
+Abuild::appendRuleHelpTopics(HelpTopic_map& topics,
+			     std::string const& item_name,
+			     std::string const& dir)
+{
+    std::list<std::string> dirs;
+    appendRulePaths(dirs, dir, TargetType::tt_all);
+    for (std::list<std::string>::iterator iter = dirs.begin();
+	 iter != dirs.end(); ++iter)
+    {
+	appendHelpTopics(topics, item_name,
+			 TargetType::getID(Util::basename(*iter)), *iter);
+    }
+}
+
+void
+Abuild::appendHelpTopics(HelpTopic_map& topics,
+			 std::string const& item_name,
+			 TargetType::target_type_e target_type,
+			 std::string const& dir)
+{
+    boost::regex module_re("(.*?)\\.(mk|groovy)");
+    boost::regex helpfile_re("(.*?)-help\\.txt");
+    boost::smatch match;
+
+    std::set<std::string> modules;
+    std::set<std::string> helpfiles;
+
+    std::vector<std::string> entries = Util::getDirEntries(dir);
+    for (std::vector<std::string>::iterator iter = entries.begin();
+	 iter != entries.end(); ++iter)
+    {
+	std::string const& entry = *iter;
+	std::string path = dir + "/" + entry;
+	if (boost::regex_match(entry, match, module_re))
+	{
+	    // Don't worry if we see the same module more than once
+	    // (both make and groovy).  In that case, the modules
+	    // share a help file anyway.
+	    modules.insert(match.str(1));
+	}
+	else if (boost::regex_match(entry, match, helpfile_re))
+	{
+	    helpfiles.insert(match.str(1));
+	}
+    }
+    for (std::set<std::string>::iterator iter = modules.begin();
+	 iter != modules.end(); ++iter)
+    {
+	std::string const& module = *iter;
+	if (helpfiles.count(module))
+	{
+	    QTC::TC("abuild", "Abuild helpfile found");
+	    helpfiles.erase(module);
+	    topics[module].push_back(
+		HelpTopic(
+		    item_name, target_type, dir + "/" + module + "-help.txt"));
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild module without helpfile found");
+	    topics[module].push_back(HelpTopic(item_name, target_type, ""));
+	}
+    }
+    for (std::set<std::string>::iterator iter = helpfiles.begin();
+	 iter != helpfiles.end(); ++iter)
+    {
+	QTC::TC("abuild", "Abuild module stray helpfile found");
+	notice("WARNING: help file \"" +
+	       dir + "/" + *iter + "-help.txt\""
+	       " does not correspond to any implementation file");
+    }
+}
+
+bool
+Abuild::showHelpFiles(HelpTopic_map& topics,
+		      std::string const& module_type,
+		      std::string const& module_name)
+{
+    bool displayed = false;
+
+    if (! module_name.empty())
+    {
+	boost::function<void(std::string const&)> h =
+	    boost::bind(&Logger::logInfo, &(this->logger), _1);
+
+	if (topics.count(module_name))
+	{
+	    displayed = true;
+	    h("");
+	    h("The following help is available for " + module_type +
+	      " \"" + module_name + "\":");
+	    HelpTopic_vec& htv = topics[module_name];
+	    for (HelpTopic_vec::iterator iter = htv.begin();
+		 iter != htv.end(); ++iter)
+	    {
+		HelpTopic& ht = *iter;
+		h("");
+		if (ht.item_name.empty())
+		{
+		    h("built in " + module_type);
+		}
+		else
+		{
+		    h("providing build item: " + ht.item_name);
+		}
+		h("applies to target type: " +
+		  TargetType::getName(ht.target_type));
+		if (ht.filename.empty())
+		{
+		    if (ht.item_name.empty())
+		    {
+			QTC::TC("abuild", "Abuild no help for item");
+		    }
+		    h("No help file has been provided for this item.");
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild show item help file",
+			    ht.filename.empty() ? 1 : 0);
+		    h("");
+		    readHelpFile(ht.filename);
+		}
+	    }
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild help for unknown module");
+	    h("");
+	    h(module_type + " \"" + module_name + "\" is not known");
+	}
+    }
+
+    return displayed;
+}
+
+void
+Abuild::listHelpTopics(HelpTopic_map& topics, std::string const& description,
+		       std::set<std::string>& references)
+{
+    boost::function<void(std::string const&)> h =
+	boost::bind(&Logger::logInfo, &(this->logger), _1);
+
+    h("");
+    h("The following " + description + " are available:");
+    for (HelpTopic_map::iterator i1 = topics.begin();
+	 i1 != topics.end(); ++i1)
+    {
+	std::string const& module = (*i1).first;
+	h("");
+	h("  " + module);
+	HelpTopic_vec& htv = (*i1).second;
+	for (HelpTopic_vec::iterator i2 = htv.begin();
+	     i2 != htv.end(); ++i2)
+	{
+	    HelpTopic& ht = (*i2);
+	    if (ht.item_name.empty())
+	    {
+		h("  * built in; available: yes");
+	    }
+	    else
+	    {
+		h("    provided by build item " + ht.item_name +
+		  "; available: " +
+		  (references.count(ht.item_name) ? "yes" : "no"));
+	    }
+	    h("    applies to target type " +
+	      TargetType::getName(ht.target_type));
+	    h(std::string("    help provided: ") +
+	      (ht.filename.empty() ? "no" : "yes"));
+	}
     }
 }
 

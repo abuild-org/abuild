@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Copy;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-help") or die;
+
+my $td = new TestDriver("help system");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+
+setup($td);
+
+check_work_accessed($td);
+
+$td->report(1);

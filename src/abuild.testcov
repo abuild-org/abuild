@@ -373,3 +373,12 @@ Abuild skipping optional dependency 0
 BuildItem remove dependency 0
 BackingConfig ERR backing area doesn't exist 0
 Interface ERR multiword scalar 0
+Abuild ERR bad rules help topic 0
+Abuild ERR bad help topic 0
+Abuild rules help with/without build item 1
+Abuild helpfile found 0
+Abuild module without helpfile found 0
+Abuild module stray helpfile found 0
+Abuild help for unknown module 0
+Abuild no help for item 0
+Abuild show item help file 1

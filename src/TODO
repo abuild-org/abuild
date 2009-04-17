@@ -44,28 +44,9 @@ find . -type f -print0 -o \( -name .svn -o -name 'abuild-*' -o -name manual \) -
 
 to look for other potential cases.
 
-Specifying --help by itself should provide a very short usage synopsis
-with pointers to other uses for the help system.  Then other topics
-will show different information.  Topics:
-
- * options: show summary of command line options
-
- * buildsets: list available build sets and describe them
-
- * platforms: talk about platform selectors
-
- * .... check current --help output for other ideas
-
-We also need topics to do the following:
-
- * show the names (tree, item) of all items that offer rules
-
- * show the help text for all items referenced (plugin/dep) by the
-   current build item
-
  * eliminate rules-help, interface-help, ...
 
- * available interface variables
+ * document available interface variables
 
 
 Groovy Framework

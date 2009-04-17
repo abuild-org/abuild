@@ -17,6 +17,7 @@
 #include <PlatformSelector.hh>
 #include <JavaBuilder.hh>
 #include <CompatLevel.hh>
+#include <TargetType.hh>
 
 class Logger;
 class ItemConfig;
@@ -46,6 +47,28 @@ class Abuild
     typedef BuildForest::BuildTree_map BuildTree_map;
     typedef boost::function<bool(std::string const&, std::string const&)>
             item_filter_t;
+
+    // Helper class for help system
+    class HelpTopic
+    {
+      public:
+	HelpTopic()
+	{
+	}
+	HelpTopic(std::string const& item_name,
+		  TargetType::target_type_e target_type,
+		  std::string const& filename) :
+	    item_name(item_name),
+	    target_type(target_type),
+	    filename(filename)
+	{
+	}
+	std::string item_name;
+	TargetType::target_type_e target_type;
+	std::string filename;
+    };
+    typedef std::vector<HelpTopic> HelpTopic_vec;
+    typedef std::map<std::string, HelpTopic_vec> HelpTopic_map;
 
     bool runInternal();
     void getThisPlatform();
@@ -202,11 +225,16 @@ class Abuild
 	BuildItem& build_item,
 	std::string const& dir,
 	bool relative);
+    void appendRulePaths(std::list<std::string>& rules_dirs,
+			 std::string const& dir,
+			 TargetType::target_type_e desired_type);
     std::list<std::string> getToolchainPaths(
 	std::string const& item_name,
 	BuildItem& build_item,
 	std::string const& dir,
 	bool relative);
+    void appendToolchainPaths(std::list<std::string>& toolchain_dirs,
+			      std::string const& dir);
     bool invoke_gmake(std::string const& item_name,
 		      std::string const& item_platform,
 		      BuildItem& build_item,
@@ -237,6 +265,22 @@ class Abuild
     void cleanOutputDir();
     bool generalHelp();
     void readHelpFile(std::string const& filename);
+    void rulesHelp(BuildForest& forest);
+    void appendToolchainHelpTopics(HelpTopic_map& topics,
+				   std::string const& item_name,
+				   std::string const& dir);
+    void appendRuleHelpTopics(HelpTopic_map& topics,
+			      std::string const& item_name,
+			      std::string const& dir);
+    void appendHelpTopics(HelpTopic_map& topics,
+			  std::string const& item_name,
+			  TargetType::target_type_e target_type,
+			  std::string const& dir);
+    bool showHelpFiles(HelpTopic_map& topics,
+		       std::string const& module_type,
+		       std::string const& module_name);
+    void listHelpTopics(HelpTopic_map& topics, std::string const& description,
+			std::set<std::string>& references);
     void usage(std::string const& msg);
     void exitIfErrors();
     void info(std::string const& msg);
@@ -288,6 +332,9 @@ class Abuild
     static std::string const s_NO_OP;
     static std::string const h_HELP;
     static std::string const h_RULES;
+    static std::string const hr_LIST;
+    static std::string const hr_RULE;
+    static std::string const hr_TOOLCHAIN;
     static std::string const PLUGIN_PLATFORM;
     static std::string const FILE_PLUGIN_INTERFACE;
     static std::set<std::string> special_targets;
@@ -303,6 +350,7 @@ class Abuild
     std::string whoami;
     bool stdout_is_tty;
     std::string help_topic;
+    std::string rules_help_topic;
     unsigned int max_workers;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
