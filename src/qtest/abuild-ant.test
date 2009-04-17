@@ -243,12 +243,20 @@ $td->runtest("no-op",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("no ANT_HOME or JAVA_HOME",
+$td->runtest("no ANT_HOME or JAVA_HOME, --ant",
 	     {$td->COMMAND => "unset ANT_HOME; unset JAVA_HOME;" .
-		  " abuild potato.salad='four five six'",
+		  " abuild --ant -Dpotato.salad='four five six' -e",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/defines2.out",
 	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("--ant with 1.1",
+	     {$td->COMMAND => ['abuild', '--compat-level=1.1',
+			       '--ant', '-Da=b', '-e'],
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/no-ant-1_1.out",
+	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 cd("work/missing-hook-file/user");
@@ -262,6 +270,6 @@ $td->runtest("missing hook file",
 
 check_work_accessed($td);
 
-$td->report(19 +
+$td->report(20 +
 	    ($java_cygwin ? 1 : 0) +
 	    ($test_junit ? 3 : 0));

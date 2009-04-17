@@ -328,6 +328,10 @@ Abuild::parseArgv()
 	compat_level_version = "1.0";
     }
 
+    // for backward compatibility
+    std::list<std::string> ant_args;
+    boost::regex ant_define_re("-D([^-][^=]*)=(.*)");
+
     std::list<std::string> clean_platform_strings;
     bool no_deps = false;
 
@@ -424,6 +428,24 @@ Abuild::parseArgv()
 	    while (*argp)
 	    {
 		this->make_args.push_back(*argp++);
+		if (*argp && (strcmp(*argp, "--ant") == 0))
+		{
+		    --argp;
+		    break;
+		}
+	    }
+	}
+	else if (arg == "--ant")
+	{
+	    // Do not document --ant.
+	    while (*argp)
+	    {
+		ant_args.push_back(*argp++);
+		if (*argp && (strcmp(*argp, "--make") == 0))
+		{
+		    --argp;
+		    break;
+		}
 	    }
 	}
 	else if ((arg == "--platform-selector") || (arg == "-p"))
@@ -636,6 +658,33 @@ Abuild::parseArgv()
     else
     {
 	usage("invalid compatibility level " + compat_level_version);
+    }
+
+    if (! ant_args.empty())
+    {
+	if (this->compat_level.allow_1_0())
+	{
+	    deprecate("1.1",
+		      "the --ant option is deprecated;"
+		      " use prop=value instead of --ant -Dprop=value");
+	    for (std::list<std::string>::iterator iter = ant_args.begin();
+		 iter != ant_args.end(); ++iter)
+	    {
+		if (boost::regex_match(*iter, match, ant_define_re))
+		{
+		    this->defines[match.str(1)] = match.str(2);
+		}
+		else
+		{
+		    notice("WARNING: ant options other than -Dprop=value"
+			   " are ignored");
+		}
+	    }
+	}
+	else
+	{
+	    usage("invalid option --ant");
+	}
     }
 
     // called after changing directories

@@ -13,6 +13,10 @@ following:
    should use ABUILD_ITEM_NAME instead of ABUILD_THIS, but the
    ABUILD_THIS variable will stick around.
 
+ * Add --ant command line option back in and make it deprecated.  Any
+   option other than -Dprop=value is ignored.  -Dprop=value is treated
+   as if prop=value had been given at the normal command line.
+
 These changes have already been made and need to make it into the
 release notes.
 
@@ -33,10 +37,10 @@ release notes.
 Next
 ====
 
- * Add --ant back in.
-
  * Consider moving symlink-traversal code for externals into abuild
    --upgrade-trees and just giving a warning in regular abuild.
+
+ * Test qtest coverage from abuild test suite for both java and make.
 
 
 Groovy Framework
@@ -114,12 +118,6 @@ Miscellaneous
 
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
-
- * Test qtest coverage from abuild test suite.  Relatively low
-   priority since abuild's test suite itself uses coverage, so
-   abuild's qtest coverage support is exercised every time the abuild
-   test suite is run.  (It's just that you might not notice if it
-   weren't there.)
 
 
 Abuild Contrib
