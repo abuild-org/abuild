@@ -7282,32 +7282,28 @@ Abuild::rulesHelp(BuildForest& forest)
     QTC::TC("abuild", "Abuild rules help with/without build item",
 	    this_builditem.get() ? 0 : 1);
 
-    std::set<std::string> references;
-    if (this_builditem.get())
-    {
-	references = this_builditem->getReferences();
-    }
-
     // Create a table of available topics.
 
     static int const tt_toolchain = 0; // tt = topic type
     static int const tt_rule = 1;
     std::vector<HelpTopic_map> topics(2);
 
-    appendToolchainHelpTopics(topics[tt_toolchain], "",
+    appendToolchainHelpTopics(topics[tt_toolchain], "", "",
 			      this->abuild_top + "/make");
-    appendRuleHelpTopics(topics[tt_rule], "", this->abuild_top);
+    appendRuleHelpTopics(topics[tt_rule], "", "", this->abuild_top);
 
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
 	BuildItem& item = *((*iter).second);
-	std::string item_name =
-	    (*iter).first + " (from tree " + item.getTreeName() + ")";
+	std::string const& item_name = (*iter).first;
+	std::string tree_name = item.getTreeName();
 	std::string const& item_dir = item.getAbsolutePath();
 
-	appendToolchainHelpTopics(topics[tt_toolchain], item_name, item_dir);
-	appendRuleHelpTopics(topics[tt_rule], item_name, item_dir);
+	appendToolchainHelpTopics(
+	    topics[tt_toolchain], item_name, tree_name, item_dir);
+	appendRuleHelpTopics(
+	    topics[tt_rule], item_name, tree_name, item_dir);
     }
 
     // Special case: remove data for built-in "_base" rules.
@@ -7339,19 +7335,32 @@ Abuild::rulesHelp(BuildForest& forest)
     h("Run \"" + this->whoami + " --help " + h_RULES + " " +
       hr_TOOLCHAIN + "rulename\" for help on a specific toolchain.");
     h("");
-    h("When an item below is shown to be available, it means that it is provided");
-    h("by a build item that is in your dependency chain or is a plugin that is");
-    h("active for your build item.  In order to make use of a rule or toolchain,");
-    h("it must also work for your platform and be available for your item's");
-    h("target type.");
 
-    listHelpTopics(topics[tt_toolchain], "toolchains", references);
+    h("When an rule is shown to be available, it means that it is provided by");
+    h("a build item that is in your dependency chain or is a plugin that is");
+    h("active for your build item.  When a toolchain is shown to be");
+    h("available, it means it is provided by a plugin that is active for your");
+    h("build item.  Built-in toolchains and rules are always available.  In");
+    h("order to make use of a rule or toolchain, it must also work for your");
+    h("platform and be available for your item's target type.");
+
+    std::set<std::string> references;
+    std::set<std::string> plugins;
+    if (this_builditem.get())
+    {
+	references = this_builditem->getReferences();
+	std::list<std::string> const& plist = this_builditem->getPlugins();
+	plugins.insert(plist.begin(), plist.end());
+    }
+
+    listHelpTopics(topics[tt_toolchain], "toolchains", plugins);
     listHelpTopics(topics[tt_rule], "rules", references);
 }
 
 void
 Abuild::appendToolchainHelpTopics(HelpTopic_map& topics,
 				  std::string const& item_name,
+				  std::string const& tree_name,
 				  std::string const& dir)
 {
     std::list<std::string> dirs;
@@ -7359,13 +7368,15 @@ Abuild::appendToolchainHelpTopics(HelpTopic_map& topics,
     for (std::list<std::string>::iterator iter = dirs.begin();
 	 iter != dirs.end(); ++iter)
     {
-	appendHelpTopics(topics, item_name, TargetType::tt_object_code, *iter);
+	appendHelpTopics(topics, item_name, tree_name,
+			 TargetType::tt_object_code, *iter);
     }
 }
 
 void
 Abuild::appendRuleHelpTopics(HelpTopic_map& topics,
 			     std::string const& item_name,
+			     std::string const& tree_name,
 			     std::string const& dir)
 {
     std::list<std::string> dirs;
@@ -7373,7 +7384,7 @@ Abuild::appendRuleHelpTopics(HelpTopic_map& topics,
     for (std::list<std::string>::iterator iter = dirs.begin();
 	 iter != dirs.end(); ++iter)
     {
-	appendHelpTopics(topics, item_name,
+	appendHelpTopics(topics, item_name, tree_name,
 			 TargetType::getID(Util::basename(*iter)), *iter);
     }
 }
@@ -7381,6 +7392,7 @@ Abuild::appendRuleHelpTopics(HelpTopic_map& topics,
 void
 Abuild::appendHelpTopics(HelpTopic_map& topics,
 			 std::string const& item_name,
+			 std::string const& tree_name,
 			 TargetType::target_type_e target_type,
 			 std::string const& dir)
 {
@@ -7419,12 +7431,14 @@ Abuild::appendHelpTopics(HelpTopic_map& topics,
 	    helpfiles.erase(module);
 	    topics[module].push_back(
 		HelpTopic(
-		    item_name, target_type, dir + "/" + module + "-help.txt"));
+		    item_name, tree_name, target_type,
+		    dir + "/" + module + "-help.txt"));
 	}
 	else
 	{
 	    QTC::TC("abuild", "Abuild module without helpfile found");
-	    topics[module].push_back(HelpTopic(item_name, target_type, ""));
+	    topics[module].push_back(
+		HelpTopic(item_name, tree_name, target_type, ""));
 	}
     }
     for (std::set<std::string>::iterator iter = helpfiles.begin();
@@ -7446,12 +7460,14 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 
     if (! module_name.empty())
     {
+	// Set displayed even when we just given an "unknown" message.
+	displayed = true;
+
 	boost::function<void(std::string const&)> h =
 	    boost::bind(&Logger::logInfo, &(this->logger), _1);
 
 	if (topics.count(module_name))
 	{
-	    displayed = true;
 	    h("");
 	    h("The following help is available for " + module_type +
 	      " \"" + module_name + "\":");
@@ -7467,13 +7483,16 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 		}
 		else
 		{
-		    h("provided by build item " + ht.item_name);
+		    h("provided by build item " + ht.item_name +
+		      " (from tree " + ht.tree_name + ")");
 		}
 		h("applies to target type " +
 		  TargetType::getName(ht.target_type));
+		QTC::TC("abuild", "Abuild show item help file",
+			ht.filename.empty() ? 1 : 0);
 		if (ht.filename.empty())
 		{
-		    if (ht.item_name.empty())
+		    if (! ht.item_name.empty())
 		    {
 			QTC::TC("abuild", "Abuild no help for item");
 		    }
@@ -7481,9 +7500,7 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 		}
 		else
 		{
-		    QTC::TC("abuild", "Abuild show item help file",
-			    ht.filename.empty() ? 1 : 0);
-		    h("");
+		    h("Help text:");
 		    h("----------");
 		    readHelpFile(ht.filename);
 		    h("----------");
@@ -7495,6 +7512,9 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 	    QTC::TC("abuild", "Abuild help for unknown module");
 	    h("");
 	    h(module_type + " \"" + module_name + "\" is not known");
+	    h("");
+	    h("Run \"" + this->whoami + " --help " + h_RULES + " " + hr_LIST + "\" for a list of available rule topics.");
+	    h("");
 	}
     }
 
@@ -7527,8 +7547,9 @@ Abuild::listHelpTopics(HelpTopic_map& topics, std::string const& description,
 	    }
 	    else
 	    {
-		h("    provided by build item " + ht.item_name +
-		  "; available: " +
+		h("  * provided by build item " + ht.item_name +
+		  " (from tree " + ht.tree_name +
+		  "); available: " +
 		  (references.count(ht.item_name) ? "yes" : "no"));
 	    }
 	    h("    applies to target type " +

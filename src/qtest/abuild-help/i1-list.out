@@ -1,0 +1,94 @@
+abuild: WARNING: help file "--topdir--/backing/t1/i1/rules/all/dangling-help.txt" does not correspond to any implementation file
+abuild: WARNING: help file "--topdir--/backing/t2/toolchains/dangling-help.txt" does not correspond to any implementation file
+
+Run "abuild --help rules rule:rulename" for help on a specific rule.
+Run "abuild --help rules toolchain:rulename" for help on a specific toolchain.
+
+When an rule is shown to be available, it means that it is provided by
+a build item that is in your dependency chain or is a plugin that is
+active for your build item.  When a toolchain is shown to be
+available, it means it is provided by a plugin that is active for your
+build item.  Built-in toolchains and rules are always available.  In
+order to make use of a rule or toolchain, it must also work for your
+platform and be available for your item's target type.
+
+The following toolchains are available:
+
+  gcc
+  * built in
+    applies to target type object-code
+    help provided: no
+
+  mingw
+  * built in
+    applies to target type object-code
+    help provided: no
+
+  msvc
+  * built in
+    applies to target type object-code
+    help provided: no
+
+  qcc
+  * provided by build item i2 (from tree t2); available: no
+    applies to target type object-code
+    help provided: yes
+
+  undocumented
+  * provided by build item i2 (from tree t2); available: no
+    applies to target type object-code
+    help provided: no
+
+  unix_compiler
+  * built in
+    applies to target type object-code
+    help provided: no
+
+The following rules are available:
+
+  autoconf
+  * built in
+    applies to target type object-code
+    help provided: yes
+
+  ccxx
+  * built in
+    applies to target type object-code
+    help provided: yes
+
+  empty
+  * built in
+    applies to target type all
+    help provided: no
+
+  groovy
+  * built in
+    applies to target type java
+    help provided: no
+
+  java
+  * built in
+    applies to target type java
+    help provided: yes
+
+  r1
+  * provided by build item i1 (from tree t1); available: yes
+    applies to target type platform-independent
+    help provided: yes
+  * provided by build item i1 (from tree t1); available: yes
+    applies to target type object-code
+    help provided: yes
+  * provided by build item i1 (from tree t1); available: yes
+    applies to target type java
+    help provided: no
+  * provided by build item i1 (from tree t1); available: yes
+    applies to target type all
+    help provided: yes
+
+  undocumented
+  * provided by build item i1 (from tree t1); available: yes
+    applies to target type platform-independent
+    help provided: no
+  * provided by build item i1 (from tree t1); available: yes
+    applies to target type all
+    help provided: no

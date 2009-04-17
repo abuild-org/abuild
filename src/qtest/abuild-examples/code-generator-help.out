@@ -3,7 +3,7 @@ The following help is available for rule "code-generator":
 
 provided by build item derived-code-generator (from tree derived)
 applies to target type all
-
+Help text:
 ----------
 
 You must set these variables:

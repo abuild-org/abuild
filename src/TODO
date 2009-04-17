@@ -28,12 +28,15 @@ release notes.
    and properties-help are still around because the new help system is
    not aware of the ant framework.
 
- * Implemented new help system.
+ * Implemented new help system.  Run abuild --help help for details.
 
 Next
 ====
 
- * ...
+ * Add --ant back in.
+
+ * Consider moving symlink-traversal code for externals into abuild
+   --upgrade-trees and just giving a warning in regular abuild.
 
 
 Groovy Framework

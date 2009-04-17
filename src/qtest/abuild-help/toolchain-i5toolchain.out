@@ -1,0 +1,11 @@
+abuild: WARNING: help file "--topdir--/backing/t1/i1/rules/all/dangling-help.txt" does not correspond to any implementation file
+abuild: WARNING: help file "--topdir--/backing/t2/toolchains/dangling-help.txt" does not correspond to any implementation file
+
+The following help is available for toolchain "i5toolchain":
+
+provided by build item i5 (from tree t1)
+applies to target type object-code
+Help text:
+----------
+i5toolchain
+----------

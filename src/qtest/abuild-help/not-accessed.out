@@ -1,0 +1,14 @@
+work/.now
+work/backing/t1/i1/rules/all/dangling-help.txt
+work/backing/t1/i1/rules/all/r1.mk
+work/backing/t1/i1/rules/all/undocumented.groovy
+work/backing/t1/i1/rules/java/r1.groovy
+work/backing/t1/i1/rules/object-code/r1.mk
+work/backing/t1/i1/rules/platform-independent/r1.mk
+work/backing/t1/i1/rules/platform-independent/undocumented.groovy
+work/backing/t1/i1/rules/platform-independent/undocumented.mk
+work/backing/t2/toolchains/dangling-help.txt
+work/backing/t2/toolchains/qcc.mk
+work/backing/t2/toolchains/undocumented.mk
+work/main/t1/i5/rules/all/i5rule.mk
+work/main/t1/i5/toolchains/i5toolchain.mk

@@ -56,14 +56,17 @@ class Abuild
 	{
 	}
 	HelpTopic(std::string const& item_name,
+		  std::string const& tree_name,
 		  TargetType::target_type_e target_type,
 		  std::string const& filename) :
 	    item_name(item_name),
+	    tree_name(tree_name),
 	    target_type(target_type),
 	    filename(filename)
 	{
 	}
 	std::string item_name;
+	std::string tree_name;
 	TargetType::target_type_e target_type;
 	std::string filename;
     };
@@ -268,12 +271,15 @@ class Abuild
     void rulesHelp(BuildForest& forest);
     void appendToolchainHelpTopics(HelpTopic_map& topics,
 				   std::string const& item_name,
+				   std::string const& tree_name,
 				   std::string const& dir);
     void appendRuleHelpTopics(HelpTopic_map& topics,
 			      std::string const& item_name,
+			      std::string const& tree_name,
 			      std::string const& dir);
     void appendHelpTopics(HelpTopic_map& topics,
 			  std::string const& item_name,
+			  std::string const& tree_name,
 			  TargetType::target_type_e target_type,
 			  std::string const& dir);
     bool showHelpFiles(HelpTopic_map& topics,

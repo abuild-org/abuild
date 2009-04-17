@@ -18,6 +18,77 @@ my $filters = get_filters();
 
 setup($td);
 
-check_work_accessed($td);
+cd("work");
 
-$td->report(1);
+my @list = (
+    ['nothing available',
+     'main', 'main-list.out'],
+    ['plugin',
+     'backing/t2', 'i2-list.out'],
+    ['own rules',
+     'backing/t1/i1', 'i1-list.out'],
+    ['backing with referent',
+     'main/t1/i3', 'i3-list.out'],
+    ['backing without referent',
+     'main/t1/i4', 'i4-list.out'],
+    );
+
+foreach my $d (@list)
+{
+    my ($description, $dir, $out) = @$d;
+    $td->runtest($description,
+		 {$td->COMMAND => "abuild -C $dir --help rules list",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/$out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+cd("work/main");
+
+my @help = (
+    ['rule', 'r1'],
+    ['rule', 'i5rule'],
+    ['toolchain', 'qcc'],
+    ['toolchain', 'i5toolchain'],
+    ['rule', 'dangling'],
+    ['toolchain', 'notfound'],
+    );
+
+foreach my $d (@help)
+{
+    my ($type, $item) = @$d;
+    my $out = "$type-$item.out";
+    my $description = "help for $type $item";
+    $td->runtest($description,
+		 {$td->COMMAND => "abuild --help rules $type:$item",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/$out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+$td->runtest("help help",
+	     {$td->COMMAND => "abuild --help help",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/help-help.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bad topic",
+	     {$td->COMMAND => "abuild --help potato",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-topic.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("bad rules topic",
+	     {$td->COMMAND => "abuild --help rules spackle",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-rules-topic.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td, "not-accessed.out");
+
+$td->report(4 + @list + @help);

@@ -524,3 +524,14 @@ Help System
 ===========
 
 Write this section.  See abuild --help help for details.
+
+For every file x.{mk,groovy} in toolchains or rules, either built in
+or provided by a build item, if x-help.txt exists, it is a help file
+for that toolchain or rule.  The file is just displalyed, with
+newlines normalized to the native newline, and with any lines starting
+with "#" removed.
+
+For internal help files in help, help/topic.txt is displayed by abuild
+--help topic.  The first line can start with "## description: " in
+which case the rest of the line is a description displayed by --help
+help.
