@@ -1,0 +1,13 @@
+
+The following help is available for rule "codegen":
+
+provided by build item codegen (from tree cross-platform)
+applies to target type all
+
+----------
+
+Set NUMBERS to the name of a file that contains a list of numbers, one
+per line, to pass to the generator.  The file generate.cc will be
+generated.
+
+----------

@@ -112,3 +112,26 @@ base.x using rpcgen.
 The special target ccxx_debug can be used to print the values of the
 INCLUDES, LIBDIRS, and LIBS and can be useful for debugging.
 
+** Help for Abuild.interface for C/C++ build items **
+
+Abuild.interface files for C/C++ build items are expected to assign to
+the following variables:
+
+  INCLUDES -- list of directories to add to the include path
+  LIBDIRS -- list of directories to add to the library path
+  LIBS -- list of libraries to link against
+
+Note that LIBS just includes the library basenames as with the
+TARGETS_lib variable used in Abuild.mk.
+
+The following additional variables may also be assigned to:
+
+  XCPPFLAGS
+  XCFLAGS
+  XCXXFLAGS
+  XLINKFLAGS
+
+When using these variables, be careful to avoid code that is
+compiler-dependent.  If necessary, make the assignments conditinal on
+values of the ABUILD_PLATFORM_* variables.
+

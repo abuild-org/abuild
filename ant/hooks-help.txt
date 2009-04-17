@@ -89,11 +89,6 @@ The following hooks are defined:
    about any properties that may need to set to make use of
    the services provided by your hooks.
 
- * interface-help -- called from the "interface-help"
-   target.  Use this hook to provide help to your users
-   about any variables that may need to set to set in their
-   Abuild.interface files.
-
 Any file that provides hooks must create an ant-hooks.xml
 file.  For each hook that it wants to provide, it should
 create a target called "-hook" where "hook" is replaced by

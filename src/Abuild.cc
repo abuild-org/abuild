@@ -7339,9 +7339,11 @@ Abuild::rulesHelp(BuildForest& forest)
     h("Run \"" + this->whoami + " --help " + h_RULES + " " +
       hr_TOOLCHAIN + "rulename\" for help on a specific toolchain.");
     h("");
-    h("When an item below is show to be available, it means that either it is");
-    h("built in, or that the build item that provides the functionality is in your");
-    h("dependency chain or is a plugin that is active for your build item.");
+    h("When an item below is shown to be available, it means that it is provided");
+    h("by a build item that is in your dependency chain or is a plugin that is");
+    h("active for your build item.  In order to make use of a rule or toolchain,");
+    h("it must also work for your platform and be available for your item's");
+    h("target type.");
 
     listHelpTopics(topics[tt_toolchain], "toolchains", references);
     listHelpTopics(topics[tt_rule], "rules", references);
@@ -7465,9 +7467,9 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 		}
 		else
 		{
-		    h("providing build item: " + ht.item_name);
+		    h("provided by build item " + ht.item_name);
 		}
-		h("applies to target type: " +
+		h("applies to target type " +
 		  TargetType::getName(ht.target_type));
 		if (ht.filename.empty())
 		{
@@ -7482,7 +7484,9 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 		    QTC::TC("abuild", "Abuild show item help file",
 			    ht.filename.empty() ? 1 : 0);
 		    h("");
+		    h("----------");
 		    readHelpFile(ht.filename);
+		    h("----------");
 		}
 	    }
 	}
@@ -7519,7 +7523,7 @@ Abuild::listHelpTopics(HelpTopic_map& topics, std::string const& description,
 	    HelpTopic& ht = (*i2);
 	    if (ht.item_name.empty())
 	    {
-		h("  * built in; available: yes");
+		h("  * built in");
 	    }
 	    else
 	    {

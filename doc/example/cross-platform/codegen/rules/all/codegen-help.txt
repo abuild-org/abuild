@@ -1,0 +1,5 @@
+
+Set NUMBERS to the name of a file that contains a list of numbers, one
+per line, to pass to the generator.  The file generate.cc will be
+generated.
+

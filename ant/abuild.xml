@@ -3,12 +3,11 @@
 <!--
 
  These comments describe implementation details for this file.  For
- user-oriented help, please see properties-help.txt,
- interface-help.txt, and hooks-help.txt.  These can be viewed by
- invoking the rules-help, interface-help, and hooks-help targets.
- When editing the help files, please keep lines no wider than 60
- columns so that the files display cleanly on an 80-column display
- when prefixed by ant's [concat] prefix.
+ user-oriented help, please see properties-help.txt, and
+ hooks-help.txt.  These can be viewed by invoking the properties-help
+ and hooks-help targets.  When editing the help files, please keep
+ lines no wider than 60 columns so that the files display cleanly on
+ an 80-column display when prefixed by ant's [concat] prefix.
 
  When modifying this file to create new user-defined properties, new
  interface properties, or new hooks, please update the appropriate
@@ -301,16 +300,11 @@
 
  <!--  Help targets                                                -->
 
- <!--XXXX-HELP-->
  <filterchain id="help-filter">
   <linecontainsregexp negate="true">
    <regexp pattern="^#"/>
   </linecontainsregexp>
  </filterchain>
-
- <!--  Define rules-help for compatibility with make-based build   -->
- <!--  items.                                                      -->
- <target name="rules-help" depends="properties-help"/>
 
  <target name="properties-help"
     description="Show abuild-specific help for Abuild-ant.properties files">
@@ -319,15 +313,6 @@
    <filterchain refid="help-filter"/>
   </concat>
   <run-hooks name="properties-help"/>
- </target>
-
- <target name="interface-help"
-         description="Show abuild-specific help for Abuild.interface files">
-  <concat>
-   <fileset dir="${abuild.top}/ant" includes="interface-help.txt"/>
-   <filterchain refid="help-filter"/>
-  </concat>
-  <run-hooks name="interface-help"/>
  </target>
 
  <target name="hooks-help"

@@ -1,0 +1,15 @@
+
+You must set these variables:
+  DERIVED_CODEGEN_SRC -- name of a C source file to generate
+  DERIVED_CODEGEN_HDR -- name of a C header file to generate
+  DERIVED_CODEGEN_INFILE -- a file containing a numerical value
+
+These rules will generate a source file called DERIVED_CODEGEN_SRC
+which will contain a function called getNumber().  That function will
+return the number whose value you have placed in the file named in
+DERIVED_CODEGEN_INFILE.  The file DERIVED_CODEGEN_HDR will contain a
+prototype for the function.
+
+You must include DERIVED_CODEGEN_SRC in the list of sources for one of
+your build targets in order to have it included in that target.
+

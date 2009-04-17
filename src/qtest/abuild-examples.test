@@ -285,6 +285,13 @@ foreach my $compat (qw(1.0 1.1))
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
+    $td->runtest("code generator help",
+		 {$td->COMMAND => "abuild --help rules rule:code-generator",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/code-generator-help.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
     $td->runtest("clean all in user branch",
 		 {$td->COMMAND => "abuild --clean=all",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -457,6 +464,13 @@ $td->runtest("dump build graph",
 	     {$td->COMMAND => "abuild --with-deps --dump-build-graph",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/cross-platform-build-graph.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("codegen help",
+	     {$td->COMMAND => "abuild --help rules rule:codegen",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/codegen-help.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -764,7 +778,7 @@ if (! in_windows())
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(114 +
+$td->report(117 +
 	    (in_windows() ? 0 : 1) +
 	    ($test_java ? 7 : 0) +
 	    ($have_whole_archive ? 2 : 1));

@@ -465,21 +465,6 @@ $td->runtest("no more .ab-dyanmic.mk files",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-cd("work/c/cb");
-
-#XXXX-HELP
-$td->runtest("rules help",
-	     {$td->COMMAND => "abuild rules-help"},
-	     {$td->REGEXP => 'Help for users of RULES=ccxx',
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-$td->runtest("interface help",
-	     {$td->COMMAND => "abuild interface-help"},
-	     {$td->REGEXP => 'Help for Abuild.interface for C/C\+\+',
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
 cd("work/ext");
 
 mkdir "subdir", 0777 or die;
@@ -613,4 +598,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(77 + ($msvc ? 24 : 0));
+$td->report(75 + ($msvc ? 24 : 0));

@@ -1,0 +1,43 @@
+
+** Help for users of RULES=autoconf **
+
+These rules can be used by build items that require some
+autoconf-based configuration either internally for to provide
+information for their users.
+
+In order for these rules to work, the following conventions must be
+followed:
+
+ - The configure input file must be called configure.ac
+
+ - If the AUTOCONFIGH variable is defined, configure.ac must include
+   the statement AC_CONFIG_HEADERS([header.h]) where header.h is the
+   value of the AUTOCONFIGH.  The header file must be named in such a
+   way as to avoid naming clashes with those created by other build
+   items.
+
+ - Any custom m4 macros used by the configure.ac script are in a
+   directory called m4 and end with the extension .m4
+
+The following variables may be defined in Abuild.mk:
+
+  AUTOFILES: must be set to the list of files that appear in
+      AC_CONFIG_FILES in configure.ac
+
+  AUTOCONFIGH: must be set to the name of the header file in
+      AC_CONFIG_HEADERS in configure.ac
+
+Additionally, the following variable may be set if needed:
+
+  CONFIGURE_ARGS: additional arguments to be passed to ./configure
+
+
+** Help for Abuild.interface for autoconf build items **
+
+Generally, Abuild.interface files for autoconf-based build items will
+assign to INCLUDES for the benefit of any C/C++ build items that use
+this.  See help for the ccxx rule set for details.  It is also common
+for autoconf-based build items to generate an autoconf.interface file
+to be declared in Abuild.interface as an autofile.  This allows
+additinal variables to be set based on the output of autoconf.
+

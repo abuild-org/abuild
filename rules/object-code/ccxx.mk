@@ -3,8 +3,7 @@
 # libraries are not presently supported but will be in the future.
 # Please see the file make/README.shared-libraries for details.
 #
-# Please see rules-help and interface-help below for details on how to
-# use these rules.
+# Please see ccxx-help.txt for details on how to use these rules.
 
 # ---------------
 
@@ -123,13 +122,6 @@
 # have.
 
 # ---------------
-
-#XXXX-HELP
-rules-help::
-	@cat $(ABUILD_TOP)/rules/object-code/ccxx-rules-help.txt
-
-interface-help::
-	@cat $(ABUILD_TOP)/rules/object-code/ccxx-interface-help.txt
 
 TARGETS_lib ?=
 TARGETS_bin ?=
