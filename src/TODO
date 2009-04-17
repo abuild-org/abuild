@@ -17,6 +17,10 @@ following:
    option other than -Dprop=value is ignored.  -Dprop=value is treated
    as if prop=value had been given at the normal command line.
 
+ * Externals crossing symbolic links has been changed from an error to
+   a deprecation warning.  It is still in an error during the upgrade
+   process.
+
 These changes have already been made and need to make it into the
 release notes.
 
@@ -36,9 +40,6 @@ release notes.
 
 Next
 ====
-
- * Consider moving symlink-traversal code for externals into abuild
-   --upgrade-trees and just giving a warning in regular abuild.
 
  * Test qtest coverage from abuild test suite for both java and make.
 

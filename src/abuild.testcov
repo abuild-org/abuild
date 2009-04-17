@@ -253,7 +253,7 @@ ItemConfig root without tree-name 0
 ItemConfig has parent-dir 0
 ItemConfig has this 0
 ItemConfig has deleted 0
-ItemConfig ERR external symlink 0
+ItemConfig external symlink 0
 ItemConfig ERR child symlink 0
 Abuild-upgrade upgrade not required 0
 UpgradeData ERR unknown section 0
@@ -382,3 +382,4 @@ Abuild module stray helpfile found 0
 Abuild help for unknown module 0
 Abuild no help for item 0
 Abuild show item help file 1
+Abuild-upgrade ERR external symlinks 0

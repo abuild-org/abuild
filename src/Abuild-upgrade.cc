@@ -224,6 +224,17 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	std::list<std::string>& externals = ud.externals[dir];
 	std::list<std::string>& tree_deps = ud.tree_deps[dir];
 	std::list<std::string> const& old_externals = config->getExternals();
+	if (config->hasExternalSymlinks())
+	{
+	    // Coverage case below...
+	    error(config->getLocation(),
+		  "unable to upgrade a build tree with externals"
+		  " that traverse symbolic links");
+	}
+	if ((! Util::osSupportsSymlinks()) || config->hasExternalSymlinks())
+	{
+	    QTC::TC("abuild", "Abuild-upgrade ERR external symlinks");
+	}
 	for (std::list<std::string>::const_iterator eiter =
 		 old_externals.begin();
 	     eiter != old_externals.end(); ++eiter)

@@ -67,6 +67,7 @@ class ItemConfig
     bool isForestRoot() const;
     bool isChildOnly() const;
     bool usesDeprecatedFeatures() const;
+    bool hasExternalSymlinks() const;
     std::string const& getAbsolutePath() const;
     std::string const& getParentDir() const;
     std::string const& getName() const;
@@ -185,6 +186,7 @@ class ItemConfig
     bool is_forest_root;
     bool is_child_only;
     bool deprecated;
+    bool external_symlinks;
 
     // Information used during validation
     std::string buildfile;

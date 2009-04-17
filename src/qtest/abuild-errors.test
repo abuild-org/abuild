@@ -284,6 +284,12 @@ if (! in_windows())
 		 {$td->FILE => "$top/symlink-errors.out",
 		  $td->EXIT_STATUS => 2},
 		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("upgrade with symlink errors",
+		 {$td->COMMAND => "abuild --upgrade-trees",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/symlink-errors-upgrade.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
 }
 else
 {
@@ -292,4 +298,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(30 + (in_windows() ? 0 : 1));
+$td->report(30 + (in_windows() ? 0 : 2));

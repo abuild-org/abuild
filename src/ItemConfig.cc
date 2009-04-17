@@ -899,7 +899,6 @@ ItemConfig::checkExternals()
 
     boost::regex winpath_re("-winpath=(\\S+)");
     boost::smatch match;
-    bool any_symlinks = false;
 
     std::list<std::string> words =
 	Util::splitBySpace(this->kv.getVal(k_EXTERNAL));
@@ -938,34 +937,26 @@ ItemConfig::checkExternals()
 		this->location,
 		"absolute path externals are no longer supported");
 	}
-	else if (hasSymlinks(*iter))
-	{
-	    this->error.error(
-		this->location,
-		"external directory \"" + *iter + "\" is a symbolic link or"
-		" crosses a symbolic link");
-	    // Coverage check is below
-	    any_symlinks = true;
-	}
 	else
 	{
+	    if (hasSymlinks(*iter))
+	    {
+		this->error.deprecate(
+		    "1.1", this->location,
+		    "external directory \"" + *iter + "\" is a symbolic link or"
+		    " crosses a symbolic link; this is not supported outside of"
+		    " 1.0-compatibility mode");
+		// Coverage check is below
+		this->external_symlinks = true;
+	    }
 	    this->externals.push_back(*iter);
 	}
     }
 
-    if (any_symlinks)
-    {
-	this->error.error(
-	    this->location,
-	    "NOTE: Although external-dirs may no longer traverse symbolic "
-	    "links, abuild 1.1 supports use of multiple backing areas, so "
-	    "that solution may work for you instead.");
-    }
-
-    if ((! Util::osSupportsSymlinks()) || any_symlinks)
+    if ((! Util::osSupportsSymlinks()) || this->external_symlinks)
     {
 	// avoid coverage failure on operating systems without symlinks
-	QTC::TC("abuild", "ItemConfig ERR external symlink");
+	QTC::TC("abuild", "ItemConfig external symlink");
     }
 }
 
@@ -1273,7 +1264,8 @@ ItemConfig::ItemConfig(
     is_root(false),
     is_forest_root(false),
     is_child_only(false),
-    deprecated(false)
+    deprecated(false),
+    external_symlinks(false)
 {
 }
 
@@ -1299,6 +1291,12 @@ bool
 ItemConfig::usesDeprecatedFeatures() const
 {
     return this->deprecated;
+}
+
+bool
+ItemConfig::hasExternalSymlinks() const
+{
+    return this->external_symlinks;
 }
 
 std::string const&

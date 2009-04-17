@@ -190,6 +190,24 @@ for (my $i = 1; $i <= 2; ++$i)
     copy("Abuild-with-t3.conf", "Abuild.conf") or die;
 }
 
+cd("work/symlink-ext");
+
+if (! in_windows())
+{
+    symlink "target", "link" or die;
+    symlink "ext.target", "ext" or die;
+    $td->runtest("symlinked externals",
+		 {$td->COMMAND => "abuild --dump-data",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/symlinked-external.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    system("(tar cf - . | cat > /dev/null)");
+}
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(25);
+$td->report(25 + (in_windows() ? 0 : 1));

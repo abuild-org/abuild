@@ -1,0 +1,123 @@
+--topdir--/symlink-ext/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
+--topdir--/symlink-ext/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "link/ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
+<?xml version="1.0"?>
+<abuild-data version="2">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--/symlink-ext"
+ >
+  <build-tree
+   name="tree.2.-RND-"
+   absolute-path="--topdir--/symlink-ext/ext.target"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="ext"
+    home-forest="f-1"
+    absolute-path="--topdir--/symlink-ext/ext.target"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+  </build-tree>
+  <build-tree
+   name="tree.3.-RND-"
+   absolute-path="--topdir--/symlink-ext/target/ext"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <build-item
+    name="target-ext"
+    home-forest="f-1"
+    absolute-path="--topdir--/symlink-ext/target/ext"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+  </build-tree>
+  <build-tree
+   name="tree.1.-RND-"
+   absolute-path="--topdir--/symlink-ext"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <declared-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+    <tree-dependency name="tree.3.-RND-"/>
+   </declared-tree-dependencies>
+   <expanded-tree-dependencies>
+    <tree-dependency name="tree.2.-RND-"/>
+    <tree-dependency name="tree.3.-RND-"/>
+   </expanded-tree-dependencies>
+   <build-item
+    name="child1"
+    home-forest="f-1"
+    absolute-path="--topdir--/symlink-ext/child"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+   <build-item
+    name="top"
+    home-forest="f-1"
+    absolute-path="--topdir--/symlink-ext"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   />
+  </build-tree>
+ </forest>
+</abuild-data>
