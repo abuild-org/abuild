@@ -43,6 +43,10 @@ Next
 
  * Test qtest coverage from abuild test suite for both java and make.
 
+ * Release 1.1.a7 (or maybe do autogeneration first)
+
+ * Do autogeneration
+
 
 Groovy Framework
 ================
