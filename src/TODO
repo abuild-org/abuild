@@ -43,6 +43,9 @@ Next
 
  * Test qtest coverage from abuild test suite for both java and make.
 
+ * Look into problem Brandon/Joe are having with copying things into
+   lib
+
  * Release 1.1.a7 (or maybe do autogeneration first)
 
  * Do autogeneration
