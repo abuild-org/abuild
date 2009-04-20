@@ -32,11 +32,6 @@ endif
 	$(flex_to_c)
 
 ifdef FLEX_CACHE
- FlexLexer.h: /usr/include/FlexLexer.h
-	$(CODEGEN_WRAPPER) --cache $(FLEX_CACHE) \
-	    --input $< --output $@ --command \
-	    cp $< $@
-
  FlexLexer.%.cc: %.fl FlexLexer.h
 	@$(PRINT) "Generating $@ from $<"
 	$(CODEGEN_WRAPPER) --cache $(FLEX_CACHE) \
