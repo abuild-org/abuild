@@ -65,30 +65,6 @@ Groovy Framework
  * Write some good examples
 
 
-Information Extraction
-======================
-
- * Provide arguments for querying abuild's state, such as listing all
-   trees with locations and dependencies, summarizing the state of all
-   plugin information (which items are plugins in any tree, which tree
-   provides the plugin, and which trees use the plugin), etc.  The
-   --dump-data option will always be available for providing full
-   information, but providing a more human-readable format for
-   commonly needed information will help.  Or maybe provide some
-   sample xslt scripts to the above.
-
- * Provide a way to get --dump-data's output into a relational
-   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
-   have an option that causes --dump-data to generate a script file
-   that can be used with sqlite3 rather than generating XML data.
-   Alternatively, we can create xsl/perl code that loads directly into
-   a sqlite database or that creates the input file.  It's probably
-   okay if we create the SQL such that an erroneous dumpdata won't
-   load.  For example, the SQL can enforce uniqueness and referential
-   integrity constraints even though they may not be satisfied when
-   there are errors.
-
-
 Miscellaneous
 =============
 
@@ -100,11 +76,6 @@ Miscellaneous
 
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
-
- * Consider moving rpc stuff out of abuild and into a plugin,
-   especially since we can't test it.  Maybe flex and bison get to
-   stay because abuild uses them for its own build, or maybe they have
-   to come out too.
 
 
 Abuild Contrib
@@ -147,7 +118,7 @@ Documentation
     - QTest.export prop for groovy backend; also automatic export of
       TESTS
 
-    - abuild.local-rules, abuild.rules
+    - abuild.localRules, abuild.rules
 
  * Describe somewhere why we don't provide information about platforms
    in the interface files for java and indep.  Basically, it would be
@@ -215,6 +186,30 @@ Windows Issues
    worth doing if we can remove a runtime dependency on Cygwin for
    Windows/C++.  For non-Windows systems, requiring perl is not a big
    deal.
+
+
+Information Extraction
+======================
+
+ * Provide arguments for querying abuild's state, such as listing all
+   trees with locations and dependencies, summarizing the state of all
+   plugin information (which items are plugins in any tree, which tree
+   provides the plugin, and which trees use the plugin), etc.  The
+   --dump-data option will always be available for providing full
+   information, but providing a more human-readable format for
+   commonly needed information will help.  Or maybe provide some
+   sample xslt scripts to the above.
+
+ * Provide a way to get --dump-data's output into a relational
+   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
+   have an option that causes --dump-data to generate a script file
+   that can be used with sqlite3 rather than generating XML data.
+   Alternatively, we can create xsl/perl code that loads directly into
+   a sqlite database or that creates the input file.  It's probably
+   okay if we create the SQL such that an erroneous dumpdata won't
+   load.  For example, the SQL can enforce uniqueness and referential
+   integrity constraints even though they may not be satisfied when
+   there are errors.
 
 
 Compiler/Platform Configuration
