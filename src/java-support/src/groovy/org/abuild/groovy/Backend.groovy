@@ -81,7 +81,7 @@ class Backend implements GroovyBackend
 
         // Load pre-plugin initialization code
         buildState.pluginPaths.each {
-            File f = new File("${it}/pre-plugin.groovy")
+            File f = new File("${it}/preplugin.groovy")
             if (f.isFile())
             {
                 loadScript(f)
