@@ -14662,23 +14662,6 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
-         Non-compatible changes
-        </para>
-        <itemizedlist>
-         <listitem>
-          <para>
-           The order in which <filename>plugin.mk</filename> files are
-           loaded has changed.  In most cases, this won't matter, but
-           plugins that assume they are loaded after
-           <filename>Abuild.mk</filename> may have to be altered
-           somewhat.  See changes to make framework for additional
-           details.
-          </para>
-         </listitem>
-        </itemizedlist>
-       </listitem>
-       <listitem>
-        <para>
          Deprecated Features
         </para>
         <itemizedlist>
@@ -14803,23 +14786,6 @@ Y = $(X)
            modify variables set in those places and also provides a
            mechanism for plugins and built-in rules to supply default
            values for parameters that can be referenced from
-           <filename>Abuild.mk</filename>.
-          </para>
-          <para>
-           In some cases, <filename>plugin.mk</filename> files that
-           assume they are loaded after <filename>Abuild.mk</filename>
-           may need to be altered.  For example, if a plugin does
-           something conditionally upon a variable that is set or
-           modified in <filename>Abuild.mk</filename>, the test may
-           have to be coded to use non-order-independent make
-           constructs, such as &ldquo;<literal>=</literal>&rdquo;
-           instead of &ldquo;<literal>:=</literal>&rdquo; for variable
-           assignments or testing for whether a variable is empty
-           rather than testing for whether it is defined.  It should
-           generally be possible to code plugin rules in such a way
-           that they would work properly with both the old and the new
-           load ordering.  We may be adding some complexity to plugins
-           in exchange for decreasing the complexity of the
            <filename>Abuild.mk</filename>.
           </para>
          </listitem>
