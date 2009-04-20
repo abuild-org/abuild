@@ -44,12 +44,15 @@ include $(abMK)/qtest-support.mk
 # Load the base rule
 include $(call load_rule,_base)
 
-# Load any plugin files
-include $(wildcard $(foreach P,$(ABUILD_PLUGINS),$(P)/plugin.mk))
+# Load any pre-plugin initialization files
+include $(wildcard $(foreach P,$(ABUILD_PLUGINS),$(P)/pre-plugin.mk))
 
 # Include the current directory's build rules, remembering that the
 # source directory is actually this directory's parent.
 include $(SRCDIR)/Abuild.mk
+
+# Load any plugin files
+include $(wildcard $(foreach P,$(ABUILD_PLUGINS),$(P)/plugin.mk))
 
 RULES ?=
 LOCAL_RULES ?=

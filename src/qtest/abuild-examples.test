@@ -776,7 +776,7 @@ if (! in_windows())
 		 $td->NORMALIZE_NEWLINES);
 }
 
-check_work_accessed($td, "not-accessed.out");
+check_work_accessed($td);
 
 $td->report(117 +
 	    (in_windows() ? 0 : 1) +

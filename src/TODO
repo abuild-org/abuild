@@ -41,6 +41,13 @@ release notes.
  * abuild automatically exports the make variable/groovy parameter
    TC_SRCS in its qtest support
 
+ * Revert plugin.mk load ordering change.  plugin.mk files are once
+   again loaded after Abuild.mk, and plugin.groovy files are now
+   loaded after Abuild.groovy.  Before Abuild.mk and Abuild.groovy, we
+   have pre-plugin.mk and pre-plugin.groovy.  This provides a way to
+   do early initialization without breaking compatibility for plugins
+   that use variables set in Abuild.mk.
+
 Next
 ====
 
@@ -49,42 +56,34 @@ Next
  * Release 1.1.a7
 
 
-Groovy Framework
-================
+Code generation
+===============
 
- * Need to figure out what desired junit and javadoc behavior should
-   be.  Maybe junit should be able to support multiple testsuites?
+XXX unresolved
 
- * Exercise javadoc in test suite.  Use
-   abuild-java-rules/data/jars/simple.
+ * FlexLexer.h has been manually copied into the src directory.  Would
+   be better if we can use a newer flex, dump the C++ scanner, use
+   re-entrant scanners, and drop the need for FlexLexer.h and its
+   associated problems.
 
+ * SKIP_PARSER_CACHE for abuild's own bootstrapping
 
-Information Extraction
-======================
+ * Points to include in documentation:
 
- * Provide arguments for querying abuild's state, such as listing all
-   trees with locations and dependencies, summarizing the state of all
-   plugin information (which items are plugins in any tree, which tree
-   provides the plugin, and which trees use the plugin), etc.  The
-   --dump-data option will always be available for providing full
-   information, but providing a more human-readable format for
-   commonly needed information will help.  Or maybe provide some
-   sample xslt scripts to the above.
+    - usually, --input $^ --output $@ is sufficient.  Sometimes output
+      generates more files than just $@ though and you have to specify
+      them.
 
- * Provide a way to get --dump-data's output into a relational
-   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
-   have an option that causes --dump-data to generate a script file
-   that can be used with sqlite3 rather than generating XML data.
-   Alternatively, we can create xsl/perl code that loads directly into
-   a sqlite database or that creates the input file.  It's probably
-   okay if we create the SQL such that an erroneous dumpdata won't
-   load.  For example, the SQL can enforce uniqueness and referential
-   integrity constraints even though they may not be satisfied when
-   there are errors.
+    - tries to detect whether input file was found in "." or "..".
+      Although the code tries to be written so that it doesn't matter
+      what --src points to, it has only been tested for when --src is
+      "..".
+
+ * If this is real, we need to get rid of save-autos and the whole
+   save-autos thing in make-binary-distribution.
 
 
-Miscellaneous
-=============
+XXX old:
 
  * Need a better solution for files that are automatically generated
    by optional tools.  Abuild itself could use this for flex/bison
@@ -115,6 +114,46 @@ Miscellaneous
 
    Package auto-srcs with abuild sources if autogeneration make
    enhancement is done.
+
+
+Groovy Framework
+================
+
+ * Need to figure out what desired junit and javadoc behavior should
+   be.  Maybe junit should be able to support multiple testsuites?
+
+ * Exercise javadoc in test suite.  Use
+   abuild-java-rules/data/jars/simple.
+
+ * Write some good examples
+
+
+Information Extraction
+======================
+
+ * Provide arguments for querying abuild's state, such as listing all
+   trees with locations and dependencies, summarizing the state of all
+   plugin information (which items are plugins in any tree, which tree
+   provides the plugin, and which trees use the plugin), etc.  The
+   --dump-data option will always be available for providing full
+   information, but providing a more human-readable format for
+   commonly needed information will help.  Or maybe provide some
+   sample xslt scripts to the above.
+
+ * Provide a way to get --dump-data's output into a relational
+   database.  Ideally, we shouldn't have to link with sqlite.  Maybe
+   have an option that causes --dump-data to generate a script file
+   that can be used with sqlite3 rather than generating XML data.
+   Alternatively, we can create xsl/perl code that loads directly into
+   a sqlite database or that creates the input file.  It's probably
+   okay if we create the SQL such that an erroneous dumpdata won't
+   load.  For example, the SQL can enforce uniqueness and referential
+   integrity constraints even though they may not be satisfied when
+   there are errors.
+
+
+Miscellaneous
+=============
 
  * Consider Deprecating ABUILD_FORCE_32BIT and adding
    ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding

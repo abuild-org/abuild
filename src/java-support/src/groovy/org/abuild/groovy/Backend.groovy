@@ -79,9 +79,9 @@ class Backend implements GroovyBackend
         def targetType = buildState.interfaceVars['ABUILD_TARGET_TYPE']
         loadScript(buildState.abuildTop + "/rules/${targetType}/_base.groovy")
 
-        // Load plugin code
+        // Load pre-plugin initialization code
         buildState.pluginPaths.each {
-            File f = new File("${it}/plugin.groovy")
+            File f = new File("${it}/pre-plugin.groovy")
             if (f.isFile())
             {
                 loadScript(f)
@@ -92,6 +92,15 @@ class Backend implements GroovyBackend
         def sourceDirectory = buildDirectory.parentFile
         def buildFile = new File(sourceDirectory.path + "/Abuild.groovy")
         loadScript(buildFile)
+
+        // Load plugin code
+        buildState.pluginPaths.each {
+            File f = new File("${it}/plugin.groovy")
+            if (f.isFile())
+            {
+                loadScript(f)
+            }
+        }
 
         if (! (buildState.params['abuild.rules'] ||
                buildState.params['abuild.localRules']))
