@@ -74,6 +74,11 @@ AUTO_SRCS := \
 # Files to be saved by save_auto in local-rules.mk
 SAVE_AUTO := $(AUTO_SRCS) interface.tab.hh /usr/include/FlexLexer.h
 
+ifndef SKIP_PARSER_CACHE
+ FLEX_CACHE := parser-cache
+ BISON_CACHE := parser-cache
+endif
+
 # All sources including abuild-specific sources
 
 # The "abuild library" isn't released -- it's just a convenient way of

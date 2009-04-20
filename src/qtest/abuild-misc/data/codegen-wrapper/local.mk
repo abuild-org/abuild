@@ -1,12 +1,19 @@
-out1: a/in1 in2
+in2: in2.in
+	@$(PRINT) generating $@ from $^
 	$(CODEGEN_WRAPPER) --cache cache \
-		--input a/in1 in2 \
-		--output out1 b/out1 \
+		--input $^ --output $@ \
+		--command cp $< $@
+
+out1: a/in1 in2
+	@$(PRINT) generating $@ from $^
+	$(CODEGEN_WRAPPER) --cache cache \
+		--input $^ --output out1 b/out1 \
 		--command perl ../codegen $^ $@
 
 out2:
+	@$(PRINT) generating $@
 	$(CODEGEN_WRAPPER) --cache cache \
-		--output out2 \
+		--output $@ \
 		--command sh -c "echo test > $@"
 
 all:: out1 out2

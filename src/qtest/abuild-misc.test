@@ -54,6 +54,12 @@ for my $i (1, 2)
 		     $td->NORMALIZE_NEWLINES);
     }
 
+    $td->runtest("check cache",
+		 {$td->COMMAND => "find cache -type f -print | LANG=C sort"},
+		 {$td->FILE => "$top/cache-contents.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
     $td->runtest("clean",
 		 {$td->COMMAND => "abuild clean",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -250,4 +256,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(35 + (in_windows() ? 0 : 3));
+$td->report(37 + (in_windows() ? 0 : 3));

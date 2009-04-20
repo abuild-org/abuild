@@ -3,6 +3,67 @@
 # None of this code is exercised in abuild's test suite, though flex
 # and bison support are used in its own build.
 
+# Flex rules that are separate from lex rules
+
+FLEX := flex
+ifdef FLEX_CACHE
+ define flex_to_c
+	@$(PRINT) Generating $@ from $< with $(FLEX)
+	$(RM) $@
+	$(CODEGEN_WRAPPER) --cache $(FLEX_CACHE) \
+	    --input $< --output $@ --command \
+	    $(FLEX) -o$@ $<
+ endef
+else
+ define flex_to_c
+	@$(PRINT) Generating $@ from $< with $(FLEX)
+	$(RM) $@
+	$(FLEX) -o$@ $<
+ endef
+endif
+
+%.fl.cc: %.fl
+	$(flex_to_c)
+
+%.fl.cpp: %.fl
+	$(flex_to_c)
+
+%.fl.c: %.l
+	$(flex_to_c)
+
+ifdef FLEX_CACHE
+ FlexLexer.h: /usr/include/FlexLexer.h
+	$(CODEGEN_WRAPPER) --cache $(FLEX_CACHE) \
+	    --input $< --output $@ --command \
+	    cp $< $@
+
+ FlexLexer.%.cc: %.fl FlexLexer.h
+	@$(PRINT) "Generating $@ from $<"
+	$(CODEGEN_WRAPPER) --cache $(FLEX_CACHE) \
+	    --input $< --output $@ --command \
+	    $(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<
+
+else
+ FlexLexer.%.cc: %.fl
+	@$(PRINT) "Generating $@ from $<"
+	$(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<
+endif
+
+# Bison rules
+
+BISON := bison
+ifdef BISON_CACHE
+ %.tab.cc %.tab.hh: %.yy
+	@$(PRINT) "Generating $@ from $<"
+	$(CODEGEN_WRAPPER) --cache $(BISON_CACHE) \
+	    --input $< --output $(basename $@).cc $(basename $@).hh \
+	    --command $(BISON) -p $(notdir $(basename $<)) -t -d $<
+else
+ %.tab.cc %.tab.hh: %.yy
+	@$(PRINT) "Generating $@ from $<"
+	$(BISON) -p $(notdir $(basename $<)) -t -d $<
+endif
+
 # Lex rules
 
 LEX := lex
@@ -20,35 +81,6 @@ endef
 
 %.l.c: %.l
 	$(lex_to_c)
-
-# Flex rules that are separate from lex rules
-
-FLEX := flex
-define flex_to_c
-	@$(PRINT) Generating $@ from $< with $(FLEX)
-	$(RM) $@
-	$(FLEX) -o$@ $<
-endef
-
-%.fl.cc: %.fl
-	$(flex_to_c)
-
-%.fl.cpp: %.fl
-	$(flex_to_c)
-
-%.fl.c: %.l
-	$(flex_to_c)
-
-FlexLexer.%.cc: %.fl
-	@$(PRINT) "Generating $@ from $<"
-	$(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<
-
-# Bison rules
-
-BISON := bison
-%.tab.cc %.tab.hh: %.yy
-	@$(PRINT) "Generating $@ from $<"
-	$(BISON) -p $(notdir $(basename $<)) -t -d $<
 
 # Sun RPC rules
 

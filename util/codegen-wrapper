@@ -76,11 +76,30 @@ if (! -d "$cachedir")
 {
     error("$cachedir does not exist or is not a directory");
 }
-foreach my $f (@inputs)
+my @t = @inputs;
+@inputs = ();
+foreach my $f (@t)
 {
-    if (! -f "$srcdir/$f")
+    if (-f "$f")
     {
-	error("$srcdir/$f does not exist or is not a file");
+	my $ckfile = $f;
+	$ckfile =~ s,^$srcdir/,,;
+	push(@inputs, [$f, "$cachedir/$ckfile.md5"]);
+    }
+    elsif ($srcdir ne '.')
+    {
+	if (-f "$srcdir/$f")
+	{
+	    push(@inputs, ["$srcdir/$f", "$cachedir/$f.md5"]);
+	}
+	else
+	{
+	    error("$f not found in . or $srcdir");
+	}
+    }
+    else
+    {
+	error("$f not found");
     }
 }
 exit_if_errors();
@@ -129,9 +148,9 @@ else
     }
     %checksums = ();
     compute_checksums();
-    foreach my $f (@inputs)
+    foreach my $d (@inputs)
     {
-	my $ckfile = "$cachedir/$f.md5";
+	my ($f, $ckfile) = @$d;
 	safe_mkpath(dirname($ckfile));
 	my $fh = new IO::File(">$ckfile") or
 	    fatal("unable to create or write to $ckfile: $!");
@@ -158,9 +177,9 @@ sub output_files_exist
 
 sub checksums_match
 {
-    foreach my $f (@inputs)
+    foreach my $d (@inputs)
     {
-	my $ckfile = "$cachedir/$f.md5";
+	my ($f, $ckfile) = @$d;
 	if (! -f $ckfile)
 	{
 	    verbose("can't find cached checksum for input file $f");
@@ -218,9 +237,10 @@ sub get_these_args
 
 sub compute_checksums
 {
-    foreach my $f (@inputs)
+    foreach my $d (@inputs)
     {
-	$checksums{$f} = get_md5_checksum("$srcdir/$f");
+	my ($f, $ckfile) = @$d;
+	$checksums{$f} = get_md5_checksum($f);
     }
 }
 
@@ -288,9 +308,13 @@ required.  It is designed so that cached output files can be used when
 input files are unchanged even when the code generator is not
 available.
 
-Input files and the cache directory are specified relative to the
-source directory.  Output files are created in the current directory,
-which is presumed to be the abuild output directory.
+The cache directory is specified relative to the source directory.
+Input files and output files should be specified relative to the
+abuild output directory, usually by using \$^ as input and \$@ as
+output.
+
+Output files are created in the current directory, which is presumed
+to be the abuild output directory.
 
 For every output file Y, make sure cache-directory/Y exists.  If so,
 then for every input file X, compare X's md5 checksum with the value
