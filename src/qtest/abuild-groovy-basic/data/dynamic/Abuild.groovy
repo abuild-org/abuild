@@ -1,5 +1,6 @@
 parameters {
     abuild.rules = 'empty'
+    abuild.localRules = 'local'
     qtest.export << 'VAR1'
     qtest.export << 'VAR2'
     qtest.export << 'potato'
@@ -7,6 +8,7 @@ parameters {
     qtest.export << 'truth1'
     VAR1 = 'first value'
     VAR2 = 'second value'
+    TC_SRCS << '../local.groovy'
 }
 
 println abuild.resolve('potato.salad')

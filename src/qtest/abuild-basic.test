@@ -551,6 +551,15 @@ $td->runtest("descendants",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/coverage");
+
+$td->runtest("qtest coverage",
+	     {$td->COMMAND => "abuild check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/coverage.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 my $msvc = ($platform_native =~ m/\.msvc$/);
 
 cd("work/msvc");
@@ -598,4 +607,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(75 + ($msvc ? 24 : 0));
+$td->report(76 + ($msvc ? 24 : 0));

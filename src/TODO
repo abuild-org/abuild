@@ -38,17 +38,15 @@ release notes.
 
  * Implemented new help system.  Run abuild --help help for details.
 
+ * abuild automatically exports the make variable/groovy parameter
+   TC_SRCS in its qtest support
+
 Next
 ====
 
- * Test qtest coverage from abuild test suite for both java and make.
-
- * Look into problem Brandon/Joe are having with copying things into
-   lib
-
- * Release 1.1.a7 (or maybe do autogeneration first)
-
  * Do autogeneration
+
+ * Release 1.1.a7
 
 
 Groovy Framework

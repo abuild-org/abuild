@@ -70,9 +70,11 @@ abuild.addTargetClosure('test-only') {
                     'value':12)
             }
             def toExport = abuild.resolveAsList('qtest.export', [])
-            if (abuild.resolve('TESTS') != null)
-            {
-                toExport << 'TESTS'
+            ['TESTS', 'TC_SRCS'].each {
+                if (abuild.resolve(it) != null)
+                {
+                    toExport << it
+                }
             }
             if (toExport)
             {

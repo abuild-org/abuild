@@ -8,6 +8,7 @@ first value
      [exec] STARTING TESTS on ---timestamp---
      [exec] *********************************
      [exec] 
+     [exec] Test coverage active in scope dyn
      [exec] 
      [exec] Running ../qtest/a.test
      [exec] demo  1 (POTATO)                                   ... PASSED
@@ -15,13 +16,16 @@ first value
      [exec] demo  3 (TRUTH1)                                   ... PASSED
      [exec] demo  4 (VAR1)                                     ... PASSED
      [exec] demo  5 (VAR2)                                     ... PASSED
+     [exec] demo  6 (test coverage)                            ... PASSED
+     [exec] 
+     [exec] Coverage analysis                                  ... PASSED
      [exec] 
      [exec] Overall test suite                                 ... PASSED
      [exec] 
      [exec] TESTS COMPLETE.  Summary:
      [exec] 
-     [exec] Total tests: 5
-     [exec] Passes: 5
+     [exec] Total tests: 6
+     [exec] Passes: 6
      [exec] Failures: 0
      [exec] Unexpected Passes: 0
      [exec] Expected Failures: 0

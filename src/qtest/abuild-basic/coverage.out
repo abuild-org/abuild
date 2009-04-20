@@ -1,0 +1,27 @@
+abuild: coverage (abuild-indep): check
+make: Entering directory `--topdir--/coverage/abuild-indep'
+
+*********************************
+STARTING TESTS on ---timestamp---
+*********************************
+
+Test coverage active in scope coverage
+
+Running ../qtest/coverage.test
+coverage  1 (coverage)                                         ... PASSED
+
+Coverage analysis                                              ... PASSED
+
+Overall test suite                                             ... PASSED
+
+TESTS COMPLETE.  Summary:
+
+Total tests: 1
+Passes: 1
+Failures: 0
+Unexpected Passes: 0
+Expected Failures: 0
+Missing Tests: 0
+Extra Tests: 0
+
+make: Leaving directory `--topdir--/coverage/abuild-indep'

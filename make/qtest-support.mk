@@ -1,5 +1,8 @@
 # Targets to support the qtest automated test framework
 
+TC_SRCS ?=
+export TC_SRCS
+
 ifeq ($(wildcard $(SRCDIR)/qtest),$(SRCDIR)/qtest)
 
 define run_qtest

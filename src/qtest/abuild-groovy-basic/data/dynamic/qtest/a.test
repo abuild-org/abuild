@@ -21,4 +21,9 @@ foreach my $v (sort keys %exp)
 		 $td->NORMALIZE_NEWLINES);
 }
 
-$td->report(5);
+$td->runtest("test coverage",
+	     {$td->COMMAND => "abuild -C .. tctest"},
+	     {$td->REGEXP => "abuild:.*: tctest\\b.*", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(6);

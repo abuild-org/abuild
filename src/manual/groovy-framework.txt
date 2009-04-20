@@ -155,7 +155,7 @@ Abuild.groovy environment
 
     Methods:
 
-     - configureTarget('name', named parameteres) {
+     - configureTarget('name', named parameters) {
 	   closureBody()
        }
 
