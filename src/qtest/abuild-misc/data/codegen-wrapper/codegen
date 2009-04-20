@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Path;
+use File::Basename;
+
+my ($in1, $in2, $out) = @ARGV;
+
+mkpath("b") unless -d "b";
+open(F, "<$in1") or die;
+my @lines = <F>;
+close(F);
+open(F, "<$in2") or die;
+push(@lines, <F>);
+close(F);
+open(O1, ">$out") or die;
+open(O2, ">b/$out") or die;
+map { print O1 $_; print O2 "b/$_" } @lines;
+close(O1);
+close(O2);
+chmod 0775, "b/$out";

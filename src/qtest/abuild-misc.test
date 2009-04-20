@@ -22,6 +22,46 @@ my $filters = get_filters();
 
 setup($td);
 
+cd("work/codegen-wrapper");
+
+for my $i (1, 2)
+{
+    my $description = "codegen-wrapper: " .
+	($i == 1 ? "run command" : "use cached");
+
+    $td->runtest($description,
+		 {$td->COMMAND => "abuild",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/codegen-wrapper$i.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    if (! in_windows())
+    {
+	$td->runtest("check executable",
+		     {$td->STRING =>
+			  (-x "abuild-indep/b/out1" ? "yes\n" : "no\n")},
+		     {$td->STRING => "yes\n"});
+    }
+
+    foreach my $f (qw(out1 b/out1 out2))
+    {
+	my $out = "codegen-wrapper-$f.out";
+	$out =~ s,/,-,g;
+	$td->runtest("check $f",
+		     {$td->FILE => "abuild-indep/$f"},
+		     {$td->FILE => "$top/$out"},
+		     $td->NORMALIZE_NEWLINES);
+    }
+
+    $td->runtest("clean",
+		 {$td->COMMAND => "abuild clean",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/codegen-wrapper-clean.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 cd("work/autoconf");
 
 $td->runtest("autoconf compiler invocation",
@@ -210,4 +250,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(25 + (in_windows() ? 0 : 1));
+$td->report(35 + (in_windows() ? 0 : 3));

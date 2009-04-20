@@ -1,0 +1,5 @@
+abuild: z (abuild-indep): all
+make: Entering directory `--topdir--/codegen-wrapper/abuild-indep'
+codegen-wrapper: files are up to date; using cached output files
+codegen-wrapper: files are up to date; using cached output files
+make: Leaving directory `--topdir--/codegen-wrapper/abuild-indep'

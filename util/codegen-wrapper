@@ -1,0 +1,310 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+use File::Basename;
+use Digest::MD5;
+use IO::File;
+use File::Copy;
+use File::Path;
+use POSIX ':sys_wait_h';
+
+my $whoami = basename($0);
+my $errors = 0;
+
+my $srcdir = undef;
+my $cachedir = undef;
+my @inputs = ();
+my @outputs = ();
+my @command = ();
+
+my $verbose = ((exists $ENV{'ABUILD_VERBOSE'}) &&
+	       ($ENV{'ABUILD_VERBOSE'} eq '1'));
+my $silent = ((exists $ENV{'ABUILD_SILENT'}) &&
+	      ($ENV{'ABUILD_SILENT'} eq '1'));
+
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '--src')
+    {
+	usage() unless @ARGV;
+	$srcdir = shift(@ARGV);
+    }
+    elsif ($arg eq '--cache')
+    {
+	usage() unless @ARGV;
+	$cachedir = shift(@ARGV);
+    }
+    elsif ($arg eq '--input')
+    {
+	usage() unless @ARGV;
+	get_these_args(\@inputs);
+    }
+    elsif ($arg eq '--output')
+    {
+	usage() unless @ARGV;
+	get_these_args(\@outputs);
+    }
+    elsif ($arg eq '--command')
+    {
+	@command = @ARGV;
+	@ARGV = ();
+    }
+    else
+    {
+	usage();
+    }
+}
+
+# Don't require inputs to be non-empty...it's okay to have a code
+# generator that doesn't read any input files.
+usage() unless ((defined $srcdir) &&
+		(defined $cachedir) &&
+		@outputs &&
+		@command);
+
+if (! -d $srcdir)
+{
+    error("$srcdir does not exist or is not a directory");
+}
+
+# Interpret cache as relative to src
+$cachedir = "$srcdir/$cachedir";
+
+if (! -d "$cachedir")
+{
+    error("$cachedir does not exist or is not a directory");
+}
+foreach my $f (@inputs)
+{
+    if (! -f "$srcdir/$f")
+    {
+	error("$srcdir/$f does not exist or is not a file");
+    }
+}
+exit_if_errors();
+
+my %checksums = ();
+compute_checksums();
+
+if (output_files_exist() && checksums_match())
+{
+    info("files are up to date; using cached output files");
+    foreach my $f (@outputs)
+    {
+	fullcopy("$cachedir/$f", $f);
+    }
+}
+else
+{
+    verbose("running " . join(' ', @command));
+    my $r = system(@command);
+    if ($r != 0)
+    {
+	if (WIFSIGNALED($r))
+	{
+	    fatal($command[0] . " was terminated with signal " . WTERMSIG($r));
+	}
+	elsif (WIFEXITED($r))
+	{
+	    exit WEXITSTATUS($r);
+	}
+    }
+
+    foreach my $f (@outputs)
+    {
+	if (! -f $f)
+	{
+	    fatal("after successful command invocation," .
+		  " output file $f does not exist or is not a file");
+	}
+    }
+
+    verbose("command succeeded; updating cache");
+
+    foreach my $f (@outputs)
+    {
+	fullcopy($f, "$cachedir/$f");
+    }
+    %checksums = ();
+    compute_checksums();
+    foreach my $f (@inputs)
+    {
+	my $ckfile = "$cachedir/$f.md5";
+	safe_mkpath(dirname($ckfile));
+	my $fh = new IO::File(">$ckfile") or
+	    fatal("unable to create or write to $ckfile: $!");
+	$fh->print($checksums{$f} . "\n");
+	$fh->close();
+    }
+
+    info("generation succeeded; cache updated");
+}
+
+sub output_files_exist
+{
+    foreach my $f (@outputs)
+    {
+	if (! -f "$cachedir/$f")
+	{
+	    verbose("can't find cached output file $f");
+	    return 0;
+	}
+    }
+    verbose("found cached copies of all output files");
+    1;
+}
+
+sub checksums_match
+{
+    foreach my $f (@inputs)
+    {
+	my $ckfile = "$cachedir/$f.md5";
+	if (! -f $ckfile)
+	{
+	    verbose("can't find cached checksum for input file $f");
+	    return 0;
+	}
+	my $ckfh = new IO::File("<$ckfile") or
+	    fatal("unable to open $ckfile: $!");
+	my $ck = scalar(<$ckfh>) || "";
+	$ckfh->close();
+	$ck =~ s/\s*$//;
+	if ($ck ne $checksums{$f})
+	{
+	    verbose("checksum mismatch for input file $f");
+	    return 0;
+	}
+    }
+    1;
+}
+
+sub fullcopy
+{
+    my ($src, $dest) = @_;
+    safe_mkpath(dirname($dest));
+    copy($src, $dest) or fatal("copy of $src to $dest failed: $!");
+    eval
+    {
+	# preserve protections if system supports doing so
+	my @stat = stat($src);
+	if (@stat)
+	{
+	    my $mode = $stat[2] & 07777;
+	    chmod $mode, $dest;
+	}
+    };
+}
+
+sub safe_mkpath
+{
+    my $dir = shift;
+    if (! -d $dir)
+    {
+	mkpath($dir) or fatal("mkpath $dir failed: $!");
+    }
+}
+
+sub get_these_args
+{
+    my $argp = shift;
+    # Grab arguments up to the next one that starts with --.
+    while (@ARGV && ($ARGV[0] !~ m/^--/))
+    {
+	push(@$argp, shift(@ARGV));
+    }
+}
+
+sub compute_checksums
+{
+    foreach my $f (@inputs)
+    {
+	$checksums{$f} = get_md5_checksum("$srcdir/$f");
+    }
+}
+
+sub get_md5_checksum
+{
+    my $file = shift;
+    my $fh = new IO::File("<$file") or fatal("can't open $file: $!");
+    binmode $fh;
+    my $digest = Digest::MD5->new->addfile($fh)->hexdigest;
+    $fh->close();
+    $digest;
+}
+
+sub error
+{
+    my $msg = shift;
+    warn "$whoami: $msg\n";
+    $errors = 1;
+}
+
+sub exit_if_errors
+{
+    fatal("errors detected; exiting") if $errors;
+}
+
+sub fatal
+{
+    my $msg = shift;
+    error($msg);
+    exit 2;
+}
+
+sub info
+{
+    return if $silent;
+    my $msg = shift;
+    print "$whoami: $msg\n";
+}
+
+sub verbose
+{
+    return unless $verbose;
+    my $msg = shift;
+    print "$whoami: (verbose) $msg\n";
+}
+
+sub usage
+{
+    die "
+Usage: $whoami options
+
+  --src source-directory
+  --cache cache-directory
+  --input input files
+  --output output files
+  --command command [ args ... ]
+
+The --command option must be the last option specified.  All remaining
+arguments are taken as the command and its arguments.
+
+This program is used to wrap code generators to enable use of cached
+generated files in place of regenerating them, and to do so in a way
+that does not invalided automatic updating of the generated files when
+required.  It is designed so that cached output files can be used when
+input files are unchanged even when the code generator is not
+available.
+
+Input files and the cache directory are specified relative to the
+source directory.  Output files are created in the current directory,
+which is presumed to be the abuild output directory.
+
+For every output file Y, make sure cache-directory/Y exists.  If so,
+then for every input file X, compare X's md5 checksum with the value
+stored in cache-directory/X.md5.  If all the checksums match, copy
+each cached output file to the current directory.  If not, run
+command, which is presumed to generate the output files from the input
+files.  If command fails, fail.  Otherwise, if command succeeds and
+some output file Y does not exist, fail.  Otherwise, copy each output
+file Y to cache-directory and update each input file's checksum.
+
+Note that command is run as provided from the current directory.  This
+means that, in many cases, the names of input files or output files
+will be duplicated on the command line.  This is not a problem if the
+command is invoked from a make pattern rule.
+
+";
+}

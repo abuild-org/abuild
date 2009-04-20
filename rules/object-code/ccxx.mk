@@ -390,82 +390,6 @@ $(_CCpproc): %.i: %.cc FORCE
 $(_CPPpproc): %.i: %.cpp FORCE
 	$(cxx_to_i)
 
-# Lex rules
-
-LEX := lex
-define lex_to_c
-	@$(PRINT) Generating $@ from $< with $(LEX)
-	$(RM) $@
-	$(LEX) -o$@ $<
-endef
-
-%.ll.cc: %.ll
-	$(lex_to_c)
-
-%.ll.cpp: %.ll
-	$(lex_to_c)
-
-%.l.c: %.l
-	$(lex_to_c)
-
-# Flex rules that are separate from lex rules
-
-FLEX := flex
-define flex_to_c
-	@$(PRINT) Generating $@ from $< with $(FLEX)
-	$(RM) $@
-	$(FLEX) -o$@ $<
-endef
-
-%.fl.cc: %.fl
-	$(flex_to_c)
-
-%.fl.cpp: %.fl
-	$(flex_to_c)
-
-%.fl.c: %.l
-	$(flex_to_c)
-
-FlexLexer.%.cc: %.fl
-	@$(PRINT) "Generating $@ from $<"
-	$(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<
-
-# Bison rules
-
-BISON := bison
-%.tab.cc %.tab.hh: %.yy
-	@$(PRINT) "Generating $@ from $<"
-	$(BISON) -p $(notdir $(basename $<)) -t -d $<
-
-# Sun RPC rules
-
-RPCGEN := rpcgen
-# make sure make does not remove the generated header file
-.PRECIOUS: %_rpc.h
-
-%_rpc.h: %.x
-	@$(PRINT) Generating $@ from $< with $(RPCGEN)
-	$(RM) $@
-	$(RPCGEN) -h -o $@ $<
-
-%_rpc_xdr.c: %_rpc.h
-	@$(PRINT) Generating $@ from $< with $(RPCGEN)
-	$(RM) $@
-	$(RPCGEN) -c -o $@ $(SRCDIR)/$*.x
-	sed -i -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@
-
-%_rpc_svc.c: %_rpc.h
-	@$(PRINT) Generating $@ from $< with $(RPCGEN)
-	$(RM) $@
-	$(RPCGEN) -m -o $@ $(SRCDIR)/$*.x
-	sed -i -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@
-
-%_rpc_clnt.c: %_rpc.h
-	@$(PRINT) Generating $@ from $< with $(RPCGEN)
-	$(RM) $@
-	$(RPCGEN) -l -o $@ $(SRCDIR)/$*.x
-	sed -i -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@
-
 # Ensure that we can use -llib dependencies properly.
 .LIBPATTERNS ?=
 $(foreach PAT,$(.LIBPATTERNS),$(eval vpath $(PAT) $(LIBDIRS)))
@@ -542,16 +466,6 @@ else
  DUMMY := $(shell $(RM) $(_extra_obj) $(_all_lib) $(_all_bin))
 endif
 
-# This "clean" rule only gets run when abuild clean is manually run
-# from the output directory itself.  The "clean" rule in the actual
-# source directory just removes all the output directories.
-clean::
-	$(RM) *.$(OBJ) *.$(LOBJ) *.$(DEP) *.i
-	$(RM) $(_lib_TARGETS) $(_bin_TARGETS) *.i
-	$(RM) *.ll.cc *.ll.cpp *.l.c *.fl.cc *.fl.cpp *.fl.c
-	$(RM) FlexLexer.*.cc *.tab.cc *.tab.hh
-	$(RM) *_rpc.h *_rpc_xdr.c *_rpc_svc.c *_rpc_clnt.c
-
 # Create a debugging target that shows values of some critical
 # variables.
 .PHONY: ccxx_debug
@@ -560,3 +474,8 @@ ccxx_debug::
 	@$(PRINT) INCLUDES = $(INCLUDES)
 	@$(PRINT) LIBDIRS = $(LIBDIRS)
 	@$(PRINT) LIBS = $(LIBS)
+
+# Include legacy built-in support for certain code generators.  These
+# should have been plugins, but they were added before plugins were
+# supported.
+include $(abMK)/legacy-code-generators.mk

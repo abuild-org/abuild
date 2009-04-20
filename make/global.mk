@@ -43,6 +43,9 @@ DEP := dep
 
 FORCE: ;
 
+# Support for codegen-wrapper
+CODEGEN_WRAPPER = perl $(ABUILD_TOP)/util/codegen-wrapper --src $(SRCDIR)
+
 # Define some useful utility functions and common variables
 
 ABUILD_SUPPORT_1_0 ?= 1

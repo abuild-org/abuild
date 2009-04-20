@@ -125,6 +125,11 @@ Miscellaneous
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
 
+ * Consider moving rpc stuff out of abuild and into a plugin,
+   especially since we can't test it.  Maybe flex and bison get to
+   stay because abuild uses them for its own build, or maybe they have
+   to come out too.
+
 
 Abuild Contrib
 ==============
