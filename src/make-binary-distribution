@@ -68,7 +68,6 @@ my $make_java_dist = 0;
 my $doc_dist = undef;
 my $make_doc_dist = 0;
 my $make_static = 0;
-my $save_auto = 0;
 foreach my $arg (@ARGV)
 {
     if ($arg eq '--make-java-dist')
@@ -90,10 +89,6 @@ foreach my $arg (@ARGV)
     elsif ($arg eq '--make-static')
     {
 	$make_static = 1;
-    }
-    elsif ($arg eq '--save-auto')
-    {
-	$save_auto = 1;
     }
     elsif ($test_mkdist && ($arg =~ m/abuild-.*-java.tar.bz2$/))
     {
@@ -175,10 +170,6 @@ if ($^O eq 'cygwin')
     $windows = 1;
     # We need objdump to determine which DLLs are required.
     run("objdump --version > /dev/null");
-    if ((! -d "auto-srcs") && (! $test_mkdist))
-    {
-	die "$whoami: auto-srcs must exist\n";
-    }
 }
 
 if ($windows && $make_static)
@@ -239,12 +230,6 @@ print $bin_dist, "\n";
 
 safe_chdir("src");
 
-if (-d "$cwd/auto-srcs")
-{
-    safe_mkdir("$abuild_outdir");
-    run("cp $cwd/auto-srcs/* $abuild_outdir");
-}
-
 if ($test_mkdist && (-f "$abuild_outdir/abuild" ||
 		     -f "$abuild_outdir/abuild.exe"))
 {
@@ -273,14 +258,6 @@ if ($make_static)
     safe_rename($abuild, "$tmpdir/abuild.static");
     $static_dist = "abuild-$version-${os}_static-$cpu-bin";
     safe_rename("$abuild.real", $abuild);
-}
-if ($save_auto)
-{
-    run("$abuild save-auto");
-    if (-d "$cwd/auto-srcs")
-    {
-	rmrf("$cwd/auto-srcs");
-    }
 }
 
 if ($build_java)
@@ -396,12 +373,6 @@ else
     safe_copy($abuild, "bin/abuild");
     system("chmod -R g-w .");
     system("chmod +x bin/abuild");
-}
-
-if ($save_auto)
-{
-    safe_rename("src/auto-srcs", "$cwd/auto-srcs");
-    print "$whoami: created auto-srcs\n";
 }
 
 rmrf("src");

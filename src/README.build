@@ -105,17 +105,6 @@ To build on Windows, perform the following steps:
  * Create the abuild output directory (e.g., "mkdir
    abuild-windows.ix86.nt5-cygwin.msvc")
 
- * Go to a UNIX system with a working flex and bison and run "abuild
-   save-auto".  [Note: as of 1.0.a15, this doesn't work in a
-   non-updated Fedora 7 because of a bug in Fedora's local
-   modification to flex.  Fedora has acknowledged and fixed this bug.
-   Flex 2.5.33-8 or better is required.  A yum install flex will bring
-   in at least this version.]
-
- * Copy the files in the auto-srcs directory from there into your
-   local abuild output directory and then delete the auto-srcs
-   directory.
-
  * Run
 
    make -f Makefile.bootstrap
@@ -179,13 +168,13 @@ Basic steps:
  * run
 
  ./make-binary-distribution abuild-version.tar.bz2 --make-java-dist \
-       --make-doc-dist --make-static --save-auto
+       --make-doc-dist --make-static
 
  * save the binary distribution or distributions
 
- * Distribute the auto-srcs directory, source distribution, java
-   distribution, and doc distribution, and make-binary-distribution as
-   needed to the build hosts
+ * Distribute the source distribution, java distribution, and doc
+   distribution, and make-binary-distribution as needed to the build
+   hosts
 
  * For each build host, run make-binary-distribution on each build
    host.  Pass the doc-dist and/or java-dist files as arguments as

@@ -66,13 +66,10 @@ GENERAL_SRCS := \
 	DependencyGraph.cc \
 	DependencyRunner.cc
 
-# Automatically generated scanners and parsers that we may sometimes save
+# Automatically generated scanners and parsers
 AUTO_SRCS := \
 	interface.tab.cc \
 	FlexLexer.interface.cc
-
-# Files to be saved by save_auto in local-rules.mk
-SAVE_AUTO := $(AUTO_SRCS) interface.tab.hh /usr/include/FlexLexer.h
 
 ifndef SKIP_PARSER_CACHE
  FLEX_CACHE := parser-cache
