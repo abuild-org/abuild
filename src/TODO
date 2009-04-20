@@ -7,75 +7,12 @@ Notes for Next Release
 Remember to keep deprecated features list up-to-date.  Add the
 following:
 
- * ABUILD_THIS is no longer deprecated.  We can't really deprecate an
-   interface variable because there's no way to detect or warn for the
-   use of a specific variable in backend configuration files.  People
-   should use ABUILD_ITEM_NAME instead of ABUILD_THIS, but the
-   ABUILD_THIS variable will stick around.
-
- * Add --ant command line option back in and make it deprecated.  Any
-   option other than -Dprop=value is ignored.  -Dprop=value is treated
-   as if prop=value had been given at the normal command line.
-
- * Externals crossing symbolic links has been changed from an error to
-   a deprecation warning.  It is still in an error during the upgrade
-   process.
+ * ...
 
 These changes have already been made and need to make it into the
 release notes.
 
- * add flag --find item-name or --find tree:tree-name to print the
-   location of the given build item or build tree.
-
- * abuild is slightly quieter with --silent than it used to be
-
- * bug fix: abuild properly detects and gives an error for an attempt
-   to assign multiple words to a scalar interface variable
-
- * Removed rules-help and interface-help targets.  For ant, hooks-help
-   and properties-help are still around because the new help system is
-   not aware of the ant framework.
-
- * Implemented new help system.  Run abuild --help help for details.
-
- * abuild automatically exports the make variable/groovy parameter
-   TC_SRCS in its qtest support
-
- * Revert plugin.mk load ordering change.  plugin.mk files are once
-   again loaded after Abuild.mk, and plugin.groovy files are now
-   loaded after Abuild.groovy.  Before Abuild.mk and Abuild.groovy, we
-   have preplugin.mk and preplugin.groovy.  This provides a way to do
-   early initialization without breaking compatibility for plugins
-   that use variables set in Abuild.mk.
-
- * Provide new tool, util/codegen-wrapper, that can be used to wrap
-   code generation using optional code generators.  This tool is
-   invoked with a source directory (automatically supplied by abuild),
-   a cache directory, a list of input files, a list of output files,
-   and a command used to generate the output files.  It caches the
-   generated output files and checksums of the input files.  If all
-   input files have matching checksums and all output files are
-   present in the cache, codegen-wrapper will copy the cached output
-   files into the output directory.  Otherwise, it will run the
-   command and then cache the output files and update the input file
-   checksums.  Pending documentation of this tool, see
-   src/qtest/abuild-misc/codegen-wrapper for an example of its use.
-
- * Flex and bison support have been tentatively enhanced to use the
-   new codegen-wrapper utility.  This functionality is used for
-   abuild's own build, but it is not yet exercised in the test suite.
-
- * Remove save-autos target and all support for it.  Instead, we are
-   using the new code generator wrapper for flex and bison code.  The
-   abuild source, as distributed, now includes automatically generated
-   scanners and parsers, so flex and bison are no longer needed to
-   build it from the source distribution.
-
-
-Next
-====
-
- * Release 1.1.a7
+ * ...
 
 
 Code Generation
@@ -109,6 +46,8 @@ Unresolved issues surrounding codegen-wrapper:
       Although the code tries to be written so that it doesn't matter
       what --src points to, it has only been tested for when --src is
       "..".
+
+    - FLEX_CACHE, BISON_CACHE
 
  * We really need to test rpcgen and the rest of lex/flex/bison in the
    test suite if all required tools are present.

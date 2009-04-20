@@ -6,8 +6,8 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "1.1.a6">
-<!ENTITY lastreleased "April 13, 2009">
+<!ENTITY swversion "1.1.a7">
+<!ENTITY lastreleased "April 20, 2009">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13750,6 +13750,215 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.a7: April 20, 2009</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Deprecated Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The interface variable <varname>ABUILD_THIS</varname> is no
+           longer deprecated.  We can't really deprecate an interface
+           variable because there's no way to detect or warn for the
+           use of a specific variable in backend configuration files.
+           People should use <varname>ABUILD_ITEM_NAME</varname>
+           instead of <varname>ABUILD_THIS</varname>, but the
+           <varname>ABUILD_THIS</varname> variable will stick around.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <option>--ant</option> command line option, which had
+           been removed in an earlier alpha release, has been
+           restored, but it only supports arguments of the form
+           <option>-Dprop=value</option>.  Using it will generate a
+           deprecation warning and will point out the new syntax.
+           This is to make it easier for users to discover the new way
+           to pass parameters to builds and to avoid breaking some
+           scripted builds.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           External directories crossing symbolic links is no longer
+           an error condition.  Instead, this will generate a
+           deprecation warning, and <command>abuild
+           --upgrade-trees</command> will refuse to upgrade any build
+           trees that have symbolically linked externals.  This change
+           should make it easier for people to test &abuild; 1.1
+           without having to make unwanted changes to their build
+           areas, particularly when things outside of &abuild; may be
+           relying on the symbolic links.  As allowing symbolically
+           linked externals is just postponing the inevitable, people
+           are still encouraged to avoid them.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Usability Features
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Add new flag <option>--find</option> that can be used to
+           show the location of a build item or build tree.  Use
+           <command>abuild --find
+           <replaceable>item-name</replaceable></command> to show the
+           location and containing tree name of a build item, and
+           <command>abuild --find
+           tree:<replaceable>tree-name</replaceable></command> to show
+           the location of a tree name.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; is somewhat quieter with <option>--silent</option>
+           than it used to be.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Older versions of &abuild; would allow assignment of
+           multiple words to scalar interface variables.  This was
+           never intended functionality, and only happened to work
+           because of the syntax of make and ant.  With the groovy
+           backend, this actually causes a problem, so &abuild; no
+           properly gives an error when multiple words are assigned to
+           a scalar interface variable.  (Thanks to Brian Reid for
+           noticing the problem.)
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         New Help System
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; has a new help system.  The new help system
+           provides a more robust ways for help to be provided for
+           built-in and user-provided toolchains and rules.  Pending
+           full documentation, run <command>abuild --help
+           help</command> for details.  For information on creating
+           help files, see
+           <filename>src/manual/pending.txt</filename>.  Help files
+           have not yet been written for all built-in rules and
+           toolchains, but this will be done prior to the release of
+           &abuild; version 1.1.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The targets <command>rules-help</command> and
+           <command>interface-help</command> have been removed.  For
+           the ant framework, the targets
+           <command>properties-help</command> and
+           <command>hooks-help</command> are still there since the new
+           help system does not have any support for the ant backend.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Improved Code Generator Support
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           A new tool, <filename>util/codegen-wrapper</filename>, has
+           been provided.  This tool can be used to wrap code
+           generation that uses optional code generators.  It is
+           invoked with a source directory (automatically supplied by
+           abuild), a cache directory, a list of input files, a list
+           of output files, and a command used to generate the output
+           files.  It caches the generated output files and checksums
+           of the input files.  If all input files have matching
+           checksums and all output files are present in the cache,
+           codegen-wrapper will copy the cached output files into the
+           output directory.  Otherwise, it will run the command and
+           then cache the output files and update the input file
+           checksums.  Pending documentation of this tool, see
+           <filename>src/qtest/abuild-misc/codegen-wrapper</filename>
+           for an example of its use.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; uses <command>codegen-wrapper</command> in its own
+           build.  As such, the <command>save-autos</command> target
+           and all support for it have been removed from the build of
+           &abuild; itself.  The &abuild; source, as distributed, now
+           includes automatically generated scanners and parsers, so
+           flex and bison are no longer needed to build it from the
+           source distribution.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Backend Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Reverted earlier change to the order in which
+           <filename>plugin.mk</filename> files are loaded relative to
+           <filename>Abuild.mk</filename>.  As in &abuild; 1.0,
+           &abuild; 1.1 now loads <filename>plugin.mk</filename> after
+           loading <filename>Abuild.mk</filename>.  A new file,
+           <filename>preplugin.mk</filename>, is now loaded before
+           <filename>Abuild.mk</filename> to allow plugins to provide
+           initialization that is run prior to parsing of the
+           <filename>Abuild.mk</filename> file.  The previous change
+           to loading order was an unnecessary non-backward-compatible
+           change.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           To be consistent with the make backend, the file
+           <filename>plugin.groovy</filename> is now loaded after
+           <filename>Abuild.groovy</filename>, and the file
+           <filename>preplugin.groovy</filename> has been provided for
+           pre-plugin initialization.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           QTest support for both make and groovy now exports the
+           <varname>TC_SRCS</varname> variable automatically.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Built-in flex and bison support have tentatively been
+           expanded to use the <command>codegen-wrapper</command>.
+           The variables <varname>FLEX_CACHE</varname> and
+           <varname>BISON_CACHE</varname> must be set to enable this.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.a6: April 13, 2009</term>
      <listitem>
