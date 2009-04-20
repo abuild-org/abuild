@@ -45,7 +45,7 @@ include $(abMK)/qtest-support.mk
 include $(call load_rule,_base)
 
 # Load any pre-plugin initialization files
-include $(wildcard $(foreach P,$(ABUILD_PLUGINS),$(P)/pre-plugin.mk))
+include $(wildcard $(foreach P,$(ABUILD_PLUGINS),$(P)/preplugin.mk))
 
 # Include the current directory's build rules, remembering that the
 # source directory is actually this directory's parent.
