@@ -44,8 +44,8 @@ release notes.
  * Revert plugin.mk load ordering change.  plugin.mk files are once
    again loaded after Abuild.mk, and plugin.groovy files are now
    loaded after Abuild.groovy.  Before Abuild.mk and Abuild.groovy, we
-   have pre-plugin.mk and pre-plugin.groovy.  This provides a way to
-   do early initialization without breaking compatibility for plugins
+   have preplugin.mk and preplugin.groovy.  This provides a way to do
+   early initialization without breaking compatibility for plugins
    that use variables set in Abuild.mk.
 
 Next

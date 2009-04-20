@@ -90,6 +90,14 @@ $td->runtest("plugin-anywhere",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/pre-plugin/user");
+$td->runtest("plugin-anywhere",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/pre-plugin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 # Dependency on multiple instances of an interface.  "a" depends on
 # two different platforms instances of "b".
 
@@ -256,4 +264,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(37 + (in_windows() ? 0 : 3));
+$td->report(38 + (in_windows() ? 0 : 3));

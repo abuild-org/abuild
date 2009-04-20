@@ -1,3 +1,4 @@
 abuild.configureTarget('all') {
-    println "all from plugin top-level"
+    print "all from plugin top-level: "
+    println abuild.resolve('pre.plugin.param').join(' ')
 }

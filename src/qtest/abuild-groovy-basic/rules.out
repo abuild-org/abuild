@@ -1,5 +1,5 @@
 abuild: user (abuild-indep): all
-all from plugin top-level
+all from plugin top-level: potato spackle
 all from custom
 all from rule
 all from local
