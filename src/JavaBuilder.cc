@@ -359,7 +359,10 @@ JavaBuilder::runJava(unsigned short port)
     }
 
     std::vector<std::string> args;
-    args.push_back("java");
+    // The IBM jdk seems to want argv[0] to be its full path if this
+    // is not in its path, so set argv[0] to the full path rather than
+    // just "java".
+    args.push_back(this->java);
     args.push_back("-classpath");
     args.push_back(Util::join(Util::pathSeparator(), jars));
     args.push_back("org.abuild.javabuilder.JavaBuilder");
@@ -381,5 +384,6 @@ JavaBuilder::runJava(unsigned short port)
     }
 
     std::map<std::string, std::string> environment;
+    verbose("invoking java: " + Util::join(" ", args));
     Util::runProgram(this->java, args, environment, this->envp, ".");
 }
