@@ -15,6 +15,20 @@ release notes.
  * ...
 
 
+Next
+====
+
+ * Change JavaBuilder to use asynchronous accept and handle case of
+   java exiting prematurely.
+
+ * embedded groovy in a groovy task in an ant file whose path contains
+   x.y in it (or something like that) doesn't work with IBM jdk.
+   Change ant/abuild.xml to either use <groovy src="file"/>, which
+   requires creating a new property with abuild-top in it (done), or
+   remove the groovy task and create two custom tasks to replace the
+   existing groovy code.  The second solution would be preferred.
+
+
 Code Generation
 ===============
 
@@ -74,6 +88,8 @@ Miscellaneous
    for FORCE32 in the code.  The only references are in
    private/bin/get_native_platform_data and make/toolchains/gcc.mk.
 
+   Make sure we test this in the test suite for 64-bit platforms.
+
  * Incorporate as much of abuild-lint as possible or otherwise include
    abuild-lint in the distribution.
 
@@ -89,6 +105,11 @@ Abuild Contrib
 
 Documentation
 =============
+
+ * Make sure information about requiring flex and bison is correct in
+   the documentation and README.build.  Document which versions are
+   required and mention that they are only required if you are making
+   changes to the interface scanner or parser.
 
  * Mention somewhere that people can copy jars into abuild's lib
    directory if I want that to be something people do...
