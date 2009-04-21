@@ -30,6 +30,14 @@ setup($td);
 
 cd('work/jars');
 
+$td->runtest("java startup failure",
+	     {$td->COMMAND => [qw(abuild -b all -k --no-dep-failures),
+			       ' --test-java-builder-bad-java'],
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/java-startup-failure.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("build",
 	     {$td->COMMAND => "abuild -b all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -215,4 +223,4 @@ else
 
 check_work_accessed($td, 'not-accessed.out');
 
-$td->report(22 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));
+$td->report(23 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));

@@ -57,6 +57,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     whoami(Util::removeExe(Util::basename(argv[0]))),
     stdout_is_tty(Util::stdoutIsTty()),
     max_workers(1),
+    test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
     full_integrity(false),
@@ -358,6 +359,11 @@ Abuild::parseArgv()
 	if (boost::regex_match(arg, match, define_re))
 	{
 	    this->defines[match.str(1)] = match.str(2);
+	}
+	else if (arg == " --test-java-builder-bad-java")
+	{
+	    // undocumented option used by the test suite
+	    this->test_java_builder_bad_java = true;
 	}
 	else if ((arg == "-H") || (arg == "--help"))
 	{
@@ -5953,6 +5959,13 @@ Abuild::findJava()
 	}
     }
     java_libs.push_back(ant_home + "/lib");
+
+    if (this->test_java_builder_bad_java)
+    {
+	// For test suite: pass a bad java path to JavaBuilder to
+	// exercise having the java backend fail to start.
+	java = "/non/existent/java";
+    }
 
     this->java_builder.reset(
 	new JavaBuilder(

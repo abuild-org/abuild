@@ -40,7 +40,11 @@ class JavaBuilder
     JavaBuilder(JavaBuilder const&);
     JavaBuilder& operator=(JavaBuilder const&);
 
-    enum run_mode_e { rm_idle, rm_running, rm_starting_up,
+    class StartupFailed
+    {
+    };
+
+    enum run_mode_e { rm_idle, rm_running, rm_starting_up, rm_startup_failed,
 		      rm_shutting_down, rm_stopped };
     typedef boost::shared_ptr<boost::asio::ip::tcp::socket> socket_ptr;
     typedef boost::shared_ptr<boost::thread> thread_ptr;
@@ -51,11 +55,14 @@ class JavaBuilder
     void start();
     void cleanup();
     void runIO();
+    void handleAccept(boost::system::error_code const&,
+		      boost::shared_ptr<boost::asio::ip::tcp::acceptor>);
     void handleRead(boost::system::error_code const&, size_t length);
     void handleWrite(boost::system::error_code const&);
     void runJava(unsigned short port);
     void handleResponse();
-    void waitForRunMode(run_mode_e);
+    void waitForStartup();
+    void waitForShutdown();
     void setRunMode(run_mode_e);
 
     Error& error;

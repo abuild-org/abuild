@@ -360,6 +360,7 @@ class Abuild
     unsigned int max_workers;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
+    bool test_java_builder_bad_java;
     std::map<std::string, std::string> defines;
     std::string start_dir;
     bool keep_going;

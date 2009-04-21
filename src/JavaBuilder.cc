@@ -51,7 +51,14 @@ JavaBuilder::invoke(std::string const& backend,
 bool
 JavaBuilder::makeRequest(std::string const& message)
 {
-    start();
+    try
+    {
+	start();
+    }
+    catch (StartupFailed)
+    {
+	return false;
+    }
 
     // Register response queue
     response_queue_ptr response(new ThreadSafeQueue<bool>());
@@ -81,7 +88,8 @@ void
 JavaBuilder::finish()
 {
     boost::mutex::scoped_lock lock(this->mutex);
-    if (this->run_mode == rm_idle)
+    if ((this->run_mode == rm_idle) ||
+	(this->run_mode == rm_startup_failed))
     {
 	return;
     }
@@ -94,7 +102,7 @@ JavaBuilder::finish()
 		&JavaBuilder::handleWrite, this,
 		boost::asio::placeholders::error));
     }
-    waitForRunMode(rm_stopped);
+    waitForShutdown();
     cleanup();
 }
 
@@ -120,8 +128,12 @@ JavaBuilder::start()
 	return;
 
       case rm_starting_up:
-	waitForRunMode(rm_running);
+	waitForStartup();
 	return;
+
+      case rm_startup_failed:
+	throw StartupFailed();
+	break;
 
       case rm_shutting_down:
 	throw std::logic_error("start() called while shutting down");
@@ -139,7 +151,7 @@ JavaBuilder::start()
     this->io_thread.reset(
 	new boost::thread(boost::bind(&JavaBuilder::runIO, this)));
 
-    waitForRunMode(rm_running);
+    waitForStartup();
 }
 
 void
@@ -161,37 +173,43 @@ JavaBuilder::runIO()
 	boost::asio::ip::tcp::resolver resolver(*this->io_service);
 	boost::asio::ip::tcp::resolver::query query("127.0.0.1", "0");
 	boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
-	boost::asio::ip::tcp::acceptor a(
-	    *this->io_service, boost::asio::ip::tcp::endpoint(*iter));
-	unsigned short port = a.local_endpoint().port();
+	boost::shared_ptr<boost::asio::ip::tcp::acceptor> a(
+	    new boost::asio::ip::tcp::acceptor(
+		*this->io_service, boost::asio::ip::tcp::endpoint(*iter)));
+	unsigned short port = a->local_endpoint().port();
 	this->sock.reset(new boost::asio::ip::tcp::socket(*this->io_service));
 	java_thread.reset(
 	    new boost::thread(
 		boost::bind(&JavaBuilder::runJava, this, port)));
-	a.accept(*(this->sock));
-
-	// Start accepting requests
-	setRunMode(rm_running);
-	requestRead();
+	a->async_accept(*(this->sock),
+			boost::bind(&JavaBuilder::handleAccept, this,
+				    boost::asio::placeholders::error, a));
     }
 
     this->io_service->run();
 
+    // Java side has shut down.  Join the thread and fail any
+    // pending requests.  There won't be any if we exited
+    // normally.
+    java_thread->join();
+
     {
 	boost::mutex::scoped_lock lock(this->mutex);
-
-	// Java side has shut down.  Join the thread and fail any
-	// pending requests.  There won't be any if we exited
-	// normally.
-	java_thread->join();
-	for (std::map<int, response_queue_ptr>::iterator iter =
-		 this->response_queues.begin();
-	     iter != this->response_queues.end(); ++iter)
+	if (this->run_mode == rm_starting_up)
 	{
-	    (*iter).second->enqueue(false);
+	    setRunMode(rm_startup_failed);
 	}
-	this->response_queues.clear();
-	setRunMode(rm_stopped);
+	else
+	{
+	    for (std::map<int, response_queue_ptr>::iterator iter =
+		     this->response_queues.begin();
+		 iter != this->response_queues.end(); ++iter)
+	    {
+		(*iter).second->enqueue(false);
+	    }
+	    this->response_queues.clear();
+	    setRunMode(rm_stopped);
+	}
     }
 }
 
@@ -204,6 +222,24 @@ JavaBuilder::requestRead()
 	    &JavaBuilder::handleRead, this,
 	    boost::asio::placeholders::error,
 	    boost::asio::placeholders::bytes_transferred));
+}
+
+void
+JavaBuilder::handleAccept(boost::system::error_code const& ec,
+			  boost::shared_ptr<boost::asio::ip::tcp::acceptor> ac)
+{
+    if (ec)
+    {
+	throw ec;
+    }
+
+    // Do not accept any more connections;
+    ac.reset();
+
+    // Start accepting requests
+    boost::mutex::scoped_lock lock(this->mutex);
+    setRunMode(rm_running);
+    requestRead();
 }
 
 void
@@ -306,10 +342,25 @@ JavaBuilder::handleResponse()
 }
 
 void
-JavaBuilder::waitForRunMode(run_mode_e mode)
+JavaBuilder::waitForStartup()
 {
     // Must be called with mutex locked
-    while (this->run_mode != mode)
+    while (! ((this->run_mode == rm_running) ||
+	      (this->run_mode == rm_startup_failed)))
+    {
+	this->running_cond.wait(this->mutex);
+    }
+    if (this->run_mode == rm_startup_failed)
+    {
+	throw StartupFailed();
+    }
+}
+
+void
+JavaBuilder::waitForShutdown()
+{
+    // Must be called with mutex locked
+    while (this->run_mode != rm_stopped)
     {
 	this->running_cond.wait(this->mutex);
     }
@@ -386,4 +437,11 @@ JavaBuilder::runJava(unsigned short port)
     std::map<std::string, std::string> environment;
     verbose("invoking java: " + Util::join(" ", args));
     Util::runProgram(this->java, args, environment, this->envp, ".");
+
+    boost::mutex::scoped_lock lock(this->mutex);
+    if (this->run_mode == rm_starting_up)
+    {
+	error.error(FileLocation(), "java builder backend failed to start");
+	this->io_service->stop();
+    }
 }
