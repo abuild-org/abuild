@@ -33,8 +33,7 @@ InterfaceParser::~InterfaceParser()
 InterfaceParser::InterfaceParser(std::string const& item_name,
 				 std::string const& item_platform,
 				 std::string const& local_dir) :
-    Parser(lexer, tok_EOF),
-    lexer(this),
+    Parser(interfaceGetFlexCaller(), tok_EOF),
     parse_tree(0),
     allow_after_build(false)
 {

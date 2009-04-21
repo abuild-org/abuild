@@ -31,18 +31,9 @@ endif
 %.fl.c: %.l
 	$(flex_to_c)
 
-ifdef FLEX_CACHE
- FlexLexer.%.cc: %.fl FlexLexer.h
-	@$(PRINT) "Generating $@ from $<"
-	$(CODEGEN_WRAPPER) --cache $(FLEX_CACHE) \
-	    --input $< --output $@ --command \
-	    $(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<
-
-else
- FlexLexer.%.cc: %.fl
+FlexLexer.%.cc: %.fl
 	@$(PRINT) "Generating $@ from $<"
 	$(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<
-endif
 
 # Bison rules
 

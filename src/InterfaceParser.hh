@@ -13,7 +13,9 @@
 
 #include <nt_all.hh>
 #include "interface.tab.hh"
-#include "InterfaceLexer.hh"
+
+class InterfaceParser;
+class FlexCaller;
 
 extern "C"
 {
@@ -21,6 +23,7 @@ extern "C"
     int interfacelex(YYSTYPE*, InterfaceParser*);
     int interfaceparse(InterfaceParser*);
 }
+extern FlexCaller& interfaceGetFlexCaller();
 
 // A single InterfaceParser object may be used to parse multiple
 // interface files.  When used in this way, it is as if the contents
@@ -192,7 +195,6 @@ class InterfaceParser: public Parser
 			bool& /* function_true */)> function_evaluators;
 
     YYSTYPE* yydata;
-    InterfaceLexer lexer;
     nt_Blocks* parse_tree;
     bool allow_after_build;
     // <windows.h> #define's interface to struct sometimes.

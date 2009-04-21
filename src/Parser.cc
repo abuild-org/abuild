@@ -1,18 +1,18 @@
 #include <Parser.hh>
 
-#include <iostream>
-#include <fstream>
-#include <FlexLexer.h>
+#include <stdio.h>
 #include <assert.h>
 #include <QEXC.hh>
 #include <Token.hh>
 #include <Logger.hh>
+#include <FlexCaller.hh>
 
-Parser::Parser(FlexLexer& lexer, int eof_token) :
+Parser::Parser(FlexCaller& flex_caller, int eof_token) :
     debug_parser(false),
+    flex_caller(flex_caller),
+    scanner(0),
     found_eof(false),
-    eof_token(eof_token),
-    lexer(lexer)
+    eof_token(eof_token)
 {
 }
 
@@ -33,7 +33,7 @@ Parser::getNextToken()
     {
 	// After the lexer returns EOF, fabricate a special EOF token
 	// and return it before returning 0.
-	result = this->lexer.yylex();
+	result = this->flex_caller.lex(this->scanner);
 	if (result == 0)
 	{
 	    this->found_eof = true;
@@ -74,21 +74,24 @@ Parser::createToken(std::string const& val)
 bool
 Parser::parse(std::string const& filename)
 {
-    std::ifstream input(filename.c_str());
-    if (! input.is_open())
+    FILE* input = fopen(filename.c_str(), "rb");
+    if (! input)
     {
 	throw QEXC::System(std::string("failed to open ") + filename, errno);
     }
 
-    this->lexer.switch_streams(&input, 0);
+    this->flex_caller.init_extra(this, &this->scanner);
+    this->flex_caller.set_in(input, this->scanner);
     this->token_factory.reset();
     this->token_factory.setFilename(filename);
     this->found_eof = false;
     startFile(filename);
     parseFile();
     endFile(filename);
+    fclose(input);
     this->token_factory.reset();
     this->heap.clear();
-    this->lexer.switch_streams(0, 0);
+    this->flex_caller.lex_destroy(this->scanner);
+    this->scanner = 0;
     return (this->error_handler.numErrors() == 0);
 }

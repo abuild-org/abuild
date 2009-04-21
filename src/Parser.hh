@@ -8,8 +8,8 @@
 #include <TokenFactory.hh>
 #include <Error.hh>
 
-class FlexLexer;
 class Error;
+class FlexCaller;
 class FileLocation;
 class Token;
 
@@ -35,7 +35,7 @@ class Parser
     FileLocation const& getLastFileLocation();
 
   protected:
-    Parser(FlexLexer&, int eof_token);
+    Parser(FlexCaller&, int eof_token);
 
     // Returns true if there were no errors.
     bool parse(std::string const& filename);
@@ -69,10 +69,11 @@ class Parser
     Parser(Parser const&);
     Parser& operator=(Parser const&);
 
+    FlexCaller& flex_caller;
+    void* scanner;
     bool found_eof;
     int eof_token;
     TokenFactory token_factory;
-    FlexLexer& lexer;
     std::list<boost::shared_ptr<NonTerminal> > heap;
 };
 

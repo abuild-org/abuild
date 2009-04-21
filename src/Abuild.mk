@@ -31,7 +31,7 @@ WFLAGS_InterfaceParser.cc = -wd4355
 endif
 
 WFLAGS_interface.tab.cc :=
-WFLAGS_FlexLexer.interface.cc :=
+WFLAGS_interface.fl.cc :=
 
 TEST_PROGS := \
 	test_util \
@@ -69,7 +69,7 @@ GENERAL_SRCS := \
 # Automatically generated scanners and parsers
 AUTO_SRCS := \
 	interface.tab.cc \
-	FlexLexer.interface.cc
+	interface.fl.cc
 
 ifndef SKIP_PARSER_CACHE
  FLEX_CACHE := parser-cache
@@ -87,7 +87,6 @@ endif
 SRCS_lib_abuild := \
 	$(GENERAL_SRCS) \
 	$(AUTO_SRCS) \
-	InterfaceLexer.cc \
 	InterfaceParser.cc \
 	FlagData.cc \
 	Parser.cc \

@@ -8,13 +8,13 @@
 #include <nt_all.hh>
 #include <interface.tab.hh>
 #include <Token.hh>
-#include <InterfaceLexer.hh>
+#include <FlexCaller.hh>
 #include <InterfaceParser.hh>
 %}
 
-%option yyclass="InterfaceLexer"
-%option prefix="yy_interface"
-%option noyywrap
+%option prefix="yy_interface_"
+%option extra-type="Parser *"
+%option noyywrap reentrant nounistd never-interactive
 
 /*
  * Identifiers may contain alphanumerics, dash, underscore, and

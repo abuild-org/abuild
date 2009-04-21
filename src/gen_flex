@@ -38,17 +38,27 @@ foreach my $token (@tokens)
     if ($token eq 'comment')
     {
 	# special case: don't return comments to the parser
-	output("    parser->createToken(yytext);\n");
+	output("    yyextra->createToken(yytext);\n");
     }
     else
     {
-	output("    parser->setToken(parser->createToken(yytext));\n");
+	output("    yyextra->setToken(yyextra->createToken(yytext));\n");
 	output("    return tok_$token;\n");
     }
     output("}\n");
 }
 
 output("\n%%\n");
+output("\n");
+output("static FlexCaller flex_caller(yy_interface_lex_init_extra,\n");
+output("			      yy_interface_set_in,\n");
+output("			      yy_interface_lex,\n");
+output("			      yy_interface_lex_destroy);\n");
+output("\n");
+output("FlexCaller& interfaceGetFlexCaller()\n");
+output("{\n");
+output("    return flex_caller;\n");
+output("}\n");
 
 close(OUT) or die "$whoami: can't close $fl: $!\n";
 close(IN);
