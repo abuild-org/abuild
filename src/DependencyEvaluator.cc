@@ -165,7 +165,8 @@ DependencyEvaluator::evaluate(ItemType const& item)
     // recursively to its reverse dependencies.
 
     ItemState istate = this->states[item];
-    if ((istate == i_completed) ||
+    if ((istate == i_running) ||
+	(istate == i_completed) ||
 	(istate == i_failed) ||
 	(istate == i_depfailed))
     {
