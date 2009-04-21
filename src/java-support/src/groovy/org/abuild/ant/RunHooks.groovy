@@ -1,5 +1,10 @@
+package org.abuild.ant
+
+import org.apache.tools.ant.Project
+import org.apache.tools.ant.Task
 import org.abuild.ant.CheckForTarget
-class HookRunner extends org.apache.tools.ant.Task
+
+class HookRunner extends Task
 {
     String name
     public void execute ()
@@ -16,4 +21,3 @@ class HookRunner extends org.apache.tools.ant.Task
 	}
     }
 }
-project.addTaskDefinition('run-hooks', HookRunner)

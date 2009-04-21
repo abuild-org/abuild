@@ -21,13 +21,6 @@ Next
  * Change JavaBuilder to use asynchronous accept and handle case of
    java exiting prematurely.
 
- * embedded groovy in a groovy task in an ant file whose path contains
-   x.y in it (or something like that) doesn't work with IBM jdk.
-   Change ant/abuild.xml to either use <groovy src="file"/>, which
-   requires creating a new property with abuild-top in it (done), or
-   remove the groovy task and create two custom tasks to replace the
-   existing groovy code.  The second solution would be preferred.
-
 
 Code Generation
 ===============

@@ -81,7 +81,8 @@
 
  <!-- Load task definitions -->
  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
- <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"/>
+ <taskdef name="abuild-setup" classname="org.abuild.ant.AntSetup"/>
+ <taskdef name="run-hooks" classname="org.abuild.ant.HookRunner"/>
 
  <!--
 
@@ -205,7 +206,7 @@
   </then>
  </if>
 
- <groovy src="${abuild.private.abuild-top}/ant/setup.groovy"/>
+ <abuild-setup/>
 
  <condition property="ant.build.javac.target"
             value="${abuild.java-target-version}">
@@ -239,8 +240,6 @@
    <matches string="${abuild.jar-name}" pattern="\."/>
   </and>
  </condition>
-
- <groovy src="${abuild.private.abuild-top}/ant/runhooks.groovy"/>
 
  <!--  Define special "all" target                                 -->
  <target name="all" depends="package"
