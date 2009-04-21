@@ -15,39 +15,6 @@ release notes.
  * ...
 
 
-Next
-====
-
- * Change JavaBuilder to use asynchronous accept and handle case of
-   java exiting prematurely.
-
-
-Code Generation
-===============
-
-Unresolved issues surrounding codegen-wrapper:
-
- * SKIP_PARSER_CACHE can be used to skip use of the parser cache.  We
-   need a way to force regeneration of the cache for testing with
-   newer versions of flex, for example.
-
- * Points to include in documentation:
-
-    - usually, --input $^ --output $@ is sufficient.  Sometimes output
-      generates more files than just $@ though and you have to specify
-      them.
-
-    - tries to detect whether input file was found in "." or "..".
-      Although the code tries to be written so that it doesn't matter
-      what --src points to, it has only been tested for when --src is
-      "..".
-
-    - FLEX_CACHE, BISON_CACHE
-
- * We really need to test rpcgen and the rest of lex/flex/bison in the
-   test suite if all required tools are present.
-
-
 Groovy Framework
 ================
 
@@ -62,6 +29,13 @@ Groovy Framework
 
 Miscellaneous
 =============
+
+ * For abuild's build, SKIP_PARSER_CACHE can be used to skip use of
+   the parser cache.  We need a way to force regeneration of the cache
+   for testing with newer versions of flex, for example.
+
+ * We really need to test rpcgen and the rest of lex/flex/bison in the
+   test suite if all required tools are present.
 
  * Consider Deprecating ABUILD_FORCE_32BIT and adding
    ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding
@@ -92,6 +66,19 @@ Documentation
    required (flex >= 2.5.33, tested with 2.5.35) and mention that they
    are only required if you are making changes to the interface
    scanner or parser.
+
+ * Points to include in codegen-wrapper documentation:
+
+    - usually, --input $^ --output $@ is sufficient.  Sometimes output
+      generates more files than just $@ though and you have to specify
+      them.
+
+    - tries to detect whether input file was found in "." or "..".
+      Although the code tries to be written so that it doesn't matter
+      what --src points to, it has only been tested for when --src is
+      "..".
+
+    - FLEX_CACHE, BISON_CACHE
 
  * Mention somewhere that people can copy jars into abuild's lib
    directory if I want that to be something people do...
