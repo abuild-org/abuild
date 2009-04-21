@@ -30,7 +30,6 @@ class JavaBuilder
 	Pattern.compile("(\\d+) (.*)");
     static private final Pattern defines_re =
 	Pattern.compile("([^-][^=]*)=(.*)");
-    private String abuildTop;
     private Socket socket;
     private PrintStream responseStream;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -44,7 +43,6 @@ class JavaBuilder
 		Map<String, String> defines)
 	throws IOException
     {
-	this.abuildTop = abuildTop;
 	this.buildArgs = buildArgs;
 	this.defines = defines;
 	SocketFactory factory = SocketFactory.getDefault();
@@ -171,8 +169,7 @@ class JavaBuilder
     }
 
     public static Project createAntProject(
-	String abuildTop, String dirName, BuildArgs buildArgs,
-	Map<String, String> defines)
+	String dirName, BuildArgs buildArgs, Map<String, String> defines)
     {
 	int messageOutputLevel = Project.MSG_INFO;
 	if (buildArgs.verbose)
@@ -187,7 +184,6 @@ class JavaBuilder
 	File dir = new File(dirName);
 	Project p = new Project();
 	p.setKeepGoingMode(buildArgs.keepGoing);
-	p.setUserProperty("abuild.private.abuild-top", abuildTop);
 	p.setUserProperty(MagicNames.PROJECT_BASEDIR, dir.getAbsolutePath());
 	for (Map.Entry<String, String> e: defines.entrySet())
 	{
@@ -255,8 +251,7 @@ class JavaBuilder
 	}
 
 	Project antProject =
-	    createAntProject(
-		this.abuildTop, dir, this.buildArgs, this.defines);
+	    createAntProject(dir, this.buildArgs, this.defines);
 	return runner.invokeBackend(
 	    buildFile, dir, this.buildArgs, antProject, targets, this.defines);
     }
