@@ -146,6 +146,10 @@ class WorkerPool
 	}
 	ResultType r = this->results.front();
 	this->results.pop_front();
+	if (this->results.empty())
+	{
+	    this->condition.notify_all();
+	}
 	return r;
     }
 
