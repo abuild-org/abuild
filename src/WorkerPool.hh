@@ -78,14 +78,16 @@ class WorkerPool
 	}
     }
 
-    // Block until there are results to report.  This should be called
-    // instead of wait() if there is nothing ready to be processed and
-    // nothing new can become available without additional results.
+    // Block until there are results to report or there are no more
+    // workers working.  This should be called instead of wait() if
+    // there is nothing ready to be processed and nothing new can
+    // become available without additional results.
     void waitForResults()
     {
 	boost::mutex::scoped_lock lock(this->mutex);
 	while ((! this->shutdown_requested) &&
-	       (this->results.empty()))
+	       (this->results.empty()) &&
+	       (this->available_workers.size() < this->num_workers))
 	{
 	    this->condition.wait(lock);
 	}

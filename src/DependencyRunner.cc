@@ -47,16 +47,8 @@ DependencyRunner::run(bool stop_on_first_error,
 	{
 	    pool.wait();
 	}
-	else if (! pool.idle())
+	else
 	{
-	    // Although it is possible for a thread to finish between
-	    // the call to pool.idle() and pool.waitForResults(), it
-	    // is not possible for pool.idle() to change from false to
-	    // true.  The reason is that, if the last task finishes
-	    // between the first and second call, its results will be
-	    // available.  The worker pool mutex-protects the process
-	    // of posting the results and returning the thread to the
-	    // free pool.
 	    pool.waitForResults();
 	}
 	while (pool.resultsAvailable())
