@@ -1128,6 +1128,7 @@ Util::runProgram(std::string const& progname,
 	*argp = 0;
 
 	execve(progname.c_str(), argv, env);
+	_exit(1);
     }
     else
     {
