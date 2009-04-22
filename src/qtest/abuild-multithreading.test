@@ -1,0 +1,74 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-multithreading") or die;
+
+my $td = new TestDriver("multithreading");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+
+# These tests attempt to exercise abuild's multithreaded build
+# capability.  Although the mutlithreaded nature of the dependency
+# evaluator and dependency runner are well exercised in their own test
+# suites, there are other considerations, such as race condition
+# opportunities or proper mutex protection in abuild's own internals,
+# that should be exercised.  These tests are designed to create
+# situations in which lots of things can happen as close to
+# simultaneously as possible.  The output is not deterministic, so we
+# have a special filter that makes sure we see what we are expecting.
+# Also, we repeat each test several times to try to make sure that we
+# have consistent results.
+
+my $nreps = 10;
+
+setup($td);
+
+cd("work/basic");
+runtest("mixed success and failure", "mixed.out");
+
+cd("work/fails");
+runtest("multiple failures", "failures.out");
+
+cd("work/java");
+
+if ($test_java)
+{
+    runtest("premature java exit", "premature-java-exit.out", 1);
+    runtest("java startup failure", "java-startup-failure.out", 2);
+
+    # It's not deterministic which Abuild.groovy files will be accessed.
+    system("cat ?/Abuild.groovy > /dev/null");
+}
+else
+{
+    system("(tar cf - . | cat > /dev/null)");
+}
+
+check_work_accessed($td, "not-accessed.out");
+
+$td->report(1 + ($nreps * (2 + ($test_java ? 2 : 0))));
+
+sub runtest
+{
+    my ($description, $out, $flag) = @_;
+    $flag = 0 unless defined $flag;
+    my $xargs = ($flag == 2 ? "' --test-java-builder-bad-java'" : "");
+    my $fargs = ($flag == 1 ? '--no-failure' : "");
+    for (my $i = 0; $i < $nreps; ++$i)
+    {
+	$td->runtest("$description ($i)",
+		     {$td->COMMAND => "abuild -b all -k -j4 $xargs",
+		      $td->FILTER => "perl $top/filter.pl $fargs"},
+		     {$td->FILE => "$top/$out", $td->EXIT_STATUS => 2},
+		     $td->NORMALIZE_NEWLINES);
+    }
+}

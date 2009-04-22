@@ -30,8 +30,8 @@ Groovy Framework
 Miscellaneous
 =============
 
- * There should be more testing of -jn in the test suite, particularly
-   with lots of build items failing or completing at once.
+ * Would be nice to get to the bottom of the dependency runner hang on
+   solaris.
 
  * Consider Deprecating ABUILD_FORCE_32BIT and adding
    ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding
