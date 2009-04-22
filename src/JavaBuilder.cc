@@ -18,6 +18,8 @@ JavaBuilder::JavaBuilder(Error& error,
 			 boost::function<void(std::string const&)> verbose,
 			 std::string const& abuild_top,
 			 std::string const& java,
+			 std::string const& java_home,
+			 std::string const& ant_home,
 			 std::list<std::string> const& java_libs,
 			 char** envp,
 			 std::list<std::string> const& build_args,
@@ -27,6 +29,8 @@ JavaBuilder::JavaBuilder(Error& error,
     verbose(verbose),
     abuild_top(abuild_top),
     java(java),
+    java_home(java_home),
+    ant_home(ant_home),
     java_libs(java_libs),
     envp(envp),
     build_args(build_args),
@@ -435,6 +439,10 @@ JavaBuilder::runJava(unsigned short port)
     }
 
     std::map<std::string, std::string> environment;
+    environment["JAVA_HOME"] = this->java_home;
+    environment["ANT_HOME"] = this->ant_home;
+    verbose("JAVA_HOME=" + this->java_home);
+    verbose("ANT_HOME=" + this->ant_home);
     verbose("invoking java: " + Util::join(" ", args));
     Util::runProgram(this->java, args, environment, this->envp, ".");
 

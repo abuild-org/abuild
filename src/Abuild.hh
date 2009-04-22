@@ -7,6 +7,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/thread/mutex.hpp>
 #include <Error.hh>
 #include <QEXC.hh>
 #include <BuildForest.hh>
@@ -395,6 +396,7 @@ class Abuild
     bool local_build;
 
     // Other data
+    boost::mutex build_mutex;
     Error error_handler;
     std::string current_directory;
     std::string program_fullpath;

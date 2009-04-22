@@ -5971,7 +5971,8 @@ Abuild::findJava()
 	new JavaBuilder(
 	    this->error_handler,
 	    boost::bind(&Abuild::verbose, this, _1),
-	    this->abuild_top, java, java_libs, this->envp,
+	    this->abuild_top, java, java_home, ant_home,
+	    java_libs, this->envp,
 	    this->java_builder_args, this->defines));
 }
 
@@ -5999,6 +6000,13 @@ bool
 Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 		    bool is_dep_failure)
 {
+    // Remember: this method, and therefore all methods it calls, may
+    // be run simultaenously from multiple threads.  Therefore, any
+    // shared data structures that are modified must be
+    // mutex-protected for all accesses, both read and write.
+    // this->build_mutex is provided for this purpose.  This code
+    // should take pains to avoid gratuitous modification to data.
+
     // NOTE: This function must not return failure without adding the
     // failed builder_string to the failed_builds list.
 
@@ -6030,6 +6038,11 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 
     if (use_interfaces)
     {
+	// Although createItemInterface modifies this build item and
+	// accesses build items that this one depends on, we are
+	// guaranteed that no dependent build items will be being
+	// built at the same time as this one is.  Therefore, this
+	// operation does not require mutex protection.
 	status = createItemInterface(
 	    builder_string, item_name, item_platform, build_item, parser);
     }
@@ -6096,6 +6109,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     if (! status)
     {
         notice(item_name + " (" + output_dir + "): build failed");
+	boost::mutex::scoped_lock lock(this->build_mutex);
 	this->failed_builds.push_back(builder_string);
     }
 

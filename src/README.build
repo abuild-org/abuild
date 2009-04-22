@@ -183,3 +183,28 @@ Basic steps:
  * If this is an official release, remember to update the
    web-accessible copies of the documentation and create a tag in the
    version control system.
+
+
+NOTES ON AUTOMATICALLY GENERATED FILES
+======================================
+
+The scanner and parser for abuild interface files is implemented using
+flex and bison.  flex version 2.5.33 or newer is required, and the
+build has never been tested with a version older than 2.5.35.  Abuild
+caches the generated files and will use cached files if it detects
+that the input files are unchanged.  This check is based on checksum,
+not modification time.  For most purposes, you should therefore only
+require flex and bison if you are modifying interface.qfl (which is
+used by gen_flex to generate interface.fl) or interface.yy.
+
+The variable SKIP_PARSER_CACHE may be set when building abuild to
+ignore the parser cache.  In this case, abuild will neither use the
+cache to supply the generated files nor will it update the cache with
+new generated files.  This can be useful for testing with new versions
+of flex or bison.  Additionally, the local target "clean-parser-cache"
+can be used to remove cached output files and stored input file
+checksums.  After this is run, the cached output files will be
+regenerated during the next clean build.
+
+The caching of flex and bison files is achieved using abuild's own
+codegen-wrapper facility.

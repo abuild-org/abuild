@@ -31,6 +31,11 @@ endif
 %.fl.c: %.l
 	$(flex_to_c)
 
+# Caching generated files for the C++ scanner can't be done reliably
+# because of the need for the file FlexLexer.h.  Besides, the C++
+# scanner is experimental, broken, and subject to being removed in a
+# future version of flex.  It should really not be used now that
+# %option reentrant is available for creating re-entrant scanners.
 FlexLexer.%.cc: %.fl
 	@$(PRINT) "Generating $@ from $<"
 	$(FLEX) -Pyy_$(notdir $(basename $<)) -+ -s -o$@ $<

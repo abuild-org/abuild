@@ -26,6 +26,8 @@ class JavaBuilder
 		boost::function<void(std::string const&)> verbose,
 		std::string const& abuild_top,
 		std::string const& java,
+		std::string const& java_home,
+		std::string const& ant_home,
 		std::list<std::string> const& java_libs,
 		char* envp[],
 		std::list<std::string> const& build_args,
@@ -70,6 +72,8 @@ class JavaBuilder
     boost::function<void(std::string const&)> verbose;
     std::string abuild_top;
     std::string java;
+    std::string java_home;
+    std::string ant_home;
     std::list<std::string> java_libs;
     char** envp;
     std::list<std::string> build_args;

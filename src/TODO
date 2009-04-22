@@ -30,21 +30,8 @@ Groovy Framework
 Miscellaneous
 =============
 
- * There are things in Abuild::itemBuilder that really should be
-   serialized.  There's unsafe multithreading access to things
-   including the list of build failures.  If possible, everything
-   except for the actual invocation of the backend in buildItem should
-   be serialized, or we should make sure we only use mt-safe accesses
-   to things.
-
  * There should be more testing of -jn in the test suite, particularly
    with lots of build items failing or completing at once.
-
- * For abuild's build, SKIP_PARSER_CACHE can be used to skip use of
-   the parser cache.  The clean-parser-cache target will remove files
-   from the parser cache so the next run will regenerate them.  This
-   can be used for testing with newer versions of flex and bison, for
-   example.
 
  * We really need to test rpcgen and the rest of lex/flex/bison in the
    test suite if all required tools are present.
@@ -72,12 +59,6 @@ Abuild Contrib
 
 Documentation
 =============
-
- * Make sure information about requiring flex and bison is correct in
-   the documentation and README.build.  Document which versions are
-   required (flex >= 2.5.33, tested with 2.5.35) and mention that they
-   are only required if you are making changes to the interface
-   scanner or parser.
 
  * Points to include in codegen-wrapper documentation:
 
