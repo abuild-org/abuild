@@ -9,7 +9,7 @@ tok_comment	^#.*
 tok_keyval	^[^[:space:]:]+[ \t]*:[ \t]*.+
 tok_other	.
 
-%option noyywrap nounistd never-interactive
+%option noyywrap
 
 %%
 
