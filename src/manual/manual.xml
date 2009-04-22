@@ -6,8 +6,8 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
-<!ENTITY swversion "1.1.a7">
-<!ENTITY lastreleased "April 20, 2009">
+<!ENTITY swversion "1.1.a8">
+<!ENTITY lastreleased "April 22, 2009">
 <!ENTITY example "../../doc/example">
 <!ENTITY testdir "../qtest/abuild">
 <!ENTITY javawarning "
@@ -13750,6 +13750,60 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.a8: April 22, 2009</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Bug fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Various refinements have been made to &abuild;'s
+           multithreaded building code, which should improve both
+           performance and reliability of multithreaded builds.  This
+           includes correction of a few possible race conditions,
+           strengthening of multithreaded testing in the test suite,
+           and correction of a long-standing problem that was visible
+           only on Solaris but actually turned out to be present on
+           all platforms.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The java builder code has been corrected so that it invokes
+           IBM's JDK according to its requirements.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The built-in support for sun RPC's rpcgen has been fixed to
+           avoid using a GNU-specific option to sed.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Building &abuild;
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; now uses a re-entrant scanner in the lexical
+           portion of the interface parser, which should further
+           simplify building &abuild;.  Additional notes have been
+           added to <filename>src/README.build</filename> regarding
+           this and other build-related issues.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.a7: April 20, 2009</term>
      <listitem>
