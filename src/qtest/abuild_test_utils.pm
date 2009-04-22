@@ -272,6 +272,25 @@ sub fake_qtc
     $in->close();
 }
 
+sub find_in_path
+{
+    my $prog = shift;
+    if ($in_windows)
+    {
+	# For now, don't worry about .com, .bat
+	$prog .= ".exe";
+    }
+    my @path = split(':', $ENV{'PATH'});
+    foreach my $p (@path)
+    {
+	if (-x "$p/$prog")
+	{
+	    return "$p/$prog";
+	}
+    }
+    undef;
+}
+
 # Setup functions
 
 sub _sanitize_environment

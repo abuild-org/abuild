@@ -475,7 +475,7 @@ ccxx_debug::
 	@$(PRINT) LIBDIRS = $(LIBDIRS)
 	@$(PRINT) LIBS = $(LIBS)
 
-# Include legacy built-in support for certain code generators.  These
-# should have been plugins, but they were added before plugins were
+# Include built-in support for certain code generators.  These should
+# have been plugins, but they were added before plugins were
 # supported.
-include $(abMK)/legacy-code-generators.mk
+include $(abMK)/standard-code-generators.mk

@@ -1,7 +1,7 @@
 # Support for these code generators was added to abuild before plugins
-# were implemented.  They should have been implemented as plugins.
-# None of this code is exercised in abuild's test suite, though flex
-# and bison support are used in its own build.
+# were implemented.  They should have been implemented as plugins, but
+# people are using them, and they are simple, so we let them stick
+# around.  Support for them is exercised in abuild-misc.test.
 
 # Flex rules that are separate from lex rules
 

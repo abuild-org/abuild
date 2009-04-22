@@ -4,6 +4,7 @@ require 5.008;
 BEGIN { $^W = 1; }
 use strict;
 use File::Copy;
+use File::Basename;
 
 require TestDriver;
 require abuild_test_utils;
@@ -15,6 +16,7 @@ test_setup();
 
 my $top = get_top();
 my $filters = get_filters();
+my $native_out = get_native_out();
 
 # This test suite is a place where we dump additional random tests to
 # exercise very specific features or to exercise previously detected
@@ -66,6 +68,86 @@ for my $i (1, 2)
 		 {$td->FILE => "$top/codegen-wrapper-clean.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+}
+
+# Test built-in code generator support.  We don't bother with these if
+# we're on Windows since we'd most likely be finding cygwin versions
+# of the commands and compiling with in a native Windows environment,
+# which isn't a particular useful thing to test even if it might work
+# fine in some cases.
+
+cd("work/rpc");
+my $rpcgen = find_in_path('rpcgen');
+my $have_rpcgen = ((! in_windows()) && (defined $rpcgen));
+if ($have_rpcgen)
+{
+    $td->runtest("build rpc files",
+		 {$td->COMMAND => "abuild",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/rpc-build.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    my $files = join(' ', sort map { basename($_) } (<$native_out/*.[ch]>));
+    $td->runtest("check generated files",
+		 {$td->STRING => $files},
+		 {$td->STRING => "complex_rpc.h complex_rpc_clnt.c" .
+		      " complex_rpc_svc.c complex_rpc_xdr.c"});
+}
+else
+{
+    $td->runtest("rpcgen not found; skipping tests",
+		 {$td->STRING => ""},
+		 {$td->STRING => ""});
+    system("(tar cf - . | cat > /dev/null)");
+}
+
+cd("work/flex-bison");
+my $flex = find_in_path('flex');
+my $bison = find_in_path('bison');
+my $have_flex_bison = (((defined $flex) && (defined $bison)) ? 1 : 0);
+if ($have_flex_bison)
+{
+    for my $i (1..3)
+    {
+	my $description = "flex/bison: " .
+	    (($i == 1) ? "build" :
+	     ($i == 2) ? "use cached" :
+	     ($i == 3) ? "ignore cache" : "oops");
+
+	my $cmd = "abuild";
+	if ($i == 3)
+	{
+	    $cmd .= " IGNORE_CACHE=1";
+	}
+
+	$td->runtest($description,
+		     {$td->COMMAND => $cmd,
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/flex-bison-build$i.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+
+	$td->runtest("clean",
+		     {$td->COMMAND => "abuild clean",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/flex-bison-clean.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+
+    $td->runtest("check cache",
+		 {$td->COMMAND =>
+		      "find fcache bcache -type f -print | LANG=C sort"},
+		 {$td->FILE => "$top/flex-bison-cache-contents.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    $td->runtest("flex/bison not found; skipping tests",
+		 {$td->STRING => ""},
+		 {$td->STRING => ""});
+    system("(tar cf - . | cat > /dev/null)");
 }
 
 cd("work/autoconf");
@@ -264,4 +346,7 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(38 + (in_windows() ? 0 : 3));
+$td->report(38 +
+	    (in_windows() ? 0 : 3) +
+	    ($have_rpcgen ? 2 : 1) +
+	    ($have_flex_bison ? 7 : 1));

@@ -1,0 +1,10 @@
+abuild: flex-bison (abuild-<native>): all
+make: Entering directory `--topdir--/flex-bison/abuild-<native>'
+Generating fbtest.tab.hh from ../fbtest.yy
+codegen-wrapper: generation succeeded; cache updated
+Generating fbtest.fl.cc from ../fbtest.fl with flex
+codegen-wrapper: generation succeeded; cache updated
+Compiling fbtest.fl.cc as C++
+Compiling fbtest.tab.cc as C++
+Creating flex-bison library
+make: Leaving directory `--topdir--/flex-bison/abuild-<native>'

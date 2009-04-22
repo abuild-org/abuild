@@ -1,0 +1,31 @@
+/* -*- c++ -*- */
+
+%{
+#include <fbtest.tab.hh>
+%}
+
+tok_newline	\n
+tok_comment	^#.*
+tok_keyval	^[^[:space:]:]+[ \t]*:[ \t]*.+
+tok_other	.
+
+%option noyywrap nounistd never-interactive
+
+%%
+
+{tok_newline} {
+    return tok_newline;
+}
+
+{tok_comment} {
+}
+
+{tok_keyval} {
+    return tok_keyval;
+}
+
+{tok_other} {
+    return tok_other;
+}
+
+%%

@@ -1,0 +1,11 @@
+abuild: rpc (abuild-<native>): all
+make: Entering directory `--topdir--/rpc/abuild-<native>'
+Generating complex_rpc.h from ../complex.x with rpcgen
+Generating complex_rpc_xdr.c from complex_rpc.h with rpcgen
+Compiling complex_rpc_xdr.c as C
+Generating complex_rpc_svc.c from complex_rpc.h with rpcgen
+Compiling complex_rpc_svc.c as C
+Generating complex_rpc_clnt.c from complex_rpc.h with rpcgen
+Compiling complex_rpc_clnt.c as C
+Creating complex library
+make: Leaving directory `--topdir--/rpc/abuild-<native>'

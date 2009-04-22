@@ -33,9 +33,6 @@ Miscellaneous
  * There should be more testing of -jn in the test suite, particularly
    with lots of build items failing or completing at once.
 
- * We really need to test rpcgen and the rest of lex/flex/bison in the
-   test suite if all required tools are present.
-
  * Consider Deprecating ABUILD_FORCE_32BIT and adding
    ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding
    ABUILD_FORCE_64BIT and verifying that both can't be set.  Search
