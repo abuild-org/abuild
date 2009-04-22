@@ -78,7 +78,7 @@ class JavaBuilder
     char data[max_data_size];
     std::string accumulated_response;
 
-    // These fields must be acceessed with mutex protection.
+    // These fields must be accessed with mutex protection.
     boost::mutex mutex;
     boost::condition running_cond;
     int last_request;
