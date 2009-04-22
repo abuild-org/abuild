@@ -12,8 +12,10 @@
 // has been requested to stop, a result is ready, or a worker is
 // available.  When wait() returns, methods may be called to determine
 // which of those conditions have been satisfied, and appropriate
-// action may be taken.  Please see comments accompanying the method
-// declarations for details.
+// action may be taken.  If you are in a state where there is nothing
+// else to do until there are results, then you should call
+// waitForResults() instead of wait().  Please see comments
+// accompanying the method declarations for details.
 
 // For a non-trivial example of using a worker pool, please see the
 // DependencyRunner class.
@@ -71,6 +73,19 @@ class WorkerPool
 	while ((! this->shutdown_requested) &&
 	       (this->results.empty()) &&
 	       (this->available_workers.empty()))
+	{
+	    this->condition.wait(lock);
+	}
+    }
+
+    // Block until there are results to report.  This should be called
+    // instead of wait() if there is nothing ready to be processed and
+    // nothing new can become available without additional results.
+    void waitForResults()
+    {
+	boost::mutex::scoped_lock lock(this->mutex);
+	while ((! this->shutdown_requested) &&
+	       (this->results.empty()))
 	{
 	    this->condition.wait(lock);
 	}

@@ -42,7 +42,15 @@ DependencyRunner::run(bool stop_on_first_error,
     }
     while (! done)
     {
-	pool.wait();
+	std::string item;
+	if (evaluator.nextReadyItem(item))
+	{
+	    pool.wait();
+	}
+	else
+	{
+	    pool.waitForResults();
+	}
 	while (pool.resultsAvailable())
 	{
 	    boost::tuple<std::string, bool> result = pool.getResults();
@@ -63,7 +71,6 @@ DependencyRunner::run(bool stop_on_first_error,
 	    }
 	}
 
-	std::string item;
 	if (! stop)
 	{
 	    // Don't process any new items if any results are
