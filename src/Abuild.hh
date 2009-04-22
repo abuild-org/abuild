@@ -7,7 +7,6 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
-#include <boost/thread/mutex.hpp>
 #include <Error.hh>
 #include <QEXC.hh>
 #include <BuildForest.hh>
