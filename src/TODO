@@ -15,6 +15,14 @@ release notes.
  * ...
 
 
+Next
+====
+
+ * Look into premature java exit tests on ppc.  They either take
+   forever or hang.  Maybe the pause task isn't doing what I think it
+   should and System.exit isn't working right away.
+
+
 Groovy Framework
 ================
 
