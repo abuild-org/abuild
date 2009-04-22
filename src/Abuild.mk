@@ -71,7 +71,7 @@ AUTO_SRCS := \
 	interface.tab.cc \
 	interface.fl.cc
 
-ifndef SKIP_PARSER_CACHE
+ifndef ABUILD_SKIP_PARSER_CACHE
  FLEX_CACHE := parser-cache
  BISON_CACHE := parser-cache
 endif

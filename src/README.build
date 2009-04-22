@@ -185,8 +185,12 @@ Basic steps:
    version control system.
 
 
-NOTES ON AUTOMATICALLY GENERATED FILES
-======================================
+BUILD NOTES
+===========
+
+By default, abuild's build includes -Werror if building with gcc.  You
+may set ABUILD_SKIP_WERROR if you are getting compiler warnings and
+are not in a position to fix them.
 
 The scanner and parser for abuild interface files is implemented using
 flex and bison.  flex version 2.5.33 or newer is required, and the
@@ -197,8 +201,8 @@ not modification time.  For most purposes, you should therefore only
 require flex and bison if you are modifying interface.qfl (which is
 used by gen_flex to generate interface.fl) or interface.yy.
 
-The variable SKIP_PARSER_CACHE may be set when building abuild to
-ignore the parser cache.  In this case, abuild will neither use the
+The variable ABUILD_SKIP_PARSER_CACHE may be set when building abuild
+to ignore the parser cache.  In this case, abuild will neither use the
 cache to supply the generated files nor will it update the cache with
 new generated files.  This can be useful for testing with new versions
 of flex or bison.  Additionally, the local target "clean-parser-cache"
