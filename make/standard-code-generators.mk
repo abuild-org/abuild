@@ -88,16 +88,19 @@ RPCGEN := rpcgen
 	@$(PRINT) Generating $@ from $< with $(RPCGEN)
 	$(RM) $@
 	$(RPCGEN) -c -o $@ $(SRCDIR)/$*.x
-	sed -i -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@
+	sed -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@ > $@.tmp
+	mv $@.tmp $@
 
 %_rpc_svc.c: %_rpc.h
 	@$(PRINT) Generating $@ from $< with $(RPCGEN)
 	$(RM) $@
 	$(RPCGEN) -m -o $@ $(SRCDIR)/$*.x
-	sed -i -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@
+	sed -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@ > $@.tmp
+	mv $@.tmp $@
 
 %_rpc_clnt.c: %_rpc.h
 	@$(PRINT) Generating $@ from $< with $(RPCGEN)
 	$(RM) $@
 	$(RPCGEN) -l -o $@ $(SRCDIR)/$*.x
-	sed -i -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@
+	sed -e 's/#include \"\.\.\/$*\.h/#include \"$*_rpc\.h/' $@ > $@.tmp
+	mv $@.tmp $@
