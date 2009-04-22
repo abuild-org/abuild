@@ -29,6 +29,7 @@ my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 # have consistent results.
 
 my $nreps = 10;
+my $savecount = 0;
 
 setup($td);
 
@@ -65,10 +66,16 @@ sub runtest
     my $fargs = ($flag == 1 ? '--no-failure' : "");
     for (my $i = 0; $i < $nreps; ++$i)
     {
-	$td->runtest("$description ($i)",
-		     {$td->COMMAND => "abuild -b all -k -j4 $xargs",
-		      $td->FILTER => "perl $top/filter.pl $fargs"},
-		     {$td->FILE => "$top/$out", $td->EXIT_STATUS => 2},
-		     $td->NORMALIZE_NEWLINES);
+	if (! $td->runtest("$description ($i)",
+			   {$td->COMMAND => "abuild -b all -k -j4 $xargs",
+			    $td->FILTER =>
+				"perl $top/filter.pl f.tmp $fargs"},
+			   {$td->FILE => "$top/$out", $td->EXIT_STATUS => 2},
+			   $td->NORMALIZE_NEWLINES))
+	{
+	    my $save = "$top/failure." . ++$savecount . ".save";
+	    $td->emphasize("actual output in $save");
+	    rename("f.tmp", $save);
+	}
     }
 }

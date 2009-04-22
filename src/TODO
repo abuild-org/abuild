@@ -12,7 +12,9 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ...
+ * Made a few refinements to abuild's multithreading code, which
+   should improve both performance and reliability of multithreaded
+   builds.
 
 
 Groovy Framework
@@ -29,9 +31,6 @@ Groovy Framework
 
 Miscellaneous
 =============
-
- * Would be nice to get to the bottom of the dependency runner hang on
-   solaris.
 
  * Consider Deprecating ABUILD_FORCE_32BIT and adding
    ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding
