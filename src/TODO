@@ -12,9 +12,7 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * Made a few refinements to abuild's multithreading code, which
-   should improve both performance and reliability of multithreaded
-   builds.
+ * ...
 
 
 Groovy Framework
