@@ -47,7 +47,7 @@ DependencyRunner::run(bool stop_on_first_error,
 	{
 	    pool.wait();
 	}
-	else
+	else if (! pool.idle())
 	{
 	    pool.waitForResults();
 	}
