@@ -91,34 +91,40 @@ JavaBuilder::makeRequest(std::string const& message)
 void
 JavaBuilder::finish()
 {
-    boost::mutex::scoped_lock lock(this->mutex);
-    if ((this->run_mode == rm_idle) ||
-	(this->run_mode == rm_startup_failed))
     {
-	return;
+	boost::mutex::scoped_lock lock(this->mutex);
+	if ((this->run_mode == rm_idle) ||
+	    (this->run_mode == rm_startup_failed))
+	{
+	    return;
+	}
+	if (this->run_mode == rm_running)
+	{
+	    setRunMode(rm_shutting_down);
+	    boost::asio::async_write(
+		*this->sock, boost::asio::buffer("shutdown\n"),
+		boost::bind(
+		    &JavaBuilder::handleWrite, this,
+		    boost::asio::placeholders::error));
+	}
+	waitForShutdown();
     }
-    if (this->run_mode == rm_running)
-    {
-	setRunMode(rm_shutting_down);
-	boost::asio::async_write(
-	    *this->sock, boost::asio::buffer("shutdown\n"),
-	    boost::bind(
-		&JavaBuilder::handleWrite, this,
-		boost::asio::placeholders::error));
-    }
-    waitForShutdown();
     cleanup();
+    {
+	boost::mutex::scoped_lock lock(this->mutex);
+	setRunMode(rm_idle);
+    }
 }
 
 void
 JavaBuilder::cleanup()
 {
-    // Must be called with the mutex locked
+    // Should not be called with the mutex locked
+    assert(this->run_mode == rm_stopped);
     this->io_thread->join();
     this->io_thread.reset();
     this->sock.reset();
     this->io_service.reset();
-    setRunMode(rm_idle);
 }
 
 void
