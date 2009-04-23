@@ -560,11 +560,9 @@ $td->runtest("qtest coverage",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-my $msvc = ($platform_native =~ m/\.msvc$/);
-my $gcc = ($platform_native =~ m/\.gcc$/);
-
 cd("work/msvc");
 
+my $msvc = ($platform_native =~ m/\.msvc$/);
 if ($msvc)
 {
     foreach my $d (['normal', 'normal', ''],
@@ -608,6 +606,7 @@ else
 
 cd("work/gcc");
 
+my $gcc = ($platform_native =~ m/\.gcc$/);
 my $gcc32 = 0;
 my $gcc64 = 0;
 if ($gcc)
@@ -619,7 +618,7 @@ if ($gcc)
 	unlink "a.o";
 	if ($$var)
 	{
-	    my $o = 64 - $w;
+	    my $o = ($w == 32 ? 64 : 32);
 	    my $env = "ABUILD_FORCE_${w}BIT=1 ABUILD_FORCE_${o}BIT=0";
 	    $td->runtest("build forcing $w bit",
 			 {$td->COMMAND => "$env abuild --silent",
