@@ -34,7 +34,7 @@ my $savecount = 0;
 setup($td);
 
 cd("work/basic");
-runtest("mixed success and failure", "mixed.out");
+runtest("mixed success and failure", "mixed.out", 3);
 
 cd("work/fails");
 runtest("multiple failures", "failures.out");
@@ -64,10 +64,11 @@ sub runtest
     $flag = 0 unless defined $flag;
     my $xargs = ($flag == 2 ? "' --test-java-builder-bad-java'" : "");
     my $fargs = ($flag == 1 ? '--no-failure' : "");
+    my $j = ($flag == 3 ? "-j12" : "-j4"); # -j12 gives more threads than items
     for (my $i = 0; $i < $nreps; ++$i)
     {
 	if (! $td->runtest("$description ($i)",
-			   {$td->COMMAND => "abuild -b all -k -j4 $xargs",
+			   {$td->COMMAND => "abuild -b all -k $j $xargs",
 			    $td->FILTER =>
 				"perl $top/filter.pl f.tmp $fargs"},
 			   {$td->FILE => "$top/$out", $td->EXIT_STATUS => 2},
