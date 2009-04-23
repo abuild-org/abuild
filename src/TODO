@@ -449,7 +449,8 @@ See also "Known Limitations" in the documentation.
       Abuild.interface
 
  * Java out of memory problem with ant is reportedly fixed with
-   1.5.0_12.  Actually, it still happens with 1.5.0_15.
+   1.5.0_12.  Actually, it still happens with 1.5.0_15, but much less
+   often.
 
  * abuild_contrib: include a generic UNIX compiler configurable plugin
    for which the user can set up the compliation commands using
