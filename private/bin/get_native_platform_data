@@ -127,6 +127,23 @@ sub get_platform_components_unix
         elsif (read_dist_file("/etc/debian_version", \$release))
         {
 	    $release =~ s/^(\d+\.\d+).*?$/$1/;
+	    if ($release =~ m/^(\d+)\./)
+	    {
+		my $major = $1;
+		if ($major >= 4)
+		{
+		    # Starting with 5.x, debian keeps the major
+		    # version the same for all updates within a
+		    # release cycle.  For example, 5.0 is Lenny, so
+		    # 5.1 would be "Lenny and a half", updated to
+		    # support newer hardware.  Within any major
+		    # version, we should have full binary
+		    # compatbility.  It also happens that there was
+		    # only a 4.0, so we can do this test for versions
+		    # >= 4.
+		    $release = $major;
+		}
+	    }
 	    $toolset = "deb$release";
 	}
 	else
