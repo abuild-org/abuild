@@ -122,7 +122,8 @@ if ($have_flex_bison)
 
 	$td->runtest($description,
 		     {$td->COMMAND => $cmd,
-		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		      $td->FILTER =>
+			  "grep -v '^fbtest' | perl $filters/filter-abuild.pl"},
 		     {$td->FILE => "$top/flex-bison-build$i.out",
 		      $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);
