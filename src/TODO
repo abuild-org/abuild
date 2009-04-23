@@ -131,7 +131,8 @@ Documentation
    are in private/bin/get_native_platform_data and
    make/toolchains/gcc.mk.
 
- * Autoconf: remember to mention attributes: serial.
+ * Autoconf: remember to mention attributes: serial.  Also, mention
+   the serial attribute in the description of --make-jobs.
 
 
 ----------------------------------------------------------------------
