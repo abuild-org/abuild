@@ -18,12 +18,19 @@ release notes.
    systems and vice versa.  Note that when you build 64-bit code on a
    32-bit system, you will generally not be able to run the resulting
    executables, but abuild will still consider the platform to be
-   native.
+   native.  For Linux systems, the platform name may change to reflect
+   the choice, though this will not necessarily happen on all systems.
 
  * Support "serial" attribute (attributes: serial) which can be
    applied in Abuild.conf to any build item that builds with make.
    The effect is to prevent --make-jobs=n from applying to that build
    item, thus forcing it to always be built serially.
+
+
+Next
+====
+
+ * Test FORCE32 and FORCE64 on solaris.
 
 
 Groovy Framework
@@ -219,10 +226,12 @@ life even before private/bin/get_native_platform_data is called.
    platform string in a global way for a particular collection of
    build trees.
 
- * There needs to be better cross-compiler support for things like
-   building 32-bit code on a 64-bit system.  Adding -m32 doesn't
-   really do it because why should have you
-   linux.x86_64.rhel51.gcc.m32 be the same as linux.ix86.rhel51.gcc?
+ * ABUILD_FORCE{32,64}_BIT is close for 32/64-bit configurations, but
+   it doesn't always make the platform consistent without the object
+   file format.  For example, ppc64 on rhel5 is 32-bit by default, and
+   on Solaris, the platform name doesn't change depending on 32- or
+   64-bit.  Adding another field to the platform seems like overkill,
+   though generating smarter CPU strings might be worth doing.
 
 
 Platform Conditionals
