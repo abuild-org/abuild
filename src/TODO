@@ -27,12 +27,6 @@ release notes.
    item, thus forcing it to always be built serially.
 
 
-Next
-====
-
- * Test FORCE32 and FORCE64 on solaris.
-
-
 Groovy Framework
 ================
 
@@ -141,6 +135,11 @@ Documentation
  * Autoconf: remember to mention attributes: serial.  Also, mention
    the serial attribute in the description of --make-jobs.
 
+ * Mention somewhere that the native platform components are
+   determined by private/bin/get_native_platform_data.  If there were
+   a need to tweek this, this would be the only place that would have
+   to be changed.
+
 
 ----------------------------------------------------------------------
 
@@ -224,14 +223,16 @@ life even before private/bin/get_native_platform_data is called.
 
  * We need some way for people to change the toolset portion of the
    platform string in a global way for a particular collection of
-   build trees.
+   build trees.  Right now, it can only be done for "native" by
+   editing private/bin/get_native_platform_data.
 
- * ABUILD_FORCE{32,64}_BIT is close for 32/64-bit configurations, but
-   it doesn't always make the platform consistent without the object
-   file format.  For example, ppc64 on rhel5 is 32-bit by default, and
-   on Solaris, the platform name doesn't change depending on 32- or
-   64-bit.  Adding another field to the platform seems like overkill,
-   though generating smarter CPU strings might be worth doing.
+ * Use of ABUILD_FORCE{32,64}_BIT is close for 32/64-bit
+   configurations, but it doesn't always make the platform consistent
+   without the object file format.  For example, ppc64 on rhel5 is
+   32-bit by default, and on Solaris, the platform name doesn't change
+   depending on 32- or 64-bit.  Adding another field to the platform
+   seems like overkill, though generating smarter CPU strings might be
+   worth doing.
 
 
 Platform Conditionals
@@ -446,9 +447,6 @@ See also "Known Limitations" in the documentation.
 
     - example: library name inconsistency between Abuild.mk and
       Abuild.interface
-
- * Cass Dalton reports that he sometimes gets "resource busy" errors
-   when running autoconf with --make-jobs.
 
  * Java out of memory problem with ant is reportedly fixed with
    1.5.0_12.  Actually, it still happens with 1.5.0_15.
