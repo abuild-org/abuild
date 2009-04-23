@@ -18,6 +18,7 @@
 --topdir--/a/ac/Abuild.conf: ERROR: file ended with continuation line
 --topdir--/a/ac/Abuild.conf: ERROR: "build-also" is not permitted for unnamed build items
 --topdir--/a/ac/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
+--topdir--/a/ac/Abuild.conf: ERROR: the "serial" attribute may only be applied to items built with make
 --topdir--/a/ad/Abuild.conf: ERROR: "platform-types" is not permitted for unnamed build items
 --topdir--/a/ad/Abuild.conf: ERROR: "platform-types" may not appear if there are no build or interface files
 --topdir--/a/ag/Abuild.conf: ERROR: "supported-flags" is not permitted for unnamed build items

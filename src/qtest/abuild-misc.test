@@ -345,9 +345,39 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
+cd("work/make-jobs");
+
+validate_dump_data($td);
+$td->runtest("serial attribute",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/serial-attribute-dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+foreach my $d (['serial', 'serial', ''],
+	       ['2 jobs', 'parallel', '--make-jobs=2'],
+	       ['unlimited jobs', 'parallel', '--make-jobs'])
+{
+    my ($description, $out, $args) = @$d;
+
+    $td->runtest("make-jobs: $description",
+		 {$td->COMMAND => "abuild -b all -k $args",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/make-jobs-$out.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("clean",
+		 {$td->COMMAND => "abuild -c all",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/make-jobs-clean.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(38 +
+$td->report(46 +
 	    (in_windows() ? 0 : 3) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));

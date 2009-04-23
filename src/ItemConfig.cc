@@ -1088,7 +1088,7 @@ ItemConfig::checkAttributes()
 	    }
 	    else
 	    {
-		this->attributes.setGlobalTreeDep(true);
+		this->global_treedep = true;
 	    }
 	}
 	else if (attr == "global-plugin")
@@ -1102,7 +1102,21 @@ ItemConfig::checkAttributes()
 	    }
 	    else
 	    {
-		this->attributes.setGlobalPlugin(true);
+		this->global_plugin = true;
+	    }
+	}
+	else if (attr == "serial")
+	{
+	    if (getBackend() != b_make)
+	    {
+		QTC::TC("abuild", "ItemConfig ERR serial without make");
+		this->error.error(this->location,
+				  "the \"serial\" attribute may only"
+				  " be applied to items built with make");
+	    }
+	    else
+	    {
+		this->serial = true;
 	    }
 	}
 	else
@@ -1265,7 +1279,10 @@ ItemConfig::ItemConfig(
     is_forest_root(false),
     is_child_only(false),
     deprecated(false),
-    external_symlinks(false)
+    external_symlinks(false),
+    global_treedep(false),
+    global_plugin(false),
+    serial(false)
 {
 }
 
@@ -1492,13 +1509,19 @@ ItemConfig::getPlugins() const
 bool
 ItemConfig::isGlobalTreeDep() const
 {
-    return this->attributes.getGlobalTreeDep();
+    return this->global_treedep;
 }
 
 bool
 ItemConfig::isGlobalPlugin() const
 {
-    return this->attributes.getGlobalPlugin();
+    return this->global_plugin;
+}
+
+bool
+ItemConfig::isSerial() const
+{
+    return this->serial;
 }
 
 bool

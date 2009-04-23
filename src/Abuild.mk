@@ -121,7 +121,6 @@ SRCS_bin_abuild := \
 	BackingConfig.cc \
 	BuildForest.cc \
 	BuildTree.cc \
-	BuildItemAttributes.cc \
 	BuildItem.cc \
 	JavaBuilder.cc \
 	UpgradeData.cc \

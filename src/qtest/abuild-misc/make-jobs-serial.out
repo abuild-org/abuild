@@ -1,0 +1,8 @@
+abuild: i1 (abuild-indep): all
+make: Entering directory `--topdir--/make-jobs/i1/abuild-indep'
+a exists
+make: Leaving directory `--topdir--/make-jobs/i1/abuild-indep'
+abuild: i2 (abuild-indep): all
+make: Entering directory `--topdir--/make-jobs/i2/abuild-indep'
+a exists
+make: Leaving directory `--topdir--/make-jobs/i2/abuild-indep'

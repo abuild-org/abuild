@@ -383,3 +383,6 @@ Abuild help for unknown module 0
 Abuild no help for item 0
 Abuild show item help file 1
 Abuild-upgrade ERR external symlinks 0
+ItemConfig ERR serial without make 0
+Abuild make_njobs 1
+Abuild explicit serial 0

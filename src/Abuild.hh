@@ -358,6 +358,7 @@ class Abuild
     std::string help_topic;
     std::string rules_help_topic;
     unsigned int max_workers;
+    int make_njobs;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
     bool test_java_builder_bad_java;

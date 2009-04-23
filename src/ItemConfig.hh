@@ -16,7 +16,6 @@
 #include <FlagData.hh>
 #include <TraitData.hh>
 #include <PlatformSelector.hh>
-#include <BuildItemAttributes.hh>
 
 class Error;
 class CompatLevel;
@@ -98,6 +97,7 @@ class ItemConfig
     std::list<std::string> const& getPlugins() const;
     bool isGlobalTreeDep() const;
     bool isGlobalPlugin() const;
+    bool isSerial() const;
 
     // For 1.0 to 1.1 upgrade process
     bool upgradeConfig(std::string const& file,
@@ -211,9 +211,11 @@ class ItemConfig
     std::map<std::string, std::string> dep_platform_types;
     std::map<std::string,
 	     boost::shared_ptr<PlatformSelector> > dep_platform_selectors;
-    BuildItemAttributes attributes;
     std::set<std::string> optional_deps;
     std::set<std::string> optional_tree_deps;
+    bool global_treedep;
+    bool global_plugin;
+    bool serial;
 };
 
 #endif // __ITEMCONFIG_HH__

@@ -125,6 +125,12 @@ BuildItem::getOptionalDeps() const
     return this->config->getOptionalDeps();
 }
 
+bool
+BuildItem::isSerial() const
+{
+    return this->config->isSerial();
+}
+
 std::list<std::string> const&
 BuildItem::getDeps() const
 {

@@ -57,6 +57,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     whoami(Util::removeExe(Util::basename(argv[0]))),
     stdout_is_tty(Util::stdoutIsTty()),
     max_workers(1),
+    make_njobs(1),
     test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
@@ -403,12 +404,19 @@ Abuild::parseArgv()
 	}
 	else if (boost::regex_match(arg, match, make_jobs_re))
 	{
-	    std::string make_njobs;
 	    if (match[1].matched)
 	    {
-		make_njobs = match[1].str();
+		this->make_njobs = atoi(match[1].str().c_str());
+		if (this->make_njobs == 0)
+		{
+		    usage("--make-jobs=0 is invalid");
+		}
 	    }
-	    this->make_args.push_back("-j" + make_njobs);
+	    else
+	    {
+		// unlimited
+		this->make_njobs = -1;
+	    }
 	}
 	else if ((arg == "-k") || (arg == "--keep-going"))
 	{
@@ -4638,6 +4646,10 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
       << "    is-plugin=\""
       << (isPlugin(name) ? "1" : "0") << "\""
       << std::endl;
+    if (item.isSerial())
+    {
+	o << "    serial=\"1\"" << std::endl;
+    }
     if (any_subelements)
     {
 	FlagData const& flag_data = item.getFlagData();
@@ -6808,6 +6820,27 @@ Abuild::invoke_gmake(std::string const& item_name,
     }
     make_argv.insert(make_argv.end(),
 		     this->make_args.begin(), this->make_args.end());
+    if (this->make_njobs != 1)
+    {
+	if (build_item.isSerial())
+	{
+	    QTC::TC("abuild", "Abuild explicit serial");
+	    verbose("invoking make serially");
+	}
+	else
+	{
+	    QTC::TC("abuild", "Abuild make_njobs",
+		    (this->make_njobs < 0) ? 0 : 1);
+	    if (this->make_njobs > 1)
+	    {
+		make_argv.push_back("-j" + Util::intToString(this->make_njobs));
+	    }
+	    else
+	    {
+		make_argv.push_back("-j");
+	    }
+	}
+    }
     for (std::map<std::string, std::string>::iterator iter =
 	     this->defines.begin();
 	 iter != this->defines.end(); ++iter)

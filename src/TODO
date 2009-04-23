@@ -20,6 +20,11 @@ release notes.
    executables, but abuild will still consider the platform to be
    native.
 
+ * Support "serial" attribute (attributes: serial) which can be
+   applied in Abuild.conf to any build item that builds with make.
+   The effect is to prevent --make-jobs=n from applying to that build
+   item, thus forcing it to always be built serially.
+
 
 Groovy Framework
 ================
@@ -125,6 +130,8 @@ Documentation
    for searching for FORCE_WORDSIZE in the code.  The only references
    are in private/bin/get_native_platform_data and
    make/toolchains/gcc.mk.
+
+ * Autoconf: remember to mention attributes: serial.
 
 
 ----------------------------------------------------------------------

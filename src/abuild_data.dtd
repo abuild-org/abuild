@@ -217,6 +217,9 @@
 <!--  is-plugin: true if the item is used as a plugin by at least  -->
 <!--  one tree                                                     -->
 
+<!--  serial true if the item is declared to be serial; absent     -->
+<!--  otherwise.                                                   -->
+
 <!ELEMENT build-item (build-also-items?, declared-dependencies?,
                       expanded-dependencies?, omitted-dependencies?,
                       platform-types?, buildable-platforms?,
@@ -231,6 +234,7 @@
   visible-to              CDATA     #IMPLIED
   target-type             %target-type;  #REQUIRED
   is-plugin               %boolean; #REQUIRED
+  serial                  %boolean; #IMPLIED
 >
 
 <!--  build-also-items contains the list of build items named in   -->

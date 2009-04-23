@@ -35,6 +35,7 @@ class BuildItem
     std::string const& getBuildFile() const;
     std::string const& getAbsolutePath() const;
     std::set<std::string> const& getOptionalDeps() const;
+    bool isSerial() const;
 
     std::list<std::string> const& getDeps() const;
     FlagData const& getFlagData() const;
