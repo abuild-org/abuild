@@ -617,7 +617,7 @@ if ($gcc)
 	my $var = ($w == 32) ? \$gcc32 : \$gcc64;
 	$$var = (system("gcc -m$w -c a.c -o a.o >/dev/null 2>&1") == 0);
 	unlink "a.o";
-	if ($var)
+	if ($$var)
 	{
 	    my $o = 64 - $w;
 	    my $env = "ABUILD_FORCE_${w}BIT=1 ABUILD_FORCE_${o}BIT=0";

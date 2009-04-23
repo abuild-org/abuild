@@ -11,25 +11,17 @@ CXX = g++ $(GDFLAGS)
 CXXPP = g++ -E
 
 # FORCE_WORDSIZE
-ifdef ABUILD_FORCE_32BIT
- ifeq ($(ABUILD_FORCE_32BIT),1)
-  ifeq ($(words $(filter $(shell uname -m),x86_64 ppc64)), 1)
-   CC += -m32
-   CCPP += -m32
-   CXX += -m32
-   CXXPP += -m32
-  endif
- endif
+ifeq ($(value ABUILD_FORCE_32BIT),1)
+ CC += -m32
+ CCPP += -m32
+ CXX += -m32
+ CXXPP += -m32
 endif
-ifdef ABUILD_FORCE_64BIT
- ifeq ($(ABUILD_FORCE_64BIT),1)
-  ifeq ($(words $(filter $(shell uname -m),i386 i486 i586 i686 ppc)), 1)
-   CC += -m64
-   CCPP += -m64
-   CXX += -m64
-   CXXPP += -m64
-  endif
- endif
+ifeq ($(value ABUILD_FORCE_64BIT),1)
+ CC += -m64
+ CCPP += -m64
+ CXX += -m64
+ CXXPP += -m64
 endif
 # END FORCE_WORDSIZE
 
