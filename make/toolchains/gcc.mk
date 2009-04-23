@@ -10,7 +10,7 @@ CCPP = gcc -E
 CXX = g++ $(GDFLAGS)
 CXXPP = g++ -E
 
-# TEMPORARY: FORCE32
+# FORCE_WORDSIZE
 ifdef ABUILD_FORCE_32BIT
  ifeq ($(ABUILD_FORCE_32BIT),1)
   ifeq ($(words $(filter $(shell uname -m),x86_64 ppc64)), 1)
@@ -21,7 +21,17 @@ ifdef ABUILD_FORCE_32BIT
   endif
  endif
 endif
-# END FORCE32
+ifdef ABUILD_FORCE_64BIT
+ ifeq ($(ABUILD_FORCE_64BIT),1)
+  ifeq ($(words $(filter $(shell uname -m),i386 i486 i586 i686 ppc)), 1)
+   CC += -m64
+   CCPP += -m64
+   CXX += -m64
+   CXXPP += -m64
+  endif
+ endif
+endif
+# END FORCE_WORDSIZE
 
 AR = ar cru
 RANLIB = ranlib

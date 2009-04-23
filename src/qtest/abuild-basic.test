@@ -561,6 +561,7 @@ $td->runtest("qtest coverage",
 	     $td->NORMALIZE_NEWLINES);
 
 my $msvc = ($platform_native =~ m/\.msvc$/);
+my $gcc = ($platform_native =~ m/\.gcc$/);
 
 cd("work/msvc");
 
@@ -605,6 +606,55 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
+cd("work/gcc");
+
+my $gcc32 = 0;
+my $gcc64 = 0;
+if ($gcc)
+{
+    foreach my $w (32, 64)
+    {
+	my $var = ($w == 32) ? \$gcc32 : \$gcc64;
+	$$var = (system("gcc -m$w -c a.c -o a.o >/dev/null 2>&1") == 0);
+	unlink "a.o";
+	if ($var)
+	{
+	    my $o = 64 - $w;
+	    my $env = "ABUILD_FORCE_${w}BIT=1 ABUILD_FORCE_${o}BIT=0";
+	    $td->runtest("build forcing $w bit",
+			 {$td->COMMAND => "$env abuild --silent",
+			  $td->FILTER => "perl $filters/filter-abuild.pl"},
+			 {$td->STRING => "", $td->EXIT_STATUS => 0},
+			 $td->NORMALIZE_NEWLINES);
+	    my @out = (<abuild-*/prog*>);
+	    if (@out == 1)
+	    {
+		$td->runtest("check result",
+			     {$td->COMMAND => "file $out[0]"},
+			     {$td->REGEXP => ".*\\b$w-bit\\b",
+			      $td->EXIT_STATUS => 0});
+	    }
+	    else
+	    {
+		$td->runtest("check result",
+			     {$td->STRING => "able to check\n"},
+			     {$td->STRING => "unable to check\n"});
+	    }
+	    $td->runtest("clean",
+			 {$td->COMMAND => "abuild clean",
+			  $td->FILTER => "perl $filters/filter-abuild.pl"},
+			 {$td->STRING => "abuild: cleaning in .\n",
+			  $td->EXIT_STATUS => 0},
+			 $td->NORMALIZE_NEWLINES);
+	}
+    }
+}
+else
+{
+    # force files to be accessed
+    system("(tar cf - . | cat > /dev/null)");
+}
+
 check_work_accessed($td);
 
-$td->report(76 + ($msvc ? 24 : 0));
+$td->report(76 + ($msvc ? 24 : 0) + ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));

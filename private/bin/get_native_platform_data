@@ -13,10 +13,23 @@ my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
 
 my $devnull = File::Spec->devnull();
 
-# TEMPORARY: FORCE32
+# FORCE_WORDSIZE
 my $force_32 = (exists $ENV{'ABUILD_FORCE_32BIT'} &&
 		($ENV{'ABUILD_FORCE_32BIT'}) eq '1');
-# END FORCE32
+my $force_64 = (exists $ENV{'ABUILD_FORCE_64BIT'} &&
+		($ENV{'ABUILD_FORCE_64BIT'}) eq '1');
+if ($force_32 && $force_64)
+{
+    die "$whoami: ABUILD_FORCE_32BIT and ABUILD_FORCE_64BIT" .
+	" may not both be set\n";
+}
+my %force_32_to_64 = ('ix86' => 'x86_64', 'ppc' => 'ppc64');
+my %force_64_to_32 = ();
+foreach my $k (keys %force_32_to_64)
+{
+    $force_64_to_32{$force_32_to_64{$k}} = $k;
+}
+# END FORCE_WORDSIZE
 
 my $windows = 0;
 if ((@ARGV == 1) && ($ARGV[0] eq '--windows') &&
@@ -65,28 +78,19 @@ sub get_platform_components_unix
     {
 	$cpu = safe_run("uname -m");
 
-	# TEMPORARY: FORCE32
-	if ($force_32)
-	{
-	    my $try = undef;
-	    if ($cpu eq 'x86_64')
-	    {
-		$try = 'i386';
-	    }
-	    elsif ($cpu eq 'ppc64')
-	    {
-		$try = 'ppc';
-	    }
-	    if ((defined $try) &&
-		(system("setarch $try uname -m >/dev/null 2>&1") == 0))
-	    {
-		$cpu = $try;
-	    }
-	}
-	# END FORCE32
-
-	# Don't distinguish for now between different flavors of ix86.
+	# Don't distinguish between different flavors of ix86.
 	$cpu =~ s/^i.86$/ix86/;
+
+	# FORCE_WORDSIZE
+	if ($force_32 && (exists $force_64_to_32{$cpu}))
+	{
+	    $cpu = $force_64_to_32{$cpu};
+	}
+	elsif ($force_64 && (exists $force_32_to_64{$cpu}))
+	{
+	    $cpu = $force_32_to_64{$cpu};
+	}
+	# END FORCE_WORDSIZE
 
 	my $release = "";
         if (read_dist_file("/etc/mandrake-release", \$release) &&

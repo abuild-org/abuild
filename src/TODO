@@ -12,19 +12,13 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ...
-
-
-Abuild Contrib
-==============
-
- * Fix deprecation warnings (Rules.mk) in pkg-config.
-
- * Make sure any compiler plugins included with abuild contrib have
-   the 1.0.2 fixes integrated into them.
-
- * Upgrade abuild-lint to make it useful and then include it in
-   abuild-contrib.
+ * ABUILD_FORCE32_BIT, ABUILD_FORCE64_BIT behavior: will attempt to
+   use -m32 and -m64 whether or not the system can run these modes.
+   This makes it possible to cross-compile to 32-bit from 64-bit
+   systems and vice versa.  Note that when you build 64-bit code on a
+   32-bit system, you will generally not be able to run the resulting
+   executables, but abuild will still consider the platform to be
+   native.
 
 
 Groovy Framework
@@ -39,16 +33,11 @@ Groovy Framework
  * Write some good examples
 
 
-Miscellaneous
-=============
+Abuild Lint
+==============
 
- * Consider Deprecating ABUILD_FORCE_32BIT and adding
-   ABUILD_FORCE_WORDSIZE={32,64}.  Alternatively, consider adding
-   ABUILD_FORCE_64BIT and verifying that both can't be set.  Search
-   for FORCE32 in the code.  The only references are in
-   private/bin/get_native_platform_data and make/toolchains/gcc.mk.
-
-   Make sure we test this in the test suite for 64-bit platforms.
+ * Upgrade abuild-lint to make it useful and then include it in
+   abuild-contrib or as its own release.
 
 
 Documentation
@@ -130,6 +119,12 @@ Documentation
 
  * New acknowledgements: Brian Reid, Kathleen Locher, Joe Schettino,
    Brandon Barlow for help with the Java redesign and 1.1 testing
+
+ * Document ABUILD_FORCE_32BIT and ABUILD_FORCE_64BIT.  See release
+   notes.  Mention somewhere that all support for this can be found
+   for searching for FORCE_WORDSIZE in the code.  The only references
+   are in private/bin/get_native_platform_data and
+   make/toolchains/gcc.mk.
 
 
 ----------------------------------------------------------------------
