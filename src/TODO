@@ -15,12 +15,16 @@ release notes.
  * ...
 
 
-Next
-====
+Abuild Contrib
+==============
 
- * Look into premature java exit tests on ppc.  They either take
-   forever or hang.  Maybe the pause task isn't doing what I think it
-   should and System.exit isn't working right away.
+ * Fix deprecation warnings (Rules.mk) in pkg-config.
+
+ * Make sure any compiler plugins included with abuild contrib have
+   the 1.0.2 fixes integrated into them.
+
+ * Upgrade abuild-lint to make it useful and then include it in
+   abuild-contrib.
 
 
 Groovy Framework
@@ -45,18 +49,6 @@ Miscellaneous
    private/bin/get_native_platform_data and make/toolchains/gcc.mk.
 
    Make sure we test this in the test suite for 64-bit platforms.
-
- * Incorporate as much of abuild-lint as possible or otherwise include
-   abuild-lint in the distribution.
-
-
-Abuild Contrib
-==============
-
- * Fix deprecation warnings (Rules.mk) in pkg-config.
-
- * Make sure any compiler plugins included with abuild contrib have
-   the 1.0.2 fixes integrated into them.
 
 
 Documentation
