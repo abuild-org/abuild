@@ -7,7 +7,7 @@ abuild-groovy: ERROR: ant build failure: Test com.example.FailingTest failed
 abuild: failing (abuild-java): build failed
 abuild: test (abuild-java): test
     [mkdir] Created dir: --topdir--/junit/test/abuild-java/classes
-    [javac] Compiling 1 source file to --topdir--/junit/test/abuild-java/classes
+    [javac] Compiling 3 source files to --topdir--/junit/test/abuild-java/classes
     [mkdir] Created dir: --topdir--/junit/test/abuild-java/dist
       [jar] Building jar: --topdir--/junit/test/abuild-java/dist/potato-test.jar
      [exec] 
@@ -32,6 +32,10 @@ abuild: test (abuild-java): test
      [exec] Missing Tests: 0
      [exec] Extra Tests: 0
      [exec] 
+    [junit] Running com.example.Potato1Test
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: <time>
+    [junit] Running com.example.Potato2Test
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: <time>
     [junit] Running com.example.PotatoTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
 abuild: ERROR: at least one build failure occurred; summary follows

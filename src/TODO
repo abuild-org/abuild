@@ -12,29 +12,14 @@ following:
 These changes have already been made and need to make it into the
 release notes.
 
- * ABUILD_FORCE32_BIT, ABUILD_FORCE64_BIT behavior: will attempt to
-   use -m32 and -m64 whether or not the system can run these modes.
-   This makes it possible to cross-compile to 32-bit from 64-bit
-   systems and vice versa.  Note that when you build 64-bit code on a
-   32-bit system, you will generally not be able to run the resulting
-   executables, but abuild will still consider the platform to be
-   native.  For Linux systems, the platform name may change to reflect
-   the choice, though this will not necessarily happen on all systems.
-
- * Support "serial" attribute (attributes: serial) which can be
-   applied in Abuild.conf to any build item that builds with make.
-   The effect is to prevent --make-jobs=n from applying to that build
-   item, thus forcing it to always be built serially.
+ * ...
 
 
 Groovy Framework
 ================
 
- * Need to figure out what desired junit and javadoc behavior should
-   be.  Maybe junit should be able to support multiple testsuites?
-
- * Exercise javadoc in test suite.  Use
-   abuild-java-rules/data/jars/simple.
+ * Figure out exactly what javadoc rules should do.  Exercise javadoc
+   in test suite.  Use abuild-java-rules/data/jars/simple.
 
  * Write some good examples
 

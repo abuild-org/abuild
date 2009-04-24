@@ -13751,6 +13751,75 @@ Y = $(X)
  end template -->
 
     <varlistentry>
+     <term>1.1.a9: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Enhancements to gcc toolchain support
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The behavior of <varname>ABUILD_FORCE32_BIT</varname> has
+           been expanded, and the variable
+           <varname>ABUILD_FORCE64_BIT</varname> has been added.  If
+           exactly one of these variables has the value
+           &ldquo;<literal>1</literal>&rdquo;, the option
+           <option>-m32</option> or <option>-m64</option>, as
+           appropriate, will be added to all gcc compilation steps.
+           Additionally, in some cases the CPU portion of the platform
+           string may be changed.  This is a generalization of the
+           behavior introduced in version 1.0.1, and also a change of
+           the status of the <varname>ABUILD_FORCE32_BIT</varname>
+           variable to &ldquo;supported&rdquo; instead of temporary,
+           at least pending some better solution.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <property>attributes</property> key in
+           <filename>Abuild.conf</filename> may now have the value
+           <property>serial</property> for any build item that is
+           built with GNU Make (<emphasis>i.e.,</emphasis> any build
+           item that has an <filename>Abuild.mk</filename> file).  In
+           this case, &abuild; will never instruct make to build that
+           item in parallel even if <option>--make-jobs</option> is
+           specified.  This is useful for build items that, for
+           whatever reason, do not build properly in parallel.  Many
+           build items that use autoconf will benefit from setting
+           this, as will builds that use other tools that create
+           temporary files whose names may clash with other instances
+           of themselves.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Groovy Framework Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The junit test target now accepts attributes that allow the
+           <command>batchtest</command> task to be run in addition to
+           or instead of the <command>test</command> task.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.a8: April 22, 2009</term>
      <listitem>
       <itemizedlist>

@@ -561,11 +561,14 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
     def testJunit(Map attributes)
     {
         def testsuite = attributes.remove('testsuite')
-        if (! testsuite)
+        def batchIncludes = attributes.remove('batchincludes')
+        def batchExcludes = attributes.remove('batchexcludes')
+        if (! (testsuite || batchIncludes))
         {
             return
         }
         def distdir = attributes.remove('distdir')
+        def classesdir = attributes.remove('classesdir')
         def reportdir = attributes.remove('reportdir')
         def testClassPath = attributes.remove('classpath')
 
@@ -582,13 +585,26 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
                     }
                     fileset('dir': distdir, 'includes': '*.jar')
                 }
-                test('name': testsuite,
-                     'todir': distdir) {
-                    formatter('type': 'xml')
+                if (testsuite)
+                {
+                    test('name': testsuite,
+                         'todir': distdir) {
+                        formatter('type': 'xml')
+                    }
                 }
-                // Probably want to support calling batchtest as well.
-                // We should be able to call test and/or batchtest
-                // based on which parameters are supplied.
+                if (batchIncludes)
+                {
+                    batchtest('todir': distdir) {
+                        fileset('dir': classesdir) {
+                            include('name': batchIncludes)
+                            if (batchExcludes)
+                            {
+                                exclude('name': batchExcludes)
+                            }
+                        }
+                        formatter('type': 'xml')
+                    }
+                }
             }
         }
         finally
@@ -605,7 +621,10 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
         def buildDir = abuild.buildDirectory.absolutePath
         def defaultAttrs = [
             'testsuite': abuild.resolveAsString('java.junitTestsuite'),
+            'batchincludes': abuild.resolveAsString('java.junitBatchIncludes'),
+            'batchexcludes': abuild.resolveAsString('java.junitBatchExcludes'),
             'classpath': defaultWrapperClassPath,
+            'classesdir': getPathVariable('classes'),
             'distdir': getPathVariable('dist'),
             'reportdir': new File(abuild.buildDirectory,
                                   'junit/html').absolutePath,
