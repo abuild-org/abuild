@@ -1,19 +1,15 @@
 
-=== Changes Targeted for Version 1.1 ===
+Before 1.1
+==========
 
-Notes for Next Release
-======================
+ * Update documentation
 
-Remember to keep deprecated features list up-to-date.  Add the
-following:
+    - Create unified release notes for next alpha
 
- * ...
+    - manual/pending.txt, manual/groovy-framework.txt
 
-These changes have already been made and need to make it into the
-release notes.
 
- * ...
-
+----------------------------------------------------------------------
 
 Abuild Lint
 ==============
@@ -21,107 +17,6 @@ Abuild Lint
  * Upgrade abuild-lint to make it useful and then include it in
    abuild-contrib or as its own release.
 
-
-Documentation
-=============
-
- * Points to include in codegen-wrapper documentation:
-
-    - usually, --input $^ --output $@ is sufficient.  Sometimes output
-      generates more files than just $@ though and you have to specify
-      them.
-
-    - tries to detect whether input file was found in "." or "..".
-      Although the code tries to be written so that it doesn't matter
-      what --src points to, it has only been tested for when --src is
-      "..".
-
-    - FLEX_CACHE, BISON_CACHE
-
- * Mention somewhere that people can copy jars into abuild's lib
-   directory if I want that to be something people do...
-
- * Incorporate manual/groovy-framework.txt and manual/pending.txt.
-
- * Read through all 1.1 release notes and update the body of the
-   documentation accordingly.  Save this until all the new features
-   are implemented, if possible.
-
- * Note: references to ant examples are still in the documentation.
-   There are comments like <!-- ?example ....? --> marking where the
-   file references used to be.  Files can be found in the abuild-ant
-   test suite.  Paths that used to start with java now start with
-   basic.
-
- * Describe groovy framework (obviously).  Specific things to remember:
-
-    - For groovy backends, defining a new test procedure requires only
-      defining a closure for the 'test-only' target.  Abuild
-      automatically calls this from test or check.
-
-    - document fields and interface of BuildState ("abuild").  Also
-      describe parameter handling.  setParameter vs. getVariable, which
-      looks at defines, parameters, interface, and default in that order
-
-    - QTest.export prop for groovy backend; also automatic export of
-      TESTS
-
-    - abuild.localRules, abuild.rules
-
-    - Examples...
-
- * Describe somewhere why we don't provide information about platforms
-   in the interface files for java and indep.  Basically, it would be
-   a bug to have an interface variable have a different value in
-   different contexts when it might influence a build that could be
-   used on multiple platforms.  For example, an indep build item could
-   write out some value based on a platform variable and then that
-   information could be wrong when the results of the build were used
-   on a different platform.  If you really need to know what platform
-   you are on for something indep or java, you can always get the
-   information using a cross-platform dependency, which at least makes
-   it visible.  But remember that text files containing
-   platform-dependent values (like pathnames, etc.) are in fact
-   platform-dependent.
-
- * Mention that we don't support descrpition for unnamed build items,
-   including nameless tree roots, because we don't store anything
-   about unnamed build items.  If you want a description in your tree
-   root, give it a name.  Comments are allowed anywhere.
-
- * For msvc toolchain, document MSVC_GLOBAL_FLAGS,
-   MSVC_MANAGEMENT_FLAGS, and MSVC_RUNTIME_FLAGS.  See comments in
-   msvc.mk.
-
- * Update **/*-help.txt.  Write help files for all built-in toolchains
-   and rules.
-
- * Document built-in interface variables in help/vars.txt
-
- * Groovy framework: document somewhere that lazy jar signing is true
-   by default in order to have idempotent builds
-
- * New acknowledgements: Brian Reid, Kathleen Locher, Joe Schettino,
-   Brandon Barlow for help with the Java redesign and 1.1 testing
-
- * Document ABUILD_FORCE_32BIT and ABUILD_FORCE_64BIT.  See release
-   notes.  Mention somewhere that all support for this can be found
-   for searching for FORCE_WORDSIZE in the code.  The only references
-   are in private/bin/get_native_platform_data and
-   make/toolchains/gcc.mk.
-
- * Autoconf: remember to mention attributes: serial.  Also, mention
-   the serial attribute in the description of --make-jobs.
-
- * Mention somewhere that the native platform components are
-   determined by private/bin/get_native_platform_data.  If there were
-   a need to tweek this, this would be the only place that would have
-   to be changed.
-
-
-----------------------------------------------------------------------
-
-=== Things with no Specific Release Target ===
 
 Windows Issues
 ==============

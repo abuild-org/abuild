@@ -1,6 +1,28 @@
 Groovy Framework Documentation (incorporate into manual)
 ========================================================
 
+Miscellaneous Points to Incorporate
+-----------------------------------
+
+ * For groovy backends, defining a new test procedure requires only
+   defining a closure for the 'test-only' target.  Abuild
+   automatically calls this from test or check.
+
+ * document fields and interface of BuildState ("abuild").  Also
+   describe parameter handling.  setParameter vs. getVariable, which
+   looks at defines, parameters, interface, and default in that order
+
+ * QTest.export prop for groovy backend; also automatic export of
+   TESTS and TC_SRCS
+
+ * abuild.localRules, abuild.rules
+
+ * Lazy jar signing is true by default in order to have idempotent
+   builds
+
+ * Examples...
+
+
 General Guidelines
 ------------------
 
