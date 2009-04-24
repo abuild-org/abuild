@@ -586,6 +586,9 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
                      'todir': distdir) {
                     formatter('type': 'xml')
                 }
+                // Probably want to support calling batchtest as well.
+                // We should be able to call test and/or batchtest
+                // based on which parameters are supplied.
             }
         }
         finally
