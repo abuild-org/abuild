@@ -39,9 +39,16 @@ $td->runtest("java startup failure",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build",
-	     {$td->COMMAND => "abuild -b all",
+	     {$td->COMMAND => "abuild -b all all doc",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/jars1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("check html",
+	     {$td->COMMAND => "find . -name index.html -print",
+	      $td->FILTER => "LANG=C sort"},
+	     {$td->FILE => "$top/javadoc-html.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -223,4 +230,4 @@ else
 
 check_work_accessed($td, 'not-accessed.out');
 
-$td->report(23 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));
+$td->report(24 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));

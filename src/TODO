@@ -15,15 +15,6 @@ release notes.
  * ...
 
 
-Groovy Framework
-================
-
- * Figure out exactly what javadoc rules should do.  Exercise javadoc
-   in test suite.  Use abuild-java-rules/data/jars/simple.
-
- * Write some good examples
-
-
 Abuild Lint
 ==============
 
@@ -76,6 +67,8 @@ Documentation
       TESTS
 
     - abuild.localRules, abuild.rules
+
+    - Examples...
 
  * Describe somewhere why we don't provide information about platforms
    in the interface files for java and indep.  Basically, it would be

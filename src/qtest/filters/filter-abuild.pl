@@ -16,6 +16,7 @@ my ($os_data, $compiler) = ($1, $2);
 my $in_autoconf = 0;
 my $in_stacktrace = 0;
 my $saw_junitreport = 0;
+my $saw_javadoc = 0;
 
 while (<>)
 {
@@ -45,6 +46,12 @@ while (<>)
 	next;
     }
 
+    if (m/^abuild:/)
+    {
+	$saw_junitreport = 0;
+	$saw_javadoc = 0;
+    }
+
     s,\\,/,g;
     # Normalize exit code of make
     s,(make:.*Error) (\d+)$,$1 1,;
@@ -63,6 +70,16 @@ while (<>)
 	{
 	    print "[junitreport]...\n";
 	    $saw_junitreport = 1;
+	}
+	next;
+    }
+    # Filter javadoc
+    if (m/\[javadoc\]\s/)
+    {
+	if (! $saw_javadoc)
+	{
+	    print "[javadoc]...\n";
+	    $saw_javadoc = 1;
 	}
 	next;
     }

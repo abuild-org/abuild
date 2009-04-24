@@ -38,5 +38,6 @@ abuild: test (abuild-java): test
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: <time>
     [junit] Running com.example.PotatoTest
     [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: <time>
+[junitreport]...
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: failing on platform java
