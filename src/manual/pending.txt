@@ -32,23 +32,6 @@ Miscellaneous
  * Mention somewhere that people can copy jars into abuild's lib
    directory if I want that to be something people do...
 
- * Describe groovy framework (obviously).  Specific things to remember:
-
-    - For groovy backends, defining a new test procedure requires only
-      defining a closure for the 'test-only' target.  Abuild
-      automatically calls this from test or check.
-
-    - document fields and interface of BuildState ("abuild").  Also
-      describe parameter handling.  setParameter vs. getVariable, which
-      looks at defines, parameters, interface, and default in that order
-
-    - QTest.export prop for groovy backend; also automatic export of
-      TESTS
-
-    - abuild.localRules, abuild.rules
-
-    - Examples...
-
  * Describe somewhere why we don't provide information about platforms
    in the interface files for java and indep.  Basically, it would be
    a bug to have an interface variable have a different value in
@@ -76,9 +59,6 @@ Miscellaneous
    and rules.
 
  * Document built-in interface variables in help/vars.txt
-
- * Groovy framework: document somewhere that lazy jar signing is true
-   by default in order to have idempotent builds
 
  * New acknowledgements: Brian Reid, Kathleen Locher, Joe Schettino,
    Brandon Barlow for help with the Java redesign and 1.1 testing
