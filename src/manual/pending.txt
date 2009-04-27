@@ -69,11 +69,6 @@ Miscellaneous
  * Autoconf: remember to mention attributes: serial.  Also, mention
    the serial attribute in the description of --make-jobs.
 
- * Mention somewhere that the native platform components are
-   determined by private/bin/get_native_platform_data.  If there were
-   a need to tweek this, this would be the only place that would have
-   to be changed.
-
 ----------------------------------------------------------------------
 
 Read-only Build Items

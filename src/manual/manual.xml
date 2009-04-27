@@ -1614,7 +1614,7 @@ C:\cygwin\cygwin.bat
      JAR-providing build items will do this.  &Abuild; actually
      provides multiple classpath variables, each of which is intended
      to be used in a particular way.  For a discussion, please see
-     XXX.
+     XXX-java-class-paths.
     </para>
     <para>
      As with the C++ library, it is possible to build this item by
@@ -1670,7 +1670,6 @@ C:\cygwin\cygwin.bat
    </sect1>
   </chapter>
  </part>
-<!--XXX HERE-->
  <part id="ref.part2" label="II">
   <title>Normal Operation</title>
   <partintro id="ref.part2.intro">
@@ -1693,10 +1692,11 @@ C:\cygwin\cygwin.bat
     Now that we've had a chance to see &abuild; in action for a simple
     case, it's time to go into more detail about how things fit
     together.  In <xref linkend="ref.basic-terminology"/>, we briefly
-    defined the terms <firstterm>build item</firstterm> and
-    <firstterm>build tree</firstterm>.  In this chapter, we will
-    describe them in bit more detail and briefly introduce a number of
-    concepts that apply to them.
+    defined the terms <firstterm>build item</firstterm>,
+    <firstterm>build tree</firstterm>, and <firstterm>build
+    forest</firstterm>.  In this chapter, we will describe them in bit
+    more detail and briefly introduce a number of concepts that apply
+    to them.
    </para>
    <sect1 id="ref.build-items-as-objects">
     <title>Build Items as Objects</title>
@@ -1711,13 +1711,13 @@ C:\cygwin\cygwin.bat
      participates in &abuild;'s object-oriented view of a software
      build.  A build item provides some <emphasis>service</emphasis>
      within a build tree.  Most build items build some kind of code:
-     usually a library, executable, or Java archive.  Build items may
-     provide other kinds of services as well.  For example, a build
-     item may implement a code generator, support for a new compiler,
-     or the ability to make use of a third-party software library.  In
-     addition, a build item may have certain attributes including a
-     list of <firstterm>dependencies</firstterm>, a list of
-     <firstterm>supported flags</firstterm>, information about what
+     most often a library, executable, or Java archive.  Build items
+     may provide other kinds of services as well.  For example, a
+     build item may implement a code generator, support for a new
+     compiler, or the ability to make use of a third-party software
+     library.  In addition, a build item may have certain attributes
+     including a list of <firstterm>dependencies</firstterm>, a list
+     of <firstterm>supported flags</firstterm>, information about what
      types of platforms the build item may be built on, a list of
      <firstterm>traits</firstterm>, and other non-dependency
      relationships to other build items.  Each of these concepts is
@@ -1757,10 +1757,7 @@ C:\cygwin\cygwin.bat
      <primary>Abuild.mk</primary>
     </indexterm>
     <indexterm>
-     <primary>Abuild-ant.properties</primary>
-    </indexterm>
-    <indexterm>
-     <primary>Abuild-ant.xml</primary>
+     <primary>Abuild.groovy</primary>
     </indexterm>
     <indexterm>
      <primary>build file</primary>
@@ -1782,8 +1779,7 @@ C:\cygwin\cygwin.bat
      </varlistentry>
      <varlistentry>
       <term><filename>Abuild.mk</filename></term>
-      <term><filename>Abuild-ant.properties</filename></term>
-      <term><filename>Abuild-ant.xml</filename></term>
+      <term><filename>Abuild.groovy</filename></term>
       <listitem>
        <para>
         These are the files that direct &abuild; what to actually
@@ -1797,6 +1793,14 @@ C:\cygwin\cygwin.bat
         <filename>Abuild.conf</filename> and
         <filename>Abuild.interface</filename> are not considered build
         files.
+        <footnote>
+         <para>
+          Additionally, the files
+          <filename>Abuild-ant.properties</filename> and
+          <filename>Abuild-ant.xml</filename> are recognized as build
+          files, associated with the deprecated xml-based ant backend.
+         </para>
+        </footnote>
        </para>
       </listitem>
      </varlistentry>
@@ -1828,57 +1832,80 @@ C:\cygwin\cygwin.bat
     </indexterm>
     <para>
      A build tree, as defined before, is a collection of build items
-     arranged hierarchically in the file system.  A build tree is
-     formed as a result of the items it contains holding references to
-     the locations of their parents and children within the file
-     system hierarchy.  These locations are named as relative paths in
-     the <property>parent-dir</property> and
-     <property>child-dirs</property> keys of the items'
-     <filename>Abuild.conf</filename> files.  Ordinarily, the value of
-     the <property>parent-dir</property> key is
-     &ldquo;<filename>..</filename>&rdquo;, but it doesn't have to be.
-     It is also customary to have the value of
-     <property>child-dirs</property> contain single path elements
-     (<emphasis>i.e.</emphasis>just a file without a directory), but
-     this is also not a hard restriction.  When &abuild; starts up, it
-     looks for an <filename>Abuild.conf</filename> in the current
-     directory and looks for its <property>parent-dir</property> key.
-     Using that, it locates the parent build item's
-     <filename>Abuild.conf</filename> file and reads it for its
-     <property>parent-dir</property> key.  This process is repeated
-     until &abuild; discovers a build item that does not have a
-     <property>parent-dir</property> key.  This build item is known as
-     the <firstterm>root build item</firstterm> of the build tree.
+     arranged hierarchically in the file system.  Like build items,
+     build trees have names, and are only referred to from other build
+     trees by name.  The root of a build tree is a build item whose
+     <filename>Abuild.conf</filename> contains the
+     <property>tree-name</property> key.  We refer to this item as the
+     tree's <firstterm>root build item</firstterm>.
     </para>
     <para>
-     Note that the hierarchy defined by the layout of build items in
-     the file system is a file system hierarchy and nothing more.  It
-     doesn't have to have any bearing at all on the dependency
-     relationships among the build items.
-     <footnote>
-      <para>
-       This information is used only at startup to locate the root of
-       the build tree and to find the locations of all of the build
-       items in the tree so that they may be later referred to only by
-       name. In fact, &abuild; doesn't even retain the information
-       about the parents and children of build items in the file
-       system after it uses the information during startup.
-      </para>
-     </footnote>
-     That said, it is sensible to organize build items in a manner
-     that relates to the architecture of the system, and this in turn
-     usually has implications about dependencies.  Still, it is
-     important to keep in mind that &abuild; is not file-system driven
-     but rather is dependency driven.
+     A build tree is formed as a result of the items it contains
+     holding references to the locations of their children within the
+     file system hierarchy.  These locations are named as relative
+     paths in the <property>child-dirs</property> keys of the items'
+     <filename>Abuild.conf</filename> files.  It is customary to have
+     the value of <property>child-dirs</property> contain single path
+     elements (<emphasis>i.e.</emphasis>just a directory without any
+     subdirectories), but this is also not a requirement:
+     <property>child-dirs</property> entries may contain multiple path
+     elements as long as there are no <filename>Abuild.conf</filename>
+     files in any of the intermediate directories.  If a build item's
+     child contains its own <property>tree-name</property> key, that
+     child build item is the root of a separate build tree that is
+     part of the same forest, defined below.  Otherwise, the child
+     build item is part of the same tree as its parent.
     </para>
     <para>
      In addition to containing build items, build trees can contain
      other attributes.  Among these are references to other build
      trees, a list of <firstterm>supported traits</firstterm>, and a
      list of <firstterm>plugins</firstterm>.  We will discuss these
-     topics later in the document.  Most of a build tree's attributes
-     appear in the root build item's <filename>Abuild.conf</filename>
+     topics later in the document.  These attributes are defined using
+     keys in the root build item's <filename>Abuild.conf</filename>
      file.
+    </para>
+   </sect1>
+   <sect1 id="ref.build-forests">
+    <title>Build Forests</title>
+    <indexterm>
+     <primary>build forest</primary>
+    </indexterm>
+    <para>
+     A build forest is a collection of build trees that are connected
+     to each other by virtue of one tree's root build item being
+     referenced as a child of a build item in another tree in the
+     forest.  When &abuild; starts up, it looks for an
+     <filename>Abuild.conf</filename> in the current directory.  It
+     then walks up the file system one directory at a time looking for
+     additional <filename>Abuild.conf</filename> files.  Eventually,
+     it will either find the topmost <filename>Abuild.conf</filename>
+     file, or it will find an <filename>Abuild.conf</filename> file
+     that is not listed as a child of the next higher one.  Whichever
+     of these cases is found first, the resulting
+     <filename>Abuild.conf</filename> file is the root of the build
+     forest.  The forest then consists of all the trees encountered by
+     following all the <property>child-dirs</property> pointers from
+     the forest root.
+    </para>
+    <para>
+     Note that, unlike with build items and trees, forests do not have
+     names.  Note also that, unlike with trees, there is no explicit
+     marker of the root of a build forest.  This is very important as
+     it allows you to extend a forest from above without modifying the
+     forest itself.  For a more in-depth discussion, see
+     <xref linkend="ref.multiple-trees"/>.
+    </para>
+    <para>
+     Note that the hierarchy defined by the layout of build items in
+     the file system is a file system hierarchy and nothing more.  It
+     doesn't have to have any bearing at all on the dependency
+     relationships among the build items.  That said, it is sensible
+     to organize build items in a manner that relates to the
+     architecture of the system, and this in turn usually has
+     implications about dependencies.  Still, it is important to keep
+     in mind that &abuild; is not file-system driven but rather is
+     dependency driven.
     </para>
    </sect1>
    <sect1 id="ref.build-item-types">
@@ -1901,13 +1928,15 @@ C:\cygwin\cygwin.bat
           <primary>build item</primary>
           <secondary>root</secondary>
          </indexterm>
-         The root build item of a build tree is the item in that tree
-         that has no <property>parent-dir</property> key.  It is often
-         the case that the root build item is unnamed and therefore
-         lacks a <property>this</property> key.  (See below for a
-         discussion of unnamed build items.)  Keys that define
-         attributes of the build tree may appear only in the root
-         build item's <filename>Abuild.conf</filename>.
+         The root build item of a build tree is the topmost item in
+         that tree.  It has a <property>tree-name</property> key that
+         gives the name of the build tree.  It is often the case that
+         the root build item serves no purpose other than to hold onto
+         tree-wide attributes.  It is therefore permissible for a root
+         build item to lack a <property>name</property> key.  (See
+         below for a discussion of unnamed build items.)  Keys that
+         define attributes of the build tree may appear only in the
+         root build item's <filename>Abuild.conf</filename>.
         </para>
        </listitem>
       </varlistentry>
@@ -1924,30 +1953,23 @@ C:\cygwin\cygwin.bat
          </indexterm>
          In order to refer to one build item from another, both build
          items must have names.  &Abuild; requires that every named
-         build item in a build tree be named uniquely within that
-         tree.  A name is given to a build item by setting the
-         <property>this</property> key in its
-         <filename>Abuild.conf</filename>.
-         <footnote>
-          <para>
-           Perhaps <property>name</property> would have been a better
-           name for this key, but it's too late to change it now.
-           This key might be renamed in a future major release of
-           &abuild;.
-          </para>
-         </footnote>
-         Sometimes, a build item exists for the sole purpose of
-         bridging its parent with its children in the file system.
-         Such items do not need to be referenced by other build items,
-         so they do not need names.  The only use of an unnamed build
-         item is to serve as an intermediary during traversal of the
-         file system.  Such a build item's
-         <filename>Abuild.conf</filename> may only contain the
-         <property>parent-dir</property> and
-         <property>child-dirs</property> keys.  &Abuild; doesn't
-         retain any information about these build items.  It simply
-         traverses through them when locating build items at startup
-         time.
+         build item in a build forest be named uniquely within that
+         forest.  A name is given to a build item by setting the
+         <property>name</property> key in its
+         <filename>Abuild.conf</filename>.  Sometimes, a build item
+         exists for the sole purpose of bridging its parent with its
+         children in the file system.  Such items do not need to be
+         referenced by other build items, so they do not need names.
+         The only use of an unnamed build item is to serve as an
+         intermediary during traversal of the file system.  Such a
+         build item's <filename>Abuild.conf</filename> may only
+         contain the <property>child-dirs</property> key.  &Abuild;
+         doesn't retain any information about these build items.  It
+         simply traverses through them when locating build items at
+         startup time.  Unnamed build items are the only types of
+         build items that don't have to belong to any particular build
+         tree.  It is common for the root of a forest to be an unnamed
+         build item whose children are all roots of build trees.
         </para>
        </listitem>
       </varlistentry>
@@ -1967,15 +1989,17 @@ C:\cygwin\cygwin.bat
          <filename>Abuild.interface</filename> file.  They do not
          build anything and therefore do not contain build files (such
          as <filename>Abuild.mk</filename> or
-         <filename>Abuild-ant.properties</filename>).  Since they have
-         nothing to build, &abuild; never actually invokes a backend
-         on them.  They are, however, included in all dependency and
-         integrity checks.  A typical use of interface-only build
-         items would be to add the locations of external libraries to
-         the include and library paths (or to the classpaths for Java
-         items).  There may also be some interface-only build items
-         that consist solely of static files (templated C++ classes,
-         lists of constants, etc.).
+         <filename>Abuild.groovy</filename>).  Since they have nothing
+         to build, &abuild; never actually invokes a backend on them.
+         They are, however, included in all dependency and integrity
+         checks.  A typical use of interface-only build items would be
+         to add the locations of external libraries to the include and
+         library paths (or to the classpaths for Java items).  There
+         may also be some interface-only build items that consist
+         solely of static files (templated C++ classes, lists of
+         constants, etc.).  Interface-only build items may also be
+         used to declare interface variables that are used by other
+         build items.
         </para>
        </listitem>
       </varlistentry>
@@ -1990,18 +2014,20 @@ C:\cygwin\cygwin.bat
           <primary>build item</primary>
           <secondary>pass-through</secondary>
          </indexterm>
-         Pass-through build items are useful for solving some more
-         advanced &abuild; problems.  They contain no build or
-         interface files, but they are named and have dependencies.
-         This makes pass-through build items useful as top-level
-         facades for hiding more complicated build item structures.
-         This could include build items that have private names
-         relative to the pass-through item, and it could also include
-         structures containing build items that cross language and
-         platform boundaries.  Several examples in the documentation
-         use pass-through build items to hide private build item
-         names.  For further discussion of using pass-through build
-         items in a cross-platform environment, please see <xref
+         Pass-through build items are useful for solving certain
+         advanced &abuild; problems.  As such, there are aspects of
+         this definition that may not be clear on the first reading.
+         Pass-through build items contain no build or interface files,
+         but they are named and have dependencies.  This makes
+         pass-through build items useful as top-level facades for
+         hiding more complicated build item structures.  This could
+         include build items that have private names relative to the
+         pass-through item, and it could also include structures
+         containing build items that cross language and platform
+         boundaries.  Several examples in the documentation use
+         pass-through build items to hide private build item names.
+         For further discussion of using pass-through build items in a
+         cross-platform environment, please see <xref
          linkend="ref.cross-platform-dependencies"/>.
         </para>
        </listitem>
@@ -2028,12 +2054,12 @@ C:\cygwin\cygwin.bat
      Virtually every software development project has some need to
      integrate with third-party software libraries.  In a traditional
      build system, you might list the include paths, libraries, and
-     library directories right in your <filename>Makefile</filename>
-     or configuration file for whatever build system you are using.
-     With &abuild;, the best way to integrate with a third-party
-     library is to use a build item whose sole purpose is to export
-     that library's information using an
-     <filename>Abuild.interface</filename> file.  In the simplest
+     library directories right in your <filename>Makefile</filename>,
+     <filename>build.xml</filename>, or configuration file for
+     whatever build system you are using.  With &abuild;, the best way
+     to integrate with a third-party library is to use a build item
+     whose sole purpose is to export that library's information using
+     an <filename>Abuild.interface</filename> file.  In the simplest
      cases, a third-party library build item might be an interface
      only build item (described above) that just includes the
      appropriate library directives in a static
@@ -2049,6 +2075,10 @@ C:\cygwin\cygwin.bat
      For Java build items, a third-party JAR build item would
      typically append the path to the JAR file to the
      <varname>abuild.classpath.external</varname> interface variable.
+     (For a discussion of the various classpath variables, see
+     XXX-java-class-paths.)
+    </para>
+    <para>
      Sometimes, the process may be more involved.  For example, on a
      UNIX system, it is often desirable to use
      <application>autoconf</application> to determine what interface
@@ -2060,15 +2090,10 @@ C:\cygwin\cygwin.bat
      automatically generate an <filename>Abuild.interface</filename>
      <function>after-build</function> file (also discussed in <xref
      linkend="ref.example.autoconf"/>) by running the
-     <command>pkg-config</command> command.
-     <footnote>
-      <para>
-       An example <application>pkg-config</application> build item may
-       be found in the <filename>abuild-contrib</filename> package
-       available at <ulink url="http://www.abuild.org">&abuild;'s web
-       site</ulink>.
-      </para>
-     </footnote>
+     <command>pkg-config</command> command.  An example
+     <application>pkg-config</application> build item may be found in
+     the <filename>abuild-contrib</filename> package available at
+     <ulink url="http://www.abuild.org">&abuild;'s web site</ulink>.
     </para>
     <para>
      Whichever way you do it for a given package, the idea is that you
@@ -2081,6 +2106,9 @@ C:\cygwin\cygwin.bat
      uniform standard for doing so within any specific &abuild; build
      tree.  It also alleviates the need to duplicate information about
      the third-party library throughout your source tree.
+     <emphasis>Whenever you are duplicating knowledge about the path
+     of some entity, you would probably be better off creating a
+     separate build item to encapsulate that knowledge.</emphasis>
     </para>
    </sect1>
   </chapter>
@@ -2230,15 +2258,19 @@ C:\cygwin\cygwin.bat
     </para>
     <para>
      When a build item is defined with multiple platform types, they
-     must all belong to the same target type.  Some interface
-     variables are also based on target type.  For example, it may be
-     permissible for a java build item to depend on a C++ build item
-     if the C++ build item exports native code or provides an
-     executable code generator, but it would never make sense for a
-     java build item to have an include path or library path in the
-     sense of a C/C++ build item.  When one build item depends on
-     another, the platforms on which the two build items are being
-     built come into play.  We discuss this in <xref
+     must all belong to the same target type.  (Since the only target
+     type that has more than one platform type is
+     <type>object-code</type>, this means the target type of a build
+     item with multiple platform types will always be
+     <type>object-code</type>.)  Some interface variables are also
+     based on target type.  For example, it may be permissible for a
+     java build item to depend on a C++ build item if the C++ build
+     item exports native code or provides an executable code
+     generator, but it would never make sense for a java build item to
+     have an include path or library path in the sense of a C/C++
+     build item.  When one build item depends on another, the
+     platforms on which the two build items are being built come into
+     play.  We discuss this in <xref
      linkend="ref.cross-platform-dependencies"/>.
     </para>
    </sect1>
@@ -2287,8 +2319,18 @@ C:\cygwin\cygwin.bat
         By default, &abuild; will create a toolset name based on the
         operating system distribution or similar factors.  Examples
         include <type>rhel4</type> on a Red Hat Enterprise Linux 4
-        system, or <type>deb4_0</type> on a Debian GNU/Linux 4.0
-        system.
+        system, or <type>deb5</type> on a Debian GNU/Linux 5.x system.
+        <footnote>
+         <para>
+          At present, it is possible to add new toolsets easily with
+          plugins, but the only way to <emphasis>override</emphasis>
+          the built-in default toolset would be to edit
+          <filename>private/bin/get_native_platform_data</filename>,
+          the perl script &abuild; uses to determine this information
+          at startup.  This may be addressed in a future version of
+          &abuild;.
+         </para>
+        </footnote>
        </para>
       </listitem>
      </varlistentry>
@@ -2362,14 +2404,26 @@ C:\cygwin\cygwin.bat
      </footnote>
     </para>
     <para>
-     When &abuild; invokes a backend to perform the actual compilation
-     steps, it always does so from an output directory.  This is true
-     even for platform-independent build items.  In this way, even
-     temporary files created by compilers or other build systems will
-     not appear in the build item's local directory.  This makes it
-     possible to build a specific item for multiple platforms in
-     parallel without having to be concerned about the separate builds
-     overwriting each other's files.
+     When &abuild; invokes make, it always does so from an output
+     directory.  This is true even for platform-independent build
+     items.  In this way, even temporary files created by compilers or
+     other build systems will not appear in the build item's local
+     directory.  This makes it possible to build a specific item for
+     multiple platforms in parallel without having to be concerned
+     about the separate builds overwriting each other's files.
+    </para>
+    <para>
+     When &abuild; builds items using the Groovy backend (and also
+     using the legacy xml-based ant backend), it performs those builds
+     inside a single Java virtual machine instance.  As such, it does
+     not change its working directory to the output directory.  (Java
+     does not support changing current directories, and besides, there
+     could be multiple builds going on simultaneously in different
+     threads.)  However, each Java-based build has its own private ant
+     <classname>Project</classname> whose <varname>basedir</varname>
+     property is set to the output directory.  As such, all
+     well-behaved ant tasks will only create files in the output
+     directory.
     </para>
    </sect1>
   </chapter>
@@ -2399,9 +2453,13 @@ C:\cygwin\cygwin.bat
      <primary>dependency</primary>
      <secondary>circular</secondary>
     </indexterm>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>transitive</secondary>
+    </indexterm>
     <para>
-     The principle mechanism for declaring dependencies among build
-     items in &abuild; is the <property>deps</property> key in a build
+     The sole mechanism for declaring dependencies among build items
+     in &abuild; is the <property>deps</property> key in a build
      item's <filename>Abuild.conf</filename>.  Suppose build item
      <classname>A</classname> declares build item
      <classname>B</classname> as a dependency.  The following line
@@ -2415,7 +2473,7 @@ C:\cygwin\cygwin.bat
       <listitem>
        <para>
         It ensures that <classname>B</classname> will be built before
-        <classname>A</classname> in any dependency-aware build.
+        <classname>A</classname>.
        </para>
       </listitem>
       <listitem>
@@ -2474,6 +2532,12 @@ C:\cygwin\cygwin.bat
     <para>
      &Abuild; performs various validations on dependencies.  The most
      important of these is that no cyclic dependencies are permitted.
+     <footnote>
+      <para>
+       Stated formally, &abuild; requires that build item dependencies
+       form a directed acyclic graph.
+      </para>
+     </footnote>
      In other words, if <classname>A</classname> depends on
      <classname>B</classname> either directly or indirectly, then
      <classname>B</classname> cannot depend on
@@ -2486,8 +2550,8 @@ C:\cygwin\cygwin.bat
      name.  &Abuild; offers two mechanisms to restrict which items can
      depend on which other items.  One mechanism is through build item
      name scoping rules, discussed below.  The other mechanism is
-     through use of external build trees, discussed in <xref
-     linkend="ref.externals"/>.
+     through use of multiple build trees, discussed in <xref
+     linkend="ref.multiple-trees"/>.
     </para>
    </sect1>
    <sect1 id="ref.build-ordering">
@@ -2751,6 +2815,7 @@ C:\cygwin\cygwin.bat
      linkend="ref.build-item-visibility"/>.
     </para>
    </sect1>
+  <!--XXX HERE-->
    <sect1 id="ref.example.simple-build-tree">
     <title>Simple Build Tree Example</title>
     <para>
@@ -2876,7 +2941,7 @@ C:\cygwin\cygwin.bat
     </para>
    </sect1>
   </chapter>
-  <chapter id="ref.externals">
+  <chapter id="ref.multiple-trees">
    <title>External Build Trees</title>
    <para>
     In large development environments, it is common to have
@@ -5932,7 +5997,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          This key is allowed only in a root build item. It contains a
          list of whitespace-separated paths to the root directories of
          external build trees.  For a discussion of using externals,
-         please see <xref linkend="ref.externals"/>.
+         please see <xref linkend="ref.multiple-trees"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -14743,7 +14808,9 @@ Y = $(X)
            <filename>A</filename> declares a tree dependency on tree
            <filename>B</filename>, then &abuild; will build all items
            in <filename>A</filename> before building any build items
-           in <filename>B</filename>.
+           in <filename>B</filename>.  As always, build ordering is
+           considered an implementation detail that should not be
+           relied upon.
           </para>
          </listitem>
         </itemizedlist>
