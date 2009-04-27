@@ -8,19 +8,17 @@
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY swversion "1.1.a8">
 <!ENTITY lastreleased "April 22, 2009">
-<!ENTITY example "../../doc/example">
-<!ENTITY testdir "../qtest/abuild">
-<!ENTITY javawarning "
-<warning>
-<para>
-Note that &abuild;'s Java support is considered alpha as of
-version 1.0.  Version 1.1 of &abuild; may include a Java solution that
-is not backward compatible with the solution in version 1.0.
-</para>
-</warning>
-">
 ]>
 <!--
+
+BEFORE EACH RELEASE
+
+ * update swversion and lastreleased above
+
+ * make sure a real date has been included in the release notes
+
+ * Update copyright notice, if needed, in this file, Abuild.cc, and
+   README.source-distribution.
 
 Possible fop/stylesheet bugs (as of fop 0.94):
 
@@ -28,9 +26,6 @@ Possible fop/stylesheet bugs (as of fop 0.94):
    after hyphens in command-line options
 
  * <indexterm/> generates a hard space.
-
- * footnotes from list items don't seem to work as of fop 0.94.
-   Search for comment containing "end footnote".
 
  * Index terms after a chapter title before the first paragraph of the
    chapter do not work.  The same is not true in sections.
@@ -41,15 +36,6 @@ Possible stylesheet considerations:
    instructions in a formal listing/example element if we can get it
    to have a title of "Listing" instead of "Example".  See also
    Program listings chapter in DocBook XSL.
-
-BEFORE EACH RELEASE
-
- * update swversion and lastreleased above
-
- * make sure a real date has been included in the release notes
-
- * Update copyright notice, if needed, in this file, Abuild.cc, and
-   README.source-distribution.
 
 PLEASE READ THESE IMPORTANT NOTES ABOUT EDITING THIS DOCUMENT.
 
@@ -66,7 +52,7 @@ put the start tag flush left as these will interfere with future line
 indentation.
 
 Each chapter, section, or appendix is given an id that starts with
-"ref.".  Each example section is given an id that starts with
+ref.".  Each example section is given an id that starts with
 "ref.example.".  We use the "example" processing instruction to
 include the contents of a file from doc/example.  Our processing
 program requires the example to appear in a section whose id starts
@@ -79,7 +65,7 @@ makes it easier for people who just want examples to find them
 quickly.
 
 We also make use of the "qtest" processing instruction to pull files
-from the "../src/qtest/abuild" directory, the "dump-data"
+from the "../src/qtest/abuild-examples" directory, the "dump-data"
 processing instruction to include the DTD for the dump data format,
 and the "ccxx-mk" processing instruction to include ccxx.mk.
 Our processing program requires processing instructions to be on a
@@ -164,27 +150,22 @@ following checks:
    </para>
   </legalnotice>
  </bookinfo>
- <preface id="ref.alpha-release">
-  <title>Preface to 1.1 Alpha Releases</title>
+ <preface id="ref.for-1.0-users">
+  <title>Notes For Users of &Abuild; Version 1.0</title>
   <para>
-   The manual has not yet been updated to reflect changes for Version
-   1.1 of &abuild;.  The manual will be updated to describe new
-   functionality prior to the release of the first 1.1 beta release.
-   In the mean time, please see <xref linkend="ref.release-notes"/>
-   for details about the changes that have already been implemented
-   and the <filename>TODO</filename> file in the source for
-   information about changes that are pending.
+   This manual is written for &abuild; version 1.1.  If you are a user
+   of &abuild; version 1.0 and are just looking for a summary of what
+   changed, please see <xref linkend="ref.changes-in-1.1"/>.  The
+   material there includes a summary of a change along with cross
+   references to relevant sections of documentation.
   </para>
   <para>
-   There is one exception to this: there are a few instances in the
-   examples section where the documentation refers to an
-   <filename>Abuild-ant.properties</filename> file but actually shows
-   an <filename>Abuild.groovy</filename> file instead.  These will be
-   fixed when the manual is updated.  These discrepancies exist
-   because the files referenced in the documentation are part of
-   &abuild;'s test suite, and as some of the example files are
-   updated, the documentation has to be changed to refer to existing
-   files.
+   Please note that, with a small handful of exceptions, &abuild;
+   version 1.1 is be able to build software that used &abuild; 1.0
+   with few if any modifications.  The section on changes in version
+   1.1 (<xref linkend="ref.changes-in-1.1"/>) includes a detailed list
+   of things to watch out for during upgrading and when running in
+   1.0-compatibility mode.
   </para>
  </preface>
  <preface id="ref.how-to-read-this-manual">
@@ -205,7 +186,8 @@ following checks:
    examples in the document can be found in <xref
    linkend="ref.list-of-examples"/>.  If you are just looking for
    changes from previous versions of &abuild;, please see <xref
-   linkend="ref.release-notes"/>.
+   linkend="ref.release-notes"/> and <xref
+   linkend="ref.changes-in-1.1"/>.
   </para>
   <para>
    This manual is divided into four parts.  Each part of the document
@@ -266,22 +248,46 @@ following checks:
    <itemizedlist>
     <listitem>
      <para>
+      Brian Reid, who first introduced me to Groovy, the language that
+      is at the heart of &abuild; version 1.1's significantly improved
+      Java support, and who kept the momentum going for making
+      &abuild;'s Groovy-based Java framework a reality
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Brian Reid, Joe Schettino, Kathleen Locher, and Brandon Barlow
+      who met with me many times to help hammer out and test early
+      versions of the Groovy-based Java framework
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Cass Dalton, who has frequently served as a sounding board as I
+      think about new &abuild; capabilities, and who has played a
+      significant role in helping to ensure that &abuild; is as stable
+      and widely usable as possible
+     </para>
+    </listitem>
+    <listitem>
+     <para>
       Chris Costa, who served as a sounding board and contributed
       numerous ideas throughout the entire development process of
-      &abuild;, including conducting a thorough review of this
-      document
+      &abuild;, including conducting a thorough review of the &abuild;
+      1.0 documentation
      </para>
     </listitem>
     <listitem>
      <para>
-      Andrew Hayden, who spent many hours reviewing and critiquing
-      this entire document and who was the visionary behind an early
-      &abuild; Eclipse plugin
+      Andrew Hayden, who spent many hours reviewing and critiquing the
+      entire manual prior to the release of version 1.0 and who
+      contributed many feature ideas designed to ease implementation
+      of an &abuild; Eclipse plugin
      </para>
     </listitem>
     <listitem>
      <para>
-      Joe Davidson, the primary &abuild; evangelist who has been
+      Joe Davidson, the first &abuild; evangelist who has been
       invaluable in getting &abuild; to become as widely accepted
       within Argon ST as it is
      </para>
@@ -402,15 +408,25 @@ following checks:
      system for managing build items as well as the dependencies and
      relationships among them.  It also provides various build rules
      implemented with underlying tools, specifically <application>GNU
-     Make</application> and <application>Apache Ant</application>, to
-     perform the actual build steps.  We refer to these underlying
-     tools as <firstterm>backends</firstterm>.  Although the bulk of
-     the functionality and sophistication of &abuild; comes from its
-     own core capabilities rather than the build rules, the rules have
-     rich functionality as well.  &Abuild; is intended to
-     <emphasis>be</emphasis> your build system.  It is not intended,
-     as some other tools are, to wrap around your existing build
-     system.
+     Make</application> and <application>Apache Ant</application>
+     accessed using the <application>Groovy</application> programming
+     language,
+     <footnote>
+      <para>
+       There is also support for ant using xml files.  This was the
+       primary mechanism for using ant in &abuild; 1.0, but it is
+       deprecated in version 1.1 in favor of the much more flexible
+       and capable Groovy-based backend.
+      </para>
+     </footnote>
+     to perform the actual build steps.  We refer to these
+     underlying tools as <firstterm>backends</firstterm>.  Although
+     the bulk of the functionality and sophistication of &abuild;
+     comes from its own core capabilities rather than the build rules,
+     the rules have rich functionality as well.  &Abuild; is intended
+     to <emphasis>be</emphasis> your build system.  It is not
+     intended, as some other tools are, to wrap around your existing
+     build system.
      <footnote>
       <para>
        &Abuild; can, however, interoperate with other build systems as
@@ -428,11 +444,16 @@ following checks:
      work inside of an <firstterm>output directory</firstterm>.  When
      &abuild; performs the actual build, it always creates an output
      directory named
-     <filename>abuild-<replaceable>platform</replaceable></filename>
-     and invokes the backend in that directory.  By actually invoking
-     the backend in that directory, &abuild; avoids the situation of
-     temporary files conflicting with each other on multiple
-     simultaneous builds of a given build item on multiple platforms.
+     <filename>abuild-<replaceable>platform</replaceable></filename>.
+     When &abuild; invokes <application>make</application>, it does so
+     in that directory.  By actually invoking the backend in the
+     output directory, &abuild; avoids the situation of temporary
+     files conflicting with each other on multiple simultaneous builds
+     of a given build item on multiple platforms.  For ant-based
+     builds, using either the Groovy backend or the deprecated
+     xml-based ant backend, each build is given a private ant
+     <classname>Project</classname> object whose
+     <varname>basedir</varname> is set to the output directory.
      &Abuild; is designed to never create or remove any output files
      outside of its output directories.  This enables &abuild;'s
      cleanup operation to simply remove all output directories created
@@ -465,8 +486,8 @@ following checks:
        <function>Abuild.interface keywords</function>
       </member>
       <member>
-       <command>commands</command>, <command>build targets</command>,
-       and <command>ant hooks</command>
+       <command>commands</command> and <command>build
+       targets</command>
       </member>
       <member>
        <option>command line options</option> and <option>build
@@ -476,7 +497,7 @@ following checks:
        <envar>environment variables</envar>
       </member>
       <member>
-       <filename>file names</filename> and <filename>make rule
+       <filename>file names</filename> and <filename>make/Groovy rule
        sets</filename>
       </member>
       <member>
@@ -829,18 +850,19 @@ following checks:
        <para>
         The parts of &abuild; that manage dependencies and build
         integrity are distinct from the parts of &abuild; that
-        actually perform builds.  Initial versions of &abuild; can use
-        either <application>GNU Make</application> or
-        <application>Apache Ant</application> to perform builds.  The
-        internal integration between &abuild; and its backend build
-        programs is fairly loose, and adding additional backends would
-        require relatively minor and localized code changes.  In
-        addition, &abuild; requires only the backends that a
-        particular build tree uses to be present on your system when
-        you are performing a build.  That is, if you are building only
-        Java code, you don't need <application>GNU Make</application>,
-        and if you're building only C and C++ code, you don't need
-        <application>Apache Ant</application>.
+        actually perform builds.  &Abuild; current uses either
+        <application>GNU Make</application> or <application>Apache
+        Ant</application>, accessed through a
+        <application>Groovy</application> language front end, to
+        perform builds.  The internal integration between &abuild; and
+        its backend build programs is fairly loose, and adding
+        additional backends requires relatively minor and localized
+        code changes.  In addition, &abuild; requires only the
+        backends that a particular build tree uses to be present on
+        your system when you are performing a build.  That is, if you
+        are building only Java code, you don't need <application>GNU
+        Make</application>, and if you're building only C and C++
+        code, you don't need a Java or ant environment.
        </para>
       </listitem>
      </varlistentry>
@@ -870,21 +892,18 @@ following checks:
      <listitem>
       <para>
        A Java 5 or newer Java SDK is required if you are going to use
-       &abuild; to build Java code.  &Abuild; is known to pass its
-       test suite using GNU gcj 4.2.1 in addition to versions 1.5 or
-       newer of Sun's Java SDK, so it is possible to build and run
-       &abuild; in a pure open source environment.
+       &abuild; to build Java code.
       </para>
      </listitem>
      <listitem>
       <para>
        <ulink url="http://ant.apache.org/"><application>Apache
-       Ant</application></ulink> version 1.7.0 or newer with <ulink
+       Ant</application></ulink> version 1.7.0 or newer is required if
+       you are building any Java code.  If you are using &abuild;'s
+       deprecated xml-based ant framework, then you also need <ulink
        url="http://ant-contrib.sourceforge.net/"><application>ant-contrib</application></ulink>
-       version 1.0.b3 or later installed in ant's lib directory is
-       required if you are building any Java code.  &Abuild;'s own
-       Java code requires a Java 5 Java SDK, but it could likely be
-       ported fairly easily to any Java SDK that can build Apache Ant.
+       version 1.0.b3 or later installed in either ant's or &abuild;'s
+       lib directory.
       </para>
      </listitem>
      <listitem>
@@ -929,37 +948,15 @@ following checks:
      </listitem>
     </itemizedlist>
     <para>
-     To build &abuild;, you must also have version 1.33.1 or newer of
-     the <ulink url="http://www.boost.org/">boost</ulink> regex and
-     thread libraries.
-     <footnote>
-      <para>
-       &Abuild; is known to work with the boost 1.32 in Red Hat
-       Enterprise Linux 4, but it may not work with that version of
-       boost on other systems.  It has also been tested with boost
-       1.34 and 1.34.1.
-      </para>
-     </footnote>
-     &Abuild; is known to buildable by gcc, xlc, Microsoft Visual C++
-     (7.1 or newer), and <ulink
-     url="http://www.mingw.org/">mingw</ulink>,
-     <footnote>
-      <para>
-       &Abuild; does not pass its test suite reliably when built with
-       mingw, and it also appears to run more slowly when built with
-       mingw than when built with Visual C++.  No serious effort has
-       been put into figuring out why there are problems with &abuild;
-       when built with mingw, but this may be addressed in conjunction
-       of creating a version of &abuild; that works in Windows for
-       C/C++ builds without Cygwin.  &Abuild; appears to work with
-       equal reliability on Windows with Visual C++ as on Linux with
-       gcc.
-      </para>
-     </footnote>
-     and it should be buildable by on any system and with any compiler
-     that supports the boost thread and regular expression libraries.
-     In order for shared library support to work properly with gcc,
-     gcc must be configured to use the GNU linker.
+     To build &abuild;, you must also have version 1.35 or newer of
+     <ulink url="http://www.boost.org/">boost</ulink>.  &Abuild; uses
+     several boost libraries, including regex, thread, system, and
+     date_time as well as several header-only libraries such as asio,
+     bind, and function.  &Abuild; is known to buildable by gcc and
+     Microsoft Visual C++ (7.1 or newer), but it should be buildable
+     by any compiler that supports boost 1.35.  In order for shared
+     library support to work properly with gcc, gcc must be configured
+     to use the GNU linker.
      <footnote>
       <para>
        The only reason for the GNU linker requirement is that &abuild;
@@ -976,6 +973,23 @@ following checks:
      &abuild;.
     </para>
     <para>
+     In order to build &abuild;'s Java code, which is required if you
+     are doing any Java-based builds, you must have at least version
+     1.5.7 of <ulink url="http://groovy.codehaus.org">Groovy</ulink>.
+     It is recommended that you have at least version 1.6.0.  It is
+     not required that you have Groovy to <emphasis>run</emphasis>
+     &abuild; because &abuild; includes an embedded version of the
+     Groovy environment, but a full installation of Groovy is required
+     in order to do the initial bootstrapping build of &abuild;'s Java
+     code.
+     <footnote>
+      <para>
+       Besides, every Java programmer should have a copy of Groovy
+       installed!
+      </para>
+     </footnote>
+    </para>
+    <para>
      Since &abuild; determines where it is being run from when it is
      invoked, a binary distribution of &abuild; is not tied to a
      particular installation path.  It finds the root of its
@@ -990,10 +1004,18 @@ following checks:
      &Abuild; itself does not require any environment variables to be
      set, but <application>ant</application> and/or the Java
      development environment may.  If you have the
-     <envar>ANT_HOME</envar> environment variable set, &abuild; will
-     honor it when selecting which copy of
-     <application>ant</application> to run.  Otherwise, it will run
-     <application>ant</application> from your path.
+     <envar>JAVA_HOME</envar> and <envar>ANT_HOME</envar> environment
+     variables set, &abuild; will honor them when selecting which copy
+     of java to run and where to find the ant JAR files.  Otherwise,
+     it will run <application>java</application> and
+     <application>ant</application> from your path to make those
+     determinations.  Although &abuild; is explicitly tested to work
+     without either <envar>ANT_HOME</envar> or
+     <envar>JAVA_HOME</envar> set, if any Java builds are being done,
+     &abuild; will start up a little more quickly if they are set.  As
+     many other applications expect these to be set, it is recommended
+     that you set <envar>JAVA_HOME</envar> and
+     <envar>ANT_HOME</envar>.
     </para>
     <para>
      As you begin using &abuild;, you may find yourself generating a
@@ -1014,7 +1036,8 @@ following checks:
      &Abuild; is self-hosting: it can be built with itself, or for
      bootstrapping, it can be built with a GNU Makefile that uses
      &abuild;'s internal <application>GNU Make</application> support.
-     To build &abuild;'s Java code, you also need <application>Apache
+     To build &abuild;'s Java code, you also need
+     <application>Groovy</application>, <application>Apache
      Ant</application> and a Java development environment.  Please see
      the file <filename>src/README.build</filename> in the source
      distribution for instructions on building abuild.
@@ -1036,6 +1059,20 @@ following checks:
      installation directory.  You may also add the &abuild;
      distribution's <filename>bin</filename> directory to your path,
      or invoke &abuild; by the full path to its executable.
+     <footnote>
+      <para>
+       If &abuild; is not invoked as an absolute path, it will iterate
+       through the directories in your <envar>PATH</envar> trying to
+       find itself.  Therefore, &abuild; may fail to work properly if
+       you invoke it programmatically, pass
+       \&ldquo;<literal>abuild</literal>&rdquo; to it as
+       <literal>argv[0]</literal>, and do not have the copy of
+       &abuild; you are invoking in your path before any other copy of
+       &abuild;.  This limitation should never impact users who are
+       invoking &abuild; normally from the command line or through a
+       shell or other program that searches the path.
+      </para>
+     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.windows-requirements">
@@ -1263,9 +1300,25 @@ C:\cygwin\cygwin.bat
          A <firstterm>build tree</firstterm> is a collection of build
          items arranged hierarchically in the file system.  All build
          items in a build tree may refer to each other by name.  Each
-         build item knows the locations of its parents and children
-         within the file system hierarchy and the names of the build
-         items on which it depends.
+         build item knows the locations of its children within the
+         file system hierarchy and the names of the build items on
+         which it depends.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>build forest</term>
+       <listitem>
+        <para>
+         <indexterm>
+          <primary>build forest</primary>
+         </indexterm>
+         A <firstterm>build forest</firstterm> is a collection of build
+         trees.  If there are multiple build trees in a forest, there
+         may be one-way visibility relationships among the trees,
+         which are declared similarly to dependency relationships
+         among build items.  We will return to this concept later in
+         the documentation.
         </para>
        </listitem>
       </varlistentry>
@@ -1296,8 +1349,9 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
      </variablelist>
-     For a more complete description of build items and build trees,
-     please see <xref linkend="ref.build-items-and-trees"/>.
+     For a more complete description of build items, build trees, and
+     build forests, please see <xref
+     linkend="ref.build-items-and-trees"/>.
     </para>
    </sect1>
    <sect1 id="ref.compiler-selection">
@@ -1308,14 +1362,14 @@ C:\cygwin\cygwin.bat
      started, on Linux systems, &abuild; will build with
      <application>gcc</application> by default.  On Windows, if you
      run &abuild; from a shell that is appropriately set up to run
-     Microsoft Visual C++ (such as by running
-     <command>%VS71COMNTOOLS%\vsvars32.bat</command>, or similar for
-     your compiler version), &abuild; will automatically use Visual
-     C++.  If you have cygwin installed with gcc and the mingw runtime
-     environment, &abuild; will attempt to use <command>gcc
-     -mno-cygwin</command> to build as long as you set the
-     <envar>MINGW</envar> environment variable to
-     <literal>1</literal>.
+     Microsoft Visual C++ (as by following the command prompt shortcut
+     provided as part of your Visual C++ implementation), &abuild;
+     will automatically use Visual C++.  If you have cygwin installed
+     with gcc and the mingw runtime environment, &abuild; will attempt
+     to use <command>gcc -mno-cygwin</command> to build as long as you
+     set the <envar>MINGW</envar> environment variable to
+     <literal>1</literal>, though bear in mind that &abuild;'s mingw
+     support is not entirely complete.
     </para>
    </sect1>
    <sect1 id="ref.example.basic.cxx-library">
@@ -1349,10 +1403,8 @@ C:\cygwin\cygwin.bat
      this file is what makes this into a build item.  We present the
      file here:
      <?example basic/cxx-library/Abuild.conf?>
-     In this file, the <property>this</property> key is used to
-     specify the name of the build item, the
-     <property>parent-dir</property> key is used to connect this build
-     item into the build tree, and the
+     In this file, the <property>name</property> key is used to
+     specify the name of the build item and the
      <property>platform-types</property> key is used to help &abuild;
      figure out on which platforms it should attempt to build this
      item.  Finally, we want this build item to be able to make the
@@ -1374,7 +1426,7 @@ C:\cygwin\cygwin.bat
     <para>
      To build this item, you would run the command
      <command>abuild</command> in the
-     <filename>basic/cxx-library</filename> directory.  &Abuild; would
+     <filename>basic/cxx-library</filename> directory.  &Abuild; will
      create an output directory whose name would start with
      <filename>abuild-</filename> and be based on the platform or
      platforms on which &abuild; was building this item.  This is the
@@ -1410,7 +1462,7 @@ C:\cygwin\cygwin.bat
      tells &abuild; that these are executable targets rather than
      library targets.  Notice the conspicuous lack of any references to
      the library build item or the location of the headers or libraries
-     that it makes available.  A principle feature of &abuild; is that
+     that it makes available.  A principal feature of &abuild; is that
      this program build item does not need to know that information.
      Instead, it merely declares a dependency on the
      <classname>cxx-library</classname> build item by name.  This is
@@ -1429,23 +1481,18 @@ C:\cygwin\cygwin.bat
      build <classname>cxx-program</classname>.
     </para>
     <para>
-     To build this item, we could just run the
-     <command>abuild</command> command as we did for
-     <classname>cxx-library</classname>, but this would only work
-     properly if <classname>cxx-library</classname> were already built.
-     A better way to build this item would to go to the
-     <filename>cxx-program</filename> directory and run <command>abuild
-     --with-deps</command>.  The <option>--with-deps</option> option to
-     &abuild; tells &abuild; to build all build items that this item
-     depends on before building this item itself.  Using the
-     <option>--with-deps</option> command line option, you can start a
-     build from any build item and let &abuild; automatically take care
-     of building all of its dependencies in the correct order.  (For a
-     complete list of all of &abuild;'s command line options, please
-     see <xref linkend="ref.command-line"/>.)
+     To build this item, we just run the <command>abuild</command>
+     command as we did for <classname>cxx-library</classname>.  This
+     will automatically build dependency
+     <classname>cxx-library</classname> before building
+     <classname>cxx-program</classname>.  In this way, you can can
+     start a build from any build item and let &abuild; automatically
+     take care of building all of its dependencies in the correct
+     order.  (For a complete list of all of &abuild;'s command line
+     options, please see <xref linkend="ref.command-line"/>.)
     </para>
     <para>
-     The output of running <command>abuild --with-deps</command> in the
+     The output of running <command>abuild</command> in the
      <filename>cxx-program</filename> directory when starting from a
      clean build is shown below.  Your actual output will differ
      slightly from this.  In particular, the output below has the
@@ -1482,26 +1529,9 @@ C:\cygwin\cygwin.bat
    </sect1>
    <sect1 id="ref.example.basic.java-library">
     <title>Building a Java Library</title>
-    &javawarning;
     <para>
      In our next example, we'll demonstrate how to build a simple Java
-     library.  &Abuild; has two different ways to build Java code: a
-     <emphasis>property-driven</emphasis> method, and a
-     <emphasis>build.xml-driven</emphasis> method.  The
-     property-driven method of building Java code is truer to
-     &abuild;'s philosophy of using declarative build files but has
-     proven to be inadequate for some of the more complex Java build
-     problems that arise in an enterprise environment.  It is hoped
-     that a future version of &abuild; will provide a more complete
-     answer to the Java build problem, perhaps by integrating with a
-     Java build engine other than <application>Apache
-     Ant</application>.  In the mean time, we will demonstrate the
-     property-driven approach to doing Java builds with &abuild; using
-     this library example.  For an example of the build.xml-based
-     approach, see <xref linkend="ref.example.build-driven-java"/>.
-    </para>
-    <para>
-     You will find the Java example in
+     library.  You will find the Java example in
      <filename>basic/java-library</filename>.  The files here are
      analogous to those in our C++ library example.  First, here is a
      Java implementation of our <classname>BasicLibrary</classname>
@@ -1514,71 +1544,133 @@ C:\cygwin\cygwin.bat
      <property>java</property> instead of the value
      <property>native</property>.  This is always true for Java build
      items.  Next, we'll look at the
-     <filename>Abuild-ant.properties</filename> file:
+     <filename>Abuild.groovy</filename> file:
      <?example basic/java-library/Abuild.groovy?>
-     Property-driven Java build items have this file instead of
-     <filename>Abuild.mk</filename>.  The only thing we have to set
-     here is the property <varname>abuild.jar-name</varname>.  For
-     Java build items, we don't explicitly list the source files.
-     Instead &abuild; automatically finds sources in the
-     <filename>src/java</filename> directory.  There are more
-     properties that can be set, and there are other ways to get files
-     into the JAR file.  We provide detailed information about the
-     directory structure for property-driven Java builds in <xref
-     linkend="ref.directory-structure-for-java-builds"/>.  Finally,
-     look at the <filename>Abuild.interface</filename> file.  This
-     file provides information to other build items about what they
-     should add to their classpaths in order to make use of the JAR
-     file created by this build item:
+     Java build items have this file instead of
+     <filename>Abuild.mk</filename>, and you'll find the contents to
+     be very similar.  The <filename>Abuild.groovy</filename> file
+     contains Groovy code that is executed inside a particular context
+     provided by &abuild;.  Most <filename>Abuild.groovy</filename>
+     files will simply set <firstterm>parameters</firstterm> that
+     describe what will be built.  In this file, we set the
+     <varname>java.jarName</varname> parameter to the name of the JAR
+     file we are creating, and we set the
+     <varname>abuild.rules</varname> parameter to the value
+     <literal>'java'</literal> to indicate that we are using the
+     <filename>java</filename> rules.  For Java build items, we don't
+     explicitly list the source files.  Instead &abuild; automatically
+     finds sources in a source directory which is, by default,
+     <filename>src/java</filename>.  There are many more parameters
+     that can be set, and you have considerable flexibility about how
+     to arrange things and how to get files into your Java archives.
+     &Abuild; aims to allow you to <emphasis>build by
+     convention</emphasis>, but it gives you the flexibility to do
+     things your own way when you want to.  We provide detailed
+     information about the directory structure for Java builds in
+     <xref linkend="ref.directory-structure-for-java-builds"/>.
+    </para>
+    <para>
+     Finally, look at the <filename>Abuild.interface</filename> file.
+     This file provides information to other build items about what
+     they should add to their classpaths in order to make use of the
+     JAR file created by this build item:
      <?example basic/java-library/Abuild.interface?>
+     You'll notice here that we are actually setting four different
+     variables.  Not all of these are required, but the pattern here
+     is one that you may well wish to adopt, especially if you are
+     working in a Java Enterprise environment.  The first statement in
+     the interface file declares a variable called
+     <varname>java-library.archiveName</varname> as a string and
+     initializes it to the value <literal>java-library.jar</literal>.
+     This syntax of declaring and initializing an interface variable
+     was introduced into &abuild; with version 1.1.  Here we adopt a
+     convention of using the build item name as the first field of the
+     variable name, and the literal string
+     <varname>archiveName</varname> as the second field.  By including
+     the name of the build item in the name of the interface variable,
+     we reduce the possibility of creating a name clash.  By providing
+     a variable to hold the name of the archive provided by this build
+     item, we allow other build items to refer to this JAR file by
+     name without having to know what it is called.  The second
+     interface variable, <varname>java-library.archivePath</varname>,
+     contains the full path to the archive.  (Notice that &abuild;
+     puts the JAR file in the <filename>dist</filename> subdirectory
+     of the &abuild; output directory.)  This enables other build
+     items to refer to this archive by path without knowing any
+     details beyond this naming convention and the name of the
+     providing build item.  Making this type of information available
+     in this way is not necessarily a straight Java &ldquo;SE&rdquo;
+     environment, but it can be very useful in a Java &ldquo;EE&rdquo;
+     environment where build items that create EAR files may have to
+     reach into other build items to package their artifacts in higher
+     level archives.  Experience has shown that adopting a convention
+     like this and following it consistently will pay dividends in the
+     end.
+    </para>
+    <para>
+     After setting these two build item-specific variables, we append
+     to two built-in variables: <varname>abuild.classpath</varname>,
+     and <varname>abuild.classpath.manifest</varname>.  Most simple
+     JAR-providing build items will do this.  &Abuild; actually
+     provides multiple classpath variables, each of which is intended
+     to be used in a particular way.  For a discussion, please see
+     XXX.
+    </para>
+    <para>
      As with the C++ library, it is possible to build this item by
      running <command>abuild</command> from the
-     <filename>basic/java-library</filename> directory.  Notice that
-     &abuild; puts the JAR file in the <filename>dist</filename>
-     subdirectory of the &abuild; output directory.
+     <filename>basic/java-library</filename> directory.
     </para>
    </sect1>
    <sect1 id="ref.example.basic.java-program">
     <title>Building a Java Program</title>
-    &javawarning;
     <para>
      In Java, there is no deep distinction between a
      &ldquo;library&rdquo; and a &ldquo;program&rdquo; except that a
      JAR file that provides a program must have a
      <function>main</function> method.  If a JAR file contains a main
      method, it can be executed, though it can also be used as a
-     library.  A JAR file can also contain a <firstterm>manifest
-     file</firstterm> that identifies a class that contains a
-     <function>main</function> method.  Starting with version 1.0.1,
-     &abuild; adds the <property>Main-Class</property> attribute to
-     the manifest file when the <varname>abuild.main-class</varname>
-     property is set in the
-     <filename>Abuild-ant.properties</filename>.
-    </para>
-    <para>
-     Here are the relevant files for the program example:
+     library.  Here are the relevant files for the program example:
      <?example basic/java-program/src/java/com/example/basic/BasicProgram.java?>
      <?example basic/java-program/Abuild.conf?>
      <?example basic/java-program/Abuild.groovy?>
-     Note the addition of the <varname>abuild.main-class</varname> and
-     <varname>abuild.wrapper-name</varname> properties.  If these are
-     both set, &abuild; will create a wrapper executable (script file
-     and/or batch file as appropriate) so that you can run the
-     resulting program with the correct classpath.  The wrapper
-     programs are placed directly in the &abuild; output directory.
+     A JAR file's manifest file may identify a class that contains a
+     <function>main</function> method.  &Abuild; adds the
+     <property>Main-Class</property> attribute to the manifest file
+     when the <varname>java.mainClass</varname> parameter is set in
+     the <filename>Abuild.groovy</filename>.  In addition, &abuild;
+     will create a wrapper script if the
+     <varname>java.wrapperName</varname> parameter is set.  The
+     wrapper script that &abuild; creates may be useful for casual
+     execution of the Java program for testing purposes, but it is
+     generally not a substitution for having your own deployment
+     mechanism.  In particular, the wrapper script references items
+     from your classpath by their paths within the build structure,
+     and additionally, &abuild;'s wrapper scripts are not as portable
+     as the Java code that they help to invoke.
+     <footnote>
+      <para>
+       Specifically, &abuild; generates different wrapper scripts
+       depending on whether you're running on Windows or not.
+       Although it would work to build Java code on UNIX and run it on
+       Windows, or vice versa, wrapper scripts generated on one
+       platform are not portable to the other.
+      </para>
+     </footnote>
     </para>
     <para>
-     Here is the output of running <command>abuild
-     --with-deps</command> in this directory.  As in the C++ program
-     example, the output has been modified slightly: in addition to
-     the <literal>--topdir--</literal> substitution, we have also
-     filtered out time stamps and other strings that could potentially
-     differ between platforms:
+     Here is the output of running <command>abuild</command> in this
+     directory.  As in the C++ program example, the output has been
+     modified slightly: in addition to the
+     <literal>--topdir--</literal> substitution, we have also filtered
+     out time stamps and other strings that could potentially differ
+     between platforms:
      <?qtest basic-java-program.out?>
     </para>
    </sect1>
   </chapter>
  </part>
+<!--XXX HERE-->
  <part id="ref.part2" label="II">
   <title>Normal Operation</title>
   <partintro id="ref.part2.intro">
@@ -5447,7 +5539,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    </sect1>
    <sect1 id="ref.targets.java">
     <title>Java-specific Targets</title>
-    &javawarning;
     <para>
      Java-based build items that use the property-driven build method
      (<filename>Abuild-ant.properties</filename>) define several
@@ -7816,7 +7907,6 @@ endif
   </chapter>
   <chapter id="ref.ant-build-files">
    <title>The Apache Ant Build Files</title>
-    &javawarning;
    <para>
     There are two different Java build files:
     <filename>Abuild-ant.properties</filename> for property-driven
@@ -9077,7 +9167,6 @@ endif
   </chapter>
   <chapter id="ref.java-hooks-and-generators">
    <title>Java Hooks and Code Generators</title>
-    &javawarning;
    <para>
     In this chapter, we explore the use of hooks and code generators
     for property-driven Java builds.  We also demonstrate how to have
@@ -11029,7 +11118,6 @@ flag private INCLUDES = private-include
   </chapter>
   <chapter id="ref.java-archive-types">
    <title>JARs and Other Archives</title>
-    &javawarning;
    <para>
     In this example, we demonstrate how to create different types of
     archive types in Java.  The actual contents of these archives are
@@ -12315,16 +12403,19 @@ native-compiler qcc
         box&rdquo; in a particular build tree.  Note also that rules
         that are part of &abuild; or are declared in a plugin are
         specific to a target type.  This restriction is not present
-        for local rules and rules provided by build-items.  <!-- This
-        parenthetical remark should have been a footnote, but fop 0.94
-        appears not to generate output for footnotes in list
-        items. --> (The reason that rules accessible through the
-        <varname>RULES</varname> variable are segregated by target
-        type is to support loading of <emphasis>base</emphasis> rules
-        that &abuild; loads before loading the actual rules.  This is
-        the mechanism used to make the variable
-        <varname>CCXX_TOOLCHAIN</varname> available to all object-code
-        rules.) <!-- end footnote --> Plugin rules must appear in the
+        for local rules and rules provided by build items.
+        <footnote>
+         <para>
+          The reason that rules accessible through the
+          <varname>RULES</varname> variable are segregated by target
+          type is to support loading of <emphasis>base</emphasis>
+          rules that &abuild; loads before loading the actual rules.
+          This is the mechanism used to make the variable
+          <varname>CCXX_TOOLCHAIN</varname> available to all
+          object-code rules.)
+         </para>
+        </footnote>
+        Plugin rules must appear in the
         <filename>rules/<replaceable>target-type</replaceable></filename>
         directory within a plugin, where
         <replaceable>target-type</replaceable> is the target type to
@@ -17757,6 +17848,13 @@ Y = $(X)
      </listitem>
     </varlistentry>
    </variablelist>
+  </appendix>
+  <appendix id="ref.changes-in-1.1">
+   <title>Major Changes from Version 1.0 to Version 1.1</title>
+   <para>
+    XXX describe changes in 1.1
+    XXX pay particular attention to upgrade gotchas
+   </para>
   </appendix>
   <appendix id="ref.known-limitations">
    <title>Known Limitations</title>

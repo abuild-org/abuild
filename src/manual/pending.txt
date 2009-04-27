@@ -60,9 +60,6 @@ Miscellaneous
 
  * Document built-in interface variables in help/vars.txt
 
- * New acknowledgements: Brian Reid, Kathleen Locher, Joe Schettino,
-   Brandon Barlow for help with the Java redesign and 1.1 testing
-
  * Document ABUILD_FORCE_32BIT and ABUILD_FORCE_64BIT.  See release
    notes.  Mention somewhere that all support for this can be found
    for searching for FORCE_WORDSIZE in the code.  The only references

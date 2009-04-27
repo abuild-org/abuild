@@ -2,12 +2,16 @@
 Before 1.1
 ==========
 
+ * Remember to build documentation with fop from svn.
+   http://svn.apache.org/repos/asf/xmlgraphics/fop/trunk
+
  * Update documentation
 
     - Create unified release notes for next alpha
 
     - manual/pending.txt, manual/groovy-framework.txt
 
+    - check for references to deprecated keys, etc.
 
 ----------------------------------------------------------------------
 

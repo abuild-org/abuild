@@ -33,7 +33,7 @@ $ENV{'ABUILD_COMPAT_LEVEL'} = '1.1';
 cd("work/basic/cxx-program");
 
 $td->runtest("c++ program",
-	     {$td->COMMAND => "abuild --with-deps",
+	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/basic-cxx-program.out",
 	      $td->EXIT_STATUS => 0},
@@ -50,7 +50,7 @@ if ($test_java)
     cd("work/basic/java-program");
 
     $td->runtest("java program",
-		 {$td->COMMAND => "abuild --with-deps",
+		 {$td->COMMAND => "abuild",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/basic-java-program.out",
 		  $td->EXIT_STATUS => 0},

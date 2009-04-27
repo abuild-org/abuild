@@ -1,4 +1,4 @@
 parameters {
-    abuild.rules = 'java'
     java.jarName = 'code.jar'
+    abuild.rules = 'java'
 }
