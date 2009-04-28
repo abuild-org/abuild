@@ -2815,28 +2815,29 @@ C:\cygwin\cygwin.bat
      linkend="ref.build-item-visibility"/>.
     </para>
    </sect1>
-  <!--XXX HERE-->
    <sect1 id="ref.example.simple-build-tree">
     <title>Simple Build Tree Example</title>
     <para>
      Now that the topic of build items and build trees has been
-     explored in somewhat more depth, let's take a look at a simple but
-     complete build tree.  The build tree in
-     <filename>doc/example/general/reference/common</filename> illustrates many of
-     the concepts described above.
+     explored in somewhat more depth, let's take a look at a simple
+     but complete build tree.  The build tree in
+     <filename>doc/example/general/reference/common</filename>
+     illustrates many of the concepts described above.
     </para>
     <para>
      The first file to look at is the <filename>Abuild.conf</filename>
      belonging to this tree's root build item:
      <?example general/reference/common/Abuild.conf?>
-     This is a root build item configuration file.  Notice that it
-     lacks a <property>this</property> key, as is often the case with
-     the root build item.  This <filename>Abuild.conf</filename>
-     contains the names of some child directories and also a build tree
-     attribute: <property>supported-traits</property>, which lists the
-     traits that are allowed in the build tree.  We will return to the
-     topic of traits in <xref linkend="ref.traits"/>.  In the mean
-     time, we will direct our focus to the child build items.
+     This is a root build item configuration file, as you can see by
+     the presence of the <property>tree-name</property> key.  Notice
+     that it lacks a <property>name</property> key, as is often the
+     case with the root build item.  This
+     <filename>Abuild.conf</filename> contains the names of some child
+     directories and also a build tree attribute:
+     <property>supported-traits</property>, which lists the traits
+     that are allowed in the build tree.  We will return to the topic
+     of traits in <xref linkend="ref.traits"/>.  In the mean time, we
+     will direct our focus to the child build items.
     </para>
     <para>
      The first child of the root build item of this tree is in the
@@ -2844,14 +2845,20 @@ C:\cygwin\cygwin.bat
      <filename>Abuild.conf</filename>:
      <?example general/reference/common/lib1/Abuild.conf?>
      This build item is called <classname>common-lib1</classname>.
-     Notice that the name of the build item is not the same as the name
-     of the directory, but it is based on the name of the directory.
-     This is a typical strategy for naming build items.  &Abuild;
-     doesn't care how you name build items as long as they conform to
-     the syntactic restrictions and are unique within a build tree.
-     Coming up with a naming structure that parallels your system's
-     architecture and/or your file system layout is a good way to help
-     ensure that you do not create conflicting build item names.
+     Notice that the name of the build item is not the same as the
+     name of the directory, but it is based on the name of the
+     directory.  This is a typical strategy for naming build items.
+     &Abuild; doesn't care how you name build items as long as they
+     conform to the syntactic restrictions and are unique within a
+     build tree.  Coming up with a naming structure that parallels
+     your system's architecture is a good way to help ensure that you
+     do not create conflicting build item names.  However, you should
+     avoid creating build item names that slavishly follow your
+     directory structure since doing so will make it needlessly
+     difficult for you to move things around.  A major feature of
+     &abuild; is that nothing cares where a build item is located, so
+     don't set a trap for yourself in which you have to rename a build
+     item when you move it!
     </para>
     <para>
      This build item does not have any build or interface files.  It is
@@ -2898,12 +2905,14 @@ C:\cygwin\cygwin.bat
      directory.  This simply illustrates that &abuild; doesn't impose
      any restrictions on how you might want to lay out your build
      items, though it is recommended that you pick a consistent way
-     and stick with it for any given build tree.  We will not study
+     and stick with it for any given build tree.  You should also
+     avoid paths that point into other build items.  Instead, depend
+     on the other item and put the variable there.  We will not study
      the source and header files in this example here, but you are
      encouraged to go to the
-     <filename>doc/example/general/reference/common</filename> directory in your
-     &abuild; source tree or installation directory to study the files
-     further on your own.
+     <filename>doc/example/general/reference/common</filename>
+     directory in your &abuild; source tree or installation directory
+     to study the files further on your own.
     </para>
     <para>
      Next, look at the <filename>test</filename> directory.  Here is
@@ -2942,19 +2951,25 @@ C:\cygwin\cygwin.bat
    </sect1>
   </chapter>
   <chapter id="ref.multiple-trees">
-   <title>External Build Trees</title>
+   <title>Multiple Build Trees</title>
    <para>
     In large development environments, it is common to have
-    collections of code that may be shared across multiple projects.
-    Ideally, such collections of shared code should be accessible by
-    multiple projects but should not be able to access code from the
-    those projects.  By creating this one-way relationship between
-    project code and common code, it is possible to ensure that the
-    common code is not modified to <emphasis>accidentally</emphasis>
-    depend on project code.  &Abuild; provides the ability to do this
-    through the use of <firstterm>external build trees</firstterm>,
-    also referred to as <firstterm>externals</firstterm>.  We define
-    the following additional terms:
+    collections of code that may be shared across multiple projects,
+    and it's also common to have multiple development efforts being
+    worked in parallel with the intention of integrating them at a
+    later date.  Ideally, such collections of shared code should be
+    accessible by multiple projects but should not be able to access
+    code from the those projects, and parallel development efforts
+    should be kept independent to the maximum possible extent.  In
+    order to support this distributed and parallel style of software
+    development, &abuild; allows you to divide your work up into
+    multiple build trees, which coexist in a <firstterm>build
+    forest</firstterm>.  These trees can remain completely independent
+    from each other, and you can also establish one-way dependency
+    relationships among trees.
+   </para>
+   <para>
+    We define the following additional terms:
     <variablelist>
      <varlistentry>
       <term>local build tree</term>
@@ -2973,162 +2988,120 @@ C:\cygwin\cygwin.bat
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>external build tree</term>
+      <term>dependent build tree</term>
       <listitem>
        <para>
         <indexterm>
          <primary>build tree</primary>
-         <secondary>external</secondary>
+         <secondary>dependent</secondary>
         </indexterm>
         <indexterm>
-         <primary>external build tree</primary>
+         <primary>dependent build tree</primary>
         </indexterm>
-        <indexterm>
-         <primary>external</primary>
-        </indexterm>
-        An <firstterm>external build tree</firstterm> is a separate
-        build tree that can supplement the local build tree.  Build
-        items in the local build tree can resolve the names of build
-        items in external build trees, but build items in external
-        build trees cannot see items in the local tree.
+        A <firstterm>dependent build tree</firstterm> is a separate
+        build tree whose items can supplement the local build tree.
+        Build items in the local build tree can resolve the names of
+        build items in dependent build trees, but build items in
+        dependent build trees cannot see items in the local tree.
        </para>
       </listitem>
      </varlistentry>
     </variablelist>
    </para>
-   <sect1 id="ref.usign-externals">
-    <title>Using External Build Trees</title>
+   <sect1 id="ref.using-tree-deps">
+    <title>Using Dependent Build Trees</title>
+    <para>
+     Even when &abuild; knows about multiple trees, it still won't
+     allow items in one build tree to refer to items in other trees
+     without an explicit instruction to do so.  This makes it possible
+     to ensure that items in one tree are not
+     <emphasis>accidentally</emphasis> modified to depend on items in
+     a tree that is supposed to be unrelated.  When you want items in
+     one tree to be able to use items in another tree, you declare a
+     <firstterm>tree dependency</firstterm> of one tree on another.
+     This creates a one-way relationship between the two trees such
+     that items in the <emphasis>depending</emphasis> tree can see
+     items in the <emphasis>dependent</emphasis> tree, but no
+     visibility is possible in the other direction.  To declare a tree
+     dependency, you list the name of the dependent tree in the
+     <property>tree-deps</property> key of the depending tree's
+     <filename>Abuild.conf</filename> file.  As with item dependencies
+     listed in <property>deps</property>, &abuild; requires that there
+     are no cycles among tree dependencies.
+    </para>
     <para>
      There is nothing special about a build tree that makes it able to
-     be an external: any tree can be an external.  In order for one
-     build tree to reference another build tree as an external, the
-     first tree must configure its root build item's
-     <filename>Abuild.conf</filename> to point to the external tree's
-     root directory.  This is done by adding an
-     <property>external-dirs</property> key to the root build item's
-     <filename>Abuild.conf</filename>.  The
-     <property>external-dirs</property> key, like the
-     <property>child-dirs</property> key, contains a space-separated
-     list of paths.  Unlike with <property>child-dirs</property>, in
-     this case, there is no reciprocation; <emphasis>i.e.</emphasis>,
-     nothing in the external tree points back to the referring tree.
-     External trees can be specified as either relative paths or as
-     absolute paths.  If an external tree is specified as a relative
-     path, then &abuild; will attempt to resolve it in a backing area
-     (see <xref linkend="ref.backing-areas.resolving-externals"/>) if
-     it is not found.
+     be a dependent tree: any tree can depend on any other tree as
+     long as no dependency cycles are created.  In order for one build
+     tree to depend on another, the first tree must configure its root
+     build item's <filename>Abuild.conf</filename> to list the
+     dependent tree's name in its <property>tree-deps</property> key.
     </para>
     <para>
-     In addition to paths, there are two options that may be specified
-     for each external: the <option>-ro</option> option, which makes
-     an external read-only, and the
-     <option>-winpath=<replaceable>windows-path</replaceable></option>
-     option, which allows an alternative path to be used only when
-     running in a Windows environment.
-     <footnote>
-      <para>
-       Our syntax does not allow spaces to appear in any external path
-       names, including the argument to <option>-winpath</option>.  In
-       Windows, you can always use the short form of the name, which
-       you can find using the <command>dir /x</command> command from
-       the Windows command prompt.
-      </para>
-     </footnote>
-     For example, this line makes <filename>../common</filename> a
-     regular external and <filename>/opt/abuild_library</filename> a
-     read-only external that can be found at
-     <filename>O:/abuild_library</filename> on Windows systems and
-     <filename>/opt/abuild_library</filename> on non-Windows systems:
-
-     <programlisting>external-dirs: ../common /opt/abuild_library -winpath=O:/abuild_library -ro
-</programlisting>
-     &Abuild; will never attempt to build an item in a read-only
-     external tree when the build is started in a tree that declares
-     it as a read-only external.  You must therefore make sure that
-     all your read-only externals are fully built for all platforms on
-     which you will use their items.  Read-only externals can be
-     useful for making libraries of utility build items available to a
-     large number of projects, or they can just be used to speed up
-     your builds if your external area is relatively static and you
-     don't mind manually rebuilding it when you make changes to it.
-     If more than one developer is making use of the same physical
-     external tree, it is recommended that they all declare that tree
-     as a read-only external since this will prevent multiple users
-     from trying to build the same items at the same time.
-    </para>
-    <para>
-     Once you set up another tree as an external to your tree, all
-     build items defined in the external build tree are available to
-     you (subject to normal scoping rules) as if they were in your
+     Once you set up another tree as a tree dependency of your tree,
+     all build items defined in the dependent build tree are available
+     to you (subject to normal scoping rules) as if they were in your
      local build tree.  This means that none of the build items in
      your build tree may have the same name as any build item in the
-     external tree.  Note that the external build tree is not affected
-     in any way by being referred to as an external.  In order to
+     dependent tree.  Note that the dependent tree is not affected in
+     any way by being referred to as a tree dependency.  In order to
      avoid build item name clashes, it's a good idea to pick a naming
      convention for your build items that includes some kind of
      tree-based prefix, as we have done with names like
      <classname>common-lib1</classname>.
     </para>
-    <para>
-     When declaring an external, you must give some thought as to
-     whether you wish to use a relative path or an absolute path.  In
-     general, if your intention is to use an external tree to contain
-     code that is parallel to your development environment, such as
-     having a collection of shared code used by many related projects
-     that live together in a version control system, you will probably
-     want to use relative paths to external trees.  On the other hand,
-     if your externals contain libraries of build items that are
-     required to be installed in a certain location on your
-     development systems, an absolute path may be more appropriate.
-     Just keep in mind that using absolute paths for your externals
-     creates a dependency from inside your build tree to files located
-     in a specific place outside of your build tree.  This may be
-     appropriate in some cases, but it may not always be what you
-     want.
-     <footnote>
-      <para>
-       For example, if your backing area declares an external using an
-       absolute path and your root <filename>Abuild.conf</filename> is
-       a copy of your backing area's root
-       <filename>Abuild.conf</filename>, you can't shadow the external
-       locally without modifying your root
-       <filename>Abuild.conf</filename>.  (Backing areas are discussed
-       in <xref linkend="ref.backing-areas"/>.)  If your external were
-       specified as a relative path, you would be able to shadow it by
-       simply creating it in the correct location, thus preventing it
-       from being resolved in the backing area.
-      </para>
-     </footnote>
-    </para>
    </sect1>
-   <sect1 id="ref.example.external-build-tree">
-    <title>External Build Tree Example</title>
+   <sect1 id="ref.example.dependent-build-tree">
+    <title>Dependent Build Tree Example</title>
     <para>
-     We will examine a new build tree that uses the build tree from
-     our previous example (see <xref
-     linkend="ref.example.simple-build-tree"/>) as an external.  This
-     new tree, which we will call the project build tree, can be found
-     at <filename>doc/example/general/reference/project</filename>.  The first
-     file we examine is the new build tree's root build item's
+     In order for &abuild; to use multiple trees, it must be able to
+     find the roots of all the trees when it traverses the file system
+     looking for <filename>Abuild.conf</filename> files.  As described
+     earlier, &abuild; locates the root of the forest by looking up
+     toward the root of the file system for other
+     <filename>Abuild.conf</filename> files that list previous
+     <filename>Abuild.conf</filename> directories in their
+     <filename>child-dirs</filename> key.  The parent directory of our
+     previous example contains (see <xref
+     linkend="ref.example.simple-build-tree"/>) the following
+     <filename>Abuild.conf</filename> file:
+     <?example general/reference/Abuild.conf?>
+     This is an unnamed build item containing only a
+     <property>child-dirs</property> key.  The
+     <property>child-dirs</property> key lists not only the
+     <filename>common</filename> directory, which is the root of the
+     <filename>common</filename> tree, but also two other directories:
+     <filename>project</filename> and <filename>derived</filename>,
+     each of which we will discuss below.  These directories contain
+     additional build tree root build items, thus making them known to
+     any &abuild; invocation that builds <filename>common</filename>.
+     It is also okay to create one build tree underneath another named
+     tree.  As with build items, having one tree physically located
+     beneath another doesn't have any implications about the dependency
+     relationships among the trees.
+    </para>
+    <para>
+     We will examine a new build tree that declares the build tree
+     from our previous example as an dependency.  This new tree, which
+     we will call the project build tree, can be found at
+     <filename>doc/example/general/reference/project</filename>.  The
+     first file we examine is the new build tree's root build item's
      <filename>Abuild.conf</filename>:
      <?example general/reference/project/Abuild.conf?>
      This build item configuration file, in addition to having the
-     <property>child-dirs</property> key, also has an
-     <property>external-dirs</property> key.  In this case, the value
-     of this key is the relative path <filename>../common</filename>.
-     It is common for an external tree to be in a parallel directory
-     structure to your build tree, so having the location start with
-     &ldquo;<filename>..</filename>&rdquo; is not unusual.  There are
-     also valid reasons to have an external build tree nested inside
-     of your own tree.  As always, it's best to come up with some
-     conventions and to follow them uniformly.
+     <property>tree-name</property> key (indicating that it is a root
+     build item), also has a <property>tree-deps</property> key, whose
+     value is the word <filename>common</filename>, which is the name
+     of the tree whose items we want to use.  Note that, as with build
+     items, &abuild; never requires you to know the location of a
+     build tree.
     </para>
     <para>
      Inside the project build tree, the
      <classname>project-lib</classname> build item is defined inside
      the <filename>lib</filename> directory.  It is set up exactly the
      same way as <classname>common-lib1</classname> and the other
-     libraries in the external tree.  Here is its
+     libraries in the dependent tree.  Here is its
      <filename>Abuild.conf</filename>:
      <?example general/reference/project/lib/Abuild.conf?>
      Now look at <classname>project-lib.src</classname>'s
@@ -3136,8 +3109,9 @@ C:\cygwin\cygwin.bat
      <?example general/reference/project/lib/src/Abuild.conf?>
      Notice that it declares a dependency on
      <classname>common-lib1</classname>, which is defined in the
-     external tree.  This works because &abuild; automatically makes
-     available to you all the build items in any external build tree.
+     <filename>common</filename> tree.  This works because &abuild;
+     automatically makes available to you all the build items in any
+     dependent build trees.
     </para>
     <para>
      This build tree also includes a main program, but we will not go
@@ -3147,20 +3121,23 @@ C:\cygwin\cygwin.bat
      discussion of traits (see <xref linkend="ref.traits"/>).
     </para>
     <para>
-     When you declare another build tree as an external, you
-     automatically inherit any externals that
-     <emphasis>that</emphasis> tree declared as externals as well.  If
-     this were not the case, &abuild; would not be able to resolve
-     dependencies declared in the external if those dependencies were
-     resolved in <emphasis>its</emphasis> externals.  To illustrate
-     this, we have a third build tree located in
+     When you declare another build tree as a tree dependency, you
+     automatically inherit any tree dependencies that
+     <emphasis>that</emphasis> tree declared, so like item
+     dependencies, tree dependencies are transitive.  If this were not
+     the case, &abuild; would not be able to resolve dependencies
+     declared in the dependent tree if those dependencies were
+     resolved in one of <emphasis>its</emphasis> dependent trees.  To
+     illustrate this, we have a third build tree located in
      <filename>doc/example/general/reference/derived</filename>.  This
      build tree is for a second project that is derived from the first
-     project.  This build tree declares
-     <filename>../project</filename> as an external build tree.  For a
-     diagram of the entire <filename>general/reference</filename>
-     collection of build tress, see <xref
-     linkend="fig.general-reference"/>.
+     project.  This build tree declares <filename>project</filename>
+     as an tree dependency as you can see in its root
+     <filename>Abuild.conf</filename> file:
+     <?example general/reference/derived/Abuild.conf?>
+     For a diagram of the entire
+     <filename>general/reference</filename> collection of build tress,
+     see <xref linkend="fig.general-reference"/>.
      <figure id="fig.general-reference">
       <title>Build Trees in <filename>general/reference</filename></title>
       <mediaobject>
@@ -3169,29 +3146,27 @@ C:\cygwin\cygwin.bat
        </imageobject>
        <caption>
         <para>
-         The <filename>derived</filename> build tree declares the
-         <filename>project</filename> build tree as an external.  The
-         <filename>project</filename> build tree declares the
-         <filename>common</filename> build tree as an external.
+         The <filename>derived</filename> build tree declares a
+         dependency on the <filename>project</filename> build tree.
+         The <filename>project</filename> build tree declares a
+         dependency on the <filename>common</filename> build tree.
         </para>
        </caption>
       </mediaobject>
      </figure>
-     Here is its root <filename>Abuild.conf</filename>:
-     <?example general/reference/derived/Abuild.conf?>
-     It contains a <classname>derived-main</classname> build item
-     structure identically to the C++ program build items we've seen
-     earlier.  Here at the main program's
-     <filename>Abuild.conf</filename>:
+     The <filename>derived</filename> build tree contains a
+     <classname>derived-main</classname> build item structured
+     identically to the C++ program build items we've seen earlier.
+     Here at the main program's <filename>Abuild.conf</filename>:
      <?example general/reference/derived/main/src/Abuild.conf?>
      In this file, you can see that
      <classname>derived-main.src</classname> depends on
      <classname>project-lib</classname> from the
-     <filename>../project</filename> build tree and also
+     <filename>project</filename> build tree and also
      <classname>common-lib2</classname> which is found in
-     <filename>../project</filename>'s external located at
-     <filename>../common</filename>.  We will return to this build
-     tree in the examples at the end of <xref
+     <filename>project</filename>'s dependency,
+     <filename>common</filename>.  We will return to this build tree
+     in the examples at the end of <xref
      linkend="ref.what-to-build"/>.
     </para>
    </sect1>
@@ -3200,12 +3175,12 @@ C:\cygwin\cygwin.bat
    <title>Telling &Abuild; What to Build</title>
    <para>
     Up to this point, we have seen only simple invocations of &abuild;
-    to build a single item or an item with all of its dependencies.
-    &Abuild; offers several ways of creating sets of build items to
-    build or clean.  These are known as <firstterm>build
-    sets</firstterm>.  In addition, &abuild;'s list of items to build
-    can be expanded or restricted based on
-    <firstterm>traits</firstterm> that are assigned to build items.
+    to build a single item with all of its dependencies.  &Abuild;
+    offers several ways of creating sets of build items to build or
+    clean.  These are known as <firstterm>build sets</firstterm>.  In
+    addition, &abuild;'s list of items to build can be expanded or
+    restricted based on <firstterm>traits</firstterm> that are
+    assigned to build items.
    </para>
    <sect1 id="ref.targets">
     <title>Build Targets</title>
@@ -3333,14 +3308,14 @@ C:\cygwin\cygwin.bat
      <primary>build sets</primary>
     </indexterm>
     <para>
-     We have already seen the <option>--with-deps</option> option,
-     which tells &abuild; to build all the build items on which the
-     current item depends (directly or indirectly) in addition to
-     building the current item.  Now we generalize on this concept by
-     introducing <firstterm>build sets</firstterm>.  A build set is a
-     collection of build items defined by certain criteria.  Build
-     sets can be used both to tell &abuild; which items to build and
-     also to tell it which items to clean.
+     We have already seen that, by default, &abuild; will build all of
+     the build items on which the current item depends (directly or
+     indirectly) in addition to building the current item.  Now we
+     generalize on this concept by introducing <firstterm>build
+     sets</firstterm>.  A build set is a collection of build items
+     defined by certain criteria.  Build sets can be used both to tell
+     &abuild; which items to build and also to tell it which items to
+     clean.
      <footnote>
       <para>
        In retrospect, the term <firstterm>build item set</firstterm>
@@ -3350,27 +3325,25 @@ C:\cygwin\cygwin.bat
        sometimes call them <firstterm>clean sets</firstterm> instead.
       </para>
      </footnote>
-     When &abuild; is invoked with no build set specified and without
-     the <option>--with-deps</option>, it builds the build item whose
-     <filename>Abuild.conf</filename> is in the current directory,
-     assuming that all items that this build item depends on are up to
-     date.
+     When &abuild; is invoked with no build set specified, its default
+     behavior is to build all of the current item's dependencies as
+     well as the current item.  Sometimes, you may wish to assume all
+     the dependencies are up to date and just build the current build
+     item <emphasis>without</emphasis> building any of its
+     dependencies.  To do this, you may invoke &abuild; with the
+     <option>--no-deps</option> option.  This will generally only work
+     if all dependencies are up to date.  Using
+     <option>--no-deps</option> is most convenient when you are in the
+     midst of the edit/compile/test cycle on a single build item and
+     you want to save the time of checking whether a potentially long
+     chain of dependencies is already up to date.
      <footnote>
       <para>
-       Ideally, one would never invoke &abuild; in this way: the
-       maximum reliability would be achieved if &abuild; always
-       checked all dependent build items.  In practice, however, the
-       typical development process involves multiple cycles of
-       changing files and recompiling individual units of code while
-       the rest of the system stays the same.  In these cases, having
-       &abuild; re-evaluate all the dependencies when you know that
-       nothing has changed would cause an unnecessary increase in the
-       amount of time you spend waiting for &abuild; to run.
+       In &abuild; 1.0, this was the default behavior, and the
+       <option>--with-deps</option> option was required in order to
+       tell &abuild; to build the dependencies.
       </para>
      </footnote>
-     When any build set is specified, &abuild; attempts to build all
-     dependencies, just like when <option>--with-deps</option> is
-     specified.
     </para>
     <para>
      To instruct &abuild; to build all the items in a specific build
@@ -3389,11 +3362,13 @@ C:\cygwin\cygwin.bat
      line, &abuild; will not, by default, apply those targets to items
      that it only added to the build set to satisfy dependencies; it
      will build those items with the <command>all</command> target
-     instead.  If you want &abuild; to build those items with
-     explicitly named targets as well, use the
-     <option>--apply-targets-to-deps</option> option.  When cleaning
-     with a build set, &abuild; does not ordinarily also clean the
-     dependencies of the items in the set.  To apply the
+     instead.  This is important as it enables you to add custom
+     targets to a build item without necessarily having those targets
+     be defined for dependent build items.  If you want &abuild; to
+     build dependent items with explicitly named targets as well, use
+     the <option>--apply-targets-to-deps</option> option.  When
+     cleaning with a build set, &abuild; does not ordinarily also
+     clean the dependencies of the items in the set.  To apply the
      <command>clean</command> target to all the dependencies as well,
      we also use the <option>--apply-targets-to-deps</option> option.
      This is a bit subtle, so we present several examples below.
@@ -3407,7 +3382,7 @@ C:\cygwin\cygwin.bat
         <para>
          the current build item (<emphasis>i.e.</emphasis>, the build
          item whose <filename>Abuild.conf</filename> is in the current
-         directory); <option>--with-deps</option> is equivalent to
+         directory); &abuild;'s default behavior is identical to
          <option>--build=current</option>
         </para>
        </listitem>
@@ -3451,9 +3426,21 @@ C:\cygwin\cygwin.bat
        <term><option>local</option></term>
        <listitem>
         <para>
-         all items in the build tree containing the item in the current
-         directory; <emphasis>i.e.</emphasis>, the local build tree
-         without any of its externals
+         all items in the build tree containing the item in the
+         current directory; <emphasis>i.e.</emphasis>, the local build
+         tree without any of its trees dependencies, noting that items
+         in dependent trees may, as always, still to be built to
+         satisfy dependencies
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><option>deptrees</option></term>
+       <listitem>
+        <para>
+         all items in the build tree containing the item in the
+         current directory as well as all items in any of its tree
+         dependencies
         </para>
        </listitem>
       </varlistentry>
@@ -3461,8 +3448,8 @@ C:\cygwin\cygwin.bat
        <term><option>all</option></term>
        <listitem>
         <para>
-         all items in the local build tree and all writable external
-         build trees
+         all items in all known build trees, including those items in
+         trees that are not related to the current build tree
         </para>
        </listitem>
       </varlistentry>
@@ -3485,20 +3472,35 @@ C:\cygwin\cygwin.bat
       </varlistentry>
      </variablelist>
     </para>
+    <para>
+     Ordinarily, when you invoke <command>abuild clean</command> or
+     <command>abuild
+     --clean=<replaceable>set-name</replaceable></command>, &abuild;
+     will remove all output directories for any affected build items.
+     You may also restrict &abuild; to remove only specified output
+     directories.  There are two ways to do this.  One way is to run
+     <command>abuild clean</command> from inside an output directory.
+     In that case, &abuild; will remove all the files in the output
+     directory.
+     <footnote>
+      <para>
+       In &abuild; 1.0, &abuild; actually passed the
+       <command>clean</command> target to the backend, but &abuild;
+       version 1.1 handles this <command>clean</command> invocation
+       internally as it does for other <command>clean</command>
+       invocations.  The other way is to use the
+       <option>--clean-platforms</option> option, which may be
+       followed by a shell-style regular expression that is matched
+       against the platform portion of the output directory name.
+       Examples are shown below.
+      </para>
+     </footnote>
+    </para>
     <sect2 id="ref.build-set.invocation-examples">
      <title>Example Build Set Invocations</title>
      <variablelist>
       <varlistentry>
        <term><command>abuild</command></term>
-       <listitem>
-        <para>
-         builds the current directory without building any of its
-         dependencies
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><command>abuild --with-deps</command></term>
        <listitem>
         <para>
          builds the <command>all</command> target for all dependencies
@@ -3509,8 +3511,17 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term><command>abuild --no-deps</command></term>
+       <listitem>
+        <para>
+         builds the current directory without building any of its
+         dependencies
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term>
-        <command>abuild --with-deps check</command>
+        <command>abuild check</command>
         (or <command>abuild --build=current check</command>)
        </term>
        <listitem>
@@ -3522,7 +3533,7 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><command>abuild --build=current --apply-targets-to-deps check</command></term>
+       <term><command>abuild --apply-targets-to-deps check</command></term>
        <listitem>
         <para>
          builds the <command>check</command> target for the current
@@ -3537,7 +3548,16 @@ C:\cygwin\cygwin.bat
          builds the <command>check</command> target for all build items
          in the local build tree and the <command>all</command> target
          for any dependencies of any local items that may be satisfied
-         in external trees
+         in other trees
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><command>abuild --build=deptrees check</command></term>
+       <listitem>
+        <para>
+         builds the <command>check</command> target for all build items
+         in the local build tree and all of its tree dependencies
         </para>
        </listitem>
       </varlistentry>
@@ -3558,19 +3578,19 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          removes all output directories for all build items at or below
-         the current directory
+         the current directory but not any of its dependencies
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><command>abuild --clean=all --clean-platform java
-       --clean-platform '*.ix86.*'</command></term>
+       <term><command>abuild --clean=all --clean-platforms java
+       --clean-platforms '*.ix86.*'</command></term>
        <listitem>
         <para>
          for all build items, removes all
          <filename>abuild-java</filename> output directories and all
          output directories for platforms containing the string
-         &ldquo;<filename>.ix86.</filename>&rdquo;.
+         &ldquo;<filename>.ix86.</filename>&rdquo;
         </para>
        </listitem>
       </varlistentry>
@@ -3590,7 +3610,8 @@ C:\cygwin\cygwin.bat
         <para>
          removes all output directories for all build items at or
          below the current directory and all of their direct or
-         indirect dependencies
+         indirect dependencies, including those that are not located
+         at or below the current directory
         </para>
        </listitem>
       </varlistentry>
@@ -3612,6 +3633,24 @@ C:\cygwin\cygwin.bat
          builds the <command>all</command> target for any item whose
          name ends with <literal>.test</literal> and any of those
          items' direct or indirect dependencies
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><command>abuild -b all</command></term>
+       <listitem>
+        <para>
+         builds the <command>all</command> target for all build items
+         in all known trees
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><command>abuild -c all</command></term>
+       <listitem>
+        <para>
+         removes all output directories in all the build trees in the
+         forest
         </para>
        </listitem>
       </varlistentry>
@@ -3667,6 +3706,40 @@ C:\cygwin\cygwin.bat
      anything from the ones whose builds it triggers, it is
      appropriate to use <property>build-also</property> instead of a
      dependency.
+    </para>
+   </sect1>
+   <sect1 id="ref.rdeps">
+    <title>Building Reverse Dependencies</title>
+    <indexterm>
+     <primary>reverse dependencies</primary>
+    </indexterm>
+    <indexterm>
+     <primary>dependencies</primary>
+     <secondary>reverse</secondary>
+    </indexterm>
+    <para>
+     Starting with &abuild; version 1.1, it is possible to use the
+     <option>--with-rdeps</option> flag to instruct &abuild; to
+     iteratively expand the build set by adding all <emphasis>reverse
+     dependencies</emphasis> of any build item already in the build
+     set.  When this option is used, all forward and reverse
+     dependencies of every item in the build set will also be in the
+     build set.
+     <footnote>
+      <para>
+       Stated formally, we would say that the build set is closed with
+       respect to dependencies.
+      </para>
+     </footnote>
+     This can be especially useful if you are changing a widely used
+     item and you want to make sure your change didn't break any build
+     items that use your item.  Since the effect of
+     <option>--with-rdeps</option> is applied until all forward and
+     reverse dependencies of all items in the build set are also in
+     the build set, specifying this option may add a lot of build
+     items to the build set.  For additional details on how the build
+     set is constructed, see <xref
+     linkend="ref.construction-of-build-sets"/>..
     </para>
    </sect1>
    <sect1 id="ref.traits">
@@ -3737,11 +3810,11 @@ C:\cygwin\cygwin.bat
       its build tree.  The list of traits supported in a build tree is
       given as the value of the <property>supported-traits</property>
       key in the root build item's <filename>Abuild.conf</filename>.
-      The list of supported traits is inherited through external
-      trees, so any trait declared as valid in any external trees are
-      also available.  The set of traits that can be specified on the
-      command line is the union of all traits allowed by all known
-      trees.
+      The list of supported traits is inherited through tree
+      dependencies, so any trait declared as valid in any dependent
+      trees are also available.  The set of traits that can be
+      specified on the command line is the union of all traits allowed
+      by all known trees.
      </para>
      <para>
       Traits listed in the <property>traits</property> key can be made
@@ -3851,7 +3924,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
      <para>
       For more information about how traits are handled with respect
-      to backing areas and externals, please see <xref
+      to backing areas and tree dependencies, please see <xref
       linkend="ref.computing-valid-traits"/>.  For more detailed
       information about how build sets are constructed with respect to
       traits, please see <xref
@@ -3896,9 +3969,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          Run both the <command>deploy</command> and the
          <command>test</command> targets for any build items in the
          local build tree (the current build item's tree excluding its
-         externals) that have both the <property>deployable</property>
-         and the <property>tester</property> traits either specified
-         alone or in reference to other build items.  Run the
+         tree dependencies) that have both the
+         <property>deployable</property> and the
+         <property>tester</property> traits either specified alone or
+         in reference to other build items.  Run the
          <command>all</command> target for their dependencies.
         </para>
        </listitem>
@@ -4040,8 +4114,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <filename>reference/common</filename> directory, we can run
       <command>abuild --build=local no-op</command> to tell &abuild;
       to run the special <command>no-op</command> target for every
-      build item in the local build tree.  Since this tree has no
-      externals, there is no chance that there are any dependencies
+      build item in the local build tree.  Since this tree has no tree
+      dependencies, there is no chance that there are any dependencies
       that are satisfied outside of the local build tree.  Running
       this command produces the following results (with the native
       platform again replaced by the string
@@ -4054,11 +4128,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <footnote>
        <para>
         In fact, when &abuild; creates a build order, it starts with a
-        lexically sorted list of build items and overrides the
-        ordering based on dependencies.  The exact order of build
-        items, other than that dependencies are built before items
-        that depend on them, should be considered an implementation
-        detail and not relied upon.
+        lexically sorted list of build trees and re-orders it as
+        needed so that trees appear in dependency order.  Then, within
+        each tree, it does the same with items.  The effect is that
+        items build by tree with most dependent trees building earlier
+        and, with each tree, most dependent items building earlier.
+        Ties are resolved by lexical ordering.  That said, the exact
+        order of build items, other than that dependencies are built
+        before items that depend on them, should be considered an
+        implementation detail and not relied upon.  Also, keep in mind
+        that, in a multithreaded build, the order is not
+        deterministic, other than that no item's build is started
+        before all its dependencies' builds have completed.
        </para>
       </footnote>
       Since <classname>common-lib2.src</classname> depends on
@@ -4114,15 +4195,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <option>-k</option> option to &abuild;.  When run with the
       <option>-k</option> option, &abuild; will continue building
       other items after one item fails.  It will also exit with an
-      abnormal exit status after it builds everything that it can.
-      When run with <option>-k</option>, &abuild; also passes the
-      corresponding flags to the backends so that they will try to
-      build as much as they can without stopping on the first error.
-      Both <application>make</application> and
-      <application>ant</application> behave similarly to &abuild;:
-      they will keep going on failure, skip any targets that depend on
-      failed targets, and exit abnormally if any failures are
-      detected.
+      abnormal exit status after it builds everything that it can, and
+      it will provide a summary of what failed.  When run with
+      <option>-k</option>, &abuild; also passes the corresponding
+      flags to the backends so that they will try to build as much as
+      they can without stopping on the first error.  Both the
+      <application>make</application> and
+      <application>groovy</application> backends behave similarly to
+      &abuild;: they will keep going on failure, skip any targets that
+      depend on failed targets, and exit abnormally if any failures
+      are detected.
      </para>
      <para>
       Ordinarily, if one build item fails, &abuild; will not attempt
@@ -4149,12 +4231,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
     </sect2>
     <sect2 id="ref.example.project-code-area">
-     <title>External Build Tree Example: Project Code Area</title>
+     <title>Dependent Build Tree Example: Project Code Area</title>
      <para>
       Returning to the project area, we demonstrate how dependencies
-      may be satisfied in externals and the effect this has on the
-      build set.  Under <filename>reference/project</filename>, we have
-      just two public build items called
+      may be satisfied in dependent trees and the effect this has on
+      the build set.  Under <filename>reference/project</filename>, we
+      have just two public build items called
       <classname>project-main</classname> and
       <classname>project-lib</classname>.  The
       <classname>project-lib</classname> build item is structured like
@@ -4162,27 +4244,30 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <classname>project-main</classname> build item has a
       <filename>src</filename> directory that builds an executable and
       has its own test suite.  We have already seen that
-      <filename>reference/project/Abuild.conf</filename> has an
-      <property>external-dirs</property> key that points to
-      <filename>../common</filename> and that items from the project
-      tree depend on build items from <filename>../common</filename>.
-      Specifically, <classname>project-lib</classname> depends on
+      <filename>reference/project/Abuild.conf</filename> has a
+      <property>tree-deps</property> key that lists
+      <filename>common</filename> and that items from the
+      <filename>project</filename> tree depend on build items from
+      <filename>common</filename>.  Specifically,
+      <classname>project-lib</classname> depends on
       <classname>common-lib1</classname> and
       <classname>project-main</classname> depends on
       <classname>common-lib2</classname> which in turn depends on
       <classname>common-lib3</classname>.
      </para>
      <para>
-      If we go to <filename>reference/project/main/src</filename> and run
-      <command>abuild --build=current no-op</command>, we see the
-      following output:
+      If we go to <filename>reference/project/main/src</filename> and
+      run <command>abuild no-op</command>, we see the following
+      output:
       <?qtest reference-project-main-no-op.out?>
       Notice here that &abuild; only built the build items whose names
-      end with <classname>.src</classname>, and that it built the
-      items in dependency order.  We can also run <command>abuild
-      --build=current --apply-targets-to-deps check</command> to run
-      the <command>check</command> target for each of these build
-      items.  This generates the following output:
+      end with <classname>.src</classname>, that it built the items in
+      dependency order, and that it built all the items from
+      <filename>common</filename> before any of the items in
+      <filename>project</filename>.  We can also run <command>abuild
+      --apply-targets-to-deps check</command> to run the
+      <command>check</command> target for each of these build items.
+      This generates the following output:
       <?qtest reference-project-main-check.out?>
       The presence of the <option>--apply-target-to-deps</option> flag
       caused the <command>check</command> target will be run for our
@@ -4220,7 +4305,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <?example general/reference/common/lib1/test/Abuild.conf?>
       Given that all of our build items are set up in this way, we can
       instruct &abuild; to run the test suites for everything that we
-      depend on.  We do this by running <command>abuild --with-deps
+      depend on.  We do this by running <command>abuild
       --related-by-traits tester check</command>.  This runs the
       <command>check</command> target for every item that declares
       itself as a tester of the current build item or any of its
@@ -4239,6 +4324,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       you significant assurance that everything you depend on is
       working the way it is supposed to be each time you start a
       development or debugging session.
+     </para>
+    </sect2>
+    <!--XXX HERE-->
+    <sect2 id="ref.example.rdeps">
+     <title>Building Reverse Dependencies</title>
+     <para>
+      
      </para>
     </sect2>
     <sect2 id="ref.example.derived-project">
