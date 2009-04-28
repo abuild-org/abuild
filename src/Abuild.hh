@@ -384,6 +384,7 @@ class Abuild
     std::list<std::string> targets;
     bool apply_targets_to_deps;
     bool with_rdeps;
+    bool repeat_expansion;
     std::set<std::string> explicit_target_items;
     std::list<std::string> only_with_traits;
     std::list<std::string> related_by_traits;

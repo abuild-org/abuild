@@ -66,6 +66,9 @@ OPTIONS
   --related-by-traits trait[,trait,...]  add to the build set all items that
                     relate to any item already in the build set by all of
                     the named traits
+  --repeat-expansion  repeat expansion from --related-by-traits or
+                    --with-rdeps until no new build items are added to
+                    the build set
   --ro-path=dir     repeatable: treat everything under dir as read only
   --rw-path=dir     repeatable: treat everything under dir as writable
   --silent          suppress most non-error output

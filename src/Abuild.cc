@@ -72,6 +72,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     dump_interfaces(false),
     apply_targets_to_deps(false),
     with_rdeps(false),
+    repeat_expansion(false),
     compat_level(CompatLevel::cl_1_0),
     default_writable(true),
     local_build(false),
@@ -595,6 +596,10 @@ Abuild::parseArgv()
 	else if (arg == "--apply-targets-to-deps")
 	{
 	    this->apply_targets_to_deps = true;
+	}
+	else if (arg == "--repeat-expansion")
+	{
+	    this->repeat_expansion = true;
 	}
 	else if (arg == "--dump-build-graph")
 	{
@@ -5018,8 +5023,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 
     // We always add dependencies of any items initially in the build
     // set to the build set if we are building.  If we are cleaning,
-    // we only do this when the --apply-targets-to-deps option is
-    // specified.
+    // we only do this when the --apply-targets-to-deps or
+    // --with-rdeps options are specified.
     bool add_dependencies =
 	(! cleaning) || this->apply_targets_to_deps || this->with_rdeps;
 
@@ -5037,6 +5042,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
     // added.  If X is tested by X-tester, X-tester does not get
     // added.)
     bool expanding = true;
+    bool first_pass = true;
     while (expanding)
     {
 	expanding = false;
@@ -5069,43 +5075,54 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    }
 	}
 
+	if (! (this->repeat_expansion || first_pass))
+	{
+	    continue;
+	}
+
 	if (this->with_rdeps)
 	{
-	    QTC::TC("abuild", "Abuild expand by rdeps");
-
-	    // Add to the build set any item that has a dependency on
-	    // any item already in the build set.
-	    std::set<std::string> to_add;
-	    // For each item, ...
-	    for (BuildItem_map::iterator iter = builditems.begin();
-		 iter != builditems.end(); ++iter)
+	    bool adding_rdeps = true;
+	    while (adding_rdeps)
 	    {
-		std::string const& item_name = (*iter).first;
-		BuildItem& item = *((*iter).second);
-		// get the list of dependencies. ...
-		std::list<std::string> const& deps =
-		    item.getDeps();
-		// For each dependency, ...
-		for (std::list<std::string>::const_iterator diter =
-			 deps.begin();
-		     diter != deps.end(); ++diter)
+		adding_rdeps = false;
+		QTC::TC("abuild", "Abuild expand by rdeps");
+
+		// Add to the build set any item that has a dependency on
+		// any item already in the build set.
+		std::set<std::string> to_add;
+		// For each item, ...
+		for (BuildItem_map::iterator iter = builditems.begin();
+		     iter != builditems.end(); ++iter)
 		{
-		    // see if the dependency is already in the build
-		    // set.  If so, add the item.
-		    if (this->buildset.count(*diter))
+		    std::string const& item_name = (*iter).first;
+		    BuildItem& item = *((*iter).second);
+		    // get the list of dependencies. ...
+		    std::list<std::string> const& deps =
+			item.getDeps();
+		    // For each dependency, ...
+		    for (std::list<std::string>::const_iterator diter =
+			     deps.begin();
+			 diter != deps.end(); ++diter)
 		    {
-			to_add.insert(item_name);
+			// see if the dependency is already in the build
+			// set.  If so, add the item.
+			if (this->buildset.count(*diter))
+			{
+			    to_add.insert(item_name);
+			}
 		    }
 		}
-	    }
-	    for (std::set<std::string>::iterator iter = to_add.begin();
-		 iter != to_add.end(); ++iter)
-	    {
-		if (this->buildset.count(*iter) == 0)
+		for (std::set<std::string>::iterator iter = to_add.begin();
+		     iter != to_add.end(); ++iter)
 		{
-		    QTC::TC("abuild", "Abuild non-trivial rdep expansion");
-		    expanding = true;
-		    this->buildset[*iter] = builditems[*iter];
+		    if (this->buildset.count(*iter) == 0)
+		    {
+			QTC::TC("abuild", "Abuild non-trivial rdep expansion");
+			expanding = true;
+			adding_rdeps = true;
+			this->buildset[*iter] = builditems[*iter];
+		    }
 		}
 	    }
 	}
@@ -5194,6 +5211,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    QTC::TC("abuild", "Abuild additional build-also expansion");
 	    expanding = true;
 	}
+
+	first_pass = false;
     }
 
     // Expand the build set to include all plugins of all items in the

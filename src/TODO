@@ -13,6 +13,8 @@ Before 1.1
 
     - check for references to deprecated keys, etc.
 
+    - check every use of the word external
+
 ----------------------------------------------------------------------
 
 Abuild Lint

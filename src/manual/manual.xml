@@ -79,7 +79,9 @@ otherwise.  We typeset it as a plan unadorned word because doing
 otherwise makes the document visually jarring.
 
 We use the phrase "depend on" rather than "depend upon" to refer to
-dependency relationships among build items.
+dependency relationships among build items.  Also, remember that the
+word "dependent", when used as a noun, refers to the one doing the
+depending, not the one being depended on.
 
 Whenever appropriate, this document makes use of the following
 technical character classes (definitions below from "Docbook: The
@@ -2988,28 +2990,25 @@ C:\cygwin\cygwin.bat
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>dependent build tree</term>
+      <term>tree dependency</term>
       <listitem>
        <para>
         <indexterm>
-         <primary>build tree</primary>
-         <secondary>dependent</secondary>
+         <primary>tree dependency</primary>
         </indexterm>
-        <indexterm>
-         <primary>dependent build tree</primary>
-        </indexterm>
-        A <firstterm>dependent build tree</firstterm> is a separate
-        build tree whose items can supplement the local build tree.
-        Build items in the local build tree can resolve the names of
-        build items in dependent build trees, but build items in
-        dependent build trees cannot see items in the local tree.
+        A <firstterm>tree dependency</firstterm> is a separate build
+        tree whose items can supplement the local build tree.  Build
+        items in the local build tree can resolve the names of build
+        items in the tree named as a tree dependency, but build items
+        in the dependency cannot see items in the dependent (local)
+        build tree.
        </para>
       </listitem>
      </varlistentry>
     </variablelist>
    </para>
    <sect1 id="ref.using-tree-deps">
-    <title>Using Dependent Build Trees</title>
+    <title>Using Tree Dependencies</title>
     <para>
      Even when &abuild; knows about multiple trees, it still won't
      allow items in one build tree to refer to items in other trees
@@ -3020,31 +3019,28 @@ C:\cygwin\cygwin.bat
      one tree to be able to use items in another tree, you declare a
      <firstterm>tree dependency</firstterm> of one tree on another.
      This creates a one-way relationship between the two trees such
-     that items in the <emphasis>depending</emphasis> tree can see
-     items in the <emphasis>dependent</emphasis> tree, but no
-     visibility is possible in the other direction.  To declare a tree
-     dependency, you list the name of the dependent tree in the
-     <property>tree-deps</property> key of the depending tree's
-     <filename>Abuild.conf</filename> file.  As with item dependencies
-     listed in <property>deps</property>, &abuild; requires that there
-     are no cycles among tree dependencies.
+     that items in the <emphasis>dependent</emphasis> tree (the one
+     that declares the dependency) can see items in the tree on which
+     it depends, but no visibility is possible in the other direction.
+     To declare a tree dependency, you list the name of the tree
+     dependency in the <property>tree-deps</property> key of the
+     dependent tree's <filename>Abuild.conf</filename> file.  As with
+     item dependencies listed in <property>deps</property>, &abuild;
+     requires that there are no cycles among tree dependencies.
     </para>
     <para>
      There is nothing special about a build tree that makes it able to
-     be a dependent tree: any tree can depend on any other tree as
-     long as no dependency cycles are created.  In order for one build
-     tree to depend on another, the first tree must configure its root
-     build item's <filename>Abuild.conf</filename> to list the
-     dependent tree's name in its <property>tree-deps</property> key.
+     be the target of a tree dependency: any tree can depend on any
+     other tree as long as no dependency cycles are created.
     </para>
     <para>
      Once you set up another tree as a tree dependency of your tree,
-     all build items defined in the dependent build tree are available
-     to you (subject to normal scoping rules) as if they were in your
-     local build tree.  This means that none of the build items in
-     your build tree may have the same name as any build item in the
-     dependent tree.  Note that the dependent tree is not affected in
-     any way by being referred to as a tree dependency.  In order to
+     all build items defined in the tree named by the tree dependency
+     are available to you (subject to normal scoping rules) as if they
+     were in your local build tree.  Since any tree can potentially
+     have a dependency relationship with any other, &abuild; enforces
+     that none of the build items in any build tree may have the same
+     name as any build item in any tree in the forest.  In order to
      avoid build item name clashes, it's a good idea to pick a naming
      convention for your build items that includes some kind of
      tree-based prefix, as we have done with names like
@@ -3052,7 +3048,7 @@ C:\cygwin\cygwin.bat
     </para>
    </sect1>
    <sect1 id="ref.example.dependent-build-tree">
-    <title>Dependent Build Tree Example</title>
+    <title>Tree Dependency Example</title>
     <para>
      In order for &abuild; to use multiple trees, it must be able to
      find the roots of all the trees when it traverses the file system
@@ -3101,7 +3097,7 @@ C:\cygwin\cygwin.bat
      <classname>project-lib</classname> build item is defined inside
      the <filename>lib</filename> directory.  It is set up exactly the
      same way as <classname>common-lib1</classname> and the other
-     libraries in the dependent tree.  Here is its
+     libraries in the <filename>common</filename> tree.  Here is its
      <filename>Abuild.conf</filename>:
      <?example general/reference/project/lib/Abuild.conf?>
      Now look at <classname>project-lib.src</classname>'s
@@ -3111,7 +3107,7 @@ C:\cygwin\cygwin.bat
      <classname>common-lib1</classname>, which is defined in the
      <filename>common</filename> tree.  This works because &abuild;
      automatically makes available to you all the build items in any
-     dependent build trees.
+     build trees your depends on.
     </para>
     <para>
      This build tree also includes a main program, but we will not go
@@ -3126,9 +3122,9 @@ C:\cygwin\cygwin.bat
      <emphasis>that</emphasis> tree declared, so like item
      dependencies, tree dependencies are transitive.  If this were not
      the case, &abuild; would not be able to resolve dependencies
-     declared in the dependent tree if those dependencies were
-     resolved in one of <emphasis>its</emphasis> dependent trees.  To
-     illustrate this, we have a third build tree located in
+     declared in the other tree if those dependencies were resolved in
+     one of <emphasis>its</emphasis> tree dependencies.  To illustrate
+     this, we have a third build tree located in
      <filename>doc/example/general/reference/derived</filename>.  This
      build tree is for a second project that is derived from the first
      project.  This build tree declares <filename>project</filename>
@@ -3364,8 +3360,8 @@ C:\cygwin\cygwin.bat
      will build those items with the <command>all</command> target
      instead.  This is important as it enables you to add custom
      targets to a build item without necessarily having those targets
-     be defined for dependent build items.  If you want &abuild; to
-     build dependent items with explicitly named targets as well, use
+     be defined for build items it depends on.  If you want &abuild;
+     to build dependencies with explicitly named targets as well, use
      the <option>--apply-targets-to-deps</option> option.  When
      cleaning with a build set, &abuild; does not ordinarily also
      clean the dependencies of the items in the set.  To apply the
@@ -3429,8 +3425,8 @@ C:\cygwin\cygwin.bat
          all items in the build tree containing the item in the
          current directory; <emphasis>i.e.</emphasis>, the local build
          tree without any of its trees dependencies, noting that items
-         in dependent trees may, as always, still to be built to
-         satisfy dependencies
+         in tree dependencies may, as always, still to be built to
+         satisfy item dependencies
         </para>
        </listitem>
       </varlistentry>
@@ -3719,26 +3715,25 @@ C:\cygwin\cygwin.bat
     </indexterm>
     <para>
      Starting with &abuild; version 1.1, it is possible to use the
-     <option>--with-rdeps</option> flag to instruct &abuild; to
-     iteratively expand the build set by adding all <emphasis>reverse
-     dependencies</emphasis> of any build item already in the build
-     set.  When this option is used, all forward and reverse
-     dependencies of every item in the build set will also be in the
-     build set.
+     <option>--with-rdeps</option> flag to instruct &abuild; to expand
+     the build set by adding all <emphasis>reverse
+     dependencies</emphasis> of any build item initially in the build
+     set.  When combined with <option>--repeat-expansion</option>,
+     this process is applied iteratively so that all forward and
+     reverse dependencies of every item in the build set will also be
+     in the build set.
      <footnote>
       <para>
-       Stated formally, we would say that the build set is closed with
-       respect to dependencies.
+       Stated formally, when &abuild; is invoked with both
+       <option>--with-rdeps</option> and
+       <option>--repeat-expansion</option>, the build set is closed
+       with respect to forward and reverse dependencies.
       </para>
      </footnote>
      This can be especially useful if you are changing a widely used
      item and you want to make sure your change didn't break any build
-     items that use your item.  Since the effect of
-     <option>--with-rdeps</option> is applied until all forward and
-     reverse dependencies of all items in the build set are also in
-     the build set, specifying this option may add a lot of build
-     items to the build set.  For additional details on how the build
-     set is constructed, see <xref
+     items that use your item.  For additional details on how the
+     build set is constructed, see <xref
      linkend="ref.construction-of-build-sets"/>..
     </para>
    </sect1>
@@ -3811,10 +3806,10 @@ C:\cygwin\cygwin.bat
       given as the value of the <property>supported-traits</property>
       key in the root build item's <filename>Abuild.conf</filename>.
       The list of supported traits is inherited through tree
-      dependencies, so any trait declared as valid in any dependent
-      trees are also available.  The set of traits that can be
-      specified on the command line is the union of all traits allowed
-      by all known trees.
+      dependencies, so any trait declared as valid in any trees your
+      tree depends on are also available.  The set of traits that can
+      be specified on the command line is the union of all traits
+      allowed by all known trees.
      </para>
      <para>
       Traits listed in the <property>traits</property> key can be made
@@ -4131,15 +4126,15 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         lexically sorted list of build trees and re-orders it as
         needed so that trees appear in dependency order.  Then, within
         each tree, it does the same with items.  The effect is that
-        items build by tree with most dependent trees building earlier
-        and, with each tree, most dependent items building earlier.
-        Ties are resolved by lexical ordering.  That said, the exact
-        order of build items, other than that dependencies are built
-        before items that depend on them, should be considered an
-        implementation detail and not relied upon.  Also, keep in mind
-        that, in a multithreaded build, the order is not
-        deterministic, other than that no item's build is started
-        before all its dependencies' builds have completed.
+        items build by tree with most referenced trees building
+        earlier and, with each tree, most referenced items building
+        earlier.  Ties are resolved by lexical ordering.  That said,
+        the exact order of build items, other than that dependencies
+        are built before items that depend on them, should be
+        considered an implementation detail and not relied upon.
+        Also, keep in mind that, in a multithreaded build, the order
+        is not deterministic, other than that no item's build is
+        started before all its dependencies' builds have completed.
        </para>
       </footnote>
       Since <classname>common-lib2.src</classname> depends on
@@ -4231,13 +4226,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      </para>
     </sect2>
     <sect2 id="ref.example.project-code-area">
-     <title>Dependent Build Tree Example: Project Code Area</title>
+     <title>Tree Dependency Example: Project Code Area</title>
      <para>
-      Returning to the project area, we demonstrate how dependencies
-      may be satisfied in dependent trees and the effect this has on
-      the build set.  Under <filename>reference/project</filename>, we
-      have just two public build items called
-      <classname>project-main</classname> and
+      Returning to the project area, we demonstrate how item
+      dependencies may be satisfied in trees named as tree
+      dependencies and the effect this has on the build set.  Under
+      <filename>reference/project</filename>, we have just two public
+      build items called <classname>project-main</classname> and
       <classname>project-lib</classname>.  The
       <classname>project-lib</classname> build item is structured like
       the libraries in the common area.  The
@@ -4326,13 +4321,46 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       development or debugging session.
      </para>
     </sect2>
-    <!--XXX HERE-->
     <sect2 id="ref.example.rdeps">
      <title>Building Reverse Dependencies</title>
      <para>
-      
+      Suppose you have made a modification to a particular build item,
+      and you want to make sure the modification doesn't break anyone
+      who depends on that build item, whether the dependent item is in
+      the modified item's tree or not.  In order to do this, you can
+      specify the <option>--with-rdeps</option> flag when building the
+      modified item.  This will cause &abuild; to add all of that
+      item's reverse dependencies to the build set.  For example, this
+      is the output of running <command>abuild --with-rdeps</command>
+      in the <filename>general/reference/common/lib2/src</filename>
+      directory:
+      <?qtest reference-common-lib2-rdeps.out?>
+      This includes all direct and indirect reverse dependencies of
+      <filename>common-lib2.src</filename>.  If you really want to be
+      make sure that everything that is related to this build item by
+      dependency in any way is rebuilt, you can use the
+      <option>--repeat-expansion</option> option as well.  This will
+      repeat the reverse dependency expansion after adding the other
+      dependencies of your reverse dependencies, and will continue
+      repeating the expansion until no more items are added.  If we
+      run <command>abuild --with-rdeps --repeat-expansion
+      no-op</command> from here, we get this output:
+      <?qtest reference-common-lib2-rdeps-repeated.out?>
+      Observe the addition of <filename>common-lib1.test</filename>
+      and <filename>project-lib.test</filename>, which are reverse
+      dependencies of libraries added to satisfy the dependencies of
+      some of <filename>common-lib2</filename>'s dependencies!  If
+      that seems confusing, then you probably don't need to worry
+      about ever using <option>--repeat-expansion</option>!  Using
+      <option>--repeat-expansion</option> with
+      <option>--with-rdeps</option> will usually a lot of build items
+      to the build set.  In this example, it actually adds every build
+      item in the forest to the build set.  The only build items that
+      would not be added would be completely independent sets of build
+      items that happen to exist in the same forest.
      </para>
     </sect2>
+    <!--XXX HERE-->
     <sect2 id="ref.example.derived-project">
      <title>Derived Project Example</title>
      <para>
@@ -5536,7 +5564,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         targets to be run only for those items.  The default target
         <command>all</command> is run for all other build items in the
         build set.  For more information about traits, see <xref
-        linkend="ref.traits"/>.
+        linkend="ref.traits"/>.  When combined with
+        <option>--repeat-expansion</option>, this process is repeated
+        until no more items are added.
        </para>
       </listitem>
      </varlistentry>
@@ -6055,12 +6085,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          arguments.  This causes the
          <replaceable>interface-flag</replaceable> interface flag to
          be set when this build item reads the interface of the
-         dependent build item (see <xref
-         linkend="ref.interface-flags"/>).  It is also possible to
-         specify a
+         dependency (see <xref linkend="ref.interface-flags"/>).  It
+         is also possible to specify a
          <option>-platform=<replaceable>selector</replaceable></option>
-         option to a dependency to specify which of the dependent
-         item's platforms applies to this dependency (see <xref
+         option to a dependency to specify which of the dependency's
+         platforms applies to this dependency (see <xref
          linkend="ref.cross-platform-dependencies"/>).
         </para>
        </listitem>
@@ -6685,9 +6714,9 @@ LIBS = lib3 lib4
         in which it is important to prepend to a list.  One notable
         example is the list of libraries that are linked into an
         application: if one library calls functions from another
-        library, the depending library must come
-        <emphasis>before</emphasis> the dependent library in the link
-        command.  Since &abuild; reads the dependent library's
+        library, the dependent library must come
+        <emphasis>before</emphasis> the library on which it depends in
+        the link command.  Since &abuild; reads the dependency's
         interface file first, the depending library must
         <emphasis>prepend</emphasis> itself to the list of libraries.
         Note that multiple assignments to a single list variable would
@@ -9860,24 +9889,24 @@ VAR1 = three
      assignment.  &Abuild; also stores the name of the build item that
      is responsible for each assignment in a variable's assignment
      history.  When one build item depends on another, it may request
-     the evaluation of any assignments made by the dependent build
-     item that were associated with a specific flag.  This is done by
+     the evaluation of any assignments made by the dependency item
+     that were associated with a specific flag.  This is done by
      including the
      <option>-flag=<replaceable>flagname</replaceable></option> option
      when declaring the dependency in the
      <filename>Abuild.conf</filename> file.  For example, if build
      item <classname>A</classname> wanted to see all assignments that
      <classname>B</classname> made associated with the
-     <property>private</property> flag, then <classname>A</classname>'s
-     <filename>Abuild.conf</filename> would contain the following
-     line:
+     <property>private</property> flag, then
+     <classname>A</classname>'s <filename>Abuild.conf</filename> would
+     contain the following line:
 
      <programlisting>deps: B -flag=private
 </programlisting>
      When a flag is specified as part of a dependency in this fashion,
-     &abuild; requires that the dependent build item list the given
-     flag as one of its supported flags.  For example, in this case,
-     it would be an error if <classname>B</classname>'s
+     &abuild; requires that the dependency list the given flag as one
+     of its supported flags.  For example, in this case, it would be
+     an error if <classname>B</classname>'s
      <filename>Abuild.conf</filename> did not list
      <property>private</property> in its
      <property>supported-flags</property> key.
@@ -12908,8 +12937,8 @@ native-compiler qcc
      One cost of not separating these is that if one library depends
      only on another library's header files, the two libraries could
      be built in parallel.  By making one library depend on the other
-     in its entirety, &abuild; will force the dependent library to be
-     built before the depending library.  This is unfortunate, but
+     in its entirety, &abuild; will force the other library to be
+     built before the dependent library.  This is unfortunate, but
      it's not a good idea to work around this by introducing holes in
      &abuild;'s dependency management.  A better technique would be to
      use some external analyzer that could detect at a finer level
@@ -13491,6 +13520,7 @@ native-compiler qcc
    </sect1>
    <sect1 id="ref.construction-of-build-sets">
     <title>Construction of the Build Set</title>
+    <!--XXX work in - -repeat-expansion -->
     <para>
      This section describes the process that &abuild; uses to
      construct the build set.  First, &abuild; creates a list of build
@@ -13623,11 +13653,11 @@ native-compiler qcc
       other build items, if a build item depends on another build item
       and declares the dependency with a
       <option>-platform=<replaceable>selector</replaceable></option>
-      option, the dependent build item must have the platform type
-      mentioned in the platform selector.  Otherwise, every platform
-      type of the depending build item must be present in the
-      dependent item.  For example, if <classname>A</classname> has
-      platform types <type>X</type> and <type>Y</type> and depends on
+      option, the dependency must have the platform type mentioned in
+      the platform selector.  Otherwise, every platform type of the
+      dependent build item must be present in the dependency.  For
+      example, if <classname>A</classname> has platform types
+      <type>X</type> and <type>Y</type> and depends on
       <classname>B</classname> which has types <type>X</type>,
       <type>Y</type>, and <type>Z</type>, this is okay because
       <classname>B</classname> has all of <classname>A</classname>'s
@@ -13660,8 +13690,8 @@ native-compiler qcc
       <function>addItemToBuildGraph</function> in
       <filename>Abuild.cc</filename> in the &abuild; sources.  We
       construct the build graph in reverse build order;
-      <emphasis>i.e.</emphasis>, we start with most dependent build
-      item and end with the least dependent build item.  For each
+      <emphasis>i.e.</emphasis>, we start with most depended-on build
+      item and end with the least depended-on build item.  For each
       build item, we add to the list of <firstterm>build
       platforms</firstterm> (platforms on which the item will actually
       be built), based on our platform selection criteria, as
@@ -13676,9 +13706,9 @@ native-compiler qcc
       satisfies the platform selector and make this the
       <firstterm>dependent platform</firstterm>.  If there are no
       matches, it is an error.  If there was no platform selector in
-      the dependency and the dependent item is platform-independent,
-      the dependent platform is <type>indep</type>.  Otherwise, there
-      is no specific dependent platform.  Then, for each of our build
+      the dependency and the dependency is platform-independent, the
+      dependent platform is <type>indep</type>.  Otherwise, there is
+      no specific dependent platform.  Then, for each of our build
       platforms, we add a node to the build graph for the current
       build item and platform.  If we have a specific dependent
       platform, we create a dependency from our new node to the node
@@ -13700,15 +13730,15 @@ native-compiler qcc
       involved, there are some implications that are relatively easy
       to understand.  In particular, the way the build graph works
       implies that, in general, a build item may only depend on
-      another build item if the dependent item builds on all the
-      depending item's platforms.  There are two ways around this: one
-      is to use a platform selector on a dependency, and the other is
-      to use a build item of target type <type>all</type>.  A build
-      item of target type <type>all</type> is a pass-through build
-      item, as described in <xref linkend="ref.build-item-types"/>.  A
-      build item gets to be this way by not having a build or
-      interface file, not declaring any platform types, and depending
-      on items with different groups of platform types.
+      another build item if the dependency builds on all the dependent
+      item's platforms.  There are two ways around this: one is to use
+      a platform selector on a dependency, and the other is to use a
+      build item of target type <type>all</type>.  A build item of
+      target type <type>all</type> is a pass-through build item, as
+      described in <xref linkend="ref.build-item-types"/>.  A build
+      item gets to be this way by not having a build or interface
+      file, not declaring any platform types, and depending on items
+      with different groups of platform types.
      </para>
     </sect2>
    </sect1>
@@ -14046,6 +14076,16 @@ Y = $(X)
            this, as will builds that use other tools that create
            temporary files whose names may clash with other instances
            of themselves.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The behavior of whether expansion by trait and reverse
+           dependency is repeated has changed again.  Now, expansion
+           by related traits or by reverse dependency is performed
+           only once by default.  In order to have the expansion
+           process repeated until no more build items are added,
+           specify the new option <option>--repeat-expansion</option>.
           </para>
          </listitem>
         </itemizedlist>
@@ -16119,8 +16159,8 @@ Y = $(X)
        <listitem>
         <para>
          When autoconf invokes the compiler, it now honors any flags
-         or includes set by dependent build items.  (Thanks for the
-         problem report from Joe Davidson.)
+         or includes set by dependencies.  (Thanks for the problem
+         report from Joe Davidson.)
         </para>
        </listitem>
        <listitem>

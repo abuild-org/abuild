@@ -72,6 +72,14 @@ $td->runtest("desc expanded with eater",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("desc repeatedly expanded with eater",
+	     {$td->COMMAND => "abuild --build=desc" .
+		  " --related-by-traits eater eat --repeat-expansion",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/desc-eater-repeat.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work");
 
 $td->runtest("build eater painter",
@@ -95,6 +103,14 @@ $td->runtest("build painter expand eater",
 		  " --related-by-traits eater eat",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/build-painter-expand-eater.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("build painter repeatedly expand eater",
+	     {$td->COMMAND => "abuild --build=all --only-with-traits painter" .
+		  " --related-by-traits eater eat --repeat-expansion",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/build-painter-expand-eater-repeat.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -147,4 +163,4 @@ $td->runtest("clean all",
 
 check_work_accessed($td);
 
-$td->report(12);
+$td->report(14);

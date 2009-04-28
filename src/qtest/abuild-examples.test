@@ -150,25 +150,40 @@ foreach my $compat (qw(1.0 1.1))
     cd("work/general/reference/project/main/src");
 
     $td->runtest("no-op in reference project-main",
-		 {$td->COMMAND => "abuild --build=current no-op",
+		 {$td->COMMAND => "abuild no-op",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/reference-project-main-no-op.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("check in reference project-main",
-		 {$td->COMMAND =>
-		      "abuild --build=current --apply-targets-to-deps check",
+		 {$td->COMMAND => "abuild --apply-targets-to-deps check",
 		      $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/reference-project-main-check.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
     $td->runtest("trait-based test in reference project-main",
-		 {$td->COMMAND => "abuild --with-deps" .
-		      " --related-by-traits tester check",
+		 {$td->COMMAND => "abuild --related-by-traits tester check",
 		      $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/reference-project-main-trait-test.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/general/reference/common/lib2/src");
+
+    $td->runtest("reverse dependencies of common-lib2",
+		 {$td->COMMAND => "abuild --with-rdeps no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-lib2-rdeps.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("reverse dependencies of common-lib2 repeated",
+		 {$td->COMMAND =>
+		      "abuild --with-rdeps --repeat-expansion no-op",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/reference-common-lib2-rdeps-repeated.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
@@ -778,7 +793,7 @@ if (! in_windows())
 
 check_work_accessed($td);
 
-$td->report(117 +
+$td->report(121 +
 	    (in_windows() ? 0 : 1) +
 	    ($test_java ? 7 : 0) +
 	    ($have_whole_archive ? 2 : 1));

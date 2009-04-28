@@ -69,6 +69,11 @@ Miscellaneous
  * Autoconf: remember to mention attributes: serial.  Also, mention
    the serial attribute in the description of --make-jobs.
 
+ * Put a --with-rdeps example somewhere in the documentation.  It
+   could go in the "general" area, except, for any build item,
+   --with-rdeps ends up being the same as --build=all as there are no
+   independent collections of build items.
+
 ----------------------------------------------------------------------
 
 Read-only Build Items
