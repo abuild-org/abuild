@@ -979,9 +979,9 @@
   </build-tree>
   <build-tree
    name="derived"
-   absolute-path="--topdir--/general/task/derived"
-   home-forest="f-2"
-   backing-depth="0"
+   absolute-path="--topdir--/general/reference/derived"
+   home-forest="f-1"
+   backing-depth="1"
   >
    <platform-data>
     <platform-type name="indep" target-type="platform-independent">
