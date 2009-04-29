@@ -5,6 +5,13 @@ These rules can be used by build items that require some
 autoconf-based configuration either internally for to provide
 information for their users.
 
+Note: there have been some problems reported with autoconf rules in
+parallel builds (with --make-jobs).  It is recommended that you place
+
+attributes: serial
+
+in the Abuild.conf of build items that use autoconf rules.
+
 In order for these rules to work, the following conventions must be
 followed:
 
