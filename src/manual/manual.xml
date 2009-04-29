@@ -4988,7 +4988,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
    </sect1>
   </chapter>
-  <!--XXX HERE-->
   <chapter id="ref.command-line">
    <title>Command-Line Reference</title>
    <para>
@@ -5001,11 +5000,39 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     <para>
      When running &abuild;, the basic invocation syntax is as follows:
 
-     <programlisting><command>abuild [options] [targets]</command>
+     <programlisting><command>abuild [options] [definitions] [targets]</command>
 </programlisting>
-     Options and targets may appear in any order.  Any argument that
-     starts with a dash (&ldquo;<option>-</option>&rdquo;) is treated
-     as an option.  Anything else is considered to be a target.
+     Options, definitions, and targets may appear in any order.  Any
+     argument that starts with a dash
+     (&ldquo;<option>-</option>&rdquo;) is treated as an option.  Any
+     option of the form <option>VAR=value</option> is considered to be
+     a definition.  Anything else is considered to be a target.
+    </para>
+   </sect1>
+   <sect1 id="ref.command-line.definitions">
+    <title>Variable Definitions</title>
+    <para>
+     Arguments of the form <option>VAR=value</option> are variable or
+     parameter definitions.  Variables defined in this way are made
+     available to all backends.  These can be used to override the
+     value of interface variables or variables set in backend build
+     files.
+    </para>
+    <para>
+     For the <application>make</application> backend, these variable
+     definitions are just passed along to make.
+    </para>
+    <para>
+     For the <application>Groovy</application> backend, these
+     variables are stored in a manner such that
+     <function>abuild.resolve</function> will give them precedence
+     over normal parameters or interface variables.  They are also
+     defined as properties in the ant project.
+    </para>
+    <para>
+     For the deprecated xml-based ant framework, these definitions are
+     made available as ant properties that are defined prior to
+     reading any generated or user-provided files.
     </para>
    </sect1>
    <sect1 id="ref.command-line.informational">
@@ -5048,10 +5075,30 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>--find item-name</term>
+      <listitem>
+       <para>
+        Print the name of the tree that contains item
+        <replaceable>item-name</replaceable>, and also print its
+        location.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--find tree:tree-name</term>
+      <listitem>
+       <para>
+        Print the location of the root build item of build tree
+        <replaceable>tree-name</replaceable>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>--help|-H</term>
       <listitem>
        <para>
-        Print a brief summary of &abuild;'s command-line options.
+        Print a brief introduction to &abuild;'s help system.  For
+        additional details, see XXX-help-system.
        </para>
       </listitem>
      </varlistentry>
@@ -5104,15 +5151,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
     <variablelist>
      <varlistentry>
-      <term>--ant</term>
-      <listitem>
-       <para>
-        Terminate argument parsing and pass all remaining arguments
-        (up to <option>--make</option>) to ant.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
       <term>-C start-directory</term>
       <listitem>
        <para>
@@ -5134,6 +5172,55 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         be left alone.  This can be useful for removing only output
         directories for platforms we no longer care about or for other
         selective cleanup operations.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--compat-level=version</term>
+      <listitem>
+       <para>
+        Set &abuild;'s compatibility level to the specified version,
+        which may be either <literal>1.0</literal> or
+        <literal>1.1</literal>.  You may also place the compatibility
+        level version in the <envar>ABUILD_COMPAT_LEVEL</envar>
+        environment variable.  By default, &abuild; attempts to detect
+        deprecated constructs from older versions and issue warnings
+        about their use.  Setting the compatibility level to a given
+        version causes &abuild; to not recognize constructs deprecated
+        by that version at all.  For example, in compatibility level
+        <literal>1.1</literal>, use of the <property>this</property>
+        key in <filename>Abuild.conf</filename> would result in an
+        error about an unknown key rather than being treated as if it
+        were <property>name</property>, and the make variable
+        <varname>BUILD_ITEM_RULES</varname> would be treated like any
+        ordinary variable and would not influence the build in any
+        way.  See also <option>--deprecation-is-error</option>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--deprecation-is-error</term>
+      <listitem>
+       <para>
+        Ordinarily, &abuild; detects deprecated constructs, issues
+        warnings about them, and continues operating by mapping
+        deprecated constructs into their intended replacements.  When
+        this option is specified, any use of deprecated constructs are
+        detected and reported as errors instead of warnings.  Note
+        that this is subtly different from specifying
+        <option>--compat-level</option> with the current major and
+        minor versions of &abuild;.  For example, if
+        <option>--deprecation-is-error</option> is specified, use of
+        the make variable <varname>BUILD_ITEM_RULES</varname> will
+        result in an error message, while if
+        <option>--compat-level=1.1</option> is specified, the variable
+        will simply be ignored.  A good upgrade strategy is to use
+        <option>--deprecation-is-error</option> to first test to make
+        sure you've successfully eliminated all deprecated constructs,
+        and then to use <option>--compat-level</option> (or to set the
+        <envar>ABUILD_COMPAT_LEVEL</envar> environment variable) to
+        turn off &abuild;'s backward compatibility support, if
+        desired.
        </para>
       </listitem>
      </varlistentry>
@@ -5204,8 +5291,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>--make</term>
       <listitem>
        <para>
-        Terminate argument parsing and pass all remaining arguments
-        (up to <option>--ant</option>) to make.
+        Terminate argument parsing and pass all remaining arguments to
+        make.  Intended primarily for debugging.
        </para>
       </listitem>
      </varlistentry>
@@ -5220,6 +5307,22 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         could potentially be the product of the two numerical
         arguments.
        </para>
+       <para>
+        Note that certain types of make rules and certain may cause
+        problems for parallel builds.  For example, if your build
+        involves invoking a compiler or other tool that writes poorly
+        named temporary files, it's possible that two simultaneous
+        invocations of that tool may interfere with each other.
+        Starting with &abuild; 1.1, it is possible to place
+        <property>attributes: serial</property> in a make-based build
+        item's <filename>Abuild.conf</filename> file to prevent
+        <option>--make-jobs</option> from applying to that specific
+        item.  This will force serial compilation of items that you
+        know don't build properly in parallel.  This can be useful for
+        build items that use the <filename>autoconf</filename> rules,
+        which are known to sometimes cause trouble for parallel
+        builds.
+       </para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -5232,26 +5335,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>-n | --just-print | --dry-run | --recon</term>
+      <term>-n</term>
       <listitem>
        <para>
-        For make-based builds only: have make print what it would do
-        without actually doing it.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>--no-abuild-logger</term>
-      <listitem>
-       <para>
-        Do not tell ant to use the custom
-        <classname>AbuildLogger</classname> as its logger.
-        <classname>AbuildLogger</classname> is aware of the
-        possibility of nested ant targets and also properly suppresses
-        output of empty ant targets.  As of ant version 1.7, the
-        <classname>DefaultLogger</classname> and
-        <classname>NoBannerLogger</classname> loggers produce
-        misleading output when there are nested ant targets.
+        Have the backend print what it would do without actually doing
+        it.
        </para>
       </listitem>
      </varlistentry>
@@ -5286,6 +5374,28 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         in the <envar>ABUILD_PLATFORM_SELECTORS</envar> environment
         variable.  For details on platform selectors, see <xref
         linkend="ref.platform-selection"/>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--ro-path path</term>
+      <listitem>
+       <para>
+        Indicate that <replaceable>path</replaceable> is to be treated
+        as read-only by &abuild; during build or clean operations.
+        For details on using explicitly read-only and read/write
+        paths, see XXX-read-only-paths.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--rw-path path</term>
+      <listitem>
+       <para>
+        Indicate that <replaceable>path</replaceable> is to be treated
+        as read-write by &abuild; during build or clean operations.
+        For details on using explicitly read-only and read/write
+        paths, see XXX-read-only-paths.
        </para>
       </listitem>
      </varlistentry>
@@ -5378,6 +5488,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
+      <term>--no-deps</term>
+      <listitem>
+       <para>
+        Prevent &abuild; from attempting to build any dependencies of
+        the current build item before building the item itself.  The
+        <option>--no-deps</option> option may not be combined with a
+        build set.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>--only-with-traits trait[,trait,...]</term>
       <listitem>
        <para>
@@ -5414,10 +5535,28 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--with-deps | -d</term>
+      <term>--repeat-expansion</term>
       <listitem>
        <para>
-        Alternative for <option>--build=current</option>
+        Instruct &abuild; to apply build set expansion based on traits
+        (<option>--related-by-traits</option>) or or reverse
+        dependencies (<option>--with-rdeps</option>) repeatedly after
+        adding dependencies of newly added items until no further
+        expansion of the build set results.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--with-rdeps</term>
+      <listitem>
+       <para>
+        Expand the build set by adding all reverse dependencies of any
+        item already in the build set.  As always, any additional
+        dependencies of newly added items are also added.  When
+        specified with <option>--repeat-expansion</option>, addition
+        of reverse dependencies is repeated (after adding additional
+        dependencies) until no further expansion of the build set
+        results.
        </para>
       </listitem>
      </varlistentry>
@@ -5486,27 +5625,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         is not automatically run by the default target; it must be
         requested explicitly.  It depends on the
         <command>all</command> target.  There is no internal support
-        for document generation, so this capability must be provided
-        by a plugin.  For <application>ant</application> builds,
-        plugins should define a <command>doc</command> hook.  For
-        <application>make</application> builds, they should make the
-        document generation a dependency of the <command>doc</command>
-        target.  Contributed plugins to support javadoc and doxygen
-        are available in <filename>abuild-contrib</filename>, which is
-        released separately from &abuild;.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>interface-help</term>
-      <listitem>
-       <para>
-        This target prints help information for authors of the
-        <filename>Abuild.interface</filename> file for the current
-        build item.  What is printed is based on which backend is
-        in use and, for <application>make</application>-based build
-        items, the value of the <varname>RULES</varname> variable
-        in <filename>Abuild.mk</filename>.
+        for document generation in the <application>make</application>
+        backend, so this capability must be provided by a plugin.  For
+        <application>Groovy/ant</application> builds, there is
+        built-in support for javadoc, but it is minimal and will
+        likely have to be supplemented for any major documentation
+        effort.  A contributed plugins to support doxygen is available
+        in <filename>abuild-contrib</filename>, which is released
+        separately from &abuild;.
        </para>
       </listitem>
      </varlistentry>
@@ -5524,20 +5650,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         no errors in any <filename>Abuild.conf</filename> files.  Note
         that <filename>Abuild.interface</filename> files are not read
         when invoking the <command>no-op</command> target.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>rules-help</term>
-      <listitem>
-       <para>
-        For <application>make</application>-based build items, this
-        target prints help information for any rules defined in the
-        <varname>RULES</varname> variable in
-        <filename>Abuild.mk</filename>.  For property-driven
-        <application>ant</application>-based build items, it prints
-        information about properties that can be set in
-        <filename>Abuild-ant.properties</filename>.
        </para>
       </listitem>
      </varlistentry>
@@ -5566,68 +5678,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
     </variablelist>
-   </sect1>
-   <sect1 id="ref.targets.java">
-    <title>Java-specific Targets</title>
-    <para>
-     Java-based build items that use the property-driven build method
-     (<filename>Abuild-ant.properties</filename>) define several
-     additional targets, listed below.
-    </para>
-    <variablelist>
-     <varlistentry>
-      <term>deploy</term>
-      <listitem>
-       <para>
-        This target will deploy any items that can be deployed.  The
-        default implementation doesn't do anything, so
-        <command>deploy</command> hooks have to be written in order to
-        add functionality.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>hooks-help</term>
-      <listitem>
-       <para>
-        This target shows help information on how to add hooks from
-        build items or in a local build file.  It also describes
-        what hooks are run and when.  For information on hooks, please
-        see <xref linkend="ref.java-hooks-and-generators"/>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>properties-help</term>
-      <listitem>
-       <para>
-        This is a synonym for <command>rules-help</command>.  It
-        describes the properties that you can set in
-        <filename>Abuild-ant.properties</filename>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>wrapper</term>
-      <listitem>
-       <para>
-        This target will generate an executable wrapper script around
-        a JAR file if certain properties are defined.  The resulting
-        script or batch file will invoke the Java runtime environment
-        on the JAR file with the specified main class and with the
-        proper classpath.  This target is run automatically by the
-        <command>all</command> target.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-    <para>
-     There are other targets that you can invoke, but they are all
-     direct or indirect dependencies of the default
-     <command>all</command> target.  For a complete list of supported
-     targets, run <command>abuild --ant -p</command> from any Java
-     build item.
-    </para>
    </sect1>
   </chapter>
   <chapter id="ref.additional-capabilities">
@@ -5724,12 +5774,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <term>Java Archives</term>
       <listitem>
        <para>
-        Although &abuild;'s Java support is not as mature as its C and
-        C++ support, &abuild; does include limited support for
-        creation of web archives (WAR files) and enterprise archives
-        (EAR files) for use in Java Enterprise environments.  We
-        explore how to create different types of Java archives in
-        <xref linkend="ref.java-archive-types"/>.
+        &Abuild;'s Java support includes support for creation of web
+        archives (WAR files) and enterprise archives (EAR files) for
+        use in Java Enterprise environments.  It also supports
+        creation of higher-level JAR files, such as RARs, that can
+        contain other JAR files.  We explore how to create different
+        types of Java archives in <xref
+        linkend="ref.java-archive-types"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -5786,6 +5837,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    </para>
   </chapter>
  </part>
+ <!--XXX HERE-->
  <part id="ref.part3" label="III">
   <title>Advanced Functionality</title>
   <partintro id="ref.part3.intro">

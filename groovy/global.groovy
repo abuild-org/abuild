@@ -11,4 +11,5 @@ abuild.configureTarget('test', 'deps':'all') {
 // Make check an alias for test
 abuild.addTargetDependencies('check', 'test')
 
-abuild.addTarget('doc')
+// doc depends on all
+abuild.addTargetDependencies('doc', 'all')

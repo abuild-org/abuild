@@ -39,7 +39,7 @@ $td->runtest("java startup failure",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("build",
-	     {$td->COMMAND => "abuild -b all all doc",
+	     {$td->COMMAND => "abuild -b all doc",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/jars1.out",
 	      $td->EXIT_STATUS => 0},
