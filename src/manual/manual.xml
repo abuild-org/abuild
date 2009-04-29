@@ -1616,7 +1616,7 @@ C:\cygwin\cygwin.bat
      JAR-providing build items will do this.  &Abuild; actually
      provides multiple classpath variables, each of which is intended
      to be used in a particular way.  For a discussion, please see
-     XXX-java-class-paths.
+     <xref linkend="ref.interface.java"/>.
     </para>
     <para>
      As with the C++ library, it is possible to build this item by
@@ -2077,8 +2077,8 @@ C:\cygwin\cygwin.bat
      For Java build items, a third-party JAR build item would
      typically append the path to the JAR file to the
      <varname>abuild.classpath.external</varname> interface variable.
-     (For a discussion of the various classpath variables, see
-     XXX-java-class-paths.)
+     (For a discussion of the various classpath variables, see <xref
+     linkend="ref.interface.java"/>.)
     </para>
     <para>
      Sometimes, the process may be more involved.  For example, on a
@@ -5837,7 +5837,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
    </para>
   </chapter>
  </part>
- <!--XXX HERE-->
  <part id="ref.part3" label="III">
   <title>Advanced Functionality</title>
   <partintro id="ref.part3.intro">
@@ -5877,20 +5876,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      discussion of different types of build items, please see <xref
      linkend="ref.build-item-types"/>.
     </para>
-    <para>
-     The <function>Abuild.conf</function> is optional in an external or
-     backing area root if <function>Abuild.backing</function> is present.
-     For details about configuration backing areas, see
-     <xref linkend="ref.backing-areas"/>.
-    </para>
     <indexterm>
-     <primary>this</primary>
+     <primary>name</primary>
     </indexterm>
     <indexterm>
      <primary>description</primary>
-    </indexterm>
-    <indexterm>
-     <primary>parent-dir</primary>
     </indexterm>
     <indexterm>
      <primary>child-dirs</primary>
@@ -5905,9 +5895,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <primary>visible-to</primary>
     </indexterm>
     <indexterm>
-     <primary>external-dirs</primary>
-    </indexterm>
-    <indexterm>
      <primary>supported-flags</primary>
     </indexterm>
     <indexterm>
@@ -5920,12 +5907,69 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <primary>build-also</primary>
     </indexterm>
     <indexterm>
-     <primary>deleted</primary>
+     <primary>tree-deps</primary>
+    </indexterm>
+    <indexterm>
+     <primary>tree-name</primary>
+    </indexterm>
+    <indexterm>
+     <primary>attributes</primary>
     </indexterm>
     <para>
      The following keys are supported in
      <filename>Abuild.conf</filename>:
      <variablelist>
+      <varlistentry>
+       <term><property>attributes</property></term>
+       <listitem>
+        <para>
+         This is a &ldquo;catch-all&rdquo; key whose value is a list
+         of white-space separate keywords that assign certain specific
+         attributes to a build item.  The following attributes are
+         supported:
+         <itemizedlist>
+          <listitem>
+           <para>
+            <property>global-plugin</property>: causes this build item
+            to be treated as a plugin for all build trees in the
+            forest; see XXX-global-plugins
+           </para>
+          </listitem>
+          <listitem>
+           <para>
+            <property>global-tree-dep</property>: valid only for build
+            tree root build items, where it causes that build tree to
+            be a tree dependency of all other build trees in the
+            forest; see XXX-global-tree-deps
+           </para>
+          </listitem>
+          <listitem>
+           <para>
+            <property>serial</property>: valid only for build items
+            that are built using the <application>make</application>
+            backend, where it prevents the
+            <option>--make-jobs</option> option from applying to that
+            build item, effectively forcing it to build serially
+           </para>
+          </listitem>
+         </itemizedlist>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>build-also</property></term>
+       <listitem>
+        <para>
+         This key contains a list of whitespace-separated build items.
+         Whenever &abuild; adds a given item to a build set, it also
+         adds any items listed in its <property>build-also</property>
+         key to the build set.  No dependency relationship or any
+         other relationship is implied.  This is useful for creating
+         pseudo-top-level build items that serve as starting points
+         for multiple builds.
+        </para>
+       </listitem>
+      </varlistentry>
       <varlistentry>
        <term><property>child-dirs</property></term>
        <listitem>
@@ -5933,37 +5977,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          This key is used to specify all subdirectories of this item
          that contain additional <filename>Abuild.conf</filename>
          files.  The value is a whitespace-separated list of relative
-         paths.  Every child directory's
-         <filename>Abuild.conf</filename> must have a
-         <property>parent-dir</property> key that points back to this
-         directory.  Generally, the <property>child-dirs</property>
-         key contains a list of single-element paths
-         (<emphasis>i.e.</emphasis> paths with no directory names in
-         them).  Although &abuild; does allow lower-level directories
-         to be specified (corresponding with more
-         &ldquo;<filename>..</filename>&rdquo;'s in the lower-level
-         items' <property>parent-dir</property> keys), for clarity,
-         this practice is not recommended.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><property>deleted</property></term>
-       <listitem>
-        <para>
-         This key is allowed only in a root build item.  It contains a
-         list of the names of build items that should be removed from
-         this build tree's namespace because they have been deleted.
-         The build item must not be present in the local build tree
-         but must be present in the build item's direct backing area
-         chain (i.e., traversal of backing areas is permitted, but not
-         externals).  &Abuild; would ordinarily inherit build items
-         that are not defined in the local tree but exist in a backing
-         area.  Listing an item in the deleted key prevents this from
-         happening.  Since all items listed here must be found in a
-         backing area, this key would never appear in a build tree
-         with no backing area.  For more information, see <xref
-         linkend="ref.example.deleted-item"/>.
+         paths, each of which must point down in the file system.
+         If a child directory contains more than one path element,
+         the intermediate directories may not contain their own
+         <filename>Abuild.conf</filename> files.  (In other words, you
+         can skip over a directory that has an
+         <filename>Abuild.conf</filename> file in it.)
         </para>
        </listitem>
       </varlistentry>
@@ -6002,51 +6021,26 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          programs that provide additional visualization of build
          items.  For adding information that you may wish to
          categorize items for build purposes, use traits instead (see
-         <xref linkend="ref.traits"/>).
+         <xref linkend="ref.traits"/>).  The description field is only
+         permitted for named build items, though comments may appear
+         in any <filename>Abuild.conf</filename> file.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><property>external-dirs</property></term>
+       <term><property>name</property></term>
        <listitem>
         <para>
-         This key is allowed only in a root build item. It contains a
-         list of whitespace-separated paths to the root directories of
-         external build trees.  For a discussion of using externals,
-         please see <xref linkend="ref.multiple-trees"/>.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><property>parent-dir</property></term>
-       <listitem>
-        <para>
-         This key is used to specify this item's parent in the file
-         system.  It must be a relative path.  All build items except
-         for root build items have a <property>parent-dir</property>
-         key.  The <filename>Abuild.conf</filename> in a build item's
-         parent directory must list the child directory in its
-         <property>child-dirs</property> key.  For a complete
-         description of how &abuild; reads
-         <filename>Abuild.conf</filename> files, see <xref
-         linkend="ref.traversal-details"/>.  The most common value for
-         <property>parent-dir</property> is
-         &ldquo;<filename>..</filename>&rdquo;.  Although &abuild;
-         allows <property>parent-dir</property> to point other than to
-         a parent or ancestor directory in the file system, this usage
-         is not recommended and will likely lead to confusion.
-         <footnote>
-          <para>
-           The main reason that &abuild; allows you to do this it all
-           is that it can be handy as a short-term measure during
-           reorganization of a build tree or to work around disk space
-           issues.
-          </para>
-         </footnote>
-         In particular, the <command>desc</command> build set uses
-         actual file system paths, not
-         <property>parent-dir</property>/<property>child-dirs</property>
-         relationships.
+         This key is used to set the name of the build item.  Build
+         item names consist of period-delimited segments.  Each
+         segment consists of one or more alphanumeric characters,
+         dashes, or underscores.  Some
+         <filename>Abuild.conf</filename> files exist just to connect
+         parent directories with child directories in the file system,
+         as shown in examples below.  In those cases, the
+         <property>name</property> key may be omitted.  The
+         <property>name</property> key is also optional for root build
+         items that don't build anything themselves.
         </para>
        </listitem>
       </varlistentry>
@@ -6063,6 +6057,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          Otherwise, it must not be present.  Note that a build item
          may have multiple platform types, but all platform types for
          a given build item must belong to the same target type.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>plugins</property></term>
+       <listitem>
+        <para>
+         This key is valid only in a root build item.  It is used to
+         specify the list of build items that are treated plugins by
+         this tree.  For information about plugins, see <xref
+         linkend="ref.plugins"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -6095,21 +6100,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><property>this</property></term>
-       <listitem>
-        <para>
-         This key is used to set the name of the build item.  Build
-         item names consist of period-delimited segments.  Each
-         segment consists of one or more alphanumeric characters,
-         dashes, or underscores.  Some
-         <filename>Abuild.conf</filename> files exist just to connect
-         parent directories with child directories in the file system,
-         as shown in examples below.  In those cases, the
-         <property>this</property> key may be omitted.
-        </para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
        <term><property>traits</property></term>
        <listitem>
         <para>
@@ -6124,16 +6114,27 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><property>build-also</property></term>
+       <term><property>tree-deps</property></term>
        <listitem>
         <para>
-         This key contains a list of whitespace-separated build items.
-         Whenever &abuild; adds a given item to a build set, it also
-         adds any items listed in its <property>build-also</property>
-         key to the build set.  No dependency relationship or any
-         other relationship is implied.  This is useful for creating
-         pseudo-top-level build items that serve as starting points
-         for multiple builds.
+         This key is valid only in a root build item.  It contains a
+         list of the names of trees on which this tree depends.  For
+         information about tree dependencies, see <xref
+         linkend="ref.multiple-trees"/>.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><property>tree-name</property></term>
+       <listitem>
+        <para>
+         The presence of this key establish a build item as a root
+         build item.  This key's value is the name of the build tree.
+         Build trees must be named uniquely in a forest.  Build tree
+         names may consist of alphanumeric characters, underscore,
+         dash, and period.  Unlike with build item names, there is no
+         hierarchical or scoping structure implied by any of the
+         characters in the names of build trees.
         </para>
        </listitem>
       </varlistentry>
@@ -6154,12 +6155,84 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </listitem>
       </varlistentry>
      </variablelist>
-     Note that the <property>parent-dir</property>,
-     <property>child-dirs</property>, and
-     <property>external-dirs</property> keys are the only keys that deal
-     with paths rather than names.
+     Note that the <property>child-dirs</property> keys is the only
+     key that deals with paths rather than names.
     </para>
    </sect1>
+  </chapter>
+  <chapter id="ref.abuild.backing">
+   <title>The <filename>Abuild.backing</filename> File</title>
+   <para>
+    <indexterm>
+     <primary>Abuild.backing</primary>
+    </indexterm>
+    The <filename>Abuild.backing</filename> file may appear at the
+    root of a build forest.  It specifies the locations of one or more
+    backing areas and, optionally, provides a list of build items a
+    trees that should not be inherited from the backing areas.  For
+    details about backing areas, see <xref
+    linkend="ref.backing-areas"/>.
+   </para>
+   <para>
+    The syntax of the <filename>Abuild.backing</filename> file is
+    identical to that of the <filename>Abuild.conf</filename> file: it
+    contains a list of colon-separated key/value pairs.  Blank lines
+    and lines beginning with the <literal>#</literal> character are
+    ignored.
+   </para>
+   <para>
+    <indexterm>
+     <primary>backing-areas</primary>
+    </indexterm>
+    <indexterm>
+     <primary>deleted-items</primary>
+    </indexterm>
+    <indexterm>
+     <primary>deleted-trees</primary>
+    </indexterm>
+    The following keys are defined:
+    <variablelist>
+     <varlistentry>
+      <term><property>backing-areas</property></term>
+      <listitem>
+       <para>
+        This key's value is a space-separated list of relative or
+        absolute paths to other build forests that are to be used as a
+        backing area to the current forest.  It is the only required
+        key in the <filename>Abuild.backing</filename> file.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><property>deleted-items</property></term>
+      <listitem>
+       <para>
+        This key's value is a space-separated list of build items that
+        should not be inherited from the backing area.  Any build item
+        listed here is treated as an unknown build item in the local
+        forest.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><property>deleted-trees</property></term>
+      <listitem>
+       <para>
+        This key's value is a space-separated list of build trees that
+        should be inherited from the backing area.  Any build item in
+        any build tree listed here will not be made available from the
+        backing, and the build tree will not be considered a member of
+        the local forest.  Note that, unlike with deleted items, it is
+        permissible to create a new build tree locally with the same
+        name as a deleted tree.  The new tree is not related to the
+        old tree in any way, and the new tree will not inherit build
+        items from an instance of the deleted tree in the backing
+        areas.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </para>
   </chapter>
   <chapter id="ref.abuild-interface-system">
    <title>The &Abuild; Interface System</title>
@@ -6233,12 +6306,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <firstterm>dynamic output file</firstterm>, which is called
      <filename>.ab-dynamic.mk</filename> for
      <application>make</application>-based builds and
-     <filename>.ab-dynamic-ant.properties</filename> for
-     <application>ant</application>-based builds.  The dynamic output
-     file is created in the output directory.  Although users running
-     &abuild; don't even have to know this file exists, peeking at it
-     is a useful way to see the results of parsing all the
-     <filename>Abuild.interface</filename> files in a build item's
+     <filename>.ab-dynamic.groovy</filename> for
+     <application>Groovy/ant</application>-based builds.  The dynamic
+     output file is created in the output directory.  Although users
+     running &abuild; don't even have to know this file exists,
+     peeking at it is a useful way to see the results of parsing all
+     the <filename>Abuild.interface</filename> files in a build item's
      dependency chain.
     </para>
     <para>
@@ -6311,12 +6384,14 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      statements.  Java-based rules typically use lower-case
      period-separated properties.  Ultimately &abuild; interface
      variables become <application>make</application> variables or
-     <application>ant</application> properties, which is the basis for
-     these conventions.  Note, however, that variables of both naming
-     styles may be used by either backend, and some of &abuild;'s
-     predefined interface variables that are available to both
-     <application>make</application> and
-     <application>ant</application> are of the all upper-case variety.
+     <application>ant</application> properties and keys in parameter
+     tables for <application>Groovy</application>, which is the basis
+     for these conventions.  Note, however, that variables of both
+     naming styles may be used by either backend, and some of
+     &abuild;'s predefined interface variables that are available to
+     both <application>make</application> and
+     <application>Groovy/ant</application> are of the all upper-case
+     variety.
     </para>
     <para>
      Once declared, a variable may be assigned to or referenced.  A
@@ -6359,6 +6434,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      word or numeric value is used to assign to boolean variables, the
      normalized values of <constant>0</constant> and
      <constant>1</constant> are passed to the backend build system.
+     (For simplicity and consistency, this is true even for the Groovy
+     backend, which could handle actual boolean values instead.)
      String variables just contain arbitrary text.  It is possible to
      embed spaces in string variables by quoting them with a
      backslash, but keep in mind that not all backends handle spaces
@@ -6377,7 +6454,9 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      using relative paths without having to use any special variables
      that point to their own local directories.  Although this is
      different from how make works, it is the only sensible semantic
-     for files that are referenced from multiple locations.
+     for files that are referenced from multiple locations, and it is
+     one of the most important and useful features of the &abuild;
+     interface system.
     </para>
     <para>
      List variables may contain multiple space-separated words.
@@ -6393,16 +6472,17 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      assignment below.
     </para>
     <para>
-     Scalar variables may be assigned to in one of three ways: normal,
-     override, and fallback.  A normal assignment to a scalar variable
-     fails if the variable already has a value.  An override
-     assignment initializes a previously uninitialized variable and
-     replaces any previously assigned value.  A fallback assignment
-     sets the value of the variable only if it has not previously been
-     initialized.  Uninitialized variables are passed to the backend
-     as empty strings.  It is legal to initialize a string variable to
-     the empty string, and doing this is distinct from not
-     initializing it.
+     Scalar variables may be assigned to in one of three ways:
+     <firstterm>normal</firstterm>, <firstterm>override</firstterm>,
+     and <firstterm>fallback</firstterm>.  A normal assignment to a
+     scalar variable fails if the variable already has a value.  An
+     override assignment initializes a previously uninitialized
+     variable and replaces any previously assigned value.  A fallback
+     assignment sets the value of the variable only if it has not
+     previously been initialized.  Uninitialized variables are passed
+     to the backend as empty strings.  It is legal to initialize a
+     string variable to the empty string, and doing this is distinct
+     from not initializing it.
     </para>
     <para>
      List variables work differently from anything you're likely to
@@ -6468,6 +6548,47 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      current build item (see <xref
      linkend="ref.example.opaque-wrapper"/>).
     </para>
+    <para>
+     By default, once a variable is declared and assigned to in a
+     build item's <filename>Abuild.interface</filename>, the
+     declaration and assignments are automatically visible to all
+     build items that depend on the item that made the declaration or
+     assignment.  In this sense, &abuild; variables are said to be
+     <firstterm>recursive</firstterm>.  It is also possible to declare
+     a variable as <firstterm>non-recursive</firstterm>, in which case
+     assignments to the variable are only visible in the item itself
+     and in items that depend <emphasis>directly</emphasis> on the
+     item that makes the assignment.  Declarations inherit normally.
+     <footnote>
+      <para>
+       The rationale behind using the terms
+       <emphasis>recursive</emphasis> and
+       <emphasis>non-recursive</emphasis> have to do with how these
+       variables are used.  Conceptually, when you reference an
+       interface variable, you see all assignments made to it by any
+       of your <emphasis>recursively expanded</emphasis> list of
+       dependencies, <emphasis>i.e.,</emphasis> your direct and
+       indirect dependencies.  When a variable is declared to be
+       non-recursive, you only assignments made by your direct
+       dependencies.  Other terms, such as
+       <emphasis>indirect</emphasis> or
+       <emphasis>non-inheriting</emphasis> would be technically
+       incorrect or slightly misleading.  Although there's nothing
+       specifically recursive or non-recursive about how interface
+       variables are used, we feel that this choice of terminology is
+       a reasonable reflection of the semantics achieved.
+      </para>
+     </footnote>
+    </para>
+    <para>
+     It is also possible to declare an interface variable as
+     <firstterm>local</firstterm>.  When a variable is declared as
+     local, the declaration and assignment are not visible to any
+     other build items.  This can be useful for providing values only
+     to the current build item or for using variables to hold
+     temporary values within the <filename>Abuild.interface</filename>
+     file and any after-build files that it may explicitly reference.
+    </para>
    </sect1>
    <sect1 id="ref.abuild.interface-syntactic-details">
     <title>Abuild.interface Syntactic Details</title>
@@ -6510,32 +6631,45 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <para>
         A scalar variable declaration takes the form
 
-        <programlisting>declare <replaceable>variable</replaceable> <replaceable>type</replaceable>
+        <programlisting>declare <replaceable>variable</replaceable> [ <replaceable>scope</replaceable> ] <replaceable>type</replaceable> [ = <replaceable>value</replaceable> ]
 </programlisting>
         where <replaceable>variable</replaceable> is the name of the
         variable and <replaceable>type</replaceable> is one of
         <type>boolean</type>, <type>string</type>, or
-        <type>filename</type>.  Example scalar variable declarations:
+        <type>filename</type>.  If specified,
+        <replaceable>scope</replaceable> may be one of
+        <type>non-recursive</type> or <type>local</type>.  The
+        declaration may also be followed optionally be an
+        initialization, which takes the same form as assignment,
+        described below.
+
+Example scalar variable declarations:
 
         <programlisting>declare CODEGEN filename
 declare HAS_CLASS boolean
+declare _dist local filename = $(ABUILD_OUTPUT_DIR)/dist
 </programlisting>
        </para>
        <para>
         A list variable declaration takes the form
 
-        <programlisting>declare <replaceable>variable</replaceable> list <replaceable>type</replaceable> <replaceable>append-type</replaceable>
+        <programlisting>declare <replaceable>variable</replaceable> [ <replaceable>scope</replaceable> ] list <replaceable>type</replaceable> <replaceable>append-type</replaceable> [ = <replaceable>value</replaceable> ]
 </programlisting>
         where <replaceable>variable</replaceable> is the name of the
         variable, <replaceable>type</replaceable> is one of
         <type>boolean</type>, <type>string</type>, or
         <type>filename</type>, and
         <replaceable>append-type</replaceable> is one of
-        <type>append</type> or <type>prepend</type>.  Example list
-        variable declarations:
+        <type>append</type> or <type>prepend</type>.  The optional
+        <replaceable>scope</replaceable> specification is the same as
+        for scalar variables (<type>non-recursive</type> or
+        <type>local</type>), and as with scalar variables, an optional
+        initialization may be provided.  Example list variable
+        declarations:
 
         <programlisting>declare QFLAGS list string append
-declare QPATHS list filename prepend
+declare QPATHS list filename prepend = qfiles private-qfiles
+declare DEPWORDS non-recursive list string append
 </programlisting>
        </para>
        <para>
@@ -6950,7 +7084,13 @@ endif
       <primary>ABUILD_STDOUT_IS_TTY</primary>
      </indexterm>
      <indexterm>
+      <primary>ABUILD_ITEM_NAME</primary>
+     </indexterm>
+     <indexterm>
       <primary>ABUILD_THIS</primary>
+     </indexterm>
+     <indexterm>
+      <primary>ABUILD_TREE_NAME</primary>
      </indexterm>
      <indexterm>
       <primary>ABUILD_TARGET_TYPE</primary>
@@ -6971,6 +7111,14 @@ endif
       The following interface variables are available to build items
       of all target types:
       <variablelist>
+       <varlistentry>
+        <term>ABUILD_ITEM_NAME</term>
+        <listitem>
+         <para>
+          The name of the current build item
+         </para>
+        </listitem>
+       </varlistentry>
        <varlistentry>
         <term>ABUILD_OUTPUT_DIR</term>
         <listitem>
@@ -7030,7 +7178,21 @@ endif
         <term>ABUILD_THIS</term>
         <listitem>
          <para>
-          The name of the current build item
+          The obsolete variable <varname>ABUILD_THIS</varname>
+          contains the name of the current build item.  It would have
+          been deprecated in &abuild; version 1.1, but there is no
+          reliable way to deprecate an interface variable since
+          &abuild; can't detect its use in backend build files.  New
+          code should not use <varname>ABUILD_THIS</varname>, but
+          should use <varname>ABUILD_ITEM_NAME</varname> instead.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>ABUILD_TREE_NAME</term>
+        <listitem>
+         <para>
+          The name of the current build item's tree
          </para>
         </listitem>
        </varlistentry>
@@ -7263,6 +7425,9 @@ endif
      <indexterm>
       <primary>abuild.classpath.external</primary>
      </indexterm>
+     <indexterm>
+      <primary>abuild.classpath.manifest</primary>
+     </indexterm>
      <para>
       The following variables are used by <type>java</type> build
       items:
@@ -7272,20 +7437,34 @@ endif
         <listitem>
          <para>
           This variable is to contain generated JAR files to add to
-          the classpath.  This is the variable that the most ordinary
-          Java build items will assign to.  Its value will typically
-          be
+          the compile-time classpath and to include by default in
+          higher level archives.  Most ordinary Java build items that
+          create JAR files will assign to this variable.  Its value
+          will typically be
           <filename>$(ABUILD_DIR_OUTPUT)/dist/<replaceable>JarFile.jar</replaceable></filename>,
           where <replaceable>JarFile.jar</replaceable> is the name of
           the JAR file you placed in the
-          <varname>abuild.jar-name</varname> property in your
-          <filename>Abuild-ant.properties</filename> file.  Note that
-          although Java allows both files (whose names end with
-          <filename>.jar</filename> or <filename>.zip</filename>) and
-          directories to be added to your classpath, adding
-          directories to the <varname>abuild.classpath</varname>
-          variable will not work properly in some cases with
-          &abuild;'s ant rules and should therefore be avoided.
+          <varname>java.jarName</varname> property in your
+          <filename>Abuild.groovy</filename> file.  See also
+          <varname>abuild.classpath.manifest</varname> below.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>abuild.classpath.manifest</term>
+        <listitem>
+         <para>
+          This variable is to contain JAR files whose names should be
+          listed in the <property>Class-Path</property> key of the
+          manifest of JAR files that depend on it directly.  In most
+          cases, anything that is assigned to
+          <varname>abuild.classpath</varname> must also be assigned to
+          <varname>abuild.classpath.manifest</varname>.  The
+          <varname>abuild.classpath.manifest</varname> variable is
+          declared as <type>non-recursive</type>, so assignments made
+          to it are visible only to items that depend directly on the
+          item making the assignment.  This is appropriate because
+          Java handles indirect dependencies on its own.
          </para>
         </listitem>
        </varlistentry>
@@ -7294,11 +7473,17 @@ endif
         <listitem>
          <para>
           This variable is to contain externally supplied JAR files to
-          add to the classpath.  This variable is intended to be used
-          for third-party JAR files.  The difference between it and
-          <varname>abuild.classpath</varname> is that JAR files listed
-          here are not added to EAR and WAR files while those in
-          <varname>abuild.classpath</varname> are.
+          add to the compile-time classpath.  Unlike JARs added to
+          <varname>abuild.classpath</varname>, JAR files placed here
+          will not be included in higher level archives by default.
+          Whether you assign a JAR to
+          <varname>abuild.classpath</varname> or
+          <varname>abuild.classpath.external</varname> depends on the
+          nature of your runtime environment.  Java SE applications
+          probably don't need to use this variable at all.  Java EE
+          applications should use this primarily for JAR files that
+          are required at compile time by are provided by default by
+          the application server or runtime environment.
          </para>
         </listitem>
        </varlistentry>
@@ -7366,6 +7551,7 @@ endif
     </para>
    </sect1>
   </chapter>
+ <!--XXX HERE-->
   <chapter id="ref.abuild.mk">
    <title>The <filename>Abuild.mk</filename> File</title>
    <para>
