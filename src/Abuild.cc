@@ -5075,6 +5075,12 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    }
 	}
 
+	if (addBuildAlsoToBuildset(builditems))
+	{
+	    QTC::TC("abuild", "Abuild additional build-also expansion");
+	    expanding = true;
+	}
+
 	if (! (this->repeat_expansion || first_pass))
 	{
 	    continue;
@@ -5204,12 +5210,6 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 		    this->explicit_target_items.insert(*iter);
 		}
 	    }
-	}
-
-	if (addBuildAlsoToBuildset(builditems))
-	{
-	    QTC::TC("abuild", "Abuild additional build-also expansion");
-	    expanding = true;
 	}
 
 	first_pass = false;
