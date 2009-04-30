@@ -8017,13 +8017,12 @@ endif
       that was conditional upon some value of the
       <varname>ABUILD_PLATFORM_OS</varname> variable, for example.
       Since &abuild; requires that you set at least one of
-      <varname>RULES</varname>, <varname>BUILD_ITEM_RULES</varname>,
-      or <varname>LOCAL_RULES</varname>, you can set the
-      <varname>RULES</varname> variable to the value
+      <varname>RULES</varname> or <varname>LOCAL_RULES</varname>, you
+      can set the <varname>RULES</varname> variable to the value
       <filename>empty</filename>.  &Abuild; will still attempt to
-      build the item in this case, but the build will not do
-      anything.  The <filename>empty</filename> rule set is available
-      for build items of any target type.
+      build the item in this case, but the build will not do anything.
+      The <filename>empty</filename> rule set is available for build
+      items of any target type.
      </para>
     </sect2>
    </sect1>
@@ -9278,7 +9277,6 @@ endif
     </para>
    </sect1>
   </chapter>
- <!--XXX HERE-->
   <chapter id="ref.interface-flags">
    <!--  This chapter must follow the backing areas chapter since  -->
    <!--  the private interface flags examples are in a tree with   -->
@@ -9386,9 +9384,9 @@ VAR1 = three
      <property>flag1</property> flag set, the value of
      <varname>VAR1</varname> would be <literal>one two
      three</literal>.  If you evaluate this list of assignments
-     without the <property>flag1</property> flag set, the value of
-     <varname>VAR1</varname> would just be <literal>one
-     three</literal>.
+     <emphasis>without</emphasis> the <property>flag1</property> flag
+     set, the value of <varname>VAR1</varname> would just be
+     <literal>one three</literal>.
     </para>
     <para>
      Here is a subtle but important point.  You don't really have to
@@ -10299,8 +10297,10 @@ flag private INCLUDES = private-include
      our code generator in the <filename>Abuild.interface</filename>
      file:
      <?example cross-platform/codegen/Abuild.interface?>
-     This build item provides a <filename>Rules.mk</filename> for
-     creating a file called <filename>generate.cc</filename>.  It
+     This build item provides a rules implementation file in
+     <filename>rules/object-code/codegen.mk</filename> (and a help
+     file in <filename>rules/object-code/codegen-help.txt</filename>)
+     for creating a file called <filename>generate.cc</filename>.  It
      calls the <filename>gen_code.pl</filename> program, which it
      finds using the <varname>CODEGEN</varname> interface variable, to
      do its job.  The <filename>gen_code.pl</filename> program uses
@@ -10310,10 +10310,12 @@ flag private INCLUDES = private-include
      (initialized from <classname>calculate</classname>'s
      <filename>Abuild.interface</filename> file), we need to export it
      so that it will become available in the environment.  We also
-     pass the file named in the <varname>NUMBERS</varname>
-     variable to the code generator.  Here are the
-     <filename>Rules.mk</filename> file and the code generator:
-     <?example cross-platform/codegen/rules/all/codegen.mk?>
+     pass the file named in the <varname>NUMBERS</varname> variable to
+     the code generator.  Here are the
+     <filename>codegen-help.txt</filename> file, the
+     <filename>codegen.mk</filename> file, and the code generator:
+     <?example cross-platform/codegen/rules/object-code/codegen.mk?>
+     <?example cross-platform/codegen/rules/object-code/codegen-help.txt?>
      <?example cross-platform/codegen/gen_code.pl?>
      In order for this to work, the <classname>codegen</classname>
      build item must depend on the <classname>calculate</classname>
@@ -10385,11 +10387,11 @@ flag private INCLUDES = private-include
      This build item depends on the <classname>codegen</classname>
      build item.  Its <filename>Abuild.mk</filename> defines the
      <varname>NUMBERS</varname> variable as required by
-     <classname>codegen</classname>, which it lists in its
-     <varname>BUILD_ITEM_RULES</varname> variable.  This build item
-     doesn't know or care about the interface of the
-     <classname>lib</classname> build item, which has been hidden from
-     it by the <function>reset-all</function> in
+     <filename>codegen</filename>, which it lists in its
+     <varname>RULES</varname> variable.  This build item doesn't know
+     or care about the interface of the <classname>lib</classname>
+     build item, which has been hidden from it by the
+     <function>reset-all</function> in
      <classname>calculate</classname>'s
      <filename>after.interface</filename>.  (If it wanted to, it could
      certainly also depend on <classname>lib</classname>, in which
@@ -10402,6 +10404,7 @@ flag private INCLUDES = private-include
     </para>
    </sect1>
   </chapter>
+ <!--XXX HERE-->
   <chapter id="ref.build-item-visibility">
    <title>Build Item Visibility</title>
    <para>

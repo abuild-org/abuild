@@ -2,7 +2,7 @@
 The following help is available for rule "codegen":
 
 provided by build item codegen (from tree cross-platform)
-applies to target type all
+applies to target type object-code
 Help text:
 ----------
 
