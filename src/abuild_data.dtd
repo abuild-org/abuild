@@ -119,11 +119,13 @@
 
 <!--  The global-tree-dependencies element contains a list of the  -->
 <!--  names of trees that are declared as global tree              -->
-<!--  dependencies in the forest.                                  -->
+<!--  dependencies in the forest.  Global tree dependencies also   -->
+<!--  appear as declared-tree-dependencies for each tree.          -->
 <!ELEMENT global-tree-dependencies (tree-dependency+)>
 
 <!--  The global-plugins element contains a list of all plugins    -->
-<!--  that are declared as global in the forest.                   -->
+<!--  that are declared as global in the forest.  Such plugins     -->
+<!--  will also appear in the plugins element of every tree.       -->
 <!ELEMENT global-plugins (plugin+)>
 
 <!--  One build-tree element appears for each build tree.          -->
@@ -147,6 +149,7 @@
 >
 
 <!--  The plugins element contains a list of build items that are  -->
+<!--  declared as plugins in the tree.  This includes any global   -->
 <!--  plugins.                                                     -->
 <!ELEMENT plugins (plugin+)>
 <!ELEMENT plugin EMPTY>
@@ -156,7 +159,8 @@
 
 <!--  declared-tree-dependencies contains the list of direct       -->
 <!--  dependencies in the order in which they were declared in     -->
-<!--  the Abuild.conf file.                                        -->
+<!--  the Abuild.conf file.  Additionally, any tree declared as a  -->
+<!--  global tree dependency will be included here as well.        -->
 <!ELEMENT declared-tree-dependencies (tree-dependency+)>
 
 <!--  expanded-tree-dependencies contains the list of recursively  -->
