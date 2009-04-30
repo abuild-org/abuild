@@ -9517,12 +9517,10 @@ endif
      looking at the <filename>ant-hooks.xml</filename> file.  Notice
      that it writes its generated code in to the
      <varname>${abuild.private.dir.generated-jsrc}</varname>
-     directory, which is what all code generators should do.  (For
-     additional information about writing targets, see <xref
-     linkend="ref.guidelines-for-deprecated-ant-target-authors"/>.)
-     Our <command>generate</command> hook does not have to be
-     concerned about any other details.  &Abuild; will call it
-     automatically at the correct point in the build process.
+     directory, which is what all code generators should do.  Our
+     <command>generate</command> hook does not have to be concerned
+     about any other details.  &Abuild; will call it automatically at
+     the correct point in the build process.
     </para>
     <para>
      Next, look at the <classname>other-executable</classname> build
@@ -17915,65 +17913,64 @@ Y = $(X)
    <title>The Deprecated XML-based Ant Backend</title>
    <warning>
     <para>
-     XXX this is deprecated....
+     This appendix briefly describes the deprecated xml-based ant
+     backend, which was the only mechanism for building Java code in
+     &abuild; 1.0.  To ease the transition to the newer Groovy-based
+     framework, which still uses ant through Groovy's
+     <classname>AntBuilder</classname> object, the old xml-based ant
+     framework has been left largely intact.  With one notable change,
+     it works just as it did in &abuild; 1.0.  New code should not use
+     this framework.  The rest of this appendix is mostly excerpts
+     from &abuild; 1.0's documentation with explicit examples removed.
+     The text may not be entirely coherent because of the omissions.
+     Although much of the text is written as if this is the supported
+     way to build Java code (which it was when the text was originally
+     written), in no way should anything in this appendix be taken as
+     a suggestion that this backend should be used for new code.
+    </para>
+    <para>
+     The one major difference is that &abuild; now invokes all Java
+     builds from a single JVM.  This JVM runs one build per thread up
+     to the number of threads specified by &abuild;'s
+     <option>-j</option> option.  In &abuild; 1.0, &abuild; actually
+     ran an instance of the <command>ant</command> command, which it
+     started with its current directory set to the output directory.
+     Now, &abuild; launches ant through its Java API.  Although the
+     <varname>basedir</varname> property is still set to the name of
+     the output file, certain poorly-behaved tasks that don't use that
+     for local paths may find themselves resolving local paths
+     relative to &abuild;'s start directory instead of the output
+     directory.  This seems like a small price to pay though given
+     that even the old ant framework runs many times faster using
+     &abuild; 1.1's java build launcher as it prevents creation of a
+     new JVM for each build.
     </para>
    </warning>
-   <para>
-    XXX In this chapter, we explore the use of hooks and code generators
-    for property-driven Java builds.  We also demonstrate how to have
-    a build.xml-driven Java build item interoperate with
-    property-driven build items.
-   </para>
-
-   <para>
-    XXX In this example, we demonstrate how to create different types
-    of archive types in Java.  The actual contents of these archives
-    are not necessarily valid for production, and these patterns do
-    not necessarily reflect realistic dependencies among different
-    archive types, but they do serve to illustrate how &abuild;
-    handles different archive types in a fairly general way.
-    <note>
-     <para>
-      Creation of Java archives is a weak point of &abuild; at this
-      time.  Suggestions about how to improve this are actively
-      encouraged.
-     </para>
-    </note>
-   </para>
-
-   <para>
-    There are two different Java build files:
-    <filename>Abuild-ant.properties</filename> for property-driven
-    builds, and <filename>Abuild-ant.xml</filename> for
-    build.xml-driven builds.
-    <note>
-     <para>
-      The goal is and always has been to have property-driven builds
-      be the standard method for building Java code with &abuild;.  By
-      the time of the first &abuild; release, &abuild;'s
-      property-based <application>ant</application> framework was
-      still not definitely able to handle everything that we might
-      want for the Java Enterprise Environment and full Eclipse build
-      integration.  Since <application>Apache Ant</application> is
-      already relatively declarative in nature and is not really
-      designed to be a system with which one would create a general
-      framework, it is less suitable than <application>GNU
-      Make</application> for being the basis of a general-purpose
-      build framework such as what we would want for an &abuild;
-      backend.  At the same time, <application>Apache
-      Ant</application> appears to be the best option for Java as it
-      is already very portable, flexible, written in Java, and widely
-      supported.  Introduction of build.xml-based Java build support
-      in &abuild; is a compromise as it leaves more to the developer
-      than would be desirable, but it allows for greater flexibility
-      in experimenting with alternative Java build approaches.  This
-      mechanism for building Java code may disappear in a future major
-      release of &abuild;, so developers are encouraged to use it only
-      if the property-driven approach is not able to satisfy their
-      requirements.
-     </para>
-    </note>
-   </para>
+   <warning>
+    <para>
+     There are two different build files that trigger use of the
+     deprecated xml-based ant framework:
+     <filename>Abuild-ant.properties</filename> for property-driven
+     builds, and <filename>Abuild-ant.xml</filename> for
+     <filename>build.xml</filename>-driven builds.  The
+     <filename>build.xml</filename>-based approach was introduced as a
+     means to allow for greater flexibility in experimenting with
+     alternative Java build approaches.  However, as use of ant
+     through XML files has been abandoned in &abuild; 1.1, it no
+     longer serves any purpose.  The way it works is that, if your
+     build file is <filename>Abuild-ant.xml</filename>, &abuild;
+     launches ant from the output directory using the source
+     directory's <filename>Abuild-ant.xml</filename> as the build
+     file.  Other than having to resolve paths relative to the output
+     directory rather than the directory containing
+     <filename>Abuild-ant.xml</filename> as well as having access to
+     the <filename>.ab-dynamic-ant.properties</filename> file, this
+     was essentially just using ant to do your builds.  Nothing
+     further will be said about this method in this appendix.  The
+     remainder of the appendix will focus only on the property-based
+     build method.
+    </para>
+   </warning>
    <sect1 id="ref.the-abuild-ant.properties-file">
     <title>The <filename>Abuild-ant.properties</filename> File</title>
     <indexterm>
@@ -18032,9 +18029,8 @@ Y = $(X)
     </indexterm>
     <para>
      Below is a list of supported properties.  You can also see this
-     list by running <command>abuild properties-help</command> (or,
-     equivalently, <command>abuild rules-help</command>) from any Java
-     build item.
+     list by running <command>abuild properties-help</command> from
+     any Java build item.
      <!--  This list of properties is also documented in            -->
      <!--  ant/properties-help.txt                                  -->
      <variablelist>
@@ -18410,65 +18406,10 @@ Y = $(X)
      </varlistentry>
     </variablelist>
     <para>
-     Most of these directory names are all made available to ant target
-     authors through properties.  For details, please see <xref
-     linkend="ref.guidelines-for-deprecated-ant-target-authors"/>.
+     Most of these directory names are all made available to ant
+     target authors through properties.
     </para>
    </sect1>
-   <sect1 id="ref.abuild-ant.xml">
-    <title>The <filename>Abuild-ant.xml</filename> File</title>
-    <indexterm>
-     <primary>Abuild-ant.xml</primary>
-    </indexterm>
-    <para>
-     The ant portion of the Java support in &abuild; is somewhat
-     experimental.  To handle those cases in which &abuild;'s current
-     ant support is inadequate and to facilitate experimentation with
-     alternative approaches, &abuild; will also detect the build file
-     <filename>Abuild-ant.xml</filename>.  This file is mutually
-     exclusive with <filename>Abuild-ant.properties</filename>.  If it
-     exists, &abuild; will bypass its internal ant structure and
-     invoke ant on this file directly.  Keep in mind, however, that it
-     will invoke ant from the <filename>abuild-java</filename>
-     directory as if the file were copied to a
-     <filename>build.xml</filename> in that directory.  (&Abuild; runs
-     the equivalent of <command>ant -f ../Abuild-ant.xml
-     -Dbasedir=.</command> from <filename>abuild-java</filename> when
-     it sees <filename>Abuild-ant.xml</filename>.)  This means that
-     relative paths in <filename>Abuild-ant.xml</filename> are
-     resolved from the &abuild; output directory.  This is one of the
-     reasons that this file is not called
-     <filename>build.xml</filename> as that would imply that you could
-     just run ant, which, in general, will not work.  In order to work
-     properly with &abuild;, this file must define a target called
-     <command>all</command> that builds everything needed in order to
-     build items that depend on it.  This file should also define the
-     other standard targets supported by &abuild; (see <xref
-     linkend="ref.targets.general"/>).  Even though there aren't
-     actually any restrictions on what version of ant you could use
-     for this alternative Java support, &abuild; still requires it to
-     be 1.7 or newer.  This way, you won't run into the situation of
-     having an old version of ant and suddenly needing to upgrade
-     because of the addition of a build item that uses &abuild;'s
-     included ant framework.
-    </para>
-    <para>
-     Note that &abuild; still creates the
-     <filename>.ab-dynamic-ant.properties</filename> file in the
-     <filename>abuild-java</filename> directory, so the hand-coded ant
-     build file still has access to all the information from the
-     &abuild; interfaces of its dependencies as well as the properties
-     that contain the paths to those items.  If you are writing an
-     <filename>Abuild-ant.xml</filename> file, you are
-     <emphasis>strongly encouraged</emphasis> to use this file to
-     minimize your direct dependence on ant, the environment, and the
-     file system layout.  For an example of a build item build in this
-     way that interoperates with &abuild;'s default ant support, see
-     <xref linkend="ref.example.build-driven-java"/>.
-    </para>
-   </sect1>
-
-
    <sect1 id="ref.deprecated-ant-hooks">
     <title>Ant Hooks</title>
     <!--  This information is duplicated in ant/hooks-help.txt.    -->
@@ -18605,14 +18546,6 @@ Y = $(X)
         to set to make use of the services provided by your hooks.
        </para>
       </listitem>
-      <listitem>
-       <para>
-        <command>interface-help</command>: called from the
-        <command>interface-help</command> target.  Use this hook to
-        provide help to your users about any variables that may need
-        to set to set in their Abuild.interface files.
-       </para>
-      </listitem>
      </itemizedlist>
     </para>
     <para>
@@ -18636,117 +18569,9 @@ Y = $(X)
      </footnote>
     </para>
    </sect1>
-   <sect1 id="ref.example.build-driven-java">
-    <title>Build.xml-driven Java Example</title>
-    <para>
-     In the directory <filename>java/alternative</filename>, you will
-     find a build item that has a hand-coded ant build file,
-     <filename>Abuild-ant.xml</filename>.  When &abuild; encounters
-     this file, it invokes ant directly (<xref
-     linkend="ref.abuild-ant.xml"/>).  If you examine the
-     <filename>Abuild-ant.xml</filename> in this directory, you will
-     notice that it defines a target <command>all</command> that
-     builds everything that would ordinarily be required by its
-     reverse dependencies.  It also defines the standard targets
-     <command>test</command>, <command>check</command>, and
-     <command>doc</command> that are expected to be present for all
-     build items.  In addition, it defines its own special target
-     <command>run</command> that runs the application.  Notice that
-     the source path in the <command>java</command> element in this
-     file is <filename>../src/java</filename>.  Since &abuild; invokes
-     ant on this build file from inside the
-     <filename>abuild-java</filename> output directory, all references
-     to source paths must be prefixed by
-     &ldquo;<filename>../</filename>&rdquo;:
-     <!-- ?example java/alternative/Abuild-ant.xml? -->
-     Also observe that this build file loads the
-     <filename>.ab-dynamic-ant.properties</filename> so that it can
-     still benefit from classpath information as determined by the
-     interfaces of its dependencies.  All
-     <filename>Abuild-ant.xml</filename> files should do this.  This
-     build item uses the property <varname>abuild.classpath</varname>,
-     which comes from that file.  For a list of properties that will
-     be defined in <filename>.ab-dynamic-ant.properties</filename>,
-     see <xref linkend="ref.predefined-abuild.interface-variables"/>.
-    </para>
-    <para>
-     At this time, it is uncertain what &abuild;'s final Java support
-     will look like, but the use of
-     <filename>Abuild-ant.xml</filename> is not recommended unless
-     there is no other option.
-    </para>
-   </sect1>
-
-   <sect1 id="ref.guidelines-for-deprecated-ant-target-authors">
-    <title>Guidelines for Ant Target Authors</title>
-    <para>
-     The primary mechanism for extending the functionality of
-     Java-based builds with &abuild; is by writing hook targets (see
-     <xref linkend="ref.deprecated-ant-hooks"/>).  There are also
-     examples of creating hooks in this document (<xref
-     linkend="ref.example.java-code-generator"/>).  A build item hook
-     file must be called <filename>ant-hooks.xml</filename>.  It is
-     also possible to declare ant hooks files in plugins.  The plugin
-     ant hooks file must be called
-     <filename>plugin-ant.xml</filename>.
-    </para>
-    <para>
-     Here are some things to keep in mind when writing hook targets:
-     <itemizedlist>
-      <listitem>
-       <para>
-        &Abuild; provides property names for most of the directories
-        that it uses.  The names of these properties generally start
-        with <varname>abuild.private</varname>.  This doesn't mean you
-        shouldn't reference those properties; it just means that end
-        users should not set them or access them in their
-        <filename>Abuild-ant.properties</filename> files or attempt to
-        override them from the command-line.  They are intended to be
-        private to <application>ant</application> code that is either
-        user-supplied or included in &abuild;'s
-        <application>ant</application> framework.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        &Abuild; runs with <varname>basedir</varname> set to the
-        &abuild; output directory of the build item currently being
-        built.  Relative paths are therefore resolved relative to that
-        directory.  You can use any ant-supplied methods for accessing
-        local files, and you can use the
-        <varname>abuild.dir.<replaceable>build-item-name</replaceable></varname>
-        property for the location your own build item as provided by
-        &abuild;.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        When adding your own hooks, please be sure to create a
-        <command>properties-help</command> hook (by creating a
-        <command>-properties-help</command> target) that describes any
-        additional properties your users should set in their
-        <filename>Abuild-ant.properties</filename> files.  For an
-        example, see <xref
-        linkend="ref.example.java-code-generator"/>.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Don't be afraid to read the ant code and comments in
-        <filename>ant/abuild.xml</filename> under &abuild;'s
-        installation directory.
-       </para>
-      </listitem>
-     </itemizedlist>
-    </para>
-   </sect1>
-
-
-   <sect1 id="ref.example.deprecated-jar-like-archives">
+   <sect1 id="ref.deprecated-jar-like-archives">
     <title>JAR-like Archives</title>
     <para>
-     In the <filename>doc/example/archive-types</filename> directory,
-     you will find subdirectories for each of several archive types.
      &Abuild; knows how to create JAR files, WAR files, and EAR files.
      The names of the archives that &abuild; creates do not have to
      end with the suffix corresponding to the type.  In particular,
@@ -18758,51 +18583,24 @@ Y = $(X)
      elements that are not either directories or files whose names end
      with <filename>.zip</filename> or <filename>.jar</filename>, a
      behavior that is consistent with the documentation.
-    </para>
-    <para>
-     Start by looking at the HAR example.  If you study its
-     <filename>Abuild-ant.properties</filename> file and its
-     <filename>Abuild.interface</filename> file, you will observe that
-     we are creating a HAR file here exactly the way we would create a
-     JAR file except that we are using the <filename>.har</filename>
-     suffix:
-     <!-- ?example archive-types/har/Abuild-ant.properties? -->
-     <!-- ?example archive-types/har/Abuild.interface? -->
-     Note that the HAR file created here probably wouldn't work as a
-     HAR (hibernate archive) file.  We're just naming it this way for
-     purposes of illustration.  If you needed to add other things to
-     the HAR file, you would do so in the same way as you would for
-     any other JAR file (adding to <filename>src/conf</filename>,
-     <filename>src/resources</filename>, or their automatically
-     generated counterparts as appropriate).  Here are the contents of
-     the HAR file:
-     <!-- ?qtest har-contents.out? -->
-     Note that the <filename>META-INF</filename> directory and the
-     <filename>MANIFEST.MF</filename> file are created automatically
-     during the JAR creation process.  Next, look at the JAR example.
-     It is essentially identical to the HAR example except that this
-     build item depends on <classname>har-example</classname>:
-     <!-- ?example archive-types/jar/Abuild-ant.properties? -->
-     <!-- ?example archive-types/jar/Abuild.interface? -->
-     The <filename>JarExample.java</filename> class imports a class
-     defined in the HAR file to illustrate that it works in &abuild;
-     to add a HAR file to the <varname>abuild.classpath</varname>
-     variable even if it wouldn't work in straight ant.  This is
-     because &abuild; is creating a file whose ends with
-     <filename>.har.jar</filename> and is adding that to the real
-     classpath instead.  Here are the contents of the JAR file:
-     <!-- ?qtest jar-contents.out? -->
+     <footnote>
+      <para>
+       This behavior was based on a misunderstanding of how these
+       archives might be used.  This behavior is not present in the
+       new Groovy-based framework.
+      </para>
+     </footnote>
     </para>
    </sect1>
    <sect1 id="ref.deprecated.war-files">
     <title>WAR Files</title>
     <para>
-     Next, look at the WAR (web archive) example.  The structure of
-     WAR files is slightly different from the structure of ordinary
-     JAR files.  In particular, when constructing a WAR file, the
-     <filename>src/resources</filename> directory is ignored and the
-     <filename>src/web</filename> directory is used instead.  Anything
-     in <filename>src/web</filename> is added to the WAR file at its
+     The structure of WAR files is slightly different from the
+     structure of ordinary JAR files.  In particular, when
+     constructing a WAR file, the <filename>src/resources</filename>
+     directory is ignored and the <filename>src/web</filename>
+     directory is used instead.  Anything in
+     <filename>src/web</filename> is added to the WAR file at its
      root, just as with <filename>src/resources</filename> for a JAR
      file.  Other than the name, there is no difference between how
      these directories are used.  Additionally, the
@@ -18837,98 +18635,29 @@ Y = $(X)
      <filename>src/conf/lib</filename> (remember that both of these
      paths are relative to the output directory, which is directory
      from which <application>ant</application> is run) so that they
-     will end up in <filename>WEB-INF/lib</filename>.  The EAR example
-     includes a demonstration of using a
-     <command>pre-package</command> hook for manipulating the contents
-     of the <filename>classpath</filename> directory:
-     <!-- ?example archive-types/war/Abuild-ant.properties? -->
-     <!-- ?example archive-types/war/Abuild.interface? -->
-     Here are the contents of this server WAR file:
-     <!-- ?qtest war-contents.out? -->
-     The <classname>client-war</classname> example is identical except
-     it creates a client WAR instead:
-     <!-- ?example archive-types/client-war/Abuild-ant.properties? -->
-     <!-- ?example archive-types/client-war/Abuild.interface? -->
-     Here are its contents:
-     <!-- ?qtest client-war-contents.out? -->
-     In this example, the <classname>war-example</classname> build
-     item depends on the <classname>jar-example</classname> build item
-     which in turn depends on <classname>har-example</classname>.
-     Notice that &abuild; has added
-     <filename>har-example.har.jar</filename> to the WAR file instead
-     of adding <filename>har-example.har</filename>.  This, again, is
-     to work around the fact that <command>javac</command> ignores
-     classpath elements that are files whose names don't end with
-     <filename>.jar</filename> or <filename>.zip</filename>.  This
-     behavior may change if it turns out to be incorrect.  Another
-     thing to observe about the WAR example is that it adds its WAR
-     file to the <varname>abuild.classpath</varname> variable.  This
-     is another thing that may change in the future.  It's not really
-     accurate to say that the WAR file is in the classpath, but for
-     the time being at least, this is the mechanism used for
-     population of EAR files.  &Abuild; will attempt to add
-     <filename>war-example.war.jar</filename> to the classpath of
-     build items that depend on <filename>example-war</filename>, but
-     since this file won't exist during EAR creation (as the appending
-     of <filename>.jar</filename> happens only during compilation), it
-     turns out to be harmless.  It's possible that an error might
-     result if a WAR file depends on another WAR file, but there's no
-     reason for this to ever happen.  Additionally, observe that the
-     <varname>abuild.web-xml</varname> property has to be set in the
-     <filename>Abuild-ant.properties</filename> file in addition to
-     the <filename>abuild.war-name</filename> property when creating
-     WAR files.
+     will end up in <filename>WEB-INF/lib</filename>.
     </para>
    </sect1>
    <sect1 id="ref.deprecated.ear-files">
     <title>EAR Files</title>
     <para>
-     Next, look at the EAR example.  The
-     <classname>ear-example</classname> build item directly or
-     indirectly depends on many of the other build items we've seen so
-     far.  It also depends on a private build item,
-     <filename>ear-example.local-jar</filename> that builds a JAR file
-     for inclusion in the EAR file.  There's nothing special about
-     this, but making it a private build item inside of
-     <classname>ear-example</classname> makes it clear that it is
-     private to the EAR file:
-     <!-- ?example archive-types/ear/Abuild.conf? -->
-     <!-- ?example archive-types/ear/Abuild-ant.properties? -->
-     Unlike with WAR files, EAR files actually contain the direct
-     products produced by other build items, not their JAR
-     counterparts: notice that the HAR and WAR files are directly
-     contained in the EAR file:
-     <!-- ?qtest ear-contents.out? -->
-     Note also that the EAR file contains the WAR file and it also
-     directly contains some of its contents, notably the JAR and HAR
-     files.  (The HAR file is included in the WAR by a different name;
-     the JAR file is included with the same name.)  This behavior may
-     change in the future.  Also, observe that the
-     <varname>abuild.application-xml</varname> property has to be set
-     in <filename>Abuild-ant.properties</filename> in addition to the
-     <varname>abuild.ear-name</varname> property in order for an EAR
-     to be created.
+     The <varname>abuild.application-xml</varname> property has to be
+     set in <filename>Abuild-ant.properties</filename> in addition to
+     the <varname>abuild.ear-name</varname> property in order for an
+     EAR to be created.
     </para>
     <para>
      Suppose you wanted to avoid inclusion of just the
      <filename>jar-example.jar</filename> file from the EAR file.  You
      can do this by creating a local <command>pre-package</command>
      hook that removes it from the <filename>classpath</filename>
-     directory.  To illustrate this, we have a second EAR example in
-     the <filename>other-ear</filename> directory.  It defines a local
-     build file and enables local hooks.  Here is its
-     <filename>Abuild-ant.properties</filename> file:
-     <!-- ?example archive-types/other-ear/Abuild-ant.properties? -->
-     This file refers to the local build file
-     <filename>local.xml</filename>:
-     <!-- ?example archive-types/other-ear/local.xml? -->
-     This same mechanism can be used to create hybrid client/server
-     WAR files.  The main problem with this approach is that it
-     requires you to know the name of the archives you want to move or
-     remove, though this is not as bad as knowing their locations.  A
-     comparable alternative would be to define custom interface
-     variables in your dependencies to name the actual archives.
-     These interface variables would be available as
+     directory.  This same mechanism can be used to create hybrid
+     client/server WAR files.  The main problem with this approach is
+     that it requires you to know the name of the archives you want to
+     move or remove, though this is not as bad as knowing their
+     locations.  A comparable alternative would be to define custom
+     interface variables in your dependencies to name the actual
+     archives.  These interface variables would be available as
      <application>ant</application> properties from your local build
      file.
     </para>
@@ -18938,13 +18667,6 @@ Y = $(X)
      and anything in <filename>src/resources</filename> will appear in
      the EAR file relative to its location in
      <filename>src/resources</filename>.
-    </para>
-    <para>
-     The above examples illustrate how other archive types are
-     constructed in &abuild; at the present time.  There are several
-     potential problems that may be addressed in a future release of
-     &abuild;.  For details, please see <xref
-     linkend="ref.known-limitations"/>.
     </para>
    </sect1>
   </appendix>
