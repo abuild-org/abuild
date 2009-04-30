@@ -17,6 +17,3 @@ $(TARGET): $(QOBJS)
 	$(RM) $(TARGET)
 	cat $(QOBJS) > $@
 	echo 'link' >> $@
-
-clean::
-	$(RM) $(TARGET) $(QOBJS)

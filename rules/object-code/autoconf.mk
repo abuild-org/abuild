@@ -45,8 +45,3 @@ autoconf.stamp: $(COMMONDEPS) $(AC_IN)
 	CC="$(COMPILE_c) $(AC_CFLAGS)" CXX="$(COMPILE_cxx) $(AC_CXXFLAGS)" \
 		./configure $(CONFIGURE_ARGS)
 	touch autoconf.stamp
-
-clean::
-	$(RM) -r configure autom4te.cache config.log config.status
-	$(RM) -r aclocal.m4 $(AUTOCONFIGH) $(AUTOFILES) $(AUTOCONFIGH).in
-	$(RM) autoconf.stamp

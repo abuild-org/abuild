@@ -8,6 +8,3 @@ $(WOBJS): %.x: %.w
 	$(RM) $@
 	cp -f $< $@
 	echo 'w -> x' >> $@
-
-clean::
-	$(RM) $(WOBJS)

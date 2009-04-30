@@ -8184,11 +8184,10 @@ endif
     </para>
    </sect1>
   </chapter>
- <!--XXX HERE-->
   <chapter id="ref.abuild.groovy">
    <title>The <application>Groovy</application> backend</title>
    <para>
-    XXX
+    XXX DO THIS CHAPTER.
    </para>
 
    <sect1 id="ref.directory-structure-for-java-builds">
@@ -8738,14 +8737,16 @@ endif
     In this chapter, we show how to use &abuild; with automatically
     generated code.  The examples in this chapter use the
     <application>GNU Make</application> backend, but the principles
-    are the same if you are using <application>ant</application>.
-    Examples of using code generators with Java appear later in the
-    document (<xref linkend="ref.example.java-code-generator"/>).
+    are the same if you are using
+    <application>Groovy/ant</application>.  Examples of using code
+    generators with Java appear later in the document (<xref
+    linkend="ref.example.java-code-generator"/>).
    </para>
    <sect1 id="ref.build-item-rules">
     <title>Build Item Rules</title>
     <indexterm>
-     <primary>Rules.mk</primary>
+     <primary>rules</primary>
+     <secondary>build item</secondary>
     </indexterm>
     <para>
      The most important thing to realize about code generators in
@@ -8760,32 +8761,38 @@ endif
     </para>
     <para>
      In order for a <application>make</application>-based build item
-     to provide code generation, it must have a
-     <filename>Rules.mk</filename> file.  The
-     <filename>Rules.mk</filename> file is a GNU Make fragment that is
-     included by &abuild; only when explicitly requested.  In order to
-     use the rules implemented in one build item's
-     <filename>Rules.mk</filename> file, you must depend on that build
-     item and also list its name in the
-     <varname>BUILD_ITEM_RULES</varname> variable in your
-     <filename>Abuild.mk</filename> file.  Any rules defined in
-     <filename>Rules.mk</filename> are run from the &abuild; output
-     directory of the build item that is using the rules.  That means
-     that if the rules need to refer to files inside the build item
-     that <emphasis>provides</emphasis> the rules, they must do so by
-     either accessing interface variables defined in that build item's
-     <filename>Abuild.interface</filename>, or prefixing the files
+     to provide code generation, it must supply additional make rules.
+     The rules are in the form of a make fragment.  Build
+     item-supplied rules are located in a subdirectory of the item's
+     <filename>rules</filename> directory.  The subdirectory is either
+     <filename>all</filename>, for rules that can be used with any
+     target type, or the name of the target type
+     (<filename>platform-independent</filename>,
+     <filename>object-code</filename>, or <filename>java</filename>).
+     The name of the rules file is
+     <filename><replaceable>rulename</replaceable>.mk</filename>,
+     where <replaceable>rulename</replaceable> is whatever you are
+     calling the rules.  This is what people who use the rules will
+     place in their <varname>RULES</varname> variable in their
+     <filename>Abuild.mk</filename> file.  Any rules provided by a
+     build item are run from the &abuild; output directory of the
+     build item that is using the rules, just as is the case with
+     built-in rules.  That means that if the rules need to refer to
+     files inside the build item that <emphasis>provides</emphasis>
+     the rules, they must do so by either accessing interface
+     variables defined in that build item's
+     <filename>Abuild.interface</filename> or by prefixing the files
      with a variable that &abuild; provides.  Specifically, for a
      build item named
      <classname><replaceable>build-item</replaceable></classname>,
      &abuild; provides variable called
      <varname>abDIR_<replaceable>build-item</replaceable></varname>
-     that can be accessed from a <filename>Rules.mk</filename> file.
-     Note that &abuild; only provides these variables for build items
-     in your dependency chain.  Also, use of these variables from
+     that can be accessed from the rules implementation file.  Note
+     that &abuild; only provides these variables for build items in
+     your dependency chain.  Also, use of these variables from
      <filename>Abuild.mk</filename> files is strongly discouraged as
      it can cause your build tree to contain path-based dependencies
-     instead of name-based dependencies which would defeat one of the
+     instead of name-based dependencies, which would defeat one of the
      most compelling advantages of &abuild;.  The best practice is to
      refer to files in your own build item from your own files by
      using the abuild-provided variable name to find your own path,
@@ -8807,42 +8814,43 @@ endif
      constant, which is read from a file.  We have modified
      <classname>derived-main</classname> to use the code generator.
      The code generator itself is implemented in the
-     <classname>derived-codegen</classname> build item and is made
-     available through that build item's <filename>Rules.mk</filename>
-     file.
+     <classname>derived-codegen</classname> build item, which provides
+     a rule set called <filename>code-generator</filename>.  The build
+     item is making these rules available for build items of type
+     <type>object-code</type>.  The file that implements the rules is
+     therefore called
+     <filename>rules/object-code/code-generator.mk</filename>.
     </para>
     <para>
      First, we'll look at the code generator itself.  Notice that the
-     only &abuild; files contained in the
+     only &abuild; file contained in the
      <classname>derived-code-generator</classname> build item
-     directory at <filename>user/derived/code-generator</filename> are
-     <filename>Abuild.conf</filename> and
-     <filename>Rules.mk</filename>.  There is no
+     directory at <filename>user/derived/code-generator</filename> is
+     <filename>Abuild.conf</filename>.  There is no
      <filename>Abuild.interface</filename> or
      <filename>Abuild.mk</filename>, though these files could exist if
-     they were needed.
+     the build item itself had something that it needed to build.
     </para>
     <para>
-     The important part of this is <filename>Rules.mk</filename>, so
-     we'll study it carefully.  Here is the
-     <filename>Rules.mk</filename> file:
-     <?example general/user/derived/code-generator/rules/all/code-generator.mk?>
-     The first thing we do here is to define a
-     <command>rules-help</command> target that prints some help
-     information about using the rules.  By placing the name of this
-     build item (<classname>derived-code-generator</classname>) in
-     your <varname>BUILD_ITEM_RULES</varname> variable, you will see
-     this output when you run <command>abuild rules-help</command>.
-     When writing rules help, please remember that the strings you are
-     echoing are subject to <application>make</application>'s ordinary
-     variable substitution rules.  It's best to actually test by
-     running <command>abuild rules-help</command> to make sure that it
-     echoes properly.  Alternatively, you can have your
-     <command>rules-help</command> target display the contents of a
-     file in your build item.
+     Before we get to the rules themselves, observe that there is
+     another file in <filename>rules/object-code</filename>: the help
+     file,
+     <filename>rules/object-code/code-generator-help.txt</filename>,
+     the contents of which are presented here:
+     <?example general/user/derived/code-generator/rules/object-code/code-generator-help.txt?>
+     Whenever you provide a rule implementation for rule
+     <replaceable>rulename</replaceable>, you should create a
+     <filename><replaceable>rulename</replaceable>-help.txt</filename>
+     file in the same directory.  This is the file that will be
+     displayed when the user types <command>abuild --help rules
+     rule:<replaceable>rulename</replaceable></command>.
     </para>
     <para>
-     The next thing that happens is that we have some code that checks
+     The most important part of this example is the rule
+     implementation file, so we'll study it carefully.  Here is the
+     <filename>rules/object-code/code-generator.mk</filename> file:
+     <?example general/user/derived/code-generator/rules/object-code/code-generator.mk?>
+     The first thing that happens is that we have some code that checks
      for undefined variables.  This isn't strictly necessary, but it
      can save your users a lot of trouble if you detect when variables
      they are supposed to provide are not there.  We use the function
@@ -8896,35 +8904,30 @@ endif
      echo command even when running with <option>--verbose</option>,
      and that we don't see the output at all when we're running with
      <option>--silent</option>.  All informational messages should be
-     generated this way.  (For the <command>rules-help</command>
-     target, we use <command>@echo</command> directly since it doesn't
-     make sense to suppress that output even when running with
-     <option>--silent</option>.)  Note also that we invoke the code
-     generator with <command>perl</command> rather than assuming that
-     it is executable (since some version control systems or file
-     systems make it hard to preserve execute permissions) and that we
-     specify the path to the code generator in terms of
+     generated this way.  Note also that we invoke the code generator
+     with <command>perl</command> rather than assuming that it is
+     executable (since some version control systems or file systems
+     make it hard to preserve execute permissions) and that we specify
+     the path to the code generator in terms of
      <varname>$(abDIR_derived-code-generator)</varname>.  Also notice
      that we have to prefix the name of the input file with
      <varname>$(SRCDIR)</varname> when we pass it to the code
      generator since we are running from the &abuild; output
-     directory.  (The <varname>VPATH</varname> variable tells
+     directory.  The <varname>VPATH</varname> variable tells
      <application>make</application> where to look, but it doesn't
-     tell our code generator anything!)  Finally, we add a
-     <command>clean</command> rule that removes our automatically
-     generated files.  Note that the <command>clean</command> rule is
-     only run when the user invokes &abuild; from the output
-     directory.  For this reason, adding a <command>clean</command>
-     target is optional.  For more detail on this, please see <xref
-     linkend="ref.running-in-output-directory"/>.
+     tell our code generator anything!  However, the special GNU Make
+     variables like <varname>$&lt;</varname> and <varname>$^</varname>
+     will contain the full paths to prerequisites and can often be
+     used instead.
     </para>
     <para>
      To use this code generator from
      <classname>derived-main.src</classname>, all we have to do is
      define the required variables in <filename>Abuild.mk</filename>,
-     and add <classname>derived-code-generator</classname> as a
-     dependency in <filename>Abuild.conf</filename> and to the
-     <varname>BUILD_ITEM_RULES</varname> variable in
+     add <classname>derived-code-generator</classname> as a dependency
+     in <filename>Abuild.conf</filename>, and add
+     <filename>code-generator</filename> to the
+     <varname>RULES</varname> variable in
      <filename>Abuild.mk</filename>.  Note that we have modified
      <filename>main.cpp</filename> to include
      <filename>auto.h</filename> and to call
@@ -9054,19 +9057,21 @@ endif
        building, so no explicit dependency would be required.  This
        approach would certainly work for this example.  One option
        that would definitely <emphasis>not</emphasis> work would be to
-       create a <command>generate</command> target analogous to the
-       <command>generate</command> hook in &abuild;'s
-       <application>ant</application> support and making it a
+       create a <command>generate</command> target, analogous to the
+       <command>generate</command> target in &abuild;'s
+       <application>Groovy/ant</application> support, and making it a
        prerequisite for the <command>all</command> target.  Although
        this would work for strictly serial builds, it wouldn't
        necessarily work for parallel builds as
        <application>make</application> is free to build all the
        prerequisites for a given target in any order as long as they
        don't have dependencies on each other.  In fact, the reason
-       this trick works in <application>ant</application> is that
-       <application>ant</application> only runs tasks in parallel when
-       you explicitly tell it that it can.  So the bottom line is that
-       whatever we are automatically generating must appear as a
+       this trick works in <application>Groovy</application> is that
+       the <application>Groovy</application> framework never runs
+       targets in parallel, and <application>ant</application> only
+       runs tasks within a target in parallel when you explicitly tell
+       it that it can.  So the bottom line is that whatever we are
+       automatically generating, at the file level, must appear as a
        dependency somewhere.  Source files automatically appear as
        dependencies of their object files, but header files don't
        appear as dependencies anywhere until the compile has already
@@ -9109,7 +9114,7 @@ endif
   <chapter id="ref.java-code-generators">
    <title>Automatically Generated Code for Groovy-based Builds</title>
    <para>
-    XXX
+    XXX DO THIS CHAPTER
    </para>
    <sect1 id="ref.example.java-code-generator">
     <title>Java Code Generator Example</title>
@@ -9273,6 +9278,7 @@ endif
     </para>
    </sect1>
   </chapter>
+ <!--XXX HERE-->
   <chapter id="ref.interface-flags">
    <!--  This chapter must follow the backing areas chapter since  -->
    <!--  the private interface flags examples are in a tree with   -->
