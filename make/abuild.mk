@@ -82,6 +82,11 @@ endif
 # functionality in a plugin.
 doc:: all ;
 
+# Make sure check, test, and test-only are defined and that check and
+# test depend on all.
+check test:: all ;
+test-only:: ;
+
 # Include base rule and user-specified built-in rules
 include $(foreach RULE,$(RULES),$(call load_rule,$(RULE)))
 

@@ -46,11 +46,6 @@ Miscellaneous
    platform-dependent values (like pathnames, etc.) are in fact
    platform-dependent.
 
- * Mention that we don't support descrpition for unnamed build items,
-   including nameless tree roots, because we don't store anything
-   about unnamed build items.  If you want a description in your tree
-   root, give it a name.  Comments are allowed anywhere.
-
  * For msvc toolchain, document MSVC_GLOBAL_FLAGS,
    MSVC_MANAGEMENT_FLAGS, and MSVC_RUNTIME_FLAGS.  See comments in
    msvc.mk.
@@ -59,15 +54,6 @@ Miscellaneous
    and rules.
 
  * Document built-in interface variables in help/vars.txt
-
- * Document ABUILD_FORCE_32BIT and ABUILD_FORCE_64BIT.  See release
-   notes.  Mention somewhere that all support for this can be found
-   for searching for FORCE_WORDSIZE in the code.  The only references
-   are in private/bin/get_native_platform_data and
-   make/toolchains/gcc.mk.
-
- * Autoconf: remember to mention attributes: serial.  Also, mention
-   the serial attribute in the description of --make-jobs.
 
  * Put a --with-rdeps example somewhere in the documentation.  It
    could go in the "general" area, except, for any build item,
@@ -287,6 +273,8 @@ manual intervention.
 Rationale for Changing Build Tree Structure
 ===========================================
 
+(include very abbreviated version in major changes section)
+
 A principal failing in abuild 1.0 stems from the use of paths to
 specify the locations of external build trees -- "external-dirs" is
 used to convey both dependency and location information.  This is
@@ -371,6 +359,8 @@ too cumbersome to be practical.
 
 Revamped Build Tree Structure
 =============================
+
+(include in major changes section)
 
 Introduce the concept of a "build forest".  A build forest is a
 collection of related build trees that are physically located under a

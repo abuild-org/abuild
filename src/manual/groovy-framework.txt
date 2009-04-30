@@ -20,6 +20,8 @@ Miscellaneous Points to Incorporate
  * Lazy jar signing is true by default in order to have idempotent
    builds
 
+ * Build item paths (abuild.itemPaths[item])
+
  * Examples...
 
 

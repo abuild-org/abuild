@@ -13,7 +13,6 @@ my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
 
 my $devnull = File::Spec->devnull();
 
-# FORCE_WORDSIZE
 my $force_32 = (exists $ENV{'ABUILD_FORCE_32BIT'} &&
 		($ENV{'ABUILD_FORCE_32BIT'}) eq '1');
 my $force_64 = (exists $ENV{'ABUILD_FORCE_64BIT'} &&
@@ -29,7 +28,6 @@ foreach my $k (keys %force_32_to_64)
 {
     $force_64_to_32{$force_32_to_64{$k}} = $k;
 }
-# END FORCE_WORDSIZE
 
 my $windows = 0;
 if ((@ARGV == 1) && ($ARGV[0] eq '--windows') &&
@@ -81,7 +79,6 @@ sub get_platform_components_unix
 	# Don't distinguish between different flavors of ix86.
 	$cpu =~ s/^i.86$/ix86/;
 
-	# FORCE_WORDSIZE
 	if ($force_32 && (exists $force_64_to_32{$cpu}))
 	{
 	    $cpu = $force_64_to_32{$cpu};
@@ -90,7 +87,6 @@ sub get_platform_components_unix
 	{
 	    $cpu = $force_32_to_64{$cpu};
 	}
-	# END FORCE_WORDSIZE
 
 	my $release = "";
         if (read_dist_file("/etc/mandrake-release", \$release) &&
