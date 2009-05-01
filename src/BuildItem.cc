@@ -274,7 +274,8 @@ BuildItem::getBestPlatformForType(std::string platform_type,
 	    (*(this->platform_types.find(platform_type))).second;
 	if (! platforms.empty())
 	{
-	    if (ps && (! ps->isDefault()))
+	    if ((this->target_type == TargetType::tt_object_code) &&
+		ps && (! ps->isDefault()))
 	    {
 		PlatformSelector::Matcher m(platforms[0], *ps);
 		for (std::vector<std::string>::const_iterator iter =
@@ -291,7 +292,9 @@ BuildItem::getBestPlatformForType(std::string platform_type,
 	    }
 	    if (result.empty())
 	    {
-		QTC::TC("abuild", "BuildItem used first for type");
+		QTC::TC("abuild", "BuildItem used first for type",
+			(this->target_type == TargetType::tt_object_code)
+			? 1 : 0);
 		result = platforms[0];
 	    }
 	}

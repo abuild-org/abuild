@@ -114,6 +114,21 @@
     </buildable-platforms>
    </build-item>
    <build-item
+    name="java"
+    home-forest="f-1"
+    absolute-path="--topdir--/case4/java"
+    backing-depth="0"
+    target-type="java"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="java"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="java"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
     name="a"
     home-forest="f-1"
     absolute-path="--topdir--/case4/a"
@@ -123,9 +138,11 @@
    >
     <declared-dependencies>
      <dependency name="item" platform-type="native"/>
+     <dependency name="java" platform-type="java"/>
     </declared-dependencies>
     <expanded-dependencies>
      <dependency name="item"/>
+     <dependency name="java"/>
     </expanded-dependencies>
     <platform-types>
      <platform-type name="indep"/>

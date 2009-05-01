@@ -185,7 +185,7 @@ PlatformData skipping platform type 0
 ItemConfig ptype is selector 0
 ItemConfig bad ptype selector 0
 BuildItem used selector for type 0
-BuildItem used first for type 0
+BuildItem used first for type 1
 Abuild buildset names 1
 Abuild ERR unknown items in set 0
 Abuild ERR bad buildset pattern 0

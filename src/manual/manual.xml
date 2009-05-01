@@ -13708,6 +13708,20 @@ Y = $(X)
          </listitem>
         </itemizedlist>
        </listitem>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Fix bug that caused an assertion failure when platform
+           selectors were used if there were any platform-specific
+           dependencies on java build items.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
