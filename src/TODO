@@ -25,6 +25,9 @@ Abuild Lint
  * Upgrade abuild-lint to make it useful and then include it in
    abuild-contrib or as its own release.
 
+ * Detect -- in build item names and warn about not meaning private
+   anymore.
+
 
 Windows Issues
 ==============
