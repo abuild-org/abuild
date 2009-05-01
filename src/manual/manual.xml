@@ -5088,7 +5088,136 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
   <chapter id="ref.read-only-paths">
    <title>Explicit Read-Only and Read/Write Paths</title>
    <para>
-    XXX write this
+    One of the significant defining features of &abuild; is that it
+    will automatically build items to satisfy dependencies.  Most of
+    the time, this is useful and helpful behavior, but there are
+    certain cases in which it can actually get in the way.  For
+    example, you may have one build tree that provides common code,
+    which you may want to build manually in advance of building
+    everything else.  Then you may want to kick off parallel builds of
+    separate dependent trees on multiple platforms simultaneously and
+    be able to be sure that they won't step on each other by all
+    trying to build the shared tree at the same time.  In cases like
+    this, you might want to tell &abuild; to assume the shared tree is
+    built and to treat it as read-only.
+   </para>
+   <para>
+    To support this and similar scenarios, &abuild; allows you to
+    explicitly designate specific paths as read-only on the command
+    line.
+    <footnote>
+     <para>
+      In &abuild; 1.0, we had a different mechanism for addressing
+      this need: read-only externals.  There were several problems
+      with read-only externals, though: they were ambiguous since
+      whether a tree was read-only or not would depend on how &abuild;
+      came to know about it through other trees, they were not
+      granular as you could only control this at the tree level, and
+      they were inflexible: you might set them up to address the needs
+      of a particular build, and then have them get in the way of
+      other builds.  When externals were replaced by named trees and
+      tree dependencies, we dropped support for read-only externals
+      and replaced them with read-only paths, which are much more
+      flexible and which make the decision a function of the specific
+      build rather than of the build trees, as it always should have
+      been.
+     </para>
+    </footnote>
+    Most of the time, specifying a read-only path is as simple as
+    invoking &abuild; with the
+    <option>--ro-path=<replaceable>directory</replaceable></option>
+    option for the directory you want to treat as read-only.  There
+    may cases, however, where you want a much more specific degree of
+    control.  When you need it, it's there.  Here we describe the
+    exact behavior of the <option>--ro-path</option> and
+    <option>--rw-path</option> options.
+    <itemizedlist>
+     <listitem>
+      <para>
+       Both <option>--ro-path=<replaceable>dir</replaceable></option>
+       and <option>--rw-path=<replaceable>dir</replaceable></option>
+       may appear multiple times.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       If neither option appears, all build items are writable.
+       (Except those in backing areas; backing areas are always
+       read-only.)
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       If only <option>--ro-path</option> appears, build items are
+       writable by default, and only those located under any specified
+       read-only path are read-only.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       If only <option>--rw-path</option> appears, build items are
+       <emphasis>read-only</emphasis> by default, and only build items
+       located under a directory specified with
+       <option>--rw-path</option> are writable.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       If both <option>--ro-path</option> and
+       <option>--rw-path</option> are specified:
+       <itemizedlist>
+        <listitem>
+         <para>
+          Either every <option>--ro-path</option> must be a path under
+          some <option>--rw-path</option>, in which case build items
+          are read-only by default,
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          or every <option>--rw-path</option> must be path under some
+          <option>--ro-path</option>, in which case build items are
+          writable by default.
+         </para>
+        </listitem>
+       </itemizedlist>
+       In this case, the writability of items is determined by the
+       lowest directory actually specified (start with the item's
+       directory and walk up the file system until you find a
+       directory explicitly mentioned), using the default of none is
+       found.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </para>
+   <para>
+    This seems more complicated than it really is, so let's look at a
+    simple example.  Suppose you have the directory structure
+    <filename>a/b/c/d</filename>.  If you specified
+    <option>--ro-path=a/b --rw-path=a/b/c</option>, all read/write
+    paths are under some read only path, so build items are writable
+    by default.  Everything under <filename>a/b/c</filename> is
+    writable, and everything under <filename>a/b</filename> that is
+    <emphasis>not</emphasis> under <filename>a/b/c</filename> is
+    read-only.  Use of <option>--ro-path</option> and
+    <option>--rw-path</option> together basically lets you make a
+    particular area read only and then give exceptions.  Likewise, you
+    can make everything read-only by default, and then make only a
+    specific directory read-write, again make exceptions to that.
+   </para>
+   <para>
+    These rules make it possible to unambiguously create any
+    combination of read-only/writable build items without having the
+    order of the arguments matter.  If you're sufficiently determined,
+    you can use this mechanism to precisely control which items should
+    be read-only and which should be writable.
+   </para>
+   <para>
+    Paths specified may be absolute or relative.  Relative paths are
+    resolved relative to the starting directory of abuild.  They are
+    converted internally to absolute paths after any <option>-C
+    <replaceable>start-directory</replaceable></option> option is
+    evaluated.
    </para>
   </chapter>
   <chapter id="ref.command-line">
