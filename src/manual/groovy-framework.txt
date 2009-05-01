@@ -344,4 +344,4 @@ Abuild.groovy environment
 Rule-specific Help
 ------------------
 
- * see rules/java/java_help.txt
+ * see rules/java/java-help.txt
