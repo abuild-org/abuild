@@ -267,6 +267,7 @@ class Abuild
     void cleanPath(std::string const& item_name, std::string const& dir);
     void cleanOutputDir();
     bool generalHelp();
+    void showRulesHelpMessage();
     void readHelpFile(std::string const& filename);
     void rulesHelp(BuildForest& forest);
     void appendToolchainHelpTopics(HelpTopic_map& topics,
@@ -338,6 +339,7 @@ class Abuild
     static std::string const s_NO_OP;
     static std::string const h_HELP;
     static std::string const h_RULES;
+    static std::string const hr_HELP;
     static std::string const hr_LIST;
     static std::string const hr_RULE;
     static std::string const hr_TOOLCHAIN;

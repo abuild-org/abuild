@@ -38,6 +38,7 @@ std::string const Abuild::s_CLEAN = "clean";
 std::string const Abuild::s_NO_OP = "no-op";
 std::string const Abuild::h_HELP = "help";
 std::string const Abuild::h_RULES = "rules";
+std::string const Abuild::hr_HELP = "help";
 std::string const Abuild::hr_LIST = "list";
 std::string const Abuild::hr_RULE = "rule:";
 std::string const Abuild::hr_TOOLCHAIN = "toolchain:";
@@ -376,11 +377,14 @@ Abuild::parseArgv()
 	    this->help_topic = *argp++;
 	    if (this->help_topic == h_RULES)
 	    {
-		if (! *argp)
+		if (*argp)
 		{
-		    usage("invalid --help rules invocation");
+		    this->rules_help_topic = *argp++;
 		}
-		this->rules_help_topic = *argp++;
+		else
+		{
+		    this->rules_help_topic = hr_HELP;
+		}
 	    }
 	}
 	else if (arg == "-C")
@@ -7281,7 +7285,8 @@ Abuild::generalHelp()
 
     if (this->help_topic == h_RULES)
     {
-	if ((this->rules_help_topic == hr_LIST) ||
+	if ((this->rules_help_topic == hr_HELP) ||
+	    (this->rules_help_topic == hr_LIST) ||
 	    (this->rules_help_topic.find(hr_RULE) == 0) ||
 	    (this->rules_help_topic.find(hr_TOOLCHAIN) == 0))
 	{
@@ -7366,17 +7371,26 @@ Abuild::generalHelp()
 	}
 	h(line);
     }
+    showRulesHelpMessage();
+    return true;
+}
+
+void
+Abuild::showRulesHelpMessage()
+{
+    boost::function<void(std::string const&)> h =
+	boost::bind(&Logger::logInfo, &(this->logger), _1);
+
     h("");
-    h("Help is also available on built-in and user-supplied rules.  To request");
-    h("help on rules, run \"" + this->whoami + " --help " + h_RULES + " topic");
+    h("Help is available on built-in and user-supplied rules.  To request help");
+    h("on rules, run \"" + this->whoami + " --help " + h_RULES + " topic" + "\".");
     h("The following rules topics are available:");
     h("");
+    h("  help: show help specific to --help rules");
     h("  list: show all items for which rule help is available");
     h("  rule:rulename: show help on rule \"rulename\"");
     h("  toolchain:toolchainname: show help on toolchain \"toolchainname\"");
     h("");
-
-    return true;
 }
 
 void
@@ -7397,6 +7411,12 @@ Abuild::readHelpFile(std::string const& filename)
 void
 Abuild::rulesHelp(BuildForest& forest)
 {
+    if (this->rules_help_topic == hr_HELP)
+    {
+	showRulesHelpMessage();
+	return;
+    }
+
     // Note that this function may be called on a build forest with
     // dependency/integrity errors.
 

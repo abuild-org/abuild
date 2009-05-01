@@ -75,6 +75,20 @@ $td->runtest("help help",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("help rules",
+	     {$td->COMMAND => "abuild --help rules",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/help-rules-help.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("help rules help",
+	     {$td->COMMAND => "abuild --help rules help",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/help-rules-help.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("bad topic",
 	     {$td->COMMAND => "abuild --help potato",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -91,4 +105,4 @@ $td->runtest("bad rules topic",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(4 + @list + @help);
+$td->report(6 + @list + @help);

@@ -1690,12 +1690,6 @@ C:\cygwin\cygwin.bat
     use it for tasks of moderate complexity.
    </para>
   </partintro>
-  <chapter id="ref.help-system">
-   <title>Help System</title>
-   <para>
-    XXX write this
-   </para>
-  </chapter>
   <chapter id="ref.build-items-and-trees">
    <title>Build Items and Build Trees</title>
    <para>
@@ -3203,6 +3197,62 @@ C:\cygwin\cygwin.bat
      linkend="ref.what-to-build"/>.
     </para>
    </sect1>
+  </chapter>
+  <chapter id="ref.help-system">
+   <title>Help System</title>
+   <para>
+    &Abuild; has a built-in help system, introduced in version 1.1,
+    that makes it easier for users to get help for &abuild; itself and
+    also for available rules, both built-in and user-supplied.
+   </para>
+   <para>
+    The starting point to &abuild;'s help system is the command
+    <command>abuild --help</command>.  Help is available on a variety
+    of general topics including the help system and command
+    invocation.  You can also get help on rules.  You can see
+    information about what kinds of help is available on rules by
+    running <command>abuild --help rules</command>.
+   </para>
+   <para>
+    The rules help facility offers three major capabilities.  By
+    running <command>abuild --help rules list</command>, you can see
+    the list of compiler toolchains and also the list of available
+    rules that you can assign to <varname>RULES</varname> (make) or
+    <varname>abuild.rules</varname> (Groovy).  In addition to telling
+    you what's offered overall, this will tell you what target types
+    the rules apply to, and whether the rules are available to you
+    through your dependency chain.  That way, if you need to make use
+    of a rule that is provided by some build item that you don't
+    depend on, you can know which item you need to add a dependency on
+    to gain access to the rule.  Once you know which toolchain or rule
+    you want help on, you can use <command>abuild --help rules
+    toolchain:<replaceable>toolchain-name</replaceable></command> or
+    <command>abuild --help rules
+    rule:<replaceable>rule-name</replaceable></command> to get
+    available help for that toolchain or rule.
+   </para>
+   <para>
+    Creating help files is very straightforward.  For any toolchain
+    support file or rule file, in the same directory, create a text
+    file called
+    <filename><replaceable>toolchain-name</replaceable>-help.txt</filename>
+    or
+    <filename><replaceable>rule-name</replaceable>-help.txt</filename>
+    as appropriate.  The contents of this help file will be displayed
+    to the user when help is requested on that toolchain or rule.
+    Lines within the help text that start with
+    &ldquo;<literal>#</literal>&rdquo; are ignored, which makes it
+    possible for you to include notes to people who might be
+    maintaining the help file.  Also, &abuild; normalizes line
+    terminators, displaying the help with whatever the platform's
+    native line terminator is.
+   </para>
+   <para>
+    We present examples of help files in this manual as we present
+    information about adding rules and toolchain support files.  You
+    can also run <command>abuild --help helpfiles</command> for a
+    reminder about the help file format.
+   </para>
   </chapter>
   <chapter id="ref.what-to-build">
    <title>Telling &Abuild; What to Build</title>
@@ -8993,9 +9043,6 @@ endif
     <application>Groovy/ant</application> as the mechanisms are very
     similar.
    </para>
-
-
-
    <sect1 id="ref.build-item-rules">
     <title>Build Item Rules</title>
     <indexterm>
@@ -11177,6 +11224,12 @@ flag private INCLUDES = private-include
     </para>
    </sect1>
   </chapter>
+  <chapter id="ref.optional-dependencies">
+   <title>Optional Dependencies</title>
+   <para>
+    XXX write this
+   </para>
+  </chapter>
   <chapter id="ref.plugins">
    <title>Enhancing &Abuild; with Plugins</title>
    <para>
@@ -11846,6 +11899,7 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       <type>abc</type> compiler defined somewhere.  This plugin also
       provides the rules for using the <type>abc</type> compiler in
       <filename>toolchains/abc.mk</filename>:
+      <!-- XXX help text -->
       <?example plugin/plugins/printer/toolchains/abc.mk?>
       To understand this file, you should read through the comments in
       <filename>rules/object-code/ccxx.mk</filename> in the
@@ -11980,6 +12034,7 @@ native-compiler qcc
       In addition to listing the compiler in
       <command>list_platforms</command>, we have to provide a support
       file for it in <filename>toolchains/qcc.mk</filename>:
+      <!-- XXX help text -->
       <?example native-compiler/compiler/toolchains/qcc.mk?>
       This file illustrates a degenerate compiler implementation,
       providing minimal implementations of all the variables and

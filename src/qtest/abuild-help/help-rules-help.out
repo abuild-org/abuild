@@ -1,14 +1,4 @@
 
-Invalid rules help topic "spackle"
-
-To request help on a specific topic, run "abuild --help topic".
-Help is available on the following topics:
-
-  help: the help system (this topic)
-  helpfiles: help file format
-  rules: rule-specific help (see below)
-  usage: abuild command invocation
-
 Help is available on built-in and user-supplied rules.  To request help
 on rules, run "abuild --help rules topic".
 The following rules topics are available:

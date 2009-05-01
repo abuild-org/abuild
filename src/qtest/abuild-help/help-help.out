@@ -7,10 +7,11 @@ Help is available on the following topics:
   rules: rule-specific help (see below)
   usage: abuild command invocation
 
-Help is also available on built-in and user-supplied rules.  To request
-help on rules, run "abuild --help rules topic
+Help is available on built-in and user-supplied rules.  To request help
+on rules, run "abuild --help rules topic".
 The following rules topics are available:
 
+  help: show help specific to --help rules
   list: show all items for which rule help is available
   rule:rulename: show help on rule "rulename"
   toolchain:toolchainname: show help on toolchain "toolchainname"
