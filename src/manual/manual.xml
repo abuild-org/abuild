@@ -4230,7 +4230,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       flags to the backends so that they will try to build as much as
       they can without stopping on the first error.  Both the
       <application>make</application> and
-      <application>groovy</application> backends behave similarly to
+      <application>Groovy</application> backends behave similarly to
       &abuild;: they will keep going on failure, skip any targets that
       depend on failed targets, and exit abnormally if any failures
       are detected.
@@ -5767,16 +5767,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>Code Generators</term>
+      <term>Build Item Rules and Code Generators</term>
       <listitem>
        <para>
-        There are two chapters that explore how to use code generators
-        with &abuild;.  In <xref linkend="ref.code-generators"/>, we
-        discuss code generators for make-based builds.  In <xref
-        linkend="ref.java-code-generators"/>, we discuss them for
-        Groovy/ant-based builds.  Although the concepts are similar,
-        there are some differences depending on which backend you are
-        using.
+        &Abuild; allows build items to supply custom rules, most often
+        for supporting automatic code generation.  In <xref
+        linkend="ref.code-generators"/>, we discuss code generators
+        for make-based and Groovy-based builds.
        </para>
       </listitem>
      </varlistentry>
@@ -6909,12 +6906,11 @@ LIBS = lib3 lib4
         files are visible to items that depend on this build item but
         not to the item itself, this mechanism is useful for changing
         interface variables for the item's reverse dependencies
-        without changing what the build item itself sees.  The Java
-        code generator example (<xref
-        linkend="ref.example.java-code-generator"/>) does this.  It
-        also makes this construct useful for automatically generated
-        interface data.  For an example of that use, see <xref
-        linkend="ref.example.autoconf"/>.
+        without changing what the build item itself sees.  The Opaque
+        Wrapper example (<xref linkend="ref.example.opaque-wrapper"/>)
+        does this.  It also makes this construct useful for
+        automatically generated interface data.  For an example of
+        that use, see <xref linkend="ref.example.autoconf"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -7720,7 +7716,7 @@ endif
         <application>GNU Make</application>'s
         <function>vpath</function> feature.  We provide an example of
         this construct in <xref
-        linkend="ref.example.code-generator"/>.
+        linkend="ref.example.code-generator.make"/>.
        </para>
       </footnote>
       There are variables that can be used to control the creation of
@@ -8987,16 +8983,19 @@ endif
    </sect1>
   </chapter>
   <chapter id="ref.code-generators">
-   <title>Automatically Generated Code for GNU Make-based Builds</title>
+   <title>Build Item Rules and Automatically Generated Code </title>
    <para>
-    In this chapter, we show how to use &abuild; with automatically
-    generated code.  The examples in this chapter use the
-    <application>GNU Make</application> backend, but the principles
-    are the same if you are using
-    <application>Groovy/ant</application>.  Examples of using code
-    generators with Java appear later in the document (<xref
-    linkend="ref.example.java-code-generator"/>).
+    In this chapter, we show how to use &abuild; with custom rules
+    provided by build items.  The most common application of build
+    item-supplied rules is to support automatic code generation.
+    Examples are presented for both the <application>GNU
+    Make</application> backend and the
+    <application>Groovy/ant</application> as the mechanisms are very
+    similar.
    </para>
+
+
+
    <sect1 id="ref.build-item-rules">
     <title>Build Item Rules</title>
     <indexterm>
@@ -9015,16 +9014,36 @@ endif
      dependency tree.
     </para>
     <para>
+     Any build item may provide custom rules.
+     <footnote>
+      <para>
+       Actually, there is no way for build items using the deprecated
+       xml-based ant backend to provide custom rules.  They are
+       limited to providing code for specific hooks in the set rule
+       structure.
+      </para>
+     </footnote>
+     To provide custom rules, a build item creates a
+     <filename>rules</filename> directory.  The rules themselves go in
+     a subdirectory of <filename>rules</filename> either named
+     <filename>all</filename>, for rules that can be used by any build
+     item, or named after the target type (one of
+     <filename>object-code</filename>, <filename>java</filename>, or
+     <filename>platform-independent</filename>) for rules that are
+     available only to build items of the specified target type.  When
+     searching for rules, &abuild; always looks the directory under
+     <filename>rules</filename> corresponding to the build item's
+     target type first, and then it searches the
+     <filename>all</filename> directory.  The basic procedure for
+     providing build item rules is essentially the same for both
+     backends.  The differences are mainly syntactic.  We describe the
+     mechanisms in turn for each backend.
+    </para>
+    <para>
      In order for a <application>make</application>-based build item
      to provide code generation, it must supply additional make rules.
-     The rules are in the form of a make fragment.  Build
-     item-supplied rules are located in a subdirectory of the item's
-     <filename>rules</filename> directory.  The subdirectory is either
-     <filename>all</filename>, for rules that can be used with any
-     target type, or the name of the target type
-     (<filename>platform-independent</filename>,
-     <filename>object-code</filename>, or <filename>java</filename>).
-     The name of the rules file is
+     The rules are in the form of a make fragment.  The name of the
+     rules file is
      <filename><replaceable>rulename</replaceable>.mk</filename>,
      where <replaceable>rulename</replaceable> is whatever you are
      calling the rules.  This is what people who use the rules will
@@ -9058,9 +9077,44 @@ endif
      &abuild;.  For a discussion of this topic, please see <xref
      linkend="ref.guidelines-for-make-rule-authors"/>.
     </para>
+    <para>
+     In order for a <application>Groovy</application>-based build item
+     to provide rules, it must supply additional groovy code in a file
+     called
+     <filename><replaceable>rulename</replaceable>.groovy</filename>.
+     Build items can use the rule by adding
+     <filename><replaceable>rulename</replaceable></filename> to the
+     <varname>abuild.rules</varname> parameter in their
+     <filename>Abuild.groovy</filename> files.  Within the context of
+     the build item-supplied, the variables
+     <varname>abuild.sourceDirectory</varname> and
+     <varname>abuild.buildDirectory</varname> are
+     <classname>File</classname> objects that represent the build item
+     directory and output directory of the item on behalf of which the
+     rules are being invoked.  If the rules need to reference a file
+     inside of the build item that is
+     <emphasis>providing</emphasis>the rules, it should either set an
+     interface variable or access its location by name using
+     <varname>abuild.itemPaths[<replaceable>item-name</replaceable>]</varname>,
+     where <replaceable>item-name</replaceable> is the name of the
+     build item providing the rules.  &Abuild; only provides locations
+     for build items that are plugins or that are in the dependency
+     chain of the item being built.
+    </para>
+    <para>
+     A build item may actually provide rules for both backends at the
+     same time as <filename>.mk</filename> and
+     <filename>.groovy</filename> files can co-mingle in the
+     <filename>rules</filename> directory.  Whichever type of rules
+     are being provided, rule authors are encouraged to create a help
+     file that gives the user information needed to use the rules.
+     The help file is called
+     <filename><replaceable>rulename</replaceable>-help.txt</filename>
+     and resides in the same directory as the rules.
+    </para>
    </sect1>
-   <sect1 id="ref.example.code-generator">
-    <title>Code Generator Example</title>
+   <sect1 id="ref.example.code-generator.make">
+    <title>Code Generator Example for Make</title>
     <para>
      The <classname>derived-code-generator</classname> build item in
      <filename>doc/example/general/user/derived/code-generator</filename>
@@ -9196,6 +9250,12 @@ endif
      <?example general/user/derived/main/src/Abuild.mk?>
      Here is the modified <filename>main.cpp</filename> file:
      <?example general/user/derived/main/src/main.cpp?>
+    </para>
+   </sect1>
+   <sect1 id="ref.example.code-generator.groovy">
+    <title>Code Generator Example for Groovy</title>
+    <para>
+     XXX write this
     </para>
    </sect1>
    <sect1 id="ref.example.auto-from-variable">
@@ -9369,171 +9429,6 @@ endif
     <title>Caching Generated Files</title>
     <para>
      XXX write this
-    </para>
-   </sect1>
-  </chapter>
-  <chapter id="ref.java-code-generators">
-   <title>Automatically Generated Code for Groovy-based Builds</title>
-   <para>
-    XXX DO THIS CHAPTER
-   </para>
-   <sect1 id="ref.example.java-code-generator">
-    <title>Java Code Generator Example</title>
-    <para>
-     In this example, we create a simple Java &ldquo;executable&rdquo;
-     (JAR file with a <function>main</function> method) that depends
-     on a simple &ldquo;library&rdquo;.  The library contains some
-     automatically generated code which is generated by a code
-     generator that we also supply.  Our code generator defines a
-     simple ant task to do the generation.  To tie this all together,
-     we have several build items, which we will examine from the top
-     down in dependency order.  This example can be found in the
-     <filename>doc/example/java</filename> directory.  When building
-     Java code with <application>ant</application>, &abuild; makes use
-     of a custom logger.  This logger suppresses the output of empty
-     <application>ant</application> targets, but does so in a manner
-     that works well with nested targets.  If you wish to use the
-     standard <application>ant</application> logger, you can invoke
-     &abuild; with the <option>--no-abuild-logger</option>
-     command-line option.
-    </para>
-    <para>
-     We'll start off with the <classname>executable</classname> build
-     item in the <filename>executable</filename> directory.  If you
-     look at its <filename>Abuild.conf</filename> file, you will see
-     that it depends on <classname>library</classname>:
-     <!-- ?example java/executable/Abuild.conf? -->
-     From <classname>executable</classname>'s
-     <filename>Abuild-ant.properties</filename> file, you can see that
-     this build item is generating the file
-     <filename>example-executable.jar</filename>, and that it is
-     generating a wrapper script:
-     <!-- ?example java/executable/Abuild-ant.properties? -->
-    </para>
-    <para>
-     The <filename>src</filename> directory under
-     <filename>executable</filename> contains a
-     <filename>java</filename> directory and a
-     <filename>resources</filename> directory.  The
-     <filename>src/java</filename> directory contains the java code,
-     which in this case consists of the single source file
-     <filename>Executable.java</filename> located in directory
-     structure based on its package, as always.  The
-     <filename>resources</filename> directory contains the file
-     <filename>file.text</filename> which is to be included in the JAR
-     file.  Our example executable reads the contents of this file
-     from the JAR file as an example of how to make use of the
-     <filename>resources</filename> directory.
-    </para>
-    <para>
-     Next, we'll turn our attention to the <classname>library</classname>
-     build item.  Our <classname>library</classname> build item creates a
-     JAR file called <filename>example-library.jar</filename> as you
-     can see from looking at the value of
-     <varname>abuild.jar-name</varname> in its
-     <filename>Abuild-ant.properties</filename> file:
-     <!-- ?example java/library/Abuild-ant.properties? -->
-     In addition, this build item makes use of hooks in the
-     <classname>code-generator</classname> build item.  Specifically,
-     we tell that build item to generate a class called
-     <classname>Negator</classname> in the
-     <classname>com.example.library.generated</classname> package.
-     Our <classname>library</classname> build item contains a single
-     source file in <filename>src/java</filename>.  This source file
-     uses the generated <classname>Negator</classname> class.
-    </para>
-    <para>
-     For most users, this is all you really need to know: you will
-     create your own code and resources and build them by setting
-     properties.  Sometimes the properties will be standard &abuild;
-     properties, and sometimes there will be additional properties as
-     required by build items that provide build-related services to
-     your build item.  As we continue, we will explore the
-     <classname>code-generator</classname> build item to see what's
-     going on behind the scenes.
-    </para>
-    <para>
-     The <classname>code-generator</classname> build item is in the
-     <filename>code-generator</filename> directory.  This build item
-     creates a JAR file called
-     <filename>CodeGenerator.jar</filename>.  It also sets the
-     &abuild; property <varname>abuild.include-ant-runtime</varname>
-     so that the <application>ant</application> runtime library will
-     be included in the compile-time classpath:
-     <!-- ?example java/code-generator/Abuild-ant.properties? -->
-    </para>
-    <para>
-     This build item also has a file called
-     <filename>ant-hooks.xml</filename>.  This file contains the build
-     hooks that are provided by this build item.  The
-     <filename>ant-hooks.xml</filename> file references the property
-     <varname>code-generator.classpath</varname>, which is declared in
-     the <filename>Abuild.interface</filename> file.  Here are those
-     files:
-     <!-- ?example java/code-generator/Abuild.interface? -->
-     <!-- ?example java/code-generator/ant-hooks.xml? -->
-     This particular build item provides two hooks: a
-     <command>generate</command> hook, and a
-     <command>properties-help</command> hook.  These are implemented
-     by defining targets called <command>-generate</command> and
-     <command>-properties-help</command>.  It is proper for all build
-     items that provide hooks to provide a
-     <command>properties-help</command> hook if the hooks expect any
-     additional properties to be set.  In this case, we are generating
-     code, so we need to know the name of the class we are to
-     generate.  Our <command>-properties-help</command> target echoes
-     this information to <application>ant</application>'s output
-     stream.  The <command>generate</command> hook is run by &abuild;
-     before it compiles any code, so the <command>javac</command> step
-     will be able to access the generated source files along with the
-     hand-coded ones.  Our <command>-generate</command> target is an
-     empty target that depends on the <command>codegen</command>
-     target which does the actual work.
-    </para>
-    <para>
-     Notice that there is nothing else required in an
-     <filename>ant-hooks.xml</filename> file other than creation of
-     appropriately named targets.  &Abuild;'s ant call will automatically
-     load and invoke these targets at the right time as required.
-    </para>
-    <para>
-     The <classname>code-generator</classname> build item's
-     <filename>Abuild.interface</filename> does something that most
-     build items don't have to do: it declares a custom variable that
-     holds the name of the JAR file that it generates, and it does not
-     add this JAR file to the classpath:
-     <!-- ?example java/code-generator/Abuild.interface? -->
-     The reason for this is that
-     <classname>code-generator</classname>'s users don't need to call
-     anything from its JAR file in their code, but its
-     <filename>ant-hooks.xml</filename> file, which will be invoked
-     with <varname>basedir</varname> set to the calling build item's
-     output directory, needs to know the location of the JAR file.
-    </para>
-    <para>
-     The <classname>code-generator</classname>'s
-     <filename>src/java</filename> directory contains the source code
-     to the ant task, but the ant task's operation is clear just by
-     looking at the <filename>ant-hooks.xml</filename> file.  Notice
-     that it writes its generated code in to the
-     <varname>${abuild.private.dir.generated-jsrc}</varname>
-     directory, which is what all code generators should do.  Our
-     <command>generate</command> hook does not have to be concerned
-     about any other details.  &Abuild; will call it automatically at
-     the correct point in the build process.
-    </para>
-    <para>
-     Next, look at the <classname>other-executable</classname> build
-     item.  This build item actually contains no source code.  All it
-     does is define the properties required to generate a wrapper
-     script, but this time, it uses a different main class in the
-     executable JAR file.  This build item serves primarily as an
-     example of using the wrapper target, which is a post-package
-     hook, from a build item that doesn't actually package anything.
-     Here are its <filename>Abuild.conf</filename> and
-     <filename>Abuild-ant.properties</filename> files:
-     <!-- ?example java/other-executable/Abuild.conf? -->
-     <!-- ?example java/other-executable/Abuild-ant.properties? -->
     </para>
    </sect1>
   </chapter>
@@ -11415,7 +11310,7 @@ flag private INCLUDES = private-include
       </listitem>
       <listitem>
        <para>
-        Additional groovy code in
+        Additional Groovy code in
         <filename>preplugin.groovy</filename> that is loaded by all
         Groovy-based build items before their own
         <filename>Abuild.groovy</filename> files are loaded
@@ -11423,7 +11318,7 @@ flag private INCLUDES = private-include
       </listitem>
       <listitem>
        <para>
-        Additional groovy code in <filename>plugin.groovy</filename>
+        Additional Groovy code in <filename>plugin.groovy</filename>
         that is loaded by all Groovy-based build items after their own
         <filename>Abuild.groovy</filename> files are loaded
        </para>
@@ -11839,21 +11734,6 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       particularly useful for adding support to &abuild; for other
       programming languages that require other information to be known
       from its dependencies.
-     </para>
-     <para>
-      <!-- XXX This paragraph should go to the build item rules
-           chapter -->
-      Note that, although we have added only a rule under
-      <filename>rules/all</filename>, thus making the rule available
-      to build items of any target type, we could have also added
-      rules under <filename>rules/object-code</filename>,
-      <filename>rules/platform-independent</filename>, or
-      <filename>rules/java</filename>, including even adding a rule
-      with the same name that does something different when used by an
-      item of a specified type.  &Abuild; always searches the
-      directory under <filename>rules</filename> corresponding to the
-      build item's target type first, and then it searches the
-      <filename>all</filename> directory.
      </para>
      <para>
       For an example of a build item that uses this plugin's
@@ -12378,7 +12258,7 @@ native-compiler qcc
         <filename><replaceable>rulename</replaceable>-help.txt</filename>,
         and lives in the same directory as the rule implementation.
         For an example and discussion of this, see <xref
-        linkend="ref.example.code-generator"/> and <xref
+        linkend="ref.code-generators"/> and <xref
         linkend="ref.help-system"/>.
        </para>
       </listitem>
@@ -12387,7 +12267,7 @@ native-compiler qcc
         If your rules require certain variables to be set, check for
         those variables and given an error if they are not defined.
         For an example of this, see <xref
-        linkend="ref.example.code-generator"/>.  The
+        linkend="ref.example.code-generator.make"/>.  The
         <filename>ccxx.mk</filename> rules in the &abuild; sources
         (<xref linkend="ref.ccxx.mk"/>) provide a somewhat more
         elaborate example of doing this since they actually generate
@@ -13969,7 +13849,7 @@ Y = $(X)
            Older versions of &abuild; would allow assignment of
            multiple words to scalar interface variables.  This was
            never intended functionality, and only happened to work
-           because of the syntax of make and ant.  With the groovy
+           because of the syntax of make and ant.  With the Groovy
            backend, this actually causes a problem, so &abuild; no
            properly gives an error when multiple words are assigned to
            a scalar interface variable.  (Thanks to Brian Reid for
@@ -14077,7 +13957,7 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           QTest support for both make and groovy now exports the
+           QTest support for both make and Groovy now exports the
            <varname>TC_SRCS</varname> variable automatically.
           </para>
          </listitem>
@@ -14374,7 +14254,7 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           When the <filename>groovy</filename> rules are used, groovy
+           When the <filename>groovy</filename> rules are used, Groovy
            sources are now expected to be in
            <filename>src/groovy</filename> instead of
            <filename>src/java</filename>.
@@ -14825,7 +14705,7 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           Documentation for the groovy framework has been moved to
+           Documentation for the Groovy framework has been moved to
            <filename>src/manual/groovy-framework.txt</filename>
            pending full inclusion in the manual.
           </para>
@@ -14833,7 +14713,7 @@ Y = $(X)
          <listitem>
           <para>
            Java examples that are not specifically illustrating the
-           ant framework have been converted to use the groovy
+           ant framework have been converted to use the Groovy
            framework.  The rest have been moved into an ant-specific
            portion of the test suite.  The text remains in the manual,
            but the files are no longer included.  Prior to the release
@@ -15282,12 +15162,12 @@ Y = $(X)
            Java and Groovy code currently called
            <filename>java_proto</filename>.  These rules may change in
            non-compatible ways throughout the 1.1 alpha testing
-           period.  The <application>groovy</application> backend is
+           period.  The <application>Groovy</application> backend is
            invoked through Java APIs.  A single instance of the Java
-           Virtual Machine is shared for all groovy-based builds.
+           Virtual Machine is shared for all Groovy-based builds.
           </para>
           <para>
-           For now, documentation on the interface to the groovy
+           For now, documentation on the interface to the Groovy
            framework can be found in <filename>src/TODO</filename> in
            the abuild distribution.  It will be moved into the manual
            as it is stabilized.
@@ -15295,7 +15175,7 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           The same JVM that is used to run groovy-based builds is now
+           The same JVM that is used to run Groovy-based builds is now
            also used to invoke ant-based builds.  As such, &abuild;
            runs all ant builds from a single JVM and no longer invokes
            ant from the command line.  This can result in a noticeable
@@ -15352,10 +15232,10 @@ Y = $(X)
            now the recommended way of overriding variables.  Any
            variables defined in this way are made available to the
            <application>ant</application> backend and to the ant
-           project in the <application>groovy</application> backend as
+           project in the <application>Groovy</application> backend as
            properties, and to the GNU Make backend as variables passed
            on the command line.  They are also passed to the
-           <application>groovy</application> backend in a manner that
+           <application>Groovy</application> backend in a manner that
            causes them to override variable values that are set in
            other ways, as long as the documented interfaces are used
            for getting and setting variables.
@@ -15383,7 +15263,7 @@ Y = $(X)
            <option>-with-rules</option> may be specified.  This causes
            the build item to load <filename>Rules.mk</filename>
            (make), <filename>ant-hooks.xml</filename> (ant), or
-           <filename>Rules.groovy</filename> (groovy).  This replaces
+           <filename>Rules.groovy</filename> (Groovy).  This replaces
            the now deprecated <varname>BUILD_ITEM_RULES</varname> make
            variable and <varname>abuild.hook-build-items</varname> ant
            property.  This change means that there is now a unified
@@ -15417,7 +15297,7 @@ Y = $(X)
          <listitem>
           <para>
            The <option>-n</option> is now supported for all the
-           backends, not just make.  For the ant and groovy backends,
+           backends, not just make.  For the ant and Groovy backends,
            &abuild; doesn't actually invoke the backend but instead
            just prints some information on what targets would be run.
           </para>
@@ -15497,9 +15377,9 @@ Y = $(X)
           <para>
            &Abuild; now loads the <command>groovy</command> ant task.
            Parts of the &abuild; ant framework use this task to embed
-           groovy code.  It is recommended that you switch to the
+           Groovy code.  It is recommended that you switch to the
            <application>groovy</application> backend rather than using
-           this task, but embedding groovy code in your ant files may
+           this task, but embedding Groovy code in your ant files may
            help with a transition to the new backend.
           </para>
          </listitem>
@@ -15572,9 +15452,9 @@ Y = $(X)
            When bootstrapping &abuild;, you must now run the
            BootstrapJava.groovy script in &abuild;'s
            <filename>src</filename> directory to build the Java code.
-           A full groovy installation (>= 1.5.7) is needed to build
-           &abuild; from scratch.  A groovy installation is not
-           required run &abuild; as &abuild; embeds groovy.
+           A full Groovy installation (>= 1.5.7) is needed to build
+           &abuild; from scratch.  A Groovy installation is not
+           required run &abuild; as &abuild; embeds Groovy.
           </para>
          </listitem>
         </itemizedlist>
