@@ -11660,8 +11660,145 @@ flag private INCLUDES = private-include
   <chapter id="ref.optional-dependencies">
    <title>Optional Dependencies</title>
    <para>
-    XXX write this
+    In widely distributed systems, it is often the case that a
+    particular component may be able to be configured to work in
+    different ways depending on whether some optional functionality is
+    present.  There are many ways to support this in any given
+    software system, including having optional capabilities register
+    themselves with some consumer of those capabilities as with our
+    mixed classification example (see <xref
+    linkend="ref.example.mixed-classification"/>).  There are some
+    situations where, for whatever reason, the onus of determining how
+    to behave must lie completely with the consumer of an optional
+    capability rather than the supplier of the capability.  This could
+    happen if, for example, the supplier of the capability is
+    completely unaware of the consumer.  It could also happen if,
+    because of the way the software is architected, the logic of how
+    the consumer uses the producer must like with the consumer.  To
+    support these cases, &abuild; supports the use of optional
+    dependencies.
    </para>
+   <sect1 id="ref.using-optional-dependencies">
+    <title>Using Optional Dependencies</title>
+    <para>
+     Both item dependencies and tree dependencies may be declared as
+     optional by placing the <option>-optional</option> option after
+     the item or tree name in the <property>deps</property> or
+     <property>tree-deps</property> declaration in the
+     <filename>Abuild.conf</filename> file.  If an optional tree
+     dependency is not found, &abuild; simply ignores the optional
+     tree dependency.  If an optional item dependency is declared,
+     &abuild; will create a local (non-inheriting) boolean interface
+     variable called
+     <varname>ABUILD_HAVE_OPTIONAL_DEP_<replaceable>item</replaceable></varname>
+     where <replaceable>item</replaceable> is the name of the item
+     that was declared as an optional dependency.  If the optional
+     dependency is found, this variable will have a true value, and
+     &abuild; will process the dependency normally.  If the optional
+     dependency is not found, this variable will have a false value,
+     and &abuild; will otherwise ignore the optional dependency.
+    </para>
+    <para>
+     This feature has a high potential for abuse, so you should
+     consider carefully whether it is the right solution to your
+     problem.  It is possible to create software that may behave
+     differently based on combinations of presence or absence of
+     optional features.  Such software can become very difficult to
+     maintain and test.  Ideally, if you have optional capabilities
+     that are configured in this way, they should be lightweight and
+     independent from each other.  However, &abuild; leaves this choice
+     up to you and provides you with this capability.  You are, of
+     course, free to use it or not as you choose.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.optional-dependencies">
+    <title>Optional Dependencies Example</title>
+    <para>
+     To illustrate optional dependencies, we have a very simple C++
+     program that calls a function called <function>xdriver</function>
+     if the <filename>xdriver</filename> build item, which supplies
+     it, is present.  The tree containing this build item can be found
+     at <filename>optional-dep/prog</filename>.  Here is its
+     <filename>Abuild.conf</filename> file:
+     <?example optional-dep/prog/Abuild.conf?>
+     Observe that there is an optional tree dependency declared on a
+     build tree called <filename>xdrivers</filename> and also an
+     optional item dependency declared on the build item called
+     <filename>xdriver</filename>.
+    </para>
+    <para>
+     In the implementation of this build item, we use the
+     <filename>Abuild.interface</filename> file to define a
+     preprocessor symbol if the <filename>xdriver</filename> build
+     item is present.  Here is the
+     <filename>Abuild.interface</filename> file:
+     <?example optional-dep/prog/Abuild.interface?>
+     This is one approach, but it is by no means the only approach.
+     Use of a preprocessor symbol in this way can be dangerous because
+     there is no mechanism to trigger a rebuild if its value changes.
+     However, as the presence of absence of optional dependencies is
+     likely to be relatively fixed for any given build environment,
+     use of a preprocessor symbol may be appropriate.  Since the
+     interface variable is, like all interface variables, exported to
+     the backend, we could have also done something based on its value
+     in the <filename>Abuild.mk</filename> file.  There, the value
+     would have a value of either <literal>1</literal> or
+     <literal>0</literal> as with all boolean interface variables.
+     This would be appropriate if we didn't want the results of
+     whatever we do to be visible to our dependencies.  In this case,
+     we use the <filename>Abuild.interface</filename> file, and the
+     <filename>Abuild.mk</filename> file looks completely normal:
+     <?example optional-dep/prog/Abuild.mk?>
+    </para>
+    <para>
+     Let's look at the source code to the program.  It's not clever at
+     all, but it illustrates how this mechanism works.  Here is
+     <filename>prog.cc</filename>:
+     <?example optional-dep/prog/prog.cc?>
+     To build this without the optional build tree present, copy the
+     file <filename>optional-dep/Abuild.conf.without</filename> to
+     <filename>optional-dep/Abuild.conf</filename>.  Here is that
+     file:
+     <?example optional-dep/Abuild.conf.without?>
+     Then run <command>abuild</command> from the
+     <filename>optional-dep/prog</filename> directory.  This results
+     in the following output:
+     <?qtest optional-without.out?>
+     The resulting <command>prog</command> executable produces this output:
+     <?qtest optional-without-run.out?>
+    </para>
+    <para>
+     Now let's try this again with the optional tree present.  First,
+     we have to copy
+     <filename>optional-dep/Abuild.conf.with</filename> to
+     <filename>optional-dep/Abuild.conf</filename>.  Here is that
+     file:
+     <?example optional-dep/Abuild.conf.with?>
+     This adds the <filename>xdriver</filename> directory as a child.
+     This directory contains what are effectively &ldquo;extra
+     drivers&rdquo; to be used by <command>prog</command>.  Here are
+     the header and source to the <function>xdriver</function>
+     function:
+     <?example optional-dep/xdriver/xdriver.hh?>
+     <?example optional-dep/xdriver/xdriver.cc?>
+     Next, we have to do a clean build since, as pointed out above,
+     there's no other mechanism for &abuild; to notice that the tree
+     has appeared and the preprocessor symbol has since the last
+     build.  (We could implement a dependency on a make variable if we
+     wanted to.  See <xref linkend="ref.example.auto-from-variable"/>
+     for an example of doing this.)  Once we have set up the new
+     <filename>Abuild.conf</filename> and run <command>abuild -c
+     all</command> to clean the tree, we can run
+     <command>abuild</command> from <filename>prog</filename> again.
+     This results in the following &abuild; output:
+     <?qtest optional-with.out?>
+     Running the resulting <command>prog</command> program in this
+     case results in this output:
+     <?qtest optional-with-run.out?>
+     This time, you can see that the <function>xdriver</function>
+     function was available.
+    </para>
+   </sect1>
   </chapter>
   <chapter id="ref.plugins">
    <title>Enhancing &Abuild; with Plugins</title>

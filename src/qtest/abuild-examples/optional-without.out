@@ -1,0 +1,5 @@
+abuild: prog (abuild-<native>): all
+make: Entering directory `--topdir--/optional-dep/prog/abuild-<native>'
+Compiling ../prog.cc as C++
+Creating prog executable
+make: Leaving directory `--topdir--/optional-dep/prog/abuild-<native>'

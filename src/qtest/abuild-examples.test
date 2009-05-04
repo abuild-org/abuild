@@ -3,6 +3,7 @@
 require 5.008;
 BEGIN { $^W = 1; }
 use strict;
+use File::Copy;
 
 require TestDriver;
 require abuild_test_utils;
@@ -841,9 +842,48 @@ $td->runtest("build all after mod, pass 2",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/optional-dep/prog");
+
+copy("../Abuild.conf.without", "../Abuild.conf") or die;
+
+$td->runtest("build prog without optional dep",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/optional-without.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run prog without",
+	     {$td->COMMAND => "$native_out/prog"},
+	     {$td->FILE => "$top/optional-without-run.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("clean",
+	     {$td->COMMAND => "abuild clean",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->STRING => "abuild: cleaning in .\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+copy("../Abuild.conf.with", "../Abuild.conf") or die;
+
+$td->runtest("build prog with optional dep",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/optional-with.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("run prog with",
+	     {$td->COMMAND => "$native_out/prog"},
+	     {$td->FILE => "$top/optional-with-run.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(127 +
+$td->report(132 +
 	    (in_windows() ? 0 : 1) +
 	    ($test_java ? 7 : 0) +
 	    ($have_whole_archive ? 2 : 1));

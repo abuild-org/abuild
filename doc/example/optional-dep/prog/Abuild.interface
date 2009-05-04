@@ -1,0 +1,3 @@
+if ($(ABUILD_HAVE_OPTIONAL_DEP_xdriver))
+  XCPPFLAGS = -DHAVE_XDRIVER
+endif
