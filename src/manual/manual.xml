@@ -7853,10 +7853,34 @@ endif
      <para>
       Rules for compiling C and C++ code are provided by the
       <filename>ccxx</filename> rules.  These rules also include
-      support for Flex, Bison, and Sun RPC.  It is possible for a
+      support for flex, bison, and Sun RPC.  It is possible for a
       single build item to build multiple targets including any
       mixture of static library, shared library, and executable
       targets.
+     </para>
+     <para>
+      The flex and bison rules can take advantage of &abuild;'s
+      <command>codegen-wrapper</command> utility.  If you set the
+      variable <varname>FLEX_CACHE</varname>, &abuild; will cache
+      generated flex output files and input file checksums making it
+      possible for your flex code to be used on systems that don't
+      have flex.  The variable <varname>BISON_CACHE</varname> serves
+      the same function for code generated with bison.  &Abuild;'s own
+      build uses this functionality.  To use this facility, set
+      <varname>FLEX_CACHE</varname> and/or
+      <varname>BISON_CACHE</varname> to directories relative to our
+      source directory.  &Abuild; will copy files to or from this
+      directory during its build.  These directories are relative to
+      your source directory, not your output directory.  As such, the
+      resulting files are likely to be controlled in your version
+      control system.  This is an exception to the ordinary rule of
+      &abuild; not creating files outside of the output directory, but
+      it's an appropriate exception as the intention is to control
+      these automatically generated files so that they could be
+      available for users who didn't have flex or bison.  For
+      information about using the <command>codegen-wrapper</command>
+      utility with your own builds, see <xref
+      linkend="ref.codegen-wrapper"/>.
      </para>
      <para>
       When building C and C++ code, you must define at least one of
@@ -8403,7 +8427,8 @@ endif
   <chapter id="ref.abuild.groovy">
    <title>The <application>Groovy</application> backend</title>
    <para>
-    XXX DO THIS CHAPTER.
+    XXX DO THIS CHAPTER.  The text in this chapter is leftover from
+    the old ant framework and has not yet been updated.
    </para>
 
    <sect1 id="ref.directory-structure-for-java-builds">
@@ -12612,7 +12637,7 @@ native-compiler qcc
    <sect1 id="ref.guidelines-for-ant-target-authors">
     <title>Guidelines for Groovy Target Authors</title>
     <para>
-     XXX
+     XXX write this
     </para>
    </sect1>
    <sect1 id="ref.hidden-dependencies">
@@ -13075,7 +13100,6 @@ native-compiler qcc
     </para>
    </sect1>
    <sect1 id="ref.traversal-details">
-    <!-- XXX rewrite -->
     <title>Traversal Details</title>
     <para>
      This section describes how &abuild; traverses build trees to
@@ -13090,203 +13114,94 @@ native-compiler qcc
      circular dependencies than a build system is.)
     </para>
     <para>
-     Internally, &abuild; maintains two data structures: a
-     <classname>BuildTree</classname> and a
+     Internally, &abuild; maintains tree data structures to hold onto
+     the shape and contents of build forests:
+     <classname>BuildForest</classname>,
+     <classname>BuildTree</classname> and
      <classname>BuildItem</classname>.  The
-     <classname>BuildTree</classname> object has a map from build item
-     names to the <classname>BuildItem</classname> object for that
-     name.  It also has a mapping of relative paths to either build
-     item names or to the empty string in the case of unnamed build
-     items.  It stores the path to the root of its backing area and a
-     map from declared external paths to external build tree root
-     absolute paths.
+     <classname>BuildForest</classname> object has a map from build
+     tree names to <classname>BuildTree</classname> objects and also
+     from build item names to <classname>BuildItem</classname>
+     objects.  The <classname>BuildForest</classname> object also
+     contains the list of backing areas that apply to the forest as
+     well as the list of items and trees that are specified as deleted
+     in the <filename>Abuild.backing</filename> file.
     </para>
     <para>
-     The <classname>BuildItem</classname> object contains the absolute
-     path of the build item, the path of the root of its local build
-     tree, its <firstterm>backing depth</firstterm> (how many levels
-     of backing areas you have to cross to get to the item), its
-     <firstterm>external depth</firstterm> (how many levels of
-     externals you have to cross to get to the item), and various
-     information read from <filename>Abuild.conf</filename> or
-     computed from the dependency graph.
+     The <classname>BuildTree</classname> object contains
+     tree-specific information, such as the tree's list of plugins,
+     tree dependencies, supported traits, etc.  It also contains the
+     absolute path of the root build item of the tree.  The
+     <classname>BuildItem</classname> object contains the absolute
+     path of the build item, the name of the containing build tree,
+     its dependencies, and various other information from the
+     <filename>Abuild.conf</filename> file.  Additionally, both
+     objects store the tree's or item's <firstterm>backing
+     depth</firstterm>, which is a count of the number of backing
+     areas that had to be followed to resolve the item or tree.
+     Although the backing depth is an integer value, nothing in
+     &abuild; cares about the depth other than whether it is zero or
+     not.  A backing depth of zero indicates that the tree or item
+     appears locally in the current forest.
     </para>
     <para>
-     When &abuild; starts up, it finds an
-     <filename>Abuild.conf</filename> in the current directory (or
-     parent directory if &abuild; is started from inside an output
-     directory) and follows <property>parent-dir</property> pointers
-     until it finds an <filename>Abuild.conf</filename> that has no
-     <property>parent-dir</property> key.  This is the root of the
-     build tree.  Once &abuild; has found the root of the local build
-     tree, it begins traversal.  Before traversing the local build
-     tree, it first traverses the backing area tree and any externals.
-     This is done by calling <varname>traverse</varname> recursively.
-     Note that we traverse the backing area first since we allow
-     externals to be resolved in backing areas: if no directory exists
-     at the path specified for an external, we see if any backing area
-     declared the same external and, if so, we consider the external
-     reference to be satisfied since we'll get all its items through
-     the backing area.  Once &abuild; has finished traversing the
-     backing area and externals, and therefore all their backing areas
-     and externals, it contains all the information it needs to finish
-     traversing the local tree.
+     When &abuild; starts up, it first locates the root of the local
+     forest.  It does this by starting with the current directory and
+     walking up the file system (toward the root) until it encounters
+     an <filename>Abuild.conf</filename> that is not referenced as a
+     child of the next higher <filename>Abuild.conf</filename>, if
+     any.  When it finds such an <filename>Abuild.conf</filename>, it
+     verifies that it is either a tree root build item or that is has
+     only a <property>child-dirs</property> key.  In either case, it
+     is the root of the forest.  Otherwise, it is an error, and
+     &abuild; indicates that it is not able to find the forest root.
     </para>
     <para>
-     The process by which &abuild; traverses a specific build tree is
-     fairly straightforward: we traverse through the
-     <varname>child-dirs</varname> pointers starting from the root
-     build item, ensuring that the links between parents and children
-     are bidirectional.  If a directory referenced in a
-     <varname>child-dirs</varname> key does not exist in the local
-     build tree, &abuild; computes the location of the missing
-     directory relative to the top of the local build tree and then
-     checks to see whether there is a valid build item at the same
-     position relative to the root of one of the build trees in your
-     backing area chain (but <emphasis>not</emphasis> your externals;
-     they are handled differently).  If there is, then we don't
-     consider the lack of that child directory to be an error.  Note
-     that we do not do anything with the information about what is
-     actually at that location, we just keep traversing as if that
-     directory were there and had been traversed successfully.  In
-     effect, this is exactly what has happened since we have completed
-     traversal of the backing area in which we found the path.  This
-     policy has the same effect as searching for unknown build item
-     names in our backing area chain.  There is no need to determine
-     that the location in the backing area is the same item or even is
-     a named item at all.  In fact, doing so would make it impossible
-     to rearrange build items in local trees with backing areas since
-     our local tree would never be able to diverge in directory
-     structure from the backing area.  One side effect of this is that
-     it is not possible to <emphasis>remove</emphasis> a build item
-     name from the namespace in a local tree if that name is present
-     in a backing area by simply removing it from the local tree.  If
-     you need to remove an item in this way, you must also list its
-     name in the <property>deleted</property> key of the root build
-     item's <filename>Abuild.conf</filename> as discussed in <xref
-     linkend="ref.example.deleted-item"/>.
+     Once &abuild; has found the root of the local build tree, it
+     begins traversal.  The actual traversal logic is more complicated
+     than what is described here because it contains code to recognize
+     the &abuild; 1.0 build tree structure (with external directories
+     and unnamed trees) as well as the simpler 1.1 format.  We omit
+     those details from the description and refer you instead to
+     comments in the code.  Continuing with our description of the 1.1
+     traversal algorithm, we just read each build item's
+     <filename>Abuild.conf</filename> doing a breadth-first traversal
+     of the tree formed by following <property>child-dirs</property>
+     keys.  If the child directory does not exist and the forest has a
+     backing area, we ignore this condition.  This is what allows
+     backed forests to be sparse.  Otherwise, if the directory exists,
+     it must have an <filename>Abuild.conf</filename>, and no
+     directory between the child directory and the parent may have
+     <filename>Abuild.conf</filename> files (possible only if a
+     <property>child-dirs</property> value has multiple path
+     elements).
     </para>
     <para>
-     Once &abuild; has finished traversing the local build tree
-     (skipping any paths that could be resolved in a backing area) and
-     has established a local mapping between names and paths, it then
-     goes through the externals and backing area and supplements its
-     name to path mapping with any names that were found there.
-     &Abuild; looks in externals first.  For each build item in our
-     externals, we check to make sure we don't have the same name
-     locally.  If we do and that name resolves to a different absolute
-     path, it's an error.  If we do and that name resolves to the same
-     absolute path, we ignore it since it just means we have more than
-     one path to the same build item through various externals, as
-     will become more clear momentarily.  If we don't have an item of
-     that name, we copy the <classname>BuildItem</classname> structure
-     from the external into our own build tree, thus making the name
-     known to us, and we increment the external depth in the copy.
-     Now to clarify the point about multiple paths to a build item
-     through various externals: if some build tree
-     <filename>T1</filename> has <filename>../T2</filename> and
-     <filename>../T3</filename> as externals and
-     <filename>T2</filename> also has <filename>../T3</filename> as an
-     external, every build item local to <filename>T3</filename> will
-     also be a member of <filename>T2</filename> since it will have
-     been copied during the traversal of <filename>T2</filename>.
-     When we try to copy items from <filename>../T3</filename>,
-     assuming we copy from <filename>../T2</filename> first, the items
-     will already be there, but it will not be an error.  (See <xref
-     linkend="fig.multiple-paths"/>.)
-     <figure id="fig.multiple-paths">
-      <title>Multiple Paths to a Build Item</title>
-      <mediaobject>
-       <imageobject>
-        <imagedata fileref="multiple-paths.png"/>
-       </imageobject>
-       <caption>
-        <para>
-         <filename>/T1</filename> inherits <classname>C</classname>
-         directly from both <filename>/T2</filename> and
-         <filename>/T3</filename>, but this is not an error since they
-         are the same item.
-        </para>
-       </caption>
-      </mediaobject>
-     </figure>
-     This does imply that the value of the external depth parameter
-     can be ambiguous, but it doesn't really matter: the only thing
-     that's important about backing depth and external depth is
-     whether they are zero or not.
+     After traversing the local forest, &abuild; traverses each
+     backing area, creating a separate
+     <classname>BuildForest</classname> object for each backing
+     forest.  Finally, once &abuild; has traversed all the build items
+     in all known forests, &abuild; creates a dependency graph of
+     backing areas.  Then, working from the leaves of the dependency
+     graph, it copies into the forest from the backing areas all the
+     <classname>BuildTree</classname> and
+     <classname>BuildItem</classname> objects of items and trees that
+     do not appear locally and increments the backing depth of the
+     local copies.  Items that are marked as deleted or that are in
+     trees that are marked as deleted are not copied.  Also, trees
+     that are marked as deleted are not copied.  This is where
+     &abuild; notices if you have multiple backing areas and one of
+     them backs to another.  In this case, &abuild; simply ignores the
+     further back of the backing areas since it will already get
+     copies of those items and trees through the closer backing area.
     </para>
     <para>
-     Once we have done this process for all externals, we perform a
-     similar process for backing areas.  For each item that exists in
-     our backing area (and therefore, its backing area and externals)
-     that does not exist in our own tree or its externals, we copy it
-     just like we did for externals, and increment the backing depth
-     of our local copy.  If we see a build item with a name that
-     conflicts with an item we already have, we ignore it.  This is
-     the normal case of local build items shadowing those in the
-     backing area.  We also take care to avoid copying any item from a
-     backing area that was deleted in an external.
-    </para>
-    <para>
-     After &abuild; has finished copying build items from backing
-     areas and externals, it iterates through the list of deleted
-     items, verifies that they exist in the current tree with a
-     backing depth greater than zero and an external depth equal to
-     zero (reporting an error if not), and then removes them from the
-     current build tree.
-    </para>
-    <para>
-     Note that backing areas may have externals and externals may have
-     backing areas.  They are, after all, build trees in their own
-     right.  This means that a particular build tree may be reachable
-     from the local build tree by multiple paths.  &Abuild; imposes no
-     requirements on the shape of the external and backing area graph
-     (other than it contain no cycles) because additional restrictions
-     are not necessary.  Ordinarily, if <filename>A1</filename> backs
-     to <filename>A2</filename> and <filename>B1</filename> backs to
-     <filename>B2</filename>, then if <filename>A1</filename> has
-     <filename>B1</filename> as an external, one would expect
-     <filename>A2</filename> to have <filename>B2</filename> as an
-     external.  This means that <filename>B2</filename> is reachable
-     from <filename>A1</filename> through two distinct paths.  There's
-     no reason though that <filename>A1</filename> couldn't have
-     backed to <filename>A3</filename> which backs to
-     <filename>A2</filename>.  It's even okay if
-     <filename>A1</filename> backs to <filename>A3</filename> and
-     <filename>A3</filename> doesn't back to anything as long as
-     <filename>A3</filename> doesn't depend on anything in one of the
-     <filename>B</filename> areas.  This flexibility makes it possible
-     to do things like add dependencies on new externals or remove
-     dependencies on externals from a side branch in your version
-     control system.  If &abuild; placed restrictions on the shape of
-     the backing area/external tree, many of these operations would
-     not be possible.  &Abuild; enforces its integrity guarantee
-     directly, and that's really a strong enough check to ensure that
-     backing area/external anomalies that matter will be caught.
-    </para>
-    <para>
-     There is nothing inherent about &abuild; that would preclude an
-     implementation that allows multiple parallel backing areas to be
-     declared for a single build tree, but given the availability of
-     externals and the fact that backing areas are transitive (a build
-     tree inherits from its backing area's backing area), it should be
-     sufficient to have only a single backing area, and it simplifies
-     both &abuild;'s own internal logic and the ability for a user to
-     figure out what is going to be found where.  Besides, in order
-     for &abuild;'s guarantee to be satisfied, it would be necessary
-     for every build tree to search its backing areas' backing areas
-     in the same order anyway.
-     <footnote>
-      <para>
-       If there is a strong case to be made for the need for more than
-       one backing area to be searched from a given build tree that
-       can't be satisfied by simply having one of the backing areas
-       back to the other backing area, please present the case.  It
-       may result in an improvement of your understanding of the
-       current intended use, or you may succeed in causing &abuild; to
-       be modified to support multiple backing areas.
-      </para>
-     </footnote>
+     Finally, after all the traversal is completed, &abuild; validates
+     each forest, again starting with the furthest back forest and
+     working toward the local forest.  Numerous validations are
+     performed.  For details, please refer to the
+     <function>validateForest</function> method in the &abuild; source
+     code.
     </para>
    </sect1>
    <sect1 id="ref.compatibility">
@@ -17907,16 +17822,16 @@ Y = $(X)
   <appendix id="ref.changes-in-1.1">
    <title>Major Changes from Version 1.0 to Version 1.1</title>
    <para>
-    XXX describe changes in 1.1
-    XXX pay particular attention to upgrade gotchas
+    XXX describe changes in 1.1;
+    XXX pay particular attention to upgrade gotchas;
     XXX refer to ref.upgrading-to-1.1
    </para>
   </appendix>
   <appendix id="ref.upgrading-to-1.1">
    <title>Upgrading from 1.0 to Version 1.1</title>
    <para>
-    XXX describe upgrade process
-    XXX pay particular attention to upgrade gotchas
+    XXX describe upgrade process;
+    XXX pay particular attention to upgrade gotchas;
     XXX refer to ref.changes-in-1.1
    </para>
   </appendix>
