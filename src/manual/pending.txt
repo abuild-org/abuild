@@ -27,8 +27,6 @@ Miscellaneous
       what --src points to, it has only been tested for when --src is
       "..".
 
-    - FLEX_CACHE, BISON_CACHE
-
  * Mention somewhere that people can copy jars into abuild's lib
    directory if I want that to be something people do...
 
