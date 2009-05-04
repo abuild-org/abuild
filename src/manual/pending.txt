@@ -16,17 +16,6 @@ Miscellaneous
    test suite.  Paths that used to start with java now start with
    basic.
 
- * Points to include in codegen-wrapper documentation:
-
-    - usually, --input $^ --output $@ is sufficient.  Sometimes output
-      generates more files than just $@ though and you have to specify
-      them.
-
-    - tries to detect whether input file was found in "." or "..".
-      Although the code tries to be written so that it doesn't matter
-      what --src points to, it has only been tested for when --src is
-      "..".
-
  * Mention somewhere that people can copy jars into abuild's lib
    directory if I want that to be something people do...
 
@@ -52,11 +41,6 @@ Miscellaneous
    and rules.
 
  * Document built-in interface variables in help/vars.txt
-
- * Put a --with-rdeps example somewhere in the documentation.  It
-   could go in the "general" area, except, for any build item,
-   --with-rdeps ends up being the same as --build=all as there are no
-   independent collections of build items.
 
 ----------------------------------------------------------------------
 

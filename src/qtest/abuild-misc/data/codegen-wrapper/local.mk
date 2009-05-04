@@ -1,8 +1,10 @@
+COPY=cp
+
 in2: in2.in
 	@$(PRINT) generating $@ from $^
 	$(CODEGEN_WRAPPER) --cache cache \
 		--input $^ --output $@ \
-		--command cp $< $@
+		--command $(COPY) $< $@
 
 out1: a/in1 in2
 	@$(PRINT) generating $@ from $^

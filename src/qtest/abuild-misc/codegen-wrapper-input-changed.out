@@ -1,0 +1,7 @@
+abuild: z (abuild-indep): all
+make: Entering directory `--topdir--/codegen-wrapper/abuild-indep'
+generating in2 from ../in2.in
+codegen-wrapper: generation succeeded; cache updated
+generating out1 from ../a/in1 in2
+codegen-wrapper: generation succeeded; cache updated
+make: Leaving directory `--topdir--/codegen-wrapper/abuild-indep'

@@ -62,6 +62,29 @@ for my $i (1, 2)
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
+    if ($i == 2)
+    {
+	sleep 1;
+	# Update input file
+	open(F, ">>in2.in") or die;
+	print F "append\n";
+	close(F);
+
+	$td->runtest("tool failure",
+		     {$td->COMMAND => "abuild COPY=false",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/codegen-wrapper-command-failure.out",
+		      $td->EXIT_STATUS => 2},
+		     $td->NORMALIZE_NEWLINES);
+
+	$td->runtest("input changed",
+		     {$td->COMMAND => "abuild",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/codegen-wrapper-input-changed.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+
     $td->runtest("clean",
 		 {$td->COMMAND => "abuild clean",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -377,7 +400,7 @@ foreach my $d (['serial', 'serial', ''],
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(46 +
+$td->report(48 +
 	    (in_windows() ? 0 : 3) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));

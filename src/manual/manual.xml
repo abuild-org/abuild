@@ -9629,8 +9629,287 @@ endif
    <sect1 id="ref.codegen-wrapper">
     <title>Caching Generated Files</title>
     <para>
-     XXX write this
+     As a general rule, it's a good idea to avoid controlling
+     automatically generated files.  Instead, it's often best to have
+     the generation of those files be part of the build process.
+     Sometimes, however, you might find yourself in a situation where
+     the tool used to create the generated file may not always be
+     available.  Perhaps it's a specialized tool that requires
+     separate installation or licensing but whose output is generally
+     usable.  In cases such as this, it would be helpful if the build
+     system would cache the generated files and use the cached files
+     if all the input files are up to date.  This is the functionality
+     provided by <command>codegen-wrapper</command>, located in
+     &abuild;'s <filename>util</filename> directory, and accessible
+     through use of the <varname>$(CODEGEN_WRAPPER)</varname> variable
+     within user-supplied make rules.
     </para>
+    <para>
+     The <command>codegen-wrapper</command> command can handle the
+     situation described above for relatively simple cases, but it is
+     likely to be good enough for many situations.  It works as
+     follows:
+     <itemizedlist>
+      <listitem>
+       <para>
+        The <command>codegen-wrapper</command> command takes four
+        inputs:
+        <itemizedlist>
+         <listitem>
+          <para>
+           a cache directory, which must exist in advance
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           a list of input files
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           a list of output files
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           a command to generate the output files from the input files
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <command>codegen-wrapper</command> checks the following
+        prerequisites:
+        <itemizedlist>
+         <listitem>
+          <para>
+           For each input file <filename>infile</filename>, see if the
+           file <filename>infile.md5</filename> exists in the cache
+           directory and contains the md5 checksum of
+           <filename>infile</filename>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           For each output file <filename>outfile</filename>, see if
+           a file called <filename>outfile</filename> exists in the
+           cache directory.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </para>
+      </listitem>
+     </itemizedlist>
+     If all of the above prerequisites are satisfied,
+     <command>codegen-wrapper</command> copies the output files from
+     the cache directory into the output directory.  Otherwise,
+     <command>codegen-wrapper</command> runs the specified command.
+     If the command succeeded and generated all the expected output
+     files, <command>codegen-wrapper</command> updates the checksums
+     of the input files and copies all the generated files into the
+     cache directory.  Note that the cache directory is expected to be
+     a controlled directory that is part of your source tree.  As
+     such, it is likely that <command>codegen-wrapper</command> will
+     actually update files in the cache directory which you will
+     subsequently have to check into your version control system.
+    </para>
+    <sect2 id="ref.example.codegen-wrapper">
+     <title>Caching Generated Files Example</title>
+     <para>
+      Let's now look at an example.  We have an example that provides a
+      simple code generator.  This generator reads an input file and,
+      based on annotations in the file, repeats some input lines into
+      an output file.  However, its exact functionality is not
+      important; for purposes of this example, all we need to care
+      about is that it generates some output file from an input file.
+     </para>
+     <para>
+      To use this code generator, we'll adopt a convention that any
+      input file passed to the code generator will generate a file by
+      the same name appended with the <filename>.rpt</filename>
+      suffix.  The code generator build item will require that any
+      input files be named in the variable <varname>INPUT</varname>.
+      For each file named in <varname>$(INPUT)</varname>, it will
+      the corresponding <filename>.rpt</filename> file using the code
+      generator.  If the variable <varname>REPEATER_CACHE</varname> is
+      defined, the build item will use that as the cache directory.  We
+      implement that with the following rule fragment:
+      <?example codegen-wrapper/repeater/rules/all/repeater.mk?>
+     </para>
+     <para>
+      There's a lot here, so let's go through it line by line.  At the
+      beginning, we see the normal check for undefined variables.  We
+      want to make sure that the <varname>INPUT</varname> variable is
+      defined.  (Obviously, a real build item would have to come up
+      with a better, less generic name than this.)  Next, we add all
+      the <filename>.rpt</filename> lines to the <command>all</command>
+      target, as usual, by adding them as dependencies of
+      <command>all</command> specified with two colons, indicating that
+      there are multiple <command>all</command> targets.  So far,
+      there's nothing different from any other code generator.
+     </para>
+     <para>
+      Next, we define a macro <function>rpt_command</function> which
+      actually runs the command to generate the files.  Note that, in
+      this case, the code generator lives right in the build item, so
+      there's really not much reason to use
+      <command>codegen-wrapper</command> with it.  But our purpose here
+      is to demonstrate <command>codegen-wrapper</command>, so we'll
+      use it!  When defining this macro, we make use of the variables
+      <varname>$&lt;</varname> and <varname>$@</varname>.  These are
+      predefined make variables that, when evaluated in the context of
+      a rule, refer to the first prerequisite and the target
+      respectively.  They aren't valid at the point where the macro is
+      defined, but they are valid at the point where it is expanded,
+      which is what's relevant.  We don't really have to define a macro
+      for this, but doing so helps us to avoid having to repeat the
+      invocation of the code generator, which might be involved in some
+      cases.
+     </para>
+     <para>
+      Finally, there's the rule itself.  This is a typically GNU Make
+      pattern rule that generates a <filename>.rpt</filename> file from
+      an input file without the suffix.  The complete rule is prefixed
+      with the list of output files, thus restricting it to only apply
+      on this files.  Within the rule definition itself, we make the
+      generation step conditional upon whether the
+      <varname>REPEATER_CACHE</varname> variable is defined.  The
+      effect of the <command>ifdef</command> is applied at the time the
+      file is read, no at the time the rule is run, but this is okay
+      because the rule implementation file is always loaded after
+      <filename>Abuild.mk</filename>.  When
+      <varname>REPEATER_CACHE</varname> is not defined, we just run the
+      repeater command normally.  When it is defined, we run it with
+      <varname>$(CODEGEN_WRAPPER)</varname>, specifying the cache
+      directory, the inptu files, the output files, and the commands
+      using arguments to the <command>codegen-wrapper</command> command
+      as invoked through the <varname>$(CODEGEN_WRAPPER)</varname>
+      variable.
+     </para>
+     <para>
+      Let's look at two build items that use these rules.  They both
+      set their <varname>RULES</varname> variable to include
+      <filename>repeater</filename>.  Both build items set the
+      <varname>INPUT</varname> variable.  Only the second one sets the
+      <varname>REPEATER_CACHE</varname> variable.  Here are the
+      <filename>Abuild.mk</filename> file:
+      <?example codegen-wrapper/user1/Abuild.mk?>
+      <?example codegen-wrapper/user2/Abuild.mk?>
+      Assuming that we start off with an empty cache directory, here is
+      what the first build from scratch with <command>abuild -b
+      all</command> would generate:
+      <?qtest repeater-pass1.out?>
+      Note that, for the build item <filename>user1</filename>, we just
+      saw the messages that the output files were generated from the
+      input files.  For <filename>user2</filename>, you can see
+      messages from <command>codegen-wrapper</command> indicating that
+      generation succeeded and that it has updated the cache.
+     </para>
+     <para>
+      If we built again right away, the output files would already
+      exist and be newer than the input files, so the rule wouldn't
+      even trigger.  Therefore we have to first clean everything with
+      <command>abuild -c all</command> to demonstrate the cache
+      functionality.  If you're following along, you'll notice that the
+      directory <filename>codegen-wrapper/user2/cache</filename> now
+      contains four files: <filename>file1.md5</filename>,
+      <filename>file1.rpt</filename>, <filename>file2.md5</filename>,
+      and <filename>file2.rpt</filename>.  Here's the output of a
+      second build from clean with <command>abuild -b all</command>:
+      <?qtest repeater-pass2.out?>
+      This time, the build of <filename>user1</filename> looks the
+      same, but the build of <filename>user2</filename> is different.
+      Instead of actually running the command to generate the output,
+      we see <command>codegen-wrapper</command> telling us that files
+      are up to date and that it is using the cached files.
+     </para>
+     <para>
+      The best part about this is that if we modify one of the input
+      files, the cache will get automatically updated.  Without doing a
+      clean, we can add some line to the end of
+      <filename>codegen-wrapper/user2/file2</filename> and run another
+      build with <command>abuild -b all</command>.  That generates the
+      following output:
+      <?qtest repeater-mod-pass1.out?>
+      Nothing happened in build item <filename>user1</filename> at all
+      since everything was up to date.  Likewise, we see no mention of
+      <filename>file1</filename> in <filename>user2</filename>.
+      However, for <filename>file2</filename> in
+      <filename>user2</filename>, we once again see the output from
+      <command>codegen-wrapper</command> indicating that generation
+      succeeded and that it has updated the cache.  Doing another clean
+      build <command>abuild -c all</command> followed by
+      <command>abuild -b all</command>, we once again see that files
+      from the cache are used:
+      <?qtest repeater-pass2.out?>
+     </para>
+     <para>
+      There's a lot to swallow here, but you will hopefully recognize
+      the power and usefulness of such an approach.  Hopefully, the
+      <command>codegen-wrapper</command> tool will meet some of your
+      needs.  Even if it doesn't, it may provide a starting point.
+      Here are a few things to take away from this example:
+      <itemizedlist>
+       <listitem>
+        <para>
+         Writing code generators is always going to require some
+         advanced make coding.  The incremental complexity added by
+         <command>codegen-wrapper</command> is relatively low, so for
+         simple code generators, enhancing them to use this utility
+         should be reasonably straightforward.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         The <command>codegen-wrapper</command> tool doesn't do
+         anything fancy with respect to knowing how to generate output
+         file names from input file names.  Instead, we just pass the
+         actual names to it on the command line.  Using the make
+         variables <varname>$&lt;</varname> and <varname>$@</varname>
+         makes this easy.  Sometimes there may be multiple input files
+         and/or multiple output files.  Handling multiple input files
+         is fairly easy.  The make variable <varname>$^</varname>
+         contains all the prerequisites for a given target while
+         <varname>$&lt;</varname> contains the first prerequisite.
+         Using <varname>$&lt;</varname> or <varname>$^</varname> for
+         your input files and <varname>$@</varname> for your output
+         files is nice when you can get away with it because all the
+         handling of finding input files in <filename>..</filename>
+         (through make's <varname>VPATH</varname> feature) is handled
+         for you automatically.
+        </para>
+        <para>
+         Handling multiple output files may be a bit trickier, but it
+         can still be done.  You may need to experiment a little.
+         Often you will find that make will pick whichever target it
+         tries to create first as <command>$@</command> and that the
+         rule will be invoked only one time.  In this case, you may
+         have to generate your output file names yourself.  Sometimes
+         you can do this by defining them relative to
+         <command>$@</command>, which you should do if at all
+         possible.  For an example of this, you can look at
+         <filename>make/standard-code-generators.mk</filename> in your
+         &abuild; distribution.  This code uses
+         <command>codegen-wrapper</command> for flex and bison.  The
+         bison rules generate multiple output files from a single input
+         file and generate the multiple output names from
+         <varname>$@</varname> in this way.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         In our little example, the code generator was always
+         available, so when we modified the input file, everything
+         worked.  If the code generator were not available or if it
+         failed, <command>codegen-wrapper</command> would fail with the
+         same exit status and would not updated the cache.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+    </sect2>
    </sect1>
   </chapter>
   <chapter id="ref.interface-flags">

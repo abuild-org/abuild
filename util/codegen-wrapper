@@ -69,6 +69,11 @@ if (! -d $srcdir)
     error("$srcdir does not exist or is not a directory");
 }
 
+if ($srcdir ne '..')
+{
+    fatal("this program has not been tested with --src other than \"..\"");
+}
+
 # Interpret cache as relative to src
 $cachedir = "$srcdir/$cachedir";
 
