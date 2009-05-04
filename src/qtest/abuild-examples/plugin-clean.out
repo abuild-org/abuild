@@ -1,4 +1,8 @@
 abuild: cleaning bin in bin
+abuild: cleaning echo-a in ../echo/a
+abuild: cleaning echo-b in ../echo/b
+abuild: cleaning echo-c in ../echo/c
+abuild: cleaning echo-d in ../echo/d
 abuild: cleaning indep-a in indep/a
 abuild: cleaning indep-b in indep/b
 abuild: cleaning java-main in ../java/code

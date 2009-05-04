@@ -549,10 +549,11 @@ $td->runtest("run count target",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->runtest("run all target",
-	     {$td->COMMAND => "abuild all",
+cd("work/plugin/echo");
+$td->runtest("echo example output",
+	     {$td->COMMAND => "abuild -b desc",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/echo-b.out",
+	     {$td->FILE => "$top/plugin-echo.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

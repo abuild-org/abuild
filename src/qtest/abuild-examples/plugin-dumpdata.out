@@ -89,6 +89,66 @@
     </buildable-platforms>
    </build-item>
    <build-item
+    name="echo-a"
+    home-forest="f-1"
+    absolute-path="--topdir--/plugin/echo/a"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="echo-b"
+    home-forest="f-1"
+    absolute-path="--topdir--/plugin/echo/b"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="echo-c"
+    home-forest="f-1"
+    absolute-path="--topdir--/plugin/echo/c"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="echo-d"
+    home-forest="f-1"
+    absolute-path="--topdir--/plugin/echo/d"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
     name="indep-a"
     home-forest="f-1"
     absolute-path="--topdir--/plugin/other/indep/a"

@@ -1,5 +1,0 @@
-abuild: indep-b (abuild-indep): all
-make: Entering directory `--topdir--/plugin/other/indep/b/abuild-indep'
-This is message from the echoer plugin.
-10 ../../a/a-file
-make: Leaving directory `--topdir--/plugin/other/indep/b/abuild-indep'

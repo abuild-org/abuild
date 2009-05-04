@@ -1,24 +1,28 @@
 abuild: lib (abuild-<native>): all
 make: Entering directory `--topdir--/plugin/other/lib/abuild-<native>'
-This is message from the echoer plugin.
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
 Compiling ../lib.cc as C++
 Creating lib library
 make: Leaving directory `--topdir--/plugin/other/lib/abuild-<native>'
 abuild: bin (abuild-<native>): all
 make: Entering directory `--topdir--/plugin/other/bin/abuild-<native>'
-This is message from the echoer plugin.
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
 Compiling ../main.cc as C++
 Creating program executable
 make: Leaving directory `--topdir--/plugin/other/bin/abuild-<native>'
 abuild: lib (abuild-zzprinter.any.test-suite.abc): all
 make: Entering directory `--topdir--/plugin/other/lib/abuild-zzprinter.any.test-suite.abc'
-This is message from the echoer plugin.
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
 Compiling ../lib.cc as C++
 Creating lib library
 make: Leaving directory `--topdir--/plugin/other/lib/abuild-zzprinter.any.test-suite.abc'
 abuild: bin (abuild-zzprinter.any.test-suite.abc): all
 make: Entering directory `--topdir--/plugin/other/bin/abuild-zzprinter.any.test-suite.abc'
-This is message from the echoer plugin.
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
 Compiling ../main.cc as C++
 Creating program executable
 make: Leaving directory `--topdir--/plugin/other/bin/abuild-zzprinter.any.test-suite.abc'

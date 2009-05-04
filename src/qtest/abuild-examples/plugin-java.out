@@ -1,5 +1,6 @@
 abuild: java-main (abuild-java): all
-     [echo] This is a compile closure from the echoer plugin.
+     [echo] This is a message from the echoer plugin.
+     [echo] The value of echo.message is default message
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/plugin/java/code/abuild-java/classes
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/dist

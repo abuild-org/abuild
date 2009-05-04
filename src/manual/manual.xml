@@ -11941,43 +11941,97 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
     </sect2>
     <sect2 id="ref.example.plugin.backend-code">
      <title>Adding Backend Code</title>
-     <!-- XXX extend this example to illustrate preplugin as well -->
-     <!-- XXX update for groovy -->
      <para>
       Here we examine the <classname>plugin.echoer</classname> plugin
       in the <filename>plugins/echoer</filename> directory.  This
-      plugin adds hook code for both ant-based and make-based build
-      items, again something that could not be done by simply using
-      build item rules.  This very simple plugin causes a message to
-      be printed when running the <command>all</command> target for
-      make-based build items and as a post-compile hook for ant-based
-      build items.  All build items in any build tree that includes
-      this plugin in its list of plugins will get this functionality
-      automatically without having to take any explicit action.  This
-      would be preferable to declaring this as a dependency for every
-      item and modifying <varname>RULES</varname> or
-      <varname>abuild.rules</varname> for every build item:
+      plugin supplies automatic build code for both Groovy-based and
+      make-based build items, something that cannot be done using
+      ordinary build item-supplied rules.  This very simple plugin
+      causes a message to be printed when running the
+      <command>all</command> target.  The contents of the message have
+      a default value but can be influenced by changes to a variable
+      that users can make in their individual build files.  All build
+      items in any build tree that includes this plugin in its list of
+      plugins will get this functionality automatically without having
+      to take any explicit action.  This would be preferable to
+      declaring this as a dependency for every item and modifying
+      <varname>RULES</varname> or <varname>abuild.rules</varname> for
+      every build item.
+     </para>
+     <para>
+      Here we show the code for both the make and Groovy backends in
+      <filename>plugin.mk</filename> and
+      <filename>plugin.groovy</filename> respectively:
       <?example plugin/plugins/echoer/plugin.mk?>
       <?example plugin/plugins/echoer/plugin.groovy?>
+      Observe that the make version refers to the variable
+      <varname>ECHO_MESSAGE</varname> and the Groovy version refers to
+      the parameter <varname>echo.message</varname>.  Where do these
+      come from?  The answer is that default values are provided by
+      <firstterm>pre-plugin</firstterm> initialization files in
+      <filename>preplugin.mk</filename> and
+      <filename>preplugin.groovy</filename>.
+      <footnote>
+       <para>
+        We had originally wanted to call these
+        <filename>pre-plugin</filename> instead of
+        <filename>preplugin</filename>, but this interferes with the
+        way Groovy generates classes for scripts.  Since
+        <classname>pre-plugin</classname> is not a valid class name
+        and we want to avoid specific mixed case file names (like
+        <filename>prePlugin</filename>, we went with
+        <filename>preplugin</filename>.  The make version is called
+        the same thing for consistency.
+       </para>
+      </footnote>
+      The pre-plugin initialization code is loaded
+      <emphasis>before</emphasis> your build file
+      (<filename>Abuild.mk</filename> or
+      <filename>Abuild.groovy</filename>), while the
+      <filename>plugin.mk</filename> and
+      <filename>plugin.groovy</filename> files are loaded after your
+      build file.  Here are the files:
+      <?example plugin/plugins/echoer/preplugin.mk?>
+      <?example plugin/plugins/echoer/preplugin.groovy?>
      </para>
      <para>
       Although this example is trivial and doesn't do anything useful,
-      there are other cases in which this type of facility might be
-      useful.  Examples could include targets that gather statistics
-      or run static analysis checks that may be required by a certain
-      project.
+      it does illustrate how you can use pre-plugin initialization
+      along with regular plugin code to interact with the user's build
+      files.  Although adding specific code without going through the
+      usual rules method should generally be used sparingly, there are
+      other cases in which this type of facility might be useful.
+      Examples could include targets that gather statistics or run
+      static analysis checks that may be required by a certain
+      project, or code that enforces policy.
      </para>
      <para>
-      For an example of using this plugin, build any build item in the
-      <varname>other</varname> or <varname>java</varname> directories
-      of <filename>example/plugin</filename>.  Here is the output of
-      running <command>abuild all</command> in the build item from the
-      previous example.  Since the <command>count</command> target is
-      declared as a dependency of <command>all</command> in
-      <filename>count.mk</filename>, we see the output of the
-      <command>count</command> target as well as the output from the
-      <classname>plugin.echoer</classname> build item:
-      <?qtest echo-b.out?>
+      Although building any item in the <filename>plugin</filename>
+      tree will illustrate use of the
+      <filename>plugin.echoer</filename> plugin, the
+      <filename>echo</filename> directory contains four items
+      specifically designed to illustrate manipulation of the echo
+      message.  Under the <filename>plugin/echo</filename> directory,
+      there are four build items.  The item
+      <filename>echo-a</filename> in the <filename>a</filename>
+      directory uses the make backend and does not modify the
+      <varname>ECHO_MESSAGE</varname> variable:
+      <?example plugin/echo/a/Abuild.mk?>
+      The item <filename>echo-b</filename> in the
+      <filename>b</filename> directory uses the make backend and
+      modifies the <varname>ECHO_MESSAGE</varname> variabel:
+      <?example plugin/echo/b/Abuild.mk?>
+      The item <filename>echo-c</filename> in the
+      <filename>c</filename> directory uses the Groovy backend and does
+      not modify the <varname>echo.message</varname> parameter:
+      <?example plugin/echo/c/Abuild.groovy?>
+      The item <filename>echo-d</filename> in the
+      <filename>d</filename> directory uses the Groovy backend and
+      modifies the <varname>echo.message</varname> parameter:
+      <?example plugin/echo/d/Abuild.groovy?>
+      To see this in action, run <command>abuild -b desc</command>
+      from the <filename>plugin/echo</filename> directory:
+      <?qtest plugin-echo.out?>
      </para>
     </sect2>
     <sect2 id="ref.example.platforms-and-platform-type-plugins">

@@ -1,10 +1,12 @@
 abuild: lib (abuild-<native>): all
 make: Entering directory `--topdir--/plugin/other/lib/abuild-<native>'
-This is message from the echoer plugin.
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
 make: Leaving directory `--topdir--/plugin/other/lib/abuild-<native>'
 abuild: lib (abuild-zzprinter.any.test-suite.abc): all
 make: Entering directory `--topdir--/plugin/other/lib/abuild-zzprinter.any.test-suite.abc'
-This is message from the echoer plugin.
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
 make: Leaving directory `--topdir--/plugin/other/lib/abuild-zzprinter.any.test-suite.abc'
 abuild: prog2 (abuild-<native>): all
 make: Entering directory `--topdir--/plugin/outside/prog2/abuild-<native>'

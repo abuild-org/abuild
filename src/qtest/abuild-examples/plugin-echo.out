@@ -1,0 +1,16 @@
+abuild: echo-a (abuild-indep): all
+make: Entering directory `--topdir--/plugin/echo/a/abuild-indep'
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message
+make: Leaving directory `--topdir--/plugin/echo/a/abuild-indep'
+abuild: echo-b (abuild-indep): all
+make: Entering directory `--topdir--/plugin/echo/b/abuild-indep'
+This is a message from the echoer plugin.
+The value of ECHO_MESSAGE is default message with modifications
+make: Leaving directory `--topdir--/plugin/echo/b/abuild-indep'
+abuild: echo-c (abuild-indep): all
+     [echo] This is a message from the echoer plugin.
+     [echo] The value of echo.message is default message
+abuild: echo-d (abuild-indep): all
+     [echo] This is a message from the echoer plugin.
+     [echo] The value of echo.message is default message with modifications
