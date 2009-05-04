@@ -14130,9 +14130,9 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           Built-in flex and bison support have tentatively been
-           expanded to use the <command>codegen-wrapper</command>.
-           The variables <varname>FLEX_CACHE</varname> and
+           Built-in flex and bison support have been expanded to use
+           the <command>codegen-wrapper</command>.  The variables
+           <varname>FLEX_CACHE</varname> and
            <varname>BISON_CACHE</varname> must be set to enable this.
           </para>
          </listitem>
@@ -14284,11 +14284,13 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           Externals may no longer be symbolic links nor may they
-           cross symbolic links.  If you were relying on symbolically
-           linked externals before, you can instead create dummy
-           directories with <filename>Abuild.backing</filename> files
-           or with their own externals pointing to the real location.
+           <emphasis>Note: in a later release, this was changed to a
+           warning.</emphasis> Externals may no longer be symbolic
+           links nor may they cross symbolic links.  If you were
+           relying on symbolically linked externals before, you can
+           instead create dummy directories with
+           <filename>Abuild.backing</filename> files or with their own
+           externals pointing to the real location.
           </para>
          </listitem>
          <listitem>
@@ -14383,7 +14385,9 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           The interface variable <varname>ABUILD_THIS</varname> is
+           <emphasis>Note: <varname>ABUILD_THIS</varname> was removed
+           from the deprecated list in a later release.</emphasis> The
+           interface variable <varname>ABUILD_THIS</varname> is
            deprecated and has been replaced by
            <varname>ABUILD_ITEM_NAME</varname>.  Note that &abuild; is
            not able to detect use of <varname>$(ABUILD_THIS)</varname>
@@ -15155,8 +15159,9 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           This change was actually introduced in version 1.1.a1.
-           &Abuild; now complains if the
+           <emphasis>Note: this change was removed in a subsequent
+           release.</emphasis> This change was actually introduced in
+           version 1.1.a1.  &Abuild; now complains if the
            <filename>ant-hooks.xml</filename> file for a hook build
            item does not exist.
           </para>
@@ -15170,15 +15175,17 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           The order in which files are loaded by the <application>GNU
-           Make</application> backend has been changed slightly.
-           <filename>plugin.mk</filename> files and the base rules
-           (which load the compiler toolchain support files) are now
-           loaded before <filename>Abuild.mk</filename>.  This makes
-           it possible for <filename>Abuild.mk</filename> files to
-           modify variables set in those places and also provides a
-           mechanism for plugins and built-in rules to supply default
-           values for parameters that can be referenced from
+           <emphasis>Note: this change was reverted in a subsequent
+           release.</emphasis> The order in which files are loaded by
+           the <application>GNU Make</application> backend has been
+           changed slightly.  <filename>plugin.mk</filename> files and
+           the base rules (which load the compiler toolchain support
+           files) are now loaded before
+           <filename>Abuild.mk</filename>.  This makes it possible for
+           <filename>Abuild.mk</filename> files to modify variables
+           set in those places and also provides a mechanism for
+           plugins and built-in rules to supply default values for
+           parameters that can be referenced from
            <filename>Abuild.mk</filename>.
           </para>
          </listitem>
@@ -15301,6 +15308,8 @@ Y = $(X)
             <listitem>
              <para>
               <varname>abuild.hook-build-items</varname>
+              (<emphasis>Note: removed from deprecated list in a
+              subsequent release</emphasis>)
              </para>
             </listitem>
             <listitem>
@@ -15383,10 +15392,11 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           The <option>--ant</option> and
+           <emphasis>Note: a limited version of <option>--ant</option>
+           was added back in a subsequent release.</emphasis> The
+           <option>--ant</option> and
            <option>--no-abuild-logger</option> options are no longer
-           supported since &abuild; now invokes ant through Java
-           APIs.
+           supported since &abuild; now invokes ant through Java APIs.
           </para>
          </listitem>
          <listitem>
@@ -15426,7 +15436,9 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           When declaring dependencies, a new flag
+           <emphasis>Note: this change was reverted in a subsequent
+           release, and a different solution was implemented in its
+           place.</emphasis> When declaring dependencies, a new flag
            <option>-with-rules</option> may be specified.  This causes
            the build item to load <filename>Rules.mk</filename>
            (make), <filename>ant-hooks.xml</filename> (ant), or
@@ -15505,11 +15517,13 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           All files from which hooks may be loaded, including hook
-           build items' <filename>ant-hooks.xml</filename> files,
-           plugins' <filename>plugin-ant.xml</filename> files, and any
-           file specified as <varname>abuild.local-buildfile</varname>
-           are now <emphasis>imported</emphasis>.  Before, plugin and
+           <emphasis>Note: this change was reverted in a subsequent
+           release.</emphasis> All files from which hooks may be
+           loaded, including hook build items'
+           <filename>ant-hooks.xml</filename> files, plugins'
+           <filename>plugin-ant.xml</filename> files, and any file
+           specified as <varname>abuild.local-buildfile</varname> are
+           now <emphasis>imported</emphasis>.  Before, plugin and
            build item-supplied files were used only for loading hooks.
            This means that it is possible to add new targets in
            plugins and hook build items.  Some caveats are described
@@ -15542,9 +15556,11 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           &Abuild; now loads the <command>groovy</command> ant task.
-           Parts of the &abuild; ant framework use this task to embed
-           Groovy code.  It is recommended that you switch to the
+           <emphasis>Note: this change was reverted in a subsequent
+           release.</emphasis> &Abuild; now loads the
+           <command>groovy</command> ant task.  Parts of the &abuild;
+           ant framework use this task to embed Groovy code.  It is
+           recommended that you switch to the
            <application>groovy</application> backend rather than using
            this task, but embedding Groovy code in your ant files may
            help with a transition to the new backend.
@@ -15552,20 +15568,12 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           The <command>other</command> and <command>deploy</command>
-           targets will be removed from the
-           <application>ant</application> framework in a future 1.1
-           alpha release as they are no longer needed now that it is
-           possible for users to add their own new targets.  If you
-           are relying on them, you can code your own in a plugin.
-          </para>
-         </listitem>
-         <listitem>
-          <para>
            Since &abuild; no longer invokes ant from the command line,
-           the <option>--ant</option> option has been removed.  As
-           such, it is no longer possible to pass arbitrary flags to
-           ant.  The most common use of this was to pass
+           the <option>--ant</option> option has been removed.
+           <emphasis>Note: a limited version of <option>--ant</option>
+           was added back in a subsequent release.</emphasis> As such,
+           it is no longer possible to pass arbitrary flags to ant.
+           The most common use of this was to pass
            <option>-Dprop-value</option> options to ant.  This can now
            be accomplished through &abuild;'s new
            <option>VAR=value</option> argument syntax as described
