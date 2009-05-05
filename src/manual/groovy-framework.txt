@@ -102,6 +102,8 @@ Abuild.groovy environment
 
     Fields:
 
+     (check code)
+
      - interfaceVars: a map corresponding to the values from
        Abuild.interface; all values are strings or lists of strings
 

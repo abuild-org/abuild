@@ -569,10 +569,11 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
         }
         def distdir = attributes.remove('distdir')
         def classesdir = attributes.remove('classesdir')
+        def junitdir = attributes.remove('junitdir')
         def reportdir = attributes.remove('reportdir')
         def testClassPath = attributes.remove('classpath')
 
-        ant.mkdir('dir': distdir)
+        ant.mkdir('dir': junitdir)
         def junitAttrs = attributes
         // Make sure we run junitreport even if junit fails and
         // haltonfailure is set.
@@ -588,13 +589,13 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
                 if (testsuite)
                 {
                     test('name': testsuite,
-                         'todir': distdir) {
+                         'todir': junitdir) {
                         formatter('type': 'xml')
                     }
                 }
                 if (batchIncludes)
                 {
-                    batchtest('todir': distdir) {
+                    batchtest('todir': junitdir) {
                         fileset('dir': classesdir) {
                             include('name': batchIncludes)
                             if (batchExcludes)
@@ -609,8 +610,8 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
         }
         finally
         {
-            ant.junitreport('todir': distdir) {
-                fileset('dir': distdir, 'includes':  'TEST-*.xml')
+            ant.junitreport('todir': junitdir) {
+                fileset('dir': junitdir, 'includes':  'TEST-*.xml')
                 report('format': 'frames', 'todir': reportdir)
             }
         }
@@ -626,8 +627,8 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
             'classpath': defaultWrapperClassPath,
             'classesdir': getPathVariable('classes'),
             'distdir': getPathVariable('dist'),
-            'reportdir': new File(abuild.buildDirectory,
-                                  'junit/html').absolutePath,
+            'junitdir': getPathVariable('junit'),
+            'reportdir': getPathVariable('junitHtml'),
             'printsummary': 'yes',
             'haltonfailure': 'yes',
             'fork': 'true'

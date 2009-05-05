@@ -15,6 +15,8 @@ parameters {
     java.dir.dist = "${buildDir}/dist"
     java.dir.classes = "${buildDir}/classes"
     java.dir.signedJars = "${buildDir}/signed-jars"
+    java.dir.junit = "${buildDir}/junit"
+    java.dir.junitHtml = "${buildDir}/junit/html"
 
     java.dir.generatedDoc = "${buildDir}/doc"
     java.dir.generatedSrc = "${buildDir}/src/java"
