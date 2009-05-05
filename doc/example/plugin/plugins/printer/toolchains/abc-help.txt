@@ -1,0 +1,3 @@
+The "abc" toolchain is a simple example toolchain support file.  It
+doesn't do much of anything, but does illustrate many of the
+capabilities provided by abuild's ccxx rules.

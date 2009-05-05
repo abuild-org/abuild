@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('executable');
+
+$td->runtest("normal case",
+	     {$td->COMMAND => "example 5"},
+	     {$td->STRING => "The opposite of 5 is -5\nThis is a text file.\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("error case",
+	     {$td->COMMAND => "example"},
+	     {$td->STRING => "Executable: one argument is required\n",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(2);

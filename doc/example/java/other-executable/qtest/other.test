@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('other');
+
+$td->runtest("normal case",
+	     {$td->COMMAND => "other"},
+	     {$td->STRING => "Here's another main just for show.\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

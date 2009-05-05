@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<!--  This ant fragment provides the "codegen" task, provided by   -->
+<!--  this build item, to generate a class named by the user of    -->
+<!--  the build item.                                              -->
+
+<project name="code-generator-hooks">
+
+ <!--  Create the targets required to glue our codegen target      -->
+ <!--  into abuild.  We want our codegen task to be called as a    -->
+ <!--  code generator as a "generate" hook.  We also provide a     -->
+ <!--  properties-help hook.                                       -->
+
+ <!--  Provide the "-generate" target and have it invoke the       -->
+ <!--  "codegen" target.                                           -->
+
+ <target name="-generate" depends="codegen"/>
+
+ <!--  Provide properties-help information.                        -->
+
+ <target name="-properties-help">
+  <echo>properties-help for code-generator:
+Set the following property:
+ * code-generator.classname -- the fully qualified classname to
+   be generated
+</echo>
+ </target>
+
+ <!--  Now provide our actual task and target.                     -->
+
+ <taskdef name="codegen"
+          classname="com.example.codeGenerator.ExampleTask"
+          classpath="${code-generator.classpath}"/>
+
+ <!--  Our code generator will write to the generated-jsrc         -->
+ <!--  directory named in the abuild.private.dir.generated-jsrc    -->
+ <!--  property as provided by abuild.                             -->
+
+ <target name="codegen">
+  <fail message="property code-generator.classname must be defined"
+        unless="code-generator.classname"/>
+  <codegen sourcedir="${abuild.private.dir.generated-jsrc}"
+           classname="${code-generator.classname}"/>
+ </target>
+
+</project>
