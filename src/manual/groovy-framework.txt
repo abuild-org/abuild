@@ -4,29 +4,18 @@ Groovy Framework Documentation (incorporate into manual)
 Miscellaneous Points to Incorporate
 -----------------------------------
 
- * For groovy backends, defining a new test procedure requires only
-   defining a closure for the 'test-only' target.  Abuild
-   automatically calls this from test or check.
-
  * document fields and interface of BuildState ("abuild").  Also
    describe parameter handling.  setParameter vs. getVariable, which
    looks at defines, parameters, interface, and default in that order
-
- * QTest.export prop for groovy backend; also automatic export of
-   TESTS and TC_SRCS
 
  * abuild.localRules, abuild.rules
 
  * Lazy jar signing is true by default in order to have idempotent
    builds
 
- * Build item paths (abuild.itemPaths[item])
 
- * Examples...
-
-
-General Guidelines
-------------------
+Guidelines For Groovy Target Authors
+------------------------------------
 
  * Coding style recommendation: all groovy files loaded by abuild are
    scripts.  The scripts should generally explicitly define a class
@@ -55,6 +44,13 @@ General Guidelines
    moment, is provided for pre-initializing parameters for build
    item-supplied rules.  Maybe we need to add one, but this facility
    may not really be needed.
+
+ * For groovy backends, defining a new test procedure requires only
+   defining a closure for the 'test-only' target.  Abuild
+   automatically calls this from test or check.
+
+ * Build item paths (abuild.itemPaths[item])
+
 
 Class Paths
 -----------
@@ -340,8 +336,3 @@ Abuild.groovy environment
     - abuild.localRules -- a list of files, treated as relative to the
       source directory, to load for defining local rules; abuild
       automatically appends .groovy suffix
-
-Rule-specific Help
-------------------
-
- * see rules/java/java-help.txt
