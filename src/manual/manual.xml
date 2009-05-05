@@ -8485,29 +8485,618 @@ endif
     so, without further delay, we'll continue with our description of
     &abuild;'s Groovy backend.
    </para>
-   <sect1 id="ref.groovy.environment">
-    <title>The &Abuild; Groovy Environment</title>
+   <sect1 id="ref.groovy.crash-course">
+    <title>A Crash Course in Groovy</title>
     <para>
-     XXX
+     To get the most out of &abuild;'s Groovy backend, it helps to
+     have a decent understanding of the <ulink
+     url="http://groovy.codehaus.org">Groovy language</ulink>.
+     Providing a tutorial on Groovy would be out of scope for this
+     manual.  However, there are a few Groovy idioms that &abuild; (as
+     well as many other Groovy-based systems) make heavy use of, and
+     understanding at least that much will certainly help you to make
+     sense of what is going on here.
     </para>
-    <sect2 id="ref.groovy.binding">
-     <title>The Binding</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
-    <sect2 id="ref.groovy.parameters">
-     <title>Groovy Parameters</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
+    <variablelist>
+     <varlistentry>
+      <term>
+       Closures
+      </term>
+      <listitem>
+       <para>
+        A <firstterm>closure</firstterm> is an anonymous block of code
+        that is treated as an object.  When a closure is run,
+        variables and functions that it uses are generally resolved in
+        the context in which the closure was
+        <emphasis>defined</emphasis> rather than in the context in
+        which it is run.  You can't get very far in Groovy without
+        having a basic understanding of closures.  You don't have to
+        understand closures to <emphasis>use</emphasis> &abuild;'s
+        Groovy backend, but you certainly have to understand them, at
+        least at some level, when you get to the point of writing
+        custom rules.
+       </para>
+       <para>
+        Although a closure is often written as a literal block of code
+        enclosed in curly braces, Groovy allows you to treat any
+        function as a closure.  In particular, Groovy allows you take
+        a particular method call of a <emphasis>specific
+        instance</emphasis> of an object and treat that method call as
+        a closure.  This feature is sometimes known as
+        <firstterm>bound methods</firstterm> and is present in many
+        modern programming languages.  The syntax for creating a
+        closure from a method in Groovy is
+        <literal>object.&amp;methodName</literal>.  &Abuild;'s Groovy
+        backend uses this construct heavily in its rule code.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Automatic Bean Formation
+      </term>
+      <listitem>
+       <para>
+        In Groovy, calling <literal>object.field</literal> is just
+        &ldquo;syntactic sugar&rdquo; for
+        <literal>object.getField()</literal>.  In other words, if an
+        object has a method called <function>getField</function>, then
+        accessing <literal>object.field</literal> is exactly the same
+        as calling <literal>object.getField()</literal>.  It is
+        important to understand this when looking at Groovy code that
+        is interfacing with the Java standard library.  For example,
+        <literal>object.class.name</literal> is the same as
+        <literal>object.getClass().getName()</literal>, which may not
+        be obvious to a Java programmer with no prior Groovy
+        experience.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       List and Map Literals
+      </term>
+      <listitem>
+       <para>
+        Groovy supports lists and maps that are similar to those in
+        Java.  However, Groovy has a syntax for list and map
+        <emphasis>literals</emphasis> that can appear directly in
+        code.  We make heavy use of these in the &abuild; Groovy
+        backend, and in fact, you will find heavy use of these in just
+        about any Groovy code.
+       </para>
+       <para>
+        The syntax for a list literal is <literal>[val1, val2, val3,
+        ...]</literal>.  The syntax for a map literal is
+        <literal>['key1': value1, 'key2': value2, ...]</literal>.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       The <literal>&lt;&lt;</literal> Operator
+      </term>
+      <listitem>
+       <para>
+        Groovy overloads the left-shift operator
+        (<literal>&lt;&lt;</literal>) for appending to lists.  For
+        example, this code:
+
+        <programlisting>def var = []
+var &lt;&lt; 1
+var &lt;&lt; 2
+</programlisting>
+        would result in a list whose value is <literal>[1,
+        2]</literal>.  The <literal>&lt;&lt;</literal> operator, like
+        all operators in Groovy, is just a shortcut for calling a
+        specific corresponding method.  This method returns the object
+        being appended.  So the above code could also have been
+        written as
+
+        <programlisting>def var = []
+var &lt;&lt; 1 &lt;&lt; 2
+</programlisting>
+        We use this syntax sometimes to append maps to lists of maps
+        as it's a little cleaner (in the author's opinion) than
+        explicitly coding lists of maps.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Named Parameters
+      </term>
+      <listitem>
+       <para>
+        Under the covers, Groovy runs on top of the Java virtual
+        machine.  As such, Groovy function calls are really just like
+        Java function calls: a function may take a specific number of
+        arguments that appear in a specific order.  The Java language
+        doesn't support named parameters, so there is no encoding of
+        them in Java byte code.  Yet Groovy appears to support named
+        parameters, so how does this work?
+       </para>
+       <para>
+        With Groovy, you often see function calls that look like they
+        have named parameters.  For example, the following would be a
+        valid function call in Groovy:
+
+        <programlisting>f('param1': value1, other, 'param2': value2)
+</programlisting>
+        You can even mix what look like named parameters with regular
+        parameters as in the above example.  What Groovy does when it
+        sees named parameters is that it gathers them all up in a
+        single map and then passes that map to the function as the
+        first argument.  As such, the above call is <emphasis>exactly
+        equivalent</emphasis> to the following:
+
+        <programlisting>f(['param1': value1, 'param2': value2], other)
+</programlisting>
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Trailing Closures
+      </term>
+      <listitem>
+       <para>
+        In Groovy, it is common to see something that looks like a
+        function call, or even bare function name, followed by a block
+        of code in curly braces.  In fact, this construct is used in
+        virtually every <filename>Abuild.groovy</filename> file.  This
+        points to another special bit of Groovy syntax surrounding
+        function calls.  Specifically, if a function call is
+        immediately followed by one or more closures, those closures
+        are passed to the function at the end of its parameter list.
+        Additionally, if a function is being called with no arguments
+        prior to the trailing closure, the parentheses can be
+        omitted.  So the following blocks of code are
+        <emphasis>exactly equivalent</emphasis>:
+
+        <programlisting>f({println 'hello'})
+f() {
+    println 'hello'
+}
+f {
+    println 'hello'
+}
+</programlisting>
+        In all three cases, the function <function>f</function> is
+        being called with a single argument, and that argument is a
+        closure that, when run, prints the string
+        <literal>hello</literal> followed by a newline.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Closure-based Iteration
+      </term>
+      <listitem>
+       <para>
+        Iteration over lists and maps is so common that Groovy
+        provides convenience methods for calling a closure on each
+        element of a list or map.  In Groovy, a closure with one
+        parameter can access the single parameter anonymously with
+        through the variable <varname>it</varname>.  If there are
+        multiple parameters (or zero parameters), they have to be
+        named and followed by <literal>-&gt;</literal> to separate
+        them from the body of the closure.
+       </para>
+       <para>
+        If you have a list in a variable called
+        <varname>items</varname>, the following code:
+
+        <programlisting>items.each { f(it) }
+</programlisting>
+        would call the function <function>f</function> for each
+        argument of the list.  If have a map in a variable called
+        <varname>table</varname>, this code:
+
+        <programlisting>table.each { k, v -> f(k, v) }
+</programlisting>
+        would call the function <function>f</function> on each key and
+        value in the map.  All that's happening here is that Groovy is
+        calling the <function>each</function> method of the list and
+        map objects with a closure passed to it as the last argument,
+        which should hopefully be clear now that you've seen the
+        trailing closure feature.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Safe Dereference
+      </term>
+      <listitem>
+       <para>
+        How often have you found yourself writing code where you first
+        check whether a variable is null and, only if it isn't null,
+        access it?  Groovy offers a shortcut for this.  This code:
+
+        <programlisting>obj?.method()
+</programlisting>
+        is the same as
+
+        <programlisting>if (obj != null)
+{
+    obj.method()
+}
+</programlisting>
+        but it's a lot easier to write!
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    <para>
+     These features are often combined.  In fact, this is extremely
+     common when using Groovy's <classname>AntBuilder</classname>,
+     which &abuild; uses very heavily.  So if you see something like
+     this:
+
+     <programlisting>ant.javac('destdir': classesDir, 'classpath': classPath) {
+    srcdirs.each { dir -> src('path' : dir) }
+    compilerargs?.each { arg -> compilerarg('value' : arg) }
+    includes?.each { include('name' : it) }
+    excludes?.each { exclude('name' : it) }
+}
+</programlisting>
+     you may be able to a little bit better of an idea of what's going
+     on!
+    </para>
+    <para>
+     There's a lot more to Groovy than in this tiny crash course.  You
+     are encouraged to seek out Groovy documentation or get a good
+     book on the language.  But hopefully this should be enough to get
+     you through the examples in this documentation.
+    </para>
    </sect1>
    <sect1 id="ref.Abuild.groovy">
     <title>The <filename>Abuild.groovy</filename> File</title>
     <para>
-     XXX
+     To use &abuild;'s Groovy backend, you must create a build file
+     called <filename>Abuild.groovy</filename>.  We've already seen a
+     few examples of <filename>Abuild.groovy</filename> files in <xref
+     linkend="ref.example.basic.java-library"/> and <xref
+     linkend="ref.example.basic.java-program"/>.
     </para>
+    <sect2 id="ref.groovy.parameter-blocks">
+     <title>Parameter Blocks</title>
+     <para>
+      &Abuild;'s Groovy backend loads each build item's
+      <filename>Abuild.groovy</filename> file in a private context such
+      that no two build items' build files can interfere with each
+      other.  Although the <filename>Abuild.groovy</filename> file is a
+      full-fledged Groovy script which could, in principle, run
+      arbitrary Groovy code, the intent is that your
+      <filename>Abuild.groovy</filename> file do nothing other than set
+      &abuild; parameters.  &Abuild; parameters are similar to make
+      variables or ant properties.  Unlike make variables or ant
+      parameters, they are a construct implemented by &abuild;'s Groovy
+      backend itself rather than being something more fundamental to
+      Groovy.
+      <footnote>
+       <para>
+        In fact, &abuild; parameters are nothing more than keys in a
+        map of parameter values.
+       </para>
+      </footnote>
+      Parameters look like ant or Java properties.  Unlike ant
+      properties, they are mutable (their values can be changed).
+      Parameters look like variable names divided into period-separated
+      components, like <varname>abuild.rules</varname> or
+      <varname>java.dir.dist</varname>.
+     </para>
+     <para>
+      The most common way to set &abuild; parameters is by assigning to
+      them inside of a <firstterm>parameters block</firstterm>.  A
+      parameters block in <filename>Abuild.groovy</filename> looks
+      something like this:
+
+      <programlisting>parameters {
+    first.parameter = 'value'
+    second.parameter = 'value'
+    list.parameter &lt;&lt; 'value1' &lt;&lt; 'value2'
+    other.var = resolve('something.else') + ' data'
+}
+</programlisting>
+      It is also possible to delete parameters like this:
+
+      <programlisting>parameters {
+    delete some.parameter
+}
+</programlisting>
+      though there should seldom if ever be a need to do this.
+     </para>
+     <para>
+      Basically you have something that looks like a bunch of variable
+      assignments inside a block preceded by
+      <function>parameters</function>.  Variables on the left-hand
+      side of assignments within the block are translated into
+      parameter names.  Variables on the right-hand side are normal
+      Groovy constructs.  If you'd like to get the value of an
+      existing parameter or of an interface variable or variable
+      definition from the command line, pass the name of the variable
+      to <function>resolve</function>.  The name of a variable passed
+      to resolve can always be quoted, but if it happens to look like
+      a valid parameter name, the quotes can be omitted.
+      <footnote>
+       <para>
+        If you're interested in what's going on here, this footnote
+        explains it.  Otherwise, please skip this and continue reading
+        the main text!  If you've read our Groovy crash course or are
+        otherwise familiar with Groovy, you may realize that
+        <function>parameters</function> is just a function call and
+        that the block being passed to it is a closure.  The catch here
+        is that the closure is not evaluated in the ordinary way since
+        these &ldquo;variables&rdquo; that we're modifying don't exist
+        in the lexical scope in which the closure is defined.  Instead,
+        the <function>parameters</function> method changes the
+        closure's <firstterm>delegate</firstterm>.  All the property
+        accesses within that block are intercepted by an object that
+        translates them into keys in &abuild;'s parameters map.  For
+        additional details, you are encouraged to read the code.  The
+        <function>parameters</function> function itself is a closure as
+        returned by <function>ParameterHelper.createClosure</function>,
+        which can be found in
+        <filename>ParameterHelper.groovy</filename> in &abuild;'s
+        source code.
+       </para>
+      </footnote>
+     </para>
+     <para>
+      All this magic is basically just a wrapper around calls to
+      <function>abuild.setParameter</function>,
+      <function>abuild.appendParameter</function>,
+      <function>abuild.resolve</function>, and
+      <function>abuild.deleteParameter</function>.  We discuss these
+      further in <xref linkend="ref.java.abuild-object-interface"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.groovy.parameters">
+     <title>Specific Parameters</title>
+     <para>
+      Not surprisingly, you won't actually find any parameters called
+      <varname>first.parameter</varname> or
+      <varname>something.else</varname>.  Instead, you will generally
+      be manipulating specific parameters.  There are two parameters
+      defined by &abuild; itself.  These are
+      <varname>abuild.rules</varname> and
+      <varname>abuild.localRules</varname>.  The parameter
+      <varname>abuild.rules</varname> contains a list of rule sets
+      that will be providing code to generate targets from sources.
+      The vast majority of Groovy-based build items will set the
+      <varname>abuild.rules</varname> parameter.  In rare instances, a
+      build item may need to provide additional rules for some one-off
+      purpose.  In this case, the parameter
+      <varname>abuild.localRules</varname> may be set to a list of
+      files, relative to the directory containing the
+      <filename>Abuild.groovy</filename> file, that implement the
+      local rules.  Note that <varname>abuild.rules</varname> contains
+      the <emphasis>names</emphasis> of rule set implementations while
+      <varname>abuild.localRules</varname> contains the names of
+      <emphasis>files</emphasis> that contain rule implements.  (This
+      makes these parameters consistent with the variables
+      <varname>RULES</varname> and <varname>LOCAL_RULES</varname> used
+      by the make backend.)  &Abuild; requires that at least one of
+      <varname>abuild.rules</varname> and
+      <varname>abuild.localRules</varname> be set in every
+      <filename>Abuild.groovy</filename> file.
+     </para>
+     <para>
+      In addition to <varname>abuild.rules</varname> and
+      <varname>abuild.localRules</varname>, there are many other
+      rule-specific parameters that can be set.  We will discuss them
+      in the context of the rules to which they apply.  All the
+      built-in rule sets are discussed later in this chapter.
+     </para>
+    </sect2>
+    <sect2 id="ref.groovy.variables">
+     <title>Parameters, Interface Variables, and Definitions</title>
+     <para>
+      We have discussed how to set and resolve parameters within an
+      <filename>Abuild.groovy</filename> file, but we have only just
+      glossed over interface variables and variable definitions passed
+      on &abuild;'s command line.  Most of the time, you don't have to
+      be concerned about the distinction, but sometimes it might be
+      important.  If the explanation in this section doesn't make
+      sense to you, just skip it for now.  You may never need to
+      understand the distinctions made here, but if something isn't
+      working the way you expect, you can always refer back to this
+      section.
+     </para>
+     <para>
+      &Abuild;'s groovy backend actually maintains three separate
+      namespaces of variables: parameters, interface variables, and
+      definitions.  Of these, the only ones you can actually modify
+      from an <filename>Abuild.groovy</filename> file are parameters,
+      so any assignment made in a parameter block affects a parameter.
+      However, calls to <function>resolve</function> have access to
+      interface variables and definitions.  As a reminder, parameters
+      are set explicitly in parameters blocks.  Interface variables
+      come from &abuild;'s interface system and are set in
+      <filename>Abuild.interface</filename> files.  Definitions are
+      passed on &abuild;'s command line through arguments of the form
+      <option>VAR=value</option>.  When you resolve a variable with
+      <function>resolve</function>, here is exactly what happens:
+      <itemizedlist>
+       <listitem>
+        <para>
+         If there is a <emphasis>definition</emphasis> of that
+         variable that was passed on &abuild;'s command line, return
+         that value.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Otherwise, if there is a <emphasis>parameter</emphasis> by
+         the name, return the value of the parameter.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Otherwise, if there is an <emphasis>interface
+         variable</emphasis> by that name, return that value
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Otherwise, return null
+        </para>
+       </listitem>
+      </itemizedlist>
+      When you append to a parameter in a parameter block (or by
+      calling <function>abuild.appendParameter</function>, &abuild; if
+      there is no parameter with the name of the variable that you are
+      appending to, &abuild; will first try to initialize the
+      parameter by calling resolve.  This means that if you initialize
+      something as an interface variable and then append to it in a
+      parameter block, <function>resolve</function> will return a
+      value that is the interface variable's value appended with the
+      changes made in your parameters block.  However, since
+      definitions take precedence over both interface variables and
+      parameters, if you specify the value of a variable on the
+      command line, the affect of modifying a parameter by the same
+      name will be ignored by future calls to
+      <function>resolve</function>.  What this all means is that
+      variables defined on the command line effectively override any
+      values specified in the interface or build files.  This is
+      equivalent to the behavior you would see with make or ant.
+      <footnote>
+       <para>
+        It is possible to get at the interface, definitions, and
+        parameters directly through the <varname>abuild</varname>
+        object, but you shouldn't do it.  If you are in a situation
+        where you are depending on that behavior, you're probably
+        doing something wrong.
+       </para>
+      </footnote>
+      If the above explanation didn't make a lot of sense, don't worry
+      about it.  It's set up so that the Right Thing happens most of
+      the time without your having to worry about it.
+     </para>
+    </sect2>
+   </sect1>
+   <sect1 id="ref.groovy.environment">
+    <title>The &Abuild; Groovy Environment</title>
+    <para>
+     The <filename>Abuild.groovy</filename> file along with all rules
+     implementation files are loaded as scripts by the Groovy backend.
+     We have already discussed the <function>parameters</function>
+     closure that is available within the
+     <filename>Abuild.groovy</filename> file.  This closure is
+     provided by being included in the <firstterm>binding</firstterm>,
+     which is a mechanism used by Groovy to communicate with embedded
+     scripts.  Here we discuss the remainder of the Groovy environment
+     used by &abuild;
+    </para>
+    <sect2 id="ref.groovy.binding">
+     <title>The Binding</title>
+     <para>
+      There are three variables provided through the binding to any
+      Groovy script that &abuild; loads:
+      <variablelist>
+       <varlistentry>
+        <term>
+         <varname>abuild</varname>
+        </term>
+        <listitem>
+         <para>
+          An instance of the
+          <classname>org.abuild.groovy.BuildState</classname> object,
+          which holds onto all information about the state of the
+          current build.  This includes information about parameters,
+          targets, and other things as well.  We discuss the interface
+          of this object in <xref
+          linkend="ref.java.abuild-object-interface"/>, though most
+          build items that don't implement any of their own rules will
+          find their interaction with it limited to calling
+          <function>abuild.resolve</function> if they have any
+          interaction with it at all.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>
+         <varname>ant</varname>
+        </term>
+        <listitem>
+         <para>
+          An instance of a Groovy <classname>AntBuilder</classname>
+          object set up with an ant <classname>Project</classname>
+          specific for &abuild;.  We discuss the ant project in more
+          detail in <xref linkend="ref.groovy.ant-project"/>.
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>
+         <varname>parameters</varname>
+        </term>
+        <listitem>
+         <para>
+          A closure that provides an environment for convenient
+          setting of parameters.  We discussed this above in <xref
+          linkend="ref.groovy.parameter-blocks"/>.
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+     </para>
+    </sect2>
+    <sect2 id="ref.groovy.ant-project">
+     <title>The Ant Project</title>
+     <para>
+      &Abuild; creates a fresh ant project for each build item that it
+      builds.  No information is passed between build items through
+      the ant project.  The only mechanism for passing information
+      between &abuild; build items is the interface system.  This
+      barrier is critical to &abuild;'s scalability.  It also results
+      in using the same mechanism to pass information between build
+      items regardless of whether the build items use the same
+      backend, which is important for support true cross-language
+      development.
+     </para>
+     <para>
+      The primary mechanism for passing information between a build
+      item and the rules used to build it is through setting and
+      resolving parameters, but &abuild; also provides some
+      information through ant properties.  Specifically, when you
+      define a variable on &abuild;'s command line, that variable
+      becomes available as an ant property in addition to being
+      visible to <function>resolve</function> in &abuild;'s parameter
+      blocks (or to <function>abuild.resolve</function> from anywhere
+      in the &abuild; Groovy environment).
+      <footnote>
+       <para>
+        Truth be told, the primary reason for this is that the same
+        ant project is passed to the Groovy backend as to the
+        deprecated xml-based ant backend, for which properties are the
+        only useful way of sending in information.  However, setting
+        these properties certainly doesn't hurt, and it might even
+        help, so we will continue to do it.
+       </para>
+      </footnote>
+     </para>
+     <para>
+      Additionally, &abuild; will set the project's logger and log
+      level based on how it was invoked, and &abuild; will also set
+      the <varname>basedir</varname> property to the output directory
+      of the current build item.  Note that since all Java builds are
+      running in one JVM, &abuild; cannot change the current
+      directory.  All well-behaved ant tasks are supposed to resolve
+      relative paths to <varname>basedir</varname> anyway though, so
+      this should generally not matter.
+     </para>
+     <para>
+      Note that, although &abuild; makes full use of ant tasks through
+      the ant project and the ant builder, &abuild; does not use ant's
+      target facility.  Instead, it defines its own with target bodies
+      being provided by Groovy closures.  This provides much greater
+      flexibility and ease of implementation.
+     </para>
+    </sect2>
    </sect1>
    <sect1 id="ref.groovy.directory-structure">
     <title>Directory Structure for Java Builds</title>
@@ -8974,6 +9563,12 @@ endif
 
 
     </sect2>
+   </sect1>
+   <sect1 id="ref.java.groovy">
+    <title>Groovy Rules</title>
+    <para>
+     XXX
+    </para>
    </sect1>
    <sect1 id="ref.java.for-rule-authors">
     <title>Additional Information for Rule Authors</title>
