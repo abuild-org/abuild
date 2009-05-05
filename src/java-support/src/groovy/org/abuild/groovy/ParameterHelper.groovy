@@ -47,7 +47,6 @@ class ParameterHelper
     {
         if (value instanceof ParameterHelper)
         {
-
             // Although it would be possible to avoid having to put
             // parameters in calls to resolve on the right hand side
             // of assignment or append operators just by resolving
