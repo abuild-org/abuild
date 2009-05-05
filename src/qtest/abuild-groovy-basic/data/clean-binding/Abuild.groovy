@@ -1,3 +1,3 @@
 parameters {
-    abuild.localRules = ['a', 'b']
+    abuild.localRules = ['a.groovy', 'b.groovy']
 }

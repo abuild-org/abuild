@@ -1,1 +1,1 @@
-parameters { abuild.localRules = 'local' }
+parameters { abuild.localRules = 'local.groovy' }

@@ -1,3 +1,3 @@
 parameters {
-    abuild.localRules = 'b_rules'
+    abuild.localRules = 'b_rules.groovy'
 }

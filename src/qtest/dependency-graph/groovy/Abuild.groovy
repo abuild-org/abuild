@@ -1,3 +1,3 @@
 parameters {
-    abuild.localRules = 'test_dependency_graph'
+    abuild.localRules = 'test_dependency_graph.groovy'
 }

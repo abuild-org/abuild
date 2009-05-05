@@ -59,7 +59,7 @@ def results = abuild.params.keySet().sort().collect {
     k -> [k, abuild.resolve(k)] }
 assert [
     ['a.b.c.d', 'some other value'],
-    ['abuild.localRules', 'local'],
+    ['abuild.localRules', 'local.groovy'],
     ['item.list.variable', ['a', 'b', 'c', 'd', 'e', 'f']],
     ['list', [1, 2, 3, 4, 5, 6, 'r', 7]],
     ['other.value', 'some other value'],

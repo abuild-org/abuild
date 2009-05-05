@@ -1,6 +1,6 @@
 parameters {
     abuild.rules = 'empty'
-    abuild.localRules = 'local'
+    abuild.localRules = 'local.groovy'
     qtest.export << 'VAR1'
     qtest.export << 'VAR2'
     qtest.export << 'potato'

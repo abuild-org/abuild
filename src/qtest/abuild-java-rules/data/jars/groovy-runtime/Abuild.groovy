@@ -1,3 +1,3 @@
 parameters {
-    abuild.localRules = 'findGroovy'
+    abuild.localRules = 'findGroovy.groovy'
 }

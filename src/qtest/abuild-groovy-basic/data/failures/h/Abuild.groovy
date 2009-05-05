@@ -1,1 +1,1 @@
-abuild.setParameter('abuild.localRules', 'h_rules')
+abuild.setParameter('abuild.localRules', 'h_rules.groovy')

@@ -137,7 +137,7 @@ class Backend implements GroovyBackend
         // Load any local rules files, resolving the path relative to
         // the source directory
         buildState.resolveAsList('abuild.localRules')?.each {
-            loadScript(new File("${sourceDirectory.path}/${it}.groovy"))
+            loadScript(new File("${sourceDirectory.path}/${it}"))
         }
 
         if (! buildState.checkGraph())
