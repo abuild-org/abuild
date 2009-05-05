@@ -7666,7 +7666,8 @@ endif
      </indexterm>
      <para>
       The following variables are used by <type>java</type> build
-      items:
+      items, described here from the context of the item assigning to
+      them:
       <variablelist>
        <varlistentry>
         <term>abuild.classpath</term>
@@ -7726,7 +7727,9 @@ endif
       </variablelist>
       For additional discussion of how these are used by the Groovy
       backend, please see <xref
-      linkend="ref.groovy.java-classpaths"/>.
+      linkend="ref.groovy.java-classpaths"/>.  In that section, we
+      discuss the variables from the context of the item that is using
+      them rather than the item that is assigning to them.
      </para>
     </sect2>
    </sect1>
@@ -9098,6 +9101,15 @@ f {
      </para>
     </sect2>
    </sect1>
+   <sect1 id="ref.groovy.rule-structure">
+    <title>Basic Groovy Rule Structure</title>
+    <para>
+     XXX see XXX comment below.  Describe the basic idea of targets
+     with controlling attributes whose default values come from
+     properties.  Then work the next two sections into that
+     description framework.
+    </para>
+   </sect1>
    <sect1 id="ref.groovy.directory-structure">
     <title>Directory Structure for Java Builds</title>
     <para>
@@ -9302,9 +9314,80 @@ f {
     </variablelist>
    </sect1>
    <sect1 id="ref.groovy.java-classpaths">
-    <title>Class Path Variables</title>
+    <title>Class Paths and Class Path Variables</title>
     <para>
-     XXX
+     In <xref linkend="ref.interface.java"/>, we discuss the three
+     classpath interface variables.  These are as follows, described
+     here from the perspective of the item that is using them:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <varname>abuild.classpath</varname>: archives your item
+        compiles with and probably packages in higher-level archives
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <varname>abuild.classpath.external</varname>: archives your
+        item compiles with but probably doesn't package in
+        higher-level archives
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <varname>abuild.classpath.manifest</varname>: archives that
+        should go in the your the manifest classpath of archives you
+        generate
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     Within the context of a Java build, there are four different
+     types of classpath-like entities.  We describe them here and show
+     how they are related to the three classpath interface variables:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Compile-time classpath: used as the
+        <property>classpath</property> attribute to the
+        <command>javac</command> task.  Its default value is the
+        combination of the values of
+        <varname>abuild.classpath</varname> and
+        <varname>abuild.classpath.external</varname>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Manifest classpath: used as
+        <property>Manifest-Classpath</property> attribute in the
+        manifest of any JAR files that you create.  Its default value
+        is the value of <varname>abuild.classpath.manifest</varname>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Archive to package: the list of archives that get included in
+        higher-level archives such as EAR files.  Its default value is
+        the value of <varname>abuild.classpath</varname>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Runtime class path: the classpath used by wrapper scripts and
+        test drivers.  Its default value is the values of
+        <varname>abuild.classpath</varname> and
+        <varname>abuild.classpath.external</varname> plus any JAR
+        files created by the current build item.
+       </para>
+      </listitem>
+     </itemizedlist>
+     Each of the above classpaths is computed inside &abuild;'s
+     <filename>java</filename> rules.  In each case, the computed
+     value is used as a default value for attributes to the various
+     targets that use them.  As we discuss the
+     <filename>java</filename> rules below, we will present additional
+     details about how to override these values for specific builds.
     </para>
    </sect1>
    <sect1 id="ref.groovy.java-rules">
