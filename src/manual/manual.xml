@@ -3251,7 +3251,10 @@ C:\cygwin\cygwin.bat
     We present examples of help files in this manual as we present
     information about adding rules and toolchain support files.  You
     can also run <command>abuild --help helpfiles</command> for a
-    reminder about the help file format.
+    reminder about the help file format.  To see an example of rule
+    help, see <xref linkend="ref.example.code-generator.make"/>.  To
+    see an example of toolchain help, see <xref
+    linkend="ref.example.platforms-and-platform-type-plugins"/>.
    </para>
   </chapter>
   <chapter id="ref.what-to-build">
@@ -6025,6 +6028,22 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         dependency chain, special constructs are required to implement
         opaque wrappers.  In <xref linkend="ref.opaque-wrapper"/>, we
         present the mechanisms required to make this work.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Optional Dependencies</term>
+      <listitem>
+       <para>
+        The goal of loose integration between software components can
+        often be best served by allowing different components to make
+        themselves known to the system at runtime.  However, there are
+        instances in which a tighter, compile-time integration may be
+        required with optional components.  In <xref
+        linkend="ref.optional-dependencies"/>, will illustrate how
+        &abuild; allows you to declare tree and item dependencies as
+        optional and then create code that is conditional upon whether
+        the optional dependency is satisfied.
        </para>
       </listitem>
      </varlistentry>
@@ -12522,13 +12541,18 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
       always the name of the compiler, so this implies that we have an
       <type>abc</type> compiler defined somewhere.  This plugin also
       provides the rules for using the <type>abc</type> compiler in
-      <filename>toolchains/abc.mk</filename>:
-      <!-- XXX help text -->
+      <filename>toolchains/abc.mk</filename>.  Here are the
+      implementation file and help file:
       <?example plugin/plugins/printer/toolchains/abc.mk?>
-      To understand this file, you should read through the comments in
-      <filename>rules/object-code/ccxx.mk</filename> in the
-      &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).  In this
-      case, our plugin also creates the compiler itself in
+      <?example plugin/plugins/printer/toolchains/abc-help.txt?>
+      You can see the help text by running <command>abuild --help
+      rules toolchain:abc</command>, and you can discover that this
+      toolchain is available by provided <command>abuild --help rules
+      list</command> from anywhere in the <filename>plugins</filename>
+      tree.  To understand this file, you should read through the
+      comments in <filename>rules/object-code/ccxx.mk</filename> in
+      the &abuild; distribution (<xref linkend="ref.ccxx.mk"/>).  In
+      this case, our plugin also creates the compiler itself in
       <filename>bin/abc</filename> and
       <filename>bin/abc-link</filename>.  Our &ldquo;compilers&rdquo;
       here just create text files of the source code with numbered
@@ -12658,7 +12682,6 @@ native-compiler qcc
       In addition to listing the compiler in
       <command>list_platforms</command>, we have to provide a support
       file for it in <filename>toolchains/qcc.mk</filename>:
-      <!-- XXX help text -->
       <?example native-compiler/compiler/toolchains/qcc.mk?>
       This file illustrates a degenerate compiler implementation,
       providing minimal implementations of all the variables and
