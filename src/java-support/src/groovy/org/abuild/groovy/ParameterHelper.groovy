@@ -47,6 +47,24 @@ class ParameterHelper
     {
         if (value instanceof ParameterHelper)
         {
+
+            // Although it would be possible to avoid having to put
+            // parameters in calls to resolve on the right hand side
+            // of assignment or append operators just by resolving
+            // them here automatically, there are all sorts of cases
+            // where it doesn't work, such as when parameters are used
+            // as values in map keys, passed as arguments to arbitrary
+            // functions, or assigned to local variables.  It would be
+            // possible to alleviate this to some extent by changing
+            // the implementation of ParameterHelper to automatically
+            // resolve parameter names to values a resolution is
+            // available.  However, this would prevent simultaneous
+            // use of a.b and a.b.c, as in abuild.classpath and
+            // abuild.classpath.manifest.  To keep things simple and
+            // avoid confusion, we force use of resolve in all cases.
+            // That way, people get into the habit of using it and
+            // won't be thrown off by having ParameterHelper objects
+            // floating around in unexpected places.
             throw new BuildFailure(
                 'abuild parameter names must be passed' +
                 ' to resolve to be used on the right hand side of' +
@@ -65,6 +83,7 @@ class ParameterHelper
         }
         else if (value instanceof ParameterHelper)
         {
+            // See comment above.
             throw new BuildFailure(
                 'abuild parameter names must be passed' +
                 ' to resolve to be used on the right hand side of' +
