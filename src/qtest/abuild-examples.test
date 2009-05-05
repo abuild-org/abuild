@@ -502,6 +502,20 @@ if ($test_java)
 		 {$td->FILE => "$top/mixed-classification.out",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/java");
+    $td->runtest("java examples",
+		 {$td->COMMAND => "abuild -b all test",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/java.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("help file",
+		 {$td->COMMAND => "abuild --help rules rule:codegenerator",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/java-code-generator-help.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
 }
 else
 {
@@ -509,7 +523,7 @@ else
     # don't get a false test failure.  Note that we pipe to cat >
     # /dev/null instead of just writing to /dev/null because gnu tar
     # has a special case and won't actually read the file otherwise.
-    system("(tar cf - basic/java* mixed-classification" .
+    system("(tar cf - java basic/java* mixed-classification" .
 	   " | cat > /dev/null)");
 }
 
@@ -607,6 +621,13 @@ $td->runtest("check printer ABUILD_PLATFORM_TYPE",
 		  "grep 'ABUILD_PLATFORM_TYPE :='" .
 		  " bin/abuild-zzprinter.any.test-suite.abc/.ab-dynamic.mk"},
 	     {$td->STRING => "ABUILD_PLATFORM_TYPE := printer\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("help on abc toolchain",
+	     {$td->COMMAND => "abuild --help rules toolchain:abc",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/abc-help.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -883,7 +904,7 @@ $td->runtest("run prog with",
 
 check_work_accessed($td);
 
-$td->report(132 +
+$td->report(133 +
 	    (in_windows() ? 0 : 1) +
-	    ($test_java ? 7 : 0) +
+	    ($test_java ? 9 : 0) +
 	    ($have_whole_archive ? 2 : 1));

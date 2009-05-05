@@ -1,0 +1,11 @@
+
+The following help is available for toolchain "abc":
+
+provided by build item plugin.printer (from tree plugin)
+applies to target type object-code
+Help text:
+----------
+The "abc" toolchain is a simple example toolchain support file.  It
+doesn't do much of anything, but does illustrate many of the
+capabilities provided by abuild's ccxx rules.
+----------

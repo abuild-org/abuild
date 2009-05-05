@@ -1,0 +1,16 @@
+
+The following help is available for rule "codegenerator":
+
+provided by build item code-generator (from tree basic)
+applies to target type java
+Help text:
+----------
+*** Help for users of abuild.rules = 'codegenerator' ***
+
+Set the parameter codeGenerator.classname to the fully qualified
+classname to be generated.
+
+To generate multiple classes, instead set the parameter
+codeGenerator.codegen to a list of maps, each of which has a
+'classname' key.
+----------

@@ -9475,7 +9475,11 @@ endif
    <sect1 id="ref.example.code-generator.groovy">
     <title>Code Generator Example for Groovy</title>
     <para>
-     XXX write this
+     The build tree containing the Java code generator example, built
+     using the Groovy framework, can be found in the tree located at
+     <filename>java</filename>.  The code generator itself is at
+     <filename>java/code-generator</filename>.
+     XXX continue...
     </para>
    </sect1>
    <sect1 id="ref.example.auto-from-variable">
