@@ -9107,7 +9107,11 @@ f {
      XXX see XXX comment below.  Describe the basic idea of targets
      with controlling attributes whose default values come from
      properties.  Then work the next two sections into that
-     description framework.
+     description framework.  Present as four layers: easy, where only
+     mandatory properties are set, next where other defaults are
+     overridden, next where the control parameters are used for finer
+     grained control of generating multiple artifacts, and finally
+     where closures are used for full control.
     </para>
    </sect1>
    <sect1 id="ref.groovy.directory-structure">
