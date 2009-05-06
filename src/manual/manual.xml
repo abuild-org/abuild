@@ -6,6 +6,7 @@
 <!ENTITY rdquo "&#x201D;">
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
+<!ENTITY indent "&#x2014;/">
 <!ENTITY swversion "1.1.a9">
 <!ENTITY lastreleased "May 4, 2009">
 ]>
@@ -8488,6 +8489,661 @@ endif
     so, without further delay, we'll continue with our description of
     &abuild;'s Groovy backend.
    </para>
+   <sect1 id="ref.Abuild.groovy">
+    <title>The <filename>Abuild.groovy</filename> File</title>
+    <para>
+     To use &abuild;'s Groovy backend, you must create a build file
+     called <filename>Abuild.groovy</filename>.  We've already seen a
+     few examples of <filename>Abuild.groovy</filename> files in <xref
+     linkend="ref.example.basic.java-library"/> and <xref
+     linkend="ref.example.basic.java-program"/>.
+    </para>
+    <sect2 id="ref.groovy.parameter-blocks">
+     <title>Parameter Blocks</title>
+     <para>
+      &Abuild;'s Groovy backend loads each build item's
+      <filename>Abuild.groovy</filename> file in a private context such
+      that no two build items' build files can interfere with each
+      other.  Although the <filename>Abuild.groovy</filename> file is a
+      full-fledged Groovy script which could, in principle, run
+      arbitrary Groovy code, the intent is that your
+      <filename>Abuild.groovy</filename> file do nothing other than set
+      &abuild; parameters.  &Abuild; parameters are similar to make
+      variables or ant properties.  Unlike make variables or ant
+      parameters, they are a construct implemented by &abuild;'s Groovy
+      backend itself rather than being something more fundamental to
+      Groovy.
+      <footnote>
+       <para>
+        In fact, &abuild; parameters are nothing more than keys in a
+        map of parameter values.
+       </para>
+      </footnote>
+      Parameters look like ant or Java properties, but unlike ant
+      properties, their values can be modified.  Parameter names are
+      typically divided into period-separated components, like
+      <varname>abuild.rules</varname> or
+      <varname>java.dir.dist</varname>.
+     </para>
+     <para>
+      The most common way to set &abuild; parameters is by assigning to
+      them inside of a <firstterm>parameters block</firstterm>.  A
+      parameters block in <filename>Abuild.groovy</filename> looks
+      something like this:
+
+      <programlisting>parameters {
+    java.jarName = 'example.jar'
+    abuild.rules = ['java', 'groovy']
+}
+</programlisting>
+      Within a parameters block, things that look like variables are
+      treated as &abuild; parameters instead.  (For a discussion of
+      how this works, see <xref
+      linkend="ref.parameter-blocks-implementation"/>.)  On the left
+      hand side of an assignment, &abuild; automatically treats the
+      assignment as an assignment to a parameter.  On the right hand
+      side, you have to wrap the parameter name in a call to
+      <function>resolve</function>.  You can also pass the names of
+      interface variables to <function>resolve</function>.  For
+      example, the following would give the parameter
+      <varname>item.name</varname> the value of the interface variable
+      <varname>ABUILD_ITEM_NAME</varname>:
+
+      <programlisting>parameters {
+    item.name = resolve(ABUILD_ITEM_NAME)
+}
+</programlisting>
+      If the interface variable contains characters that make it
+      invalid as a Groovy identifier, you can quote it, as in the
+      following:
+
+      <programlisting>parameters {
+    item.parameter = resolve('some-build-item.archive-name')
+}
+</programlisting>
+      In addition to assigning to parameters, you can append to them
+      by using the <literal>&lt;&lt;</literal> operator, which is the
+      same operator Groovy uses to append to lists.  The following
+      three parameter blocks are equivalent:
+
+      <programlisting>parameters {
+    abuild.rules = ['java', 'groovy']
+}
+parameters {
+    abuild.rules &lt;&lt; 'java' &lt;&lt; 'groovy'
+}
+parameters {
+    abuild.rules &lt;&lt; 'java'
+    abuild.rules &lt;&lt; 'groovy'
+}
+</programlisting>
+      It is even possible to delete parameters like this:
+
+      <programlisting>parameters {
+    delete some.parameter
+}
+</programlisting>
+      though there should seldom if ever be a need to do this.
+     </para>
+     <para>
+      Most of the time, working with parameters and parameter blocks
+      is straightforward, but there are some subtleties that may pop
+      up in rare instances.  For a full discussion, refer to <xref
+      linkend="ref.groovy.variables"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.groovy.selecting-rules">
+     <title>Selecting Rules</title>
+     <para>
+      In a typical <filename>Abuild.groovy</filename> file, you will
+      be assigning to some rule-specific parameters and to at least
+      one the two parameters provided directly by &abuild;.  The two
+      &abuild; parameters are <varname>abuild.rules</varname> and
+      <varname>abuild.localRules</varname>.  The parameter
+      <varname>abuild.rules</varname> contains a list of rule sets
+      that will be providing code to generate targets from sources.
+      The vast majority of Groovy-based build items will set the
+      <varname>abuild.rules</varname> parameter.  In rare instances, a
+      build item may need to provide additional rules for some one-off
+      purpose.  In this case, the parameter
+      <varname>abuild.localRules</varname> may be set to a list of
+      files, relative to the directory containing the
+      <filename>Abuild.groovy</filename> file, that implement the
+      local rules.  Note that <varname>abuild.rules</varname> contains
+      the <emphasis>names</emphasis> of rule set implementations while
+      <varname>abuild.localRules</varname> contains the names of
+      <emphasis>files</emphasis> that contain rule implements.  (This
+      makes these parameters consistent with the variables
+      <varname>RULES</varname> and <varname>LOCAL_RULES</varname> used
+      by the make backend.)  &Abuild; requires that at least one of
+      <varname>abuild.rules</varname> and
+      <varname>abuild.localRules</varname> be set in every
+      <filename>Abuild.groovy</filename> file.
+     </para>
+    </sect2>
+   </sect1>
+   <sect1 id="ref.groovy.directory-structure">
+    <title>Directory Structure for Java Builds</title>
+    <para>
+     &Abuild;'s Groovy backend provides a default directory structure
+     that it uses by convention when performing Java builds.  It is
+     possible to override all of these paths by setting specific
+     parameters as described in <xref
+     linkend="ref.java.file-locations"/>.  In this section, we just
+     provide a quick overview of the default paths.
+    </para>
+    <para>
+     All paths are relative to the build item directory.  Note that
+     <filename>abuild-java</filename> is the &abuild; output directory
+     for Java builds.  All directories under
+     <filename>abuild-java</filename> are created automatically if
+     needed.  All other directories are optional: &abuild; will use
+     them if they exist but will not complain if they are missing.
+     Note that the <command>clean</command> target removes the entire
+     &abuild; output directory.
+    </para>
+    <table id="table.java-directories" frame="all">
+     <title>Default Java Directory Structure</title>
+     <tgroup cols="2" align="left" colsep="1" rowsep="1">
+      <thead>
+       <row>
+        <entry>Directory</entry>
+        <entry>Purpose</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry><filename>src</filename></entry>
+        <entry/>
+       </row>
+       <row>
+        <entry><filename>&indent;java</filename></entry>
+        <entry>
+         hand-coded Java sources
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;resources</filename></entry>
+        <entry>
+         hand-created additional files to be packaged into the root of
+         the item's JAR or EAR files or into the
+         <filename>WEB-INF/classes</filename> directories of the
+         item's WAR files
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;conf</filename></entry>
+        <entry>
+         not used directly by &abuild;; a good place to put other
+         configuration files such as
+         <filename>application.xml</filename>, that are referenced by
+         specific parameters
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;META-INF</filename></entry>
+        <entry>
+         hand-created files to go into the item's archives'
+         <filename>META-INF</filename> directories
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;web</filename></entry>
+        <entry/>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;content</filename></entry>
+        <entry>
+         hand-created content to go into the root of the item's WAR
+         files
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;WEB-INF</filename></entry>
+        <entry>
+         hand-created content to go into the item's WAR files'
+         <filename>WEB-INF</filename> directories
+        </entry>
+       </row>
+       <row>
+        <entry><filename>abuild-java</filename></entry>
+        <entry>
+         the &abuild; output directory; all contents below here are
+         generated
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;src</filename></entry>
+        <entry/>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;java</filename></entry>
+        <entry>
+         generated Java sources; treated identically to
+         <filename>src/java</filename>
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;resources</filename></entry>
+        <entry>
+         generated additional files; treated identically to
+         <filename>src/resources</filename>
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;conf</filename></entry>
+        <entry>
+         not used directly by &abuild;; a good place to put generated
+         versions of whatever you would put in
+         <filename>src/conf</filename>
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;META-INF</filename></entry>
+        <entry>
+         generated META-INF files; treated identically to
+         <filename>src/conf/META-INF</filename>
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;web</filename></entry>
+        <entry/>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;content</filename></entry>
+        <entry>
+         generated web content; treated identically to
+         <filename>src/web/content</filename>
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;WEB-INF</filename></entry>
+        <entry>
+         generated WEB-INF; treated identically to
+         <filename>src/web/WEB-INF</filename>
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;dist</filename></entry>
+        <entry>
+         the location where &abuild; places generated archives
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;doc</filename></entry>
+        <entry>
+         the location where &abuild; places Javadoc documentation
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;junit</filename></entry>
+        <entry>
+         the location where &abuild; writes JUnit test results
+        </entry>
+       </row>
+       <row>
+        <entry><filename>&indent;&indent;html</filename></entry>
+        <entry>
+         the location where &abuild; writes HTML reports generated
+         from JUnit test results
+        </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+   </sect1>
+   <sect1 id="ref.groovy.basic-java">
+    <title>Basic Java Rules Functionality</title>
+    <para>
+     Virtually all Java-based build items will set the
+     <varname>abuild.rules</varname> parameter to the value
+     <literal>'java'</literal> or to a list that includes that value.
+     The <filename>java</filename> rules are quite flexible and give
+     you considerable leeway on how things should work.  In this
+     section, we will describe only the most basic use of the
+     <filename>java</filename> rules.  When using the rules in this
+     way, you control everything that you are going to build by
+     setting a few simple parameters, and you set up your build
+     item's directory structure according to &abuild;'s conventions.
+     In later sections, we will discuss various ways to customize or
+     override &abuild;'s default behavior.
+    </para>
+    <para>
+     The <filename>java</filename> rules perform a variety of
+     functions, most of which must be enabled by setting one or more
+     parameters.  With appropriate parameters, the
+     <filename>java</filename> rules can perform the following tasks:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Compiling Java source code into class files
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Generating Javadoc documentation
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating JAR files populated by class files and other
+        arbitrary contents
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating simple wrapper scripts that run executable JAR files
+        in the context of the source tree; these wrapper scripts are
+        useful for testing within the source tree, but not for
+        installation or deployment
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating WAR files that contain locally produced files as well
+        as signed JAR files or other content
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Producing higher-level JAR-like archives, such as RAR files,
+        that may contain other JAR files
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating EAR files that may contain locally produced files
+        including other archives as well as other content
+       </para>
+      </listitem>
+     </itemizedlist>
+     We will discuss each of these briefly in turn.  In the
+     discussions below, we describe the default behavior of each of
+     these capabilities.  Keep in mind that virtually every aspect of
+     them, including all the default paths and file locations, can be
+     customized.  We will be describing how to customize and override
+     the default behavior in later sections.
+    </para>
+    <para>
+     The sections below include prose descriptions of the default
+     locations of files.  To see all this presented in one place,
+     please refer to <xref linkend="ref.groovy.directory-structure"/>.
+    </para>
+    <sect2 id="ref.java.compile">
+     <title>Compiling Java Source Code</title>
+     <para>
+      By default, Java compilation involves compiling with
+      <command>javac</command> every <filename>.java</filename> file
+      found in <filename>src/java</filename> and writing the output
+      files into <filename>abuild-java/classes</filename>.  In
+      addition to <filename>src/java</filename>, &abuild; also looks
+      for Java sources in <filename>abuild-java/src/java</filename>,
+      which is where automatic code generators are expected to put
+      generated Java sources.  If you wish to specify additional
+      locations in which &abuild; should look for Java sources, you
+      may append those paths to the parameter
+      <varname>java.dir.extraSrc</varname>.  You can also override the
+      normal location where &abuild; looks for your hand-coded Java
+      sources and for generated sources as well as the location where
+      it writes class files.  For information, see <xref
+      linkend="ref.java.file-locations"/>.
+     </para>
+     <para>
+      By default, &abuild; invokes <command>javac</command> with debug
+      and deprecation turned on and with the additional arguments
+      <option>-Xlint</option> and <option>-Xlint:-path</option>.
+      These can be customized by using the more advanced control
+      parameter-based customization method as discussed in <xref
+      linkend="ref.java.control-parameters"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.jar">
+     <title>Building Basic Jar Files</title>
+     <para>
+      If the <varname>java.jarname</varname> parameter is set,
+      &abuild; will create a JAR file with the indicated name.  For an
+      example of this, see <xref
+      linkend="ref.example.basic.java-library"/>.  By default, you are
+      expected to put any hand-created files other than class files in
+      <filename>src/resources</filename>.  Build items that
+      automatically generate additional files to include in the JAR
+      file should place those files in
+      <filename>abuild-java/src/resources</filename>.  All files in
+      <filename>src/resources</filename>,
+      <filename>abuild-java/classes</filename>, and
+      <filename>abuild-java/src/resources</filename>, subject to the
+      usual ant exclusions (version control directories, editor backup
+      files, etc.), will be included in the JAR file.  You may specify
+      additional directories whose contents should be included by
+      appending the names of the directories to the parameter
+      <varname>java.dir.extraResources</varname>.  Additionally, any
+      files in the <filename>src/conf/META-INF</filename> and
+      <filename>abuild-java/src/conf/META-INF</filename> directories
+      will be included in the <filename>META-INF</filename> directory
+      of the JAR file.  You can specify additional META-INF
+      directories by setting the parameter
+      <varname>java.dir.extraMetainf</varname>.
+     </para>
+     <para>
+      As always, all default path names may be overridden; see <xref
+      linkend="ref.java.file-locations"/>.  It is also possible to
+      provide additional arguments to the <command>jar</command> task,
+      to set additional keys in the <filename>manifest</filename>, and
+      to create multiple JAR targets.  These customizations can be
+      performed using the control parameter, as described in <xref
+      linkend="ref.java.control-parameters"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.wrapper-scripts">
+     <title>Wrapper Scripts</title>
+     <para>
+      If the <varname>java.wrapperName</varname> and
+      <varname>java.mainClass</varname> parameters are set in addition
+      to the <varname>java.jarname</varname> parameter, &abuild; will
+      generate a simple wrapper script that will invoke
+      <command>java</command> on the JAR file using the specified main
+      class.  For an example of this, see <xref
+      linkend="ref.example.basic.java-program"/>. The wrapper script
+      is placed directly in the &abuild; output directory.  Using the
+      control parameter (<xref
+      linkend="ref.java.control-parameters"/>), it is possible to
+      create multiple wrapper scripts.  We also illustrate this in
+      <xref linkend="ref.example.code-generator.groovy"/>.<!-- XXX
+      maybe we should pull the multiple wrappers out into a separate
+      example section, though it can stay in the same tree -->
+     </para>
+    </sect2>
+    <sect2 id="ref.java.junit">
+     <title>Testing with JUnit</title>
+     <para>
+      If you have implemented JUnit tests suites, you can run them
+      using either the <command>test</command> or
+      <command>batchtest</command> nested tasks of the
+      <command>junit</command> ant task.  If you have a single test
+      suite that you want to run, you can set the
+      <varname>java.junitTestsuite</varname> parameter to the name of
+      the class that implements the test suite.  If you want to run
+      multiple test suites using the <command>batchtest</command>
+      task, you can set the parameter
+      <varname>java.junitBatchIncludes</varname> and optionally also
+      <varname>java.junitBatchExcludes</varname> to patterns that will
+      be matched against the classes in
+      <filename>abuild-java/classes</filename>.  You may provide
+      values for all of these if you wish, in which case &abuild; will
+      run all test specified.  &Abuild; will write XML test output to
+      the <filename>abuild-java/junit</filename> directory and,
+      whether the tests pass or fail, will also generate an HTML
+      report in <filename>abuild-java/junit/html</filename>.  By
+      default, if the test fails, the &ldquo;build&rdquo; of the
+      <command>test</command> target for the item will fail.  This and
+      other behavior can be overridden using a control parameter
+      (<xref linkend="ref.java.control-parameters"/>).
+     </para>
+    </sect2>
+    <sect2 id="ref.java.war">
+     <title>WAR Files</title>
+     <para>
+      If you wish to build a WAR file, you must set the
+      <varname>java.warname</varname> parameter to the name of the WAR
+      file and the <varname>java.webxml</varname> parameter to the
+      path to the <filename>web.xml</filename> file for that WAR.  The
+      <varname>java.webxml</varname> parameter may be set to a
+      relative path, in which case it is resolved relative to the
+      build item's top-level directory (the directory containing
+      <filename>Abuild.groovy</filename>).  By default, &abuild; will
+      package into <filename>WEB-INF/classes</filename> the contents
+      of <filename>src/resources</filename>,
+      <filename>abuild-java/classes</filename>,
+      <filename>abuild-java/src/resources</filename> and any
+      additional directories named in
+      <varname>java.dir.extraResources</varname>.  It will also
+      package at the root of the WAR file any files in
+      <filename>src/web/content</filename>,
+      <filename>abuild-java/src/web/content</filename>, and any
+      directories named in
+      <varname>java.dir.extraWebContent</varname>.  It will populate
+      <filename>META-INF</filename> exactly as it does for JAR files.
+      The <filename>WEB-INF</filename> directory will be populated
+      from <filename>src/web/WEB-INF</filename>,
+      <filename>abuild-java/src/web/WEB-INF</filename>, and any
+      directories named in <varname>java.dir.extraWebinf</varname>.
+     </para>
+     <para>
+      XXX continue...signed jars, java.warLibJars, ...
+     </para>
+    </sect2>
+    <sect2 id="ref.java.high-level-archives">
+     <title>High Level Archives</title>
+     <para>
+      XXX
+     </para>
+    </sect2>
+    <sect2 id="ref.java.ear">
+     <title>EAR Files</title>
+     <para>
+      XXX
+     </para>
+    </sect2>
+   </sect1>
+   <sect1 id="ref.java.file-locations">
+    <title>Advanced Customization: Overriding File Locations</title>
+    <para>
+     XXX describe the parameters in _base.groovy
+    </para>
+   </sect1>
+   <sect1 id="ref.java.control-parameters">
+    <title>Advanced Customization: Control Parameters</title>
+    <para>
+     XXX describe the concepts of control parameters.  Refer to --help
+     rules rule:java for details.
+    </para>
+   </sect1>
+   <sect1 id="ref.groovy.java-classpaths">
+    <title>Class Paths and Class Path Variables</title>
+    <para>
+     In <xref linkend="ref.interface.java"/>, we discuss the three
+     classpath interface variables.  These are as follows, described
+     here from the perspective of the item that is using them:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <varname>abuild.classpath</varname>: archives your item
+        compiles with and probably packages in higher-level archives
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <varname>abuild.classpath.external</varname>: archives your
+        item compiles with but probably doesn't package in
+        higher-level archives
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <varname>abuild.classpath.manifest</varname>: archives that
+        should go in the your the manifest classpath of archives you
+        generate
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     Within the context of a Java build, there are four different
+     types of classpath-like entities.  We describe them here and show
+     how they are related to the three classpath interface variables:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Compile-time classpath: used as the
+        <property>classpath</property> attribute to the
+        <command>javac</command> task.  Its default value is the
+        combination of the values of
+        <varname>abuild.classpath</varname> and
+        <varname>abuild.classpath.external</varname>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Manifest classpath: used as
+        <property>Manifest-Classpath</property> attribute in the
+        manifest of any JAR files that you create.  Its default value
+        is the value of <varname>abuild.classpath.manifest</varname>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Archive to package: the list of archives that get included in
+        higher-level archives such as EAR files.  Its default value is
+        the value of <varname>abuild.classpath</varname>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Runtime class path: the classpath used by wrapper scripts and
+        test drivers.  Its default value is the values of
+        <varname>abuild.classpath</varname> and
+        <varname>abuild.classpath.external</varname> plus any JAR
+        files created by the current build item.
+       </para>
+      </listitem>
+     </itemizedlist>
+     Each of the above classpaths is computed inside &abuild;'s
+     <filename>java</filename> rules.  In each case, the computed
+     value is used as a default value for attributes to the various
+     targets that use them.
+    </para>
+    <para>
+     To override the value of one of these classpaths for a specific
+     build item, there are two approaches.  One is to effectively
+     replace the interface variable with a parameter.  Since &abuild;
+     uses <function>resolve</function> internally to retrieve these
+     values, constructs such as this:
+
+     <programlisting>parameters {
+    abuild.classpath.manifest &lt;&lt; 'something-else.jar'
+}
+</programlisting>
+     or
+
+     <programlisting>parameters {
+    abuild.classpath.manifest =
+        resolve(abuild.classpath.manifest).grep {
+            it != 'something-else.jar' }
+}
+</programlisting>
+     can be used to change the underlying variables used to construct
+     the various class paths.  To understand why this works, please
+     refer to <xref linkend="ref.groovy.variables"/>.
+    </para>
+    <para>
+     The other way these can be overridden is to specifically override
+     the classpath that is used by each target.  This can be done by
+     using control parameters, as discussed in <xref
+     linkend="ref.java.control-parameters"/>.  Each target's
+     attributes map contains a key that can be set to supply a new
+     value for whichever classpaths need to be changed.
+    </para>
+   </sect1>
    <sect1 id="ref.groovy.crash-course">
     <title>A Crash Course in Groovy</title>
     <para>
@@ -8755,232 +9411,6 @@ f {
      you through the examples in this documentation.
     </para>
    </sect1>
-   <sect1 id="ref.Abuild.groovy">
-    <title>The <filename>Abuild.groovy</filename> File</title>
-    <para>
-     To use &abuild;'s Groovy backend, you must create a build file
-     called <filename>Abuild.groovy</filename>.  We've already seen a
-     few examples of <filename>Abuild.groovy</filename> files in <xref
-     linkend="ref.example.basic.java-library"/> and <xref
-     linkend="ref.example.basic.java-program"/>.
-    </para>
-    <sect2 id="ref.groovy.parameter-blocks">
-     <title>Parameter Blocks</title>
-     <para>
-      &Abuild;'s Groovy backend loads each build item's
-      <filename>Abuild.groovy</filename> file in a private context such
-      that no two build items' build files can interfere with each
-      other.  Although the <filename>Abuild.groovy</filename> file is a
-      full-fledged Groovy script which could, in principle, run
-      arbitrary Groovy code, the intent is that your
-      <filename>Abuild.groovy</filename> file do nothing other than set
-      &abuild; parameters.  &Abuild; parameters are similar to make
-      variables or ant properties.  Unlike make variables or ant
-      parameters, they are a construct implemented by &abuild;'s Groovy
-      backend itself rather than being something more fundamental to
-      Groovy.
-      <footnote>
-       <para>
-        In fact, &abuild; parameters are nothing more than keys in a
-        map of parameter values.
-       </para>
-      </footnote>
-      Parameters look like ant or Java properties.  Unlike ant
-      properties, they are mutable (their values can be changed).
-      Parameters look like variable names divided into period-separated
-      components, like <varname>abuild.rules</varname> or
-      <varname>java.dir.dist</varname>.
-     </para>
-     <para>
-      The most common way to set &abuild; parameters is by assigning to
-      them inside of a <firstterm>parameters block</firstterm>.  A
-      parameters block in <filename>Abuild.groovy</filename> looks
-      something like this:
-
-      <programlisting>parameters {
-    first.parameter = 'value'
-    second.parameter = 'value'
-    list.parameter &lt;&lt; 'value1' &lt;&lt; 'value2'
-    other.var = resolve('something.else') + ' data'
-}
-</programlisting>
-      It is also possible to delete parameters like this:
-
-      <programlisting>parameters {
-    delete some.parameter
-}
-</programlisting>
-      though there should seldom if ever be a need to do this.
-     </para>
-     <para>
-      Basically you have something that looks like a bunch of variable
-      assignments inside a block preceded by
-      <function>parameters</function>.  Variables on the left-hand
-      side of assignments within the block are translated into
-      parameter names.  Variables on the right-hand side are normal
-      Groovy constructs.  If you'd like to get the value of an
-      existing parameter or of an interface variable or variable
-      definition from the command line, pass the name of the variable
-      to <function>resolve</function>.  The name of a variable passed
-      to resolve can always be quoted, but if it happens to look like
-      a valid parameter name, the quotes can be omitted.
-      <footnote>
-       <para>
-        If you're interested in what's going on here, this footnote
-        explains it.  Otherwise, please skip this and continue reading
-        the main text!  If you've read our Groovy crash course or are
-        otherwise familiar with Groovy, you may realize that
-        <function>parameters</function> is just a function call and
-        that the block being passed to it is a closure.  The catch here
-        is that the closure is not evaluated in the ordinary way since
-        these &ldquo;variables&rdquo; that we're modifying don't exist
-        in the lexical scope in which the closure is defined.  Instead,
-        the <function>parameters</function> method changes the
-        closure's <firstterm>delegate</firstterm>.  All the property
-        accesses within that block are intercepted by an object that
-        translates them into keys in &abuild;'s parameters map.  For
-        additional details, you are encouraged to read the code.  The
-        <function>parameters</function> function itself is a closure as
-        returned by <function>ParameterHelper.createClosure</function>,
-        which can be found in
-        <filename>ParameterHelper.groovy</filename> in &abuild;'s
-        source code.
-       </para>
-      </footnote>
-     </para>
-     <para>
-      All this magic is basically just a wrapper around calls to
-      <function>abuild.setParameter</function>,
-      <function>abuild.appendParameter</function>,
-      <function>abuild.resolve</function>, and
-      <function>abuild.deleteParameter</function>.  We discuss these
-      further in <xref linkend="ref.java.abuild-object-interface"/>.
-     </para>
-    </sect2>
-    <sect2 id="ref.groovy.parameters">
-     <title>Specific Parameters</title>
-     <para>
-      Not surprisingly, you won't actually find any parameters called
-      <varname>first.parameter</varname> or
-      <varname>something.else</varname>.  Instead, you will generally
-      be manipulating specific parameters.  There are two parameters
-      defined by &abuild; itself.  These are
-      <varname>abuild.rules</varname> and
-      <varname>abuild.localRules</varname>.  The parameter
-      <varname>abuild.rules</varname> contains a list of rule sets
-      that will be providing code to generate targets from sources.
-      The vast majority of Groovy-based build items will set the
-      <varname>abuild.rules</varname> parameter.  In rare instances, a
-      build item may need to provide additional rules for some one-off
-      purpose.  In this case, the parameter
-      <varname>abuild.localRules</varname> may be set to a list of
-      files, relative to the directory containing the
-      <filename>Abuild.groovy</filename> file, that implement the
-      local rules.  Note that <varname>abuild.rules</varname> contains
-      the <emphasis>names</emphasis> of rule set implementations while
-      <varname>abuild.localRules</varname> contains the names of
-      <emphasis>files</emphasis> that contain rule implements.  (This
-      makes these parameters consistent with the variables
-      <varname>RULES</varname> and <varname>LOCAL_RULES</varname> used
-      by the make backend.)  &Abuild; requires that at least one of
-      <varname>abuild.rules</varname> and
-      <varname>abuild.localRules</varname> be set in every
-      <filename>Abuild.groovy</filename> file.
-     </para>
-     <para>
-      In addition to <varname>abuild.rules</varname> and
-      <varname>abuild.localRules</varname>, there are many other
-      rule-specific parameters that can be set.  We will discuss them
-      in the context of the rules to which they apply.  All the
-      built-in rule sets are discussed later in this chapter.
-     </para>
-    </sect2>
-    <sect2 id="ref.groovy.variables">
-     <title>Parameters, Interface Variables, and Definitions</title>
-     <para>
-      We have discussed how to set and resolve parameters within an
-      <filename>Abuild.groovy</filename> file, but we have only just
-      glossed over interface variables and variable definitions passed
-      on &abuild;'s command line.  Most of the time, you don't have to
-      be concerned about the distinction, but sometimes it might be
-      important.  If the explanation in this section doesn't make
-      sense to you, just skip it for now.  You may never need to
-      understand the distinctions made here, but if something isn't
-      working the way you expect, you can always refer back to this
-      section.
-     </para>
-     <para>
-      &Abuild;'s groovy backend actually maintains three separate
-      namespaces of variables: parameters, interface variables, and
-      definitions.  Of these, the only ones you can actually modify
-      from an <filename>Abuild.groovy</filename> file are parameters,
-      so any assignment made in a parameter block affects a parameter.
-      However, calls to <function>resolve</function> have access to
-      interface variables and definitions.  As a reminder, parameters
-      are set explicitly in parameters blocks.  Interface variables
-      come from &abuild;'s interface system and are set in
-      <filename>Abuild.interface</filename> files.  Definitions are
-      passed on &abuild;'s command line through arguments of the form
-      <option>VAR=value</option>.  When you resolve a variable with
-      <function>resolve</function>, here is exactly what happens:
-      <itemizedlist>
-       <listitem>
-        <para>
-         If there is a <emphasis>definition</emphasis> of that
-         variable that was passed on &abuild;'s command line, return
-         that value.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Otherwise, if there is a <emphasis>parameter</emphasis> by
-         the name, return the value of the parameter.
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Otherwise, if there is an <emphasis>interface
-         variable</emphasis> by that name, return that value
-        </para>
-       </listitem>
-       <listitem>
-        <para>
-         Otherwise, return null
-        </para>
-       </listitem>
-      </itemizedlist>
-      When you append to a parameter in a parameter block (or by
-      calling <function>abuild.appendParameter</function>, &abuild; if
-      there is no parameter with the name of the variable that you are
-      appending to, &abuild; will first try to initialize the
-      parameter by calling resolve.  This means that if you initialize
-      something as an interface variable and then append to it in a
-      parameter block, <function>resolve</function> will return a
-      value that is the interface variable's value appended with the
-      changes made in your parameters block.  However, since
-      definitions take precedence over both interface variables and
-      parameters, if you specify the value of a variable on the
-      command line, the affect of modifying a parameter by the same
-      name will be ignored by future calls to
-      <function>resolve</function>.  What this all means is that
-      variables defined on the command line effectively override any
-      values specified in the interface or build files.  This is
-      equivalent to the behavior you would see with make or ant.
-      <footnote>
-       <para>
-        It is possible to get at the interface, definitions, and
-        parameters directly through the <varname>abuild</varname>
-        object, but you shouldn't do it.  If you are in a situation
-        where you are depending on that behavior, you're probably
-        doing something wrong.
-       </para>
-      </footnote>
-      If the above explanation didn't make a lot of sense, don't worry
-      about it.  It's set up so that the Right Thing happens most of
-      the time without your having to worry about it.
-     </para>
-    </sect2>
-   </sect1>
    <sect1 id="ref.groovy.environment">
     <title>The &Abuild; Groovy Environment</title>
     <para>
@@ -9100,351 +9530,89 @@ f {
       flexibility and ease of implementation.
      </para>
     </sect2>
-   </sect1>
-   <sect1 id="ref.groovy.rule-structure">
-    <title>Basic Groovy Rule Structure</title>
-    <para>
-     XXX see XXX comment below.  Describe the basic idea of targets
-     with controlling attributes whose default values come from
-     properties.  Then work the next two sections into that
-     description framework.  Present as four layers: easy, where only
-     mandatory properties are set, next where other defaults are
-     overridden, next where the control parameters are used for finer
-     grained control of generating multiple artifacts, and finally
-     where closures are used for full control.
-    </para>
-   </sect1>
-   <sect1 id="ref.groovy.directory-structure">
-    <title>Directory Structure for Java Builds</title>
-    <para>
-     &Abuild;'s Groovy backend provides a default directory structure
-     (<firstterm>build by convention</firstterm>) by allows you to
-     override it in a variety of ways.  The following table shows a
-     partial list of the directories &abuild; looks for and what they
-     mean.  It also provides the name of the parameter that contains
-     the default.  You can override the values of these parameters in
-     your <filename>Abuild.groovy</filename> files to reflect an
-     alternative layout of your source code.  As a general rule,
-     however, it is recommended that you don't do this without a good
-     reason as consistency in this regard is a good thing.
-    </para>
-    <para>
-     All paths are relative to the build item directory.  Note that
-     <filename>abuild-java</filename> is the &abuild; output directory
-     for Java builds.  All directories under
-     <filename>abuild-java</filename> are created automatically if
-     needed.  All other directories are optional: &abuild; will use
-     them if they exist but will not complain if they are missing.
-     Note that the <command>clean</command> target removes the entire
-     &abuild; output directory.
-    </para>
-    <para>
-     For a complete list of all the paths and parameters that are
-     available, please refer to &abuild;'s online help.  You can run
-     <command>abuild --help rules rule:java</command> and
-     <command>abuild --help rules rule:groovy</command> to see this
-     help.  The table below shows the most common paths that will be
-     used by most build items.
-    </para>
-    <warning>
+    <sect2 id="ref.groovy.variables">
+     <title>Parameters, Interface Variables, and Definitions</title>
      <para>
-      XXX This section of the documentation doesn't really do justice
-      to the framework.  We really need some way to explain that there
-      are multiple tiers here....each target has its own way to
-      override paths, and each path for each target gets its default
-      value from parameters.  Come back and revisit this.
+      We have discussed how to set and resolve parameters within an
+      <filename>Abuild.groovy</filename> file, but we have only just
+      glossed over interface variables and variable definitions passed
+      on &abuild;'s command line.  Most of the time, you don't have to
+      be concerned about the distinction, but sometimes it might be
+      important.  If the explanation in this section doesn't make
+      sense to you, just skip it for now.  You may never need to
+      understand the distinctions made here, but if something isn't
+      working the way you expect, you can always refer back to this
+      section.
      </para>
-    </warning>
-    <variablelist>
-     <varlistentry>
-      <term>
-       <filename>src/java</filename>; parameter
-       <varname>java.dir.src</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory contains java source code.  Any files it
-        contains will be compiled into class files.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>src/resources</filename>; parameter
-       <varname>java.dir.resources</varname>
-      </term>
-      <listitem>
-       <para>
-        Any files contained here will be copied to whatever archives
-        are being created.  Standard ant exclusions (for CM
-        directories, editor backup files, etc.) are in effect.  For
-        all archive types except WAR files, files will be placed under
-        the root of the archive in the same relative location as they
-        are to <filename>src/resources</filename> in the source tree.
-        For WAR files, they will be placed in
-        <filename>WEB-INF/classes</filename>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>src/conf/META-INF</filename>; parameter
-       <varname>java.dir.metainf</varname>
-      </term>
-      <listitem>
-       <para>
-        Any files contained here will be added to the
-        <filename>META-INF</filename> directory in the archive.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>src/web/content</filename>; parameter
-       <varname>java.dir.webContent</varname>
-      </term>
-      <listitem>
-       <para>
-        Any files contained here will be copied to any WAR files
-        created.  Standard ant exclusions (for CM directories, editor
-        backup files, etc.)  are in effect.  Files will be placed
-        under the root of the WAR in the same relative location as
-        they are to <filename>src/web/content</filename> in the source
-        tree.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>src/web/WEB-INF</filename>; parameter
-       <varname>java.dir.webinf</varname>
-      </term>
-      <listitem>
-       <para>
-        Any files contained here will be added to the
-        <filename>WEB-INF</filename> directory of the WAR file.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term><filename>qtest</filename></term>
-      <listitem>
-       <para>
-        This directory contains any qtest test suites.  It must exist
-        in order for the <varname>test</varname> target to attempt to
-        run any qtest-based test suites.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>abuild-java/src/java</filename>; parameter
-       <varname>java.dir.generatedSrc</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory contains any automatically generated java code.
-        Build items that generate code should create this directory if
-        it doesn't exist and should put their generated code there.
-        User-supplied rules should refer only to the property and
-        never to the path itself.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>abuild-java/src/resources</filename>; parameter
-       <varname>java.dir.generatedResources</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory is intended for user-supplied rules to populate
-        with additional files that should be handled in the same as
-        <filename>src/resources</filename>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>abuild-java/classes</filename>; parameter
-       <varname>java.dir.classes</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory contains class files that result from compiling
-        files in both <filename>src/java</filename> and
-        <filename>abuild-java/src/java</filename>.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>abuild-java/dist</filename>; parameter
-       <varname>java.dir.dist</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory is where &abuild; targets place files that are
-        intended to be used outside of this build item.  Among other
-        things, generated archive files are placed into this
-        directory.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>abuild-java/junit</filename>; parameter
-       <varname>java.dir.junit</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory contains the XML output of junit tests.
-       </para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term>
-       <filename>abuild-java/junit/html</filename>; parameter
-       <varname>abuild.dir.junitHtml</varname>
-      </term>
-      <listitem>
-       <para>
-        This directory contains the HTML summary of junit test output.
-        Loading <filename>index.html</filename> from this directory
-        into a browser will allow you to view the test results.
-       </para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-   </sect1>
-   <sect1 id="ref.groovy.java-classpaths">
-    <title>Class Paths and Class Path Variables</title>
-    <para>
-     In <xref linkend="ref.interface.java"/>, we discuss the three
-     classpath interface variables.  These are as follows, described
-     here from the perspective of the item that is using them:
-     <itemizedlist>
-      <listitem>
-       <para>
-        <varname>abuild.classpath</varname>: archives your item
-        compiles with and probably packages in higher-level archives
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        <varname>abuild.classpath.external</varname>: archives your
-        item compiles with but probably doesn't package in
-        higher-level archives
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        <varname>abuild.classpath.manifest</varname>: archives that
-        should go in the your the manifest classpath of archives you
-        generate
-       </para>
-      </listitem>
-     </itemizedlist>
-    </para>
-    <para>
-     Within the context of a Java build, there are four different
-     types of classpath-like entities.  We describe them here and show
-     how they are related to the three classpath interface variables:
-     <itemizedlist>
-      <listitem>
-       <para>
-        Compile-time classpath: used as the
-        <property>classpath</property> attribute to the
-        <command>javac</command> task.  Its default value is the
-        combination of the values of
-        <varname>abuild.classpath</varname> and
-        <varname>abuild.classpath.external</varname>.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Manifest classpath: used as
-        <property>Manifest-Classpath</property> attribute in the
-        manifest of any JAR files that you create.  Its default value
-        is the value of <varname>abuild.classpath.manifest</varname>.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Archive to package: the list of archives that get included in
-        higher-level archives such as EAR files.  Its default value is
-        the value of <varname>abuild.classpath</varname>.
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Runtime class path: the classpath used by wrapper scripts and
-        test drivers.  Its default value is the values of
-        <varname>abuild.classpath</varname> and
-        <varname>abuild.classpath.external</varname> plus any JAR
-        files created by the current build item.
-       </para>
-      </listitem>
-     </itemizedlist>
-     Each of the above classpaths is computed inside &abuild;'s
-     <filename>java</filename> rules.  In each case, the computed
-     value is used as a default value for attributes to the various
-     targets that use them.  As we discuss the
-     <filename>java</filename> rules below, we will present additional
-     details about how to override these values for specific builds.
-    </para>
-   </sect1>
-   <sect1 id="ref.groovy.java-rules">
-    <title>Basic Java Rules</title>
-    <para>
-     XXX
-    </para>
-    <sect2 id="ref.java.jars">
-     <title>Building Basic Jar Files</title>
      <para>
-      XXX
-     </para>
-    </sect2>
-    <sect2 id="ref.java.wrapper-scripts">
-     <title>Wrapper Scripts</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
-    <sect2 id="ref.java.junit">
-     <title>Testing with JUnit</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
-    <sect2 id="ref.java.qtest">
-     <title>Testing with QTest</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
-   </sect1>
-   <sect1 id="ref.java.ee">
-    <title>Java EE Rules</title>
-    <para>
-     XXX
-    </para>
-    <sect2 id="ref.java.high-level-archives">
-     <title>High Level Archives</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
-    <sect2 id="ref.java.war">
-     <title>WAR Files</title>
-     <para>
-      XXX
-     </para>
-    </sect2>
-    <sect2 id="ref.java.ear">
-     <title>EAR Files</title>
-     <para>
-      XXX
+      &Abuild;'s groovy backend actually maintains three separate
+      namespaces of variables: parameters, interface variables, and
+      definitions.  Of these, the only ones you can actually modify
+      from an <filename>Abuild.groovy</filename> file are parameters,
+      so any assignment made in a parameter block affects a parameter.
+      However, calls to <function>resolve</function> have access to
+      interface variables and definitions.  As a reminder, parameters
+      are set explicitly in parameters blocks.  Interface variables
+      come from &abuild;'s interface system and are set in
+      <filename>Abuild.interface</filename> files.  Definitions are
+      passed on &abuild;'s command line through arguments of the form
+      <option>VAR=value</option>.  When you resolve a variable with
+      <function>resolve</function>, here is exactly what happens:
+      <itemizedlist>
+       <listitem>
+        <para>
+         If there is a <emphasis>definition</emphasis> of that
+         variable that was passed on &abuild;'s command line, return
+         that value.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Otherwise, if there is a <emphasis>parameter</emphasis> by
+         the name, return the value of the parameter.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Otherwise, if there is an <emphasis>interface
+         variable</emphasis> by that name, return that value
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Otherwise, return null
+        </para>
+       </listitem>
+      </itemizedlist>
+      When you append to a parameter in a parameter block (or by
+      calling <function>abuild.appendParameter</function>, &abuild; if
+      there is no parameter with the name of the variable that you are
+      appending to, &abuild; will first try to initialize the
+      parameter by calling resolve.  This means that if you initialize
+      something as an interface variable and then append to it in a
+      parameter block, <function>resolve</function> will return a
+      value that is the interface variable's value appended with the
+      changes made in your parameters block.  However, since
+      definitions take precedence over both interface variables and
+      parameters, if you specify the value of a variable on the
+      command line, the affect of modifying a parameter by the same
+      name will be ignored by future calls to
+      <function>resolve</function>.  What this all means is that
+      variables defined on the command line effectively override any
+      values specified in the interface or build files.  This is
+      equivalent to the behavior you would see with make or ant.
+      <footnote>
+       <para>
+        It is possible to get at the interface, definitions, and
+        parameters directly through the <varname>abuild</varname>
+        object, but you shouldn't do it.  If you are in a situation
+        where you are depending on that behavior, you're probably
+        doing something wrong.
+       </para>
+      </footnote>
+      If the above explanation didn't make a lot of sense, don't worry
+      about it.  It's set up so that the Right Thing happens most of
+      the time without your having to worry about it.
      </para>
     </sect2>
    </sect1>
@@ -14784,7 +14952,35 @@ Y = $(X)
      items that depend on it.
     </para>
    </sect1>
-  </chapter>
+   <sect1 id="ref.parameter-blocks-implementation">
+    <title>Parameter Block Implementation</title>
+    <para>
+     The <function>parameters</function> function in the binding for
+     scripts loaded by &abuild;'s Groovy backend is actually a closure
+     returned by <function>ParameterHelper.createClosure</function>.
+     This function takes a closure as an argument.  In order to make
+     things that look like assignments inside that closure modify
+     &abuild; parameters, the <function>parameters</function> call
+     changes the delegate of the closure to an instance of
+     <function>ParameterHelper</function> helper class constructed
+     with a reference to the <varname>abuild</varname> object, an
+     instance of <classname>BuildState</classname>.  Within
+     <classname>ParameterHelper</classname>, the
+     <function>get</function>, <function>set</function>, and
+     <function>leftshift</function> methods are overridden to result
+     in fields being translated into
+     <classname>ParameterHelper</classname> objects which, when
+     assigned to or appended to, relay the action through appropriate
+     calls in <classname>BuildState</classname>, which implements the
+     <classname>Parameterized</classname> interface.  The code is
+     relatively small.  For additional details, please find
+     <filename>ParameterHelper.groovy</filename> and
+     <filename>Parameterized.groovy</filename> in &abuild;'s source
+     code and look at the <filename>parameter-helper</filename> test
+     suite.
+    </para>
+   </sect1>
+ </chapter>
  </part>
  <part id="ref.part4" label="IV">
   <title>Appendices</title>

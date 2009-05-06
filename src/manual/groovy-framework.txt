@@ -1,21 +1,12 @@
-Groovy Framework Documentation (incorporate into manual)
-========================================================
-
 Miscellaneous Points to Incorporate
------------------------------------
-
- * document fields and interface of BuildState ("abuild").  Also
-   describe parameter handling.  setParameter vs. getVariable, which
-   looks at defines, parameters, interface, and default in that order
-
- * abuild.localRules, abuild.rules
+===================================
 
  * Lazy jar signing is true by default in order to have idempotent
    builds
 
 
 Guidelines For Groovy Target Authors
-------------------------------------
+====================================
 
  * Coding style recommendation: all groovy files loaded by abuild are
    scripts.  The scripts should generally explicitly define a class
@@ -52,232 +43,179 @@ Guidelines For Groovy Target Authors
  * Build item paths (abuild.itemPaths[item])
 
 
-Class Paths
------------
+"abuild" Object Interface
+=========================
 
-Interface variables (all list filename prepend):
+Would be nice to be able to generate this with groovydoc...
 
- * abuild.classpath: items you compile with and probably package
+(check code)
 
- * abuild.classpath.external: items you compile with and probably
-   don't package
+ * Fields:
 
- * abuild.classpath.manifest: non-recursive: items that should go in
-   the manifest classpaths of things that directly depend on you.
+    - interfaceVars: a map corresponding to the values from
+      Abuild.interface; all values are strings or lists of strings
 
-Four different types of class paths:
+    - defines: a map of variables defined on the command line; all
+      values are strings
 
- * compile: used as classpath attribute to javac
+    - params: a map of parameters defined by the user in
+      Abuild.groovy; keys are strings, but values can be any Object
+      or null
 
-   default: abuild.classpath + abuild.classpath.external
+    - buildDirectory: a File object containing the build directory
 
-   override by setting 'classpath' key in entry of java.compile
-   parameter
+    - sourceDirectory: a File object containing the source directory
 
- - manifest: used as Manifest-Classpath attribute in manifest
+ * Methods:
 
-   default: abuild.classpath.manifest
+    - configureTarget('name', named parameters) {
+	  closureBody()
+      }
 
-   Override by setting 'manifest' key in entry of java.packageJar
+      registers target 'name'; i.e., causes it to exist if it does
+      not already exist
 
-   To append rather than replace, you can always set the value of the
-   'manifest' key to something based on
-   resolve('abuild.classpath.manifest').
+      if closure body is not null, adds it to the list of closures
+      for target 'name'
 
- - packaging (not really classpath) for higher level archives (ear,
-   war, rar)
+      if 'deps' named parameter is specified, its value must be a
+      string or a list of strings; each dependency is added as a
+      dependency of name
 
-   default: abuild.classpath.
+      if 'replaceClosures' named parameter is specified, its value
+      must be a boolean; if true, removes any closures associated
+      with 'name' before (possibly) adding any specified closure
 
- - runtime: for wrapper scripts, test drivers
+    - configureTarget('name')
 
-   default: abuild.classpath + abuild.classpath.external + current jar
+      calls full configureTarget with no named parameters or closure
+      body
 
-   Override by setting 'classpath' attribute in java.wrapper.
+    - addTarget('name') -- synonym for above form of configureTarget
 
-Abuild.groovy environment
--------------------------
+    - configureTarget('name', named parameterse)
 
- * "abuild" object interface
+      calls full configureTarget with no closure body
 
-    Fields:
+    - addTargetDependencies('name', ['dep1', 'dep2'])
 
-     (check code)
+      calls configureTarget('name', 'deps': ['dep1', 'dep2'])
 
-     - interfaceVars: a map corresponding to the values from
-       Abuild.interface; all values are strings or lists of strings
+    - configureTarget('name') {
+	  closureBody()
+      }
 
-     - defines: a map of variables defined on the command line; all
-       values are strings
+      calls full configureTarget with no named parameters
 
-     - params: a map of parameters defined by the user in
-       Abuild.groovy; keys are strings, but values can be any Object
-       or null
+    - addTargetClosure('name') {
+	  closureBody()
+      }
 
-     - buildDirectory: a File object containing the build directory
+      synonym for above form of configureTarget
 
-     - sourceDirectory: a File object containing the source directory
+    - setParameter('name', value)
 
-    Methods:
+      Sets parameter 'name' to value, replacing any previous value
+      that may have been set.
 
-     - configureTarget('name', named parameters) {
-	   closureBody()
-       }
+    - appendParameter('name', value)
 
-       registers target 'name'; i.e., causes it to exist if it does
-       not already exist
+      If parameter 'name' has been previously set with setParameter
+      (and not subsequently deleted), this is an error.  Otherwise,
+      makes the value of the parameter a list and appends value to
+      it.
 
-       if closure body is not null, adds it to the list of closures
-       for target 'name'
+    - deletedParameter('name')
 
-       if 'deps' named parameter is specified, its value must be a
-       string or a list of strings; each dependency is added as a
-       dependency of name
+      Removes any previous value for parameter 'name'.
 
-       if 'replaceClosures' named parameter is specified, its value
-       must be a boolean; if true, removes any closures associated
-       with 'name' before (possibly) adding any specified closure
+    - resolve('name', defaultValue)
 
-     - configureTarget('name')
+      If defines['name'] exists, return it
+      else if params['name'] exists, return it
+      else if interfaceVars['name'] exists, return it
+      else return defaultValue
 
-       calls full configureTarget with no named parameters or closure
-       body
+      Effect: defines override everything else, params overrides
+      interface, basically resulting in the same behavior as make
+      and ant
 
-     - addTarget('name') -- synonym for above form of configureTarget
+      If 'name' names a parameter that may occur a variable number
+      of times, it is up to the caller to deal with it.
+      Alternatively, if you expect null or a single String, use
+      resolveAsString, and if you expect one or more items and want
+      to handle the result uniformly, use resolveAsList.
 
-     - configureTarget('name', named parameterse)
+    - resolve('name')
 
-       calls full configureTarget with no closure body
+      calls resolve('name', null)
 
-     - addTargetDependencies('name', ['dep1', 'dep2'])
+    - resolveAsString('name', defaultValue)
 
-       calls configureTarget('name', 'deps': ['dep1', 'dep2'])
+      If resolve('name', defaultValue) returns other than null or a
+      string, fail.  Otherwise, return value as type String.
 
-     - configureTarget('name') {
-	   closureBody()
-       }
+    - resolveAsString('name')
 
-       calls full configureTarget with no named parameters
+      calls resolveAsString('name', null)
 
-     - addTargetClosure('name') {
-	   closureBody()
-       }
+    - resolveAsList('name', defaultValue)
 
-       synonym for above form of configureTarget
+      If resolve('name', defaultValue) returns a list, return that
+      value.  Otherwise, return a list containing that value.  This
+      makes it convenient to deal with parameters whose values may
+      contain a single value or a list of values without having to
+      handle the special case in the target.
 
-     - setParameter('name', value)
 
-       Sets parameter 'name' to value, replacing any previous value
-       that may have been set.
+    - runActions(String targetParameter, Closure defaultAction,
+		 Map defaultAttributes)
 
-     - appendParameter('name', value)
+      targetParameter, if defined, resolves to a list whose elements
+      are either maps or closures.  If not defined, it is treated as
+      if its value were a list containing an empty map.
 
-       If parameter 'name' has been previously set with setParameter
-       (and not subsequently deleted), this is an error.  Otherwise,
-       makes the value of the parameter a list and appends value to
-       it.
+      For each element, if it is a closure, call it.  If it is a map,
+      then expand the map by copying entries from defaultAttributes
+      for keys that are not present in the map.  Then call
+      defaultAttributes on the resulting map.
 
-     - deletedParameter('name')
+    - fail(String message)
 
-       Removes any previous value for parameter 'name'.
+      cause the build to fail immediately by throwing an instance of
+      AbuildBuildFailure
 
-     - resolve('name', defaultValue)
+    - error(String message)
 
-       If defines['name'] exists, return it
-       else if params['name'] exists, return it
-       else if interfaceVars['name'] exists, return it
-       else return defaultValue
+      issue an error message and continue to the end of the
+      closure; the build is considered to have failed, so (unless -k
+      has been specified) no additional closures will be called
 
-       Effect: defines override everything else, params overrides
-       interface, basically resulting in the same behavior as make
-       and ant
+    - runTarget(target)
 
-       If 'name' names a parameter that may occur a variable number
-       of times, it is up to the caller to deal with it.
-       Alternatively, if you expect null or a single String, use
-       resolveAsString, and if you expect one or more items and want
-       to handle the result uniformly, use resolveAsList.
+      runs target preceded by its full dependency chain; no target
+      is ever run more than once
 
-     - resolve('name')
+    - runTargets([target, ...])
 
-       calls resolve('name', null)
-
-     - resolveAsString('name', defaultValue)
-
-       If resolve('name', defaultValue) returns other than null or a
-       string, fail.  Otherwise, return value as type String.
-
-     - resolveAsString('name')
-
-       calls resolveAsString('name', null)
-
-     - resolveAsList('name', defaultValue)
-
-       If resolve('name', defaultValue) returns a list, return that
-       value.  Otherwise, return a list containing that value.  This
-       makes it convenient to deal with parameters whose values may
-       contain a single value or a list of values without having to
-       handle the special case in the target.
-
-
-     - runActions(String targetParameter, Closure defaultAction,
-                  Map defaultAttributes)
-
-       targetParameter, if defined, resolves to a list whose elements
-       are either maps or closures.  If not defined, it is treated as
-       if its value were a list containing an empty map.
-
-       For each element, if it is a closure, call it.  If it is a map,
-       then expand the map by copying entries from defaultAttributes
-       for keys that are not present in the map.  Then call
-       defaultAttributes on the resulting map.
-
-     - fail(String message)
-
-       cause the build to fail immediately by throwing an instance of
-       AbuildBuildFailure
-
-     - error(String message)
-
-       issue an error message and continue to the end of the
-       closure; the build is considered to have failed, so (unless -k
-       has been specified) no additional closures will be called
-
-     - runTarget(target)
-
-       runs target preceded by its full dependency chain; no target
-       is ever run more than once
-
-     - runTargets([target, ...])
-
-       runs each target specified in order (with the order possibly
-       overridden based on the dependency graph)
+      runs each target specified in order (with the order possibly
+      overridden based on the dependency graph)
 
  * org.abuild.groovy.Util
 
-     - absToRel(path, basedir) -- convert "path" into a path relative
-       to "basedir".
+    - absToRel(path, basedir) -- convert "path" into a path relative to
+      "basedir".
 
-     - field inWindows is true if in Windows
+    - field inWindows is true if in Windows
 
- * QTest support
 
-    - parameter 'qtest.export' contains a list of "variables".  For
-      each variable listed, an upper-case version of the variable name
-      is exported to the environment with the value returned by
-      getVariableAsString.
+QTest Support
+=============
 
-    - The value of "TESTS" is automatically exported.  This is used by
-      qtest to restrict the list of test suites to run.
+ * parameter 'qtest.export' contains a list of "variables".  For each
+   variable listed, an upper-case version of the variable name is
+   exported to the environment with the value returned by
+   getVariableAsString.
 
- * Specific parameters that influence the build (set with
-   setParameter):
-
-    - abuild.rules -- a list of rules to be loaded from abuild's
-      internal ruleset or plugins' rules directories; corresponds to
-      RULES in make backend; abuild automatically appends .groovy
-      suffix
-
-    - abuild.localRules -- a list of files, treated as relative to the
-      source directory, to load for defining local rules; abuild
-      automatically appends .groovy suffix
+ * The value of "TESTS" is automatically exported.  This is used by
+   qtest to restrict the list of test suites to run.
