@@ -8452,6 +8452,15 @@ endif
   </chapter>
   <chapter id="ref.abuild.groovy">
    <title>The <application>Groovy</application> backend</title>
+   <warning>
+    <para>
+     <!--XXX-->
+     This chapter of the documentation is not yet completed.  Some of
+     the missing information can be found in the file
+     <filename>src/manual/groovy-framework.txt</filename> in the
+     &abuild; source tree.
+    </para>
+   </warning>
    <para>
     A Groovy-based backend, primarily intended for building Java-based
     software, was introduced in &abuild; version 1.1.  This framework
@@ -14443,8 +14452,42 @@ native-compiler qcc
    <sect1 id="ref.compatibility">
     <title>Compatibility Framework</title>
     <para>
-     XXX general compatibility framework stuff...not anything specific
-     to 1.0 to 1.1.
+     Internally to &abuild;'s implementation, there is an object
+     called <classname>CompatLevel</classname> that encapsulates the
+     compatibility level for any given run of &abuild;.  The code
+     itself is careful to wrap deprecated or backward compatibility
+     code in checks to <function>compat_level.allow_1_0()</function>
+     (or whatever version is appropriate).  This helps to keep
+     backward compatibility code isolated and makes it easy to remove
+     at some future time.  It also makes it relatively straightforward
+     to implement being able to run &abuild; at a newer compatibility
+     level.
+    </para>
+    <para>
+     Many of &abuild;'s test suites run the same tests at different
+     compatibility levels to ensure that, when compatibility code is
+     not required, it doesn't get in the way.
+    </para>
+    <para>
+     If one were to remove compatibility code from &abuild;, it would
+     be necessary to check for variables that are no longer used
+     because of the removal of compatibility support.  The intent is
+     that all such variables are commented with something that
+     contains the string <literal>compat</literal>.  Searching for
+     <literal>compat</literal> should be an excellent starting point
+     for locating all backward compatibility code.
+    </para>
+    <para>
+     As of version 1.1, there is no backward compatibility code in the
+     Groovy backend (since it is new in 1.1) or the old ant backend
+     (since it is deprecated in 1.1).  When &abuild; invokes the make
+     backend, it passes the compatibility level in a make variable.
+     This makes it possible for various make code to be conditional
+     upon whether a particular version is supported.  In versions
+     after 1.1, if the need arises, a similar capability could easily
+     be added to the Groovy backend by using the
+     <classname>BuildArgs</classname> object to hold into this
+     information.
     </para>
    </sect1>
    <sect1 id="ref.construction-of-build-sets">
@@ -19104,7 +19147,9 @@ Y = $(X)
    <para>
     XXX describe upgrade process;
     XXX pay particular attention to upgrade gotchas;
-    XXX refer to ref.changes-in-1.1
+    XXX refer to ref.changes-in-1.1;
+    XXX remember to talk about strategy of going from compatibility
+    level 1.0 to deprecation-is-error to compatibility level 1.1
    </para>
   </appendix>
   <appendix id="ref.known-limitations">
