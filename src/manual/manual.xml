@@ -66,12 +66,11 @@ makes it easier for people who just want examples to find them
 quickly.
 
 We also make use of the "qtest" processing instruction to pull files
-from the "../src/qtest/abuild-examples" directory, the "dump-data"
-processing instruction to include the DTD for the dump data format,
-and the "ccxx-mk" processing instruction to include ccxx.mk.
-Our processing program requires processing instructions to be on a
-line by themselves, so it is technically not a purely xml-aware
-processor.
+from the "../src/qtest/abuild-examples" directory, and the
+general-purpose "include-file" processing instruction to include the
+various files from the source tree.  Our processing program requires
+processing instructions to be on a line by themselves, so it is
+technically not a purely xml-aware processor.
 
 In normal writing when "abuild" is not part of a command, use the
 entities "&Abuild;" for "Abuild" at the beginning of a sentence (or
@@ -3204,7 +3203,9 @@ C:\cygwin\cygwin.bat
    <para>
     &Abuild; has a built-in help system, introduced in version 1.1,
     that makes it easier for users to get help for &abuild; itself and
-    also for available rules, both built-in and user-supplied.
+    also for available rules, both built-in and user-supplied.  All
+    help text that is part of the &abuild; distribution can also be
+    seen in <xref linkend="ref.help-files"/>.
    </para>
    <para>
     The starting point to &abuild;'s help system is the command
@@ -3252,9 +3253,11 @@ C:\cygwin\cygwin.bat
     We present examples of help files in this manual as we present
     information about adding rules and toolchain support files.  You
     can also run <command>abuild --help helpfiles</command> for a
-    reminder about the help file format.  To see an example of rule
-    help, see <xref linkend="ref.example.code-generator.make"/>.  To
-    see an example of toolchain help, see <xref
+    reminder about the help file format.  (This text is also available
+    in <xref linkend="ref.help.topic.helpfiles"/>.)  To see an example
+    of rule help, see <xref
+    linkend="ref.example.code-generator.make"/>.  To see an example of
+    toolchain help, see <xref
     linkend="ref.example.platforms-and-platform-type-plugins"/>.
    </para>
   </chapter>
@@ -5335,6 +5338,8 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        <para>
         Print a brief introduction to &abuild;'s help system.  For
         additional details, see <xref linkend="ref.help-system"/>.
+        For the text of all help files that are provided with
+        &abuild;, see <xref linkend="ref.help-files"/>.
        </para>
       </listitem>
      </varlistentry>
@@ -8200,6 +8205,8 @@ endif
      <para>
       As is the case for any rule set, you can run <command>abuild
       --help rules rule:ccxx</command> for additional information.
+      This help text is also included in <xref
+      linkend="ref.help.rule.ccxx"/>.
      </para>
      <para>
       There is a lot more to &abuild;'s C and C++ generation than is
@@ -8243,7 +8250,8 @@ endif
       targets.  A reasonably complete example of using autoconf
       follows in <xref linkend="ref.example.autoconf"/>.  You may also
       run <command>abuild --help rules rule:autoconf</command> for
-      full information on using these rules.
+      full information on using these rules.  This help text is also
+      included in <xref linkend="ref.help.rule.autoconf"/>.
      </para>
      <para>
       Some of the tools run by <filename>autoconf</filename> create
@@ -8452,15 +8460,17 @@ endif
   </chapter>
   <chapter id="ref.abuild.groovy">
    <title>The <application>Groovy</application> backend</title>
-   <warning>
+   <note>
     <para>
-     <!--XXX-->
-     This chapter of the documentation is not yet completed.  Some of
-     the missing information can be found in the file
-     <filename>src/manual/groovy-framework.txt</filename> in the
-     &abuild; source tree.
+     This part of the manual is not as narrative and thorough as it
+     ideally should be.  However, between this chapter and the
+     material in &abuild;'s help system, all the basic information is
+     presented, even if in an overly terse format.  As a supplement to
+     this chapter, please refer to the help text for the
+     <filename>java</filename> rules in <xref
+     linkend="ref.help.rule.java"/>
     </para>
-   </warning>
+   </note>
    <para>
     A Groovy-based backend, primarily intended for building Java-based
     software, was introduced in &abuild; version 1.1.  This framework
@@ -9648,6 +9658,16 @@ f {
       XXX
      </para>
     </sect2>
+   </sect1>
+   <sect1 id="ref.java.not-incorporated">
+    <title>Material Not Yet Incorporated</title>
+    <para>
+     <!-- XXX -->
+     The following material has not yet been fully incorporated into
+     the manual.  This comes from
+     <filename>src/manual/groovy-framework.txt</filename>.
+     <?include-file src/manual/groovy-framework.txt?>
+    </para>
    </sect1>
   </chapter>
   <chapter id="ref.shared-libraries">
@@ -19216,6 +19236,24 @@ Y = $(X)
     </varlistentry>
    </variablelist>
   </appendix>
+  <appendix id="ref.help-files">
+   <title>Online Help Files</title>
+   <para>
+    This appendix includes the text of all of &abuild;'s internal
+    online help.
+   </para>
+   <?strip?>
+   <!-- These are here so the document will validate before being
+        processed.  These sections will be provided inside the text
+        produced by <?help-files?>
+   -->
+   <sect1 id="ref.help.rule.autoconf"><title/><para/></sect1>
+   <sect1 id="ref.help.rule.ccxx"><title/><para/></sect1>
+   <sect1 id="ref.help.rule.java"><title/><para/></sect1>
+   <sect1 id="ref.help.topic.helpfiles"><title/><para/></sect1>
+   <?end-strip?>
+   <?help-files?>
+  </appendix>
   <appendix id="ref.dump-data">
    <title><option>--dump-data</option> Format</title>
    <para>
@@ -19245,7 +19283,7 @@ Y = $(X)
    <para>
     The contents of the <filename>abuild_data.dtd</filename> file are
     included here for reference.
-    <?dump-data?>
+    <?include-file src/abuild_data.dtd?>
    </para>
   </appendix>
   <appendix id="ref.interface-dump">
@@ -19262,7 +19300,7 @@ Y = $(X)
     distribution or in <filename>doc/interface_dump.dtd</filename> in
     the binary distribution.  Its contents are included here for
     reference.
-    <?interface-dump?>
+    <?include-file src/interface_dump.dtd?>
    </para>
   </appendix>
   <appendix id="ref.ccxx.mk">
@@ -19271,7 +19309,7 @@ Y = $(X)
     Here we include a complete copy of
     <filename>rules/object-code/ccxx.mk</filename>.
    </para>
-   <?ccxx-mk?>
+   <?include-file rules/object-code/ccxx.mk?>
   </appendix>
   <appendix id="ref.deprecated-ant">
    <title>The Deprecated XML-based Ant Backend</title>

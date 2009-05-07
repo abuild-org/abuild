@@ -1,0 +1,4 @@
+## description: built-in interface variables
+
+XXX get everything from base.interface and also local
+ABUILD_HAVE_OPTIONAL_DEP_item variables

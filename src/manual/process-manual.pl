@@ -16,6 +16,8 @@ my ($in, $out) = @ARGV;
 open(IN, "<$in") or die "$whoami: can't open $in: $!\n";
 open(OUT, ">$out") or die "$whoami: can't create $out: $!\n";
 
+my $top = '../../..';
+
 my %dirs =
     ('example' => "../../doc/example",
      'qtest' => "../qtest/abuild-examples",
@@ -24,9 +26,23 @@ my %dirs =
 my $last_id = undef;
 my @examples = ();
 
+my $stripping = 0;
+
 while (<IN>)
 {
-    if (m/<\?(example|qtest)/)
+    if ($stripping)
+    {
+	if (m/<\?end-strip\?>/)
+	{
+	    $stripping = 0;
+	}
+	next;
+    }
+    elsif (m/<\?strip\?>/)
+    {
+	$stripping = 1;
+    }
+    elsif (m/<\?(example|qtest)/)
     {
 	if (! m/^\s*<\?(example|qtest) (\S+)\?>$/)
 	{
@@ -38,17 +54,13 @@ while (<IN>)
     {
 	generate_example_list();
     }
-    elsif (m/<\?dump-data\?>/)
+    elsif (m/<\?include-file (\S+)\?>/)
     {
-	generate_dump_data();
+	include_file($1);
     }
-    elsif (m/<\?interface-dump\?>/)
+    elsif (m/<\?help-files\?>/)
     {
-	generate_interface_dump();
-    }
-    elsif (m/<\?ccxx-mk\?>/)
-    {
-	generate_ccxx_mk();
+	generate_help_files();
     }
     else
     {
@@ -109,39 +121,68 @@ sub generate_example_list
     print OUT "</simplelist>\n";
 }
 
-sub generate_dump_data
+sub generate_help_files
 {
-    print OUT "<programlisting><![CDATA[";
-    open(F, "<../../abuild_data.dtd") or
-	die "$whoami: can't open abuild_data.dtd: $!\n";
-    while (<F>)
+    my @help_topics = (<$top/help/*.txt>);
+    my @rule_help = (<$top/rules/*/*-help.txt>);
+    my @toolchain_help = (<$top/make/toolchains/*-help.txt>);
+
+    for (@help_topics)
     {
-	print OUT process_line($_);
+	my $base = help_base($_);
+	print OUT "<sect1 id=\"ref.help.topic.$base\">\n";
+	print OUT "<title><command>abuild --help $base</command></title>\n";
+	print OUT "<para>\n";
+	include_file($_, 1, 1);
+	print OUT "</para>\n";
+	print OUT "</sect1>\n";
     }
-    close(F);
-    print OUT "]]></programlisting>\n";
+    for (@rule_help)
+    {
+	my $base = help_base($_);
+	print OUT "<sect1 id=\"ref.help.rule.$base\">\n";
+	print OUT "<title><command>abuild --help rules rule:$base</command></title>\n";
+	print OUT "<para>\n";
+	include_file($_, 1, 1);
+	print OUT "</para>\n";
+	print OUT "</sect1>\n";
+    }
+    for (@toolchain_help)
+    {
+	my $base = help_base($_);
+	print OUT "<sect1 id=\"ref.help.toolchain.$base\">\n";
+	print OUT "<title><command>abuild --help rules toolchain:$base</command></title>\n";
+	print OUT "<para>\n";
+	include_file($_, 1, 1);
+	print OUT "</para>\n";
+	print OUT "</sect1>\n";
+    }
 }
 
-sub generate_interface_dump
+sub help_base
 {
-    print OUT "<programlisting><![CDATA[";
-    open(F, "<../../interface_dump.dtd") or
-	die "$whoami: can't open interface_dump.dtd: $!\n";
-    while (<F>)
-    {
-	print OUT process_line($_);
-    }
-    close(F);
-    print OUT "]]></programlisting>\n";
+    my $file = shift;
+    my $base = basename($file);
+    $base =~ s/-help.txt$//;
+    $base =~ s/\.txt$//;
+    $base;
 }
 
-sub generate_ccxx_mk
+sub include_file
 {
+    my ($file, $with_top, $strip_comments) = @_;
+    $with_top = 0 unless defined $with_top;
+    $strip_comments = 0 unless defined $strip_comments;
+    if (! $with_top)
+    {
+	$file = "$top/$file";
+    }
     print OUT "<programlisting><![CDATA[";
-    open(F, "<../../../rules/object-code/ccxx.mk") or
-	die "$whoami: can't open ccxx.mk: $!\n";
+    open(F, "<$file") or
+	die "$whoami: can't open $file: $!\n";
     while (<F>)
     {
+	next if $strip_comments && m/^\#/;
 	print OUT process_line($_, 80, 72);
     }
     close(F);

@@ -7,7 +7,7 @@ Before 1.1
 
  * Update documentation
 
-    - Create unified release notes for next alpha
+    - inline help files
 
     - manual/pending.txt, manual/groovy-framework.txt
 
@@ -15,7 +15,7 @@ Before 1.1
 
     - check every use of the word external
 
-    - check for commented out example processing instructions
+
 
 ----------------------------------------------------------------------
 
