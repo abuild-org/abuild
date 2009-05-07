@@ -17,17 +17,17 @@ The following toolchains are available:
   gcc
   * built in
     applies to target type object-code
-    help provided: no
+    help provided: yes
 
   mingw
   * built in
     applies to target type object-code
-    help provided: no
+    help provided: yes
 
   msvc
   * built in
     applies to target type object-code
-    help provided: no
+    help provided: yes
 
   qcc
   * provided by build item i2 (from tree t2); available: no
@@ -42,7 +42,7 @@ The following toolchains are available:
   unix_compiler
   * built in
     applies to target type object-code
-    help provided: no
+    help provided: yes
 
 The following rules are available:
 
@@ -59,12 +59,12 @@ The following rules are available:
   empty
   * built in
     applies to target type all
-    help provided: no
+    help provided: yes
 
   groovy
   * built in
     applies to target type java
-    help provided: no
+    help provided: yes
 
   java
   * built in
