@@ -430,6 +430,15 @@ foreach my $v (qw(1.0 1.1))
 
 # Check additional cases that can't start with a pure 1.0 forest.
 
+cd("work/only-externals");
+
+$td->runtest("previously upgraded without externals",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/only-externals.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/deleted-trees");
 
 $td->runtest("local backing area",
@@ -458,7 +467,7 @@ $td->runtest("check upgrade data",
 
 check_work_accessed($td);
 
-$td->report(72);
+$td->report(73);
 
 sub check_tree
 {
