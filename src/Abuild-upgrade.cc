@@ -89,7 +89,8 @@ Abuild::findBuildItems(UpgradeData& ud)
 	if (Util::isFile(dir + "/" + ItemConfig::FILE_CONF))
 	{
 	    ItemConfig* config = readConfig(dir, "");
-	    if (config->usesDeprecatedFeatures())
+	    if (config->usesDeprecatedFeatures() ||
+		(! config->getExternals().empty()))
 	    {
 		ud.upgrade_required = true;
 	    }

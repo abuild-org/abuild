@@ -281,8 +281,8 @@ ItemConfig::detectRoot()
 void
 ItemConfig::checkDeprecated()
 {
-    // Note: presence of explicit keys doesn't automatically cause
-    // deprecated to be set.  Abuild.cc does its own checks for
+    // Note: presence of external-dirs keys doesn't automatically
+    // cause deprecated to be set.  Abuild.cc does its own checks for
     // externals that point to upgraded trees.  This helps warning
     // people about deprecated features when there is no possible
     // remedy.
