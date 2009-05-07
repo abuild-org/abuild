@@ -15137,8 +15137,19 @@ Y = $(X)
    <title>Release Notes</title>
    <para>
     This table includes a list of user-visible changes or changes to
-    the documentation.
+    the documentation broken down by the specific release in which
+    they were entered.  This can help get you &ldquo;caught up&rdquo;
+    if you are upgrading from an older release.
    </para>
+   <note>
+    <para>
+     If you are interested in seeing a summary of all the changes made
+     between versions 1.0 and 1.1 of &abuild;, please refer to <xref
+     linkend="ref.changes-in-1.1"/>.  You can also get this
+     information from the release notes, but the information is
+     presented there in a more compact and organized fashion.
+    </para>
+   </note>
    <variablelist>
 <!-- template for release notes
 
@@ -15848,15 +15859,6 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           We introduce the term <emphasis>build forest</emphasis> to
-           refer to the collection of all the build trees that are
-           built together.  The 1.1 concept of build forests roughly
-           corresponds to an &abuild; 1.0 build tree with all of its
-           externals.
-          </para>
-         </listitem>
-         <listitem>
-          <para>
            This version of &abuild; includes a new build tree
            structure.  The highlights of this structure are named
            build trees, name-based tree dependencies instead of
@@ -15879,137 +15881,26 @@ Y = $(X)
            be recognized by &abuild; 1.0.
           </para>
           <para>
-           Here is a brief summary of changes in the new build tree
-           structure.  The items in the list below apply when &abuild;
-           is operating at compatibility level 1.1.  As described
-           above, &abuild; will still accept 1.0-style trees that do
-           not conform to the statements in this list.
-           <itemizedlist>
-            <listitem>
-             <para>
-              The <property>this</property> key has been replaced with
-              <property>name</property>.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              Build trees are required to be named.  Root build items
-              must contain a key called <property>tree-name</property>
-              which gives the name of the tree.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              Rather than using the deprecated
-              <property>external-dirs</property> key to indicate by
-              path a one-way dependency on another build tree, use
-              <property>tree-deps</property> to indicate this
-              dependency using the <emphasis>name</emphasis> of the
-              other build tree.  This removes &abuild;&nbsp;1.0's
-              flawed use of paths for this purpose.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              The value of <property>parent-dir</property> is no
-              longer used during traversal, and use of
-              <property>parent-dir</property> is deprecated.  If
-              <property>parent-dir</property> appears, &abuild; will
-              issue an error if it points to a place other than what
-              &abuild; would determine to be the parent of the build
-              item.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              It is permissible to have
-              <filename>Abuild.conf</filename> files above the roots
-              of all your build trees that contain only
-              <filename>child-dirs</filename> keys.  These files, in
-              addition to build tree root files, may be roots of the
-              entire forest of build trees.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              New interface variables
-              <varname>ABUILD_ITEM_NAME</varname> and
-              <varname>ABUILD_TREE_NAME</varname> have been
-              introduced.  These variables contain the value of the
-              current build item name and its containing tree.  The
-              <varname>ABUILD_ITEM_NAME</varname> variable replaces
-              the deprecated <varname>ABUILD_THIS</varname> variable.
-             </para>
-            </listitem>
-           </itemizedlist>
+           The way backing areas work has been significantly improved.
+           As in the case of the new build tree structure, &abuild;
+           will continue to recognize 1.0-style
+           <filename>Abuild.backing</filename> files when running in
+           1.0 compatibility mode (the default).
+          </para>
+          <para>
+           For a brief summary of changes in the new build tree
+           structure, please refer to <xref
+           linkend="ref.new11.new-tree-structure"/>.
           </para>
          </listitem>
          <listitem>
           <para>
-           The way backing areas work has been significantly
-           improved.  As in the case of the new build tree structure,
-           &abuild; will continue to recognize 1.0-style
-           <filename>Abuild.backing</filename> files when running in
-           1.0 compatibility mode (the default).  The following
-           changes have been made to backing areas:
-           <itemizedlist>
-            <listitem>
-             <para>
-              Backing areas are at the forest level, not at the tree
-              level.  When &abuild; 1.1 is used, any given development
-              effort requires only a single
-              <filename>Abuild.backing</filename> file, and that file
-              will be located at the root of the forest.  In 1.0
-              compatibility mode, &abuild; will still use information
-              from old style <filename>Abuild.backing</filename> files
-              at the roots of trees in the forest, though such files
-              are considered deprecated.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              <filename>Abuild.backing</filename> files are now
-              key/value pairs like <filename>Abuild.conf</filename>
-              files.  Valid keys are
-              <property>backing-areas</property>,
-              <property>deleted-trees</property>, and
-              <property>deleted-items</property>.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              The paths to your backing areas are specified as the
-              value to the <property>backing-areas</property> key in
-              <filename>Abuild.backing</filename>.  You may now have
-              multiple backing areas.  &Abuild; will issue an error if
-              unrelated backing areas try to supply build items or
-              build trees with the same name.  (If one of your backing
-              areas backs to another one of your backing areas,
-              &abuild; will notice this case and handle it
-              appropriately.)
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              The <property>deleted</property> key is no longer valid
-              in <filename>Abuild.conf</filename>.  Instead, use the
-              <property>deleted-items</property> key in
-              <filename>Abuild.backing</filename>.  In 1.0
-              compatibility mode, &abuild; will still read the
-              information from the <filename>Abuild.conf</filename>
-              file and treat it as if it had been read from an
-              <filename>Abuild.backing</filename> file.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              It is possible to suppress inheritance of entire trees
-              from backing ares using the
-              <property>deleted-trees</property> key in
-              <filename>Abuild.backing</filename>.
-             </para>
-            </listitem>
-           </itemizedlist>
+           New interface variables <varname>ABUILD_ITEM_NAME</varname>
+           and <varname>ABUILD_TREE_NAME</varname> have been
+           introduced.  These variables contain the value of the
+           current build item name and its containing tree.  The
+           <varname>ABUILD_ITEM_NAME</varname> variable replaces the
+           deprecated <varname>ABUILD_THIS</varname> variable.
           </para>
          </listitem>
         </itemizedlist>
@@ -19255,6 +19146,22 @@ Y = $(X)
     <itemizedlist>
      <listitem>
       <para>
+       The make backend now loads the toolchain support file
+       <emphasis>before</emphasis> your <filename>Abuild.mk</filename>
+       file.  This will almost never make a difference, and it allows
+       build items to manipulate or override variables defined by the
+       toolchain.  This greatly simplifies things like selectively
+       overriding warning or optimization flags, and is also used by
+       the new variables that allow for tighter configuration of the
+       <filename>msvc</filename> toolchain.  It's possible that
+       certain incorrect <filename>Abuild.mk</filename> code that you
+       might have gotten away with in the past may cause problems now
+       as a result of this change.  This is discussed in <xref
+       linkend="ref.upgrade11.caveats"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
        Absolute path externals are no longer supported.  Use of the
        absolute path externals or of the <option>-winpath</option>
        option in the <property>external-dirs</property> key will
@@ -19721,19 +19628,419 @@ Y = $(X)
    <sect1 id="ref.new11.new-tree-structure">
     <title>Redesigned Build Tree Structure</title>
     <para>
-     XXX
+     &Abuild; 1.1 introduces a new build tree structure that replaces
+     externals with named trees and named tree dependencies.  In
+     &abuild; 1.0, one build tree established a one-way relationship
+     with another tree, gaining the ability to use the other tree's
+     build items without making its own build items available to the
+     other tree, by declaring the other tree as an external.
+     Externals were set up by specifying a relative path to the other
+     tree.  Externals could be resolved in backing areas by resolving
+     that relative path as relative to the backing area instead of to
+     the tree itself.
+    </para>
+    <para>
+     There were three major problems with this approach.  The first
+     and most important problem is that externals were based on path.
+     Not only is this in violation of a fundamental design principle
+     of &abuild;, but it forced build environments with multiple trees
+     to organize those trees in a strict relative directory structure.
+     Worse, knowledge of that directory structure was not contained in
+     any one location but was, instead, spread out among all the root
+     build trees in the system.  This made it very hard to reuse
+     specific trees across multiple projects or even across multiple
+     configurations of the same project.  The second problem with the
+     1.0 scheme was that there was no way for you to get a complete
+     list of all the trees that comprised any given build environment.
+     The third problem is that the interaction with backing areas an
+     externals was too complex and didn't scale.  People were never
+     really able to understand how backing areas and externals
+     interacted.
+    </para>
+    <para>
+     &Abuild; 1.1 resolves all of these problems by requiring build
+     trees to be named and by setting up the one-way relationship
+     among build trees through named tree dependencies.  The new
+     mechanism is discussed in detail in <xref
+     linkend="ref.multiple-trees"/>.  Here is a brief summary of the
+     changes:
+     <itemizedlist>
+      <listitem>
+       <para>
+        &Abuild; 1.1 introduces the term <emphasis>build
+        forest</emphasis> to refer to the collection of all the build
+        trees that are built together.  The 1.1 concept of build
+        forests roughly corresponds to an &abuild; 1.0 build tree with
+        all of its externals.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <property>this</property> key has been replaced with
+        <property>name</property>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Build trees are required to be named.  Root build items must
+        contain a key called <property>tree-name</property> which
+        gives the name of the tree.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Rather than using the deprecated
+        <property>external-dirs</property> key to indicate by path a
+        one-way dependency on another build tree, use
+        <property>tree-deps</property> to indicate this dependency
+        using the <emphasis>name</emphasis> of the other build tree.
+        This removes &abuild;&nbsp;1.0's flawed use of paths for this
+        purpose.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <property>parent-dir</property> key is no longer used.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        It is permissible to have <filename>Abuild.conf</filename>
+        files above the roots of all your build trees that contain
+        only <filename>child-dirs</filename> keys.  These files, in
+        addition to build tree root files, may be roots of the entire
+        forest of build trees.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     Additionally, the way backing areas work has been significantly
+     improved.  Backing areas are discussed in <xref
+     linkend="ref.backing-areas"/>.  Here is a summary of the changes:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Backing areas are at the forest level, not at the tree level.
+        When &abuild; 1.1 is used, any given development effort
+        requires only a single <filename>Abuild.backing</filename>
+        file, and that file will be located at the root of the forest.
+        In 1.0 compatibility mode, &abuild; will still use information
+        from old style <filename>Abuild.backing</filename> files at
+        the roots of trees in the forest, though such files are
+        considered deprecated.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <filename>Abuild.backing</filename> files are now key/value
+        pairs like <filename>Abuild.conf</filename> files.  Valid keys
+        are <property>backing-areas</property>,
+        <property>deleted-trees</property>, and
+        <property>deleted-items</property>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The paths to your backing areas are specified as the value to
+        the <property>backing-areas</property> key in
+        <filename>Abuild.backing</filename>.  You may now have
+        multiple backing areas.  &Abuild; will issue an error if
+        unrelated backing areas try to supply build items or build
+        trees with the same name.  (If one of your backing areas backs
+        to another one of your backing areas, &abuild; will notice
+        this case and handle it appropriately.)
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The <property>deleted</property> key is no longer valid in
+        <filename>Abuild.conf</filename>.  Instead, use the
+        <property>deleted-items</property> key in
+        <filename>Abuild.backing</filename>.  In 1.0 compatibility
+        mode, &abuild; will still read the information from the
+        <filename>Abuild.conf</filename> file and treat it as if it
+        had been read from an <filename>Abuild.backing</filename>
+        file.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        It is possible to suppress inheritance of entire trees from
+        backing ares using the <property>deleted-trees</property> key
+        in <filename>Abuild.backing</filename>.
+       </para>
+      </listitem>
+     </itemizedlist>
     </para>
    </sect1>
   </appendix>
   <appendix id="ref.upgrading-to-1.1">
    <title>Upgrading from 1.0 to Version 1.1</title>
    <para>
-    XXX describe upgrade process;
-    XXX pay particular attention to upgrade gotchas;
-    XXX refer to ref.changes-in-1.1;
-    XXX remember to talk about strategy of going from compatibility
-    level 1.0 to deprecation-is-error to compatibility level 1.1
+    &Abuild; 1.1 offers many new capabilities relative to 1.0.  These
+    are summarized in <xref linkend="ref.changes-in-1.1"/>.  Among the
+    most significant of these changes is the redesigned build tree
+    structure.  When &abuild; 1.1 is run on a set of build trees that
+    were created to work with &abuild; 1.0, it internally maps the old
+    structure into its new representation.  &Abuild; can make this
+    mapping explicit by actually upgrading your trees from 1.0 to 1.1.
+    To use &abuild; to upgrade your trees, you can run the command
+    <command>abuild --upgrade-trees</command>.  &Abuild; will analyze
+    your build area and generate a file that you have to edit.  By
+    editing this file, you supply the information that &abuild; can't
+    possibly know on its own.  Once all the information is available,
+    &abuild; will rewrite your <filename>Abuild.conf</filename> and
+    <filename>Abuild.backing</filename> files.  In this chapter, we
+    discuss a general strategy for upgrading and then proceed to
+    provide specific instructions.
    </para>
+   <sect1 id="ref.upgrade11.strategy">
+    <title>Upgrade Strategy</title>
+    <para>
+     &Abuild; 1.1 can operate in 1.0 compatibility mode.  If you are
+     testing out &abuild; 1.1 on a build tree that is still under
+     active development with &abuild; 1.0, you should obviously wait
+     before you try to upgrade the trees.  Once you have upgraded your
+     build trees, &abuild; 1.0 will no longer be able to build them.
+    </para>
+    <para>
+     As a general rule, it's best to start your upgrade process with
+     build trees that don't have any backing areas.  This will save
+     you a lot of trouble.  Most of the time, if you have backing
+     areas and your backing areas are already upgraded, &abuild;'s
+     upgrade process can run without any intervention.  But we'll come
+     back to that in the next section.
+    </para>
+    <para>
+     Once you are ready to start upgrading, the first thing you should
+     do is to make sure your build is working with &abuild; 1.0.  You
+     must be sure to start with this as a known baseline so you can be
+     sure problems that you find during upgrade weren't already there.
+    </para>
+    <para>
+     The next thing you should do is to make sure your build still
+     works with &abuild; 1.1 running in 1.0-compatibility mode, which
+     is its default.  There are a small number of non-compatible
+     changes (<xref linkend="ref.new11.non-compatible"/>).  If your
+     build trees run into any of those, you should try to fix them in
+     a way that is still compatible with &abuild; 1.0.  You should
+     fairly quickly be able to reach a point where you have a build
+     tree that builds the same way under 1.0 and 1.1.  Only when you
+     have reached this stage should you attempt to upgrade.  If you
+     run into trouble during this process, ask for help or consult
+     <xref linkend="ref.upgrade11.caveats"/>.
+    </para>
+    <para>
+     Once you have your build trees in a state where your build
+     produces identical results with both &abuild; 1.0 and 1.1, you
+     should find a directory that is above all the trees you are
+     trying to upgrade.  If your intention is to upgrade an entire
+     forest of trees at once, meaning that you wish to upgrade a
+     collection of build trees that refer to each other through
+     external-dirs, you should go to a common ancestor of all those
+     trees.  This will be the root of your upgraded build forest.  If
+     you only wish to upgrade specific trees, you can just go to the
+     root of the trees you are upgrading.  The upgrade process will
+     allow you to upgrade your forests a little bit at a time.  This
+     is especially important for distributed development environments
+     in which different trees are maintained by different teams.
+     Whichever case you pick, your starting directory must either
+     contain a root build item or be above the top of trees with root
+     build items.  You can't pick a directory that's in the middle of
+     a build tree.  For example, you can't start in a directory that
+     has a <property>parent-dir</property> key or that is referred to
+     as a child in a higher <filename>Abuild.conf</filename> file.
+    </para>
+    <para>
+     Once you have identified your start directory, you should run
+     <command>abuild --upgrade-trees</command> and follow the upgrade
+     process as described in <xref
+     linkend="ref.upgrade11.procedures"/>.  At the end of that
+     process, your trees will be upgraded, but you are not done yet!
+     There are still a few ways in which things can be broken, so read
+     on.
+    </para>
+    <para>
+     After you have finished this stage of the upgrade process, you
+     should once again run &abuild; in 1.0-compatibility mode to make
+     sure your build still works.  If you run into problems, please
+     consult <xref linkend="ref.upgrade11.caveats"/>.
+    </para>
+    <para>
+     Once your build is once again working as it should, you will want
+     to address deprecation errors that are reported by the backends.
+     Mostly this would involve moving build item-supplied rules from
+     <filename>Rules.mk</filename> to their new locations under
+     <filename>rules</filename> (see <xref
+     linkend="ref.code-generators"/>) and then replacing
+     <varname>BUILD_ITEM_RULES</varname> with appropriate
+     <varname>RULES</varname> entries by the items that use them.  You
+     could also remove <varname>LINK_SHLIBS</varname> variables that
+     you find.  After you have done this, you should hopefully reach a
+     point where you are no longer getting any deprecation warnings.
+    </para>
+    <para>
+     When you think you have eliminated all deprecation warnings, you
+     should retry your build with the
+     <option>--deprecation-is-error</option> flag.  In this mode, any
+     deprecated features will be reported as errors instead of
+     warnings.  Once your build gets past this point, then you can be
+     confident that you are no longer using any deprecated features.
+    </para>
+    <para>
+     If you have upgraded a tree that has externals that point into an
+     area that has not yet been upgraded, though you won't be getting
+     any deprecation warnings, &abuild; will still tell you that it
+     sees deprecated features and that you should upgrade.  This is
+     because your root build item will still have a
+     <property>external-dirs</property> key in it.  &Abuild; is not
+     warning you about it specifically because there's nothing you can
+     do about it if the directory it points to is the root of a tree
+     that hasn't been upgraded yet.  The solution to this problem is
+     to run the upgrade process from a higher level directory to
+     upgrade the other tree.  If you can't do that, you'll just have
+     to wait until the other tree is upgraded.  As soon as it is,
+     &abuild; will notify you that you have an
+     <property>external-dirs</property> that points to the root of an
+     upgraded tree.  Then you can run <command>abuild
+     --upgrade-trees</command> again to let &abuild; replace the
+     <property>external-dirs</property> key with
+     <property>tree-deps</property>.  In the mean time, you will
+     continue to see the upgrade suggestion until
+     <emphasis>all</emphasis> your build trees have been upgraded.
+    </para>
+    <para>
+     When you finally get to the point where all your build trees are
+     upgraded, you should once again run with the
+     <option>--deprecation-is-error</option> flag.  This will give you
+     one last check that you are not using any deprecated features.
+     Once that passes, you are finally ready to try running in
+     1.1-compatibility mode.  To do this, either run &abuild; with
+     <option>--compat-level=1.1</option>, or set the
+     <envar>ABUILD_COMPAT_LEVEL</envar> environment variable to the
+     value &ldquo;<literal>1.1</literal>&rdquo;.  If all goes well,
+     you should see no difference.  Once you have reached this point,
+     you can be sure that your upgrade process is complete.
+    </para>
+   </sect1>
+   <sect1 id="ref.upgrade11.caveats">
+    <title>Potential Upgrade Problems: Things to Watch Out For</title>
+    <para>
+     For the most part, &abuild; upgrades are expected to be quite
+     smooth as extensive testing as been done to &abuild;'s
+     compatibility mode.  There are a few subtleties that might cause
+     problems.  Here are some things to watch out for.
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       If you have upgraded some trees in a forest and not others, you
+       may have build trees that are fully upgraded except that they
+       still contain <property>external-dirs</property> keys in their
+       <filename>Abuild.conf</filename> files.  If this happens, when
+       you run &abuild;, you will get a warning that tells you that
+       you should run <command>abuild --upgrade-trees</command>.
+       However, if you try to run the upgrade process from the root of
+       that tree, it will tell you that there is nothing to upgrade.
+       The solution is to run the upgrade process from a directory
+       that is above all the externals that are still there.  Once the
+       externals are upgraded, then &abuild; will be able to replace
+       the remaining <property>external-dirs</property> keys with
+       <property>tree-deps</property>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       In &abuild; 1.0, if you have a collection of trees that refer
+       to each other through their <property>external-dirs</property>
+       keys, in the context of any tree, &abuild; only knows about
+       items that are reachable from that tree.  In &abuild; 1.1,
+       &abuild; knows about all items that are reachable from any tree
+       in the forest.  For example, if you have trees
+       <filename>A</filename> and <filename>B</filename> that both
+       refer to <filename>C</filename> but don't refer to each other,
+       in &abuild; 1.0, <filename>A</filename> and
+       <filename>B</filename> could have build items with the same
+       name.  This would work because &abuild; would never know about
+       <filename>A</filename> and <filename>B</filename> at the same
+       time.  If you came along later and make build tree
+       <filename>D</filename> refer to both <filename>A</filename> and
+       <filename>B</filename>, you would get an error message at that
+       time since &abuild; would complain about seeing the same item
+       in multiple locations.  In &abuild; 1.1, &abuild; would know
+       about all three trees and would immediately complain that
+       <filename>A</filename> and <filename>B</filename> both
+       contained an item with the same name.  So it's possible that,
+       after running the upgrade process, you may need to rename some
+       build items.  If you have been careful to stick to build item
+       naming conventions that avoid duplications across tree
+       boundaries, you should not run into this problem.  During alpha
+       testing of &abuild; 1.1, at least one case was encountered in
+       which a build item had been copied from one tree to an
+       unrelated tree without changing its name.  &Abuild; was able to
+       upgrade the all the trees and complained about the problem
+       after the upgrade was finished.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       When &abuild; 1.1 encounters a build item with neither a
+       <property>tree-name</property> key nor a
+       <property>parent-dir</property> key, and if that build item is
+       not referenced as a child of the next higher build item,
+       &abuild; can't tell whether it is the root of a
+       non-yet-upgraded build tree or whether it just hasn't been
+       properly added to its parent's <filename>Abuild.conf</filename>
+       as a child.  In 1.0-compatibility mode, &abuild; will guess
+       that it is the root of a forest.  In 1.1-compatibility mode,
+       &abuild; will issue an error.  If you are running in
+       1.0-compatibility mode on upgraded trees and you get
+       unexplained errors about build items not being known, you might
+       first try running in 1.1-compatibility mode where you might get
+       a better error message.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       In the make backend, compiler toolchain implementation files
+       are now loaded before <filename>Abuild.mk</filename>.  Most of
+       the time, this won't matter, but sometimes it might,
+       particularly in the case of errors in
+       <filename>Abuild.mk</filename> that may have not mattered
+       before.  For example, a <filename>Abuild.mk</filename> file may
+       check to see whether a variable is defined or not and take some
+       action based on that.  If the variable in question is defined
+       by a toolchain support file, it could change the semantics of
+       such a check.  At least one case was found during testing in
+       which a <filename>Abuild.mk</filename> file assigned to
+       <varname>XCPPFLAGS</varname> using
+       &ldquo;<literal>:=</literal>&rdquo; in
+       <filename>Abuild.mk</filename> thus overwriting values supplied
+       by the interface system.  Additional values supplied by the
+       toolchain support file in turn modified the value as supplied
+       by the user's <filename>Abuild.mk</filename>, which allowed the
+       incorrect assignment to go unnoticed.  With the 1.1 load
+       ordering change, the error in <filename>Abuild.mk</filename>
+       suddenly caused the build to stop working.
+      </para>
+      <para>
+       Again, in the vast majority of cases,
+       <filename>Abuild.mk</filename> files should not need to be
+       changed as a result of this ordering change, but if your
+       <filename>Abuild.mk</filename> is inspecting or modifying
+       variables that are also used by the toolchain support files,
+       you may see a slight change in semantics.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </sect1>
+   <sect1 id="ref.upgrade11.procedures">
+    <title>Upgrade Procedures</title>
+    <para>
+     XXX describe upgrade process;
+    </para>
+   </sect1>
   </appendix>
   <appendix id="ref.known-limitations">
    <title>Known Limitations</title>
