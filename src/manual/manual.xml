@@ -882,75 +882,75 @@ following checks:
      the links on <ulink url="http://www.abuild.org">&abuild;'s
      website</ulink>.  To use &abuild;, the following items must be
      available on your system:
+     <itemizedlist>
+      <listitem>
+       <para>
+        <ulink url="http://www.gnu.org/software/make/"><application>GNU
+        Make</application></ulink> version 3.81 or higher is required
+        if you are building any build items that use <application>GNU
+        Make</application> as a backend.  This would include
+        platform-independent code and C/C++ code, but not Java code.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        A Java 5 or newer Java SDK is required if you are going to use
+        &abuild; to build Java code.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <ulink url="http://ant.apache.org/"><application>Apache
+        Ant</application></ulink> version 1.7.0 or newer is required if
+        you are building any Java code.  If you are using &abuild;'s
+        deprecated xml-based ant framework, then you also need <ulink
+        url="http://ant-contrib.sourceforge.net/"><application>ant-contrib</application></ulink>
+        version 1.0.b3 or later installed in either ant's or &abuild;'s
+        lib directory.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <ulink url="http://www.perl.com/">Perl</ulink> version 5.8 or
+        newer is required if you are performing any GNU Make-based
+        builds.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Perl version 5.8 or newer and <ulink
+        url="http://qtest.qbilt.org/">qtest</ulink> version 1.0 or
+        newer are required if you are using the qtest automated test
+        framework.  &Abuild;'s own test suite uses qtest.  Note also
+        that qtest requires <ulink
+        url="http://www.gnu.org/software/diffutils">GNU
+        diffutils</ulink>.  Any version should do.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        In order to use &abuild;'s autoconf support, you need <ulink
+        url="http://www.gnu.org/software/autoconf">autoconf</ulink>
+        version 2.59 or newer, <ulink
+        url="http://www.gnu.org/software/automake">automake</ulink>
+        version 1.9 or newer.  These are also required for &abuild;'s
+        test suite to pass since the test suite exercises its autoconf
+        support.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        If you are planning on building any GNU Make-based build items
+        on Windows, <ulink url="http://www.cygwin.com/">Cygwin</ulink>
+        is required.  For a Java-only &abuild; installation on Windows,
+        Cygwin and Perl are not required.  It is hoped that a future
+        version of &abuild; will not require Cygwin.  For details on
+        using Cygwin with &abuild;, please see <xref
+        linkend="ref.windows-requirements"/>.
+       </para>
+      </listitem>
+     </itemizedlist>
     </para>
-    <itemizedlist>
-     <listitem>
-      <para>
-       <ulink url="http://www.gnu.org/software/make/"><application>GNU
-       Make</application></ulink> version 3.81 or higher is required
-       if you are building any build items that use <application>GNU
-       Make</application> as a backend.  This would include
-       platform-independent code and C/C++ code, but not Java code.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       A Java 5 or newer Java SDK is required if you are going to use
-       &abuild; to build Java code.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       <ulink url="http://ant.apache.org/"><application>Apache
-       Ant</application></ulink> version 1.7.0 or newer is required if
-       you are building any Java code.  If you are using &abuild;'s
-       deprecated xml-based ant framework, then you also need <ulink
-       url="http://ant-contrib.sourceforge.net/"><application>ant-contrib</application></ulink>
-       version 1.0.b3 or later installed in either ant's or &abuild;'s
-       lib directory.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       <ulink url="http://www.perl.com/">Perl</ulink> version 5.8 or
-       newer is required if you are performing any GNU Make-based
-       builds.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       Perl version 5.8 or newer and <ulink
-       url="http://qtest.qbilt.org/">qtest</ulink> version 1.0 or
-       newer are required if you are using the qtest automated test
-       framework.  &Abuild;'s own test suite uses qtest.  Note also
-       that qtest requires <ulink
-       url="http://www.gnu.org/software/diffutils">GNU
-       diffutils</ulink>.  Any version should do.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       In order to use &abuild;'s autoconf support, you need <ulink
-       url="http://www.gnu.org/software/autoconf">autoconf</ulink>
-       version 2.59 or newer, <ulink
-       url="http://www.gnu.org/software/automake">automake</ulink>
-       version 1.9 or newer.  These are also required for &abuild;'s
-       test suite to pass since the test suite exercises its autoconf
-       support.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       If you are planning on building any GNU Make-based build items
-       on Windows, <ulink url="http://www.cygwin.com/">Cygwin</ulink>
-       is required.  For a Java-only &abuild; installation on Windows,
-       Cygwin and Perl are not required.  It is hoped that a future
-       version of &abuild; will not require Cygwin.  For details on
-       using Cygwin with &abuild;, please see <xref
-       linkend="ref.windows-requirements"/>.
-      </para>
-     </listitem>
-    </itemizedlist>
     <para>
      To build &abuild;, you must also have version 1.35 or newer of
      <ulink url="http://www.boost.org/">boost</ulink>.  &Abuild; uses
@@ -1019,7 +1019,16 @@ following checks:
      &abuild; will start up a little more quickly if they are set.  As
      many other applications expect these to be set, it is recommended
      that you set <envar>JAVA_HOME</envar> and
-     <envar>ANT_HOME</envar>.
+     <envar>ANT_HOME</envar>.  When &abuild; invokes Java for any of
+     the Java-based backends, it will automatically add all the JAR
+     files in <filename>$ANT_HOME/lib</filename> to the classpath as
+     well as all JAR files in &abuild;'s own <filename>lib</filename>
+     directory.  &Abuild; includes a copy of Groovy's embeddable JAR
+     in its own <filename>lib</filename> directory.  You can copy
+     additional JAR files into <filename>lib</filename> as well, but
+     if you do so, just remember that those JAR files will not
+     automatically be available to users whose &abuild; installations
+     do not include them.
     </para>
     <para>
      As you begin using &abuild;, you may find yourself generating a
@@ -8218,6 +8227,48 @@ endif
       Make</application> code.
      </para>
     </sect2>
+    <sect2 id="ref.msvc">
+     <title>Options for the <filename>msvc</filename> Compiler</title>
+     <para>
+      &Abuild; includes built-in support for Microsoft's Visual C++
+      compiler on Windows.  There are three MSVC-specific variables
+      that can be set:
+      <itemizedlist>
+       <listitem>
+        <para>
+         <varname>MSVC_RUNTIME_FLAGS</varname>: set to
+         <option>/MD</option> by default, which causes the
+         executable to dependent on Microsoft runtime DLLs.  By
+         setting this to <option>/MT</option>, it is possible to
+         create executables that statically link with the runtime
+         environment.  A trailing
+         &ldquo;<option>d</option>&rdquo; is automatically
+         appended when building debugging executables or
+         libraries.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         <varname>MSVC_MANAGEMENT_FLAGS</varname>: set to
+         <option>/EHsc</option> by default, which enables
+         synchronous exception handling and assumes
+         &ldquo;C&rdquo; functions do not throw exceptions.  By
+         setting this to <option>/clr</option>, it is possible to
+         build programs that work with the .NET framework.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         <varname>MSVC_GLOBAL_FLAGS</varname>: contains flags
+         that are passed globally to all compilation commands.
+         Users will seldom have to modify this.  For details, see
+         comments in
+         <filename>make/toolchains/msvc.mk</filename>.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+    </sect2>
     <sect2 id="ref.autoconf">
      <title>Autoconf: <filename>autoconf</filename> Rules</title>
      <indexterm>
@@ -13905,6 +13956,41 @@ native-compiler qcc
      XXX write this
     </para>
    </sect1>
+   <sect1 id="ref.platform-dependent-in-indep-or-java">
+    <title>
+     Platform-Dependent Files in Non-<type>object-code</type> Build
+     Items
+    </title>
+    <para>
+     It's easy to fall into the trap of thinking that, just because a
+     file is a text file or some other format that can be processed on
+     any platform type, it is a platform-independent file.  A plain
+     text file that contains platform-specific information is, in
+     fact, a platform-specific file.  So if you have a build item that
+     runs a platform-specific tool and caches platform-specific
+     information, that build item should probably have platform type
+     <type>native</type> rather than <type>indep</type>.
+    </para>
+    <para>
+     This is one reasons that &abuild; doesn't provide information
+     about the current platform to the &abuild; interfaces for
+     <type>java</type> and <type>platform-independent</type> build
+     items.  It would be a bug to have an interface variable have a
+     different value in different contexts when it might influence a
+     build that could be used on multiple platforms.  For example, an
+     <type>indep</type> build item could write out some value based on
+     a platform variable and then that information could be wrong when
+     the results of the build were used on a different platform.
+    </para>
+    <para>
+     &Abuild; itself actually breaks this rule for Java wrapper
+     scripts.  This is a known problem for which we don't have a ready
+     solution.  It just show that there may be instances in which you
+     might break this rule, but be aware when you do that you are
+     creating a situation in which a single built instance of build
+     tree may not work properly when used across multiple platforms.
+    </para>
+   </sect1>
    <sect1 id="ref.hidden-dependencies">
     <title>Hidden Dependencies</title>
     <para>
@@ -15123,9 +15209,9 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           The behavior of <varname>ABUILD_FORCE32_BIT</varname> has
+           The behavior of <varname>ABUILD_FORCE_32BIT</varname> has
            been expanded, and the variable
-           <varname>ABUILD_FORCE64_BIT</varname> has been added.  If
+           <varname>ABUILD_FORCE_64BIT</varname> has been added.  If
            exactly one of these variables has the value
            &ldquo;<literal>1</literal>&rdquo;, the option
            <option>-m32</option> or <option>-m64</option>, as
@@ -15133,7 +15219,7 @@ Y = $(X)
            Additionally, in some cases the CPU portion of the platform
            string may be changed.  This is a generalization of the
            behavior introduced in version 1.0.1, and also a change of
-           the status of the <varname>ABUILD_FORCE32_BIT</varname>
+           the status of the <varname>ABUILD_FORCE_32BIT</varname>
            variable to &ldquo;supported&rdquo; instead of temporary,
            at least pending some better solution.
           </para>
@@ -15527,41 +15613,8 @@ Y = $(X)
          <listitem>
           <para>
            New make variables have been added for increasing the
-           flexibility of configuring Visual C++.
-           <itemizedlist>
-            <listitem>
-             <para>
-              <varname>MSVC_RUNTIME_FLAGS</varname>: set to
-              <option>/MD</option> by default, which causes the
-              executable to dependent on Microsoft runtime DLLs.  By
-              setting this to <option>/MT</option>, it is possible to
-              create executables that statically link with the runtime
-              environment.  A trailing
-              &ldquo;<option>d</option>&rdquo; is automatically
-              appended when building debugging executables or
-              libraries.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              <varname>MSVC_MANAGEMENT_FLAGS</varname>: set to
-              <option>/EHsc</option> by default, which enables
-              synchronous exception handling and assumes
-              &ldquo;C&rdquo; functions do not throw exceptions.  By
-              setting this to <option>/clr</option>, it is possible to
-              build programs that work with the .NET framework.
-             </para>
-            </listitem>
-            <listitem>
-             <para>
-              <varname>MSVC_GLOBAL_FLAGS</varname>: contains flags
-              that are passed globally to all compilation commands.
-              Users will seldom have to modify this.  For details, see
-              comments in
-              <filename>make/toolchains/msvc.mk</filename>.
-             </para>
-            </listitem>
-           </itemizedlist>
+           flexibility of configuring Visual C++.  See <xref
+           linkend="ref.msvc"/>.
           </para>
          </listitem>
         </itemizedlist>
@@ -19157,10 +19210,520 @@ Y = $(X)
   <appendix id="ref.changes-in-1.1">
    <title>Major Changes from Version 1.0 to Version 1.1</title>
    <para>
-    XXX describe changes in 1.1;
-    XXX pay particular attention to upgrade gotchas;
-    XXX refer to ref.upgrading-to-1.1
+    This chapter presents a summary of the major changes to &abuild;
+    that were introduced in version 1.1.  If you are already familiar
+    with &abuild; 1.0, this material should help you come up to speed
+    with version 1.1 fairly quickly.
    </para>
+   <para>
+    With few exceptions, &abuild; 1.1 is able to build trees that
+    version 1.0 could build, which should make it possible, in almost
+    all cases, to operate in a mixed 1.0/1.1 environment during a
+    transitional period.  Once you are ready to start taking full
+    advantage of new functionality in 1.1, it is recommended that you
+    upgrade your trees.  &Abuild; includes a utility that will do
+    almost all of the work of upgrading your
+    <filename>Abuild.conf</filename> files.  You will have to perform
+    upgrades to your <filename>Abuild.mk</filename> files manually,
+    though there are relatively few such upgrades, and most build
+    items will not require any changes.  For details on the upgrade
+    process, please see <xref linkend="ref.upgrading-to-1.1"/>.
+   </para>
+   <warning>
+    <para>
+     Please do not use the list below to try to upgrade your build
+     trees automatically.  You shouldn't go through this list and
+     start manually fixing your <filename>Abuild.conf</filename>
+     files.  Doing this will only waste your time and making the
+     automated upgrade process less reliable.  There is a lot of
+     complex logic involved in doing the upgrades, so you're best off
+     leaving it to &abuild; which has the benefit of knowing the
+     entire build tree structure of all your trees.  Refer to <xref
+     linkend="ref.upgrading-to-1.1"/> for details.
+    </para>
+   </warning>
+   <sect1 id="ref.new11.non-compatible">
+    <title>Non-compatible Changes</title>
+    <para>
+     As a general rule, we avoid making non-compatible changes in
+     &abuild; minor releases.  There are some instances, however, in
+     which supporting the old feature is very difficult or problematic
+     in comparison to fixing existing build trees.  In all cases,
+     there is a solution that provides the desired functionality that
+     will work in a hybrid 1.0/1.1 environment.
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Absolute path externals are no longer supported.  Use of the
+       absolute path externals or of the <option>-winpath</option>
+       option in the <property>external-dirs</property> key will
+       result in an error message.  If you are relying on absolute
+       path externals, you can replace them with relative-path
+       externals, and make the relative path externals be empty except
+       for an <filename>Abuild.backing</filename> file that points to
+       the absolute path previously referenced.  This provides the
+       exact functionality of the absolute path external.  You will
+       use this only as a temporary workaround, since after you
+       upgrade your trees to version 1.1, you will no longer have any
+       <property>external-dirs</property> keys.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Read-only externals are no longer supported.  In &abuild; 1.1,
+       you can force parts of your build tree to be read only by using
+       the much more flexible <option>--ro-path</option> and
+       <option>--rw-path</option> options, described in <xref
+       linkend="ref.read-only-paths"/>.  In order to allow hybrid
+       1.0/1.1 environments to work properly, &abuild; 1.1 will allow
+       the <option>-ro</option> option to be specified in your
+       <filename>Abuild.conf</filename>'s
+       <property>external-dirs</property> keyword, but it will issue a
+       warning and ignore the option.  Once you upgrade to version
+       1.1, you will no longer have any
+       <property>external-dirs</property> keys anyway.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The value of the <property>parent-dir</property> key must now
+       point up in the file system.  That is, if the value has more
+       than one path element, every path element must be
+       &ldquo;<literal>..</literal>&rdquo;.  (So, for example,
+       &ldquo;<literal>../..</literal>&rdquo; is valid.)  Once you
+       upgrade your build trees to &abuild; 1.1, you will no longer
+       have any <property>parent-dir</property> keys.  This check for
+       existing <property>parent-dir</property> keys effectively just
+       makes sure that whatever &abuild; 1.1 would now automatically
+       figure out is consistent with you explicitly specified in your
+       1.0 trees.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Each value of the <property>child-dirs</property> key must now
+       point down in the file system.  That is, the path element
+       &ldquo;<literal>..</literal>&rdquo; may not appear in a
+       <property>child-dirs</property> key.  This check is important
+       to ensure that whatever parent/child relationships between
+       build items &abuild; 1.1 would now automatically figure out is
+       consistent with you explicitly specified in your 1.0 trees.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The values of <property>child-dirs</property> keys may not be
+       or cross over any symbolic links.  In most cases, use of
+       symbolic links for child directories would not have worked in
+       &abuild; 1.0 anyway and would have resulted in a cryptic error
+       message.  Now &abuild; explicitly detects and disallows this
+       case.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       If you use multi-element paths in your
+       <property>child-dirs</property> keys (skipping directories),
+       none of the intermediate directories may contain
+       <filename>Abuild.conf</filename> files.  In other words, you
+       can't <emphasis>interleave</emphasis> unrelated &abuild; trees.
+       Trying to do this with &abuild; 1.0 would have been crazy
+       anyway, but &abuild; would not have noticed if you tried.  Now
+       it will notice and prevent you from doing so.  This check is
+       required in order to ensure that &abuild; 1.1 is always able to
+       accurately locate the parent of any build item.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </sect1>
+   <sect1 id="ref.new11.deprecated">
+    <title>Deprecated Features</title>
+    <para>
+     This section includes a complete list of all features from
+     &abuild; 1.0 that are deprecated in &abuild; 1.1.  Use of any of
+     these features will generate a warning when running in
+     1.0-compatibility mode.  When running in 1.1-compatibility mode,
+     these features will not be recognized.  Depending on the nature
+     of the feature, this may result in an error (such as using a
+     deprecated <filename>Abuild.conf</filename> key), and in other
+     cases, use of the feature will be ignored (such as setting a
+     particular make variable).
+    </para>
+    <warning>
+     <para>
+      You should avoid trying to upgrade your
+      <filename>Abuild.conf</filename> files by hand.  See earlier
+      warnings in this chapter, and refer to <xref
+      linkend="ref.upgrading-to-1.1"/> for details.
+     </para>
+    </warning>
+    <variablelist>
+     <varlistentry>
+      <term>
+       <filename>Abuild.conf</filename> keys
+      </term>
+      <listitem>
+       <itemizedlist>
+        <listitem>
+         <para>
+          Use of the <property>this</property> key is deprecated.
+          This key has been replaced by <property>name</property>.
+          When you run <command>abuild --upgrade-trees</command>
+          (described in <xref linkend="ref.upgrading-to-1.1"/>), your
+          <filename>Abuild.conf</filename> files will be updated
+          automatically.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <property>deleted</property> key is deprecated.
+          Item deletion is now specified with the
+          <property>deleted-items</property> key in the
+          <filename>Abuild.backing</filename> file.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <property>external-dirs</property> key is deprecated.
+          External build trees have been replaced by tree dependencies
+          as discussed in <xref
+          linkend="ref.new11.new-tree-structure"/>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          The <property>parent-dir</property> key is deprecated.
+          &Abuild; 1.1 automatically finds parent build items, thus
+          rendering the <property>parent-dir</property> unnecessary.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       <application>GNU Make</application> variables
+      </term>
+      <listitem>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <varname>BUILD_ITEM_RULES</varname> is deprecated and has
+          been replaced by a new and more flexible mechanism for
+          specifying build-item supplied rules.  See <xref
+          linkend="ref.code-generators"/> for details.
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          <varname>LINK_SHLIBS</varname> is ignored and treated as if
+          it were always set.  This change was actually made in
+          version 1.0.3, but now use of <varname>LINK_SHLIBS</varname>
+          generates a deprecation warning.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Properties for deprecated ant framework
+      </term>
+      <listitem>
+       <itemizedlist>
+        <listitem>
+         <para>
+          <varname>abuild.use-local-hooks</varname> is deprecated;
+          &abuild;'s ant framework now acts as if this is always on.
+          Note that the entire 1.0 ant framework is considered
+          deprecated.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Command line arguments
+      </term>
+      <listitem>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The <option>--ant</option> option is no longer supported
+          since &abuild; no longer invokes ant.  However, for backward
+          compatibility, &abuild; will still look through any
+          <option>--ant</option> arguments for arguments of the form
+          <option>-Dprop-val</option> and treat them as regular
+          variable definitions (specified as just
+          <option>prop=val</option> in &abuild; 1.1).
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       Interface Variables
+      </term>
+      <listitem>
+       <itemizedlist>
+        <listitem>
+         <para>
+          The variable <varname>ABUILD_THIS</varname> should no longer
+          be used as it has been replaced by the more descriptively
+          named <varname>ABUILD_ITEM_NAME</varname>.  However, it is
+          not actual deprecated since &abuild; has no way to detect
+          and report its use in build files.  As such,
+          <varname>ABUILD_THIS</varname> will likely not be removed in
+          a future version of &abuild;, though its use in new code is
+          discouraged.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>
+       <filename>Abuild.backing</filename> files
+      </term>
+      <listitem>
+       <itemizedlist>
+        <listitem>
+         <para>
+          In &abuild; 1.1, there is a new syntax for
+          <filename>Abuild.backing</filename> files, and backing areas
+          are at the forest level rather than at the tree level.  (For
+          details, see <xref linkend="ref.backing-areas"/>.)
+          <filename>Abuild.backing</filename> files that just contain
+          a path name are deprecated.
+         </para>
+        </listitem>
+       </itemizedlist>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </sect1>
+   <sect1 id="ref.new11.small-changes">
+    <title>Small, Localized Changes</title>
+    <para>
+     This section describes small, localized changes to &abuild;.
+     Some of changes described here are small changes that be
+     accommodated by editing individual build or configuration files.
+     Others are new, special-purpose features.
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       When &abuild; is invoked with no options, the effect is now as
+       if the <option>--with-deps</option> or, equivalently,
+       <option>--build=current</option> option had been specified.  To
+       select the old behavior of building just the item without its
+       dependencies, use the newly added <option>--no-deps</option>
+       option.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The preferred way of passing variables to backend build systems
+       is now to specify <option>VAR=value</option> on the command
+       line.  Such definitions are passed to all backends.  You should
+       use this rather than the <option>--make</option> or (now
+       deprecated and mostly unsupported) <option>--ant</option>
+       option.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       &Abuild; has a new online help system, described in <xref
+       linkend="ref.help-system"/>.  The targets
+       <command>rules-help</command> and
+       <command>interface-help</command> have been removed in favor of
+       the new system.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       &Abuild; now prints elapsed clock time before it exits.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       When one or more build items fail, &abuild; now provides a
+       summary that lists the failed build items.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       It is now possible to declare local and non-recursive interface
+       variables.  For details, see <xref
+       linkend="ref.abuild-interface-system"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The new <filename>Abuild.conf</filename> key
+       <property>name</property> replaces <property>this</property> as
+       the way to provide the name of a build item.  Note that you
+       should go around replacing <property>this</property> with
+       <property>name</property> manually in existing
+       <filename>Abuild.conf</filename> files as &abuild; will do this
+       automatically when you run <command>abuild
+       --upgrade-trees</command> (<xref
+       linkend="ref.upgrading-to-1.1"/>).
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The new <filename>Abuild.conf</filename> key
+       <property>attributes</property> can be used to assign
+       particular supported attributes to build items.  For details,
+       see <xref linkend="ref.abuild.conf-syntax"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Build item dependencies and also newly added build tree
+       dependencies can be declared optional; see <xref
+       linkend="ref.optional-dependencies"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The <envar>ABUILD_FORCE_32BIT</envar> environment variable is
+       no longer considered temporary, and the
+       <envar>ABUILD_FORCE_64BIT</envar> has been added to encourage
+       &abuild; to generate code of the specified word size.  It is
+       initially only supported for builds that use the
+       <command>gcc</command> compiler.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The <filename>msvc</filename> toolchain can now be configured
+       to make it easier to support different runtime and management
+       flags, making it possible to build applications that statically
+       link the runtime environment or work with the .NET framework.
+       For details, see <xref linkend="ref.msvc"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The behavior of when expansion of the build set is repeated
+       during application of <option>--related-by-traits</option> has
+       changed and is now controlled by
+       <option>--repeat-expansion</option>.  For details, see <xref
+       linkend="ref.construction-of-build-sets"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The new argument <option>--with-rdeps</option> can be used to
+       add reverse dependencies of all specified items to the build
+       set.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The new command line option <option>--find</option> has been
+       added to print the location of build items or build trees.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The new command line options <option>--ro-path</option> and
+       <option>--rw-path</option> have been added to allow certain
+       parts of the build tree to be treated as read only.  For
+       details, see <xref linkend="ref.read-only-paths"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The new command line argument <option>--compat-level</option>
+       and environment variable <envar>ABUILD_COMPAT_LEVEL</envar>
+       have been added to specify &abuild;'s compatibility level.
+       &Abuild; will not support any features that were deprecated at
+       a version equal to or older than the specified compatibility
+       level.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       A new build set, <option>deptrees</option>, has been added.
+       This build set includes all items in the current tree and its
+       tree dependencies.  These concepts are described in <xref
+       linkend="ref.multiple-trees"/>.  See also <xref
+       linkend="ref.new11.new-tree-structure"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The <command>clean</command> target is no longer passed to the
+       backend when &abuild; is invoked from an output directory.  All
+       <command>clean</command> targets have been removed from rules
+       provided by &abuild; and from the examples.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Platform-specific dependencies on <type>object-code</type>
+       build items are now influenced platform selectors.  To create a
+       dependency on the default platform of a given platform type
+       regardless of platform selectors (which was the old behavior),
+       specific
+       <option>-platform=<replaceable>type</replaceable>:default</option>
+       in your dependency declaration.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       The <command>list_platforms</command> script, for plugins that
+       add platforms, is now invoked with information about the native
+       platform.  See <xref linkend="ref.adding-platforms"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       A new utility has been added to help with caching the results
+       of code generators.  For details, see <xref
+       linkend="ref.codegen-wrapper"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       A new file, <filename>preplugin.mk</filename>, can now contain
+       make code to be run by every selected plugin
+       <emphasis>before</emphasis> <filename>Abuild.mk</filename> is
+       loaded.  This can be used to provide initialization of certain
+       variables, among other purposes.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       QTest support now automatically exports the
+       <varname>TC_SRCS</varname> variable to the environment, so
+       individual <filename>Abuild.mk</filename> files no longer need
+       to do so.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </sect1>
+   <sect1 id="ref.new11.groovy-backend">
+    <title>Groovy-based Backend for Java Builds</title>
+    <para>
+     An entirely new backend has been added to support Java builds,
+     replacing the ant framework from &abuild; 1.0.  The new framework
+     uses ant through a Groovy backend.  For details, see <xref
+     linkend="ref.abuild.groovy"/>.
+    </para>
+   </sect1>
+   <sect1 id="ref.new11.new-tree-structure">
+    <title>Redesigned Build Tree Structure</title>
+    <para>
+     XXX
+    </para>
+   </sect1>
   </appendix>
   <appendix id="ref.upgrading-to-1.1">
    <title>Upgrading from 1.0 to Version 1.1</title>
