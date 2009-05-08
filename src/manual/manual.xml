@@ -20038,8 +20038,371 @@ Y = $(X)
    <sect1 id="ref.upgrade11.procedures">
     <title>Upgrade Procedures</title>
     <para>
-     XXX describe upgrade process;
+     This section covers the specific steps involved in running
+     <command>abuild --upgrade-trees</command> to upgrade the
+     <filename>Abuild.conf</filename> and
+     <filename>Abuild.backing</filename> files in your tree.  Recall
+     that this is only one step of the overall upgrade process, though
+     it is the most significant step.
     </para>
+    <note>
+     <para>
+      The <command>abuild --upgrade-trees</command> process will
+      create some new files and will remove or modify some old files,
+      always saving the old versions.  When you run <command>abuild
+      --upgrade-trees</command>, it is highly recommend that you
+      capture the output using <command>script</command> or
+      <command>tee</command> so you can see a log of exactly which
+      files were removed, added, and changed by the process.
+     </para>
+    </note>
+    <sect2 id="ref.upgrade11.procedures.outline">
+     <title>High-level Summary of Upgrade Process</title>
+     <para>
+      Here is an outline of the basic process:
+      <itemizedlist>
+       <listitem>
+        <para>
+         Change your current directory (<command>cd</command>) to a
+         directory that is above all your build trees and that you
+         wish to use as the new <emphasis>forest root</emphasis>.
+         This should be a common ancestor of all the trees you wish to
+         upgrade.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Run <command>abuild --upgrade-trees</command>.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         &Abuild; analyze all <filename>Abuild.conf</filename> files
+         that it finds at or below your starting directory.  It will
+         then generate a file called
+         <filename>abuild.upgrade-data</filename> that you will have
+         to edit.  Edit the file as described below.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Once you have filled in all required information in
+         <filename>abuild.upgrade-data</filename>, rerun
+         <command>abuild --upgrade-trees</command>.  This time, it
+         will perform the upgrade by rewriting any
+         <filename>Abuild.conf</filename> or
+         <filename>Abuild.backing</filename> that needs to be
+         rewritten.  The original file will be renamed to
+         <filename>Abuild.conf-1_0</filename> or
+         <filename>Abuild.backing-1_0</filename>.  When you are
+         satisfied with the upgrade, you can delete the
+         <filename>*-1_0</filename> files, as those files are never
+         used by &abuild;.  You should also be sure to remove deleted
+         files and check in added and modified files with your version
+         control system.  Remember that, in addition to modifying
+         files, some files may be added or removed.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+     <para>
+      Generally, if you have a backing area, you should upgrade the
+      backing area first.  If your backing areas are set up such that
+      each tree backs to the corresponding tree in the backing area
+      and if you have not added any new trees in your area, the
+      upgrade of your regular area may work without any intervention,
+      as &abuild; will use the backing area to figure out tree names
+      for trees that are backed.
+     </para>
+     <para>
+      Among the most significant changes to &abuild; for version 1.1
+      is the requirement that all build trees have names.  In order
+      for &abuild; to upgrade your trees from version 1.0 to version
+      1.1, it will need to know what name you wish to assign to all
+      your build trees.  You will use the
+      <filename>abuild.upgrade-data</filename> file to provide this
+      information to abuild.
+     </para>
+     <para>
+      Note that &abuild;'s upgrade process is extremely tolerant of
+      partially upgraded forests.  It uses exactly the same logic as
+      &abuild;'s normal build process (it <emphasis>is</emphasis> part
+      of &abuild;, after all) to internally map a forest consisting of
+      a mixture of 1.0 and 1.1 files into an internal 1.1 structure.
+      The main difference between the upgrade procedure and &abuild;'s
+      normal build process is that, when upgrading, &abuild; requires
+      you to provide names of previously unnamed trees, while during
+      the build process (in 1.0-compatibility mode only) it will
+      generate a temporary name on the fly.  So if a tree already has
+      a name, or if &abuild; can figure out what its name is from a
+      backing area, it will use that information.  Otherwise, it will
+      use the information you supply in
+      <filename>abuild.upgrade-data</filename>.
+     </para>
+     <para>
+      Once it has all the required information, abuild will insert the
+      <property>tree-name</property> key into the root
+      <filename>Abuild.conf</filename> file of every tree, and it will
+      replace any <property>external-dirs</property> keys with
+      <property>tree-deps</property> keys.  It will also remove
+      <property>parent-dir</property> keys, replace
+      <property>this</property> with <property>name</property>,
+      upgrade <filename>Abuild.backing</filename> files including
+      merging tree-level <filename>Abuild.backing</filename> files
+      into a single forest-level <filename>Abuild.backing</filename>
+      file, and remove any occurrences of <property>deleted</property>
+      from root <filename>Abuild.conf</filename> files, moving the
+      information into the <property>deleted-items</property> key of
+      the new forest-wide <filename>Abuild.backing</filename> file.
+      In addition, if you have any trees that are nested inside your
+      existing trees, &abuild; will add
+      <property>child-dirs</property> entries to those root items'
+      parent <filename>Abuild.conf</filename> files to connect them
+      into the forest.  (Recall that, in &abuild; 1.1, nested tree
+      roots are discovered through <property>child-dirs</property>
+      just like any other build items.  In 1.0, they were connected
+      into the forest using path names in other trees'
+      <property>external-dirs</property> keys instead.)
+     </para>
+     <para>
+      During the analysis process, &abuild; will find all tree roots
+      at or below your starting directory.  It will study them,
+      examining any <property>external-dirs</property> or
+      <property>tree-deps</property> keys to figure out which trees
+      refer to which other trees.  It will then group trees into
+      separate, independent forests so that it can upgrade each forest
+      separately.  The list of forests is generated such that no tree
+      in one forest refers to any tree in another forest through any
+      of its items' <filename>Abuild.conf</filename> files.  In many
+      cases, you will find that there is only one forest.  However, if
+      you have self-contained collections of build trees nested within
+      your primary forest, those will be recognized as separate.  This
+      could happen for several reasons, including the following:
+      <itemizedlist>
+       <listitem>
+        <para>
+         Maybe you used &abuild; to build some self-contained,
+         third-party software and you kept a copy of the
+         <filename>Abuild.conf</filename> files.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         You might have test suites that contain self-contained build
+         trees.  This is certainly true of &abuild;'s own source tree
+         which contains numerous self-contained build trees in its own
+         test suite.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         You may have stray <filename>Abuild.conf</filename> files
+         that you never actually connected into your regular build
+         trees.  You might just be able to delete them as part of the
+         upgrade process.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+     <para>
+      For each independent forest &abuild; finds, it will pick a
+      top-level directory for that forest.  This will be the lowest
+      directory &abuild; can find that is a common ancestor of all the
+      trees in the forest.  This directory might, in some cases, be
+      the root of one of the trees in the forest.  If not, it might be
+      a directory that contains no <filename>Abuild.conf</filename>
+      file.  In that case, &abuild; will create a
+      <filename>Abuild.conf</filename> file containing only a
+      <property>child-dirs</property> key whose value is the relative
+      paths to all the root directories of all the build trees in the
+      forest.  You may wish to manually edit this file depending on
+      how you intend to organize your forest.
+     </para>
+    </sect2>
+    <sect2 id="ref.upgrade11.procedures.editing">
+     <title>Editing <filename>abuild.upgrade-data</filename></title>
+     <para>
+      This section describes how to edit the
+      <filename>abuild.upgrade-data</filename> file. Here's a
+      &ldquo;quick start&rdquo; for the impatient or those who are
+      already basically familiar with the process:
+      <itemizedlist>
+       <listitem>
+        <para>
+         For each directory whose contents you wish to (recursively)
+         ignore (such as nested trees you're not ready to upgrade),
+         place the directory in the [ignored-directories] section.
+         Place one directory per line, and specify directories
+         relative to the one containing the
+         <filename>abuild.upgrade-data</filename> file.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         For each remaining detected build tree root below, replace
+         &ldquo;<literal>***</literal>&rdquo; with the name you intend
+         to give the tree.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Lather, rinse, repeat.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+     <para>
+      The <filename>abuild.upgrade-data</filename> file is a
+      configuration file used to assist <command>abuild
+      --upgrade-trees</command>.  Every time <command>abuild
+      --upgrade-trees</command> is run, it will replace this file, so
+      any comments or formatting changes you make will be lost.  Any
+      tree names you assign will be preserved even if &abuild; no
+      longer believes the directory is a tree root, so it is very
+      unlikely that &abuild; will throw away work you have already
+      done toward editing this file.  If you're paranoid, make a
+      backup copy of <filename>abuild.upgrade-data</filename> before
+      rerunning <command>abuild --upgrade-trees</command>.
+     </para>
+     <para>
+      The abuild.upgrade-data file consists of sections Each section
+      is opened with a line of the form
+
+      <programlisting>[<replaceable>section-name</replaceable>]
+</programlisting>
+      where <replaceable>section-name</replaceable> is replaced by one
+      of the valid section names.
+     </para>
+     <para>
+      There are three sections:
+      <variablelist>
+       <varlistentry>
+        <term><property>[ignored-directories]</property></term>
+        <listitem>
+         <para>
+          lists directories that will be skipped during the upgrade
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term><property>[forest]</property></term>
+        <listitem>
+         <para>
+          a repeatable section; one occurs for each group of trees
+          that &abuild; finds to be in a given forest
+         </para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term><property>[orphan-trees]</property></term>
+        <listitem>
+         <para>
+          an optional section used to hang onto names previously
+          assigned to any trees root at directories that no longer
+          appear in a known forest
+         </para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+     </para>
+     <para>
+      If there are directories below the start directory that you wish
+      to ignore during the conversion process, list them in the
+      <property>[ignored-directories]</property> section.  &Abuild;
+      will ignore those directories when looking for
+      <filename>Abuild.conf</filename> files.
+     </para>
+     <para>
+      In each forest that &abuild; discovers, it will require a name
+      for each tree.  If the tree already has a name, that name will
+      appear in the file.  Otherwise, the place-holder
+      &ldquo;<literal>***</literal>&rdquo; will appear.  Your job is
+      to go through and replace all occurrences of
+      &ldquo;<literal>***</literal>&rdquo; with the name you wish to
+      assign to the tree rooted at that directory.
+     </para>
+     <para>
+      In some cases, there may be a tree that you are not ready to
+      upgrade, perhaps because that tree is still being used by a
+      project that hasn't yet upgraded its version of abuild.  In that
+      case, just list the path to the root of the tree in the
+      <property>[ignored-directories]</property> section.  You do not
+      need to remove it from the <property>[forest]</property> section
+      in which it appears; &abuild; will remove it from there
+      automatically next time it writes the file.  If you subsequently
+      change your mind and remove the path from
+      <property>[ignored-directories]</property>, &abuild; will move
+      it back to the appropriate <property>[forest]</property>
+      section.  This is also where <property>[orphan-trees]</property>
+      comes into play: if you had assigned a name to a tree that ended
+      up later under an ignored directory, that path and assigned name
+      will get moved to <property>[orphan-trees]</property>.  if you
+      later remove the ignored directory entry, &abuild; will move the
+      path back out of <property>[orphan-trees]</property> so you will
+      not lose the name you previously assigned to the tree.
+     </para>
+     <para>
+      Abuild is able to perform the actual upgrade when all of the
+      following conditions are met:
+      <itemizedlist>
+       <listitem>
+        <para>
+         &Abuild; is able to parse all
+         <filename>Abuild.conf</filename> files at or below the
+         current directory, excluding any ignored directories, without
+         finding any errors.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Every <property>external-dirs</property> entry exists or can
+         be resolved through a backing area.  There is one exception,
+         discussed below.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         No <property>external-dirs</property> entries cross over any
+         symbolic links
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Every tree root listed in every <property>[forest]</property>
+         section has a name assigned to it.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Every tree that abuild finds during its scan as well as every
+         <property>external-dirs</property> entry referenced by those
+         trees that points to a place at or below the start directory
+         appears in a <property>[forest]</property> section and has a
+         name assigned to it.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </para>
+     <para>
+      &Abuild; is usually able to upgrade forests with backing areas,
+      but it will not do so if any externals resolve to 1.0-style
+      trees in backing areas.  (That is, the external doesn't exist
+      relative to the tree that declares it but does exist relative to
+      that tree's backing area.)  In that case, you must either
+      upgrade the backing area first (which is the recommended
+      practice) or make the external resolve locally.  You can make
+      the external local by just creating a directory and populating
+      it with an <filename>Abuild.conf</filename> and an
+      <filename>Abuild.backing</filename>.  The reason for this
+      restriction is that &abuild; will not read the
+      <filename>Abuild.backing</filename> file of an upgraded tree
+      root that is not at the root of a forest.  This means that
+      &abuild; would no longer be able to resolve the external in the
+      backing area.  As discussed, it is best to upgrade your backing
+      area first anyway since upgrades to forests with upgraded
+      backing areas often require no manual intervention.
+     </para>
+    </sect2>
    </sect1>
   </appendix>
   <appendix id="ref.known-limitations">
