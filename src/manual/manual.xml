@@ -8519,7 +8519,9 @@ endif
      presented, even if in an overly terse format.  As a supplement to
      this chapter, please refer to the help text for the
      <filename>java</filename> rules in <xref
-     linkend="ref.help.rule.java"/>
+     linkend="ref.help.rule.java"/>.  You can also refer to the
+     complete code for the <filename>java</filename> rules in <xref
+     linkend="ref.rules.java.groovy"/>.
     </para>
    </note>
    <para>
@@ -9107,6 +9109,7 @@ parameters {
     <title>Advanced Customization: Overriding File Locations</title>
     <para>
      XXX describe the parameters in _base.groovy
+     <?include-file rules/java/_base.groovy?>
     </para>
    </sect1>
    <sect1 id="ref.java.control-parameters">
@@ -9225,14 +9228,26 @@ parameters {
    <sect1 id="ref.groovy.crash-course">
     <title>A Crash Course in Groovy</title>
     <para>
-     To get the most out of &abuild;'s Groovy backend, it helps to
-     have a decent understanding of the <ulink
-     url="http://groovy.codehaus.org">Groovy language</ulink>.
+     XXX Should this section be earlier?  Should be in an appendix
+     with a cross reference to it from the beginning of this chapter?
+    </para>
+    <para>
+     Although you don't really have to understand Groovy to use the
+     above-described features of the Groovy backend, if you want to
+     get the most out of &abuild;'s Groovy backend, it helps to have a
+     decent understanding of the <ulink
+     url="http://groovy.codehaus.org">Groovy language</ulink>, and you
+     will certainly need to understand at least some basic Groovy to
+     take advantage of more advanced customization or to write your
+     own rules.
+    </para>
+    <para>
      Providing a tutorial on Groovy would be out of scope for this
      manual.  However, there are a few Groovy idioms that &abuild; (as
      well as many other Groovy-based systems) make heavy use of, and
-     understanding at least that much will certainly help you to make
-     sense of what is going on here.
+     understanding at least that much, particularly if you are already
+     a Java programmer, will certainly help you to make sense of what
+     is going on here.
     </para>
     <variablelist>
      <varlistentry>
@@ -10554,6 +10569,13 @@ f {
      <filename>java</filename>.  The code generator itself is at
      <filename>java/code-generator</filename>.
      XXX continue...
+     <?example java/code-generator/rules/java/codegenerator-help.txt?>
+     <?example java/library/Abuild.groovy?>
+     <?example java/code-generator/Abuild.conf?>
+     <?example java/code-generator/Abuild.groovy?>
+     <?example java/code-generator/Abuild.interface?>
+     <?example java/code-generator/rules/java/codegenerator.groovy?>
+     <?example java/code-generator/src/java/com/example/codeGenerator/ExampleTask.java?>
     </para>
    </sect1>
    <sect1 id="ref.example.auto-from-variable">
@@ -14202,9 +14224,11 @@ native-compiler qcc
      The best way to learn about what is offered by &abuild;'s Groovy
      backend is to study existing rules from the
      <filename>rules</filename> directory in your &abuild;
-     distribution.  If you're really adventurous, you can read the
-     source to the Groovy backend itself in &abuild;'s source
-     distribution.
+     distribution.  You can find a complete copy of the
+     <filename>java</filename> rules in <xref
+     linkend="ref.rules.java.groovy"/>.  If you're really adventurous,
+     you can read the source to the Groovy backend itself in
+     &abuild;'s source distribution.
     </para>
    </sect1>
    <sect1 id="ref.platform-dependent-in-indep-or-java">
@@ -15305,9 +15329,9 @@ Y = $(X)
      &abuild; distribution.  Then, for every item that is a plugin in
      any known build tree (remember: an item can be a plugin in one
      build tree but not in another because plugin status is not
-     inherited through backing areas or externals), &abuild; creates
-     an <classname>InterfaceParser</classname> object, imports the
-     base interface, and loads the plugin's
+     inherited through tree dependencies), &abuild; creates an
+     <classname>InterfaceParser</classname> object, imports the base
+     interface, and loads the plugin's
      <filename>plugin.interface</filename> file, if any.  Plugins'
      interface files are not allowed to have
      <function>after-build</function> files, so it is an error if any
@@ -20089,19 +20113,20 @@ Y = $(X)
      trying to upgrade.  If your intention is to upgrade an entire
      forest of trees at once, meaning that you wish to upgrade a
      collection of build trees that refer to each other through
-     external-dirs, you should go to a common ancestor of all those
-     trees.  This will be the root of your upgraded build forest.  If
-     you only wish to upgrade specific trees, you can just go to the
-     root of the trees you are upgrading.  The upgrade process will
-     allow you to upgrade your forests a little bit at a time.  This
-     is especially important for distributed development environments
-     in which different trees are maintained by different teams.
-     Whichever case you pick, your starting directory must either
-     contain a root build item or be above the top of trees with root
-     build items.  You can't pick a directory that's in the middle of
-     a build tree.  For example, you can't start in a directory that
-     has a <property>parent-dir</property> key or that is referred to
-     as a child in a higher <filename>Abuild.conf</filename> file.
+     <property>external-dirs</property>, you should go to a common
+     ancestor of all those trees.  This will be the root of your
+     upgraded build forest.  If you only wish to upgrade specific
+     trees, you can just go to the root of the trees you are
+     upgrading.  The upgrade process will allow you to upgrade your
+     forests a little bit at a time.  This is especially important for
+     distributed development environments in which different trees are
+     maintained by different teams.  Whichever case you pick, your
+     starting directory must either contain a root build item or be
+     above the top of trees with root build items.  You can't pick a
+     directory that's in the middle of a build tree.  For example, you
+     can't start in a directory that has a
+     <property>parent-dir</property> key or that is referred to as a
+     child in a higher <filename>Abuild.conf</filename> file.
     </para>
     <para>
      Once you have identified your start directory, you should run
@@ -20794,6 +20819,14 @@ Y = $(X)
     <filename>rules/object-code/ccxx.mk</filename>.
    </para>
    <?include-file rules/object-code/ccxx.mk?>
+  </appendix>
+  <appendix id="ref.rules.java.groovy">
+   <title>The <filename>java.groovy</filename> File</title>
+   <para>
+    Here we include a complete copy of
+    <filename>rules/groovy/java.groovy</filename>.
+   </para>
+   <?include-file rules/java/java.groovy?>
   </appendix>
   <appendix id="ref.deprecated-ant">
    <title>The Deprecated XML-based Ant Backend</title>

@@ -1,1 +1,36 @@
-XXX write this
+
+** Help for users of abuild.rules = ['java', 'groovy'] **
+
+The "groovy" rules add compilation of Groovy source code using groovyc
+to the "java" rules.  They are structured in the same way as the
+"java" rules are structured.  Run abuild --help rules rule:java for
+details.
+
+You must use the 'java' rules together with the 'groovy' rules.  You
+can list them in either order.  If you list 'java' first, abuild will
+compile your Java code before your Groovy code.  If you list 'groovy'
+first, abuild will compile your Groovy code before your Java code.  If
+some of your Groovy classes depend on some of your Java classes or
+vice versa, you should make sure you put your rules in the right
+order.  If you want to mix Groovy and Java sources in the same build
+item, they should not be interdependent or else you will have a hard
+time doing a clean build.
+
+With the groovy rules, we have these two additional properties
+
+  groovy.dir.src (src/groovy): the default location for Groovy sources
+
+  groovy.dir.generatedSrc (abuild-java/src/groovy): the default
+    location for automatically generated groovy sources
+
+Now new targets are added.  The control parameter
+
+  groovy.compile
+
+is supported to control groovy compilation.  Its fields are
+
+  srcdirs: defaults to groovy.dir.src + groovy.dir.generateSrc
+  destdir: defaults to java.dir.classes
+  classpath: defaults to abuild.classpath + abuild.classpath.external
+
+Any additional keys are passed as attributes to the groovyc task.

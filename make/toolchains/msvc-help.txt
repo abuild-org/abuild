@@ -1,1 +1,47 @@
-XXX write this
+
+** Help for users of the "msvc" compiler **
+
+The "msvc" compiler provides support for Microsoft Visual C++.  You
+are required to have your environment set up for use of the compiler
+on the command line.  There's usually a shortcut that creates a shell
+set up in this way, and there is a batch file that does it as well.
+For details, consult your Visual C++ documentation.  There is also
+some discussion in the abuild manual.
+
+As of the release of abuild 1.1, the msvc compiler support is known to
+work with Visual C++ .NET 2003, .NET 2005, and .NET 2008.  Both full
+enterprise and "express" versions have been tested.
+
+We support building both static libraries and shared libraries.
+Abuild creates DLL files for shared libraries.  Any version number
+information provided in the SHLIB_libname variable is ignored.
+
+By default, we compile with /Zi for all compiles.  /Zi enables
+debugging and causes debugging information to be written to the .pdb
+file.  We have observed that cl has trouble with long path names when
+invoked without /Zi.  Microsoft support suggests that we should use
+/Zi for all builds, including release builds.  See
+http://msdn.microsoft.com/en-us/library/xe4t6fc1.aspx for additional
+discussion.
+
+You can override this behavior by changing the value of
+MSVC_GLOBAL_FLAGS.  See make/toolchains/msvc.mk for additional
+details.
+
+There are two additional variables that you can configure:
+
+  MSVC_MANAGEMENT_FLAGS (default /EHsc)
+  MSVC_RUNTIME_FLAGS (default /MD)
+
+You can build for .NET by setting MSVC_MANAGEMENT_FLAGS /clr.
+
+You can build executables that link the runtime environment
+statically, thus avoiding a runtime dependency on MSVCRT*.dll, by
+setting MSVC_RUNTIME_FLAGS to /MT.
+
+We automatically add "d" to the end of MSVC_RUNTIME_FLAGS when
+building a debugging executable.
+
+If a manifest file is created when building a DLL or executable, we
+automatically run mt -manifest to embed the manifest file.
+

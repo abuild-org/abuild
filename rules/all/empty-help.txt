@@ -1,1 +1,14 @@
-XXX write this
+The "empty" rules are provided for cases in which you have to supply
+some value but don't have anything to build.  They are available for
+both Groovy-based and make-based builds.
+
+There are two typical reasons why you might use these rules:
+
+ * You wish to have accessed to globally available features such as
+   qtest support.  If you have a build item that has qtest-based test
+   suites but doesn't actually have to build anything, you can use the
+   "empty" rules.
+
+ * You decide which rules to use based on some kind of conditional
+   logic.  For example, for a Windows-only build item, you might use
+   RULES=ccxx Windows and RULES=empty everywhere else.

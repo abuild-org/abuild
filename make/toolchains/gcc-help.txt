@@ -1,1 +1,22 @@
-XXX write this
+
+** Help for users of the "gcc" compiler **
+
+The gcc toolchain uses the unix_compiler toolchain behind the scenes.
+You generally shouldn't need to do anything special to use the gcc
+compiler.  It is the compiler used on abuild's default platform on
+UNIX systems.  Here are a few notes:
+
+ * ABUILD_FORCE_32BIT and ABUILD_FORCE_64BIT will cause -m32 and -m64
+   respectively to be added to all compilation commands.  It is up to
+   you to make sure you only use these variables when those flags
+   work.
+
+ * The gcc compiler support file assumes "ar cru" and "ranlib" for
+   library creation.  This may not always be correct on some
+   platforms.
+
+ * The gcc compiler support file uses -fPIC for creating position
+   independent code and passes -shared to the linker for creating
+   shared libraries.  This may not work on all platforms and is
+   probably wrong for platforms on which gcc is not configured to use
+   the gnu linker.

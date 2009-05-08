@@ -1,1 +1,17 @@
-XXX write this
+
+** Help for users of the "mingw" compiler **
+
+Abuild's mingw support is incomplete.  At present, it is implemented
+using Cygwin's gcc or g++ with the -mno-cygwin option.
+
+There are a few known problems.  Since abuild itself is a Windows
+application but make and gcc are both provided by Cygwin, absolute
+paths are not portable between the two systems.  This means that
+abuild's mingw support will almost surely not work if there are any
+absolute paths in your build or if there are any build items that span
+drive letters.  However, for simple builds, it will probably work fine
+and generate executables that don't depend on Cygwin at runtime.
+
+Because of the incomplete nature of mingw support, you must set the
+environment variable MINGW=1 in order for abuild to make the mingw
+compiler available as a platform choice.

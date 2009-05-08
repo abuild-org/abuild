@@ -1,4 +1,57 @@
 ## description: built-in interface variables
 
-XXX get everything from base.interface and also local
-ABUILD_HAVE_OPTIONAL_DEP_item variables
+The following interface variables are defined automatically by abuild:
+
+ABUILD_STDOUT_IS_TTY: boolean indicating whether or not standard
+output is a terminal; potentially useful in test environments
+
+ABUILD_ITEM_NAME: the name of the current item
+ABUILD_TREE_NAME: the name of the current item's tree
+ABUILD_TARGET_TYPE: the target type of the current item
+ABUILD_PLATFORM_TYPE: the platform type of the current item
+ABUILD_OUTPUT_DIR: the output directory of the current item/platform
+ABUILD_PLATFORM: the platform of the current build of the current item
+
+For object-code build items, these variables provide access to the
+individual fields of the platform string:
+
+ABUILD_PLATFORM_OS string
+ABUILD_PLATFORM_CPU string
+ABUILD_PLATFORM_TOOLSET string
+ABUILD_PLATFORM_COMPILER string
+ABUILD_PLATFORM_OPTION string
+
+The following variables are used by C/C++ rules.  You can assign to
+them in your Abuild.interface files.  You can also append to them in
+Abuild.mk if needed, though it's usually not recommended.  If you do,
+you should use +=, rather than = or :=, in order to avoid overriding
+assignments made in your dependencies' interface files.
+
+declare INCLUDES -- include directories
+declare LIBS -- libraries specified without the "-l"
+declare LIBDIRS -- library directories
+declare XCPPFLAGS -- extra flags passed to the C preprocessor
+declare XCFLAGS -- extra flags passed to the C compiler
+declare XCXXFLAGS -- extra flags passed to the C++ compiler
+declare XLINKFLAGS -- extra flags passed to the linker
+
+For java build items, these variables are also defined:
+
+abuild.classpath -- items used at compile-time, run-time, and in packaging
+abuild.classpath.external -- used at compile-time but not in packaging
+abuild.classpath.manifest -- to be included in the manifest of direct
+       reverse dependencies
+
+The abuild.classpath.manifest variable "non-recursive", meaning you
+only see assignments made to it your own build item and in those on
+which you directly declare dependencies.  You do not see assignments
+made to it by your indirect dependencies.
+
+If you declare any optional dependencies, for each optional dependency
+"item" that you declare, a variable called
+
+  ABUILD_HAVE_OPTIONAL_DEP_item
+
+is declared as a local variable.  You have access to it in your own
+Abuild.interface, but it will not be visible to items that depend on
+your item.

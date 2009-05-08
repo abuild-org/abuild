@@ -35,5 +35,5 @@ parameters {
     // that the java rules are also being used and get most of their
     // defaults from java parameters.
     groovy.dir.src = "${itemDir}/src/groovy"
-    groovy.dir.generatedSrc = "${itemDir}/src/groovy"
+    groovy.dir.generatedSrc = "${buildDir}/src/groovy"
 }

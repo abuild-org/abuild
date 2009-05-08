@@ -1,24 +1,4 @@
 
-Before 1.1
-==========
-
- * Remember to build documentation with fop from svn.
-   http://svn.apache.org/repos/asf/xmlgraphics/fop/trunk
-
- * Update documentation
-
-    - inline help files
-
-    - manual/pending.txt, manual/groovy-framework.txt
-
-    - check for references to deprecated keys, etc.
-
-    - check every use of the word external
-
-
-
-----------------------------------------------------------------------
-
 Abuild Lint
 ==============
 

@@ -1,4 +1,5 @@
-*** Help for users of abuild.rules = 'codegenerator' ***
+
+** Help for users of abuild.rules = 'codegenerator' **
 
 Set the parameter codeGenerator.classname to the fully qualified
 classname to be generated.

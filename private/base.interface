@@ -1,5 +1,9 @@
 # This is the base interface file for abuild.
 
+# NOTE:
+# NOTE: All variables here must be documented in help/vars.txt.
+# NOTE:
+
 # Declare variables that abuild sets locally for each build item
 
 target-type all

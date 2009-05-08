@@ -1,1 +1,5 @@
-XXX write this
+The "unix_compiler" toolchain is not a real toolchain intended to be
+used directly by end users.  Instead, it is intended for use by
+compiler toolchain support authors.  For details of its use, please
+look at make/toolchains/unix_compiler.mk itself.  To study an example,
+refer to make/toolchains/gcc.mk.
