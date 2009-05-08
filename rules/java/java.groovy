@@ -1,5 +1,10 @@
 import org.abuild.groovy.Util
 
+//
+// NOTE: when modifying this file, you must keep java-help.txt up to
+// date!
+//
+
 class JavaRules
 {
     def abuild
@@ -327,7 +332,7 @@ class JavaRules
         resourcesdirs << attributes.remove('classesdir')
         def webdirs = attributes.remove('webdirs')
         webdirs.addAll(attributes.remove('extrawebdirs'))
-        webdirs << getPathVariable('signedJars')
+        webdirs << attributes.remove('signedjars')
         def metainfdirs = attributes.remove('metainfdirs')
         metainfdirs.addAll(attributes.remove('extrametainfdirs'))
         def extramanifestkeys = attributes.remove('extramanifestkeys')
@@ -390,6 +395,7 @@ class JavaRules
             'webinfdirs' : [getPathVariable('webinf'),
                             getPathVariable('generatedWebinf')],
             'extrawebinfdirs' : getPathListVariable('extraWebinf'),
+            'signedjars' : getPathVariable('signedJars'),
             'libfiles' : abuild.resolveAsList('java.warLibJars')
         ]
         archiveAttributes.each { k, v -> defaultAttrs[k] = v }
@@ -455,7 +461,6 @@ class JavaRules
         def defaultAttrs = [
             'earname': abuild.resolveAsString('java.earName'),
             'appxml': abuild.resolveAsString('java.appxml'),
-            'distdir': getPathVariable('dist'),
             'filestopackage' : defaultPackageClassPath,
         ]
         archiveAttributes.each { k, v -> defaultAttrs[k] = v }
@@ -483,6 +488,8 @@ class JavaRules
     def javadocTarget()
     {
         def title = abuild.resolveAsString('java.javadocTitle')
+        // case of Doctitle and Windowtitle are for consistency with
+        // ant task
         def defaultAttrs = [
             'Doctitle': title,
             'Windowtitle': title,
@@ -502,7 +509,7 @@ class JavaRules
         def wrapperName = attributes['name']
         def mainClass = attributes['mainclass']
         def jarName = attributes['jarname']
-        if (! (wrapperName && mainClass && jarName))
+        if (! (wrapperName && mainClass))
         {
             return
         }
@@ -510,7 +517,10 @@ class JavaRules
         def wrapperPath = new File("$wrapperDir/$wrapperName").absolutePath
         def distDir = attributes['distdir']
         def wrapperClassPath = attributes['classpath']
-        wrapperClassPath << new File("$distDir/$jarName").absolutePath
+        if (jarName)
+        {
+            wrapperClassPath << new File("$distDir/$jarName").absolutePath
+        }
         wrapperClassPath = wrapperClassPath.join(pathSep)
 
         // The wrapper script has different contents on Windows and
@@ -545,7 +555,6 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 
     def wrapperTarget()
     {
-        def buildDir = abuild.buildDirectory.absolutePath
         def defaultAttrs = [
             'name': abuild.resolveAsString('java.wrapperName'),
             'mainclass': abuild.resolveAsString('java.mainClass'),
@@ -619,7 +628,6 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 
     def testJunitTarget()
     {
-        def buildDir = abuild.buildDirectory.absolutePath
         def defaultAttrs = [
             'testsuite': abuild.resolveAsString('java.junitTestsuite'),
             'batchincludes': abuild.resolveAsString('java.junitBatchIncludes'),
@@ -642,11 +650,12 @@ exec java -classpath ${wrapperClassPath} ${mainClass} \${1+\"\$@\"}
 def javaRules = new JavaRules(abuild, ant)
 
 abuild.addTargetClosure('init', javaRules.&initTarget)
-abuild.addTargetClosure('test-only', javaRules.&testJunitTarget)
+abuild.addTargetClosure('test-junit', javaRules.&testJunitTarget)
 abuild.addTargetDependencies('all', ['package', 'wrapper'])
 abuild.addTargetDependencies('package', ['package-ear'])
 abuild.addTargetDependencies('generate', ['init'])
 abuild.addTargetDependencies('doc', ['javadoc'])
+abuild.addTargetDependencies('test-only', ['test-junit'])
 abuild.configureTarget('compile', 'deps' : ['generate'],
                        javaRules.&compileTarget)
 abuild.configureTarget('package-jar', 'deps' : ['compile'],

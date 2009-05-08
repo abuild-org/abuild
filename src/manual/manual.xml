@@ -265,6 +265,12 @@ following checks:
     </listitem>
     <listitem>
      <para>
+      Brandon Barlow for tirelessly testing numerous builds with
+      &abuild; 1.1 during its alpha period.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
       Cass Dalton, who has frequently served as a sounding board as I
       think about new &abuild; capabilities, and who has played a
       significant role in helping to ensure that &abuild; is as stable
@@ -9055,9 +9061,11 @@ parameters {
     <sect2 id="ref.java.jar-signing">
      <title>JAR Signing</title>
      <para>
-      XXX write this.  Remember to mention that lazy JAR signing is
-      true by default (even though it is false by default in the ant
-      task) in order to have idempotent builds.
+      <!-- XXX Remember to mention that lazy JAR signing is true by
+           default (even though it is false by default in the ant
+           task) in order to have idempotent builds. -->
+      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
+      Search for <literal>TARGET: sign-jars</literal>.)
      </para>
     </sect2>
     <sect2 id="ref.java.war">
@@ -9089,34 +9097,43 @@ parameters {
       directories named in <varname>java.dir.extraWebinf</varname>.
      </para>
      <para>
-      XXX continue...signed jars, java.warLibJars, ...
+      <!-- XXX -->
+      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
+      Search for <literal>TARGET: package-war</literal>.)
      </para>
     </sect2>
     <sect2 id="ref.java.high-level-archives">
      <title>High Level Archives</title>
      <para>
-      XXX
+      <!-- XXX -->
+      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
+      Search for <literal>TARGET: package-high-level-archive</literal>.)
      </para>
     </sect2>
     <sect2 id="ref.java.ear">
      <title>EAR Files</title>
      <para>
-      XXX
+      <!-- XXX -->
+      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
+      Search for <literal>TARGET: package-ear</literal>.)
      </para>
     </sect2>
    </sect1>
    <sect1 id="ref.java.file-locations">
     <title>Advanced Customization: Overriding File Locations</title>
     <para>
-     XXX describe the parameters in _base.groovy
-     <?include-file rules/java/_base.groovy?>
+     <!-- XXX -->
+     (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
+     Search for <literal>DEFAULT PARAMETERS</literal>.)
     </para>
    </sect1>
    <sect1 id="ref.java.control-parameters">
     <title>Advanced Customization: Control Parameters</title>
     <para>
-     XXX describe the concepts of control parameters.  Refer to --help
-     rules rule:java for details.
+     <!-- XXX -->
+     (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
+     Layers of customization is described at the beginning of
+     <literal>GENERAL INFORMATION</literal>.)
     </para>
    </sect1>
    <sect1 id="ref.groovy.java-classpaths">
@@ -9228,8 +9245,10 @@ parameters {
    <sect1 id="ref.groovy.crash-course">
     <title>A Crash Course in Groovy</title>
     <para>
-     XXX Should this section be earlier?  Should be in an appendix
-     with a cross reference to it from the beginning of this chapter?
+     <!-- XXX -->
+     <emphasis>Should this section be earlier?  Should be in an
+     appendix with a cross reference to it from the beginning of this
+     chapter?</emphasis>
     </para>
     <para>
      Although you don't really have to understand Groovy to use the
@@ -9750,19 +9769,27 @@ f {
    <sect1 id="ref.java.groovy">
     <title>Groovy Rules</title>
     <para>
-     XXX
+     <!-- XXX -->
+     (Incomplete; for now, see <xref linkend="ref.help.rule.groovy"/>.
+     Search for <literal>DEFAULT PARAMETERS</literal>.)
     </para>
    </sect1>
    <sect1 id="ref.java.for-rule-authors">
     <title>Additional Information for Rule Authors</title>
     <para>
-     XXX
+     The following sections describe Groovy interfaces of objects that
+     are available to rule programmers.
     </para>
     <sect2 id="ref.java.abuild-object-interface">
      <title>Interface to <classname>abuild</classname> Object</title>
      <para>
-      XXX Incorporate these notes....
-
+      The <varname>abuild</varname> variable, provided in the Groovy
+      binding to all scripts run in &abuild;, is the primary object
+      that you will interact with.
+     </para>
+     <para>
+      <!-- XXX -->
+      (Incomplete; for now, see notes below.)
       <programlisting>Would be nice to be able to generate this with groovydoc...
 
 (check code to make sure we haven't missed anything)
@@ -9919,20 +9946,42 @@ f {
 
       runs each target specified in order (with the order possibly
       overridden based on the dependency graph)
-
- * org.abuild.groovy.Util
-
-    - absToRel(path, basedir) -- convert "path" into a path relative to
-      "basedir".
-
-    - field inWindows is true if in Windows
 </programlisting>
      </para>
     </sect2>
     <sect2 id="ref.java.abuild-util">
      <title>Using <classname>org.abuild.groovy.Util</classname></title>
      <para>
-      XXX
+      The <classname>org.abuild.groovy.Util</classname> class provides
+      a small number of static methods and fields that may be useful
+      to rule authors.  You can gain access to this class by importing
+      it in your Groovy code.
+      <itemizedlist>
+       <listitem>
+        <para>
+         <function>absToRel(path, basedir)</function>: convert
+         <varname>path</varname> into a path relative to
+         <varname>basedir</varname>.  Most of the time, you need
+         absolute paths, which you can easily get from the
+         <classname>File</classname> object, but sometimes you
+         explicitly need a relative path, such as when generating
+         relative links.  This method can help you with that task.
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         <varname>inWindows</varname>: a field whose value is true if
+         you are in a Windows environment.  You should use this very
+         sparingly as it is possible to create platform-dependent
+         output files in what is supposed to be a platform-independent
+         directory.  (See <xref linkend="ref.best-practices"/> for a
+         discussion.)  However, sometimes when you are executing
+         external programs, it becomes necessary to do it different on
+         a Windows system from a UNIX system.  This field can help you
+         in those cases.
+        </para>
+       </listitem>
+      </itemizedlist>
      </para>
     </sect2>
    </sect1>
@@ -10568,7 +10617,11 @@ f {
      using the Groovy framework, can be found in the tree located at
      <filename>java</filename>.  The code generator itself is at
      <filename>java/code-generator</filename>.
-     XXX continue...
+    </para>
+    <para>
+     <!-- XXX -->
+     (Incomplete; for now, please read the comments and following
+     along with the files whose contents are show below.)
      <?example java/code-generator/rules/java/codegenerator-help.txt?>
      <?example java/library/Abuild.groovy?>
      <?example java/code-generator/Abuild.conf?>
@@ -14216,6 +14269,17 @@ native-compiler qcc
         test-related targets.  The reason we don't have to do this in
         Groovy is that our target framework allows to explicitly call
         one target from another in a dependency-aware fashion.
+       </para>
+       <para>
+        Instead of adding closures to <command>test-only</command>,
+        you may instead decide to create your own custom target, make
+        it a dependency of <command>test-only</command>, and add your
+        closures to your custom target.  This is what both QTest and
+        JUnit support do.  The advantage of this approach is that it
+        makes it possible for you invoke a particular collection of
+        tests explicitly and, for build items that use more than one
+        test framework, prevents later tests from being skipped if
+        earlier ones fail.
        </para>
       </listitem>
      </itemizedlist>
@@ -20759,6 +20823,7 @@ Y = $(X)
    <sect1 id="ref.help.rule.autoconf"><title/><para/></sect1>
    <sect1 id="ref.help.rule.ccxx"><title/><para/></sect1>
    <sect1 id="ref.help.rule.java"><title/><para/></sect1>
+   <sect1 id="ref.help.rule.groovy"><title/><para/></sect1>
    <sect1 id="ref.help.topic.helpfiles"><title/><para/></sect1>
    <?end-strip?>
    <?help-files?>

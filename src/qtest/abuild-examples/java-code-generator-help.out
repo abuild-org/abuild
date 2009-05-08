@@ -5,7 +5,8 @@ provided by build item code-generator (from tree basic)
 applies to target type java
 Help text:
 ----------
-*** Help for users of abuild.rules = 'codegenerator' ***
+
+** Help for users of abuild.rules = 'codegenerator' **
 
 Set the parameter codeGenerator.classname to the fully qualified
 classname to be generated.

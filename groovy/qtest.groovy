@@ -1,6 +1,7 @@
 import org.abuild.groovy.Util
 
-abuild.addTargetClosure('test-only') {
+abuild.addTargetDependencies('test-only', ['test-qtest'])
+abuild.addTargetClosure('test-qtest') {
     def src = abuild.sourceDirectory.path
     def qtest = new File("${src}/qtest")
     if (qtest.isDirectory())

@@ -1,50 +1,549 @@
 
-This document describes the behavior of 'java' abuild rules.  The
-default behavior is described first.  Following that is a description
-of how the behavior of the rules can be modified by setting
-parameters.  If you discover something that you cannot parameterize
-but should be able to, please report it as a bug.
+** Help for users of abuild.rules = ['java'] **
 
-(XXX Stylistic note: in general, I'm using camelCaps for parameter
-names and map keys.  An exception is when keys map to something that
-is an attribute or nested element to an ant task.  If anyone cares, we
-can come up with some conventions.  I want to avoid dashes because of
-the complexity they cause in setting parameter values in Abuild.groovy
-files.)
+If you're familiar with the general structure of the java rules and
+you just need to be reminded about specific parameters and control
+parameter attribute map keys, search for SPECIFIC PARAMETERS below.
 
-Targets use abuild.runActions.  We need to document all available
-parameters (from _base.groovy) and attribute keys.  Look at the
-targets' calls to runActions to see what keys are available and how
-they are initialized.
 
-Dependencies:
+GENERAL INFORMATION
+===================
 
-all -> package -> package-ear -> package-war -> package-rar
-  -> sign-jars -> copy-jars
-  -> package-jar -> compile -> generate -> init
+The general pattern is that the behavior all targets can customized in
+layers.  Implementation of this pattern is achieved through using the
+abuild.runActions call.  For examples, consult the abuild manual or
+look at rules/java/java.groovy.
 
-For war packaging:
 
- - src/resources is arbitrary content to go into WEB-INF/classes along
-   with "classes" directory
+LAYER 1: DEFAULT USE
 
- - src/web/content is arbitrary content to go into the root of the war
-   along with "copied-jars" directory
+By default, all targets are activated either by the existence of
+certain files or by setting certain parameters.  No targets generate
+error conditions or do anything at all when not activated.
 
- - There are generated versions of these
+For example, the "compile" target won't compile anything if there are
+no .java files in src/java, and the "package-jar" target won't create
+any JAR files if java.jarname property is not set.
 
- - Put classes and resources in WEB-INF/classes via classes task
+To use these rules at layer 1, you just have to set required
+parameters or create required input files.  This is all most build
+items will have to do.
 
- - src/web/WEB-INF -> webinf task
 
- - src/conf/META-INF -> metainf task
+LAYER 2: OVERRIDING DEFAULTS
 
- - Jars in java.warLibJars go into lib.  This is empty by default.
-   Users can assign abuild.classpath to this.  Jars in this list are
-   automatically included in the war through the lib task.  They are
-   not copied.
+In most cases, there is some parameter that can be overridden to
+change the default behavior of a particular build item.  For example,
+you can set the parameter java.dir.src to change the default location
+where abuild looks for Java sources.  A list of parameters is
+presented below.  All parameters that can be customized in this way
+are declared in _base.groovy for all built-in rules implemented for
+the Groovy backend.
 
- - Jars in java.copiedJars are be copied into
-   $(ABUILD_OUTPUT_DIR)/copied-jars.  These are included in the war
-   via fileset.  If parameters for signing are set, these will get
-   signed automatically.
+
+LAYER 3: TARGET-SPECIFIC CONTROL PARAMETERS
+
+Each target has a control parameter.  The control parameter's value,
+if defined, is always a list.  Each element of the list is either a
+map or a closure.  To customize at layer 3, we set the control
+parameter to a list of maps.  This can be done by appending a map to
+the value of the control parameter.
+
+Each target has a map of "default attributes".  Many of the values of
+the map are initialized directly or indirectly from general
+parameters.  If a target's control parameter is not defined, abuild
+runs the target as if the control parameter were a list containing the
+default attribute map.  The fact that the default attribute map is
+itself initialized from other parameters provides the mechanism behind
+which layer 2 customization works.
+
+If the control parameter is explicitly initialized, each map element
+of the list is expanded by copying into it any elements from the
+default attribute map that are not locally overridden.
+
+The control parameter may contain multiple elements.  In this case,
+the target's main closure will be run multiple times, once for each
+map.  This makes it possible for a single build item to create
+multiple JAR files, for example.
+
+
+LAYER 4: CUSTOM CLOSURES
+
+The control parameter for a target can also contain closures.  In the
+description of layer 3 customization, we described what happens with
+map elements.  If any control parameter element is a closure, abuild
+just calls the closure.  Setting a target's control parameter to a
+list containing a single closure allows you to completely override the
+behavior of the target.  You can also set the control parameter to a
+combination of maps and closures, which enables you to combine custom
+behavior with default behavior.
+
+
+CLASS PATHS
+
+Abuild's java rules define four class paths:
+
+  compile-time: JAR files used at compile time; the classpath argument
+  to javac
+
+  run-time: JAR files used at runtime; the classpath argument when
+  running test suites
+
+  package: JAR files or other archives included in higher level
+  archives
+
+  manifest: JAR files whose names are to be listed in the Class-Path
+  manifest key of JAR files
+
+These four class paths are initialized from the three classpath
+abuild interface variables as follows:
+
+  compile-time: abuild.classpath + abuild.classpath.external - locally
+  created JAR files
+
+  runtime: abuild.classpath + abuild.classpath.external
+
+  package: abuild.classpath
+
+  manifest: abuild.classpath.manifest
+
+Note that we explicitly exclude any locally created JAR files from the
+compile-time class path.  This helps to keep clean builds and
+consistent with incremental builds.  Users of the runtime classpath
+may, in some cases, have to explicitly add locally generated archives
+if they have not been included in abuild.classpath or
+abuild.classpath.external in the host item's Abuild.interface file.
+
+
+OVERRIDING INTERFACE VARIABLES
+
+The classpath values in particular are derived from interface
+variables rather than parameters.  Generally speaking, you should not
+have to override them in Abuild.groovy files, but there may be certain
+instances in which it can be useful.  Because of the way abuild
+initializes parameters when you append to them, it works to do
+something like
+
+  abuild.classpath.external << 'something.jar'
+
+This will convert abuild.classpath.external from an interface variable
+to a parameter, and the parameter value will be used to initialize the
+appropriate class path.
+
+
+TYPES OF DIRECTORIES
+====================
+
+When compiling Java files and creating packages, there are directories
+for the following kinds of things:
+
+ * Java sources: contains .java files that are compiled to .class
+   files with javac
+
+ * Java class files: contains .class files; could contain other
+   generated files as well
+
+ * Resources: contains arbitrary files that are to be packaged
+
+ * META-INF: contains files to go into META-INF except for a few
+   specific types of files that are called out separately
+
+ * web content: contains files that are to be at the root of WAR files
+
+ * WEB-INF: contains files for the WEB-INF directory of WAR files
+
+When creating all types of archives except for WAR files, the package
+is created from the contents of classes and resources directories with
+each file being placed in the archive at the same relative position as
+it was in the classes or resources directory.  Additionally, the
+package's META-INF directory contains files from the META-INF
+locations preserving relative location.
+
+For WAR files, class and resources directories are used to populate
+WEB-INF/classes instead of the root of the archive.  The root of the
+archive takes files from the web content directories, again preserving
+relative location of the files.  The WEB-INF directory is packaged
+from WEB-INF locations in the same manner.
+
+
+DEFAULT PARAMETERS
+==================
+
+The following parameters can be used to add locations in which
+abuild look for specific types of files.  You can append to these in
+your Abuild.groovy file (e.g., java.dir.extraSrc << 'src/java2').  All
+relative paths are treated as relative to the build item directory
+(the one that contains Abuild.groovy).
+
+  java.dir.extraSrc -- additional Java source directories
+  java.dir.extraResources -- additional resource directories
+  java.dir.extraMetainf -- additional META-INF directories
+  java.dir.extraWebContent -- additional web content directories
+  java.dir.extraWebinf -- additional WEB-INF directories
+
+The following parameters contain the default locations where abuild
+will look for various types of files.  They can be be modified to
+deviate from abuild's build conventions.  As a general rule, it's a
+good idea not to modify these.  These values are all treated as
+relative to the build item directory.
+
+  java.dir.src (src/java): location of Java sources
+  java.dir.resources (src/resources): location of resource files
+  java.dir.metainf (src/conf/META-INF): location of META-INF files
+  java.dir.webContent (src/web/content): location of web content
+  java.dir.webinf (src/web/WEB-INF): location of WEB-INF files
+
+The following parameters provide locations that the java rules use for
+generating its outputs.  You can modify these, but you probably
+shouldn't.
+
+  java.dir.dist (dist): for JAR files and other published artifacts
+  java.dir.classes (classes): for .class files
+  java.dir.signedJars (signed-jars): temporary location for signed JARs
+  java.dir.junit (junit): JUnit ouptut
+  java.dir.junitHtml (junit/html): JUnit HTML reports
+
+The following parameters provide the locations for generated files.
+There's really no good reason to change these.  If you are creating a
+code generator, you should use these parameters to decide where to put
+whatever you're generating.  The purposes of the directories are the
+same as their non-generated counterparts.
+
+  java.dir.generatedDoc: abuild-java/doc
+  java.dir.generatedSrc: abuild-java/src/java
+  java.dir.generatedResources: abuild-java/src/resources
+  java.dir.generatedMetainf: abuild-java/src/conf/META-INF
+  java.dir.generatedWebContent: abuild-java/src/web/content
+  java.dir.generatedWebinf: abuild-java/src/web/WEB-INF
+
+
+TARGET DEPENDENCIES
+===================
+
+The following chart illustrates the dependencies among the targets
+provided by the java rules.
+
+  all -> package, wrapper
+
+  package -> package-ear -> { package-high-level-archive, package-war }
+
+  package-high-level-archive -> sign-jars
+
+  package-war -> sign-jars
+
+  wrapper -> package-jar
+
+  sign-jars -> package-jar
+
+  package-jar -> compile -> generate -> init
+
+  test-only -> test-junit
+
+  doc -> javadoc
+
+
+SPECIFIC PARAMETERS
+===================
+
+For each target, we will describe the attributes in its default
+attribute map and where they come from.  From here, it is possible for
+you to figure out which parameter to change to override the default.
+For example, for the package-jar target, the 'jarname' key in the map
+gets its value from the 'java.jarName' parameter.  This means you can
+set the name of the primary JAR artifact by setting java.jarName.
+
+In each case below, we present the map key, its default value usually
+specified as a parameter name, and its purpose.  If a default value is
+given as a particular classpath, its initialization is as described
+above in CLASS PATHS.
+
+COMMON FOR ARCHIVE TARGETS
+--------------------------
+
+Unless otherwise noted, all archive targets' control parameters
+support the following keys:
+
+distdir (java.dir.dist): directory into which artifact will be placed
+classesdir (java.dir.classes): classes directory
+resourcesdirs (java.dir.resources + java.dir.generatedResources):
+        resource directory
+extraresourcesdirs (java.dir.extraResources as list): additional
+        resources directories
+metainfdirs (java.dir.metainf + java.dir.generatedMetainf): META-INF
+        directories
+extrametainfdirs (java.dir.extraMetainf as list): additional META-INF
+        directories
+extramanifestkeys (empty): a map whose keys are extra keys for the
+        Manifest and whose values are the values of those keys
+
+
+TARGET: init
+------------
+
+No customization available.  Initializes internal fields used by other
+rules.
+
+
+TARGET: generate
+----------------
+
+No customization available; no action provided by default.  This
+target is provided for user-provided rules to add closures to in order
+to implement their own code generation steps.  User-provided code
+generators are encouraged to follow the same layered customization
+model as the java rules.
+
+
+TARGET: compile
+---------------
+
+Purpose: compile Java sources into class files
+
+Name of control parameter: java.compile
+
+srcdirs (java.dir.src + java.dir.generatedSrc): source directories
+extrasrcdirs (java.dir.extraSrc as list): additional source
+        directories
+destdir (java.dir.classes): where to write class files
+classpath (compile classpath): compile-time classpath
+compilerargs (['-Xlint', '-Xlint:-path']): additional arguments to javac
+debug (true): value of the debug attribute to the javac ant task
+deprecation (on): value of the deprecation attribute to the javac ant task
+
+Any additional keys are treated passed as additional attributes to the
+javac ant task.
+
+
+TARGET: package-jar
+-------------------
+
+Purpose: create JAR files
+
+Name of control parameter: java.packageJar
+
+contains default archive keys plus the following:
+
+jarname (java.jarName): the name of the JAR to create
+mainclass (java.mainClass): the name of the main class
+manifestclasspath (manifest classpath): the manifest classpath
+
+The "jarname" key (possibly initialized from java.jarName) must be
+defined in order for this target to create any artifact.
+
+Any additional keys are treated passed as additional attributes to the
+jar ant task.
+
+
+TARGET: sign-jars
+-----------------
+
+Purpose: sign JAR files for inclusion in higher level archives
+
+Name of control parameter: java.signJars
+
+alias (java.sign.alias): required attribute of signjar ant task
+storepass (java.sign.storepass): required attribute of signjar ant task
+keystore (java.sign.keystore): optional attribute of signjar ant task
+keypass (java.sign.keypass): optional attribute of signjar ant task
+lazy (true): whether or not to use lazy JAR signing
+signdir (java.dir.signedJars): directory into which to place the signed JARs
+jarstosign (java.jarsToSign): a list of JAR files to sign
+includes ('*.jar'): sign everything in signdir that matches this pattern
+
+This target copies all the jars listed in jarstosign into signdir and
+then signs them in place using the specified parameters.  Lazy JAR
+signing is enabled by default to allow idempotent builds (in other
+words, so that a build of an already-built area doesn't do anything
+new).
+
+In order for this target to do anything, alias and storepass must be
+provided and either jarstosign must be provided or signdir must
+already exist.
+
+jarstosign can contain things other than JAR files, but if you do
+that, you will need to override includes as well.  You can also
+populate signdir on your own and set includes appropriately if needed.
+
+Any additional keys are treated passed as additional attributes to the
+signjars ant task.
+
+
+TARGET: wrapper
+---------------
+
+Purpose: create wrapper scripts for executable JARs that run in the
+context of the source tree; useful for testing without installation
+
+Name of control parameter: java.wrapper
+
+name (java.wrapperName): name of wrapper script
+mainclass (java.mainClass): name of main class
+jarname (java.jarName): name of local JAR file presumably containing
+        main class
+dir (abuild-java): name of directory into which to write the wrapper
+        script
+distdir (java.dir.dist): name of directory in which to find the local
+        JAR file
+classpath (runtime classpath): classpath to include in the wrapper script
+
+The "name" and "mainclass" key must be initialized in order for any
+wrapper scripts to be created.  The "jarname" key may be set to
+include a local JAR file if that JAR is not in the class path.
+
+Any additional keys are ignored.
+
+
+TARGET: package-war
+-------------------
+
+Purpose: create WAR files
+
+Name of control parameter: java.packageWar
+
+contains default archive keys plus the following:
+
+warname (java.warName): name of WAR file
+webxml (java.webxml): path to the web.xml file
+webdirs (java.dir.webContent + java.dir.generatedWebContent): web
+        content directories
+extrawebdirs (java.dir.extraWebContent as list): additional web
+        content directories
+webinfdirs (java.dir.webinf + java.dir.generatedWebinf): WEB-INF
+        directories
+extrawebinfdirs (java.dir.extraWebinf as list): additional WEB-INF
+        directories
+signedjars (java.dir.signedJars): directory containing signed JARS to
+	include at the root of the WAR file
+libfiles (java.warLibJars as list): JAR files to include in the WAR
+        under WEB-INF/lib
+
+Unlike other high level archives, the default package classpath is not
+used by default for any purpose.  In order to get JAR files into the
+WAR file, they must either be in the "signedjars" directory or they
+must be listed in the "libfiles" key.  A typical WAR file will list
+all the JARs it wants at the root of the archive in the
+java.jarsToSign parameter and all those it wants in its WEB-INF/lib
+directory in the java.warLibJars parameter.  Since the package-war
+target depends on the sign-jars target, this will cause signed
+versions of the JARs to get appropriately included in the right place.
+
+The "warname" and "webxml" parameters must be set in order for this
+target to do anything.
+
+Any additional keys are treated passed as additional attributes to the
+war ant task.
+
+
+TARGET: package-high-level-archive
+----------------------------------
+
+Purpose: create high-level JAR-like archives that may contain other
+archives; one example of what you would use this for would be creation
+of RAR files
+
+Name of control parameter: java.packageHighLevelArchive
+
+contains default archive keys plus the following:
+
+highlevelarchivename (java.highLevelArchiveName): the name of the
+        archive to create
+filestopackage (package classpath): additional files to include at
+        the root of the archive
+
+The "highlevelarchivename" key must have a value in order for this
+target to do anything.  The default behavior is to include all the
+files in the abuild.classpath interface variable in the higher level
+archive.  You can use the filestopackage key to include other files,
+which don't have to be archives.  You can also make such files appear
+by having them be in src/resources or abuild-java/src/resources, but
+using filestopackage can avoid having to copy them from other
+locations.
+
+Any additional keys are treated passed as additional attributes to the
+jar ant task.
+
+
+TARGET: package-ear
+-------------------
+
+Purpose: create EAR files
+
+Name of control parameter: java.packageEar'
+
+contains default archive keys *except classesdir* plus the following:
+
+earname (java.earName): the name of the EAR file
+appxml (java.appxml): path to the application.xml file
+filestopackage (package classpath): additional files to include at
+        the root of the archive
+
+The "earname" and "appxml" keys must have values in order for this
+target to do anything.  The default behavior is to include all the
+files in the abuild.classpath interface variable in the EAR file.  You
+can use the filestopackage key to include files other files, which
+don't have to be archives.  You can also make such files appear by
+having them be in src/resources or abuild-java/src/resources, but
+using filestopackage can avoid having to copy them from other
+locations.
+
+Any additional keys are treated passed as additional attributes to the
+ear ant task.
+
+
+TARGET: test-junit
+------------------
+
+Purpose: run JUnit test suites
+
+Name of control parameter: java.junit
+
+testsuite: (java.junitTestsuite): name of a class containing a JUnit
+        test suite
+batchincludes (java.junitBatchIncludes): pattern matching classes in
+        the classesdir in which to find JUnit test suites
+batchexcludes (java.junitBatchExcludes): pattern to filter out classes
+        in the classes directory from being searched for JUnit test
+        suites
+classpath (runtime classpath): classpath during test suite run
+classesdir (java.dir.classes): directory searched for classes
+        containing test suites
+distdir (java.dir.dist): directory containing local archives; all JAR
+        files in this directory are added to the classpath
+junitdir (java.dir.junit): directory in which to write the XML test
+        results
+reportdir (java.dir.junitHtml): directory in which to write the HTML
+        JUnit report
+printsummary (yes): passed as an attribute to junit
+haltonfailure (yes): passed as an arguments to junit
+fork (yes): passed as an arguments to junit
+
+At least one of "testsuite" or "batchincludes" must be set for this to
+do anything.  This target runs JUnit test suites and generates a
+report.  A report will be generated even if the tests fail.  This does
+not interfere with the affect of haltonfailure.
+
+Any additional keys are treated passed as additional attributes to the
+junit ant task.
+
+
+TARGET: javadoc
+---------------
+
+Purpose: generate javadoc documentation
+
+Name of control parameter: java.javadoc
+
+Doctitle (java.javadocTitle)
+Windowtitle (java.javadocTitle)
+srcdirs (java.dir.src + java.dir.generatedSrc)
+extrasrcdirs (java.dir.extraSrc as list)
+classpath (compile classpath)
+access (java.doc.accessLevel if set, or 'protected')
+destdir (java.dir.generatedDoc)
+
+All keys above plus any additional ones are passed to as arguments to
+the javadoc ant task with the exception of srcdirs and extrasrcdirs.
+Those are combined and passed as the "sourcepath" attribute.
+
+At least one source directory must exist for this target to do
+anything.

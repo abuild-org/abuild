@@ -13,6 +13,7 @@ abuild: failing (abuild-java): test
     [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: <time>
 [junitreport]...
 abuild-groovy: ERROR: ant build failure: Test com.example.FailingTest failed
+abuild-groovy: ERROR: not building target "test-only" because of failure of its dependencies
 abuild: failing (abuild-java): build failed
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: failing on platform java
