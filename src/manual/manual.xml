@@ -15574,6 +15574,24 @@ Y = $(X)
          </listitem>
         </itemizedlist>
        </listitem>
+       <listitem>
+        <para>
+         Other Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           QTest-based test suites are not invoked using a custom
+           <command>qtest</command> ant task from both the Groovy
+           backend and the legacy ant backend.  This means that when
+           qtest-based test suites are run on Windows from the
+           legacy-based ant backend, it now works to have
+           <command>qtest-driver</command> be a shell-script wrapper
+           around the actual perl implementation.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
