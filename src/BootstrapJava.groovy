@@ -56,7 +56,9 @@ ant.touch('file': '.abuild')
 ant.javac('deprecation': 'yes',
           'destdir': classesDir,
           'classpath': antJar,
-          'srcdir': srcDir.absolutePath)
+          'srcdir': srcDir.absolutePath,
+          'source': '1.5',
+          'target': '1.5')
 {
     compilerarg('value': '-Xlint')
 }
