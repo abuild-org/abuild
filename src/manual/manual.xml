@@ -15581,7 +15581,7 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           QTest-based test suites are not invoked using a custom
+           QTest-based test suites are now invoked using a custom
            <command>qtest</command> ant task from both the Groovy
            backend and the legacy ant backend.  This means that when
            qtest-based test suites are run on Windows from the
