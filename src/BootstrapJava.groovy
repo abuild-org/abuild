@@ -1,7 +1,5 @@
 #!/usr/bin/env groovy
 
-import org.codehaus.groovy.control.CompilationFailedException
-
 File srcDir = new File("java-support/src/java")
 File groovySrcDir = new File("java-support/src/groovy")
 if (! srcDir.isDirectory())
