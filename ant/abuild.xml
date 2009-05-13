@@ -83,6 +83,7 @@
  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
  <taskdef name="abuild-setup" classname="org.abuild.ant.AntSetup"/>
  <taskdef name="run-hooks" classname="org.abuild.ant.HookRunner"/>
+ <taskdef name="qtest" classname="org.abuild.ant.QTest"/>
 
  <!--
 
@@ -711,23 +712,19 @@ exec java -classpath ${wrapper.classpath} ${abuild.main-class} ${1+"$@"}
  <available property="abuild.private.need-qtest"
             file="${abuild.private.dir.item}/qtest"/>
 
+ <condition property="abuild.private.qtest.tty"
+            value="true" else="false">
+  <equals arg1="${ABUILD_STDOUT_IS_TTY}" arg2="1"/>
+ </condition>
+
+ <condition property="abuild.private.qtest.emacs"
+            value="true" else="false">
+  <equals arg1="${abuild.private.emacs-mode}" arg2="1"/>
+ </condition>
+
  <target name="-test-qtest" if="abuild.private.need-qtest">
-  <!--  Note: in order to make it possible to run qtest-driver     -->
-  <!--  with the cygwin perl from a native Windows environment,    -->
-  <!--  pass explicitly relative paths for -datadir, -bindirs,     -->
-  <!--  and -covdir rather than using properties.                  -->
-  <exec failonerror="true" executable="perl" dir=".">
-   <env key="QTEST_EXTRA_MARGIN" value="${abuild.private.qtest_extra_margin}"/>
-   <arg value="-S"/>
-   <arg value="qtest-driver"/>
-   <arg value="-stdout-tty=${ABUILD_STDOUT_IS_TTY}"/>
-   <arg value="-datadir"/>
-   <arg value="../qtest"/>
-   <arg value="-bindirs"/>
-   <arg value="..:."/>
-   <arg value="-covdir"/>
-   <arg value=".."/>
-  </exec>
+  <qtest emacsmode="${abuild.private.qtest.emacs}"
+         stdoutistty="${abuild.private.qtest.tty}"/>
  </target>
 
  <target name="deploy" depends="all" description="Deploy packages">
