@@ -63,6 +63,7 @@ ant.javac('deprecation': 'yes',
 ant.groovyc('destdir': classesDir,
             'classpath': classesDir,
             'srcdir': groovySrcDir.absolutePath)
-ant.jar('destfile': distDir + '/abuild-java-support.jar',
-        'basedir': classesDir,
-        'includes': '**/*.class')
+ant.jar('destfile': distDir + '/abuild-java-support.jar') {
+    fileset('dir': classesDir)
+    fileset('dir': '../src/resources')
+}
