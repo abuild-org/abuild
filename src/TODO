@@ -9,6 +9,44 @@ Abuild Lint
    anymore.
 
 
+GUI
+===
+
+Command Builder
+---------------
+
+ * It would be fairly easy to create a GUI for launching abuild akin
+   to what was in Xenon.  Use a fancy dialog to construct an abuild
+   command.  Ideally, it should be possible to select build items from
+   a list for being added to the build set.
+
+Monitor/Inspector
+-----------------
+
+Have an option for abuild to pop up a GUI after traversal.  We would
+be able to do the following things:
+
+ * In pure inspection mode, see a graphical depiction of the
+   dependency graph.  We could possibly present this either in
+   graphical form or in tabular form.  In all cases, we should be able
+   to analyze the graph to find collections of items such that all
+   paths going into the collection pass through a particular edge (as
+   in with a proxy item that depends on private names within itself).
+   This helps us to decrease the visible portions of the graph.  Such
+   a graphical mode should be interactive, allowing things to be
+   expanded and collapsed, and allowing people to trace through
+   forward and reverse dependencies.
+
+ * In montored mode, each node should have a color indicating its
+   dependency runner state (waiting, ready, running, completed,
+   failed, depfailed) so one can watch the overall build progress.
+
+Probably the best way to implement these would be through a
+swing-based GUI that could be started from a Java (or maybe Groovy or
+Groovy + Java) program that would communicate with abuild through a
+socket.
+
+
 Windows Issues
 ==============
 
