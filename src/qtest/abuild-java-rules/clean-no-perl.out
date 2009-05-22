@@ -1,0 +1,5 @@
+abuild: cleaning groovy-runtime in groovy-runtime
+abuild: cleaning lib1 in simple/lib1
+abuild: cleaning lib2 in simple/lib2
+abuild: cleaning multijar in multijar
+abuild: cleaning prog in simple/prog

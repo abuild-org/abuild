@@ -38,6 +38,40 @@ $td->runtest("java startup failure",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+my $cygwin = ($^O eq 'cygwin');
+if ($cygwin)
+{
+    # Test to make sure a java build will work if we don't have perl.
+    my $opath = $ENV{'PATH'};
+    my @path = ();
+    foreach my $p (split(':', $opath))
+    {
+	if ((-e "$p/perl") || (-e "$p/perl.exe") ||
+	    (-e "$p/uname") || (-e "$p/uname.exe"))
+	{
+	    # exclude from path
+	}
+	else
+	{
+	    push(@path, $p);
+	}
+    }
+    $ENV{'PATH'} = join(':', @path);
+    system("abuild --build=all > build-java.out 2>&1");
+    system("abuild --clean=all > clean-java.out 2>&1");
+    $ENV{'PATH'} = $opath;
+    $td->runtest("build java without perl in path",
+		 {$td->FILE => "build-java.out",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/build-java-no-perl.out"},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("clean without perl in path",
+		 {$td->FILE => "clean-java.out",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/clean-no-perl.out"},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 $td->runtest("build",
 	     {$td->COMMAND => "abuild -b all doc",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
@@ -230,4 +264,7 @@ else
 
 check_work_accessed($td, 'not-accessed.out');
 
-$td->report(24 + ($test_junit ? 3 : 0) + (in_windows() ? 1 : 0));
+$td->report(24 +
+	    ($test_junit ? 3 : 0) +
+	    (in_windows() ? 1 : 0) +
+	    ($cygwin ? 2 : 0));
