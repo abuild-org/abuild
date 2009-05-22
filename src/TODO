@@ -274,9 +274,6 @@ See also "Known Limitations" in the documentation.
    commented template files.  Alternatively, could be a command-line
    wizard or something.
 
- * To check for all Abuild.mk files that define local targets:
-   pcregrep '^\s*\S+\s*:(\Z|[^=])' **/Abuild.mk
-
  * It would be nice if there were a mechanism for providing
    documentation on traits so that --list-traits could tell the user
    how each trait was intended to be used.
@@ -311,10 +308,6 @@ See also "Known Limitations" in the documentation.
 
     - example: library name inconsistency between Abuild.mk and
       Abuild.interface
-
- * Java out of memory problem with ant is reportedly fixed with
-   1.5.0_12.  Actually, it still happens with 1.5.0_15, but much less
-   often.
 
  * abuild_contrib: include a generic UNIX compiler configurable plugin
    for which the user can set up the compliation commands using
