@@ -260,6 +260,7 @@ if ($make_static)
     safe_rename("$abuild.real", $abuild);
 }
 
+my $test_failed = 0;
 if ($build_java)
 {
     run("groovy BootstrapJava.groovy");
@@ -274,7 +275,12 @@ if ($test_mkdist)
 }
 else
 {
-    run("$abuild check");
+    if (system("$abuild check") != 0)
+    {
+	safe_copy("$abuild_outdir/qtest.log", "$tmpdir/../qtest.log");
+	test_warning();
+	$test_failed = 1;
+    }
 }
 
 safe_chdir($tmpdir);
@@ -400,6 +406,8 @@ if (defined $static_dist)
     print "$whoami: created $static_dist.tar.bz2\n";
 }
 
+test_warning() if $test_failed;
+
 sub get_manifest_dirs
 {
     # Find all system directories in which to search for DLLs based on
@@ -450,6 +458,14 @@ sub get_manifest_dirs
     }
 
     @dirs;
+}
+
+sub test_warning
+{
+    print  "\n\n********\n";
+    print "WARNING: TEST SUITE FAILED!\n";
+    print "CHECK qtest.log BEFORE RELEASING\n";
+    print "********\n\n\n";
 }
 
 sub safe_mkdir
