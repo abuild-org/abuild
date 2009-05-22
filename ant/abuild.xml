@@ -81,9 +81,7 @@
 
  <!-- Load task definitions -->
  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
- <taskdef name="abuild-setup" classname="org.abuild.ant.AntSetup"/>
- <taskdef name="run-hooks" classname="org.abuild.ant.HookRunner"/>
- <taskdef name="qtest" classname="org.abuild.ant.QTest"/>
+ <taskdef resource="org/abuild/ant/tasks.properties"/>
 
  <!--
 
