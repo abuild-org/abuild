@@ -7,7 +7,7 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.0.b1">
+<!ENTITY swversion "1.1.b1">
 <!ENTITY lastreleased "May 22, 2009">
 ]>
 <!--
@@ -519,7 +519,7 @@ following checks:
       &abuild; releases, we use the following version numbering
       convention:
 
-      <programlisting><replaceable>major</replaceable>.<replaceable>minor</replaceable>.<replaceable>update</replaceable>[.<replaceable>prerelease</replaceable>]
+      <programlisting><replaceable>major</replaceable>.<replaceable>minor</replaceable>.<replaceable>prerelease-or-update</replaceable>
 </programlisting>
      </para>
      <para>
@@ -533,60 +533,59 @@ following checks:
       The <replaceable>minor</replaceable> field of the version number
       indicates the minor version number.  It changes whenever a minor
       release is made.  A minor release is an incremental release that
-      may introduce new features, fix bugs, or change the way some
-      things work, but it will not fundamentally shift the way
-      &abuild; works.  We impose tight restrictions on the
+      may introduce significant new features, fix bugs, or change the
+      way some things work, but it will not fundamentally shift the
+      way &abuild; works.  We impose tight restrictions on the
       introduction of non-backward-compatible changes in minor
       releases as discussed below.
      </para>
      <para>
-      The <replaceable>update</replaceable> field indicates a
-      maintenance release within a minor release.  A maintenance
-      release may contain bug fixes or new features as long as no
-      non-compatible changes are made to existing functionality.
-      Allowing new non-breaking features to be introduced in a patch
+      The <replaceable>prerelease-or-update</replaceable> field can
+      indicate either a prerelease version or an update release of a
+      specific minor version.  A prerelease is an alpha or beta
+      release or a release candidate that precedes a regular release.
+      An update release may contain bug fixes or new features as long
+      as no non-compatible changes are made to existing functionality.
+      Allowing new non-breaking features to be introduced in an update
       release makes it possible to add features to &abuild;
       incrementally while still guaranteeing as much compatibility as
-      possible.
-     </para>
-     <para>
-      The <replaceable>prerelease</replaceable> field indicates a prerelease
-      version.  A prerelease is an alpha or beta release or a release
-      candidate that precedes a regular release.
+      possible.  There is no support for a prerelease of an update to
+      a specific minor version (like 1.1.1.b1).
      </para>
      <para>
       Before a regular major or minor release, there may be a series
       of alpha releases, beta releases, and release candidates.  In
-      those cases, the <replaceable>prerelease</replaceable> field of
-      the version number is either &ldquo;<literal>a</literal>&rdquo;,
+      those cases, the <replaceable>prerelease-or-update</replaceable>
+      field of the version number is either
+      &ldquo;<literal>a</literal>&rdquo;,
       &ldquo;<literal>b</literal>&rdquo;, or
       &ldquo;<literal>rc</literal>&rdquo; followed by a number.  The
       prerelease version numbers clearly indicate which regular
       release the prerelease applies to.  For example, version
-      <literal>1.3.0.a4</literal> would be the fourth alpha release
+      <literal>1.3.a4</literal> would be the fourth alpha release
       preceding the release of version <literal>1.3.0</literal>.
      </para>
      <para>
-      As a historical note, prior to the release of version 1.1.0.b1,
-      the <replaceable>update</replaceable> and
-      <replaceable>prerelease</replaceable> fields of the version were
-      combined.  As such, there was a version 1.0 but no version
-      1.0.0, and all the alpha releases preceding version 1.1.0 were
-      1.1.a<replacable>n</replacable> rather than
-      1.1.0.a<replaceable>n</replaceable>.  The change to require the
-      update release was made in order to disambiguate whether
-      referring to a version with just major and minor refers to the
-      first release or all releases of that major and minor.  It also
-      makes it easier to add an alias like
-      <command>abuild-1.1</command> to always point to the latest
-      1.1.x release of &abuild;
+      After any major or minor release, it is possible that a small
+      problem may be corrected in a bug-fix release.  In such a
+      release, the <replaceable>prerelease-or-update</replaceable>
+      field contains a number that indicates which bug-fix release
+      this is.  For example, version <literal>1.2.1</literal> would be
+      a bug-fix release to version <literal>1.2.0</literal>.
+     </para>
+     <para>
+      Historical note: the first release of &abuild; 1.0 was just
+      version 1.0, not version 1.0.0.  The use of &ldquo;x.y.0&rdquo;
+      was introduced with version 1.1.0 so that &ldquo;abuild
+      x.y&rdquo; could unambiguously refer to all update releases of
+      minor version x.y rather than just the first.
      </para>
     </sect2>
     <sect2 id="ref.compatibility-policy">
      <title>Backward Compatibility Policy</title>
      <para>
-      In a new major release of &abuild; (e.g., version 2.0), there is
-      no promise that changes will be backward compatible, nor is
+      In a new major release of &abuild; (e.g., version 2.0.0), there
+      is no promise that changes will be backward compatible, nor is
       there any expectation that configuration files from older
       &abuild; releases will work with the new version.  When
       possible, care will be taken to mitigate any inconvenience such
@@ -638,20 +637,23 @@ following checks:
       feature appeared in version <literal>1.4.a2</literal> and if the
       feature were changed in a non-compatible way in
       <literal>1.4.a6</literal>.  However, after version
-      <literal>1.4.rc1</literal> was released, the next non-compatible
+      <literal>1.4.0</literal> was released, the next non-compatible
       change would not be permitted until version
       <literal>1.5.a1</literal>, and even then, the feature as it
-      worked in version <literal>1.4</literal> would still have to
+      worked in version <literal>1.4.0</literal> would still have to
       work, though a deprecation warning would be issued.  The old
-      version <literal>1.4</literal> way of doing things could stop
+      version <literal>1.4.x</literal> way of doing things could stop
       working altogether in version <literal>1.6.a1</literal>.  It is
       also okay to add a new feature <emphasis>within</emphasis> a
-      minor release.  For example, it's okay if 1.0.3 adds some
-      feature that wasn't there in 1.0.2 as long as everything that
-      worked in 1.0.2 works the same way in 1.0.3.  In other words,
-      although everything that worked in 1.0.2 must work in 1.0.3,
-      there's no expectation that everything that works in 1.0.3 must
-      have worked in 1.0.2.
+      minor release.  For example, it's okay if
+      <literal>1.0.3</literal> adds some feature that wasn't there in
+      <literal>1.0.2</literal> as long as everything that worked in
+      <literal>1.0.2</literal> works the same way in
+      <literal>1.0.3</literal>.  In other words, although everything
+      that worked in <literal>1.0.2</literal> must work in
+      <literal>1.0.3 </literal>, there's no expectation that
+      everything that works in <literal>1.0.3</literal> must have
+      worked in <literal>1.0.2</literal>.
      </para>
     </sect2>
    </sect1>
@@ -15559,7 +15561,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.0.b1: May 22, 2009</term>
+     <term>1.1.b1: May 22, 2009</term>
      <listitem>
       <itemizedlist>
        <listitem>

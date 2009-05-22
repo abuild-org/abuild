@@ -59,7 +59,7 @@ if ($src_dist eq '.')
 else
 {
     usage() unless
-	$src_dist =~ m/^abuild-(\d+\.\d+\.\d+(?:\.(a|b|rc)\d+)?)\.tar.bz2$/;
+	$src_dist =~ m/^abuild-(\d+\.\d+\.(?:a|b|rc)?\d+)\.tar.bz2$/;
     $version = $1;
 }
 
