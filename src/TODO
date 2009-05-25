@@ -250,6 +250,10 @@ Known Bugs
    ansi color codes, but they don't get displayed right through ant,
    at least in cygwin.
 
+ * With ant 1.7.1, the jar task is not idempotent when multiple
+   filesets add the same directory.  This is reported:
+   https://issues.apache.org/bugzilla/show_bug.cgi?id=45902
+
 
 Capture of Backend Output
 =========================
