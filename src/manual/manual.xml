@@ -15561,6 +15561,28 @@ Y = $(X)
  end template -->
 
     <varlistentry>
+     <term>1.1.b2: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Miscellaneous Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Although no bugs were specifically known, &abuild;'s
+           multithreading code was further tightened to reduce the
+           possibility race conditions occurring when build of two
+           build items started or ended simultaneously.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.b1: May 22, 2009</term>
      <listitem>
       <itemizedlist>

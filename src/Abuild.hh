@@ -190,7 +190,8 @@ class Abuild
     bool isAnyItem(std::string const& name, std::string const& platform);
     bool itemBuilder(std::string builder_string, item_filter_t filter,
 		     bool is_dep_failure);
-    bool buildItem(std::string const& item_name,
+    bool buildItem(boost::mutex::scoped_lock& build_lock,
+		   std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item);
     std::string createOutputDirectory(std::string const& item_platform,
@@ -238,26 +239,31 @@ class Abuild
 	bool relative);
     void appendToolchainPaths(std::list<std::string>& toolchain_dirs,
 			      std::string const& dir);
-    bool invoke_gmake(std::string const& item_name,
+    bool invoke_gmake(boost::mutex::scoped_lock& build_lock,
+		      std::string const& item_name,
 		      std::string const& item_platform,
 		      BuildItem& build_item,
 		      std::string const& dir,
 		      std::list<std::string> const& targets);
-    bool invoke_ant(std::string const& item_name,
+    bool invoke_ant(boost::mutex::scoped_lock& build_lock,
+		    std::string const& item_name,
 		    std::string const& item_platform,
 		    BuildItem& build_item,
 		    std::string const& dir,
 		    std::list<std::string> const& targets);
-    bool invoke_groovy(std::string const& item_name,
+    bool invoke_groovy(boost::mutex::scoped_lock& build_lock,
+		       std::string const& item_name,
 		       std::string const& item_platform,
 		       BuildItem& build_item,
 		       std::string const& dir,
 		       std::list<std::string> const& targets);
-    bool invokeJavaBuilder(std::string const& backend,
+    bool invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
+			   std::string const& backend,
 			   std::string const& build_file,
 			   std::string const& dir,
 			   std::list<std::string> const& targets);
-    bool invokeBackend(std::string const& progname,
+    bool invokeBackend(boost::mutex::scoped_lock& build_lock,
+		       std::string const& progname,
 		       std::vector<std::string> const& args,
 		       std::map<std::string, std::string> const& environment,
 		       char* old_env[],

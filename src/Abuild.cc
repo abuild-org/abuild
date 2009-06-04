@@ -6035,12 +6035,16 @@ bool
 Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 		    bool is_dep_failure)
 {
-    // Remember: this method, and therefore all methods it calls, may
-    // be run simultaenously from multiple threads.  Therefore, any
-    // shared data structures that are modified must be
-    // mutex-protected for all accesses, both read and write.
-    // this->build_mutex is provided for this purpose.  This code
-    // should take pains to avoid gratuitous modification to data.
+    // This method, and therefore all methods it calls, may be run
+    // simultaenously from multiple threads.  With the exception of
+    // invoking the backend, we really want these activities to be
+    // serialized since there are many operations that could
+    // potentially write to shared resources.  As such, we acquire a
+    // unique_lock (through scoped_lock) on build_mutex.  Right before
+    // invocation of the backend (if any), the lock is explicitly
+    // unlocked.  It is then relocked after the backend returns.
+
+    boost::mutex::scoped_lock build_lock(this->build_mutex);
 
     // NOTE: This function must not return failure without adding the
     // failed builder_string to the failed_builds list.
@@ -6073,11 +6077,6 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 
     if (use_interfaces)
     {
-	// Although createItemInterface modifies this build item and
-	// accesses build items that this one depends on, we are
-	// guaranteed that no dependent build items will be being
-	// built at the same time as this one is.  Therefore, this
-	// operation does not require mutex protection.
 	status = createItemInterface(
 	    builder_string, item_name, item_platform, build_item, parser);
     }
@@ -6101,7 +6100,8 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    }
 	    else
 	    {
-		status = buildItem(item_name, item_platform, build_item);
+		status = buildItem(
+		    build_lock, item_name, item_platform, build_item);
 	    }
 	}
 
@@ -6144,7 +6144,6 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     if (! status)
     {
         notice(item_name + " (" + output_dir + "): build failed");
-	boost::mutex::scoped_lock lock(this->build_mutex);
 	this->failed_builds.push_back(builder_string);
     }
 
@@ -6486,7 +6485,8 @@ Abuild::readAfterBuilds(std::string const& item_name,
 }
 
 bool
-Abuild::buildItem(std::string const& item_name,
+Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
+		  std::string const& item_name,
 		  std::string const& item_platform,
 		  BuildItem& build_item)
 {
@@ -6528,17 +6528,20 @@ Abuild::buildItem(std::string const& item_name,
     switch (build_item.getBackend())
     {
       case ItemConfig::b_make:
-	result = invoke_gmake(item_name, item_platform, build_item,
+	result = invoke_gmake(build_lock,
+			      item_name, item_platform, build_item,
 			      abs_output_dir, backend_targets);
 	break;
 
       case ItemConfig::b_ant:
-	result = invoke_ant(item_name, item_platform, build_item,
+	result = invoke_ant(build_lock,
+			    item_name, item_platform, build_item,
 			    abs_output_dir, backend_targets);
 	break;
 
       case ItemConfig::b_groovy:
-	result = invoke_groovy(item_name, item_platform, build_item,
+	result = invoke_groovy(build_lock,
+			       item_name, item_platform, build_item,
 			       abs_output_dir, backend_targets);
 	break;
 
@@ -6722,7 +6725,8 @@ Abuild::appendToolchainPaths(std::list<std::string>& toolchain_dirs,
 }
 
 bool
-Abuild::invoke_gmake(std::string const& item_name,
+Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
+		     std::string const& item_name,
 		     std::string const& item_platform,
 		     BuildItem& build_item,
 		     std::string const& dir,
@@ -6876,13 +6880,14 @@ Abuild::invoke_gmake(std::string const& item_name,
     make_argv.insert(make_argv.end(),
 		     targets.begin(), targets.end());
 
-    return invokeBackend(this->gmake, make_argv,
+    return invokeBackend(build_lock, this->gmake, make_argv,
 			 std::map<std::string, std::string>(),
 			 this->envp, dir);
 }
 
 bool
-Abuild::invoke_ant(std::string const& item_name,
+Abuild::invoke_ant(boost::mutex::scoped_lock& build_lock,
+		   std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item,
 		   std::string const& dir,
@@ -6979,11 +6984,12 @@ Abuild::invoke_ant(std::string const& item_name,
 	build_file = this->abuild_top + "/ant/abuild.xml";
     }
 
-    return invokeJavaBuilder("ant", build_file, dir, targets);
+    return invokeJavaBuilder(build_lock, "ant", build_file, dir, targets);
 }
 
 bool
-Abuild::invoke_groovy(std::string const& item_name,
+Abuild::invoke_groovy(boost::mutex::scoped_lock& build_lock,
+		      std::string const& item_name,
 		      std::string const& item_platform,
 		      BuildItem& build_item,
 		      std::string const& dir,
@@ -7098,11 +7104,12 @@ Abuild::invoke_groovy(std::string const& item_name,
 
     dyn.close();
 
-    return invokeJavaBuilder("groovy", "", dir, targets);
+    return invokeJavaBuilder(build_lock, "groovy", "", dir, targets);
 }
 
 bool
-Abuild::invokeJavaBuilder(std::string const& backend,
+Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
+			  std::string const& backend,
 			  std::string const& build_file,
 			  std::string const& dir,
 			  std::list<std::string> const& targets)
@@ -7122,12 +7129,17 @@ Abuild::invokeJavaBuilder(std::string const& backend,
 	verbose("  targets: " + Util::join(" ", targets));
     }
 
+    // Explicitly unlock the build lock during invocation of the
+    // backend
+    build_lock.unlock();
     return this->java_builder->invoke(
 	backend, build_file, dir, targets);
+    build_lock.lock();
 }
 
 bool
-Abuild::invokeBackend(std::string const& progname,
+Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
+		      std::string const& progname,
 		      std::vector<std::string> const& args,
 		      std::map<std::string, std::string> const& environment,
 		      char* old_env[],
@@ -7142,7 +7154,11 @@ Abuild::invokeBackend(std::string const& progname,
 	verbose("running " + Util::join(" ", args));
     }
 
+    // Explicitly unlock the build lock during invocation of the
+    // backend
+    build_lock.unlock();
     return Util::runProgram(progname, args, environment, old_env, dir);
+    build_lock.lock();
 }
 
 void
