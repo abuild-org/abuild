@@ -141,7 +141,10 @@ class JavaBuilder
 
     private synchronized void sendResponse(String number, boolean result)
     {
+	// Synchronize writing responses, including a flush, in hopes
+	// of avoiding sending interleaved responses.
 	responseStream.println(number + " " + (result ? "true" : "false"));
+	responseStream.flush();
     }
 
     private void run()
