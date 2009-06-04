@@ -33,6 +33,43 @@ my $savecount = 0;
 
 setup($td);
 
+cd("work/delays");
+if ($test_java)
+{
+    # This test would fail if a multithreaded build actually ran all
+    # the builds serially in a single thread.  It does have a little
+    # bit of a timing issue in it: it will fail if more than the delay
+    # in the "sleep" build item (two seconds at the initial writing)
+    # elapses between the start of building the first item and the
+    # last item.  This build builds four items that all print a before
+    # and after string.  There are two make-based items and two
+    # java-based items.  The sequence groups in the test output ensure
+    # that the before of one of the make-based items precedes the
+    # after of an earlier java-based item and that the before of one
+    # of the java-based items precedes the after of an earlier
+    # make-based item.  In a single threaded build, the output would
+    # alternate between before and after.  In a multithreaded build,
+    # all the befores precede all the afters.  There's one extra build
+    # item in the mix that is java-based and that all the others
+    # depend on.  This is just to make sure the java builder
+    # application is running so that the delay of starting it up
+    # doesn't count toward the overall delay.
+    $td->runtest("uses multiple threads",
+		 {$td->COMMAND => "abuild -b all --silent -j4"},
+		 {$td->FILE => "$top/multiple-threads.out",
+		  $td->EXIT_STATUS => 0,
+		  $td->THREAD_DATA =>
+		  {$td->TD_THREADS => [qw(start-java a s d f)],
+		   $td->TD_SEQGROUPS => [qw(s1 s2)]}});
+}
+else
+{
+    system("(tar cf - . | cat > /dev/null)");
+    $td->emphasize("The test that actually ensures multithreaded" .
+		   " builds use multiple threads");
+    $td->emphasize("is not run when not building/testing Java support.");
+}
+
 cd("work/basic");
 runtest("mixed success and failure", "mixed.out", 3);
 
@@ -56,7 +93,8 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(1 + ($nreps * (2 + ($test_java ? 2 : 0))));
+$td->report(1 + ($test_java ? 10 : 0) +
+	    ($nreps * (2 + ($test_java ? 2 : 0))));
 
 sub runtest
 {

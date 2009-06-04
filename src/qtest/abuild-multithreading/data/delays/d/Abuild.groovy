@@ -1,0 +1,3 @@
+parameters {
+    abuild.rules = 'empty'
+}

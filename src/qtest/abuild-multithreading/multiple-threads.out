@@ -1,0 +1,10 @@
+[[start-java]]:((s1,s2))start-java before
+[[start-java]]:((s1,s2))start-java after
+[[a]]:a before
+[[d]]:d before
+[[f]]:((s1))f before
+[[s]]:((s2))s before
+[[a]]:((s1))a after
+[[d]]:((s2))d after
+[[f]]:f after
+[[s]]:s after
