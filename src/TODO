@@ -1,4 +1,15 @@
 
+Before 1.1
+==========
+
+ * Rewrite command line parsing to be more flexible.  We should
+   tolerate - and -- where possible as well as --option=val and
+   --option val when we can.  Also, have later options override
+   earlier ones rather than contradict so it's possible do something
+   like alias abuild='abuild --no-deps' and then run abuild -d.  Keep
+   --with-deps and -d around and fully documented for this purpose.
+
+
 Abuild Lint
 ==============
 
