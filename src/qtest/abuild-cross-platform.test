@@ -81,6 +81,8 @@ $td->runtest("dump build graph",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+validate_dump_build_graph($td, "-b desc");
+
 cd("work/case3");
 
 $td->runtest("cross-platform dependencies",
@@ -202,4 +204,4 @@ $td->runtest("list_platforms --native-data",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(29);
+$td->report(30);

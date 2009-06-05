@@ -1,0 +1,35 @@
+<!--  This DTD describes the format of the output of the files     -->
+<!--  created by abuild dump-build-graph.  Inline comments         -->
+<!--  explain the details.                                         -->
+
+<!--  The version attribute is always "1".  We will only           -->
+<!--  increment this if there is a change to the output such that  -->
+<!--  previously valid data is either no longer valid or is valid  -->
+<!--  but has different semantics.  Adding new attributes with     -->
+<!--  default values, optional attributes, or optional elements    -->
+<!--  will not cause the version number to be increased.  Code     -->
+<!--  that reads this output should be prepared to accept and      -->
+<!--  ignore unknown attributes or elements.  The item-name and    -->
+<!--  item-platform attributes describe the name and platform of   -->
+<!--  the item whose interface this is.                            -->
+<!ELEMENT build-graph (item*)>
+<!ATTLIST build-graph
+  version         CDATA     #REQUIRED
+>
+
+<!--  One item element appears for each platform built for each    -->
+<!--  item.  It corresponds to the item/platform pair.  The        -->
+<!--  attributes are self-explanatory.                             -->
+<!ELEMENT item (dep*)>
+<!ATTLIST item
+  name                  CDATA     #REQUIRED
+  platform              CDATA     #REQUIRED
+>
+
+<!--  One dep element appears for each direct dependency of each   -->
+<!--  item/platform pair.  The attributes are self-explanatory.    -->
+<!ELEMENT dep EMPTY>
+<!ATTLIST dep
+  name                  CDATA     #REQUIRED
+  platform              CDATA     #REQUIRED
+>

@@ -113,6 +113,18 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild-monitor: begin-dump-build-graph
+<?xml version="1.0"?>
+<build-graph version="1">
+ <item name="af-dep" platform="indep"/>
+ <item name="af" platform="indep">
+  <dep name="af-dep" platform="indep"/>
+ </item>
+ <item name="af-rdep" platform="indep">
+  <dep name="af" platform="indep"/>
+ </item>
+</build-graph>
+abuild-monitor: end-dump-build-graph
 abuild-monitor: state-change af indep waiting
 abuild-monitor: state-change af-dep indep ready
 abuild-monitor: state-change af-rdep indep waiting

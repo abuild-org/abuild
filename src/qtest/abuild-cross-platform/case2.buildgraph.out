@@ -1,9 +1,26 @@
-1!04-java!java -> <none>
-1!04-indep!indep -> <none>
-1!03-all!java -> 1!04-indep!indep 1!04-java!java
-1!02-all!java -> 1!03-all!java 1!04-indep!indep 1!04-java!java
-1!01-java!java -> 1!02-all!java 1!03-all!java 1!04-indep!indep 1!04-java!java
-1!04-object-code!<native> -> <none>
-1!03-all!<native> -> 1!04-indep!indep 1!04-object-code!<native>
-1!02-all!<native> -> 1!03-all!<native> 1!04-indep!indep 1!04-object-code!<native>
-1!01-object-code!<native> -> 1!02-all!<native> 1!03-all!<native> 1!04-indep!indep 1!04-object-code!<native>
+<?xml version="1.0"?>
+<build-graph version="1">
+ <item name="04-java" platform="java"/>
+ <item name="04-indep" platform="indep"/>
+ <item name="03-all" platform="java">
+  <dep name="04-java" platform="java"/>
+  <dep name="04-indep" platform="indep"/>
+ </item>
+ <item name="02-all" platform="java">
+  <dep name="03-all" platform="java"/>
+ </item>
+ <item name="01-java" platform="java">
+  <dep name="02-all" platform="java"/>
+ </item>
+ <item name="04-object-code" platform="<native>"/>
+ <item name="03-all" platform="<native>">
+  <dep name="04-object-code" platform="<native>"/>
+  <dep name="04-indep" platform="indep"/>
+ </item>
+ <item name="02-all" platform="<native>">
+  <dep name="03-all" platform="<native>"/>
+ </item>
+ <item name="01-object-code" platform="<native>">
+  <dep name="02-all" platform="<native>"/>
+ </item>
+</build-graph>

@@ -1,5 +1,7 @@
 abuild-monitor: begin-dump-data
 abuild-monitor: end-dump-data
+abuild-monitor: begin-dump-build-graph
+abuild-monitor: end-dump-build-graph
 abuild-monitor: state-change prog1 <native> waiting
 abuild-monitor: state-change shared1 <native> waiting
 abuild-monitor: state-change static <native> ready

@@ -1,10 +1,24 @@
-2!item!<native>.debug -> <none>
-2!java!java -> <none>
-2!a!indep -> 2!java!java 2!item!<native>.debug
-2!item!<native> -> <none>
-2!b!indep -> 2!item!<native>
-2!c!indep -> 2!item!<native>
-2!item!<native>.release -> <none>
-2!d!indep -> 2!item!<native>.release
-2!item!zz_os.cpu.toolset.other.debug -> <none>
-2!e!zz_os.cpu.toolset.other.debug -> 2!item!zz_os.cpu.toolset.other.debug
+<?xml version="1.0"?>
+<build-graph version="1">
+ <item name="item" platform="<native>.debug"/>
+ <item name="java" platform="java"/>
+ <item name="a" platform="indep">
+  <dep name="item" platform="<native>.debug"/>
+  <dep name="java" platform="java"/>
+ </item>
+ <item name="item" platform="<native>"/>
+ <item name="b" platform="indep">
+  <dep name="item" platform="<native>"/>
+ </item>
+ <item name="c" platform="indep">
+  <dep name="item" platform="<native>"/>
+ </item>
+ <item name="item" platform="<native>.release"/>
+ <item name="d" platform="indep">
+  <dep name="item" platform="<native>.release"/>
+ </item>
+ <item name="item" platform="zz_os.cpu.toolset.other.debug"/>
+ <item name="e" platform="zz_os.cpu.toolset.other.debug">
+  <dep name="item" platform="zz_os.cpu.toolset.other.debug"/>
+ </item>
+</build-graph>

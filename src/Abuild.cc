@@ -225,7 +225,10 @@ Abuild::runInternal()
 
     if (this->compat_level.allow_1_0())
     {
-	suggestUpgrade();
+	if (! this->dump_build_graph)
+	{
+	    suggestUpgrade();
+	}
     }
 
     boost::shared_ptr<boost::posix_time::time_duration> build_time;
@@ -280,7 +283,7 @@ Abuild::runInternal()
 	}
     }
 
-    if (build_time.get())
+    if ((! this->dump_build_graph) && build_time.get())
     {
 	std::ostringstream time;
 	time << "total build time: " << *build_time;
@@ -5413,10 +5416,18 @@ Abuild::buildBuildset()
               " final platform-aware dependency graph");
     }
 
-    if (this->dump_build_graph)
+    if (this->monitored || this->dump_build_graph)
     {
+	monitorOutput("begin-dump-build-graph");
+
 	boost::function<void(std::string const&)> o =
 	    boost::bind(&Logger::logInfo, &(this->logger), _1);
+
+	std::string item_name;
+	std::string platform;
+
+	o("<?xml version=\"1.0\"?>");
+	o("<build-graph version=\"1\">");
 
 	DependencyGraph::ItemList const& items =
 	    this->build_graph.getSortedGraph();
@@ -5425,22 +5436,36 @@ Abuild::buildBuildset()
 	     iter != items.end(); ++iter)
 	{
 	    DependencyGraph::ItemList const& deps =
-		this->build_graph.getSortedDependencies(*iter);
-	    DependencyGraph::ItemList::const_reverse_iterator dep_iter =
-		deps.rbegin();
-	    std::string msg = *dep_iter + " -> ";
-	    ++dep_iter;
-	    if (dep_iter == deps.rend())
+		this->build_graph.getDirectDependencies(*iter);
+	    parseBuildGraphNode(*iter, item_name, platform);
+	    std::string msg = "item name=\"" + item_name +
+		"\" platform=\"" + platform + "\"";
+	    if (deps.empty())
 	    {
-		msg += "<none>";
+		o(" <" + msg + "/>");
 	    }
 	    else
 	    {
-		msg += Util::join(" ", dep_iter, deps.rend());
+		o(" <" + msg + ">");
+		for (DependencyGraph::ItemList::const_iterator dep_iter =
+			 deps.begin();
+		     dep_iter != deps.end(); ++dep_iter)
+		{
+		    parseBuildGraphNode(*dep_iter, item_name, platform);
+		    o("  <dep name=\"" + item_name +
+		      "\" platform=\"" + platform + "\"/>");
+		}
+		o(" </item>");
 	    }
-	    o(msg);
 	}
 
+	o("</build-graph>");
+
+	monitorOutput("end-dump-build-graph");
+    }
+
+    if (this->dump_build_graph)
+    {
 	return true;
     }
 

@@ -544,6 +544,51 @@ abuild-monitor: begin-dump-data
  </forest>
 </abuild-data>
 abuild-monitor: end-dump-data
+abuild-monitor: begin-dump-build-graph
+<?xml version="1.0"?>
+<build-graph version="1">
+ <item name="bb" platform="indep"/>
+ <item name="ca" platform="<native>"/>
+ <item name="aa" platform="<native>">
+  <dep name="bb" platform="indep"/>
+  <dep name="ca" platform="<native>"/>
+ </item>
+ <item name="aaa" platform="indep"/>
+ <item name="d.a.a" platform="indep"/>
+ <item name="d.b.a" platform="indep"/>
+ <item name="d.a" platform="indep">
+  <dep name="d.a.a" platform="indep"/>
+  <dep name="d.b.a" platform="indep"/>
+ </item>
+ <item name="ab" platform="indep">
+  <dep name="d.a" platform="indep"/>
+ </item>
+ <item name="ac" platform="indep"/>
+ <item name="ad" platform="indep"/>
+ <item name="b" platform="indep"/>
+ <item name="ba" platform="indep"/>
+ <item name="bc" platform="indep"/>
+ <item name="cb" platform="<native>">
+  <dep name="ca" platform="<native>"/>
+ </item>
+ <item name="cc" platform="indep"/>
+ <item name="e.lib" platform="zz_os.cpu.toolset.echo"/>
+ <item name="e.shlib" platform="zz_os.cpu.toolset.echo">
+  <dep name="e.lib" platform="zz_os.cpu.toolset.echo"/>
+ </item>
+ <item name="e.bin" platform="zz_os.cpu.toolset.echo">
+  <dep name="e.lib" platform="zz_os.cpu.toolset.echo"/>
+  <dep name="e.shlib" platform="zz_os.cpu.toolset.echo"/>
+ </item>
+ <item name="e.global" platform="zz_os.cpu.toolset.echo"/>
+ <item name="e.multi" platform="<native>"/>
+ <item name="e.multi" platform="zz_os.cpu.toolset.echo"/>
+ <item name="e.shlib2" platform="zz_os.cpu.toolset.echo">
+  <dep name="e.lib" platform="zz_os.cpu.toolset.echo"/>
+ </item>
+ <item name="root" platform="indep"/>
+</build-graph>
+abuild-monitor: end-dump-build-graph
 abuild-monitor: state-change aa <native> waiting
 abuild-monitor: state-change aaa indep ready
 abuild-monitor: state-change ab indep waiting

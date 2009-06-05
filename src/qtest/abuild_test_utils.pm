@@ -211,6 +211,20 @@ sub validate_dump_data
 {
     my ($td, $extract) = @_;
     $extract = 0 unless defined $extract;
+    validate_xml($td, $extract, "dump-data", "--dump-data", "abuild_data.dtd");
+}
+
+sub validate_dump_build_graph
+{
+    my ($td, $xargs, $extract) = @_;
+    $extract = 0 unless defined $extract;
+    validate_xml($td, $extract, "dump-build-graph",
+		 "--dump-build-graph $xargs", "build_graph.dtd");
+}
+
+sub validate_xml
+{
+    my ($td, $extract, $what, $args, $dtd) = @_;
     if ($have_xmllint)
     {
 	my $extract_cmd = "";
@@ -218,20 +232,20 @@ sub validate_dump_data
 	{
 	    $extract_cmd = " | perl $filters/extract-xml.pl";
 	}
-	$td->runtest("dump-data xml validation",
+	$td->runtest("$what xml validation",
 		     {$td->COMMAND =>
-			  "abuild --dump-data" .
+			  "abuild $args" .
 			  ($extract ? " 2>/dev/null" : "") .
 			  " | perl $filters/extract-xml.pl" .
 			  $extract_cmd .
 			  " | xmllint --noout --dtdvalid" .
-			  " $top/../../abuild_data.dtd -"},
+			  " $top/../../$dtd -"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
     }
     else
     {
-	$td->runtest("skipping dump-data xml validation",
+	$td->runtest("skipping $what xml validation",
 		     {$td->STRING => "1"},
 		     {$td->STRING => "1"});
     }
