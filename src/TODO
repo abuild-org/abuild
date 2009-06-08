@@ -2,6 +2,8 @@
 Before 1.1
 ==========
 
+ * Move dtds from src to doc.  Update documentation and test suite.
+
  * Rewrite command line parsing to be more flexible.  We should
    tolerate - and -- where possible as well as --option=val and
    --option val when we can.  Also, have later options override
