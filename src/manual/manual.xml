@@ -5317,13 +5317,12 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         &abuild; or diagnosing unusual problems relating to which
         items are built in which order.  The build graph output data
         conforms to a DTD which can be found in
-        <filename>src/build_graph.dtd</filename> in the &abuild;
-        source distribution or in
-        <filename>doc/build_graph.dtd</filename> in the binary
-        distribution.  Although nothing is built when this option is
-        specified, &abuild; still performs complete validation
-        including reading of all the interface files.  The build graph
-        is discussed in <xref
+        <filename>doc/build_graph.dtd</filename> in the &abuild;
+        distribution.  The contents of the DTD can also be found in
+        <xref linkend="ref.build-graph-dtd"/>.  Although nothing is
+        built when this option is specified, &abuild; still performs
+        complete validation including reading of all the interface
+        files.  The build graph is discussed in <xref
         linkend="ref.construction-of-build-graph"/>.  For additional
         ways to use the build graph output, see also <xref
         linkend="ref.misc-xslt"/>.
@@ -15088,7 +15087,9 @@ native-compiler qcc
      on a particular platform.  We refer to this platform-aware
      dependency graph as the <firstterm>build graph</firstterm>.  The
      build graph can be inspected by running &abuild; with the
-     <option>--dump-build-graph</option> command-line option.
+     <option>--dump-build-graph</option> command-line option.  For
+     information about the format of this output, see <xref
+     linkend="ref.build-graph-dtd"/>.
     </para>
     <sect2 id="ref.build-graph.validation">
      <title>Validation</title>
@@ -15630,6 +15631,13 @@ Y = $(X)
            url="http://www.graphviz.org">graphviz</ulink>.  Thanks to
            Joe Davidson for the dot code and the idea of using
            graphviz to visualize the build graph.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Moved reference DTDs from <filename>src</filename> to
+           <filename>doc</filename> so that they're in the same place
+           in the source and binary distributions.
           </para>
          </listitem>
         </itemizedlist>
@@ -20990,10 +20998,9 @@ Y = $(X)
     its validations.  Its output is in an XML format that corresponds
     to the following DTD.  Comments in the DTD describe the meanings
     of the fields.  The DTD may be found in
-    <filename>src/abuild_data.dtd</filename> in the &abuild; source
-    distribution or in <filename>doc/abuild_data.dtd</filename> in the
-    binary distribution.  For additional ways to use the build graph
-    output, see also <xref linkend="ref.misc-xslt"/>.
+    <filename>doc/abuild_data.dtd</filename> in the &abuild;
+    distribution.  For additional ways to use the build graph output,
+    see also <xref linkend="ref.misc-xslt"/>.
    </para>
    <para>
     When there are no errors, the <option>--dump-data</option> output
@@ -21011,7 +21018,7 @@ Y = $(X)
    <para>
     The contents of the <filename>abuild_data.dtd</filename> file are
     included here for reference.
-    <?include-file src/abuild_data.dtd?>
+    <?include-file doc/abuild_data.dtd?>
    </para>
   </appendix>
   <appendix id="ref.interface-dump">
@@ -21024,11 +21031,22 @@ Y = $(X)
     linkend="ref.interface-debugging"/>.  The format of those files
     conforms to an XML DTD.  Comments in the DTD describe how to
     interpret the elements and attributes.  The DTD may be found in
-    <filename>src/interface_dump.dtd</filename> in the &abuild; source
-    distribution or in <filename>doc/interface_dump.dtd</filename> in
-    the binary distribution.  Its contents are included here for
-    reference.
-    <?include-file src/interface_dump.dtd?>
+    <filename>doc/interface_dump.dtd</filename> in the &abuild;
+    distribution.  Its contents are included here for reference.
+    <?include-file doc/interface_dump.dtd?>
+   </para>
+  </appendix>
+  <appendix id="ref.build-graph-dtd">
+   <title><option>--dump-build-graph</option> Format</title>
+   <para>
+    The <option>--dump-build-graph</option> option causes &abuild; to
+    output XML data showing the internal build graph as described in
+    <xref linkend="ref.construction-of-build-graph"/>.  The format of
+    those files conforms to an XML DTD.  Comments in the DTD describe
+    how to interpret the elements and attributes.  The DTD may be
+    found in <filename>doc/build_graph.dtd</filename> in the &abuild;
+    distribution.  Its contents are included here for reference.
+    <?include-file doc/build_graph.dtd?>
    </para>
   </appendix>
   <appendix id="ref.ccxx.mk">

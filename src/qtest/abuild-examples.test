@@ -353,7 +353,7 @@ foreach my $compat (qw(1.0 1.1))
 		     {$td->COMMAND =>
 			  "find . -type f -name .ab-interface\\* -exec" .
 			  " xmllint --noout --dtdvalid" .
-			  " $top/../../interface_dump.dtd {} \\;"},
+			  " $top/../../../doc/interface_dump.dtd {} \\;"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0},
 		     $td->NORMALIZE_NEWLINES);

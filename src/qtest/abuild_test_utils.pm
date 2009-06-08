@@ -239,7 +239,7 @@ sub validate_xml
 			  " | perl $filters/extract-xml.pl" .
 			  $extract_cmd .
 			  " | xmllint --noout --dtdvalid" .
-			  " $top/../../$dtd -"},
+			  " $top/../../../doc/$dtd -"},
 		     {$td->STRING => "",
 		      $td->EXIT_STATUS => 0});
     }
