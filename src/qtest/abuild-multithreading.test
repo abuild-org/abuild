@@ -60,7 +60,8 @@ if ($test_java)
 		  $td->EXIT_STATUS => 0,
 		  $td->THREAD_DATA =>
 		  {$td->TD_THREADS => [qw(start-java a s d f)],
-		   $td->TD_SEQGROUPS => [qw(s1 s2)]}});
+		   $td->TD_SEQGROUPS => [qw(s1 s2)]}},
+		 $td->NORMALIZE_NEWLINES);
 }
 else
 {
