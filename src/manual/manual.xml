@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.b1">
-<!ENTITY lastreleased "May 22, 2009">
+<!ENTITY swversion "1.1.b2">
+<!ENTITY lastreleased "June 12, 2009">
 ]>
 <!--
 
@@ -15600,7 +15600,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.b2: XXX</term>
+     <term>1.1.b2: June 12, 2009</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -15610,10 +15610,13 @@ Y = $(X)
         <itemizedlist>
          <listitem>
           <para>
-           Although no bugs were specifically known, &abuild;'s
-           multithreading code was further tightened to reduce the
-           possibility race conditions occurring when build of two
-           build items started or ended simultaneously.
+           Reworked the mutex protection in main build loop slightly
+           to remove all possibility of concurrent write access to
+           shared data during a multithreaded build.  This appears to
+           have removed a rarely encountered race condition in which
+           &abuild; could crash while building multiple instances of
+           the same build item on multiple platforms simultaneously in
+           separate threads.
           </para>
          </listitem>
          <listitem>
