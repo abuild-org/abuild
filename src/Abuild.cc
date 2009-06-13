@@ -51,6 +51,23 @@ std::list<std::string> Abuild::default_targets;
 // Initialize this after all other status
 bool Abuild::statics_initialized = Abuild::initializeStatics();
 
+// Unlock a lock object is in scope
+class ScopedUnlock
+{
+  public:
+    ScopedUnlock(boost::mutex::scoped_lock& l) :
+	l(l)
+    {
+	l.unlock();
+    }
+    virtual ~ScopedUnlock()
+    {
+	l.lock();
+    }
+  private:
+    boost::mutex::scoped_lock& l;
+};
+
 Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     argc(argc),
     argv(argv),
@@ -7156,10 +7173,8 @@ Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
 
     // Explicitly unlock the build lock during invocation of the
     // backend
-    build_lock.unlock();
-    return this->java_builder->invoke(
-	backend, build_file, dir, targets);
-    build_lock.lock();
+    ScopedUnlock unlock(build_lock);
+    return this->java_builder->invoke(backend, build_file, dir, targets);
 }
 
 bool
@@ -7181,9 +7196,8 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 
     // Explicitly unlock the build lock during invocation of the
     // backend
-    build_lock.unlock();
+    ScopedUnlock unlock(build_lock);
     return Util::runProgram(progname, args, environment, old_env, dir);
-    build_lock.lock();
 }
 
 void
