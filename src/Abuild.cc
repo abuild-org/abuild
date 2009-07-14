@@ -161,14 +161,13 @@ bool
 Abuild::runInternal()
 {
     // Handle a few arguments that short-circuit normal operation.
-    if (this->argc == 2)
+    if (this->argc > 1)
     {
 	boost::function<void(std::string const&)> l =
 	    boost::bind(&Logger::logInfo, &(this->logger), _1);
-	std::string first_arg = argv[1];
-	if ((first_arg == "-V") || (first_arg == "--version"))
+	std::string last_arg = argv[this->argc - 1];
+	if ((last_arg == "-V") || (last_arg == "--version"))
 	{
-	    // XXX
 	    l(this->whoami + " version " + ABUILD_VERSION);
 	    l("");
 	    l("Copyright (c) 2007-2009 Jay Berkenbilt, Argon ST");
@@ -178,9 +177,8 @@ Abuild::runInternal()
 	    l("implied warranty.");
 	    return true;
 	}
-	else if ((first_arg == "-H") || (first_arg == "--help"))
+	else if ((last_arg == "-H") || (last_arg == "--help"))
 	{
-	    // XXX
 	    l("");
 	    l("Help is available on a variety of topics.");
 	    l("");
@@ -562,6 +560,22 @@ Abuild::parseArgv()
     // called after changing directories
     checkRoRwPaths();
 
+    // Special case: if "clean" is specified with a build set, pretend
+    // a clean set was specified instead.  Also, let the user get away
+    // with stuff like abuild --clean=all clean.
+    if (special_target == s_CLEAN)
+    {
+	if (! this->buildset_name.empty())
+	{
+	    this->cleanset_name = this->buildset_name;
+	    this->buildset_name.clear();
+	}
+	if (! this->cleanset_name.empty())
+	{
+	    special_target.clear();
+	}
+    }
+
     // Once we've ensured that we're not doing anything that is not
     // allowed with a build set, enable build set "current" by
     // default.
@@ -726,7 +740,6 @@ Abuild::argPositional(std::string const& arg)
 void
 Abuild::argHelp(std::vector<std::string> const& args)
 {
-    // XXX
     if ((args.empty() || (args.size() > 2)))
     {
 	usage("invalid --help invocation");

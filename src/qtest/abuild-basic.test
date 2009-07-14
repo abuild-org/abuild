@@ -268,6 +268,88 @@ $td->runtest("no object-code platform types",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+# We want to allow people to do things like aliasing abuild to abuild
+# -d, abuild --build-desc, and abuild --no-deps.  First we run a
+# command with a specific option, and then we run the same command
+# with other options prepended to make sure we get the same output.
+# This also exercises some alternative (non-standard) command-line
+# syntaxes.
+
+foreach my $xargs ('', '--no-deps', '--with-deps', '--build=desc')
+{
+    $td->runtest("help (xargs: \"$xargs\")",
+		 {$td->COMMAND => "abuild $xargs --help",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-help.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("version (xargs: \"$xargs\")",
+		 {$td->COMMAND => "abuild $xargs --version",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-version.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("no-deps (xargs: \"$xargs\")",
+		 {$td->COMMAND => "abuild $xargs --no-deps no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-no-deps.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("with-deps (xargs: \"$xargs\")",
+		 {$td->COMMAND => "abuild $xargs --with-deps no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-with-deps.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("desc (xargs: \"$xargs\")",
+		 {$td->COMMAND => "abuild $xargs -build desc no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-desc.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean=desc (xargs: \"$xargs\")",
+		 {$td->COMMAND =>
+		      "abuild $xargs -clean=desc --clean-platforms=none",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-clean-desc.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+# Allow --no-deps clean
+foreach my $d (['clean', 'clean'],
+	       ['clean with no-deps', '--no-deps clean'])
+{
+    my ($description, $args) = @$d;
+    $td->runtest($description,
+		 {$td->COMMAND =>
+		      "abuild $args --clean-platforms=none",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-clean.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+# Let the user get away with --build=set clean and similar.
+foreach my $d (['clean desc', '-c desc'],
+	       ['clean with build set', '-b desc clean'],
+	       ['clean with clean set', '-c desc clean'])
+{
+    my ($description, $args) = @$d;
+    $td->runtest($description,
+		 {$td->COMMAND =>
+		      "abuild $args --clean-platforms=none",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/aa-clean-desc.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 cd("work/ext");
 
 $td->runtest("all items from external",
@@ -656,4 +738,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(76 + ($msvc ? 24 : 0) + ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));
+$td->report(105 + ($msvc ? 24 : 0) + ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));
