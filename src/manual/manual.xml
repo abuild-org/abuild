@@ -5358,7 +5358,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--find tree:tree-name</term>
+      <term>--find=tree:tree-name</term>
       <listitem>
        <para>
         Print the location of the root build item of build tree
@@ -5434,7 +5434,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--clean-platforms pattern</term>
+      <term>--clean-platforms=pattern</term>
       <listitem>
        <para>
         Specify a pattern that restricts which platform directories
@@ -5638,7 +5638,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--platform-selector selector | -p selector</term>
+      <term>--platform-selector=selector | -p selector</term>
       <listitem>
        <para>
         Specify a platform selector.  This argument may be repeated
@@ -5653,7 +5653,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--ro-path path</term>
+      <term>--ro-path=path</term>
       <listitem>
        <para>
         Indicate that <replaceable>path</replaceable> is to be treated
@@ -5664,7 +5664,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--rw-path path</term>
+      <term>--rw-path=path</term>
       <listitem>
        <para>
         Indicate that <replaceable>path</replaceable> is to be treated
@@ -5772,7 +5772,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>--only-with-traits trait[,trait,...]</term>
+      <term>--only-with-traits=trait[,trait,...]</term>
       <listitem>
        <para>
         Exclude from the initial build set any items that do not
@@ -15599,6 +15599,54 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.b3: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Command-line Parsing Improvements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           When specifying build set options cases, later options now
+           supersede earlier ones rather than contradicting them.
+           This makes it possible to alias <command>abuild</command>
+           to <command>abuild --no-deps</command>, <command>abuild
+           --build=desc</command>, or other similar invocations to
+           suit your preferences while still being able to get
+           different behavior just by appending additional arguments
+           on the command line.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           As a convenience, &abuild; now recognizes <command>abuild
+           --build=<replaceable>set</replaceable> clean</command> as a
+           synonym for <command>abuild
+           --clean=<replaceable>set</replaceable></command>.  This
+           means that if you have <command>abuild</command> aliased to
+           <command>abuild --build=desc</command>, typing
+           <command>abuild clean</command> will now have the effect of
+           running <command>abuild --clean=desc</command>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild;'s command-line parsing has been made more
+           flexible.  For options with arguments,
+           <option>--option=value</option> and <option>--option
+           value</option> both work, among other possibilities.  In
+           previous versions of &abuild;, there were inconsistencies
+           in how options took arguments.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.b2: June 13, 2009</term>
      <listitem>

@@ -1,0 +1,4 @@
+abuild: bb (abuild-indep): no-op
+abuild: ca (abuild-<native>): no-op
+abuild: aa (abuild-<native>): no-op
+abuild: aaa (abuild-indep): no-op

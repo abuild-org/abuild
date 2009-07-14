@@ -1,0 +1,2 @@
+abuild: ERROR: only one special target may be specified
+abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

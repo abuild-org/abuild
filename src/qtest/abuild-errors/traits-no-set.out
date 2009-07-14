@@ -1,0 +1,2 @@
+abuild: ERROR: --only-with-traits and --related-by-traits may not be used without a build set
+abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

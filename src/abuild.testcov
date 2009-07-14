@@ -402,3 +402,14 @@ OptionParser call regex callback 0
 OptionParser call vector callback 3
 OptionParser found term arg 1
 OptionParser list to end of args 1
+Abuild ERR usage compatibility level 0
+Abuild ERR ant unknown 0
+Abuild ERR usage traits without set 0
+Abuild ERR usage rdeps without set 0
+Abuild ERR usage --clean with targets 0
+Abuild ERR usage special with targets 0
+Abuild ERR usage special or set in output 0
+Abuild ERR usage multiple special targets 0
+Abuild ERR usage invalid help 0
+Abuild ERR usage j = 0 0
+Abuild ERR usage invalid build set 0

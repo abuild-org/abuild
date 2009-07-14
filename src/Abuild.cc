@@ -526,6 +526,7 @@ Abuild::parseArgv()
     }
     else
     {
+	QTC::TC("abuild", "Abuild ERR usage compatibility level");
 	usage("invalid compatibility level " + compat_level_version);
     }
 
@@ -553,6 +554,7 @@ Abuild::parseArgv()
 	else
 	{
 	    // Pretend we just didn't recognize the option at all
+	    QTC::TC("abuild", "Abuild ERR ant unknown");
 	    usage("unknown option \"ant\"");
 	}
     }
@@ -594,11 +596,13 @@ Abuild::parseArgv()
 	if (! (this->only_with_traits.empty() &&
 	       this->related_by_traits.empty()))
 	{
+	    QTC::TC("abuild", "Abuild ERR usage traits without set");
 	    usage("--only-with-traits and --related-by-traits may"
 		  " not be used without a build set");
 	}
 	if (this->with_rdeps)
 	{
+	    QTC::TC("abuild", "Abuild ERR usage rdeps without set");
 	    usage("--with-rdeps may not be used without a build set");
 	}
     }
@@ -606,31 +610,18 @@ Abuild::parseArgv()
     // Make sure we're not trying to clean and build at the same time.
     if (! this->cleanset_name.empty())
     {
-	if ((! this->buildset_name.empty()) ||
-	    (! this->targets.empty()) ||
-	    (! this->special_target.empty()) ||
-	    this->with_rdeps)
+	if ((! this->targets.empty()) ||
+	    (! this->special_target.empty()))
 	{
-	    usage("--clean may not be combined with --build, --with-deps,"
-		  " --with-rdeps, or targets");
-	}
-    }
-    else if (this->special_target == s_CLEAN)
-    {
-	// already known cleanset_name is empty
-	if ((! this->buildset_name.empty()) ||
-	    (! this->targets.empty()) ||
-	    this->with_rdeps)
-	{
-	    usage("\"clean\" may not be combined with --build, --with-deps,"
-		  " --with-rdeps, or other targets");
+	    QTC::TC("abuild", "Abuild ERR usage --clean with targets");
+	    usage("--clean may not be combined with other targets");
 	}
     }
     else if (! this->special_target.empty())
     {
-	// already known cleanset_name is empty
 	if (! this->targets.empty())
 	{
+	    QTC::TC("abuild", "Abuild ERR usage special with targets");
 	    usage("\"" + this->special_target + "\" may not be combined"
 		  " with any other targets");
 	}
@@ -648,6 +639,7 @@ Abuild::parseArgv()
 		    this->buildset_name.empty() &&
 		    this->cleanset_name.empty()))
 	{
+	    QTC::TC("abuild", "Abuild ERR usage special or set in output");
 	    usage("special targets, build sets, and clean sets may not be"
 		  " specified when running inside an output directory");
 	}
@@ -727,6 +719,7 @@ Abuild::argPositional(std::string const& arg)
     {
 	if (! this->special_target.empty())
 	{
+	    QTC::TC("abuild", "Abuild ERR usage multiple special targets");
 	    usage("only one special target may be specified");
 	}
 	this->special_target = arg;
@@ -742,6 +735,7 @@ Abuild::argHelp(std::vector<std::string> const& args)
 {
     if ((args.empty() || (args.size() > 2)))
     {
+	QTC::TC("abuild", "Abuild ERR usage invalid help");
 	usage("invalid --help invocation");
     }
     this->help_topic = args[0];
@@ -769,6 +763,7 @@ Abuild::argSetJobs(unsigned int arg)
 {
     if (arg == 0)
     {
+	QTC::TC("abuild", "Abuild ERR usage j = 0");
 	usage("-j's argument must be > 0");
     }
     else
@@ -1025,6 +1020,7 @@ Abuild::checkBuildsetName(std::string const& kind, std::string& name)
     }
     else if (valid_buildsets.count(name) == 0)
     {
+	QTC::TC("abuild", "Abuild ERR usage invalid build set");
 	usage("unknown " + kind + " set " + name);
     }
 }

@@ -1,0 +1,2 @@
+abuild: ERROR: invalid compatibility level 0.9
+abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

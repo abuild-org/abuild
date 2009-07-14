@@ -1,0 +1,2 @@
+abuild: ERROR: -j's argument must be > 0
+abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

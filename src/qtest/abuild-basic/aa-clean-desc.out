@@ -1,0 +1,4 @@
+abuild: cleaning aa in .
+abuild:   not removing abuild-<native>
+abuild: cleaning aaa in aaa
+abuild:   not removing abuild-indep

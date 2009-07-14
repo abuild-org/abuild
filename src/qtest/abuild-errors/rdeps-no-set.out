@@ -1,0 +1,2 @@
+abuild: ERROR: --with-rdeps may not be used without a build set
+abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

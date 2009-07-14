@@ -262,13 +262,77 @@ $td->runtest("global plugins",
 my $dir = tempdir();
 my $windir = windir($dir);
 open(F, ">$dir/Abuild.conf") or die;
-print F "this: hello\n";
+print F "tree-name: hello\n";
+print F "name: hello\n";
 close(F);
 $td->runtest("find root looking for top",
 	     {$td->COMMAND => "abuild --no-deps -C $windir",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/found-root.out",
 	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Command-line parsing
+cd("work/usage");
+$td->runtest("create output directory",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/make-indep.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("clean set with targets",
+	     {$td->COMMAND => "abuild --clean=all check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-set-with-targetes.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("clean with targets",
+	     {$td->COMMAND => "abuild clean all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/clean-with-targetes.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("bad compatibility level",
+	     {$td->COMMAND => "abuild --compat-level 0.9",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-compat.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("invalid build set",
+	     {$td->COMMAND => "abuild -b oinq",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-buildset.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("invalid help invocation",
+	     {$td->COMMAND => "abuild --help one two three",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad-help.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("invalid number of jobs",
+	     {$td->COMMAND => "abuild -j0",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/j0.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("multiple special targets",
+	     {$td->COMMAND => "abuild clean no-op",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/multiple-special.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("rdeps with no build set",
+	     {$td->COMMAND => "abuild --no-deps --with-rdeps",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/rdeps-no-set.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+$td->runtest("traits with no build set",
+	     {$td->COMMAND => "abuild --no-deps --only-with-traits tester",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/traits-no-set.out",
+	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
 cd("work/symlink");
@@ -298,4 +362,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(30 + (in_windows() ? 0 : 2));
+$td->report(40 + (in_windows() ? 0 : 2));
