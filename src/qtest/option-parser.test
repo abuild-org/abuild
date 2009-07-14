@@ -31,7 +31,7 @@ my @test_cases = (
     ['trailing numeric',
      ['--number'],
      'trailing-numeric'],
-    ['trailing-regex',
+    ['trailing regex',
      ['--potato-type'],
      'trailing-regex'],
     ['consuming list terminated by end',
