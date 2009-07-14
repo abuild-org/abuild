@@ -287,7 +287,7 @@ foreach my $xargs ('', '--no-deps', '--with-deps', '--build=desc')
     $td->runtest("version (xargs: \"$xargs\")",
 		 {$td->COMMAND => "abuild $xargs --version",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/aa-version.out",
+		 {$td->REGEXP => "^abuild version \\d+",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 
