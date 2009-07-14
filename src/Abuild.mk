@@ -39,6 +39,7 @@ TEST_PROGS := \
 	test_canonicalize_path \
 	test_get_program_fullpath \
 	test_run_program \
+	test_option_parser \
 	test_logger \
 	test_thread_safe_queue \
 	test_worker_pool \
@@ -62,6 +63,7 @@ GENERAL_SRCS := \
 	Error.cc \
 	KeyVal.cc \
 	FileLocation.cc \
+	OptionParser.cc \
 	DependencyEvaluator.cc \
 	DependencyGraph.cc \
 	DependencyRunner.cc

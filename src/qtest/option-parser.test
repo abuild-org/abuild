@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+chdir("option-parser") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+my $td = new TestDriver('OptionParser');
+
+my @test_cases = (
+    ['normal cases',
+     [qw(--do-something -flag1 -flag1 1 --flag1=2 -f 3 -f4 -f z -do-something),
+      qw(-number 1 --number=2 --potato-name salad --potato-name=pi spackle),
+      qw(--potato-type half-baked --potato-type=mashed --potato-type roasted),
+      qw(--help help topic --end-help --words moo oinq cluq --do-something),
+      qw(the end)
+     ],
+     'normal'],
+    ['errors',
+     [qw(--flag1=twelve --number six --potato-type=boiled),
+      qw(-9 --unrecognized --?invalid ---zebra --16059 --do-something=else),
+      qw(--potato-name)],
+     'errors1'],
+    ['trailing optional numeric',
+     ['-f'],
+     'trailing-optional-numeric'],
+    ['trailing numeric',
+     ['--number'],
+     'trailing-numeric'],
+    ['trailing-regex',
+     ['--potato-type'],
+     'trailing-regex'],
+    ['consuming list terminated by end',
+     [qw(--help=one two three)],
+     'consuming-list-end'],
+    ['non-consuming list terminated by end',
+     [qw(--words=four five six)],
+     'non-consuming-list-end'],
+    ['empty consuming list',
+     ['--help'],
+     'empty-consuming-list'],
+    ['empty non-consuming list',
+     ['--words'],
+     'empty-non-consuming-list'],
+    );
+
+foreach my $d (@test_cases)
+{
+    my ($description, $args, $outfile) = @$d;
+    $td->runtest($description,
+		 {$td->COMMAND => ['test_option_parser', @$args]},
+		 {$td->FILE => "$outfile.out", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+cleanup();
+
+$td->report(scalar(@test_cases));
+
+sub cleanup
+{
+}

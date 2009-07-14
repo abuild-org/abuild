@@ -386,3 +386,20 @@ Abuild-upgrade ERR external symlinks 0
 ItemConfig ERR serial without make 0
 Abuild make_njobs 1
 Abuild explicit serial 0
+OptionParser ERR unknown option 0
+OptionParser ERR unknown argument 0
+OptionParser positional argument 0
+OptionParser matched 3
+OptionParser ERR unwanted attached arg 0
+OptionParser found numeric arg 1
+OptionParser using default numeric value 0
+OptionParser ERR non-numeric arg 1
+OptionParser ERR missing required arg 1
+OptionParser ERR regex mismatch 0
+OptionParser call void callback 0
+OptionParser call int callback 0
+OptionParser call string callback 0
+OptionParser call regex callback 0
+OptionParser call vector callback 3
+OptionParser found term arg 1
+OptionParser list to end of args 1

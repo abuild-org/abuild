@@ -1,0 +1,30 @@
+doing something
+flag 1, argument = 12
+flag 1, argument = 1
+flag 1, argument = 2
+flag 1, argument = 3
+flag 1, argument = 4
+flag 1, argument = 12
+positional option: z
+doing something
+number, argument = 1
+number, argument = 2
+potato name: salad
+potato name: pi
+positional option: spackle
+potato type: half baked
+potato type: fully mashed
+potato type: fully roasted
+help args:
+  "help"
+  "topic"
+  "--end-help"
+end of help args
+words:
+  "moo"
+  "oinq"
+  "cluq"
+end of words
+doing something
+positional option: the
+positional option: end

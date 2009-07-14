@@ -1,0 +1,11 @@
+test_option_parser: ERROR: option "flag1"'s argument must be numeric
+test_option_parser: ERROR: option "number"'s argument must be numeric
+positional option: six
+test_option_parser: ERROR: invalid argument to option "potato-type": "boiled"
+test_option_parser: ERROR: unknown argument "-9"
+test_option_parser: ERROR: unknown option "unrecognized"
+test_option_parser: ERROR: unknown argument "--?invalid"
+test_option_parser: ERROR: unknown argument "---zebra"
+test_option_parser: ERROR: unknown argument "--16059"
+test_option_parser: ERROR: option "do-something" does not take any arguments
+test_option_parser: ERROR: option "potato-name" requires an argument
