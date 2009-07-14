@@ -1,2 +1,2 @@
-abuild: ERROR: invalid option --ant
+abuild: ERROR: unknown option "ant"
 abuild: ERROR: run "abuild --help" or "abuild --help usage" for help

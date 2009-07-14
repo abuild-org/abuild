@@ -7,6 +7,7 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
+#include <boost/regex.hpp>
 #include <Error.hh>
 #include <QEXC.hh>
 #include <BuildForest.hh>
@@ -76,6 +77,29 @@ class Abuild
     bool runInternal();
     void getThisPlatform();
     void parseArgv();
+    void argPositional(std::string const&);
+    void argVersion();
+    void argHelp(std::vector<std::string> const&);
+    void argFindConf();
+    void argSetJobs(unsigned int);
+    void argSetMakeJobs(unsigned int);
+    void argSetKeepGoing();
+    void argSetNoOp();
+    void argSetEmacs();
+    void argSetMakeArgs(std::vector<std::string> const&);
+    void argSetBackendArgs(std::vector<std::string> const&,
+			   std::list<std::string>&);
+    void argSetDeprecationIsError();
+    void argSetVerbose();
+    void argSetSilent();
+    void argSetCompatLevel(std::string& var, boost::smatch const&);
+    void argSetBuildSet(std::string const&);
+    void argSetCleanSet(std::string const&);
+    void argSetBool(bool& var, bool val);
+    void argSetString(std::string& var, std::string const& val);
+    void argSetStringSplit(std::list<std::string>& var,
+			   std::string const& val);
+    void argInsertInSet(std::set<std::string>& var, std::string const& val);
     void checkRoRwPaths();
     void checkValidPaths(std::set<std::string>& paths);
     bool anyFirstNotUnderSomeSecond(
@@ -374,6 +398,7 @@ class Abuild
     std::string start_dir;
     bool keep_going;
     bool no_dep_failures;
+    bool explicit_buildset;
     std::string buildset_name;
     std::set<std::string> buildset_named_items;
     std::string buildset_pattern;

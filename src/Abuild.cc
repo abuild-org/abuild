@@ -4,6 +4,7 @@
 #include <QEXC.hh>
 #include <Util.hh>
 #include <Logger.hh>
+#include <OptionParser.hh>
 #include <FileLocation.hh>
 #include <ItemConfig.hh>
 #include <BackingConfig.hh>
@@ -79,6 +80,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
+    explicit_buildset(false),
     full_integrity(false),
     list_traits(false),
     list_platforms(false),
@@ -166,6 +168,7 @@ Abuild::runInternal()
 	std::string first_arg = argv[1];
 	if ((first_arg == "-V") || (first_arg == "--version"))
 	{
+	    // XXX
 	    l(this->whoami + " version " + ABUILD_VERSION);
 	    l("");
 	    l("Copyright (c) 2007-2009 Jay Berkenbilt, Argon ST");
@@ -177,6 +180,7 @@ Abuild::runInternal()
 	}
 	else if ((first_arg == "-H") || (first_arg == "--help"))
 	{
+	    // XXX
 	    l("");
 	    l("Help is available on a variety of topics.");
 	    l("");
@@ -329,14 +333,6 @@ Abuild::getThisPlatform()
 void
 Abuild::parseArgv()
 {
-    boost::regex jobs_re("(?:-j|--jobs=)(\\d+)");
-    boost::regex make_jobs_re("--make-jobs(?:=(\\d+))?");
-    boost::regex buildset_re("--build=(\\S+)");
-    boost::regex cleanset_re("--clean=(\\S+)");
-    boost::regex define_re("([^-][^=]*)=(.*)");
-    boost::regex compat_re("--compat-level=(\\d+\\.\\d+)");
-    boost::regex rorwpath_re("--r([ow])-path=(.+)");
-
     boost::smatch match;
 
     std::list<std::string> platform_selector_strings;
@@ -357,321 +353,153 @@ Abuild::parseArgv()
     boost::regex ant_define_re("-D([^-][^=]*)=(.*)");
 
     std::list<std::string> clean_platform_strings;
-    bool no_deps = false;
 
-    // Abuild has several operational modes:
-    //
-    //  * Build with build set
-    //
-    //  * Build without build set
-    //
-    //  * Query
-    //
-    // We parse arguments and then make sure we are not being pushed
-    // into more than one mode of operation.
+    OptionParser op(boost::bind(&Abuild::usage, this, _1),
+		    boost::bind(&Abuild::argPositional, this, _1));
 
-    char** argp = &argv[1];
-    while (*argp)
-    {
-	std::string arg = *argp++;
+    op.registerListArg(
+	"help", "-.*", false,
+	boost::bind(&Abuild::argHelp, this, _1));
+    op.registerSynonym("H", "help");
+    op.registerStringArg(
+	"C",
+	boost::bind(&Abuild::argSetString, this,
+		    boost::ref(this->start_dir), _1));
+    op.registerNoArg(
+	"find-conf",
+	boost::bind(&Abuild::argFindConf, this));
+    op.registerNumericArg(
+	"jobs",
+	boost::bind(&Abuild::argSetJobs, this, _1));
+    op.registerSynonym("j", "jobs");
+    op.registerOptionalNumericArg(
+	"make-jobs", ((unsigned int) -1),
+	boost::bind(&Abuild::argSetMakeJobs, this, _1));
+    op.registerNoArg(
+	"keep-going",
+	boost::bind(&Abuild::argSetKeepGoing, this));
+    op.registerSynonym("k", "keep-going");
+    op.registerNoArg(
+	"no-dep-failures",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->no_dep_failures), true));
+    op.registerNoArg(
+	"n",
+	boost::bind(&Abuild::argSetNoOp, this));
+    op.registerNoArg(
+	"emacs",
+	boost::bind(&Abuild::argSetEmacs, this));
+    op.registerSynonym("e", "emacs");
+    op.registerListArg(
+	"make", "-?-ant", false,
+	boost::bind(&Abuild::argSetBackendArgs, this, _1,
+		    boost::ref(this->make_args)));
+    // Do not document --ant.
+    op.registerListArg(
+	"ant", "-?-make", false,
+	boost::bind(&Abuild::argSetBackendArgs, this, _1,
+		    boost::ref(ant_args)));
+    op.registerStringArg(
+	"platform-selector",
+	boost::bind(&std::list<std::string>::push_back,
+		    boost::ref(platform_selector_strings),
+		    _1));
+    op.registerSynonym("p", "platform-selector");
+    op.registerStringArg(
+	"clean-platforms",
+	boost::bind(&std::list<std::string>::push_back,
+		    boost::ref(clean_platform_strings),
+		    _1));
+    op.registerNoArg(
+	"full-integrity",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->full_integrity), true));
+    op.registerNoArg(
+	"deprecation-is-error",
+	boost::bind(&Abuild::argSetDeprecationIsError, this));
+    op.registerNoArg(
+	"verbose",
+	boost::bind(&Abuild::argSetVerbose, this));
+    op.registerNoArg(
+	"silent",
+	boost::bind(&Abuild::argSetSilent, this));
+    op.registerNoArg(
+	"monitored",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->monitored), true));
+    op.registerNoArg(
+	"dump-interfaces",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->dump_interfaces), true));
+    op.registerRegexArg(
+	"compat-level", "\\d+\\.\\d+",
+	boost::bind(&Abuild::argSetCompatLevel, this,
+		    boost::ref(compat_level_version), _1));
+    op.registerStringArg(
+	"ro-path",
+	boost::bind(&Abuild::argInsertInSet, this,
+		    boost::ref(this->ro_paths), _1));
+    op.registerStringArg(
+	"rw-path",
+	boost::bind(&Abuild::argInsertInSet, this,
+		    boost::ref(this->rw_paths), _1));
+    op.registerNoArg(
+	"no-deps",
+	boost::bind(&Abuild::argSetBuildSet, this, ""));
+    op.registerNoArg(
+	"with-deps",
+	boost::bind(&Abuild::argSetBuildSet, this, b_CURRENT));
+    op.registerSynonym("d", "with-deps");
+    op.registerStringArg(
+	"build",
+	boost::bind(&Abuild::argSetBuildSet, this, _1));
+    op.registerSynonym("b", "build");
+    op.registerStringArg(
+	"clean",
+	boost::bind(&Abuild::argSetCleanSet, this, _1));
+    op.registerSynonym("c", "clean");
+    op.registerStringArg(
+	"only-with-traits",
+	boost::bind(&Abuild::argSetStringSplit, this,
+		    boost::ref(this->only_with_traits), _1));
+    op.registerStringArg(
+	"related-by-traits",
+	boost::bind(&Abuild::argSetStringSplit, this,
+		    boost::ref(this->related_by_traits), _1));
+    op.registerNoArg(
+	"with-rdeps",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->with_rdeps), true));
+    op.registerNoArg(
+	"apply-targets-to-deps",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->apply_targets_to_deps), true));
+    op.registerNoArg(
+	"repeat-expansion",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->repeat_expansion), true));
+    op.registerNoArg(
+	"dump-build-graph",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->dump_build_graph), true));
+    op.registerNoArg(
+	"list-traits",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->list_traits), true));
+    op.registerNoArg(
+	"list-platforms",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->list_platforms), true));
+    op.registerNoArg(
+	"dump-data",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->dump_data), true));
+    op.registerStringArg(
+	"find",
+	boost::bind(&Abuild::argSetString, this,
+		    boost::ref(this->to_find), _1));
 
-	// Look at arguments that don't affect and aren't affected by
-	// the operational mode.  Some of these have no effect if we
-	// are not building, but specifying them is not an error.
-
-	if (boost::regex_match(arg, match, define_re))
-	{
-	    this->defines[match.str(1)] = match.str(2);
-	}
-	else if (arg == " --test-java-builder-bad-java")
-	{
-	    // undocumented option used by the test suite
-	    this->test_java_builder_bad_java = true;
-	}
-	else if ((arg == "-H") || (arg == "--help"))
-	{
-	    if (! *argp)
-	    {
-		usage("invalid --help invocation");
-	    }
-	    this->help_topic = *argp++;
-	    if (this->help_topic == h_RULES)
-	    {
-		if (*argp)
-		{
-		    this->rules_help_topic = *argp++;
-		}
-		else
-		{
-		    this->rules_help_topic = hr_HELP;
-		}
-	    }
-	}
-	else if (arg == "-C")
-	{
-	    if (! *argp)
-	    {
-		usage("-C requires an argument");
-	    }
-	    this->start_dir = *argp++;
-	}
-	else if (arg == "--find-conf")
-	{
-	    this->start_dir = findConf();
-	}
-	else if (boost::regex_match(arg, match, jobs_re))
-	{
-	    this->max_workers = atoi(match[1].str().c_str());
-	    if (max_workers == 0)
-	    {
-		usage("-j's argument must be > 0");
-	    }
-	}
-	else if (boost::regex_match(arg, match, make_jobs_re))
-	{
-	    if (match[1].matched)
-	    {
-		this->make_njobs = atoi(match[1].str().c_str());
-		if (this->make_njobs == 0)
-		{
-		    usage("--make-jobs=0 is invalid");
-		}
-	    }
-	    else
-	    {
-		// unlimited
-		this->make_njobs = -1;
-	    }
-	}
-	else if ((arg == "-k") || (arg == "--keep-going"))
-	{
-	    this->make_args.push_back("-k");
-	    this->java_builder_args.push_back("-k");
-	    this->keep_going = true;
-	}
-	else if (arg == "--no-dep-failures")
-	{
-	    this->no_dep_failures = true;
-	}
-	else if (arg == "-n")
-	{
-	    this->java_builder_args.push_back("-n");
-	    this->make_args.push_back("-n");
-	}
-	else if ((arg == "-e") || (arg == "--emacs"))
-	{
-	    this->java_builder_args.push_back("-e");
-	}
-	else if (arg == "--make")
-	{
-	    while (*argp)
-	    {
-		this->make_args.push_back(*argp++);
-		if (*argp && (strcmp(*argp, "--ant") == 0))
-		{
-		    --argp;
-		    break;
-		}
-	    }
-	}
-	else if (arg == "--ant")
-	{
-	    // Do not document --ant.
-	    while (*argp)
-	    {
-		ant_args.push_back(*argp++);
-		if (*argp && (strcmp(*argp, "--make") == 0))
-		{
-		    --argp;
-		    break;
-		}
-	    }
-	}
-	else if ((arg == "--platform-selector") || (arg == "-p"))
-	{
-	    if (! *argp)
-	    {
-		usage("--platform-selector requires an argument");
-	    }
-	    platform_selector_strings.push_back(*argp++);
-	}
-	else if (arg == "--clean-platforms")
-	{
-	    if (! *argp)
-	    {
-		usage("--clean-platforms requires an argument");
-	    }
-	    clean_platform_strings.push_back(*argp++);
-	}
-	else if (arg == "--full-integrity")
-	{
-	    this->full_integrity = true;
-	}
-	else if (arg == "--deprecation-is-error")
-	{
-	    this->make_args.push_back("ABUILD_DEPRECATE_IS_ERROR=1");
-	    this->java_builder_args.push_back("-de");
-	    Error::setDeprecationIsError(true);
-	}
-	else if (arg == "--verbose")
-	{
-	    this->make_args.push_back("ABUILD_VERBOSE=1");
-	    this->java_builder_args.push_back("-v");
-	    this->verbose_mode = true;
-	}
-	else if (arg == "--silent")
-	{
-	    this->make_args.push_back("ABUILD_SILENT=1");
-	    this->java_builder_args.push_back("-q");
-	    this->silent = true;
-	}
-	else if (arg == "--monitored")
-	{
-	    this->monitored = true;
-	}
-	else if (arg == "--dump-interfaces")
-	{
-	    this->dump_interfaces = true;
-	}
-	else if (boost::regex_match(arg, match, compat_re))
-	{
-	    compat_level_version = match.str(1);
-	}
-	else if (boost::regex_match(arg, match, rorwpath_re))
-	{
-	    std::string which = match.str(1);
-	    std::string path = match.str(2);
-	    // Do not attempt to check or canonicalize path -- we have
-	    // to chdir from -C first.
-	    if (which == "o")
-	    {
-		this->ro_paths.insert(path);
-	    }
-	    else
-	    {
-		assert(which == "w");
-		this->rw_paths.insert(path);
-	    }
-	}
-
-	// Check for arguments that imply build/clean without build
-	// set
-
-	else if (arg == "--no-deps")
-	{
-	    no_deps = true;
-	}
-
-	// Check for arguments that imply build/clean with build set
-
-	else if ((arg == "--with-deps") || (arg == "-d"))
-	{
-	    QTC::TC("abuild", "Abuild with_deps");
-	    this->buildset_name = b_CURRENT;
-	}
-	else if (boost::regex_match(arg, match, buildset_re))
-	{
-	    this->buildset_name = match[1].str();
-	    checkBuildsetName("build", this->buildset_name);
-	}
-	else if (arg == "-b")
-	{
-	    if (! *argp)
-	    {
-		usage("-b requires an argument");
-	    }
-	    this->buildset_name = *argp++;
-	    checkBuildsetName("build", this->buildset_name);
-	}
-	else if (boost::regex_match(arg, match, cleanset_re))
-	{
-	    this->cleanset_name = match[1].str();
-	    checkBuildsetName("clean", this->cleanset_name);
-	}
-	else if (arg == "-c")
-	{
-	    if (! *argp)
-	    {
-		usage("-c requires an argument");
-	    }
-	    this->cleanset_name = *argp++;
-	    checkBuildsetName("clean", this->cleanset_name);
-	}
-	else if (arg == "--only-with-traits")
-	{
-	    if (! *argp)
-	    {
-		usage("--only-with-traits requires an argument");
-	    }
-	    this->only_with_traits = Util::split(',', *argp++);
-	}
-	else if (arg == "--related-by-traits")
-	{
-	    if (! *argp)
-	    {
-		usage("--related-by-traits requires an argument");
-	    }
-	    this->related_by_traits = Util::split(',', *argp++);
-	}
-	else if (arg == "--with-rdeps")
-	{
-	    this->with_rdeps = true;
-	}
-	else if (arg == "--apply-targets-to-deps")
-	{
-	    this->apply_targets_to_deps = true;
-	}
-	else if (arg == "--repeat-expansion")
-	{
-	    this->repeat_expansion = true;
-	}
-	else if (arg == "--dump-build-graph")
-	{
-	    this->dump_build_graph = true;
-	}
-
-	// Check for arguments that are for general queries
-
-	else if (arg == "--list-traits")
-	{
-	    this->list_traits = true;
-	}
-	else if (arg == "--list-platforms")
-	{
-	    this->list_platforms = true;
-	}
-	else if (arg == "--dump-data")
-	{
-	    this->dump_data = true;
-	}
-	else if (arg == "--find")
-	{
-	    if (! *argp)
-	    {
-		usage("--find requires an argument");
-	    }
-	    this->to_find = *argp++;
-	}
-
-	// Invalid options and targets....
-
-	else if ((! arg.empty()) && (arg[0] == '-'))
-	{
-	    usage("invalid option " + arg);
-	}
-	else if (special_targets.count(arg))
-	{
-	    if (! this->special_target.empty())
-	    {
-		usage("only one special target may be specified");
-	    }
-	    this->special_target = arg;
-	}
-	else
-	{
-	    this->targets.push_back(arg);
-	}
-    }
+    op.parseOptions(argv + 1);
 
     // If an alternative start directory was specified, chdir to it
     // before we ever access any of the user's files.
@@ -726,44 +554,26 @@ Abuild::parseArgv()
 	}
 	else
 	{
-	    usage("invalid option --ant");
+	    // Pretend we just didn't recognize the option at all
+	    usage("unknown option \"ant\"");
 	}
     }
 
     // called after changing directories
     checkRoRwPaths();
 
-    // Check for mutually exclusive options.
-
-    bool explicit_buildset = (! (this->buildset_name.empty() &&
-				 this->cleanset_name.empty()));
-
-    if (explicit_buildset)
-    {
-	if (no_deps)
-	{
-	    usage("--no-deps may not be used with a build set");
-	}
-
-	if (this->dump_data || this->list_platforms || this->list_traits ||
-	    (! this->help_topic.empty()) || (! this->to_find.empty()))
-	{
-	    usage("help/query options may not be used with a build set");
-	}
-    }
-
     // Once we've ensured that we're not doing anything that is not
     // allowed with a build set, enable build set "current" by
     // default.
-    bool have_buildset = explicit_buildset;
-    if ((! (no_deps || explicit_buildset || (special_target == s_CLEAN))) &&
+    if ((! (explicit_buildset || (special_target == s_CLEAN))) &&
 	this->this_platform.empty())
     {
-	have_buildset = true;
 	QTC::TC("abuild", "Abuild build current by default");
 	this->buildset_name = b_CURRENT;
     }
 
+    bool have_buildset = (! (this->buildset_name.empty() &&
+			     this->cleanset_name.empty()));
     if (! have_buildset)
     {
 	this->local_build = true;
@@ -878,10 +688,189 @@ Abuild::parseArgv()
 
     // Put significant option coverage cases after any potential exit
     // from incorrect usage....
-    if (no_deps)
+    if (this->buildset_name.empty() && this->this_platform.empty())
     {
 	QTC::TC("abuild", "Abuild no_deps");
     }
+}
+
+void
+Abuild::argPositional(std::string const& arg)
+{
+    boost::regex define_re("([^-][^=]*)=(.*)");
+    boost::smatch match;
+
+    if (boost::regex_match(arg, match, define_re))
+    {
+	this->defines[match.str(1)] = match.str(2);
+    }
+    else if (arg == " --test-java-builder-bad-java")
+    {
+	// undocumented option used by the test suite
+	this->test_java_builder_bad_java = true;
+    }
+    else if (special_targets.count(arg))
+    {
+	if (! this->special_target.empty())
+	{
+	    usage("only one special target may be specified");
+	}
+	this->special_target = arg;
+    }
+    else
+    {
+	this->targets.push_back(arg);
+    }
+}
+
+void
+Abuild::argHelp(std::vector<std::string> const& args)
+{
+    // XXX
+    if ((args.empty() || (args.size() > 2)))
+    {
+	usage("invalid --help invocation");
+    }
+    this->help_topic = args[0];
+    if (this->help_topic == h_RULES)
+    {
+	if (args.size() == 2)
+	{
+	    this->rules_help_topic = args[1];
+	}
+	else
+	{
+	    this->rules_help_topic = hr_HELP;
+	}
+    }
+}
+
+void
+Abuild::argFindConf()
+{
+    this->start_dir = findConf();
+}
+
+void
+Abuild::argSetJobs(unsigned int arg)
+{
+    if (arg == 0)
+    {
+	usage("-j's argument must be > 0");
+    }
+    else
+    {
+	this->max_workers = arg;
+    }
+}
+
+void
+Abuild::argSetMakeJobs(unsigned int arg)
+{
+    this->make_njobs = (int)arg;
+}
+
+void
+Abuild::argSetKeepGoing()
+{
+    this->make_args.push_back("-k");
+    this->java_builder_args.push_back("-k");
+    this->keep_going = true;
+}
+
+void
+Abuild::argSetNoOp()
+{
+    this->java_builder_args.push_back("-n");
+    this->make_args.push_back("-n");
+}
+
+void
+Abuild::argSetEmacs()
+{
+    this->java_builder_args.push_back("-e");
+}
+
+void
+Abuild::argSetBackendArgs(std::vector<std::string> const& from,
+			  std::list<std::string>& to)
+{
+    to.insert(to.end(), from.begin(), from.end());
+}
+
+void
+Abuild::argSetDeprecationIsError()
+{
+    this->make_args.push_back("ABUILD_DEPRECATE_IS_ERROR=1");
+    this->java_builder_args.push_back("-de");
+    Error::setDeprecationIsError(true);
+}
+
+void
+Abuild::argSetVerbose()
+{
+    this->make_args.push_back("ABUILD_VERBOSE=1");
+    this->java_builder_args.push_back("-v");
+    this->verbose_mode = true;
+}
+
+void
+Abuild::argSetSilent()
+{
+    this->make_args.push_back("ABUILD_SILENT=1");
+    this->java_builder_args.push_back("-q");
+    this->silent = true;
+}
+
+void
+Abuild::argSetCompatLevel(std::string& var, boost::smatch const& m)
+{
+    var = m[0].str();
+}
+
+void
+Abuild::argSetBuildSet(std::string const& arg)
+{
+    this->buildset_name = arg;
+    this->explicit_buildset = true;
+    this->cleanset_name.clear();
+    if (! arg.empty())
+    {
+	checkBuildsetName("build", this->buildset_name);
+    }
+}
+
+void
+Abuild::argSetCleanSet(std::string const& arg)
+{
+    this->cleanset_name = arg;
+    this->explicit_buildset = true;
+    this->buildset_name.clear();
+    checkBuildsetName("clean", this->cleanset_name);
+}
+
+void
+Abuild::argSetBool(bool& var, bool val)
+{
+    var = val;
+}
+
+void
+Abuild::argSetString(std::string& var, std::string const& val)
+{
+    var = val;
+}
+
+void
+Abuild::argSetStringSplit(std::list<std::string>& var, std::string const& val)
+{
+    var = Util::split(',', val);
+}
+
+void
+Abuild::argInsertInSet(std::set<std::string>& var, std::string const& val)
+{
+    var.insert(val);
 }
 
 void
@@ -7766,10 +7755,7 @@ Abuild::listHelpTopics(HelpTopic_map& topics, std::string const& description,
 void
 Abuild::usage(std::string const& msg)
 {
-    if (! msg.empty())
-    {
-	error(msg);
-    }
+    error(msg);
     fatal("run \"" + this->whoami + " --help\" or \"" +
 	  this->whoami + " --help usage\" for help");
 }

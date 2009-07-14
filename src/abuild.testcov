@@ -46,7 +46,6 @@ KeyVal using default 0
 KeyVal ERR invalid key 0
 KeyVal ERR missing keys 0
 KeyVal ignore blank line 0
-Abuild with_deps 0
 ItemConfig ERR build item invalid name 0
 ItemConfig ERR deps without name 0
 ItemConfig ERR external on non-root 0
