@@ -28,7 +28,7 @@ OPTIONS
   -C start-dir      change directories to start-dir before running
   --clean=set |     specify a clean set; see below for a list of valid sets
     -c set
-  --clean-platforms pattern   when cleaning, only remove platforms that
+  --clean-platforms=pattern   when cleaning, only remove platforms that
                     match the given shell-style filename pattern
   --compat-level=x.y       disable backward compatible for constructs that
                     were deprecated at or before version x.y
@@ -40,7 +40,7 @@ OPTIONS
   -e | --emacs      pass the -e flags to ant and also set a property
                     telling our ant build file that we are running in
                     emacs mode.
-  --find { item-name | tree:tree-name}    print the location of build item
+  --find={ item-name | tree:tree-name}    print the location of build item
                     item-name or build tree tree-name
   --find-conf       look above the current directory to find a directory
                     that contains Abuild.conf and run abuild from there
@@ -58,12 +58,12 @@ OPTIONS
   --no-dep-failures   when used with -k, attempt to build items even when
                     one or more of their dependencies have failed
   --no-deps         build only the current item without its dependencies
-  --only-with-traits trait[,trait,...]   remove all items from build set
+  --only-with-traits=trait[,trait,...]   remove all items from build set
                     that do not have all of the named traits
-  --platform-selector selector |       specify a platform selector
+  --platform-selector=selector |       specify a platform selector
     -p selector     for object-code platforms; see below
   --print-abuild-top  print the path to the top of the abuild installation
-  --related-by-traits trait[,trait,...]  add to the build set all items that
+  --related-by-traits=trait[,trait,...]  add to the build set all items that
                     relate to any item already in the build set by all of
                     the named traits
   --repeat-expansion  repeat expansion from --related-by-traits or
