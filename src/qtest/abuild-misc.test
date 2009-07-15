@@ -130,6 +130,19 @@ my $bison = find_in_path('bison');
 my $have_flex_bison = (((defined $flex) && (defined $bison)) ? 1 : 0);
 if ($have_flex_bison)
 {
+    chop(my $bison_version = `bison --version | head -1`);
+    if ($bison_version =~ m/1\.875$/)
+    {
+	# This version of bison, present on some Solaris systems, is
+	# broken and produces code that doesn't compile in some cases,
+	# including our test suite.  If we need a more general check
+	# in the future, we can add one.
+	$have_flex_bison = 0;
+    }
+}
+
+if ($have_flex_bison)
+{
     for my $i (1..3)
     {
 	my $description = "flex/bison: " .
