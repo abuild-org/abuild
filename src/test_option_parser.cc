@@ -1,5 +1,6 @@
 #include <OptionParser.hh>
 
+#include <Util.hh>
 #include <boost/bind.hpp>
 #include <exception>
 #include <string>
@@ -30,7 +31,7 @@ class OPTest
 };
 
 OPTest::OPTest(char** argv) :
-    whoami(argv[0]),
+    whoami(Util::removeExe(Util::basename(argv[0]))),
     args(argv + 1),
     op(boost::bind(&OPTest::usageError, this, _1),
        boost::bind(&OPTest::doPositional, this, _1))
