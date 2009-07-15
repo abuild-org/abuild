@@ -3,7 +3,7 @@ CCPP = $(CC)
 CXX = $(CC)
 CXXPP = $(CC)
 
-AR = touch
+AR = echo test >
 RANLIB = @:
 PIC_FLAGS =
 SHARED_FLAGS =
