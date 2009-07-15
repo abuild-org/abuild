@@ -28,6 +28,7 @@ endif
 ifeq ($(CCXX_TOOLCHAIN), msvc)
 # Disable a warning in InterfaceParser about using "this" in a constructor
 WFLAGS_InterfaceParser.cc = -wd4355
+WFLAGS_test_option_parser.cc = -wd4355
 endif
 
 WFLAGS_interface.tab.cc :=
