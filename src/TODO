@@ -1,13 +1,4 @@
 
-Before 1.1
-==========
-
- * Test suite fails on dingo (solaris 10); not sure whether this has
-   to do with specific problems on that machine or general problems.
-   Test failures are in flex/bison testing and in compiler
-   verification for the non-native compiler.
-
-
 Abuild Lint
 ==============
 
