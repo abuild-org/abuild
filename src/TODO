@@ -2,29 +2,30 @@
 Klocwork
 ========
 
-Make sure it's possible to create a plugin for klocwork integration.
-It would have to do something like this:
+Klocwork plugin: create preplugin.groovy:
 
-ant.property('name': 'kwout', 'location': 'kwant.out')
-rep_inst = '/opt/klocwork-8.2'
-ant.property('name': 'rep.inst', 'location': rep_inst)
-ant.taskdef('name': 'javac',
-            'classname': 'com.klocwork.kwant.KWJavac') {
-    classpath {
-        pathelement('location': "$rep_inst/class/kwant.jar")
-        pathelement('location': "$rep_inst/class/buildspec.jar")
-        pathelement('location': "$rep_inst/class/kwutils.jar")
-        pathelement('location': "$rep_inst/class/log4j.jar")
-        pathelement('location': "$rep_inst/class/jdom.jar")
+if (System.getenv('ABUILD_KWANT'))
+{
+    ant.property('name': 'kwout',
+                 'location': abuild.buildDirectory.absolutePath + '/kwant.out')
+    rep_inst = '/opt/kwuser' // Get this in a better way
+    ant.property('name': 'rep.inst', 'location': rep_inst)
+    ant.taskdef('name': 'javac',
+                'classname': 'com.klocwork.kwant.KWJavac') {
+        classpath {
+            pathelement('location': "$rep_inst/class/kwant.jar")
+            pathelement('location': "$rep_inst/class/buildspec.jar")
+            pathelement('location': "$rep_inst/class/kwutils.jar")
+            pathelement('location': "$rep_inst/class/log4j.jar")
+            pathelement('location': "$rep_inst/class/jdom.jar")
+        }
     }
 }
 
-It would have to be run early enough.  Such a thing would be best in a
-global plugin.  That means we need to rethink global plugins to make
-them useful.  We should get rid of global tree-deps and instead make
-something like global plugin trees that are visible to all trees or
-something.
-
+Such a thing would be best in a global plugin.  That means we need to
+rethink global plugins to make them useful.  We should get rid of
+global tree-deps and instead make something like global plugin trees
+that are visible to all trees or something.
 
 Abuild Lint
 ==============
