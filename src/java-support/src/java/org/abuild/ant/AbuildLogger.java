@@ -77,7 +77,7 @@ public class AbuildLogger extends DefaultLogger {
 	    if (target_stack.size() > 0)
 	    {
 		this_target = target_stack.peek();
-		if (this_target != last_target)
+		if (! this_target.equals(last_target))
 		{
 		    logTargetName(this_target, event);
 		}
