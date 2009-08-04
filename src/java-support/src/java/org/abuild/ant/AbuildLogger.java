@@ -73,10 +73,9 @@ public class AbuildLogger extends DefaultLogger {
         // Filter out messages based on priority
         if (priority <= msgOutputLevel) {
 
-	    String this_target = null;
 	    if (target_stack.size() > 0)
 	    {
-		this_target = target_stack.peek();
+		String this_target = target_stack.peek();
 		if (! this_target.equals(last_target))
 		{
 		    logTargetName(this_target, event);
