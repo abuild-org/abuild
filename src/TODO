@@ -2,6 +2,8 @@
 Klocwork
 ========
 
+See ~/argon/tmp/kwjava
+
 Klocwork plugin: create preplugin.groovy:
 
 if (System.getenv('ABUILD_KWANT'))
