@@ -1,5 +1,6 @@
 abuild: java-main (abuild-java): all
 Buildfile: --abuild.xml--
+     [echo] preplugin message
 
 init:
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/empty

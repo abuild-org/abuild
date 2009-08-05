@@ -82,6 +82,7 @@
  <!-- Load task definitions -->
  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
  <taskdef resource="org/abuild/ant/tasks.properties"/>
+ <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy"/>
 
  <!--
 
@@ -187,6 +188,9 @@
  <property file=".ab-dynamic-ant.properties"/>
 
  <!--  Load Abuild build files                                     -->
+ <groovy src="${abuild.top}/ant/ImportPreplugins.groovy"/>
+ <import file="${basedir}/.abuild-load.xml"/>
+
  <property file="${abuild.private.dir.item}/Abuild-ant.properties"/>
  <if>
   <and>

@@ -10397,7 +10397,8 @@ f {
        Actually, there is no way for build items using the deprecated
        xml-based ant backend to provide custom rules.  They are
        limited to providing code for specific hooks in the set rule
-       structure.
+       structure.  It is possible for plugins to provide custom
+       targets using <filename>preplugin-ant.xml</filename>.
       </para>
      </footnote>
      To provide custom rules, a build item creates a
@@ -13144,6 +13145,14 @@ flag private INCLUDES = private-include
         xml-based ant framework.
        </para>
       </listitem>
+      <listitem>
+       <para>
+        Arbitrary hook code in <filename>preplugin-ant.xml</filename>
+        that is imported prior by all build items using the deprecated
+        xml-based ant framework prior to reading
+        <filename>Abuild-ant.properties</filename>.
+       </para>
+      </listitem>
      </itemizedlist>
      Additionally, plugins may have <filename>rules</filename>
      directories containing additional <application>make</application>
@@ -15598,6 +15607,72 @@ Y = $(X)
     </varlistentry>
 
  end template -->
+
+    <varlistentry>
+     <term>1.1.b4: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Changes to Deprecated xml-based Ant Framework
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The file <filename>preplugin-ant.xml</filename> is now
+           <emphasis>imported</emphasis> for each plugin prior to
+           loading the local build file or running any targets.  This
+           makes it possible for a plugin to override built-in tasks,
+           set properties, and do other activities that would not be
+           possible from inside of hooks.  This was introduced
+           primarily to support static analyzers and similar tools
+           that require replacing built-in tasks.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         HEADING
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         HEADING
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+
+
+
+
+
 
     <varlistentry>
      <term>1.1.b3: July 28, 2009</term>

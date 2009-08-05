@@ -1,0 +1,3 @@
+<project name="plugin.echoer-preplugin">
+ <echo message="preplugin message"/>
+</project>
