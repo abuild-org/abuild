@@ -1,4 +1,4 @@
---topdir--/external/main/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../a/b/c" of "--topdir--/external/main" points to an named tree in an upgraded build area
+--topdir--/external/main/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../a/b/c" of "--topdir--/external/main" points to a named tree in an upgraded build area
 --topdir--/external/a/b/Abuild.conf: ERROR: "parent-dir" points to a directory that does not contain Abuild.conf
 abuild: ERROR: unable to find top of build forest containing "--topdir--/external/a/b/c" (external "../a/b/c" of "--topdir--/external/main"); run with --verbose for details
 --topdir--/external/main/Abuild.conf: ERROR: tree tree.1.-RND- depends on unknown build tree c

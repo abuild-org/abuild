@@ -1,4 +1,4 @@
---topdir--/globals/t2/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../t3" of "--topdir--/globals/t2" points to an named tree in an upgraded build area
+--topdir--/globals/t2/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../t3" of "--topdir--/globals/t2" points to a named tree in an upgraded build area
 abuild: ERROR: at least one build tree in the forest rooted at --topdir--/globals uses external-dirs, and  global plugins are in use; global plugins may not be used until all tree dependencies are converted to named tree dependencies
 --topdir--/globals/items/Abuild.conf: ERROR: item "g3" is declared as a plugin, but it has a build or non-plugin interface file
 --topdir--/globals/t3/g3/Abuild.conf: ERROR: here is "g3"'s Abuild.conf

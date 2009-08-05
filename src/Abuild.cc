@@ -2410,7 +2410,7 @@ Abuild::registerBuildTree(BuildForest& forest,
 			deprecate("1.1", config->getLocation(),
 				  "external \"" + edecl +
 				  "\" of \"" + dir + "\" points to"
-				  " an named tree in an upgraded"
+				  " a named tree in an upgraded"
 				  " build area");
 		    }
 		    tree_deps.push_back(ext_tree_name);
