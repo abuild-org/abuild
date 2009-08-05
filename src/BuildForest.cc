@@ -1,7 +1,8 @@
 #include <BuildForest.hh>
 
 BuildForest::BuildForest(std::string const& root_path) :
-    root_path(root_path)
+    root_path(root_path),
+    has_externals(false)
 {
 }
 
@@ -42,6 +43,18 @@ BuildForest::getDeletedItems()
     return this->deleted_items;
 }
 
+void
+BuildForest::setHasExternals()
+{
+    this->has_externals = true;
+}
+
+bool
+BuildForest::hasExternals() const
+{
+    return this->has_externals;
+}
+
 std::map<std::string, std::set<std::string> >&
 BuildForest::getTreeAccessTable()
 {
@@ -73,18 +86,6 @@ BuildForest::getSortedItemNames() const
 }
 
 void
-BuildForest::addGlobalTreeDep(std::string const& tree_name)
-{
-    this->global_treedeps.insert(tree_name);
-}
-
-std::set<std::string>&
-BuildForest::getGlobalTreeDeps()
-{
-    return this->global_treedeps;
-}
-
-void
 BuildForest::addGlobalPlugin(std::string const& item_name)
 {
     this->global_plugins.insert(item_name);
@@ -103,7 +104,6 @@ BuildForest::propagateGlobals()
 	 iter != this->build_trees.end(); ++iter)
     {
 	BuildTree& tree = *((*iter).second);
-	tree.addTreeDeps(this->global_treedeps);
 	tree.addPlugins(this->global_plugins);
     }
 }

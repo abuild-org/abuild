@@ -89,8 +89,7 @@
 <!--  even with the errors attribute of the top-level element is   -->
 <!--  set.                                                         -->
 <!ELEMENT forest (backing-area*, deleted-trees?, deleted-items?,
-                  global-tree-dependencies?, global-plugins?,
-                  build-tree+)>
+                  global-plugins?, build-tree+)>
 <!ATTLIST forest
   id             ID      #REQUIRED
   absolute-path  CDATA   #REQUIRED
@@ -116,12 +115,6 @@
 <!ATTLIST deleted-item
   name           CDATA   #REQUIRED
 >
-
-<!--  The global-tree-dependencies element contains a list of the  -->
-<!--  names of trees that are declared as global tree              -->
-<!--  dependencies in the forest.  Global tree dependencies also   -->
-<!--  appear as declared-tree-dependencies for each tree.          -->
-<!ELEMENT global-tree-dependencies (tree-dependency+)>
 
 <!--  The global-plugins element contains a list of all plugins    -->
 <!--  that are declared as global in the forest.  Such plugins     -->

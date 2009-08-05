@@ -1,0 +1,4 @@
+abuild: t2 (abuild-indep): all
+make: Entering directory `--topdir--/global-plugin/t2/abuild-indep'
+hello from global plugin from ../../t1 for t2
+make: Leaving directory `--topdir--/global-plugin/t2/abuild-indep'

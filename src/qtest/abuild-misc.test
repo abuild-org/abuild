@@ -363,6 +363,16 @@ for (my $i = 1; $i <= 2; ++$i)
     copy("Abuild-with-t3.conf", "Abuild.conf") or die;
 }
 
+cd("work/global-plugin");
+
+# Make sure global plugins work backwards across tree dependencies
+$td->runtest("global plugin in reverse tree-dep",
+	     {$td->COMMAND => "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/global-plugin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/symlink-ext");
 
 if (! in_windows())
@@ -413,7 +423,7 @@ foreach my $d (['serial', 'serial', ''],
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(48 +
+$td->report(49 +
 	    (in_windows() ? 0 : 3) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));

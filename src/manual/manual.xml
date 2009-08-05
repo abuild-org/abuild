@@ -3076,35 +3076,6 @@ C:\cygwin\cygwin.bat
      <classname>common-lib1</classname>.
     </para>
    </sect1>
-   <sect1 id="ref.global-tree-dep">
-    <title>Global Tree Dependency</title>
-    <indexterm>
-     <primary>tree dependency</primary>
-     <secondary>global</secondary>
-    </indexterm>
-    <para>
-     It is also possible to have a tree declare itself to be a global
-     tree dependency, meaning that its items are available to all
-     build trees in a forest.  Such a tree may not declare any of its
-     own tree dependencies since, if it did, each of those trees would
-     be involved in a circular dependency when they depended back on
-     the global tree dependency.  Additionally, at most one tree in a
-     forest may be a global tree dependency since, otherwise, all
-     global tree dependencies would try to depend on each other.
-     There are few good reasons to use global tree dependencies, and
-     when you do use them, it should be the decision of a specific
-     project, not the decision of a provider of a shared code
-     provider, specially since you can only have one global tree
-     dependency.  The use of global tree dependencies is required for
-     global plugins, discussed in <xref
-     linkend="ref.global-plugins"/>.  To make a tree a global tree
-     dependency, include
-
-     <programlisting>attributes: global-tree-dep
-</programlisting>
-     in its root <filename>Abuild.conf</filename> file.
-    </para>
-   </sect1>
    <sect1 id="ref.example.dependent-build-tree">
     <title>Tree Dependency Example</title>
     <para>
@@ -6209,14 +6180,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
             <property>global-plugin</property>: causes this build item
             to be treated as a plugin for all build trees in the
             forest; see <xref linkend="ref.global-plugins"/>.
-           </para>
-          </listitem>
-          <listitem>
-           <para>
-            <property>global-tree-dep</property>: valid only for build
-            tree root build items, where it causes that build tree to
-            be a tree dependency of all other build trees in the
-            forest; see <xref linkend="ref.global-tree-dep"/>.
            </para>
           </listitem>
           <listitem>
@@ -13205,12 +13168,12 @@ flag private INCLUDES = private-include
 
      <programlisting>attributes: global-plugin
 </programlisting>
-     in its <filename>Abuild.conf</filename>.  &Abuild; requires that
-     all global plugins are in trees that are global tree dependencies
-     (see <xref linkend="ref.global-tree-dep"/>).  This means that at
-     most one build tree per forest may contain global plugins, which
-     is yet another reason that they should be used only for enforcing
-     project-wide policy.
+     in its <filename>Abuild.conf</filename>.  When a build item is
+     declared as a global plugin, &abuild; disregards access checks
+     based on tree dependencies.  In this sense, the affect of global
+     plugins may &ldquo;flow backwards&rdquo; across tree
+     dependencies.  This is yet another reason that they should be
+     used only for enforcing project-wide policy.
     </para>
    </sect1>
    <sect1 id="ref.adding-platform-types-and-platforms">
@@ -15614,6 +15577,29 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The global tree dependency feature has been removed as
+           there was no way to make its use practical.  As such,
+           global plugins no longer have to be in trees declared as
+           global tree dependencies.  Instead, &abuild; disregards
+           tree dependency-based access checks when turning on global
+           plugins.  To ensure build consistency when global plugins
+           are used, &abuild; disallows use of global tree
+           dependencies if any tree in the forest uses
+           <property>external-dirs</property>.  Otherwise, a global
+           plugin may not be in effect if a build were started in the
+           root of an external tree from which the real forest root
+           could not be determined.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
          Changes to Deprecated xml-based Ant Framework
         </para>
         <itemizedlist>
@@ -15631,49 +15617,9 @@ Y = $(X)
          </listitem>
         </itemizedlist>
        </listitem>
-       <listitem>
-        <para>
-         HEADING
-        </para>
-        <itemizedlist>
-         <listitem>
-          <para>
-           LIST ITEM
-          </para>
-         </listitem>
-         <listitem>
-          <para>
-           LIST ITEM
-          </para>
-         </listitem>
-        </itemizedlist>
-       </listitem>
-       <listitem>
-        <para>
-         HEADING
-        </para>
-        <itemizedlist>
-         <listitem>
-          <para>
-           LIST ITEM
-          </para>
-         </listitem>
-         <listitem>
-          <para>
-           LIST ITEM
-          </para>
-         </listitem>
-        </itemizedlist>
-       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
-
-
-
-
-
-
     <varlistentry>
      <term>1.1.b3: July 28, 2009</term>
      <listitem>
@@ -16697,6 +16643,8 @@ Y = $(X)
            <itemizedlist>
             <listitem>
              <para>
+              <emphasis>Note: this feature was removed in a subsequent
+              release.</emphasis>
               <property>global-tree-dep</property>: This attribute may
               be assigned to any root build item of an explicitly
               named tree.  Such a tree may not have any tree
@@ -16711,19 +16659,21 @@ Y = $(X)
               be assigned to any build item that otherwise meets the
               qualifications for being a plugin.  It must reside in a
               tree with the <property>global-tree-dep</property>
-              attribute.  This item will then be treated as if it had
-              been explicitly listed as a plugin for all build trees.
-              This is a very powerful feature which must used with
-              care.  Good uses for it might include implementing
-              project-wide checks, such as making sure appropriate
-              environment variables are set or appropriate dependency
-              rules are followed, or for adding new platforms or
-              platform types that may be used by all build items in a
-              forest.  Care should be taken to avoid introducing
-              global plugins that wider consequences than you might
-              initially expect.  Global plugins should generally be
-              coded in such a way that their impact can be disabled in
-              some way.
+              attribute.  <emphasis>Note:
+              <property>global-tree-dep</property> was removed in a
+              later release.</emphasis> This item will then be treated
+              as if it had been explicitly listed as a plugin for all
+              build trees.  This is a very powerful feature which must
+              used with care.  Good uses for it might include
+              implementing project-wide checks, such as making sure
+              appropriate environment variables are set or appropriate
+              dependency rules are followed, or for adding new
+              platforms or platform types that may be used by all
+              build items in a forest.  Care should be taken to avoid
+              introducing global plugins that wider consequences than
+              you might initially expect.  Global plugins should
+              generally be coded in such a way that their impact can
+              be disabled in some way.
              </para>
             </listitem>
            </itemizedlist>

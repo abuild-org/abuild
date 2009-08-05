@@ -27,14 +27,15 @@ class BuildForest
     std::set<std::string>& getDeletedTrees();
     std::set<std::string>& getDeletedItems();
 
+    void setHasExternals();
+    bool hasExternals() const;
+
     std::map<std::string, std::set<std::string> >& getTreeAccessTable();
     void setSortedTreeNames(std::list<std::string> const& sorted_trees);
     std::list<std::string> const& getSortedTreeNames() const;
     void setSortedItemNames(std::list<std::string> const& sorted_items);
     std::list<std::string> const& getSortedItemNames() const;
 
-    void addGlobalTreeDep(std::string const& tree_name);
-    std::set<std::string>& getGlobalTreeDeps();
     void addGlobalPlugin(std::string const& item_name);
     std::set<std::string>& getGlobalPlugins();
 
@@ -49,6 +50,8 @@ class BuildForest
     // When adding fields to BuildForest, remember to handle them in
     // Abuild::mergeForests.
 
+    bool has_externals;
+
     BuildItem_map build_items;
     BuildTree_map build_trees;
     std::list<std::string> backing_areas;
@@ -59,7 +62,6 @@ class BuildForest
     std::list<std::string> sorted_tree_names;
     std::list<std::string> sorted_item_names;
 
-    std::set<std::string> global_treedeps;
     std::set<std::string> global_plugins;
 };
 

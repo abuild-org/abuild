@@ -1076,22 +1076,7 @@ ItemConfig::checkAttributes()
 	 iter != attrs.end(); ++iter)
     {
 	std::string const& attr = *iter;
-	if (attr == "global-tree-dep")
-	{
-	    if (this->tree_name.empty())
-	    {
-		QTC::TC("abuild", "ItemConfig ERR global-tree-dep non-root");
-		this->error.error(this->location,
-				  "the \"global-tree-dep\" attribute may only"
-				  " be applied to root build items of named"
-				  " trees");
-	    }
-	    else
-	    {
-		this->global_treedep = true;
-	    }
-	}
-	else if (attr == "global-plugin")
+	if (attr == "global-plugin")
 	{
 	    if (this->name.empty())
 	    {
@@ -1280,7 +1265,6 @@ ItemConfig::ItemConfig(
     is_child_only(false),
     deprecated(false),
     external_symlinks(false),
-    global_treedep(false),
     global_plugin(false),
     serial(false)
 {
@@ -1504,12 +1488,6 @@ std::list<std::string> const&
 ItemConfig::getPlugins() const
 {
     return this->plugins;
-}
-
-bool
-ItemConfig::isGlobalTreeDep() const
-{
-    return this->global_treedep;
 }
 
 bool

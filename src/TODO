@@ -1,20 +1,4 @@
 
-Rethink Global Plugins
-======================
-
- * Eliminate global-tree-deps as they are not useful
-
- * Disallow global-plugins from any forest that has any externals.
-   Rationale: when externals are used, there is no guarantee that
-   abuild will find the same forest root when the build is initiated
-   from the external, so the plugin may be in effect conditionally
-   upon where the build was started
-
- * Disregard visibility/accessibility checks for global plugins; allow
-   a global plugin to be turned on regardless of which tree it is in.
-
- * Test global plugin working backwards across tree-dep
-
 Abuild Lint
 ==============
 

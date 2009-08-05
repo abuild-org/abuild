@@ -17,48 +17,9 @@
   id="f-1"
   absolute-path="--topdir--/case4"
  >
-  <global-tree-dependencies>
-   <tree-dependency name="other"/>
-  </global-tree-dependencies>
   <global-plugins>
    <plugin name="plugin.other"/>
   </global-plugins>
-  <build-tree
-   name="other"
-   absolute-path="--topdir--/case4/other"
-   home-forest="f-1"
-   backing-depth="0"
-  >
-   <platform-data>
-    <platform-type name="indep" target-type="platform-independent">
-     <platform name="indep" selected="1"/>
-    </platform-type>
-    <platform-type name="native" target-type="object-code">
-     <platform name="<native>" selected="1"/>
-     <platform name="<native>.debug" selected="0"/>
-     <platform name="<native>.release" selected="0"/>
-    </platform-type>
-    <platform-type name="other" target-type="object-code">
-     <platform name="zz_os.cpu.toolset.other" selected="1"/>
-     <platform name="zz_os.cpu.toolset.other.debug" selected="0"/>
-     <platform name="zz_os.cpu.toolset.other.release" selected="0"/>
-    </platform-type>
-    <platform-type name="java" target-type="java">
-     <platform name="java" selected="1"/>
-    </platform-type>
-   </platform-data>
-   <plugins>
-    <plugin name="plugin.other"/>
-   </plugins>
-   <build-item
-    name="plugin.other"
-    home-forest="f-1"
-    absolute-path="--topdir--/case4/other"
-    backing-depth="0"
-    target-type="all"
-    is-plugin="1"
-   />
-  </build-tree>
   <build-tree
    name="case4"
    absolute-path="--topdir--/case4"
@@ -86,12 +47,6 @@
    <plugins>
     <plugin name="plugin.other"/>
    </plugins>
-   <declared-tree-dependencies>
-    <tree-dependency name="other"/>
-   </declared-tree-dependencies>
-   <expanded-tree-dependencies>
-    <tree-dependency name="other"/>
-   </expanded-tree-dependencies>
    <build-item
     name="item"
     home-forest="f-1"
@@ -237,6 +192,42 @@
      <platform name="zz_os.cpu.toolset.other.release"/>
     </buildable-platforms>
    </build-item>
+  </build-tree>
+  <build-tree
+   name="other"
+   absolute-path="--topdir--/case4/other"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="other" target-type="object-code">
+     <platform name="zz_os.cpu.toolset.other" selected="1"/>
+     <platform name="zz_os.cpu.toolset.other.debug" selected="0"/>
+     <platform name="zz_os.cpu.toolset.other.release" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <plugins>
+    <plugin name="plugin.other"/>
+   </plugins>
+   <build-item
+    name="plugin.other"
+    home-forest="f-1"
+    absolute-path="--topdir--/case4/other"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="1"
+   />
   </build-tree>
  </forest>
 </abuild-data>

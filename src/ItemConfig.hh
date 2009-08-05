@@ -95,7 +95,6 @@ class ItemConfig
     bool hasAntBuild() const;
     std::string const& getBuildFile() const;
     std::list<std::string> const& getPlugins() const;
-    bool isGlobalTreeDep() const;
     bool isGlobalPlugin() const;
     bool isSerial() const;
 
@@ -213,7 +212,6 @@ class ItemConfig
 	     boost::shared_ptr<PlatformSelector> > dep_platform_selectors;
     std::set<std::string> optional_deps;
     std::set<std::string> optional_tree_deps;
-    bool global_treedep;
     bool global_plugin;
     bool serial;
 };

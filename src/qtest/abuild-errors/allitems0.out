@@ -36,7 +36,6 @@
 --topdir--/a/ag/Abuild.conf: ERROR: invalid trait !wrong!
 --topdir--/a/ag/Abuild.conf: ERROR: deleted item "quack" listed more than once
 --topdir--/a/ag/Abuild.conf: ERROR: plugin "oink" listed more than once
---topdir--/a/ag/Abuild.conf: ERROR: the "global-tree-dep" attribute may only be applied to root build items of named trees
 --topdir--/a/ag/Abuild.conf: ERROR: the "global-plugin" attribute may only be applied to named build items
 --topdir--/a/ag/Abuild.conf: ERROR: unknown attribute "glarpenspliel"
 --topdir--/a/ag/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded

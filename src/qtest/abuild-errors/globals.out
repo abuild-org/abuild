@@ -1,6 +1,5 @@
---topdir--/globals/t2/Abuild.conf: ERROR: a tree with tree dependencies may not declare itself to be a global tree dependency
---topdir--/globals/t1/g1/Abuild.conf: ERROR: this item's tree, "t1" must be have the global-tree-dep attribute in order for this item to be a global plugin
---topdir--/globals/t1/Abuild.conf: ERROR: here is the tree that contains this item
+--topdir--/globals/t2/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../t3" of "--topdir--/globals/t2" points to an named tree in an upgraded build area
+abuild: ERROR: at least one build tree in the forest rooted at --topdir--/globals uses external-dirs, and  global plugins are in use; global plugins may not be used until all tree dependencies are converted to named tree dependencies
 --topdir--/globals/items/Abuild.conf: ERROR: item "g3" is declared as a plugin, but it has a build or non-plugin interface file
 --topdir--/globals/t3/g3/Abuild.conf: ERROR: here is "g3"'s Abuild.conf
 --topdir--/globals/t3/g3/Abuild.conf: ERROR: NOTE: this item declares itself as a global plugin, so some of the above error messages may be repeated for every tree, including those that do not explicitly declare the item to be a plugin
@@ -15,4 +14,5 @@
 --topdir--/globals/t3/g3/Abuild.conf: ERROR: NOTE: this item declares itself as a global plugin, so some of the above error messages may be repeated for every tree, including those that do not explicitly declare the item to be a plugin
 --topdir--/globals/items/Abuild.conf: ERROR: this item depends on "g3", which is declared as a plugin
 --topdir--/globals/t3/g3/Abuild.conf: ERROR: the dependency is declared as a global plugin
+--topdir--/globals/items/Abuild.conf: ERROR: build item "i1" may not depend on build item "g3" because "i1"'s tree ("items") does not depend on "g3"'s tree ("t3")
 abuild: ERROR: errors detected; exiting
