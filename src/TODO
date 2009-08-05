@@ -13,6 +13,7 @@ Rethink Global Plugins
  * Disregard visibility/accessibility checks for global plugins; allow
    a global plugin to be turned on regardless of which tree it is in.
 
+ * Test global plugin working backwards across tree-dep
 
 Abuild Lint
 ==============
