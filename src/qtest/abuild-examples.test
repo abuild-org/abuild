@@ -547,12 +547,20 @@ if ($test_java)
 		 {$td->STRING => "What am I supposed to say again?\n",
 		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
+
+    cd("work/plugin/echo");
+    $td->runtest("echo example output",
+		 {$td->COMMAND => "abuild -b desc",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/plugin-echo.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
 }
 else
 {
     cd("work/plugin");
-
-    system("(tar cf - java plugins/echoer/plugin.groovy | cat > /dev/null)");
+    system("(tar cf - java echo plugins/echoer/*plugin.groovy" .
+	   " | cat > /dev/null)");
 }
 
 # Specific cases for documentation
@@ -561,14 +569,6 @@ $td->runtest("run count target",
 	     {$td->COMMAND => "abuild count",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/count-b.out",
-	      $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
-
-cd("work/plugin/echo");
-$td->runtest("echo example output",
-	     {$td->COMMAND => "abuild -b desc",
-	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->FILE => "$top/plugin-echo.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
@@ -904,7 +904,7 @@ $td->runtest("run prog with",
 
 check_work_accessed($td);
 
-$td->report(133 +
+$td->report(132 +
 	    (in_windows() ? 0 : 1) +
-	    ($test_java ? 9 : 0) +
+	    ($test_java ? 10 : 0) +
 	    ($have_whole_archive ? 2 : 1));
