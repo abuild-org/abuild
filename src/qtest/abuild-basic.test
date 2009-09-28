@@ -696,8 +696,8 @@ if ($gcc)
     foreach my $w (32, 64)
     {
 	my $var = ($w == 32) ? \$gcc32 : \$gcc64;
-	$$var = (system("gcc -m$w -c a.c -o a.o >/dev/null 2>&1") == 0);
-	unlink "a.o";
+	$$var = (system("gcc -m$w a.c -o a.out >/dev/null 2>&1") == 0);
+	unlink "a.out";
 	if ($$var)
 	{
 	    my $o = ($w == 32 ? 64 : 32);
