@@ -1,0 +1,10 @@
+abuild: searching for build items...
+abuild: analyzing...
+abuild: upgrade data has been written to abuild.upgrade-data
+abuild: ERROR: interleaved forests detected; this situation must be resolved manually prior to upgrading:
+abuild: ERROR:   the tree rooted at "a/b/c/d/e" belongs to the forest rooted at "a"
+abuild: ERROR:   the first build item above "a/b/c/d/e" was found at "a/b/c/d"
+abuild: ERROR:   the root of the next higher build item's tree is "a/b/c"
+abuild: ERROR:   the root of the next higher build item's forest is "a/b"
+abuild: ERROR:   to resolve, either break the connection that joins "a/b/c/d/e" to "a" or add a connection that joins "a/b/c" to "a"
+abuild: ERROR: errors detected; exiting

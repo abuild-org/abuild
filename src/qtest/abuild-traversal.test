@@ -230,6 +230,15 @@ $td->runtest("bad forest root",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/errors/interleaved-forests");
+
+$td->runtest("interleaved forests",
+	     {$td->COMMAND => "abuild --upgrade-trees",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/interleaved-forests.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 # Traverse a 1.0-style tree with complex externals and backing areas.
 
 cd("work/1.0");
@@ -467,7 +476,7 @@ $td->runtest("check upgrade data",
 
 check_work_accessed($td);
 
-$td->report(73);
+$td->report(74);
 
 sub check_tree
 {

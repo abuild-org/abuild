@@ -533,14 +533,30 @@ Abuild::upgradeForests(UpgradeData& ud)
 	    if (ud.items.count(path))
 	    {
 		// If this item is part of a different forest, we have
-		// interleaved forests, which is precluded by checks
-		// in ItemConfig.
-		assert(ud.tree_forest_roots[
-			   ud.item_tree_roots[path]] == forest_root);
-		QTC::TC("abuild", "Abuild-upgrade add child");
-		children_to_add[path].insert(
-		    Util::absToRel(Util::canonicalizePath(tree_root),
-				   Util::canonicalizePath(path)));
+		// interleaved forests.  We detect this in ItemConfig
+		// for the case of child-dirs (where we don't allow
+		// any interleaved Abuild.conf files at all) but not
+		// for external-dirs.  It's not detectible in the
+		// external-dirs case without doing the full analysis
+		// required to group trees into forests.
+		if (ud.tree_forest_roots[
+			ud.item_tree_roots[path]] != forest_root)
+		{
+		    QTC::TC("abuild", "Abuild-upgrade ERR interleaved forests");
+		    error("interleaved forests detected; this situation must be resolved manually prior to upgrading:");
+		    error("  the tree rooted at \"" + tree_root + "\" belongs to the forest rooted at \"" + forest_root + "\"");
+		    error("  the first build item above \"" + tree_root + "\" was found at \"" + path + "\"");
+		    error("  the root of the next higher build item's tree is \"" + ud.item_tree_roots[path] + "\"");
+		    error("  the root of the next higher build item's forest is \"" + ud.tree_forest_roots[ud.item_tree_roots[path]] + "\"");
+		    error("  to resolve, either break the connection that joins \"" + tree_root + "\" to \"" + forest_root + "\" or add a connection that joins \"" + ud.item_tree_roots[path] + "\" to \"" + forest_root + "\"");
+		}
+		else
+		{
+		    QTC::TC("abuild", "Abuild-upgrade add child");
+		    children_to_add[path].insert(
+			Util::absToRel(Util::canonicalizePath(tree_root),
+				       Util::canonicalizePath(path)));
+		}
 		break;
 	    }
 	    else if (path == forest_root)
