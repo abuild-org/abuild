@@ -412,3 +412,5 @@ Abuild ERR usage invalid build set 0
 Abuild ERR global plugins with externals 0
 Abuild allow access to global plugin 0
 Abuild-upgrade ERR interleaved forests 0
+Abuild ignoring missing optional child 0
+ItemConfig ERR optional without child 0

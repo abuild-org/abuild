@@ -2276,25 +2276,28 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
                     error(location, "child " + child_conf + " is missing");
                 }
             }
-            else
-            {
-                if (has_backing_area)
-                {
-                    // Allow sparse trees if we have a backing area.
-                    // No validation is required for the child
-                    // directory.
-                    QTC::TC("abuild", "Abuild sparse tree");
-		    verbose("ignoring non-existence of child dir " +
-			    *iter + " from " + Util::absToRel(dir) +
-			    " in a tree with a backing area");
-                }
-                else
-                {
-                    QTC::TC("abuild", "Abuild ERR can't resolve child");
-                    error(location, "unable to find child " + *iter);
-                }
-            }
-        }
+            else if (has_backing_area)
+	    {
+		// Allow sparse trees if we have a backing area.
+		// No validation is required for the child
+		// directory.
+		QTC::TC("abuild", "Abuild sparse tree");
+		verbose("ignoring non-existence of child dir " +
+			*iter + " from " + Util::absToRel(dir) +
+			" in a tree with a backing area");
+	    }
+	    else if (config->childIsOptional(*iter))
+	    {
+		QTC::TC("abuild", "Abuild ignoring missing optional child");
+		verbose("ignoring non-existence of optional child dir " +
+			*iter + " from " + Util::absToRel(dir));
+	    }
+	    else
+	    {
+		QTC::TC("abuild", "Abuild ERR can't resolve child");
+		error(location, "unable to find child " + *iter);
+	    }
+	}
     }
 
     decrementVerboseIndent();

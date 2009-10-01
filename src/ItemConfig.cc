@@ -518,10 +518,30 @@ ItemConfig::checkChildren()
 	QTC::TC("abuild", "ItemConfig ERR absolute child");
     }
     std::list<std::string>::iterator iter = this->children.begin();
+    std::string last_child;
     while (iter != this->children.end())
     {
 	std::list<std::string>::iterator next = iter;
 	++next;
+
+	if (*iter == "-optional")
+	{
+	    if (last_child.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR optional without child");
+		this->error.error(this->location, "-optional"
+				  " is not preceded by a child directory");
+	    }
+	    else
+	    {
+		this->optional_children.insert(last_child);
+	    }
+	    this->children.erase(iter, next);
+	    iter =  next;
+	    continue;
+	}
+
+	last_child = *iter;
 	Util::stripTrailingSlash(*iter);
 	std::string const& child = *iter;
 	std::list<std::string> elements = Util::split('/', child);
@@ -1500,6 +1520,12 @@ bool
 ItemConfig::isSerial() const
 {
     return this->serial;
+}
+
+bool
+ItemConfig::childIsOptional(std::string const& child) const
+{
+    return (this->optional_children.count(child) != 0);
 }
 
 bool

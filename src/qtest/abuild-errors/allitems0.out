@@ -4,6 +4,7 @@
 --topdir--/a/aa/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
 --topdir--/a/ab/Abuild.conf: ERROR: "external-dirs" may only appear in a root build item
+--topdir--/a/ab/Abuild.conf: ERROR: -optional is not preceded by a child directory
 --topdir--/a/ab/Abuild.conf: ERROR: invalid build-also build item name !oops!
 --topdir--/a/ab/Abuild.conf: ERROR: -optional is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf: ERROR: flag -flag=moo is not preceded by a build item name

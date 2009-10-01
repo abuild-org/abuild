@@ -97,6 +97,7 @@ class ItemConfig
     std::list<std::string> const& getPlugins() const;
     bool isGlobalPlugin() const;
     bool isSerial() const;
+    bool childIsOptional(std::string const& child) const;
 
     // For 1.0 to 1.1 upgrade process
     bool upgradeConfig(std::string const& file,
@@ -212,6 +213,7 @@ class ItemConfig
 	     boost::shared_ptr<PlatformSelector> > dep_platform_selectors;
     std::set<std::string> optional_deps;
     std::set<std::string> optional_tree_deps;
+    std::set<std::string> optional_children;
     bool global_plugin;
     bool serial;
 };
