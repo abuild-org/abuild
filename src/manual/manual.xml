@@ -3086,7 +3086,7 @@ C:\cygwin\cygwin.bat
      toward the root of the file system for other
      <filename>Abuild.conf</filename> files that list previous
      <filename>Abuild.conf</filename> directories in their
-     <filename>child-dirs</filename> key.  The parent directory of our
+     <property>child-dirs</property> key.  The parent directory of our
      previous example contains (see <xref
      linkend="ref.example.simple-build-tree"/>) the following
      <filename>Abuild.conf</filename> file:
@@ -6217,6 +6217,18 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          that contain additional <filename>Abuild.conf</filename>
          files.  The value is a whitespace-separated list of relative
          paths, each of which must point down in the file system.
+        </para>
+        <para>
+         A child directory may be followed by the
+         <option>-optional</option> flag, in which case &abuild; will
+         not complain if the directory doesn't exist.  This can be
+         especially useful for high-level
+         <filename>Abuild.conf</filename> files whose children may
+         correspond to optional dependencies, optional build trees, or
+         self-contained trees that may or may not be included in a
+         particular configuration.
+        </para>
+        <para>
          If a child directory contains more than one path element,
          the intermediate directories may not contain their own
          <filename>Abuild.conf</filename> files.  (In other words, you
@@ -15572,6 +15584,31 @@ Y = $(X)
  end template -->
 
     <varlistentry>
+     <term>1.1.b5: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <option>-optional</option> flag may follow a child
+           directory in the <property>child-dirs</property> key in
+           <filename>Abuild.conf</filename>.  In this case, &abuild;
+           will not complain if the child directory is missing.  This
+           can be especially useful for
+           <filename>Abuild.conf</filename> files that may contain
+           that are optional trees or optional dependencies.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.b4: September 28, 2009</term>
      <listitem>
       <itemizedlist>
@@ -20793,7 +20830,11 @@ Y = $(X)
       <property>child-dirs</property> key whose value is the relative
       paths to all the root directories of all the build trees in the
       forest.  You may wish to manually edit this file depending on
-      how you intend to organize your forest.
+      how you intend to organize your forest.  In some cases, &abuild;
+      may include references to trees that are not always present.
+      When this happens, you may wish to add the
+      <option>-optional</option> flag after the directory name in the
+      <property>child-dirs</property> key.
      </para>
     </sect2>
     <sect2 id="ref.upgrade11.procedures.editing">
