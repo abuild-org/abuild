@@ -8,6 +8,8 @@
    into the DLL name without encoding it into the lib name to get some
    kind of versioning semantics with Windows builds.
 
+   Update ~/information/technical-notes: search for abuild in a DLL
+   section.
 
 Abuild Lint
 ==============
