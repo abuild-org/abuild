@@ -64,6 +64,8 @@ while (<>)
     # Skip VC++'s DLL creation output
     next if m/Creating library .*\.lib and object .*\.exp/i;
     next if m/Renaming .*\.lib/i;
+    next if m/make:.*modification time.*future/i;
+    next if m/make:.*clock skew/i;
     # Filter junitreport
     if (m/\[junitreport\]\s/)
     {
