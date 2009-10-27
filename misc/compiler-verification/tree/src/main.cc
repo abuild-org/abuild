@@ -16,6 +16,7 @@ int main()
     A::hello();
     B::hello();
     X::hello();
-    Z::hello();
+    Z1::hello();
+    Z2::hello();
     return 0;
 }

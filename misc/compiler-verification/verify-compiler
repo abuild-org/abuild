@@ -284,15 +284,16 @@ if ($platform_type ne 'native')
 In each case, the executable target is \"main\" and is located in
 $tmpdir/src/$abuild_out.
 
-The program requires two shared libraries: \"Z\", which can be found in the
-same directory as \"main\", and \"B\", which is located in
-$tmpdir/b/$abuild_out.
+The program requires three shared libraries: \"Z1\" and \"Z2\", which
+can be found in the same directory as \"main\", and \"B\", which is
+located in $tmpdir/b/$abuild_out.
 
 The program itself should contain the symbols A::hello() and
 X::hello().  If Other::Other() is in the expected output, it should
 also contain the symbol Other::Other().  The B shared library should
-contain the symbol B::hello().  The Z shared library should contain
-the symbols Y::hello() and Z::hello().
+contain the symbol B::hello().  The Z1 shared library should contain
+the symbols Y::hello() and Z1::hello().  The Z2 shared library should
+contain the symbol Z2::hello().
 
 When this program asks you to run the program, it will display the expected
 output and prompt you to continue.
@@ -306,7 +307,8 @@ Hello from A
 Hello from B
 Hello from X
 Hello from Y
-Hello from Z
+Hello from Z1
+Hello from Z2
 ";
 
 my $expected1 = "Other::Other()
@@ -318,8 +320,8 @@ safe_copy("Abuild.mk-1", "Abuild.mk");
 notice("RUNNING INITIAL BUILD");
 check_build("abuild",
 	    [],
-	    [qw(A.cc B.cc X.cc Y.cc Z.cc main.cc other.cc)],
-	    [qw(A B X Y Z main)],
+	    [qw(A.cc B.cc X.cc Y.cc Z1.cc Z2.cc main.cc other.cc)],
+	    [qw(A B X Y Z1 Z2 main)],
 	    ["for printf yes", "for exception yes",
 	     "whether we are cross compiling $cross"]);
 check_prog($expected1);
@@ -331,15 +333,15 @@ check_build("abuild", [], [], [], []);
 # If we remove a source file, everything should relink
 safe_copy("Abuild.mk-2", "Abuild.mk");
 notice("RUNNING BUILD AFTER REMOVING SOURCE");
-check_build("abuild", ["object files"], [], [qw(Y Z main)], []);
+check_build("abuild", ["object files"], [], [qw(Y Z1 Z2 main)], []);
 check_prog($expected2);
 
 # After moving X.hh, anything that uses X.hh should recompile and
-# anythnig that links with X, including the shared library Z, should
-# relink.
+# anythnig that links with X, including the shared libraries Z*,
+# should relink.
 safe_rename("../incl1/X.hh", "../incl2/X.hh");
 notice("RUNNING BUILD AFTER MOVING HEADER");
-check_build("abuild", [], [qw(X.cc main.cc)], [qw(X Z main)], []);
+check_build("abuild", [], [qw(X.cc main.cc)], [qw(X Z1 Z2 main)], []);
 check_prog($expected2);
 
 notice("REBUILD WHEN UP TO DATE");

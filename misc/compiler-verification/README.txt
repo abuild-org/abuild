@@ -14,8 +14,9 @@ This build tree consists of the following:
 
  * b: shared library build item
 
- * src: build item consisting of static library Y, shared library Z,
-   and executable main.  Shared library Z calls static library Y.
+ * src: build item consisting of static library Y, shared libraries Z1
+   (versioned) and Z2 (unversioned), and executable main.  Shared
+   library Z1 calls static library Y, but Z2 does not.
 
 We verify several things:
 

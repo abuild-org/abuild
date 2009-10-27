@@ -1,8 +1,10 @@
-TARGETS_lib := Y Z
+TARGETS_lib := Y Z1 Z2
 TARGETS_bin := main
-SHLIB_Z := 1 2 3
+SHLIB_Z1 := 1 2 3
+SHLIB_Z2 :=
 SRCS_lib_Y := Y.cc
-SRCS_lib_Z := Z.cc
+SRCS_lib_Z1 := Z1.cc
+SRCS_lib_Z2 := Z2.cc
 SRCS_bin_main := main.cc
 XCPPFLAGS_main.cc := -DD1\=$(HAVE_PRINTF) -DD2\=$(HAVE_EXCEPTION)
 RULES := ccxx
