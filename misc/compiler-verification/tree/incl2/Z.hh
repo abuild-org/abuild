@@ -1,13 +1,12 @@
 #ifndef __Z_HH__
 #define __Z_HH__
 
-class
-#ifdef _WIN32
-__declspec(dllexport)
-#endif
-Z
+class Z
 {
   public:
+#ifdef _WIN32
+    __declspec(dllexport)
+#endif
     static void hello();
 };
 
