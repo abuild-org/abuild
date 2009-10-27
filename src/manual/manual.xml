@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.b4">
-<!ENTITY lastreleased "September 28, 2009">
+<!ENTITY swversion "1.1.b5">
+<!ENTITY lastreleased "October 28, 2009">
 ]>
 <!--
 
@@ -10025,18 +10025,20 @@ f {
      revision number should be incremented if any changes were made to
      the shared library code that did not affect the interfaces.  This
      just tells the user that the library has changed relative to
-     another version that may be installed.  On UNIX platforms,
-     &abuild; will build executables that link against shared
-     libraries in such a way that they will fail to locate shared
-     libraries whose major version numbers do not match what they
-     linked against.  The unversioned <filename>.so</filename> file
-     and the <filename>.so</filename> file with only the major version
-     will be symbolic links to the fully versioned file name.  (For
-     example, if the actual shared library file were
+     another version that may be installed.  &Abuild; will build
+     executables that link against shared libraries in such a way that
+     they will fail to locate shared libraries whose major version
+     numbers do not match what they linked against.  On UNIX
+     platforms, the unversioned <filename>.so</filename> file and the
+     <filename>.so</filename> file with only the major version will be
+     symbolic links to the fully versioned file name.  (For example,
+     if the actual shared library file were
      <filename>libmoo.so.1.2.3</filename>, both
      <filename>libmoo.so</filename> and
      <filename>libmoo.so.1</filename> would be symbolic links to it.)
-     On Windows systems, the version number parameters are ignored.
+     On Windows, the DLL will contain the major version in its name
+     (e.g., <filename>moo1.dll</filename>) while the companion static
+     library remains unversioned.
     </para>
     <para>
      Note that all the version number parameters are optional.
@@ -10052,7 +10054,7 @@ f {
      create both a shared and a static version of the same library at
      the same time, but it is possible to create a shared library that
      links against a static library, which can be used to achieve the
-     same effect.
+     same effect in many circumstances.
     </para>
     <para>
      When &abuild; builds shared libraries, it links them with any
@@ -10220,15 +10222,18 @@ f {
      <filename>shared</filename> library target as a shared library
      instead of a static library using the version information
      provided.  On Windows, &abuild; will create
-     <filename>shared.dll</filename> along with
-     <filename>shared.lib</filename> and
-     <filename>shared.exp</filename>.  On UNIX, it will create
+     <filename>shared1.dll</filename> along with
+     <filename>shared1.exp</filename> and
+     <filename>shared.lib</filename>.  On UNIX, it will create
      <filename>libshared.so.1.2.3</filename> and will make
      <filename>libshared.so</filename> and
-     <filename>libshared.so.1</filename> symbolic links to it.
-     Executables that link with <filename>-lshared</filename> will
+     <filename>libshared.so.1</filename> symbolic links to it.  UNIX
+     executables that link with <filename>-lshared</filename> will
      need to find <filename>libshared.so.1</filename> in their library
-     paths at runtime.
+     paths at runtime.  Windows executables that link with
+     <filename>-lshared</filename> will need to find
+     <filename>shared1.dll</filename> in their executable paths at
+     runtime.
     </para>
     <para>
      This shared library consists of a single file called
@@ -15584,7 +15589,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.b5: XXX</term>
+     <term>1.1.b5: October 28, 2009</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -15601,6 +15606,24 @@ Y = $(X)
            can be especially useful for
            <filename>Abuild.conf</filename> files that may contain
            that are optional trees or optional dependencies.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Windows-related Enhancements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Both the mingw and msvc toolchains now create DLL file
+           names that include the major version number of the library.
+           The static library that goes with the DLL remains
+           versionless so that linking works, but executables that use
+           the DLL will expect its name to contain the version number.
+           This is described in <xref
+           linkend="ref.shared-libraries"/>.
           </para>
          </listitem>
         </itemizedlist>

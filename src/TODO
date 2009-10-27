@@ -1,16 +1,3 @@
-1.1
-===
-
- * Look at qpdf's rules for msvc and mingw with respect to DLL
-   generation.  With dlltool, we can force the lib and dll to have
-   different names.  With msvc, we can just rename the lib after
-   generating the dll.  Either way, we can encode the major number
-   into the DLL name without encoding it into the lib name to get some
-   kind of versioning semantics with Windows builds.
-
-   Update ~/information/technical-notes: search for abuild in a DLL
-   section.
-
 Abuild Lint
 ==============
 
