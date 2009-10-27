@@ -29,9 +29,8 @@ endef
 
 # Override shared library information
 define shlibname
-$(1).dll
+$(1)$(if $(2),$(2)).dll
 endef
-.LIBPATTERNS := %.dll lib%.a
 # Usage: $(call make_shlib,linker,compiler-flags,link-flags,objects,libdirs,libs,shlib-base,major,minor,revision
 define make_shlib
 	$(RM) $(call shlibname,$(7))
@@ -39,4 +38,5 @@ define make_shlib
 		$(SHARED_FLAGS) \
 		$(foreach L,$(5),-L$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)
+	dlltool -l$(call libname,$(7)) -D $(call shlibname,$(7),$(8)) $(4)
 endef
