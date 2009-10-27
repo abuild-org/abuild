@@ -13,8 +13,9 @@ endef
 define binname
 $(1).exe
 endef
+# base, major, minor, revision
 define shlibname
-$(1).dll
+$(1)$(if $(2),$(2)).dll
 endef
 
 # General-purpose flags supported by all compiler toolchains
@@ -111,15 +112,19 @@ define make_bin
 	fi
 endef
 
+#                          1      2              3          4       5       6    7               8     9     10
 # Usage: $(call make_shlib,linker,compiler-flags,link-flags,objects,libdirs,libs,binary-filename,major,minor,revision)
 define make_shlib
-	$(RM) $(call shlibname,$(7))
-	$(LINKWRAPPER) $(1) $(2) $(4) /LD /Fe$(call shlibname,$(7)) \
+	$(RM) $(call shlibname,$(7),$(8))
+	$(LINKWRAPPER) $(1) $(2) $(4) /LD /Fe$(call shlibname,$(7),$(8)) \
 		/link /incremental:no \
 		$(foreach L,$(5),/LIBPATH:$(L)) \
 		$(foreach L,$(6),$(call link_with,$(L))) $(3)
-	if [ -f $(call shlibname,$(7)).manifest ]; then \
-		mt.exe -nologo -manifest $(call shlibname,$(7)).manifest \
-			-outputresource:$(call shlibname,$(7))\;2; \
+	if [ -f $(call shlibname,$(7),$(8)).manifest ]; then \
+		mt.exe -nologo -manifest $(call shlibname,$(7),$(8)).manifest \
+			-outputresource:$(call shlibname,$(7),$(8))\;2; \
+	fi
+	if [ "$(8)" != "" ]; then \
+		mv $(call libname,$(7)$(8)) $(call libname,$(7))
 	fi
 endef

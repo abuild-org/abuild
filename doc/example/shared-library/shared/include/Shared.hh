@@ -1,12 +1,13 @@
 #ifndef __SHARED_HH__
 #define __SHARED_HH__
 
-class Shared
+class
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
+Shared
 {
   public:
-#ifdef _WIN32
-    __declspec(dllexport)
-#endif
     static void hello();
 };
 

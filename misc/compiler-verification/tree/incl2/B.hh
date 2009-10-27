@@ -1,12 +1,13 @@
 #ifndef __B_HH__
 #define __B_HH__
 
-class B
+class
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
+B
 {
   public:
-#ifdef _WIN32
-    __declspec(dllexport)
-#endif
     static void hello();
 };
 
