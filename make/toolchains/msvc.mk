@@ -125,6 +125,7 @@ define make_shlib
 			-outputresource:$(call shlibname,$(7),$(8))\;2; \
 	fi
 	if [ "$(8)" != "" ]; then \
-		mv $(call libname,$(7)$(8)) $(call libname,$(7))
+		echo "renaming $(call libname,$(7)$(8)) to $(call libname,$(7))"; \
+		mv $(call libname,$(7)$(8)) $(call libname,$(7)); \
 	fi
 endef
