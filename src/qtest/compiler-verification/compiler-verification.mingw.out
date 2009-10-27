@@ -27,8 +27,10 @@ abuild: src (abuild-<native-os-data>.mingw): all
 make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.mingw'
 Compiling ../Y.cc as C++
 Creating Y library
-Compiling ../Z.cc as C++
-Creating Z shared library
+Compiling ../Z1.cc as C++
+Creating Z1 shared library
+Compiling ../Z2.cc as C++
+Creating Z2 shared library
 Compiling ../main.cc as C++
 Compiling ../other.cc as C++
 Creating main executable
@@ -62,7 +64,8 @@ Removing extraneous dep files
 Extra object files found: removing libraries and binaries
 make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.mingw'
 Creating Y library
-Creating Z shared library
+Creating Z1 shared library
+Creating Z2 shared library
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.mingw'
 
@@ -84,7 +87,8 @@ Creating X library
 make: Leaving directory `--topdir--/.verify-tmp/x/abuild-<native-os-data>.mingw'
 abuild: src (abuild-<native-os-data>.mingw): all
 make: Entering directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.mingw'
-Creating Z shared library
+Creating Z1 shared library
+Creating Z2 shared library
 Compiling ../main.cc as C++
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.mingw'

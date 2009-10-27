@@ -8,15 +8,16 @@ You will be asked to run programs at various times during this test.
 In each case, the executable target is "main" and is located in
 .verify-tmp/src/abuild-zz_os.cpu.toolset.xcc.
 
-The program requires two shared libraries: "Z", which can be found in the
-same directory as "main", and "B", which is located in
-.verify-tmp/b/abuild-zz_os.cpu.toolset.xcc.
+The program requires three shared libraries: "Z1" and "Z2", which
+can be found in the same directory as "main", and "B", which is
+located in .verify-tmp/b/abuild-zz_os.cpu.toolset.xcc.
 
 The program itself should contain the symbols A::hello() and
 X::hello().  If Other::Other() is in the expected output, it should
 also contain the symbol Other::Other().  The B shared library should
-contain the symbol B::hello().  The Z shared library should contain
-the symbols Y::hello() and Z::hello().
+contain the symbol B::hello().  The Z1 shared library should contain
+the symbols Y::hello() and Z1::hello().  The Z2 shared library should
+contain the symbol Z2::hello().
 
 When this program asks you to run the program, it will display the expected
 output and prompt you to continue.
@@ -47,8 +48,10 @@ abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 Compiling ../Y.cc as C++
 Creating Y library
-Compiling ../Z.cc as C++
-Creating Z shared library
+Compiling ../Z1.cc as C++
+Creating Z1 shared library
+Compiling ../Z2.cc as C++
+Creating Z2 shared library
 Compiling ../main.cc as C++
 Compiling ../other.cc as C++
 Creating main executable
@@ -67,7 +70,8 @@ Hello from A
 Hello from B
 Hello from X
 Hello from Y
-Hello from Z
+Hello from Z1
+Hello from Z2
 
 Hit return to continue.
 
@@ -92,7 +96,8 @@ abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 Extra object files found: removing libraries and binaries
 make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 Creating Y library
-Creating Z shared library
+Creating Z1 shared library
+Creating Z2 shared library
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
 
@@ -108,7 +113,8 @@ Hello from A
 Hello from B
 Hello from X
 Hello from Y
-Hello from Z
+Hello from Z1
+Hello from Z2
 
 Hit return to continue.
 
@@ -125,7 +131,8 @@ abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 missing compilation of X.cc
 missing compilation of main.cc
 missing creation of X
-missing creation of Z
+missing creation of Z1
+missing creation of Z2
 missing creation of main
 
 
@@ -138,7 +145,8 @@ Hello from A
 Hello from B
 Hello from X
 Hello from Y
-Hello from Z
+Hello from Z1
+Hello from Z2
 
 Hit return to continue.
 
