@@ -20133,7 +20133,8 @@ Y = $(X)
      <listitem>
       <para>
        It is now possible to declare local and non-recursive interface
-       variables.  For details, see <xref
+       variables and also to declare and initialize interface
+       variables in a single statement.  For details, see <xref
        linkend="ref.abuild-interface-system"/>.
       </para>
      </listitem>
