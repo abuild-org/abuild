@@ -354,7 +354,6 @@ Abuild default platform selector 0
 Abuild no platform selector 0
 Abuild ignoring skip selector 0
 PlatformSelector default 0
-ItemConfig ERR global-plugin unnamed 0
 ItemConfig ERR invalid attribute 0
 Abuild ERR error for global plugin 0
 Abuild add global plugin 0
@@ -414,3 +413,5 @@ Abuild allow access to global plugin 0
 Abuild-upgrade ERR interleaved forests 0
 Abuild ignoring missing optional child 0
 ItemConfig ERR optional without child 0
+ItemConfig ERR global without plugin 0
+ItemConfig global plugin 0

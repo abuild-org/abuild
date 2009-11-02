@@ -36,7 +36,6 @@ class BuildForest
     void setSortedItemNames(std::list<std::string> const& sorted_items);
     std::list<std::string> const& getSortedItemNames() const;
 
-    void addGlobalPlugin(std::string const& item_name);
     std::set<std::string>& getGlobalPlugins();
 
     void propagateGlobals();

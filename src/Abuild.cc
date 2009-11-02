@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <assert.h>
 
-std::string const Abuild::ABUILD_VERSION = "1.1.b5";
+std::string const Abuild::ABUILD_VERSION = "1.1.b5+";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
@@ -2249,11 +2249,6 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 	    BuildItem_ptr item(
 		new BuildItem(item_name, tree_name, config));
 	    addItemToForest(forest, item_name, item);
-	    if (config->isGlobalPlugin())
-	    {
-		QTC::TC("abuild", "Abuild add global plugin");
-		forest.addGlobalPlugin(item_name);
-	    }
 	}
 
 	std::list<std::string> const& children = config->getChildren();
@@ -2451,6 +2446,15 @@ Abuild::registerBuildTree(BuildForest& forest,
 		      config->getPlugins(),
 		      this->internal_platform_data));
     addTreeToForest(forest, tree_name, tree);
+    if (config->hasGlobalPlugins())
+    {
+	QTC::TC("abuild", "Abuild add global plugin");
+	std::set<std::string>& global_plugins = forest.getGlobalPlugins();
+	std::set<std::string> const& t_global_plugins =
+	    config->getGlobalPlugins();
+	global_plugins.insert(
+	    t_global_plugins.begin(), t_global_plugins.end());
+    }
 
     return tree_name;
 }

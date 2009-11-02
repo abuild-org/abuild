@@ -95,7 +95,8 @@ class ItemConfig
     bool hasAntBuild() const;
     std::string const& getBuildFile() const;
     std::list<std::string> const& getPlugins() const;
-    bool isGlobalPlugin() const;
+    bool hasGlobalPlugins() const;
+    std::set<std::string> const& getGlobalPlugins() const;
     bool isSerial() const;
     bool childIsOptional(std::string const& child) const;
 
@@ -214,7 +215,7 @@ class ItemConfig
     std::set<std::string> optional_deps;
     std::set<std::string> optional_tree_deps;
     std::set<std::string> optional_children;
-    bool global_plugin;
+    std::set<std::string> global_plugins;
     bool serial;
 };
 

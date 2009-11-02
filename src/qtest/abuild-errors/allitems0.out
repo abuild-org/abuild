@@ -4,6 +4,7 @@
 --topdir--/a/aa/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/a/aa/Abuild.conf: ERROR: child a/aa/aaa/Abuild.conf is missing
 --topdir--/a/ab/Abuild.conf: ERROR: "external-dirs" may only appear in a root build item
+--topdir--/a/ab/Abuild.conf: ERROR: "plugins" may only appear in a root build item
 --topdir--/a/ab/Abuild.conf: ERROR: -optional is not preceded by a child directory
 --topdir--/a/ab/Abuild.conf: ERROR: invalid build-also build item name !oops!
 --topdir--/a/ab/Abuild.conf: ERROR: -optional is not preceded by a build item name
@@ -14,6 +15,7 @@
 --topdir--/a/ab/Abuild.conf: ERROR: invalid dependency !heh!
 --topdir--/a/ab/Abuild.conf: ERROR: visible-to not permitted for public build items
 --topdir--/a/ab/Abuild.conf: ERROR: flag names may contain only alphanumeric characters, underscores, periods, and dashes
+--topdir--/a/ab/Abuild.conf: ERROR: -global is not preceded by a plugin
 --topdir--/a/ac/Abuild.conf:1: ERROR: invalid key that (ignored)
 --topdir--/a/ac/Abuild.conf:2: ERROR: syntax error
 --topdir--/a/ac/Abuild.conf: ERROR: file ended with continuation line
@@ -37,7 +39,6 @@
 --topdir--/a/ag/Abuild.conf: ERROR: invalid trait !wrong!
 --topdir--/a/ag/Abuild.conf: ERROR: deleted item "quack" listed more than once
 --topdir--/a/ag/Abuild.conf: ERROR: plugin "oink" listed more than once
---topdir--/a/ag/Abuild.conf: ERROR: the "global-plugin" attribute may only be applied to named build items
 --topdir--/a/ag/Abuild.conf: ERROR: unknown attribute "glarpenspliel"
 --topdir--/a/ag/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): this file uses deprecated features, and this build item belongs to a tree that has already been upgraded
 --topdir--/a/ah/aha/Abuild.conf: ERROR: "this" and "name" may not appear in the same Abuild.conf file

@@ -1080,6 +1080,35 @@ void
 ItemConfig::checkPlugins()
 {
     this->plugins = Util::splitBySpace(this->kv.getVal(k_PLUGINS));
+
+    std::list<std::string>::iterator iter = this->plugins.begin();
+    std::string last_plugin;
+    while (iter != this->plugins.end())
+    {
+	std::list<std::string>::iterator next = iter;
+	++next;
+	if (*iter == "-global")
+	{
+	    if (last_plugin.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR global without plugin");
+		this->error.error(this->location, "-global"
+				  " is not preceded by a plugin");
+	    }
+	    else
+	    {
+		QTC::TC("abuild", "ItemConfig global plugin");
+		this->global_plugins.insert(last_plugin);
+		this->plugins.erase(iter, next);
+	    }
+	}
+	else
+	{
+	    last_plugin = *iter;
+	}
+	iter = next;
+    }
+
     std::set<std::string> s_plugins;
     if (checkDuplicates(this->plugins, s_plugins, "plugin"))
     {
@@ -1096,21 +1125,7 @@ ItemConfig::checkAttributes()
 	 iter != attrs.end(); ++iter)
     {
 	std::string const& attr = *iter;
-	if (attr == "global-plugin")
-	{
-	    if (this->name.empty())
-	    {
-		QTC::TC("abuild", "ItemConfig ERR global-plugin unnamed");
-		this->error.error(this->location,
-				  "the \"global-plugin\" attribute may only"
-				  " be applied to named build items");
-	    }
-	    else
-	    {
-		this->global_plugin = true;
-	    }
-	}
-	else if (attr == "serial")
+	if (attr == "serial")
 	{
 	    if (getBackend() != b_make)
 	    {
@@ -1285,7 +1300,6 @@ ItemConfig::ItemConfig(
     is_child_only(false),
     deprecated(false),
     external_symlinks(false),
-    global_plugin(false),
     serial(false)
 {
 }
@@ -1511,9 +1525,15 @@ ItemConfig::getPlugins() const
 }
 
 bool
-ItemConfig::isGlobalPlugin() const
+ItemConfig::hasGlobalPlugins() const
 {
-    return this->global_plugin;
+    return (! this->global_plugins.empty());
+}
+
+std::set<std::string> const&
+ItemConfig::getGlobalPlugins() const
+{
+    return this->global_plugins;
 }
 
 bool

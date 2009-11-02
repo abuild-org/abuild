@@ -6177,13 +6177,6 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <itemizedlist>
           <listitem>
            <para>
-            <property>global-plugin</property>: causes this build item
-            to be treated as a plugin for all build trees in the
-            forest; see <xref linkend="ref.global-plugins"/>.
-           </para>
-          </listitem>
-          <listitem>
-           <para>
             <property>serial</property>: valid only for build items
             that are built using the <application>make</application>
             backend, where it prevents the
@@ -12871,16 +12864,25 @@ flag private INCLUDES = private-include
      and &abuild; will otherwise ignore the optional dependency.
     </para>
     <para>
-     This feature has a high potential for abuse, so you should
-     consider carefully whether it is the right solution to your
-     problem.  It is possible to create software that may behave
-     differently based on combinations of presence or absence of
-     optional features.  Such software can become very difficult to
-     maintain and test.  Ideally, if you have optional capabilities
-     that are configured in this way, they should be lightweight and
-     independent from each other.  However, &abuild; leaves this choice
-     up to you and provides you with this capability.  You are, of
-     course, free to use it or not as you choose.
+     Sometimes an optional dependency may be satisfied by a build item
+     or tree that may not always be present.  In this case, you may
+     find that using <option>-optional</option> when listing the child
+     directory that contains the item or tree when it's present makes
+     it possible to use the exact same &abuild; configuration whether
+     or not the optional item is present.  With this mode of use, a
+     capability may be turned on or off simply by including or
+     excluding a particular directory in a build.  Although there are
+     certainly valid scenarios for this style of operation, this
+     feature has a high potential for abuse, so you should consider
+     carefully whether it is the right solution to your problem.  It
+     is possible to create software that may behave differently based
+     on combinations of presence or absence of optional features.
+     Such software can become very difficult to maintain and test.
+     Ideally, if you have optional capabilities that are configured in
+     this way, they should be lightweight and independent from each
+     other.  However, &abuild; leaves this choice up to you and
+     provides you with this capability.  You are, of course, free to
+     use it or not as you choose.
     </para>
    </sect1>
    <sect1 id="ref.example.optional-dependencies">
@@ -13157,10 +13159,10 @@ flag private INCLUDES = private-include
      <secondary>global</secondary>
     </indexterm>
     <para>
-     It is possible for a build item to declare itself to be a global
-     plugin.  The effect of declaring an item to be a global plugin is
-     the same as having it be listed as a plugin for every build tree
-     in the forest.
+     It is possible for a build tree to declare one or more of its
+     plugins to be global.  The effect of declaring an item to be a
+     global plugin is the same as having it be listed as a plugin for
+     every build tree in the forest.
      <footnote>
       <para>
        In fact, this is how &abuild; implements this internally.  As
@@ -13173,24 +13175,26 @@ flag private INCLUDES = private-include
      </footnote>
      Global plugins should be used extremely sparingly, though there
      are some cases in which their use may be appropriate.  For
-     example, if a particular project requires certain environmental
+     example, if a particular project requires certain environment
      setup to be done, it would be possible to create a global plugin
      that checks to make sure it is correct.  It may also be
      appropriate, in some cases, to define additional integrity
-     checking rules in global plugins.
+     checking rules or additional platforms and platform types in
+     global plugins.
     </para>
     <para>
-     A build item that meets all the criteria for being a plugin may
-     declare itself to be a global plugin by including
-
-     <programlisting>attributes: global-plugin
+     A build tree can declare one of its plugins to be global by
+     following the plugin name with <option>-global</option> in the
+     <property>plugins</property> entry of
+     <filename>Abuild.conf</filename>, as in
+     <programlisting>plugins: global-plugin -plugin
 </programlisting>
-     in its <filename>Abuild.conf</filename>.  When a build item is
-     declared as a global plugin, &abuild; disregards access checks
-     based on tree dependencies.  In this sense, the affect of global
-     plugins may &ldquo;flow backwards&rdquo; across tree
-     dependencies.  This is yet another reason that they should be
-     used only for enforcing project-wide policy.
+     When a build item is declared as a global plugin, &abuild;
+     disregards access checks based on tree dependencies.  In this
+     sense, the affect of global plugins may &ldquo;flow
+     backwards&rdquo; across tree dependencies.  This is yet another
+     reason that they should be used only for enforcing project-wide
+     policy.
     </para>
    </sect1>
    <sect1 id="ref.adding-platform-types-and-platforms">
@@ -15589,6 +15593,31 @@ Y = $(X)
  end template -->
 
     <varlistentry>
+     <term>1.1: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Core Functionality Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The implementation of global plugins has changed again.
+           Now, instead of having items declare themselves to be
+           global plugins, a tree can declare a plugin to be global
+           for the forest by adding the <option>-global</option> flag
+           to the plugin declaration in
+           <filename>Abuild.conf</filename>.  This actually makes
+           global plugins usable in a real setting.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.b5: October 28, 2009</term>
      <listitem>
       <itemizedlist>
@@ -16696,9 +16725,11 @@ Y = $(X)
            &Abuild; now supports global plugins.  This is implemented
            through introduction of a new, general-purpose key in
            <filename>Abuild.conf</filename>:
-           <property>attributes</property>.  This key can be used to
-           flag certain build items as having specific properties that
-           &abuild; recognizes.  At present, only two attributes are
+           <property>attributes</property>.  (<emphasis>Note:
+           implementation of this feature was changed in a subsequent
+           release.</emphasis>) This key can be used to flag certain
+           build items as having specific properties that &abuild;
+           recognizes.  At present, only two attributes are
            recognized:
            <itemizedlist>
             <listitem>
@@ -16715,6 +16746,8 @@ Y = $(X)
             </listitem>
             <listitem>
              <para>
+              <emphasis>Note: this feature was changed in a subsequent
+              release.</emphasis>
               <property>global-plugin</property>: This attribute may
               be assigned to any build item that otherwise meets the
               qualifications for being a plugin.  It must reside in a
@@ -20127,9 +20160,17 @@ Y = $(X)
      </listitem>
      <listitem>
       <para>
+       It is possible to declare plugins to be global.  Global plugins
+       are discussed in <xref linkend="ref.global-plugins"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
        Build item dependencies and also newly added build tree
        dependencies can be declared optional; see <xref
-       linkend="ref.optional-dependencies"/>.
+       linkend="ref.optional-dependencies"/>.  To go along with this,
+       child directories specified in <property>child-dirs</property>
+       can also be made optional.
       </para>
      </listitem>
      <listitem>

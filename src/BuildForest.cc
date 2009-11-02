@@ -85,12 +85,6 @@ BuildForest::getSortedItemNames() const
     return this->sorted_item_names;
 }
 
-void
-BuildForest::addGlobalPlugin(std::string const& item_name)
-{
-    this->global_plugins.insert(item_name);
-}
-
 std::set<std::string>&
 BuildForest::getGlobalPlugins()
 {
