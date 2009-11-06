@@ -1,16 +1,15 @@
+--topdir--/bad/7/intermediate/product/a/Abuild.conf: ERROR: build item "a" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
 --topdir--/bad/7/backing/product/b/Abuild.conf: ERROR: build item "b" depends on "c", which is shadowed
 --topdir--/bad/7/intermediate/common/c/Abuild.conf: ERROR: here is the location of "c"
+--topdir--/bad/7/backing/product/b/Abuild.conf: ERROR: build item "b" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
+--topdir--/bad/7/intermediate/product/common/Abuild.conf: ERROR: build item "product-common" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
 --topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "common-lib1", which is shadowed
 --topdir--/bad/7/main/common/libs/lib1/Abuild.conf: ERROR: here is the location of "common-lib1"
+--topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
 --topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "product-common", which is shadowed
 --topdir--/bad/7/intermediate/product/common/Abuild.conf: ERROR: here is the location of "product-common"
---topdir--/bad/7/backing/Abuild.conf: ERROR: some plugins declared by this forest are shadowed
---topdir--/bad/7/intermediate/Abuild.conf: ERROR: this is the forest that contains the shadowing plugins
---topdir--/bad/7/intermediate/common/plugin/Abuild.conf: ERROR: here is the shadowing copy of plugin "plugin"
---topdir--/bad/7/backing/Abuild.conf: ERROR: some plugins declared by this forest are shadowed
---topdir--/bad/7/main/Abuild.conf: ERROR: this is the forest that contains the shadowing plugins
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the shadowing copy of plugin "plugin"
---topdir--/bad/7/intermediate/Abuild.conf: ERROR: some plugins declared by this forest are shadowed
---topdir--/bad/7/main/Abuild.conf: ERROR: this is the forest that contains the shadowing plugins
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the shadowing copy of plugin "plugin"
 abuild: ERROR: errors detected; exiting

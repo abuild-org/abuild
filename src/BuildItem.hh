@@ -49,9 +49,7 @@ class BuildItem
     bool isLocal() const;
     bool isInTree(std::string const& tree) const;
     bool isInTrees(std::set<std::string> const& trees) const;
-    std::set<std::string> const& getShadowedDependencies() const;
-    std::map<std::string, std::set<std::string> > const&
-    getShadowedPlugins() const;
+    std::set<std::string> const& getShadowedReferences() const;
     std::set<std::string> getPlatformTypes() const;
     std::string const& getPlatformType(std::string const& platform) const;
     std::set<std::string> getBuildablePlatforms() const;
@@ -73,8 +71,6 @@ class BuildItem
 
     void incrementBackingDepth();
     void setOptionalDependencyPresence(std::string const& item, bool);
-    void addShadowedPlugin(std::string const& local_tree,
-			   std::string const& remote_tree);
     void setPlatformTypes(std::set<std::string> const& platform_types);
     void setTargetType(TargetType::target_type_e target_type);
     void setBuildablePlatforms(
@@ -88,7 +84,7 @@ class BuildItem
     // is the item itself, it is removed.
     void setExpandedDependencies(std::list<std::string> const&);
 
-    void setShadowedDependencies(std::set<std::string> const&);
+    void setShadowedReferences(std::set<std::string> const&);
     void setInterface(std::string const& platform,
 		      boost::shared_ptr<Interface>);
     void setPlugins(std::list<std::string> const&);
@@ -114,8 +110,7 @@ class BuildItem
     std::map<std::string, std::string> platform_to_type;
     std::set<std::string> build_platforms; // platforms we will build on
     std::list<std::string> expanded_dependencies; // recursively expanded
-    std::set<std::string> shadowed_dependencies;
-    std::map<std::string, std::set<std::string> > shadowed_plugins;
+    std::set<std::string> shadowed_references;
     std::map<std::string, boost::shared_ptr<Interface> > interfaces;
     TargetType::target_type_e target_type;
     std::list<std::string> plugins;

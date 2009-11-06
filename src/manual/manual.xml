@@ -15593,7 +15593,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1: XXX</term>
+     <term>1.1.b6: XXX</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -15610,6 +15610,25 @@ Y = $(X)
            to the plugin declaration in
            <filename>Abuild.conf</filename>.  This actually makes
            global plugins usable in a real setting.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The logic to detect shadowed plugins has been corrected to
+           eliminate false positives and to provide enough information
+           to resolve the problem.  In many cases, multiple distinct
+           error messages will be issued when a plugin is actually
+           shadowed, but this is better than not having the required
+           information to resolve the problem.
           </para>
          </listitem>
         </itemizedlist>

@@ -197,16 +197,10 @@ BuildItem::isInTrees(std::set<std::string> const& trees) const
     return (trees.count(this->tree_name) != 0);
 }
 
-std::map<std::string, std::set<std::string> > const&
-BuildItem::getShadowedPlugins() const
-{
-    return this->shadowed_plugins;
-}
-
 std::set<std::string> const&
-BuildItem::getShadowedDependencies() const
+BuildItem::getShadowedReferences() const
 {
-    return this->shadowed_dependencies;
+    return this->shadowed_references;
 }
 
 TargetType::target_type_e
@@ -344,8 +338,7 @@ BuildItem::isAtOrBelowPath(std::string const& path) const
 bool
 BuildItem::hasShadowedReferences() const
 {
-    return (! (this->shadowed_plugins.empty() &&
-	       this->shadowed_dependencies.empty()));
+    return (! this->shadowed_references.empty());
 }
 
 Interface const&
@@ -431,13 +424,6 @@ BuildItem::setOptionalDependencyPresence(std::string const& item,
 }
 
 void
-BuildItem::addShadowedPlugin(std::string const& local_tree,
-			     std::string const& remote_tree)
-{
-    this->shadowed_plugins[local_tree].insert(remote_tree);
-}
-
-void
 BuildItem::setPlatformTypes(std::set<std::string> const& platform_types)
 {
     assertLocal();
@@ -497,10 +483,10 @@ BuildItem::setExpandedDependencies(
 }
 
 void
-BuildItem::setShadowedDependencies(
-    std::set<std::string> const& shadowed_dependencies)
+BuildItem::setShadowedReferences(
+    std::set<std::string> const& shadowed_references)
 {
-    this->shadowed_dependencies = shadowed_dependencies;
+    this->shadowed_references = shadowed_references;
 }
 
 void

@@ -3828,15 +3828,12 @@ Abuild::checkIntegrity(BuildForest_map& forests,
     // Check abuild's basic integrity guarantee.  Refer to the manual
     // for details.
 
-    std::set<std::string> plugin_check_forests;
-
-    // Find items with shadowed dependencies.  An item has a shadowed
-    // dependency if the local forest resolves the item to a different
-    // path than the item's native forest.  Local items therefore
-    // can't have shadowed dependencies.  (They can still have
-    // dependencies with shadowed dependencies, so they can still have
-    // integrity errors.)  Also store a list of all forests for which
-    // we have to perform plugin checks.
+    // Find items with shadowed references (dependencies or plugins).
+    // An item has a shadowed reference if the local forest resolves
+    // the item to a different path than the item's native forest.
+    // Local items therefore can't have shadowed references.  (They
+    // can still have references with shadowed references, so they
+    // can still have integrity errors.)
     BuildForest& forest = *(forests[top_path]);
     BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
@@ -3849,120 +3846,32 @@ Abuild::checkIntegrity(BuildForest_map& forests,
 	}
 
 	std::string const& item_forest = item.getForestRoot();
-	plugin_check_forests.insert(item_forest);
 	BuildItem_map& item_forest_items =
 	    forests[item_forest]->getBuildItems();
-	std::set<std::string> shadowed_dependencies;
+	std::set<std::string> shadowed_references;
 
-	std::list<std::string> const& deps = item.getExpandedDependencies();
-	for (std::list<std::string>::const_iterator dep_iter = deps.begin();
-	     dep_iter != deps.end(); ++dep_iter)
+	std::set<std::string> const& refs = item.getReferences();
+	for (std::set<std::string>::const_iterator ref_iter = refs.begin();
+	     ref_iter != refs.end(); ++ref_iter)
         {
-	    std::string const& dep_name = (*dep_iter);
-	    if ((builditems.count(dep_name) == 0) ||
-		(item_forest_items.count(dep_name) == 0))
+	    std::string const& ref_name = (*ref_iter);
+	    if ((builditems.count(ref_name) == 0) ||
+		(item_forest_items.count(ref_name) == 0))
 	    {
-		// unknown dependency error already reported
+		// unknown item already reported
 		continue;
 	    }
 
-	    if (builditems[dep_name]->getAbsolutePath() !=
-		item_forest_items[dep_name]->getAbsolutePath())
+	    if (builditems[ref_name]->getAbsolutePath() !=
+		item_forest_items[ref_name]->getAbsolutePath())
 	    {
-		// The instance of dep_name that item would see is
+		// The instance of ref_name that item would see is
 		// shadowed.
-		shadowed_dependencies.insert(dep_name);
+		shadowed_references.insert(ref_name);
 	    }
         }
 
-	item.setShadowedDependencies(shadowed_dependencies);
-    }
-
-    // Create a mapping of name to path for each plugin that is
-    // declared by the local forest and also present natively in the
-    // local forest.  Any such plugin could potentially be shadowing a
-    // plugin in a more distant forest.
-    std::map<std::string, std::string> plugin_paths;
-    BuildTree_map& buildtrees = forest.getBuildTrees();
-    for (BuildTree_map::iterator iter = buildtrees.begin();
-	 iter != buildtrees.end(); ++iter)
-    {
-	BuildTree& tree = *((*iter).second);
-	std::list<std::string> const& plugins = tree.getPlugins();
-	for (std::list<std::string>::const_iterator iter = plugins.begin();
-	     iter != plugins.end(); ++iter)
-	{
-	    std::string const& plugin_name = *iter;
-	    if (builditems.count(plugin_name) == 0)
-	    {
-		// error already reported
-		continue;
-	    }
-	    BuildItem& plugin = *(builditems[plugin_name]);
-	    plugin_paths[plugin_name] = plugin.getAbsolutePath();
-	}
-    }
-
-    // For each plugin check forest, see if that forest defines any of
-    // the same plugins the local forest does and resolves them to a
-    // different location.
-    for (std::set<std::string>::const_iterator iter =
-	     plugin_check_forests.begin();
-	 iter != plugin_check_forests.end(); ++iter)
-    {
-	std::string const& other_top_path = *iter;
-	BuildForest& other_forest = *(forests[other_top_path]);
-	BuildTree_map& other_trees = other_forest.getBuildTrees();
-	BuildItem_map& other_items = other_forest.getBuildItems();
-	for (BuildTree_map::iterator iter = other_trees.begin();
-	     iter != other_trees.end(); ++iter)
-	{
-	    BuildTree& other_tree = *((*iter).second);
-	    std::list<std::string> const& other_plugins =
-		other_tree.getPlugins();
-	    for (std::list<std::string>::const_iterator plugin_iter =
-		     other_plugins.begin();
-		 plugin_iter != other_plugins.end(); ++plugin_iter)
-	    {
-		std::string const& plugin = *plugin_iter;
-		if (plugin_paths.count(plugin) == 0)
-		{
-		    // We don't care about this plugin
-		    continue;
-		}
-		if (other_items.count(plugin) == 0)
-		{
-		    // error already reported
-		    continue;
-		}
-		if (other_items[plugin]->getAbsolutePath() !=
-		    plugin_paths[plugin])
-		{
-		    this->shadowed_plugins[top_path][other_top_path].
-			push_back(plugin);
-		}
-	    }
-        }
-    }
-
-    // For each non-local build item, if it references shadowed
-    // plugins, store this fact.
-
-    for (BuildItem_map::iterator iter = builditems.begin();
-	 iter != builditems.end(); ++iter)
-    {
-	BuildItem& item = *((*iter).second);
-	if (item.isLocal())
-	{
-	    continue;
-	}
-
-	std::string const& item_forest = item.getForestRoot();
-	if ((this->shadowed_plugins.count(top_path) != 0) &&
-	    (this->shadowed_plugins[top_path].count(item_forest) != 0))
-	{
-	    item.addShadowedPlugin(top_path, item_forest);
-	}
+	item.setShadowedReferences(shadowed_references);
     }
 }
 
@@ -3972,38 +3881,15 @@ Abuild::reportIntegrityErrors(BuildForest_map& forests,
 			      std::string const& top_path)
 {
     std::set<std::string> integrity_error_items;
-    std::map<std::string, std::set<std::string> > plugin_error_forests;
 
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
 	std::string const& item_name = (*iter).first;
 	BuildItem& item = *((*iter).second);
-	if (! item.getShadowedDependencies().empty())
+	if (! item.getShadowedReferences().empty())
 	{
 	    integrity_error_items.insert(item_name);
-	}
-	std::map<std::string, std::set<std::string> > const&
-	    item_shadowed_plugins = item.getShadowedPlugins();
-	for (std::map<std::string, std::set<std::string> >::const_iterator i2 =
-		 item_shadowed_plugins.begin();
-	     i2 != item_shadowed_plugins.end(); ++i2)
-	{
-	    std::string const& local_forest = (*i2).first;
-	    if (this->full_integrity && (local_forest != top_path))
-	    {
-		// In full integrity mode, let each forest report its
-		// own errors.
-		continue;
-	    }
-	    std::set<std::string> const& remote_forests = (*i2).second;
-	    for (std::set<std::string>::const_iterator i3 =
-		     remote_forests.begin();
-		 i3 != remote_forests.end(); ++i3)
-	    {
-		std::string const& remote_forest = *i3;
-		plugin_error_forests[local_forest].insert(remote_forest);
-	    }
 	}
     }
 
@@ -4013,70 +3899,33 @@ Abuild::reportIntegrityErrors(BuildForest_map& forests,
     {
 	std::string const& item_name = *iter;
 	BuildItem& item = *(builditems[item_name]);
-	std::set<std::string> const& shadowed_dependencies =
-	    item.getShadowedDependencies();
-	for (std::set<std::string>::const_iterator dep_iter =
-		 shadowed_dependencies.begin();
-	     dep_iter != shadowed_dependencies.end(); ++dep_iter)
+	std::set<std::string> const& shadowed_references =
+	    item.getShadowedReferences();
+	std::list<std::string> const& plugin_list = item.getPlugins();
+	std::set<std::string> plugins;
+	plugins.insert(plugin_list.begin(), plugin_list.end());
+	for (std::set<std::string>::const_iterator ref_iter =
+		 shadowed_references.begin();
+	     ref_iter != shadowed_references.end(); ++ref_iter)
 	{
-	    std::string const& dep_name = *dep_iter;
-	    BuildItem& dep = *(builditems[dep_name]);
-	    QTC::TC("abuild", "Abuild ERR dep inconsistency");
-	    error(item.getLocation(), "build item \"" + item_name +
-		  "\" depends on \"" + dep_name + "\", which is shadowed");
-	    error(dep.getLocation(),
-		  "here is the location of \"" + dep_name + "\"");
-	}
-    }
-
-    for (std::map<std::string, std::set<std::string> >::const_iterator i1 =
-	     plugin_error_forests.begin();
-	 i1 != plugin_error_forests.end(); ++i1)
-    {
-	std::string const& local_forest = (*i1).first;
-	if (this->full_integrity && (local_forest != top_path))
-	{
-	    // In full integrity mode, let each forest report its
-	    // own errors.
-	    continue;
-	}
-	std::set<std::string> const& remote_forests = (*i1).second;
-	for (std::set<std::string>::const_iterator i2 = remote_forests.begin();
-	     i2 != remote_forests.end(); ++i2)
-	{
-	    std::string const& remote_forest = *i2;
-	    std::vector<std::string> plugins =
-		this->shadowed_plugins[local_forest][remote_forest];
-	    FileLocation local_forest_location(
-		local_forest + "/" + ItemConfig::FILE_CONF, 0, 0);
-	    FileLocation remote_forest_location(
-		remote_forest + "/" + ItemConfig::FILE_CONF, 0, 0);
-	    BuildItem_map& local_items =
-		forests[local_forest]->getBuildItems();
-	    QTC::TC("abuild", "Abuild ERR plugin integrity");
-	    error(remote_forest_location,
-		  "some plugins declared by this forest are shadowed");
-	    error(local_forest_location,
-		  "this is the forest that contains the shadowing plugins");
-	    std::set<FileLocation> reported;
-	    for (std::vector<std::string>::const_iterator p_iter =
-		     plugins.begin();
-		 p_iter != plugins.end(); ++p_iter)
+	    std::string const& ref_name = *ref_iter;
+	    BuildItem& ref = *(builditems[ref_name]);
+	    if (plugins.count(ref_name))
 	    {
-		std::string const& plugin_name = *p_iter;
-		BuildItem& plugin = *(local_items[plugin_name]);
-		if (! reported.count(plugin.getLocation()))
-		{
-		    // avoid reporting the same error more than once,
-		    // which can happen for plugins that shadow
-		    // something defined more than one backing area
-		    // away.
-		    reported.insert(plugin.getLocation());
-		    error(plugin.getLocation(),
-			  "here is the shadowing copy of plugin \"" +
-			  plugin_name + "\"");
-		}
+		QTC::TC("abuild", "Abuild ERR plugin integrity");
+		error(item.getLocation(), "build item \"" + item_name +
+		      "\" in tree \"" + item.getTreeName() +
+		      "\" uses plugin \"" + ref_name +
+		      "\", which is shadowed");
 	    }
+	    else
+	    {
+		QTC::TC("abuild", "Abuild ERR dep inconsistency");
+		error(item.getLocation(), "build item \"" + item_name +
+		      "\" depends on \"" + ref_name + "\", which is shadowed");
+	    }
+	    error(ref.getLocation(),
+		  "here is the location of \"" + ref_name + "\"");
 	}
     }
 }
