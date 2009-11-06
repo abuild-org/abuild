@@ -1,0 +1,74 @@
+parse(keywords): success
+dumping interface keywords
+  a: local filename, target type all = /usr/local
+  keywords: list string append, target type all = if elseif else endif reset reset-all no-reset override fallback flag declare boolean string filename list append prepend non-recursive local after-build target-type alocalb alocal localb  local  flagging locally
+  x: string, target type all = else
+  y: local string, target type all = override
+  no after-build files
+<?xml version="1.0"?>
+<interface version="1" item-name="p0" item-platform="indep">
+ <variable name="a" type="local filename" target-type="all" declaration-location="keywords:1:9">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:1:28">
+    <value value="/usr/local"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="keywords" type="list string append" target-type="all" declaration-location="keywords:2:9">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:2:39">
+    <value value="if"/>
+    <value value="elseif"/>
+    <value value="else"/>
+    <value value="endif"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:3:1">
+    <value value="reset"/>
+    <value value="reset-all"/>
+    <value value="no-reset"/>
+    <value value="override"/>
+    <value value="fallback"/>
+    <value value="flag"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:4:1">
+    <value value="declare"/>
+    <value value="boolean"/>
+    <value value="string"/>
+    <value value="filename"/>
+    <value value="list"/>
+    <value value="append"/>
+    <value value="prepend"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:5:1">
+    <value value="non-recursive"/>
+    <value value="local"/>
+    <value value="after-build"/>
+    <value value="target-type"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:6:1">
+    <value value="alocalb"/>
+    <value value="alocal"/>
+    <value value="localb"/>
+    <value value=" local "/>
+    <value value="flagging"/>
+    <value value="locally"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="x" type="string" target-type="all" declaration-location="keywords:7:9">
+  <assignment-history>
+   <assignment assignment-type="override" item-name="p0" item-platform="indep" location="keywords:10:12">
+    <value value="else"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="y" type="local string" target-type="all" declaration-location="keywords:8:9">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:11:3">
+    <value value="override"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
+end of interface keywords

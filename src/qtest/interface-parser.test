@@ -26,29 +26,33 @@ test_interfaces("importing", "import.out",
 test_interfaces("reset", "reset.out", ["reset"]);
 test_interfaces("space parsing 1", "spaces1.out", ["spaces1"]);
 test_interfaces("space parsing 2", "spaces2.out", ["spaces2"]);
+test_interfaces("keywords", "keywords.out", ["keywords"], undef, 1);
 
-
-$td->report(8);
+$td->report(9);
 
 sub test_interfaces
 {
-    my ($description, $output, $files, $flags) = @_;
+    my ($description, $output, $files, $flags, $dumpxml) = @_;
     my @methods = (0, 1);
     if (@$files == 1)
     {
 	@methods = (0);
     }
-    my @flag_args = ();
+    my @xargs = ();
     if (defined $flags)
     {
-	@flag_args = ('-allow-flags', @$flags);
+	push(@xargs, '-allow-flags', @$flags);
+    }
+    if ((defined $dumpxml) && ($dumpxml eq '1'))
+    {
+	push(@xargs, '-dump-xml');
     }
 
     foreach my $method (@methods)
     {
 	my $out = (-f "$output-$method") ? "$output-$method" : $output;
 	$td->runtest($description . " (method $method)",
-		     {$td->COMMAND => ['test_interface_parser', @flag_args,
+		     {$td->COMMAND => ['test_interface_parser', @xargs,
 				       '-method', $method, @$files],
 		      $td->FILTER => "perl filter-interface.pl $top"},
 		     {$td->FILE => $out, $td->EXIT_STATUS => 0},

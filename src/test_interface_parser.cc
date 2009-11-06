@@ -2,7 +2,9 @@
 #include <InterfaceParser.hh>
 
 #include <iostream>
+#include <sstream>
 #include <list>
+#include <vector>
 #include <Logger.hh>
 #include <Error.hh>
 #include <Util.hh>
@@ -23,6 +25,7 @@ unparse_values(std::deque<std::string> const& value)
 }
 
 static void dump_interface(std::string const& name, Interface const& _interface,
+			   bool dump,
 			   std::vector<std::string> const& after_builds)
 {
     FlagData flag_data;
@@ -64,51 +67,60 @@ static void dump_interface(std::string const& name, Interface const& _interface,
 	}
     }
 
+    if (dump)
+    {
+	std::ostringstream s;
+	_interface.dump(s);
+	logger->logInfo(s.str());
+    }
+
     logger->logInfo("end of interface " + name);
 }
 
 static void usage()
 {
     std::cerr << "Usage: test_interface_parser [ -allow-flags flag ... ]"
-	      << " -method { 0 | 1 } file ..."
+	      << " [ -dump-xml ] -method { 0 | 1 } file ..."
 	      << std::endl;
     exit(2);
 }
 
 int main(int argc, char* argv[])
 {
-    if (argc < 3)
+    bool dump = false;
+    std::set<std::string> supported_flags;
+    std::vector<std::string> files;
+    int method = -1;
+    for (char** arg = &argv[1]; *arg; ++arg)
+    {
+	if (strcmp(*arg, "-allow-flags") == 0)
+	{
+	    while (*(arg+1) && (*(arg+1))[0] != '-')
+	    {
+		supported_flags.insert(*(++arg));
+	    }
+	}
+	else if (strcmp(*arg, "-dump-xml") == 0)
+	{
+	    dump = true;
+	}
+	else if (strcmp(*arg, "-method") == 0)
+	{
+	    if (! *(arg+1))
+	    {
+		usage();
+	    }
+	    method = atoi(*(++arg));
+	}
+	else
+	{
+	    files.push_back(*arg);
+	}
+    }
+    if ((method == -1) || files.empty())
     {
 	usage();
     }
-
-    int method_arg = 2;
-    int first_file_arg = 3;
-    std::set<std::string> supported_flags;
-    if (strcmp(argv[1], "-allow-flags") == 0)
-    {
-	int i = 0;
-	for (i = 2; i < argc; ++i)
-	{
-	    if (argv[i][0] != '-')
-	    {
-		supported_flags.insert(argv[i]);
-	    }
-	    else
-	    {
-		break;
-	    }
-	}
-	if (! ((strcmp(argv[i], "-method") == 0) &&
-	       (argc >= i + 2)))
-	{
-	    usage();
-	}
-	method_arg = i + 1;
-	first_file_arg = i + 2;
-    }
-
-    int method = atoi(argv[method_arg]);
 
     logger = Logger::getInstance();
     std::list<boost::shared_ptr<Interface> > interfaces;
@@ -134,9 +146,10 @@ int main(int argc, char* argv[])
 	    debug = true;
 	}
 
-	for (int i = first_file_arg; i < argc; ++i)
+	for (std::vector<std::string>::iterator iter = files.begin();
+	     iter != files.end(); ++iter)
 	{
-	    char const* filename = argv[i];
+	    char const* filename = (*iter).c_str();
 	    std::string dir = Util::dirname(Util::canonicalizePath(filename));
 
 	    // Per-file InterfaceParser for method 1
@@ -163,7 +176,8 @@ int main(int argc, char* argv[])
 	    logger->logInfo(std::string("parse(") + filename + "): " +
 			    (status ? "success" : "failure"));
 	    boost::shared_ptr<Interface> _interface = parser.getInterface();
-	    dump_interface(filename, *_interface, parser.getAfterBuilds());
+	    dump_interface(filename, *_interface, dump,
+			   parser.getAfterBuilds());
 	    if (method == 1)
 	    {
 		interfaces.push_back(_interface);
