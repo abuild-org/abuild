@@ -54,8 +54,8 @@ tok_comma	[ \t]*,[ \t]*
 tok_clope	[ \t]*\)[ \t]*
 
 /* keywords */
-tok_if		[ \t]*if[ \t]*[ \t]*+\(
-tok_elseif	[ \t]*elseif[ \t]*[ \t]*+\(
+tok_if		[ \t]*if[ \t]*+\(
+tok_elseif	[ \t]*elseif[ \t]*+\(
 tok_else	[ \t]*else[ \t]*
 tok_endif	[ \t]*endif[ \t]*
 tok_reset	[ \t]*reset[ \t]*
