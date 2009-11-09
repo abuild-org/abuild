@@ -36,6 +36,7 @@ dumping interface c/good3
   TARGET-TYPE: string, target type all = object-code
   XFLAGS: list string append, target type object-code = -DHAVE_good3=1 -DHAVE_good2=1
   empty: string, target type object-code = 
+  ftest: list string append, target type object-code = 1 2 3
   after-build files:
     --CWD--/c/other-file
 end of interface c/good3

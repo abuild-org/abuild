@@ -5,18 +5,18 @@
 #include <FileLocation.hh>
 #include <string>
 
-class nt_Words;
+class nt_Word;
 
 class nt_AfterBuild: public NonTerminal
 {
   public:
-    nt_AfterBuild(nt_Words const*);
+    nt_AfterBuild(nt_Word const*);
     virtual ~nt_AfterBuild();
 
-    nt_Words const* getArgument() const;
+    nt_Word const* getArgument() const;
 
   private:
-    nt_Words const* argument;
+    nt_Word const* argument;
 };
 
 #endif // __NT_AUTOFILE_HH__

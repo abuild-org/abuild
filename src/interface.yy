@@ -96,8 +96,8 @@
 %type <function> function
 %type <arguments> arguments
 %type <argument> argument
-%type <token> nospaceendofline
 %type <token> endofline
+%type <token> nospaceendofline
 
 %%
 
@@ -400,7 +400,7 @@ basetypespec : tok_boolean
 	  }
 	;
 
-afterbuild : tok_afterbuild words endofline
+afterbuild : tok_afterbuild word endofline
 	  {
 	      $$ = parser->createAfterBuild($2);
 	  }
@@ -487,6 +487,11 @@ nospaceendofline : tok_EOF
 	  {
 	      $$ = $1;
 	  }
+	;
+
+/* optional whitespace */
+sp	:
+	| tok_spaces
 	;
 
 %%

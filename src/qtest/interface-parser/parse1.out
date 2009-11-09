@@ -5,6 +5,7 @@ parse1:9:1: ERROR: unable to parse if statement
 parse1:10:4: ERROR: a parse error occured on or before this line
 parse1:17:1: ERROR: unable to parse if statement
 parse1:22:6: ERROR: a parse error occured on or before this line
+parse1:5:13: ERROR: unknown variable a
 parse1:5:13: ERROR: this argument must be a filename
 parse1:13:5: ERROR: unknown function x
 parse(parse1): failure

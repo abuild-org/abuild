@@ -2,7 +2,7 @@
 target-type
 a ==
 
-after-build x y z
+after-build $(a)
 
 something
 

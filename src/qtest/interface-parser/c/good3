@@ -24,3 +24,14 @@ after-build other-file
 NONREC_LIST = c1 c2
 declare empty string =
 override empty =
+
+declare ftest list string append
+if (contains(1 2 3, 1))
+  ftest = 1
+endif
+if(not(contains(1 2 3, 4)))
+  ftest = 2
+endif
+if (not(contains(, z)))
+  ftest = 3
+endif

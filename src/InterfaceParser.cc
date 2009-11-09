@@ -94,7 +94,7 @@ InterfaceParser::createWords(FileLocation const& location)
 }
 
 nt_AfterBuild*
-InterfaceParser::createAfterBuild(nt_Words* w)
+InterfaceParser::createAfterBuild(nt_Word* w)
 {
     return saveNonTerminal(new nt_AfterBuild(w));
 }
@@ -570,9 +570,11 @@ InterfaceParser::evaluateAfterBuild(
     }
     if (evaluating)
     {
-	nt_Words const* words = after_build->getArgument();
+	nt_Word const* word = after_build->getArgument();
+	nt_Words words(word->getLocation());
+	words.append(word);
+	nt_Argument argument(&words);
 	std::string filename;
-	nt_Argument argument(words);
 	if (checkFilenameArgument(&argument, filename))
 	{
 	    this->after_builds.push_back(filename);
