@@ -72,6 +72,7 @@ class InterfaceParser: public Parser
     // deletion.
     nt_Word* createWord();
     nt_Words* createWords(FileLocation const&);
+    nt_Words* createEmptyWords();
     nt_AfterBuild* createAfterBuild(nt_Word*);
     nt_TargetType* createTargetType(Token*);
     nt_TypeSpec* createTypeSpec(FileLocation const&, Interface::type_e);

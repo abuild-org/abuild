@@ -223,9 +223,13 @@ reset : tok_reset tok_identifier endofline
 	  }
 	;
 
-assignment : tok_identifier tok_equal words endofline
+assignment : tok_identifier sp tok_equal sp words endofline
 	  {
-	      $$ = parser->createAssignment($1, $3);
+	      $$ = parser->createAssignment($1, $5);
+	  }
+	| tok_identifier sp tok_equal endofline
+	  {
+	      $$ = parser->createAssignment($1, parser->createEmptyWords());
 	  }
 	| tok_override assignment
 	  {
@@ -318,7 +322,11 @@ arguments : arguments tok_comma argument
 	  }
 	;
 
-argument : words
+argument :
+	  {
+	      $$ = parser->createArgument(parser->createEmptyWords());
+	  }
+	| words
 	  {
 	      $$ = parser->createArgument($1);
 	  }
@@ -338,9 +346,14 @@ declaration : declbody endofline
 	  {
 	      $$ = $1;
 	  }
-	| declbody tok_equal words endofline
+	| declbody sp tok_equal sp words endofline
 	  {
-	      $1->addInitializer($3);
+	      $1->addInitializer($5);
+	      $$ = $1;
+	  }
+	| declbody sp tok_equal endofline
+	  {
+	      $1->addInitializer(parser->createEmptyWords());
 	      $$ = $1;
 	  }
 	;
@@ -416,11 +429,7 @@ targettype : tok_targettype tok_identifier endofline
 	  }
 	;
 
-words	:
-          {
-	      $$ = parser->createWords(parser->getLastFileLocation());
-	  }
-	| word
+words	: word
 	  {
 	      $$ = parser->createWords($1->getLocation());
 	      $$->append($1);

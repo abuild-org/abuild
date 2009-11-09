@@ -93,6 +93,12 @@ InterfaceParser::createWords(FileLocation const& location)
     return saveNonTerminal(new nt_Words(location));
 }
 
+nt_Words*
+InterfaceParser::createEmptyWords()
+{
+    return saveNonTerminal(new nt_Words(getLastFileLocation()));
+}
+
 nt_AfterBuild*
 InterfaceParser::createAfterBuild(nt_Word* w)
 {

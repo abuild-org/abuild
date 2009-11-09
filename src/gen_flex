@@ -14,18 +14,64 @@ my $base = basename($qfl, '.qfl');
 
 my $lineno = 1;
 open(IN, "<$qfl") or die "$whoami: can't open $qfl: $!\n";
-open(OUT, ">$fl") or die "$whoami: can't create $fl: $!\n";
+open(OUT, ">$fl.tmp") or die "$whoami: can't create $fl.tmp: $!\n";
 
 output("#line $lineno \"$qfl\"\n");
 
 my @tokens = ();
+my %kw_tokens = ();
 while (<IN>)
 {
     if (m/^tok_(\S+)\t/)
     {
-	push(@tokens, $1);
+	my $tok = $1;
+	push(@tokens, $tok);
+	if ($tok =~ m/^kw_/)
+	{
+	    $kw_tokens{$tok} = 1;
+	}
     }
     output($_);
+}
+open(Y, "<../$base.yy") or die "$whoami: can't open ../$base.yy: $!\n";
+{ # local scope
+    my $in_keyword = 0;
+    while (<Y>)
+    {
+	if (! $in_keyword)
+	{
+	    if (m/^keyword/)
+	    {
+		$in_keyword = 1;
+	    }
+	}
+	if ($in_keyword)
+	{
+	    if (m/^\s+;/)
+	    {
+		$in_keyword = 0;
+	    }
+	    elsif (m/tok_(kw_\S+)/)
+	    {
+		my $tok = $1;
+		if (exists $kw_tokens{$tok})
+		{
+		    delete $kw_tokens{$tok};
+		}
+		else
+		{
+		    # This must be an invalid token, so it will get
+		    # its own error message from bison.
+		}
+	    }
+	}
+    }
+    close(Y);
+    if (scalar keys %kw_tokens)
+    {
+	my $toks = join(' ', (sort keys %kw_tokens));
+	die "$whoami: tokens missing from keywords in $base.yy: $toks\n";
+    }
 }
 
 output("#line $lineno \"$fl\"\n");
@@ -60,8 +106,9 @@ output("{\n");
 output("    return flex_caller;\n");
 output("}\n");
 
-close(OUT) or die "$whoami: can't close $fl: $!\n";
+close(OUT) or die "$whoami: can't close $fl.tmp: $!\n";
 close(IN);
+rename "$fl.tmp", "$fl" or die "$whoami: can't rename $fl.tmp to $fl: $!\n";
 
 sub output
 {

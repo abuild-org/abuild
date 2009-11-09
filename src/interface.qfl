@@ -49,7 +49,7 @@ tok_newline	\r?\n
 tok_quotedchar	\\.
 
 /* operators */
-tok_equal	[ \t]*=[ \t]*
+tok_equal	=
 tok_comma	[ \t]*,[ \t]*
 tok_clope	[ \t]*\)[ \t]*
 
