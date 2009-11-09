@@ -14,6 +14,10 @@ semantic1:53:7: ERROR: resetting unknown variable UNKNOWN
 semantic1:54:10: ERROR: unknown variable UNKNOWN
 semantic1:55:6: ERROR: flag unknown-flag is not supported by this build item
 semantic1:57:22: ERROR: multiple words may not be assigned to scalar variable sc1
+semantic1:58:28: ERROR: value  is invalid for boolean variable empty_bool
+semantic1:59:33: ERROR: the empty string may not be used as a value for filename variable empty_filename
+semantic1:60:10: ERROR: value  is invalid for boolean variable empty_bool
+semantic1:61:10: ERROR: the empty string may not be used as a value for filename variable empty_filename
 parse(semantic1): failure
 dumping interface semantic1
   a: string, target type object-code = 
@@ -21,6 +25,8 @@ dumping interface semantic1
   c: boolean, target type object-code = 1
   d: filename, target type object-code = --CWD--/a
   e: list filename prepend, target type object-code: uninitialized
+  empty_bool: boolean, target type object-code = 
+  empty_filename: filename, target type object-code = 
   sc1: string, target type object-code = 1 2 3
   after-build files:
     --CWD--/something.interface

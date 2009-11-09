@@ -22,5 +22,5 @@ endif
 after-build other-file
 
 NONREC_LIST = c1 c2
-declare empty string
-empty =
+declare empty string =
+override empty =

@@ -55,3 +55,7 @@ no-reset UNKNOWN
 flag unknown-flag override a = x
 
 declare sc1 string = 1 2 3
+declare empty_bool boolean =
+declare empty_filename filename =
+override empty_bool =
+override empty_filename =
