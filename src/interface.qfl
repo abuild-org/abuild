@@ -37,7 +37,7 @@
 tok_comment	^[ \t]*#.*\n
 
 /* be flexible about line terminators */
-tok_newline	[ \t]*\r?\n
+tok_newline	\r?\n
 
 /* Trailing backslash followed by a newline is a line continuation
  * character and is embedded in the tok_spaces token.  Any other
