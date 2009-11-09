@@ -26,7 +26,7 @@ test_interfaces("importing", "import.out",
 test_interfaces("reset", "reset.out", ["reset"]);
 test_interfaces("space parsing 1", "spaces1.out", ["spaces1"]);
 test_interfaces("space parsing 2", "spaces2.out", ["spaces2"]);
-test_interfaces("space parsing 3", "spaces3.out", ["spaces3"]);
+test_interfaces("space parsing 3", "spaces3.out", ["spaces3"], undef, 1);
 test_interfaces("keywords", "keywords.out", ["keywords"], undef, 1);
 
 $td->report(10);

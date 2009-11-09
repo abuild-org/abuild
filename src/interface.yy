@@ -34,14 +34,12 @@
 %parse-param { InterfaceParser* parser }
 
 %token <token> tok_EOF /* special case handled by Parser class */
-%token <not_used> tok_comment
 %token <not_used> tok_spaces
 %token <token> tok_newline
 %token <token> tok_quotedchar
 %token <token> tok_equal
 %token <token> tok_comma
 %token <token> tok_clope
-%token <token> tok_continue
 %token <token> tok_if
 %token <token> tok_else
 %token <token> tok_elseif
@@ -93,6 +91,7 @@
 %type <targettype> targettype
 %type <words> words
 %type <word> word
+%type <word> wordfragment
 %type <conditional> conditional
 %type <function> function
 %type <arguments> arguments
@@ -224,7 +223,7 @@ reset : tok_reset tok_identifier endofline
 	  }
 	;
 
-assignment : tok_identifier tok_equal words nospaceendofline
+assignment : tok_identifier tok_equal words endofline
 	  {
 	      $$ = parser->createAssignment($1, $3);
 	  }
@@ -339,7 +338,7 @@ declaration : declbody endofline
 	  {
 	      $$ = $1;
 	  }
-	| declbody tok_equal words nospaceendofline
+	| declbody tok_equal words endofline
 	  {
 	      $1->addInitializer($3);
 	      $$ = $1;
@@ -401,7 +400,7 @@ basetypespec : tok_boolean
 	  }
 	;
 
-afterbuild : tok_afterbuild words nospaceendofline
+afterbuild : tok_afterbuild words endofline
 	  {
 	      $$ = parser->createAfterBuild($2);
 	  }
@@ -417,7 +416,11 @@ targettype : tok_targettype tok_identifier endofline
 	  }
 	;
 
-words	: word
+words	:
+          {
+	      $$ = parser->createWords(parser->getLastFileLocation());
+	  }
+	| word
 	  {
 	      $$ = parser->createWords($1->getLocation());
 	      $$->append($1);
@@ -429,45 +432,40 @@ words	: word
 	  }
 	;
 
-word	:
+word	: wordfragment
 	  {
-	      $$ = parser->createWord(parser->getLastFileLocation());
-	  }
-	| word tok_variable
-	  {
-	      $1->appendVariable($2);
 	      $$ = $1;
 	  }
-	| word tok_quotedchar
+	| word wordfragment
 	  {
-	      $1->appendString($2);
+	      $1->appendWord($2);
 	      $$ = $1;
 	  }
-	| word tok_identifier
-	  {
-	      $1->appendString($2);
-	      $$ = $1;
-	  }
-	| word tok_environment
-	  {
-	      $1->appendEnvironment($2);
-	      $$ = $1;
-	  }
-	| word tok_other
-	  {
-	      $1->appendString($2);
-	      $$ = $1;
-	  }
-	;
 
-/* use nospaceendofline after words to avoid shift/reduce conflict */
-nospaceendofline : tok_EOF
+wordfragment : tok_variable
 	  {
-	      $$ = $1;
+	      $$ = parser->createWord();
+	      $$->appendVariable($1);
 	  }
-	| tok_newline
+	| tok_quotedchar
 	  {
-	      $$ = $1;
+	      $$ = parser->createWord();
+	      $$->appendString($1);
+	  }
+	| tok_identifier
+	  {
+	      $$ = parser->createWord();
+	      $$->appendString($1);
+	  }
+	| tok_environment
+	  {
+	      $$ = parser->createWord();
+	      $$->appendEnvironment($1);
+	  }
+	| tok_other
+	  {
+	      $$ = parser->createWord();
+	      $$->appendString($1);
 	  }
 	;
 
@@ -478,6 +476,16 @@ endofline : nospaceendofline
 	| tok_spaces nospaceendofline
 	  {
 	      $$ = $2;
+	  }
+	;
+
+nospaceendofline : tok_EOF
+	  {
+	      $$ = $1;
+	  }
+	| tok_newline
+	  {
+	      $$ = $1;
 	  }
 	;
 

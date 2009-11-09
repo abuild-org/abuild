@@ -211,38 +211,23 @@ Interface::assignVariable(FileLocation const& location,
 	    }
 	}
 
-	// Filter out empty strings from values with the special case
-	// exception of allowing a single-word scalar value to be the
-	// empty string.
-	std::deque<std::string> values;
-	if ((var.list_type == l_scalar) && (ovalues.size() == 1))
-	{
-	    values = ovalues;
-	}
-	else
-	{
-	    for (std::deque<std::string>::const_iterator iter = ovalues.begin();
-		 iter != ovalues.end(); ++iter)
-	    {
-		if ((*iter).empty())
-		{
-		    QTC::TC("abuild", "Interface skip empty string");
-		}
-		else
-		{
-		    values.push_back(*iter);
-		}
-	    }
-	}
+	std::deque<std::string> values = ovalues;
 
-	if ((var.list_type == l_scalar) &&
-	    (! (values.empty() || (values.size() == 1))))
+	if (var.list_type == l_scalar)
 	{
-	    QTC::TC("abuild", "Interface ERR multiword scalar");
-	    status = false;
-	    error.error(location,
-			"multiple words may not be assigned"
-			" to scalar variable " + variable_name);
+	    if (values.empty())
+	    {
+		QTC::TC("abuild", "Interface empty scalar assignment");
+		values.push_back("");
+	    }
+	    if (values.size() != 1)
+	    {
+		QTC::TC("abuild", "Interface ERR multiword scalar");
+		status = false;
+		error.error(location,
+			    "multiple words may not be assigned"
+			    " to scalar variable " + variable_name);
+	    }
 	}
 
 	// Check and, if needed, adjust each value based on the type.

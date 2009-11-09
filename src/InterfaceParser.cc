@@ -82,9 +82,9 @@ InterfaceParser::setSupportedFlags(std::set<std::string> const& supported_flags)
 }
 
 nt_Word*
-InterfaceParser::createWord(FileLocation const& location)
+InterfaceParser::createWord()
 {
-    return saveNonTerminal(new nt_Word(location));
+    return saveNonTerminal(new nt_Word());
 }
 
 nt_Words*

@@ -14,8 +14,8 @@ semantic1:53:7: ERROR: resetting unknown variable UNKNOWN
 semantic1:54:10: ERROR: unknown variable UNKNOWN
 semantic1:55:6: ERROR: flag unknown-flag is not supported by this build item
 semantic1:57:22: ERROR: multiple words may not be assigned to scalar variable sc1
-semantic1:58:28: ERROR: value  is invalid for boolean variable empty_bool
-semantic1:59:33: ERROR: the empty string may not be used as a value for filename variable empty_filename
+semantic1:58:29: ERROR: value  is invalid for boolean variable empty_bool
+semantic1:59:34: ERROR: the empty string may not be used as a value for filename variable empty_filename
 semantic1:60:10: ERROR: value  is invalid for boolean variable empty_bool
 semantic1:61:10: ERROR: the empty string may not be used as a value for filename variable empty_filename
 parse(semantic1): failure

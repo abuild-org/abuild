@@ -40,78 +40,74 @@
       know about them.  */
    enum yytokentype {
      tok_EOF = 258,
-     tok_comment = 259,
-     tok_spaces = 260,
-     tok_newline = 261,
-     tok_quotedchar = 262,
-     tok_equal = 263,
-     tok_comma = 264,
-     tok_clope = 265,
-     tok_continue = 266,
-     tok_if = 267,
-     tok_else = 268,
-     tok_elseif = 269,
-     tok_endif = 270,
-     tok_reset = 271,
-     tok_reset_all = 272,
-     tok_no_reset = 273,
-     tok_override = 274,
-     tok_fallback = 275,
-     tok_flag = 276,
-     tok_declare = 277,
-     tok_boolean = 278,
-     tok_string = 279,
-     tok_filename = 280,
-     tok_list = 281,
-     tok_append = 282,
-     tok_prepend = 283,
-     tok_nonrecursive = 284,
-     tok_local = 285,
-     tok_afterbuild = 286,
-     tok_targettype = 287,
-     tok_identifier = 288,
-     tok_environment = 289,
-     tok_function = 290,
-     tok_variable = 291,
-     tok_other = 292
+     tok_spaces = 259,
+     tok_newline = 260,
+     tok_quotedchar = 261,
+     tok_equal = 262,
+     tok_comma = 263,
+     tok_clope = 264,
+     tok_if = 265,
+     tok_else = 266,
+     tok_elseif = 267,
+     tok_endif = 268,
+     tok_reset = 269,
+     tok_reset_all = 270,
+     tok_no_reset = 271,
+     tok_override = 272,
+     tok_fallback = 273,
+     tok_flag = 274,
+     tok_declare = 275,
+     tok_boolean = 276,
+     tok_string = 277,
+     tok_filename = 278,
+     tok_list = 279,
+     tok_append = 280,
+     tok_prepend = 281,
+     tok_nonrecursive = 282,
+     tok_local = 283,
+     tok_afterbuild = 284,
+     tok_targettype = 285,
+     tok_identifier = 286,
+     tok_environment = 287,
+     tok_function = 288,
+     tok_variable = 289,
+     tok_other = 290
    };
 #endif
 /* Tokens.  */
 #define tok_EOF 258
-#define tok_comment 259
-#define tok_spaces 260
-#define tok_newline 261
-#define tok_quotedchar 262
-#define tok_equal 263
-#define tok_comma 264
-#define tok_clope 265
-#define tok_continue 266
-#define tok_if 267
-#define tok_else 268
-#define tok_elseif 269
-#define tok_endif 270
-#define tok_reset 271
-#define tok_reset_all 272
-#define tok_no_reset 273
-#define tok_override 274
-#define tok_fallback 275
-#define tok_flag 276
-#define tok_declare 277
-#define tok_boolean 278
-#define tok_string 279
-#define tok_filename 280
-#define tok_list 281
-#define tok_append 282
-#define tok_prepend 283
-#define tok_nonrecursive 284
-#define tok_local 285
-#define tok_afterbuild 286
-#define tok_targettype 287
-#define tok_identifier 288
-#define tok_environment 289
-#define tok_function 290
-#define tok_variable 291
-#define tok_other 292
+#define tok_spaces 259
+#define tok_newline 260
+#define tok_quotedchar 261
+#define tok_equal 262
+#define tok_comma 263
+#define tok_clope 264
+#define tok_if 265
+#define tok_else 266
+#define tok_elseif 267
+#define tok_endif 268
+#define tok_reset 269
+#define tok_reset_all 270
+#define tok_no_reset 271
+#define tok_override 272
+#define tok_fallback 273
+#define tok_flag 274
+#define tok_declare 275
+#define tok_boolean 276
+#define tok_string 277
+#define tok_filename 278
+#define tok_list 279
+#define tok_append 280
+#define tok_prepend 281
+#define tok_nonrecursive 282
+#define tok_local 283
+#define tok_afterbuild 284
+#define tok_targettype 285
+#define tok_identifier 286
+#define tok_environment 287
+#define tok_function 288
+#define tok_variable 289
+#define tok_other 290
 
 
 
@@ -141,7 +137,7 @@ typedef union YYSTYPE
     nt_IfClauses* ifclauses;
 }
 /* Line 1529 of yacc.c.  */
-#line 145 "interface.tab.hh"
+#line 141 "interface.tab.hh"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -11,12 +11,13 @@ class Token;
 class nt_Word: public NonTerminal
 {
   public:
-    nt_Word(FileLocation const&);
+    nt_Word();
     virtual ~nt_Word();
 
     enum word_type_e { w_string, w_variable, w_environment };
     typedef std::pair<Token const*, word_type_e> word_t;
 
+    void appendWord(nt_Word const* w);
     void appendString(Token const* t);
     void appendVariable(Token const* t);
     void appendEnvironment(Token const* t);

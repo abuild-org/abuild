@@ -95,7 +95,6 @@ Abuild ERR no abuild.conf 0
 Abuild item added twice 0
 Abuild ERR missing after-build 0
 Abuild good after-build 0
-Interface skip empty string 0
 ItemConfig ERR multiple build files 0
 ItemConfig ERR platform-types without name 0
 Abuild ERR after-build with no build file 0
@@ -415,3 +414,4 @@ Abuild ignoring missing optional child 0
 ItemConfig ERR optional without child 0
 ItemConfig ERR global without plugin 0
 ItemConfig global plugin 0
+Interface empty scalar assignment 0

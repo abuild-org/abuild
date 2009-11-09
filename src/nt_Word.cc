@@ -1,13 +1,20 @@
 #include <nt_Word.hh>
 #include <Token.hh>
 
-nt_Word::nt_Word(FileLocation const& location) :
-    NonTerminal(location)
+nt_Word::nt_Word()
 {
 }
 
 nt_Word::~nt_Word()
 {
+}
+
+void
+nt_Word::appendWord(nt_Word const* w)
+{
+    maybeSetLocation(w->tokens.front().first);
+    this->tokens.insert(this->tokens.end(),
+			w->tokens.begin(), w->tokens.end());
 }
 
 void

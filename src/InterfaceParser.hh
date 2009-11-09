@@ -70,7 +70,7 @@ class InterfaceParser: public Parser
 
     // These methods create non-terminals and save them for automatic
     // deletion.
-    nt_Word* createWord(FileLocation const&);
+    nt_Word* createWord();
     nt_Words* createWords(FileLocation const&);
     nt_AfterBuild* createAfterBuild(nt_Words*);
     nt_TargetType* createTargetType(Token*);
