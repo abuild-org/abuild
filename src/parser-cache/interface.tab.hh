@@ -50,23 +50,23 @@
      tok_else = 266,
      tok_elseif = 267,
      tok_endif = 268,
-     tok_reset = 269,
-     tok_reset_all = 270,
-     tok_no_reset = 271,
-     tok_override = 272,
-     tok_fallback = 273,
-     tok_flag = 274,
-     tok_declare = 275,
-     tok_boolean = 276,
-     tok_string = 277,
-     tok_filename = 278,
-     tok_list = 279,
-     tok_append = 280,
-     tok_prepend = 281,
-     tok_nonrecursive = 282,
-     tok_local = 283,
-     tok_afterbuild = 284,
-     tok_targettype = 285,
+     tok_kw_reset = 269,
+     tok_kw_reset_all = 270,
+     tok_kw_no_reset = 271,
+     tok_kw_override = 272,
+     tok_kw_fallback = 273,
+     tok_kw_flag = 274,
+     tok_kw_declare = 275,
+     tok_kw_boolean = 276,
+     tok_kw_string = 277,
+     tok_kw_filename = 278,
+     tok_kw_list = 279,
+     tok_kw_append = 280,
+     tok_kw_prepend = 281,
+     tok_kw_nonrecursive = 282,
+     tok_kw_local = 283,
+     tok_kw_afterbuild = 284,
+     tok_kw_targettype = 285,
      tok_identifier = 286,
      tok_environment = 287,
      tok_function = 288,
@@ -86,23 +86,23 @@
 #define tok_else 266
 #define tok_elseif 267
 #define tok_endif 268
-#define tok_reset 269
-#define tok_reset_all 270
-#define tok_no_reset 271
-#define tok_override 272
-#define tok_fallback 273
-#define tok_flag 274
-#define tok_declare 275
-#define tok_boolean 276
-#define tok_string 277
-#define tok_filename 278
-#define tok_list 279
-#define tok_append 280
-#define tok_prepend 281
-#define tok_nonrecursive 282
-#define tok_local 283
-#define tok_afterbuild 284
-#define tok_targettype 285
+#define tok_kw_reset 269
+#define tok_kw_reset_all 270
+#define tok_kw_no_reset 271
+#define tok_kw_override 272
+#define tok_kw_fallback 273
+#define tok_kw_flag 274
+#define tok_kw_declare 275
+#define tok_kw_boolean 276
+#define tok_kw_string 277
+#define tok_kw_filename 278
+#define tok_kw_list 279
+#define tok_kw_append 280
+#define tok_kw_prepend 281
+#define tok_kw_nonrecursive 282
+#define tok_kw_local 283
+#define tok_kw_afterbuild 284
+#define tok_kw_targettype 285
 #define tok_identifier 286
 #define tok_environment 287
 #define tok_function 288

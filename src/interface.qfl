@@ -29,8 +29,13 @@
  *
  * Whitespace handling is tricky in our grammar.  It's significant in
  * some places but not in others, more or less like how make variables
- * are assigned.  We deal with this by allowing keyword and operator
- * tokens to suck in ignorable whitespace around them.
+ * are assigned.  Unfortunately, regular words that happen to match
+ * keywords are recognized as their special tokens in some contexts
+ * where they shouldn't be.  We can't use start states to prevent this
+ * because the lexer can't tell when to switch in and out, so we have
+ * to deal with that specially in the grammar.  To help, we use
+ * tok_kw_ as the prefix for any token that just matches identifier
+ * characters.
  */
 
 /* comments, as a special case, are consumed by the lexer */
@@ -53,28 +58,31 @@ tok_equal	=
 tok_comma	[ \t]*,[ \t]*
 tok_clope	[ \t]*\)[ \t]*
 
-/* keywords */
+/* keywords that would otherwise parse as functions */
 tok_if		[ \t]*if[ \t]*+\(
 tok_elseif	[ \t]*elseif[ \t]*+\(
-tok_else	[ \t]*else[ \t]*
-tok_endif	[ \t]*endif[ \t]*
-tok_reset	[ \t]*reset[ \t]*
-tok_reset_all	[ \t]*reset-all[ \t]*
-tok_no_reset	[ \t]*no-reset[ \t]*
-tok_override	[ \t]*override[ \t]*
-tok_fallback	[ \t]*fallback[ \t]*
-tok_flag	[ \t]*flag[ \t]*
-tok_declare	[ \t]*declare[ \t]*
-tok_boolean	[ \t]*boolean[ \t]*
-tok_string	[ \t]*string[ \t]*
-tok_filename	[ \t]*filename[ \t]*
-tok_list	[ \t]*list[ \t]*
-tok_append	[ \t]*append[ \t]*
-tok_prepend	[ \t]*prepend[ \t]*
-tok_nonrecursive	[ \t]*non-recursive[ \t]*
-tok_local	[ \t]*local[ \t]*
-tok_afterbuild	[ \t]*after-build[ \t]*
-tok_targettype	[ \t]*target-type[ \t]*
+
+/* keywords that would otherwise parse as identifiers -- these must
+ * start with tok_kw and be part of the keywords nonterminal. */
+tok_else		[ \t]*else[ \t]*
+tok_endif		[ \t]*endif[ \t]*
+tok_kw_reset		reset
+tok_kw_reset_all	reset-all
+tok_kw_no_reset		no-reset
+tok_kw_override		override
+tok_kw_fallback		fallback
+tok_kw_flag		flag
+tok_kw_declare		declare
+tok_kw_boolean		boolean
+tok_kw_string		string
+tok_kw_filename		filename
+tok_kw_list		list
+tok_kw_append		append
+tok_kw_prepend		prepend
+tok_kw_nonrecursive	non-recursive
+tok_kw_local		local
+tok_kw_afterbuild	after-build
+tok_kw_targettype	target-type
 
 /* remaining syntax */
 tok_function	[_[:alnum:]\.-]+[ \t]*+\(

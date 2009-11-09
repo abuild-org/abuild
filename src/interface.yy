@@ -44,23 +44,23 @@
 %token <token> tok_else
 %token <token> tok_elseif
 %token <token> tok_endif
-%token <token> tok_reset
-%token <token> tok_reset_all
-%token <token> tok_no_reset
-%token <token> tok_override
-%token <token> tok_fallback
-%token <token> tok_flag
-%token <token> tok_declare
-%token <token> tok_boolean
-%token <token> tok_string
-%token <token> tok_filename
-%token <token> tok_list
-%token <token> tok_append
-%token <token> tok_prepend
-%token <token> tok_nonrecursive
-%token <token> tok_local
-%token <token> tok_afterbuild
-%token <token> tok_targettype
+%token <token> tok_kw_reset
+%token <token> tok_kw_reset_all
+%token <token> tok_kw_no_reset
+%token <token> tok_kw_override
+%token <token> tok_kw_fallback
+%token <token> tok_kw_flag
+%token <token> tok_kw_declare
+%token <token> tok_kw_boolean
+%token <token> tok_kw_string
+%token <token> tok_kw_filename
+%token <token> tok_kw_list
+%token <token> tok_kw_append
+%token <token> tok_kw_prepend
+%token <token> tok_kw_nonrecursive
+%token <token> tok_kw_local
+%token <token> tok_kw_afterbuild
+%token <token> tok_kw_targettype
 %token <token> tok_identifier
 %token <token> tok_environment
 %token <token> tok_function
@@ -92,6 +92,7 @@
 %type <words> words
 %type <word> word
 %type <word> wordfragment
+%type <token> keyword
 %type <conditional> conditional
 %type <function> function
 %type <arguments> arguments
@@ -209,17 +210,17 @@ else	: elsestatement blocks
 	  }
 	;
 
-reset : tok_reset tok_identifier endofline
+reset : tok_kw_reset tok_spaces tok_identifier endofline
 	  {
-	      $$ = parser->createReset($2, false);
+	      $$ = parser->createReset($3, false);
 	  }
-	| tok_reset_all endofline
+	| tok_kw_reset_all endofline
 	  {
 	      $$ = parser->createReset($1->getLocation());
 	  }
-	| tok_no_reset tok_identifier endofline
+	| tok_kw_no_reset tok_spaces tok_identifier endofline
 	  {
-	      $$ = parser->createReset($2, true);
+	      $$ = parser->createReset($3, true);
 	  }
 	;
 
@@ -231,20 +232,20 @@ assignment : tok_identifier sp tok_equal sp words endofline
 	  {
 	      $$ = parser->createAssignment($1, parser->createEmptyWords());
 	  }
-	| tok_override assignment
+	| tok_kw_override tok_spaces assignment
 	  {
-	      $2->setAssignmentType(Interface::a_override);
-	      $$ = $2;
-	  }
-	| tok_fallback assignment
-	  {
-	      $2->setAssignmentType(Interface::a_fallback);
-	      $$ = $2;
-	  }
-	| tok_flag tok_identifier assignment
-	  {
-	      $3->setFlag($2);
+	      $3->setAssignmentType(Interface::a_override);
 	      $$ = $3;
+	  }
+	| tok_kw_fallback tok_spaces assignment
+	  {
+	      $3->setAssignmentType(Interface::a_fallback);
+	      $$ = $3;
+	  }
+	| tok_kw_flag tok_spaces tok_identifier tok_spaces assignment
+	  {
+	      $5->setFlag($3);
+	      $$ = $5;
 	  }
 	| tok_spaces assignment
 	  {
@@ -358,9 +359,9 @@ declaration : declbody endofline
 	  }
 	;
 
-declbody : tok_declare tok_identifier typespec
+declbody : sp tok_kw_declare tok_spaces tok_identifier tok_spaces typespec
 	  {
-	      $$ = parser->createDeclaration($2, $3);
+	      $$ = parser->createDeclaration($4, $6);
 	  }
 	;
 
@@ -368,15 +369,15 @@ typespec : listtypespec
 	  {
 	      $$ = $1;
 	  }
-	| tok_nonrecursive listtypespec
+	| tok_kw_nonrecursive tok_spaces listtypespec
 	  {
-	      $2->setScope(Interface::s_nonrecursive);
-	      $$ = $2;
+	      $3->setScope(Interface::s_nonrecursive);
+	      $$ = $3;
 	  }
-	| tok_local listtypespec
+	| tok_kw_local tok_spaces listtypespec
 	  {
-	      $2->setScope(Interface::s_local);
-	      $$ = $2;
+	      $3->setScope(Interface::s_local);
+	      $$ = $3;
 	  }
 	;
 
@@ -384,48 +385,48 @@ listtypespec : basetypespec
           {
 	      $$ = $1;
 	  }
-        | tok_list basetypespec tok_append
+        | tok_kw_list tok_spaces basetypespec tok_spaces tok_kw_append
 	  {
-	      $2->setListType(Interface::l_append);
-	      $$ = $2;
+	      $3->setListType(Interface::l_append);
+	      $$ = $3;
 	  }
-	| tok_list basetypespec tok_prepend
+	| tok_kw_list tok_spaces basetypespec tok_spaces tok_kw_prepend
 	  {
-	      $2->setListType(Interface::l_prepend);
-	      $$ = $2;
+	      $3->setListType(Interface::l_prepend);
+	      $$ = $3;
 	  }
 	;
 
-basetypespec : tok_boolean
+basetypespec : tok_kw_boolean
 	  {
 	      $$ = parser->createTypeSpec(
 		  $1->getLocation(), Interface::t_boolean);
 	  }
-	| tok_string
+	| tok_kw_string
 	  {
 	      $$ = parser->createTypeSpec(
 		  $1->getLocation(), Interface::t_string);
 	  }
-	| tok_filename
+	| tok_kw_filename
 	  {
 	      $$ = parser->createTypeSpec(
 		  $1->getLocation(), Interface::t_filename);
 	  }
 	;
 
-afterbuild : tok_afterbuild word endofline
+afterbuild : sp tok_kw_afterbuild tok_spaces word endofline
 	  {
-	      $$ = parser->createAfterBuild($2);
+	      $$ = parser->createAfterBuild($4);
 	  }
 	;
 
-targettype : tok_targettype tok_identifier endofline
+targettype : sp tok_kw_targettype tok_spaces tok_identifier endofline
 	  {
-	      $$ = parser->createTargetType($2);
+	      $$ = parser->createTargetType($4);
 	  }
-	| tok_targettype tok_variable endofline
+	| sp tok_kw_targettype tok_spaces tok_variable endofline
 	  {
-	      $$ = parser->createTargetType($2);
+	      $$ = parser->createTargetType($4);
 	  }
 	;
 
@@ -476,6 +477,30 @@ wordfragment : tok_variable
 	      $$ = parser->createWord();
 	      $$->appendString($1);
 	  }
+	| keyword
+	  {
+	      $$ = parser->createWord();
+	      $$->appendString($1);
+	  }
+	;
+
+keyword : tok_kw_reset
+	| tok_kw_reset_all
+	| tok_kw_no_reset
+	| tok_kw_override
+	| tok_kw_fallback
+	| tok_kw_flag
+	| tok_kw_declare
+	| tok_kw_boolean
+	| tok_kw_string
+	| tok_kw_filename
+	| tok_kw_list
+	| tok_kw_append
+	| tok_kw_prepend
+	| tok_kw_nonrecursive
+	| tok_kw_local
+	| tok_kw_afterbuild
+	| tok_kw_targettype
 	;
 
 endofline : nospaceendofline
