@@ -1,0 +1,22 @@
+# Exercise all sorts of optional and required space parsing
+declare 	A  list string	append=1\ 2 3  4 \ \ 5\
+6 \7\ 8\	9
+ declare B boolean= true
+	declare	C	string =potato
+declare D boolean
+
+
+  if($(B) )
+   override B =false
+	fallback D= true
+   if	(not ($(B)	)   )
+      fallback C = s\a\l\a\ \	d
+      endif			\
+		
+ elseif(	or	( $(B) , \
+                  not($(B)	)	) )
+A=z	\	y\
+x
+endif
+A=qz	\	qy\
+qx

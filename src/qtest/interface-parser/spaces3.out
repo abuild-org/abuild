@@ -1,0 +1,56 @@
+parse(spaces3): success
+dumping interface spaces3
+  A: list string append, target type all = 1 2 3 4   5 6 7 8	9 qz 	qy qx
+  B: boolean, target type all = 0
+  C: string, target type all = potato
+  D: boolean, target type all = 1
+  no after-build files
+<?xml version="1.0"?>
+<interface version="1" item-name="p0" item-platform="indep">
+ <variable name="A" type="list string append" target-type="all" declaration-location="spaces3:2:10">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="spaces3:2:32">
+    <value value="1 2"/>
+    <value value="3"/>
+    <value value="4"/>
+    <value value="  5"/>
+    <value value="6"/>
+    <value value="7 8	9"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="spaces3:21:1">
+    <value value="qz"/>
+    <value value="	qy"/>
+    <value value="qx"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="B" type="boolean" target-type="all" declaration-location="spaces3:4:10">
+  <assignment-history>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="spaces3:4:21">
+    <value value="1"/>
+   </assignment>
+   <assignment assignment-type="override" item-name="p0" item-platform="indep" location="spaces3:10:13">
+    <value value="0"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="C" type="string" target-type="all" declaration-location="spaces3:5:10">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="p0" item-platform="indep" location="spaces3:13:16">
+    <value value="sala 	d"/>
+   </assignment>
+   <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="spaces3:5:20">
+    <value value="potato"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+ <variable name="D" type="boolean" target-type="all" declaration-location="spaces3:6:9">
+  <assignment-history>
+   <assignment assignment-type="fallback" item-name="p0" item-platform="indep" location="spaces3:11:11">
+    <value value="1"/>
+   </assignment>
+  </assignment-history>
+ </variable>
+</interface>
+
+end of interface spaces3
