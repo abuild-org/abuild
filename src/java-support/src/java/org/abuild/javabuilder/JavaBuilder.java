@@ -142,7 +142,11 @@ class JavaBuilder
     private synchronized void sendResponse(String number, boolean result)
     {
 	// Synchronize writing responses, including a flush, in hopes
-	// of avoiding sending interleaved responses.
+	// of avoiding sending interleaved responses.  Even with this,
+	// interleaved responses seem to appear once in a blue moon.
+	// The best fix would be to have a responder thread that reads
+	// responses off of a therad-safe queue and sends them out
+	// serially.
 	responseStream.println(number + " " + (result ? "true" : "false"));
 	responseStream.flush();
     }
