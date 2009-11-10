@@ -64,8 +64,8 @@ tok_elseif	[ \t]*elseif[ \t]*+\([ \t]*
 
 /* keywords that would otherwise parse as identifiers -- these must
  * start with tok_kw and be part of the keywords nonterminal. */
-tok_else		[ \t]*else[ \t]*
-tok_endif		[ \t]*endif[ \t]*
+tok_else		[ \t]*else
+tok_endif		[ \t]*endif
 tok_kw_reset		reset
 tok_kw_reset_all	reset-all
 tok_kw_no_reset		no-reset
