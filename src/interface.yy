@@ -311,9 +311,9 @@ conditional : tok_variable tok_clope
 	  }
 	;
 
-arguments : arguments tok_comma argument
+arguments : arguments tok_comma sp argument
 	  {
-	      $1->appendArgument($3);
+	      $1->appendArgument($4);
 	      $$ = $1;
 	  }
 	| argument

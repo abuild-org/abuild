@@ -863,7 +863,7 @@ InterfaceParser::getVariableName(Token const* token)
 std::string
 InterfaceParser::getFunctionName(Token const* token)
 {
-    boost::regex function_re("(.*?)[ \t]*\\(");
+    boost::regex function_re("(.*?)[ \t]*\\([ \t]*");
     return getFirstMatch(token, function_re);
 }
 

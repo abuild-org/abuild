@@ -55,12 +55,12 @@ tok_quotedchar	\\.
 
 /* operators */
 tok_equal	=
-tok_comma	[ \t]*,[ \t]*
-tok_clope	[ \t]*\)[ \t]*
+tok_comma	[ \t]*,
+tok_clope	[ \t]*\)
 
 /* keywords that would otherwise parse as functions */
-tok_if		[ \t]*if[ \t]*+\(
-tok_elseif	[ \t]*elseif[ \t]*+\(
+tok_if		[ \t]*if[ \t]*+\([ \t]*
+tok_elseif	[ \t]*elseif[ \t]*+\([ \t]*
 
 /* keywords that would otherwise parse as identifiers -- these must
  * start with tok_kw and be part of the keywords nonterminal. */
@@ -85,7 +85,7 @@ tok_kw_afterbuild	after-build
 tok_kw_targettype	target-type
 
 /* remaining syntax */
-tok_function	[_[:alnum:]\.-]+[ \t]*+\(
+tok_function	[_[:alnum:]\.-]+[ \t]*+\([ \t]*
 tok_identifier	[_[:alnum:]\.-]+
 tok_variable	\$\([_[:alnum:]\.-]+\)
 tok_environment	\$\(ENV:[_[:alnum:]]+\)

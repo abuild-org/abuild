@@ -3,7 +3,7 @@ LIBS = l2-1 l2-2
 LIBDIRS = d2-1 d2-2
 
 flag test-interface-parser override PLATFORM = arch2
-flag other-flag override PLATFORM = not-seen
+  flag other-flag override PLATFORM = not-seen
 override TARGET-TYPE = object-code
 
 target-type $(TARGET-TYPE)
