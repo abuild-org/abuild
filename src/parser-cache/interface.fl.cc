@@ -666,11 +666,18 @@ static yyconst flex_int16_t yy_chk[578] =
  * resolve them by restructuring the grammar, but it doesn't seem
  * worth it when people can just quote characters if they have bare
  * words in their interface files that start with "else" or "endif".
+ * The basic difficulty in the grammar is that the parser can't tell
+ * whether a space inside an if block belongs to the else or endif or
+ * whether it belongs to the next statement.  I'd rather make people
+ * use a backslash before a letter in else or endif than either change
+ * the syntax (adding braces or something), use a glr grammar, or
+ * doing major rework of the grammar and moving logic into the
+ * semantic section of the parser.
  */
 /* keywords that would otherwise parse as identifiers -- these must
  * start with tok_kw and be part of the keywords nonterminal. */
 /* remaining syntax */
-#line 674 "interface.fl.cc"
+#line 681 "interface.fl.cc"
 
 #define INITIAL 0
 
@@ -892,10 +899,10 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 104 "interface.fl"
+#line 111 "interface.fl"
 
 
-#line 899 "interface.fl.cc"
+#line 906 "interface.fl.cc"
 
 	if ( !yyg->yy_init )
 		{
@@ -978,7 +985,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 106 "interface.fl"
+#line 113 "interface.fl"
 {
     yyextra->createToken(yytext);
 }
@@ -986,7 +993,7 @@ YY_RULE_SETUP
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 110 "interface.fl"
+#line 117 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_newline;
@@ -994,7 +1001,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 115 "interface.fl"
+#line 122 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_quotedchar;
@@ -1002,7 +1009,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 120 "interface.fl"
+#line 127 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_equal;
@@ -1010,7 +1017,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 125 "interface.fl"
+#line 132 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_comma;
@@ -1018,7 +1025,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 130 "interface.fl"
+#line 137 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_clope;
@@ -1026,7 +1033,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 135 "interface.fl"
+#line 142 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_if;
@@ -1034,7 +1041,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 140 "interface.fl"
+#line 147 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_elseif;
@@ -1042,7 +1049,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 145 "interface.fl"
+#line 152 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_else;
@@ -1050,7 +1057,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 150 "interface.fl"
+#line 157 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_endif;
@@ -1058,7 +1065,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 155 "interface.fl"
+#line 162 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_reset;
@@ -1066,7 +1073,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 160 "interface.fl"
+#line 167 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_reset_all;
@@ -1074,7 +1081,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 165 "interface.fl"
+#line 172 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_no_reset;
@@ -1082,7 +1089,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 170 "interface.fl"
+#line 177 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_override;
@@ -1090,7 +1097,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 175 "interface.fl"
+#line 182 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_fallback;
@@ -1098,7 +1105,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 180 "interface.fl"
+#line 187 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_flag;
@@ -1106,7 +1113,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 185 "interface.fl"
+#line 192 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_declare;
@@ -1114,7 +1121,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 190 "interface.fl"
+#line 197 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_boolean;
@@ -1122,7 +1129,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 195 "interface.fl"
+#line 202 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_string;
@@ -1130,7 +1137,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 200 "interface.fl"
+#line 207 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_filename;
@@ -1138,7 +1145,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 205 "interface.fl"
+#line 212 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_list;
@@ -1146,7 +1153,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 210 "interface.fl"
+#line 217 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_append;
@@ -1154,7 +1161,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 215 "interface.fl"
+#line 222 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_prepend;
@@ -1162,7 +1169,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 220 "interface.fl"
+#line 227 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_nonrecursive;
@@ -1170,7 +1177,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 225 "interface.fl"
+#line 232 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_local;
@@ -1178,7 +1185,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 230 "interface.fl"
+#line 237 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_afterbuild;
@@ -1186,7 +1193,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 235 "interface.fl"
+#line 242 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_kw_targettype;
@@ -1194,7 +1201,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 240 "interface.fl"
+#line 247 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_function;
@@ -1202,7 +1209,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 245 "interface.fl"
+#line 252 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_identifier;
@@ -1210,7 +1217,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 250 "interface.fl"
+#line 257 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_variable;
@@ -1218,7 +1225,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 255 "interface.fl"
+#line 262 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_environment;
@@ -1227,7 +1234,7 @@ YY_RULE_SETUP
 case 32:
 /* rule 32 can match eol */
 YY_RULE_SETUP
-#line 260 "interface.fl"
+#line 267 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_spaces;
@@ -1235,7 +1242,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 265 "interface.fl"
+#line 272 "interface.fl"
 {
     yyextra->setToken(yyextra->createToken(yytext));
     return tok_other;
@@ -1243,10 +1250,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 270 "interface.fl"
+#line 277 "interface.fl"
 ECHO;
 	YY_BREAK
-#line 1250 "interface.fl.cc"
+#line 1257 "interface.fl.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2401,7 +2408,7 @@ void yy_interface_free (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 270 "interface.fl"
+#line 277 "interface.fl"
 
 
 
