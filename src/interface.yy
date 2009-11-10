@@ -69,8 +69,8 @@
 
 %type <not_used> start
 %type <blocks> blocks
-%type <not_used> ignore
 %type <block> block
+%type <block> ignore
 %type <ifblock> ifblock
 %type <ifclause> if
 %type <ifclauses> elseifs
@@ -115,24 +115,11 @@ blocks	:
 	  }
 	| blocks block
 	  {
-	      $1->addBlock($2);
-	      $$ = $1;
-	  }
-	| blocks ignore
-	  {
-	      $$ = $1;
-	  }
-	;
-
-ignore	: endofline
-	  {
-	      $$ = 0;
-	  }
-	| error endofline
-	  {
-	      parser->error($2->getLocation(),
-			    "a parse error occured on or before this line");
-	      $$ = 0;
+	      if ($2)
+	      {
+		  $1->addBlock($2);
+		  $$ = $1;
+	      }
 	  }
 	;
 
@@ -159,6 +146,26 @@ block	: ifblock
 	| targettype
 	  {
 	      $$ = parser->createBlock($1);
+	  }
+	| ignore
+	  {
+	      $$ = 0;
+	  }
+	| tok_spaces block
+	  {
+	      $$ = $2;
+	  }
+	;
+
+ignore	: nospaceendofline
+	  {
+	      $$ = 0;
+	  }
+	| error endofline
+	  {
+	      parser->error($2->getLocation(),
+			    "a parse error occured on or before this line");
+	      $$ = 0;
 	  }
 	;
 
@@ -247,19 +254,15 @@ assignment : tok_identifier sp tok_equal sp words endofline
 	      $5->setFlag($3);
 	      $$ = $5;
 	  }
-	| tok_spaces assignment
+	;
+
+ifstatement : tok_if conditional endofline
 	  {
 	      $$ = $2;
 	  }
-	;
-
-ifstatement : sp tok_if conditional endofline
+	| tok_if error endofline
 	  {
-	      $$ = $3;
-	  }
-	| sp tok_if error endofline
-	  {
-	      parser->error($2->getLocation(),
+	      parser->error($1->getLocation(),
 			    "unable to parse if statement");
 	      $$ = 0;
 	  }
@@ -359,9 +362,9 @@ declaration : declbody endofline
 	  }
 	;
 
-declbody : sp tok_kw_declare tok_spaces tok_identifier tok_spaces typespec
+declbody : tok_kw_declare tok_spaces tok_identifier tok_spaces typespec
 	  {
-	      $$ = parser->createDeclaration($4, $6);
+	      $$ = parser->createDeclaration($3, $5);
 	  }
 	;
 
@@ -414,19 +417,19 @@ basetypespec : tok_kw_boolean
 	  }
 	;
 
-afterbuild : sp tok_kw_afterbuild tok_spaces word endofline
+afterbuild : tok_kw_afterbuild tok_spaces word endofline
 	  {
-	      $$ = parser->createAfterBuild($4);
+	      $$ = parser->createAfterBuild($3);
 	  }
 	;
 
-targettype : sp tok_kw_targettype tok_spaces tok_identifier endofline
+targettype : tok_kw_targettype tok_spaces tok_identifier endofline
 	  {
-	      $$ = parser->createTargetType($4);
+	      $$ = parser->createTargetType($3);
 	  }
-	| sp tok_kw_targettype tok_spaces tok_variable endofline
+	| tok_kw_targettype tok_spaces tok_variable endofline
 	  {
-	      $$ = parser->createTargetType($4);
+	      $$ = parser->createTargetType($3);
 	  }
 	;
 
