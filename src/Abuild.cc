@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <assert.h>
 
-std::string const Abuild::ABUILD_VERSION = "1.1.b5+2";
+std::string const Abuild::ABUILD_VERSION = "1.1.b6";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";

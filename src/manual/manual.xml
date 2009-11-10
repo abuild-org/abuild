@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.b5">
-<!ENTITY lastreleased "October 28, 2009">
+<!ENTITY swversion "1.1.b6">
+<!ENTITY lastreleased "November 10, 2009">
 ]>
 <!--
 
@@ -15592,7 +15592,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.b6: XXX</term>
+     <term>1.1.b6: November 10, 2009</term>
      <listitem>
       <itemizedlist>
        <listitem>
