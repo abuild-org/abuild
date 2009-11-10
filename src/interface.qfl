@@ -68,6 +68,13 @@ tok_elseif	[ \t]*elseif[ \t]*+\([ \t]*
  * resolve them by restructuring the grammar, but it doesn't seem
  * worth it when people can just quote characters if they have bare
  * words in their interface files that start with "else" or "endif".
+ * The basic difficulty in the grammar is that the parser can't tell
+ * whether a space inside an if block belongs to the else or endif or
+ * whether it belongs to the next statement.  I'd rather make people
+ * use a backslash before a letter in else or endif than either change
+ * the syntax (adding braces or something), use a glr grammar, or
+ * doing major rework of the grammar and moving logic into the
+ * semantic section of the parser.
  */
 tok_else		[ \t]*else
 tok_endif		[ \t]*endif
