@@ -59,13 +59,21 @@ tok_comma	[ \t]*,
 tok_clope	[ \t]*\)
 
 /* keywords that would otherwise parse as functions */
-tok_if		[ \t]*if[ \t]*+\([ \t]*
+tok_if		if[ \t]*+\([ \t]*
 tok_elseif	[ \t]*elseif[ \t]*+\([ \t]*
+
+/* Ideally, else and endif should be tok_kw keywords, but removing the
+ * leading whitespace of these as well as elseif and handling them in
+ * the grammar create shift/reduce conflicts.  We could probably
+ * resolve them by restructuring the grammar, but it doesn't seem
+ * worth it when people can just quote characters if they have bare
+ * words in their interface files that start with "else" or "endif".
+ */
+tok_else		[ \t]*else
+tok_endif		[ \t]*endif
 
 /* keywords that would otherwise parse as identifiers -- these must
  * start with tok_kw and be part of the keywords nonterminal. */
-tok_else		[ \t]*else
-tok_endif		[ \t]*endif
 tok_kw_reset		reset
 tok_kw_reset_all	reset-all
 tok_kw_no_reset		no-reset

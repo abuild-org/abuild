@@ -253,13 +253,13 @@ assignment : tok_identifier sp tok_equal sp words endofline
 	  }
 	;
 
-ifstatement : tok_if conditional endofline
+ifstatement : sp tok_if conditional endofline
 	  {
-	      $$ = $2;
+	      $$ = $3;
 	  }
-	| tok_if error endofline
+	| sp tok_if error endofline
 	  {
-	      parser->error($1->getLocation(),
+	      parser->error($2->getLocation(),
 			    "unable to parse if statement");
 	      $$ = 0;
 	  }

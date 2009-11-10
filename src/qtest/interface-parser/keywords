@@ -1,5 +1,5 @@
 declare a local filename = /usr/local
-declare keywords list string append = if elseif else endif
+declare keywords list string append = if \elseif \else \endif
 keywords = reset reset-all no-reset override fallback flag
 keywords = declare boolean string filename list append prepend
 keywords = non-recursive local after-build target-type
@@ -7,9 +7,9 @@ keywords = alocalb alocal localb \ local\  flagging locally
 declare x string
 declare y local string
 if(contains($(keywords), declare))
-  override x = else
+  override x = \else
   y = override
 else
-  fallback x = endif
+  fallback x = \endif
   y = append
 endif

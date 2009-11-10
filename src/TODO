@@ -4,6 +4,13 @@
  * Make compatibility mode 1.1 by default; update the manual to
    explain this
 
+ * Get rid of whitespace from elseif, else, endif if possible.  Will
+   have to create new nonterminals.  Either that or give up and
+   document that you have to quote characters if using words that
+   start with else or endif on the right-hand side of assignments or
+   in function arguments.  If we fix it, replace \e with e in
+   qtest/interface-parser/keywords.
+
  * "local" etc. by itself in an interface file (e.g. INCLUDES =
    /usr/local/...) causes a parse error.
 
