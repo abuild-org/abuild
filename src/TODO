@@ -1,6 +1,8 @@
 1.1
 ===
 
+ * Groovy: add resolveAsPath and resolveAsFile (and/or resolveAsFiles)
+
  * Make compatibility mode 1.1 by default; update the manual to
    explain this
 

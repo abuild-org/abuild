@@ -469,6 +469,7 @@ class Abuild
     std::map<std::string, std::string> assigned_tree_names;
     std::set<std::string> items_traversed;
     bool suggest_upgrade;
+    std::set<std::string> deprecated_backing_files;
 
     Logger& logger;
 };

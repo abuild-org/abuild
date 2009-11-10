@@ -21,7 +21,7 @@
 #include <cstdio>
 #include <assert.h>
 
-std::string const Abuild::ABUILD_VERSION = "1.1.b5+1";
+std::string const Abuild::ABUILD_VERSION = "1.1.b5+2";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
@@ -3996,6 +3996,10 @@ Abuild::appendBackingData(std::string const& dir,
     if (Util::isFile(file_backing))
     {
 	BackingConfig* backing = readBacking(dir);
+	if (backing->isDeprecated())
+	{
+	    this->deprecated_backing_files.insert(file_backing);
+	}
 	std::list<std::string> const& dirs = backing->getBackingAreas();
 	for (std::list<std::string>::const_iterator iter = dirs.begin();
 	     iter != dirs.end(); ++iter)
@@ -4046,10 +4050,6 @@ Abuild::readBacking(std::string const& dir)
         QTC::TC("abuild", "Abuild ERR invalid backing file");
         error(FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
 	      "unable to get backing area data");
-    }
-    if (backing->isDeprecated())
-    {
-	this->suggest_upgrade = true;
     }
     return backing;
 }
@@ -7686,30 +7686,42 @@ void
 Abuild::suggestUpgrade()
 {
     assert(this->compat_level.allow_1_0());
-    if (! this->suggest_upgrade)
+    if (this->suggest_upgrade)
     {
-	return;
+	this->logger.logInfo("");
+	this->logger.logInfo("******************** " + this->whoami +
+			     " ********************");
+	this->logger.logInfo("WARNING: Build items/trees with"
+			     " deprecated 1.0 features were found.");
+	this->logger.logInfo("Consider upgrading your build trees,"
+			     " which you can do automatically by");
+	this->logger.logInfo("running");
+	this->logger.logInfo("");
+	this->logger.logInfo("  " + this->whoami + " --upgrade-trees");
+	this->logger.logInfo("");
+	this->logger.logInfo("from the appropriate location.");
+	this->logger.logInfo("");
+	this->logger.logInfo("For details, please see \"Upgrading Build"
+			     " Trees from 1.0 to 1.1\" in");
+	this->logger.logInfo("the user's manual");
+	this->logger.logInfo("******************** " + this->whoami +
+			     " ********************");
+	this->logger.logInfo("");
     }
-
-    this->logger.logInfo("");
-    this->logger.logInfo("******************** " + this->whoami +
-			 " ********************");
-    this->logger.logInfo("WARNING: Build items/trees with"
-			 " deprecated 1.0 features were found.");
-    this->logger.logInfo("Consider upgrading your build trees,"
-			 " which you can do automatically by");
-    this->logger.logInfo("running");
-    this->logger.logInfo("");
-    this->logger.logInfo("  " + this->whoami + " --upgrade-trees");
-    this->logger.logInfo("");
-    this->logger.logInfo("from the appropriate location.");
-    this->logger.logInfo("");
-    this->logger.logInfo("For details, please see \"Upgrading Build"
-			 " Trees from 1.0 to 1.1\" in");
-    this->logger.logInfo("the user's manual");
-    this->logger.logInfo("******************** " + this->whoami +
-			 " ********************");
-    this->logger.logInfo("");
+    else if (! this->deprecated_backing_files.empty())
+    {
+	// Only complain specifically about deprecated backing files
+	// if there aren't other upgrade suggestions.
+	QTC::TC("abuild", "Abuild backing deprecation warning");
+	for (std::set<std::string>::iterator iter =
+		 this->deprecated_backing_files.begin();
+	     iter != this->deprecated_backing_files.end(); ++iter)
+	{
+	    deprecate("1.1", FileLocation(*iter, 0, 0),
+		      "this is a 1.0-style " + BackingConfig::FILE_BACKING +
+		      " file in an otherwise updated area");
+	}
+    }
 }
 
 void

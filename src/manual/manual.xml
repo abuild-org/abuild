@@ -9858,7 +9858,7 @@ f {
       makes the value of the parameter a list and appends value to
       it.
 
-    - deletedParameter('name')
+    - deleteParameter('name')
 
       Removes any previous value for parameter 'name'.
 
@@ -9899,7 +9899,6 @@ f {
       makes it convenient to deal with parameters whose values may
       contain a single value or a list of values without having to
       handle the special case in the target.
-
 
     - runActions(String targetParameter, Closure defaultAction,
 		 Map defaultAttributes)
@@ -15629,6 +15628,33 @@ Y = $(X)
            error messages will be issued when a plugin is actually
            shadowed, but this is better than not having the required
            information to resolve the problem.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Minor Updates
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Parsing of interface files has improved slightly.  Some
+           &abuild; reserved words are now valid on the right hand
+           side of assignments without quoting, and handling of
+           whitespace is more robust, including allowing lines to be
+           split with continuation characters in some places where
+           they could not previously be split.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When an &abuild; 1.0-style
+           <filename>Abuild.backing</filename> file is found in an
+           otherwise upgraded area, a deprecation warning is given
+           rather than telling the user to run the upgrade process.
           </para>
          </listitem>
         </itemizedlist>

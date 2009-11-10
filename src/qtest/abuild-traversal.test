@@ -426,6 +426,19 @@ $td->runtest("check upgrade data",
 	     {$td->FILE => "$top/forest2-upgrade-data-2.in"}, # unchanged
 	     $td->NORMALIZE_NEWLINES);
 
+# Backing area deprecation warning
+cd("work/1.0/forest1/F2C2");
+rename "Abuild.backing", "Abuild.backing.safe", or die;
+open(F, ">Abuild.backing") or die;
+print F "../../forest0\n";
+close(F);
+cd("work/1.0");
+check_tree("forest1 with deprecated backing", "forest1/F2C2",
+	   "forest1-u1-deprecated-backing");
+cd("work/1.0/forest1/F2C2");
+unlink "Abuild.backing" or die;
+rename "Abuild.backing.safe", "Abuild.backing", or die;
+
 # Check trees after upgrading.
 
 cd("work/1.0");
@@ -476,7 +489,7 @@ $td->runtest("check upgrade data",
 
 check_work_accessed($td);
 
-$td->report(74);
+$td->report(76);
 
 sub check_tree
 {
