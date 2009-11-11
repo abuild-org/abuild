@@ -1,4 +1,4 @@
-declare a local filename = /usr/local
+declare a local filename = some/local/path
 declare keywords list string append = if \elseif \else \endif
 keywords = reset reset-all no-reset override fallback flag
 keywords = declare boolean string filename list append prepend

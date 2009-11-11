@@ -1,6 +1,6 @@
 parse(keywords): success
 dumping interface keywords
-  a: local filename, target type all = /usr/local
+  a: local filename, target type all = --CWD--/some/local/path
   keywords: list string append, target type all = if elseif else endif reset reset-all no-reset override fallback flag declare boolean string filename list append prepend non-recursive local after-build target-type alocalb alocal localb  local  flagging locally
   x: string, target type all = else
   y: local string, target type all = override
@@ -10,7 +10,7 @@ dumping interface keywords
  <variable name="a" type="local filename" target-type="all" declaration-location="keywords:1:9">
   <assignment-history>
    <assignment assignment-type="normal" item-name="p0" item-platform="indep" location="keywords:1:28">
-    <value value="/usr/local"/>
+    <value value="--CWD--/some/local/path"/>
    </assignment>
   </assignment-history>
  </variable>
