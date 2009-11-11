@@ -1,9 +1,9 @@
 no defaults
 test3.in:1: ERROR: invalid key x (ignored)
-test3.in: ERROR: file ended with continuation line
-test3.in: ERROR: no values for the following keys: chicken duck pig qoww
+test3.in:1: ERROR: file ended with continuation line
+test3.in:1: ERROR: no values for the following keys: chicken duck pig qoww
 defaults
 test3.in:1: ERROR: invalid key x (ignored)
-test3.in: ERROR: file ended with continuation line
-test3.in: ERROR: no values for the following keys: chicken duck pig qoww
+test3.in:1: ERROR: file ended with continuation line
+test3.in:1: ERROR: no values for the following keys: chicken duck pig qoww
 explicit keys: 

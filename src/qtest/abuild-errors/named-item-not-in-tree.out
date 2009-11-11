@@ -1,2 +1,2 @@
---topdir--/not-in-tree/other/Abuild.conf: ERROR: named build items are not allowed outside of named build trees
+--topdir--/not-in-tree/other/Abuild.conf:1: ERROR: named build items are not allowed outside of named build trees
 abuild: ERROR: errors detected; exiting

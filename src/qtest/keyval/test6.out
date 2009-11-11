@@ -1,5 +1,5 @@
 no defaults
-test6.in: ERROR: no values for the following keys: duck
+test6.in:1: ERROR: no values for the following keys: duck
 defaults
-test6.in: ERROR: no values for the following keys: duck
+test6.in:1: ERROR: no values for the following keys: duck
 explicit keys: chicken pig qoww

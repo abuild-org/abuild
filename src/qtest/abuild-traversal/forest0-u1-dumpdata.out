@@ -1,5 +1,5 @@
---topdir--/1.0/forest0/PROJ0/proj/c2/impl/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../c1" of "--topdir--/1.0/forest0/PROJ0/proj/c2/impl" points to a named tree in an upgraded build area
---topdir--/1.0/forest0/PROJ0/proj/c2/ifc/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../../../PLUGINS/plugins" of "--topdir--/1.0/forest0/PROJ0/proj/c2/ifc" points to a named tree in an upgraded build area
+--topdir--/1.0/forest0/PROJ0/proj/c2/impl/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../c1" of "--topdir--/1.0/forest0/PROJ0/proj/c2/impl" points to a named tree in an upgraded build area
+--topdir--/1.0/forest0/PROJ0/proj/c2/ifc/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "../../../../PLUGINS/plugins" of "--topdir--/1.0/forest0/PROJ0/proj/c2/ifc" points to a named tree in an upgraded build area
 <?xml version="1.0"?>
 <abuild-data version="2">
  <platform-data>

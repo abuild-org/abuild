@@ -1,5 +1,5 @@
---topdir--/symlink/Abuild.conf: ERROR: child directory "child" is a symbolic link or crosses a symbolic link
---topdir--/symlink/Abuild.conf: ERROR: child directory "link/child" is a symbolic link or crosses a symbolic link
---topdir--/symlink/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
---topdir--/symlink/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "link/ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
+--topdir--/symlink/Abuild.conf:1: ERROR: child directory "child" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf:1: ERROR: child directory "link/child" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
+--topdir--/symlink/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "link/ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
 abuild: ERROR: errors detected; exiting

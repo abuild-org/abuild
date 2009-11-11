@@ -10,7 +10,7 @@ FileLocation::FileLocation() :
 FileLocation::FileLocation(std::string const& filename,
 			   int lineno, int colno) :
     filename(filename),
-    lineno(lineno),
+    lineno(lineno == 0 ? 1 : lineno),
     colno(colno)
 {
 }

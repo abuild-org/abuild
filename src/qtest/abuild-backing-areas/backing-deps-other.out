@@ -1,3 +1,3 @@
---topdir--/shared/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "product-common", which is shadowed
---topdir--/bad/3/product/common/Abuild.conf: ERROR: here is the location of "product-common"
+--topdir--/shared/product/lib/Abuild.conf:1: ERROR: build item "product-lib" depends on "product-common", which is shadowed
+--topdir--/bad/3/product/common/Abuild.conf:1: ERROR: here is the location of "product-common"
 abuild: ERROR: errors detected; exiting

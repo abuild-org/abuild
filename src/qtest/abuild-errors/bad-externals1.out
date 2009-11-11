@@ -1,5 +1,5 @@
---topdir--/a/aa/aaf/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): the read-only flag for externals is now ignored; use --ro-path and --rw-path from the command-line instead
---topdir--/a/aa/aaf/aafa/aafaa/Abuild.conf: ERROR: this build item does not appear to be a build tree root, but it is referenced as external "aafa/aafaa" of "--topdir--/a/aa/aaf"
---topdir--/a/aa/aaf/Abuild.conf: ERROR: here is the referring item
---topdir--/a/aa/aaf/Abuild.conf: ERROR: unable to locate or resolve external "oops"
+--topdir--/a/aa/aaf/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): the read-only flag for externals is now ignored; use --ro-path and --rw-path from the command-line instead
+--topdir--/a/aa/aaf/aafa/aafaa/Abuild.conf:1: ERROR: this build item does not appear to be a build tree root, but it is referenced as external "aafa/aafaa" of "--topdir--/a/aa/aaf"
+--topdir--/a/aa/aaf/Abuild.conf:1: ERROR: here is the referring item
+--topdir--/a/aa/aaf/Abuild.conf:1: ERROR: unable to locate or resolve external "oops"
 abuild: ERROR: errors detected; exiting

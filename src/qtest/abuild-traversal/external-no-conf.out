@@ -1,2 +1,2 @@
---topdir--/errors/ext-no-conf/Abuild.conf: ERROR: unable to locate or resolve external "a"
+--topdir--/errors/ext-no-conf/Abuild.conf:1: ERROR: unable to locate or resolve external "a"
 abuild: ERROR: errors detected; exiting

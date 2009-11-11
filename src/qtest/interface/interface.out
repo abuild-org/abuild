@@ -20,9 +20,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
 <?xml version="1.0"?>
 <interface version="1" item-name="base" item-platform="base">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -31,9 +31,9 @@ THINGS: list string append, target type platform-independent: uninitialized
  </variable>
  <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -67,9 +67,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
 <?xml version="1.0"?>
 <interface version="1" item-name="base" item-platform="base">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -78,9 +78,9 @@ THINGS: list string append, target type platform-independent: uninitialized
  </variable>
  <variable name="LIBS" type="list string prepend" target-type="object-code" declaration-location="base:2:1">
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -99,9 +99,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2
 <?xml version="1.0"?>
 <interface version="1" item-name="item1" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -135,9 +135,9 @@ THINGS: list string append, target type platform-independent = th1-1 th1-2
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -186,9 +186,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1 th2-2
 <?xml version="1.0"?>
 <interface version="1" item-name="item2" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -251,9 +251,9 @@ THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -291,9 +291,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th3-1
 <?xml version="1.0"?>
 <interface version="1" item-name="item3" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -333,9 +333,9 @@ THINGS: list string append, target type platform-independent = th1-1 th1-2 th3-1
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -383,9 +383,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1 th2-2 th3-1 th4-1
 <?xml version="1.0"?>
 <interface version="1" item-name="item4" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -464,9 +464,9 @@ THINGS: list string append, target type platform-independent = th1-1 th1-2 th2-1
  </variable>
  <variable name="QUACK" type="string" target-type="object-code" declaration-location="item4:5:1">
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -508,9 +508,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent: uninitialized
 <?xml version="1.0"?>
 <interface version="1" item-name="item5" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -526,9 +526,9 @@ THINGS: list string append, target type platform-independent: uninitialized
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -557,7 +557,7 @@ bad1:5:1: ERROR: the empty string may not be used as a value for filename variab
 failure
 normal assignment to STRING1 = spackle
 bad1:6:1: ERROR: variable STRING1 already has a value
-[internal]: ERROR: here is the previous assignment
+[internal]:1: ERROR: here is the previous assignment
 failure
 getting value for unknown variable
 getVariable(FARBAGE): failure
@@ -604,9 +604,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th6-1
 <?xml version="1.0"?>
 <interface version="1" item-name="item6" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -687,9 +687,9 @@ THINGS: list string append, target type platform-independent = th6-1
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -721,9 +721,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th1-1 th1-2 th6-1
 <?xml version="1.0"?>
 <interface version="1" item-name="item7" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -809,9 +809,9 @@ THINGS: list string append, target type platform-independent = th1-1 th1-2 th6-1
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>
@@ -880,9 +880,9 @@ STRING1: string, target type all = potato
 THINGS: list string append, target type platform-independent = th7-1
 <?xml version="1.0"?>
 <interface version="1" item-name="item7" item-platform="indep">
- <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]">
+ <variable name="BOOL1" type="boolean" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="1"/>
    </assignment>
   </assignment-history>
@@ -968,9 +968,9 @@ THINGS: list string append, target type platform-independent = th7-1
    </assignment>
   </assignment-history>
  </variable>
- <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]">
+ <variable name="STRING1" type="string" target-type="all" declaration-location="[internal]:1">
   <assignment-history>
-   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]">
+   <assignment assignment-type="normal" item-name="base" item-platform="base" location="[internal]:1">
     <value value="potato"/>
    </assignment>
   </assignment-history>

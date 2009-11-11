@@ -1,29 +1,29 @@
---topdir--/bad/7/backing/product/b/Abuild.conf: ERROR: build item "b" depends on "c", which is shadowed
---topdir--/bad/7/intermediate/common/c/Abuild.conf: ERROR: here is the location of "c"
---topdir--/bad/7/backing/product/b/Abuild.conf: ERROR: build item "b" in tree "product" uses plugin "plugin", which is shadowed
---topdir--/bad/7/intermediate/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/common/d/Abuild.conf: ERROR: build item "d" in tree "common" uses plugin "plugin", which is shadowed
---topdir--/bad/7/intermediate/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "common-lib1", which is shadowed
---topdir--/bad/7/intermediate/common/libs/lib1/Abuild.conf: ERROR: here is the location of "common-lib1"
---topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" in tree "product" uses plugin "plugin", which is shadowed
---topdir--/bad/7/intermediate/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "product-common", which is shadowed
---topdir--/bad/7/intermediate/product/common/Abuild.conf: ERROR: here is the location of "product-common"
---topdir--/bad/7/intermediate/product/a/Abuild.conf: ERROR: build item "a" in tree "product" uses plugin "plugin", which is shadowed
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/product/b/Abuild.conf: ERROR: build item "b" depends on "c", which is shadowed
---topdir--/bad/7/intermediate/common/c/Abuild.conf: ERROR: here is the location of "c"
---topdir--/bad/7/backing/product/b/Abuild.conf: ERROR: build item "b" in tree "product" uses plugin "plugin", which is shadowed
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/common/d/Abuild.conf: ERROR: build item "d" in tree "common" uses plugin "plugin", which is shadowed
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/intermediate/product/common/Abuild.conf: ERROR: build item "product-common" in tree "product" uses plugin "plugin", which is shadowed
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "common-lib1", which is shadowed
---topdir--/bad/7/main/common/libs/lib1/Abuild.conf: ERROR: here is the location of "common-lib1"
---topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" in tree "product" uses plugin "plugin", which is shadowed
---topdir--/bad/7/main/common/plugin/Abuild.conf: ERROR: here is the location of "plugin"
---topdir--/bad/7/backing/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "product-common", which is shadowed
---topdir--/bad/7/intermediate/product/common/Abuild.conf: ERROR: here is the location of "product-common"
+--topdir--/bad/7/backing/product/b/Abuild.conf:1: ERROR: build item "b" depends on "c", which is shadowed
+--topdir--/bad/7/intermediate/common/c/Abuild.conf:1: ERROR: here is the location of "c"
+--topdir--/bad/7/backing/product/b/Abuild.conf:1: ERROR: build item "b" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/intermediate/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/common/d/Abuild.conf:1: ERROR: build item "d" in tree "common" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/intermediate/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/product/lib/Abuild.conf:1: ERROR: build item "product-lib" depends on "common-lib1", which is shadowed
+--topdir--/bad/7/intermediate/common/libs/lib1/Abuild.conf:1: ERROR: here is the location of "common-lib1"
+--topdir--/bad/7/backing/product/lib/Abuild.conf:1: ERROR: build item "product-lib" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/intermediate/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/product/lib/Abuild.conf:1: ERROR: build item "product-lib" depends on "product-common", which is shadowed
+--topdir--/bad/7/intermediate/product/common/Abuild.conf:1: ERROR: here is the location of "product-common"
+--topdir--/bad/7/intermediate/product/a/Abuild.conf:1: ERROR: build item "a" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/product/b/Abuild.conf:1: ERROR: build item "b" depends on "c", which is shadowed
+--topdir--/bad/7/intermediate/common/c/Abuild.conf:1: ERROR: here is the location of "c"
+--topdir--/bad/7/backing/product/b/Abuild.conf:1: ERROR: build item "b" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/common/d/Abuild.conf:1: ERROR: build item "d" in tree "common" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/intermediate/product/common/Abuild.conf:1: ERROR: build item "product-common" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/product/lib/Abuild.conf:1: ERROR: build item "product-lib" depends on "common-lib1", which is shadowed
+--topdir--/bad/7/main/common/libs/lib1/Abuild.conf:1: ERROR: here is the location of "common-lib1"
+--topdir--/bad/7/backing/product/lib/Abuild.conf:1: ERROR: build item "product-lib" in tree "product" uses plugin "plugin", which is shadowed
+--topdir--/bad/7/main/common/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
+--topdir--/bad/7/backing/product/lib/Abuild.conf:1: ERROR: build item "product-lib" depends on "product-common", which is shadowed
+--topdir--/bad/7/intermediate/product/common/Abuild.conf:1: ERROR: here is the location of "product-common"
 abuild: ERROR: errors detected; exiting

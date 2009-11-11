@@ -1,2 +1,2 @@
---topdir--/a/ab/abc/Abuild.conf: ERROR: unable to locate or resolve external "does-not-exist"
+--topdir--/a/ab/abc/Abuild.conf:1: ERROR: unable to locate or resolve external "does-not-exist"
 abuild: ERROR: errors detected; exiting

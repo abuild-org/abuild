@@ -1,7 +1,7 @@
 abuild: ERROR: circular dependency detected among build trees: tree.3.-RND- -> tree.4.-RND- -> tree.3.-RND-
---topdir--/errors/cycle/c/Abuild.conf: ERROR: tree.3.-RND- participates in a circular tree dependency
---topdir--/errors/cycle/d/Abuild.conf: ERROR: tree.4.-RND- participates in a circular tree dependency
+--topdir--/errors/cycle/c/Abuild.conf:1: ERROR: tree.3.-RND- participates in a circular tree dependency
+--topdir--/errors/cycle/d/Abuild.conf:1: ERROR: tree.4.-RND- participates in a circular tree dependency
 abuild: ERROR: circular dependency detected among build trees: tree.3.-RND- -> tree.4.-RND- -> tree.3.-RND-
---topdir--/errors/cycle/c/Abuild.conf: ERROR: tree.3.-RND- participates in a circular tree dependency
---topdir--/errors/cycle/d/Abuild.conf: ERROR: tree.4.-RND- participates in a circular tree dependency
+--topdir--/errors/cycle/c/Abuild.conf:1: ERROR: tree.3.-RND- participates in a circular tree dependency
+--topdir--/errors/cycle/d/Abuild.conf:1: ERROR: tree.4.-RND- participates in a circular tree dependency
 abuild: ERROR: errors detected; exiting

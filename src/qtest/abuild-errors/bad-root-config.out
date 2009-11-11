@@ -1,16 +1,16 @@
---topdir--/a/aa/aag/Abuild.conf: ERROR: -ro is not preceded by external directory
---topdir--/a/aa/aag/Abuild.conf: ERROR: -winpath is no longer supported
+--topdir--/a/aa/aag/Abuild.conf:1: ERROR: -ro is not preceded by external directory
+--topdir--/a/aa/aag/Abuild.conf:1: ERROR: -winpath is no longer supported
 --topdir--/a/aa/aag/aaga/Abuild.conf:3: ERROR: syntax error
---topdir--/a/aa/aag/aaga/Abuild.conf: ERROR: "deps" is not permitted for unnamed build items
---topdir--/a/aa/aag/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "aaga" of "--topdir--/a/aa/aag" points to a named tree in an upgraded build area
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: build tree names may contain only alphanumeric characters, underscores, periods, and dashes
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: -optional is not preceded by a build tree name
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: invalid tree dependency don't
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: invalid tree dependency so.
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: invalid tree dependency you?
---topdir--/a/aa/aag/aagd/Abuild.conf: ERROR: another tree with the name "aagc" has been found in this forest
---topdir--/a/aa/aag/aagc/Abuild.conf: ERROR: here is the other tree
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: tree what kind of a name is this? depends on unknown build tree I
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: tree what kind of a name is this? depends on unknown build tree think
---topdir--/a/aa/aag/aagb/Abuild.conf: ERROR: tree what kind of a name is this? depends on unknown build tree Do
+--topdir--/a/aa/aag/aaga/Abuild.conf:1: ERROR: "deps" is not permitted for unnamed build items
+--topdir--/a/aa/aag/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "aaga" of "--topdir--/a/aa/aag" points to a named tree in an upgraded build area
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: build tree names may contain only alphanumeric characters, underscores, periods, and dashes
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: -optional is not preceded by a build tree name
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: invalid tree dependency don't
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: invalid tree dependency so.
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: invalid tree dependency you?
+--topdir--/a/aa/aag/aagd/Abuild.conf:1: ERROR: another tree with the name "aagc" has been found in this forest
+--topdir--/a/aa/aag/aagc/Abuild.conf:1: ERROR: here is the other tree
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree I
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree think
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree Do
 abuild: ERROR: errors detected; exiting

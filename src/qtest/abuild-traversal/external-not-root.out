@@ -1,3 +1,3 @@
---topdir--/errors/ext-not-root/a/Abuild.conf: ERROR: this build item does not appear to be a build tree root, but it is referenced as external "a" of "--topdir--/errors/ext-not-root"
---topdir--/errors/ext-not-root/Abuild.conf: ERROR: here is the referring item
+--topdir--/errors/ext-not-root/a/Abuild.conf:1: ERROR: this build item does not appear to be a build tree root, but it is referenced as external "a" of "--topdir--/errors/ext-not-root"
+--topdir--/errors/ext-not-root/Abuild.conf:1: ERROR: here is the referring item
 abuild: ERROR: errors detected; exiting

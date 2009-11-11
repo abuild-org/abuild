@@ -1,6 +1,6 @@
 --topdir--/e/platform/plugin/platform-types:1: ERROR: invalid platform type specification
 --topdir--/e/platform/plugin/platform-types:2: ERROR: platform type native has been registered multiple times
---topdir--/e/platform/plugin/list_platforms: ERROR: invalid syntax in list_platforms output
---topdir--/e/platform/plugin/list_platforms: ERROR: platform a.b.c.d.e has already been registered
---topdir--/e/platform/plugin/list_platforms: ERROR: platform <native-os-data>.xyz has already been registered
+--topdir--/e/platform/plugin/list_platforms:1: ERROR: invalid syntax in list_platforms output
+--topdir--/e/platform/plugin/list_platforms:1: ERROR: platform a.b.c.d.e has already been registered
+--topdir--/e/platform/plugin/list_platforms:1: ERROR: platform <native-os-data>.xyz has already been registered
 abuild: ERROR: errors detected; exiting

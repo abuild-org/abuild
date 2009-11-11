@@ -1,4 +1,4 @@
---topdir--/bad/5/main/Abuild.backing: ERROR: backing area "../backing" does not contain an Abuild.conf file
---topdir--/bad/5/main/Abuild.backing: ERROR: backing area "../not-even-there" does not exist
---topdir--/bad/5/main/Abuild.backing: ERROR: unable to get backing area data
+--topdir--/bad/5/main/Abuild.backing:1: ERROR: backing area "../backing" does not contain an Abuild.conf file
+--topdir--/bad/5/main/Abuild.backing:1: ERROR: backing area "../not-even-there" does not exist
+--topdir--/bad/5/main/Abuild.backing:1: ERROR: unable to get backing area data
 abuild: ERROR: errors detected; exiting

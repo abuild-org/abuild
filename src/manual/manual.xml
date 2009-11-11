@@ -15592,6 +15592,30 @@ Y = $(X)
  end template -->
 
     <varlistentry>
+     <term>1.1.xxx: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Usability Improvements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           When error messages are tied to a file but not to a
+           specific line in the file, the error message now assumes
+           the line number &ldquo;1&rdquo; rather than not outputting
+           a line number.  This makes tools like emacs, vim, or
+           eclipse that can automatically take users to the error
+           location more likely to handle those conditions.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>1.1.b6: November 10, 2009</term>
      <listitem>
       <itemizedlist>

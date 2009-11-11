@@ -1,4 +1,4 @@
 --topdir--/bad/2/common/Abuild.backing:1: ERROR: invalid key something (ignored)
---topdir--/bad/2/common/Abuild.backing: ERROR: no values for the following keys: backing-areas
---topdir--/bad/2/common/Abuild.backing: ERROR: unable to get backing area data
+--topdir--/bad/2/common/Abuild.backing:1: ERROR: no values for the following keys: backing-areas
+--topdir--/bad/2/common/Abuild.backing:1: ERROR: unable to get backing area data
 abuild: ERROR: errors detected; exiting

@@ -1,5 +1,5 @@
---topdir--/errors/integrity/f1/main/b/Abuild.conf: ERROR: build item "b" depends on "c", which is shadowed
---topdir--/errors/integrity/f2/main/ext/c/Abuild.conf: ERROR: here is the location of "c"
---topdir--/errors/integrity/f1/main/b/Abuild.conf: ERROR: build item "b" in tree "tree.1.-RND-" uses plugin "plugin", which is shadowed
---topdir--/errors/integrity/f2/main/ext/plugin/Abuild.conf: ERROR: here is the location of "plugin"
+--topdir--/errors/integrity/f1/main/b/Abuild.conf:1: ERROR: build item "b" depends on "c", which is shadowed
+--topdir--/errors/integrity/f2/main/ext/c/Abuild.conf:1: ERROR: here is the location of "c"
+--topdir--/errors/integrity/f1/main/b/Abuild.conf:1: ERROR: build item "b" in tree "tree.1.-RND-" uses plugin "plugin", which is shadowed
+--topdir--/errors/integrity/f2/main/ext/plugin/Abuild.conf:1: ERROR: here is the location of "plugin"
 abuild: ERROR: errors detected; exiting

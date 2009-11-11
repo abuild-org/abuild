@@ -1,10 +1,10 @@
---topdir--/symlink/Abuild.conf: ERROR: child directory "child" is a symbolic link or crosses a symbolic link
---topdir--/symlink/Abuild.conf: ERROR: child directory "link/child" is a symbolic link or crosses a symbolic link
---topdir--/symlink/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
---topdir--/symlink/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "link/ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
+--topdir--/symlink/Abuild.conf:1: ERROR: child directory "child" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf:1: ERROR: child directory "link/child" is a symbolic link or crosses a symbolic link
+--topdir--/symlink/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
+--topdir--/symlink/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external directory "link/ext" is a symbolic link or crosses a symbolic link; this is not supported outside of 1.0-compatibility mode
 abuild: searching for build items...
 abuild: analyzing...
---topdir--/symlink/Abuild.conf: ERROR: unable to upgrade a build tree with externals that traverse symbolic links
+--topdir--/symlink/Abuild.conf:1: ERROR: unable to upgrade a build tree with externals that traverse symbolic links
 abuild: ERROR: some build trees have not been assigned names
 abuild: upgrade data has been written to abuild.upgrade-data
 abuild: please edit that file and rerun; for details, see "Upgrading Build Trees from 1.0 to 1.1" in the user's manual

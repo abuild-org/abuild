@@ -1,7 +1,7 @@
 no defaults
 test5.in:2: ERROR: duplicate value for qoww (using new value)
-test5.in: ERROR: no values for the following keys: chicken duck pig
+test5.in:1: ERROR: no values for the following keys: chicken duck pig
 defaults
 test5.in:2: ERROR: duplicate value for qoww (using new value)
-test5.in: ERROR: no values for the following keys: chicken duck pig
+test5.in:1: ERROR: no values for the following keys: chicken duck pig
 explicit keys: qoww

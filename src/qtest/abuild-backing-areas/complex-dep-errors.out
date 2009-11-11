@@ -1,7 +1,7 @@
---topdir--/bad/6/backing2/common/c/Abuild.conf: ERROR: this tree appears in multiple backing areas
---topdir--/bad/6/backing1/product/c/Abuild.conf: ERROR: here is another location for this tree
---topdir--/bad/6/backing2/common/c/Abuild.conf: ERROR: this item appears in multiple backing areas
---topdir--/bad/6/backing1/product/c/Abuild.conf: ERROR: here is another location for this item
---topdir--/bad/6/backing1/product/lib/Abuild.conf: ERROR: build item "product-lib" depends on "product-common", which is shadowed
---topdir--/bad/6/main/product/common/Abuild.conf: ERROR: here is the location of "product-common"
+--topdir--/bad/6/backing2/common/c/Abuild.conf:1: ERROR: this tree appears in multiple backing areas
+--topdir--/bad/6/backing1/product/c/Abuild.conf:1: ERROR: here is another location for this tree
+--topdir--/bad/6/backing2/common/c/Abuild.conf:1: ERROR: this item appears in multiple backing areas
+--topdir--/bad/6/backing1/product/c/Abuild.conf:1: ERROR: here is another location for this item
+--topdir--/bad/6/backing1/product/lib/Abuild.conf:1: ERROR: build item "product-lib" depends on "product-common", which is shadowed
+--topdir--/bad/6/main/product/common/Abuild.conf:1: ERROR: here is the location of "product-common"
 abuild: ERROR: errors detected; exiting

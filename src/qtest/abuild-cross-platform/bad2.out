@@ -1,5 +1,5 @@
---topdir--/bad2/object-code/Abuild.conf: ERROR: "object-code" is being built on platform "<native>", but its dependency "all1" is not
---topdir--/bad2/all1/Abuild.conf: ERROR: here is the location of "all1"
---topdir--/bad2/indep/Abuild.conf: ERROR: "indep" wants dependency "other" on platform type "other", but the dependency has no platforms belonging to that type
---topdir--/bad2/other/Abuild.conf: ERROR: here is the location of "other"
+--topdir--/bad2/object-code/Abuild.conf:1: ERROR: "object-code" is being built on platform "<native>", but its dependency "all1" is not
+--topdir--/bad2/all1/Abuild.conf:1: ERROR: here is the location of "all1"
+--topdir--/bad2/indep/Abuild.conf:1: ERROR: "indep" wants dependency "other" on platform type "other", but the dependency has no platforms belonging to that type
+--topdir--/bad2/other/Abuild.conf:1: ERROR: here is the location of "other"
 abuild: ERROR: errors detected; exiting

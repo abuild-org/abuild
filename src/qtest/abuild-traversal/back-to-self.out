@@ -1,5 +1,5 @@
---topdir--/errors/back-to-self/t3/Abuild.conf: ERROR: another tree with the name "tree.2.-RND-" has been found in this forest
---topdir--/errors/back-to-self/t2/Abuild.conf: ERROR: here is the other tree
+--topdir--/errors/back-to-self/t3/Abuild.conf:1: ERROR: another tree with the name "tree.2.-RND-" has been found in this forest
+--topdir--/errors/back-to-self/t2/Abuild.conf:1: ERROR: here is the other tree
 abuild: ERROR: the following trees are involved in a cycle (backing area):
 abuild: ERROR:   --topdir--/errors/back-to-self/t1
 abuild: ERROR: unable to continue after backing area error

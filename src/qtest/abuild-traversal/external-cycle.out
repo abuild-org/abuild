@@ -2,6 +2,6 @@ abuild: ERROR: 1.0 compatibility mode was unable to determine proper relationshi
 abuild: ERROR: the following trees are involved in a cycle (external-dir):
 abuild: ERROR:   --topdir--/errors/cycle/c
 abuild: ERROR: circular dependency detected among build trees: tree.1.-RND- -> tree.2.-RND- -> tree.1.-RND-
---topdir--/errors/cycle/c/Abuild.conf: ERROR: tree.1.-RND- participates in a circular tree dependency
---topdir--/errors/cycle/d/Abuild.conf: ERROR: tree.2.-RND- participates in a circular tree dependency
+--topdir--/errors/cycle/c/Abuild.conf:1: ERROR: tree.1.-RND- participates in a circular tree dependency
+--topdir--/errors/cycle/d/Abuild.conf:1: ERROR: tree.2.-RND- participates in a circular tree dependency
 abuild: ERROR: errors detected; exiting

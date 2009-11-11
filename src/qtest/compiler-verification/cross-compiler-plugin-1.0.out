@@ -7,7 +7,7 @@
 
 ===> CREATING BUILD TREE <===
 
---topdir--/.verify-tmp/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
+--topdir--/.verify-tmp/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
 
 ===> NON-NATIVE COMPILER <===
 
@@ -32,7 +32,7 @@ Hit return to continue.
 
 ===> RUNNING INITIAL BUILD <===
 
---topdir--/.verify-tmp/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
+--topdir--/.verify-tmp/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
 
 ******************** abuild ********************
 WARNING: Build items/trees with deprecated 1.0 features were found.
@@ -99,7 +99,7 @@ Hit return to continue.
 
 ===> REBUILD WHEN UP TO DATE <===
 
---topdir--/.verify-tmp/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
+--topdir--/.verify-tmp/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
 
 ******************** abuild ********************
 WARNING: Build items/trees with deprecated 1.0 features were found.
@@ -125,7 +125,7 @@ abuild: src (abuild-zz_os.cpu.toolset.xcc): all
 
 ===> RUNNING BUILD AFTER REMOVING SOURCE <===
 
---topdir--/.verify-tmp/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
+--topdir--/.verify-tmp/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
 
 ******************** abuild ********************
 WARNING: Build items/trees with deprecated 1.0 features were found.
@@ -172,7 +172,7 @@ Hit return to continue.
 
 ===> RUNNING BUILD AFTER MOVING HEADER <===
 
---topdir--/.verify-tmp/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
+--topdir--/.verify-tmp/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
 
 ******************** abuild ********************
 WARNING: Build items/trees with deprecated 1.0 features were found.
@@ -219,7 +219,7 @@ Hit return to continue.
 
 ===> REBUILD WHEN UP TO DATE <===
 
---topdir--/.verify-tmp/Abuild.conf: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
+--topdir--/.verify-tmp/Abuild.conf:1: *** DEPRECATION WARNING *** (abuild version 1.1): external "plugin-tree" of "--topdir--/.verify-tmp" points to a named tree in an upgraded build area
 
 ******************** abuild ********************
 WARNING: Build items/trees with deprecated 1.0 features were found.

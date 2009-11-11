@@ -1,4 +1,4 @@
---topdir--/1.0/forest1/F2C2/Abuild.backing: *** DEPRECATION WARNING *** (abuild version 1.1): this is a 1.0-style Abuild.backing file in an otherwise updated area
+--topdir--/1.0/forest1/F2C2/Abuild.backing:1: *** DEPRECATION WARNING *** (abuild version 1.1): this is a 1.0-style Abuild.backing file in an otherwise updated area
 abuild: f2-b (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
 IFC1: F2C2-f2-b-ifc

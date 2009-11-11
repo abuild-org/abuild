@@ -1,4 +1,4 @@
---topdir--/bad1/all/Abuild.conf: ERROR: dependency "indep" declared with platform type "native" , which dependency does not have
---topdir--/bad1/all/Abuild.conf: ERROR: dependencies may not be declared with platform type "indep"
---topdir--/bad1/all/Abuild.conf: ERROR: this item has no platform types, so it may not declare platform types on its dependencies
+--topdir--/bad1/all/Abuild.conf:1: ERROR: dependency "indep" declared with platform type "native" , which dependency does not have
+--topdir--/bad1/all/Abuild.conf:1: ERROR: dependencies may not be declared with platform type "indep"
+--topdir--/bad1/all/Abuild.conf:1: ERROR: this item has no platform types, so it may not declare platform types on its dependencies
 abuild: ERROR: errors detected; exiting

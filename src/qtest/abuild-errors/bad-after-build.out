@@ -138,8 +138,8 @@ abuild-monitor: targets af indep all
 abuild: af (abuild-indep): all
 --topdir--/h/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
 abuild-monitor: error --topdir--/h/1.interface:1:13: ERROR: after-build files are not permitted in this interface file
---topdir--/h/Abuild.interface: ERROR: after-build file 2.interface does not exist
-abuild-monitor: error --topdir--/h/Abuild.interface: ERROR: after-build file 2.interface does not exist
+--topdir--/h/Abuild.interface:1: ERROR: after-build file 2.interface does not exist
+abuild-monitor: error --topdir--/h/Abuild.interface:1: ERROR: after-build file 2.interface does not exist
 abuild: af (abuild-indep): build failed
 abuild-monitor: state-change af indep failed
 abuild-monitor: state-change af-rdep indep dependency-failed

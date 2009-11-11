@@ -1,2 +1,2 @@
---topdir--/bad/1/subdir/Abuild.backing: ERROR: backing area --topdir--/bad/1/subdir/subdir belongs to this forest
+--topdir--/bad/1/subdir/Abuild.backing:1: ERROR: backing area --topdir--/bad/1/subdir/subdir belongs to this forest
 abuild: ERROR: errors detected; exiting
