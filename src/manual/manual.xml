@@ -53,7 +53,7 @@ put the start tag flush left as these will interfere with future line
 indentation.
 
 Each chapter, section, or appendix is given an id that starts with
-ref.".  Each example section is given an id that starts with
+"ref.".  Each example section is given an id that starts with
 "ref.example.".  We use the "example" processing instruction to
 include the contents of a file from doc/example.  Our processing
 program requires the example to appear in a section whose id starts
@@ -258,7 +258,7 @@ following checks:
     </listitem>
     <listitem>
      <para>
-      Brian Reid, Joe Schettino, Kathleen Locher, and Brandon Barlow
+      Brian Reid, Joe Schettino, Kathleen Friesen, and Brandon Barlow
       who met with me many times to help hammer out and test early
       versions of the Groovy-based Java framework
      </para>
@@ -303,9 +303,9 @@ following checks:
     <listitem>
      <para>
       Gavin Mulligan, who has consistently taken the time to report
-      any problem, no matter how small, and who is probably
-      responsible for reporting more issues than everyone else
-      combined
+      any problem, no matter how small, and who probably reported more
+      issues than everyone else combined during &abuild;'s pre-1.0
+      alpha period
      </para>
     </listitem>
     <listitem>
