@@ -1452,7 +1452,12 @@ C:\cygwin\cygwin.bat
      in the <filename>Abuild.mk</filename> file, and that the
      &abuild;-provided variable
      <varname>$(ABUILD_OUTPUT_DIR)</varname> is used as the library
-     directory.
+     directory.  All relative paths specified in the
+     <filename>Abuild.interface</filename> file are relative to the
+     directory that contains the <filename>Abuild.interface</filename>
+     file.  They are automatically converted internally by &abuild; to
+     absolute paths, which helps to keep build items
+     location-independent.
     </para>
     <para>
      To build this item, you would run the command
@@ -1519,8 +1524,7 @@ C:\cygwin\cygwin.bat
      <classname>cxx-program</classname>.  In this way, you can can
      start a build from any build item and let &abuild; automatically
      take care of building all of its dependencies in the correct
-     order.  (For a complete list of all of &abuild;'s command line
-     options, please see <xref linkend="ref.command-line"/>.)
+     order.
     </para>
     <para>
      The output of running <command>abuild</command> in the
@@ -1578,12 +1582,12 @@ C:\cygwin\cygwin.bat
      <filename>Abuild.groovy</filename> file:
      <?example basic/java-library/Abuild.groovy?>
      Java build items have this file instead of
-     <filename>Abuild.mk</filename>, and you'll find the contents to
-     be very similar.  The <filename>Abuild.groovy</filename> file
-     contains Groovy code that is executed inside a particular context
-     provided by &abuild;.  Most <filename>Abuild.groovy</filename>
-     files will simply set <firstterm>parameters</firstterm> that
-     describe what will be built.  In this file, we set the
+     <filename>Abuild.mk</filename>.  The contents are very similar.
+     The <filename>Abuild.groovy</filename> file contains Groovy code
+     that is executed inside a particular context provided by
+     &abuild;.  Most <filename>Abuild.groovy</filename> files will
+     simply set <firstterm>parameters</firstterm> that describe what
+     will be built.  In this file, we set the
      <varname>java.jarName</varname> parameter to the name of the JAR
      file we are creating, and we set the
      <varname>abuild.rules</varname> parameter to the value
@@ -1639,7 +1643,7 @@ C:\cygwin\cygwin.bat
      end.
     </para>
     <para>
-     After setting these two build item-specific variables, we append
+     After setting these two build item-specific variables, we assign
      to two built-in variables: <varname>abuild.classpath</varname>,
      and <varname>abuild.classpath.manifest</varname>.  Most simple
      JAR-providing build items will do this.  &Abuild; actually
