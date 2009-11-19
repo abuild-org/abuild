@@ -15714,6 +15714,16 @@ Y = $(X)
            properly access <classname>System.in</classname>.
           </para>
          </listitem>
+         <listitem>
+          <para>
+           Tighten up the logic for detecting tree roots in partially
+           upgraded build trees.  This reduces the number of false
+           positives when running an upgrade process over an already
+           upgraded forest, though it does not entirely eliminate
+           them.  The upgrade caveats section of the documentation has
+           also been clarified slightly.
+          </para>
+         </listitem>
         </itemizedlist>
        </listitem>
       </itemizedlist>
@@ -20845,12 +20855,21 @@ Y = $(X)
        non-yet-upgraded build tree or whether it just hasn't been
        properly added to its parent's <filename>Abuild.conf</filename>
        as a child.  In 1.0-compatibility mode, &abuild; will guess
-       that it is the root of a forest.  In 1.1-compatibility mode,
+       that it's missing from its parents
+       <filename>Abuild.conf</filename> if there is a
+       <property>name</property> key.  Otherwise, it will guess that
+       it is the root of a forest.  In 1.1-compatibility mode,
        &abuild; will issue an error.  If you are running in
        1.0-compatibility mode on upgraded trees and you get
        unexplained errors about build items not being known, you might
        first try running in 1.1-compatibility mode where you might get
-       a better error message.
+       a better error message.  If you have intentionally left it out
+       of the parent's <filename>Abuild.conf</filename> file because
+       you want to disable the build item for some reason, then you
+       must either enter this directory in the ignored directories
+       section of the <filename>abuild.upgrade-data</filename> file or
+       add it back as a child of its parent during the upgrade process
+       and remove it again later.
       </para>
      </listitem>
      <listitem>

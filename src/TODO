@@ -1,6 +1,12 @@
 1.1
 ===
 
+ * Figure out a way to create "native" compilers that aren't really
+   native.  Must pass something to configure to make it think it's a
+   cross compiler.  Probably have some way of registering a "native"
+   compiler as not really being native and having this cause some
+   variable to be set that rules can use.
+
  * Change build time message to avoid making error message parsers
    think it's an error message.  Maybe go with mm:ss for builds less
    than an hour, or maybe go with NNh NNm NNs or something like that.

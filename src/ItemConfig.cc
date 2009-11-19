@@ -260,6 +260,17 @@ ItemConfig::detectRoot()
 	    // doesn't have tree-name, it is not a root.
 	    this->is_root = false;
 	}
+	else if (ek.count(k_NAME))
+	{
+	    // It has neither a parent-dir nor a tree-name key, but it
+	    // has a name key.  This probably means it was upgraded
+	    // already and, prior to the upgrade, had previously had a
+	    // parent-dir that pointed to an item that didn't point
+	    // back down to it.  This can happen when people comment
+	    // out child-dirs entries for build items they want to
+	    // disable.
+	    this->is_root = false;
+	}
 	else
 	{
 	    this->is_root = true;
