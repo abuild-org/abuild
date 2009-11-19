@@ -2578,7 +2578,7 @@ C:\cygwin\cygwin.bat
      <classname>B</classname> cannot depend on
      <classname>A</classname> directly or indirectly.  There are other
      dependency validations which are discussed in various places
-     throughout the document.
+     throughout this document.
     </para>
     <para>
      By default, any build item can depend on any other build item by
@@ -2942,9 +2942,15 @@ C:\cygwin\cygwin.bat
      items, though it is recommended that you pick a consistent way
      and stick with it for any given build tree.  You should also
      avoid paths that point into other build items.  Instead, depend
-     on the other item and put the variable there.  We will not study
-     the source and header files in this example here, but you are
-     encouraged to go to the
+     on the other item and put the variable there.  As a rule, if you
+     ever have two interface variables or assignments that resolve to
+     the same path, you are probably doing something wrong: a
+     significant feature of &abuild; is that allows you to encapsulate
+     the location of any given thing in only one place.  Instead,
+     figure out who <emphasis>owns</emphasis> a given file or
+     directory and export it from that build item's interface.  We
+     will not study the source and header files in this example here,
+     but you are encouraged to go to the
      <filename>doc/example/general/reference/common</filename>
      directory in your &abuild; source tree or installation directory
      to study the files further on your own.
@@ -3038,6 +3044,26 @@ C:\cygwin\cygwin.bat
        </para>
       </listitem>
      </varlistentry>
+     <varlistentry>
+      <term>top-level <filename>Abuild.conf</filename></term>
+      <listitem>
+       <para>
+        <indexterm>
+         <primary>top-level <filename>Abuild.conf</filename></primary>
+        </indexterm>
+        The <firstterm>top-level Abuild.conf</firstterm> is an
+        <filename>Abuild.conf</filename> file that is higher in th
+        file system than any other <filename>Abuild.conf</filename>
+        file in the build forest.  If you are building a single tree,
+        the top-level <filename>Abuild.conf</filename> file is
+        typically the root build item of that tree.  If you are
+        building multiple trees, you have to create a higher-level
+        <filename>Abuild.conf</filename> file that can reach the roots
+        of all the trees you are going to use, directly or indirectly,
+        through its <property>child-dirs</property> key.
+       </para>
+      </listitem>
+     </varlistentry>
     </variablelist>
    </para>
    <sect1 id="ref.using-tree-deps">
@@ -3078,6 +3104,64 @@ C:\cygwin\cygwin.bat
      convention for your build items that includes some kind of
      tree-based prefix, as we have done with names like
      <classname>common-lib1</classname>.
+    </para>
+   </sect1>
+   <sect1 id="ref.top-level-conf">
+    <title>Top-Level <filename>Abuild.conf</filename></title>
+    <para>
+     When you declare another tree as a tree dependency of your tree,
+     you declare your dependency on the other tree by mentioning its
+     name in the <property>tree-deps</property> of your tree's root
+     <filename>Abuild.conf</filename>.  In order for this dependency
+     to work, &abuild; must know where to find the tree.  &Abuild;
+     finds items and trees in the same way: it traverses the build
+     forest from the top down and creates a table mapping names to
+     paths.  If the tree your tree depends on is
+     <emphasis>inside</emphasis> of your tree, this poses no problem.
+     But what if it is an external tree that is not inside your tree?
+     In this instance, you must place the external tree somewhere
+     within your overall build area, such as in another subdirectory
+     of the parent of your own tree's root.  Then you must create an
+     <filename>Abuild.conf</filename> file in that common parent
+     directory that knows about the root directories of the two
+     trees.  This is illustrated in <xref
+     linkend="fig.top-level-conf"/>.
+     <figure id="fig.top-level-conf">
+      <title>Top-Level <filename>Abuild.conf</filename></title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="top-level-conf.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         Tree <filename>A</filename> declares a tree dependency on
+         tree <filename>B</filename>.  In order for
+         <filename>A</filename> to find <filename>B</filename>, an
+         <filename>Abuild.conf</filename> file that points to both
+         trees' locations must be created in a common ancestor
+         directory.  The ovals show the contents of each directory's
+         <filename>Abuild.conf</filename> files.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
+     The tree named <filename>B</filename> has an
+     <filename>Abuild.conf</filename> that that declares no tree
+     dependencies.  It is a self-contained tree.  However,
+     <filename>A</filename>'s <filename>Abuild.conf</filename> file
+     mentions <filename>B</filename> <emphasis>by name</emphasis>.
+     How does <filename>A</filename> find <filename>B</filename>?
+     When you start &abuild;, it walks up the tree to find the
+     highest-level <filename>Abuild.conf</filename> (or the highest
+     level one not referenced as a child of the next higher
+     <filename>Abuild.conf</filename>) and traverses downward from
+     there.  In this case, the <filename>Abuild.conf</filename> in
+     <filename>A</filename>'s parent directory knows the locations of
+     both <filename>A</filename> and <filename>B</filename>.  In this
+     way, &abuild; has figured out where to find
+     <filename>B</filename> when <filename>A</filename> declares the
+     tree dependency.  This is illustrated with a concrete example
+     below.
     </para>
    </sect1>
    <sect1 id="ref.example.dependent-build-tree">
@@ -15612,6 +15696,22 @@ Y = $(X)
            a line number.  This makes tools like emacs, vim, or
            eclipse that can automatically take users to the error
            location more likely to handle those conditions.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Initialize ant <classname>Project</classname> properly so
+           that tasks using the deprecated xml-based ant framework can
+           properly access <classname>System.in</classname>.
           </para>
          </listitem>
         </itemizedlist>

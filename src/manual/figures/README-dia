@@ -20,26 +20,23 @@ Visual Consistency
  * For backing areas, a linewidth of 0.10 and a hollow triangle arrow
    head
 
- * For externals, use a linewidth of 0.10 and a filled in spear head
-   as the arrow head
+ * For tree dependencies, use a linewidth of 0.10 and a filled in
+   spear head as the arrow head
 
- * For dependencies, use a linewidth of 0.05 and a simple arrow head
-   (like a V).
+ * For item dependencies, use a linewidth of 0.05 and a simple arrow
+   head (like a V).
 
  * For annotations, use a labelled oval and a simple undirected
    connecting line at 0.05.  Use font size 0.6, sans, normal as the
    label font.  Use 0.05 as the line width for the oval as well.
-
- * Lines to backing areas and externals
 
  * When shading for scopes, be consistent with conventions used in
    build-item-scopes.dia
 
  * When shading for build tree membership, use #F0F0F0.
 
- * When shading build items that are inherited from backing areas or
-   externals, use #A0A0A0 as the line/text color and #E0E0E0 as the
-   background color.
+ * When shading build items that are inherited from backing areas, use
+   #A0A0A0 as the line/text color and #E0E0E0 as the background color.
 
  * For Abuild.interface or Abuild.conf code, use monospace at 0.7
 
