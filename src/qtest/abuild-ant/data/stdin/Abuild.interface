@@ -1,0 +1,1 @@
+declare testin-jar filename = $(ABUILD_OUTPUT_DIR)/dist/testin.jar

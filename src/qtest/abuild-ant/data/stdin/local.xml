@@ -1,0 +1,10 @@
+<project name="testin">
+ <target name="-test">
+  <java classname="TestSystemIn" fork="true">
+   <classpath>
+    <pathelement location="${testin-jar}"/>
+   </classpath>
+  </java>
+ </target>
+</project>
+

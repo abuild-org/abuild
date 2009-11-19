@@ -268,8 +268,17 @@ $td->runtest("missing hook file",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/stdin");
+
+$td->runtest("use System.in",
+	     {$td->COMMAND => "echo quack | abuild test",
+	      $td->FILTER => "grep input:"},
+	     {$td->REGEXP => ".*input: quack\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(20 +
+$td->report(21 +
 	    ($java_cygwin ? 1 : 0) +
 	    ($test_junit ? 3 : 0));

@@ -117,6 +117,15 @@ $td->runtest("clean binding",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/stdin");
+
+$td->runtest("use System.in",
+	     {$td->COMMAND => "echo quack | abuild",
+	      $td->FILTER => "grep input:"},
+	     {$td->STRING => "input: quack\n",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(12);
+$td->report(13);

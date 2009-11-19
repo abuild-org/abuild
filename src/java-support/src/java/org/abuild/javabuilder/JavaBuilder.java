@@ -190,6 +190,7 @@ class JavaBuilder
 
 	File dir = new File(dirName);
 	Project p = new Project();
+	p.setDefaultInputStream(System.in);
 	p.setKeepGoingMode(buildArgs.keepGoing);
 	p.setUserProperty(MagicNames.PROJECT_BASEDIR, dir.getAbsolutePath());
 	for (Map.Entry<String, String> e: defines.entrySet())
