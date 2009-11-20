@@ -120,9 +120,9 @@ $td->runtest("clean binding",
 cd("work/stdin");
 
 $td->runtest("use System.in",
-	     {$td->COMMAND => "echo quack | abuild",
+	     {$td->COMMAND => "echo quack | abuild test",
 	      $td->FILTER => "grep input:"},
-	     {$td->STRING => "input: quack\n",
+	     {$td->REGEXP => ".*input: quack\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

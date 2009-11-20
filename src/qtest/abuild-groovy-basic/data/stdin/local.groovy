@@ -1,4 +1,7 @@
-abuild.configureTarget('all') {
-    def inx = new BufferedReader(new InputStreamReader(System.in))
-    println 'input: ' + inx.readLine()
+abuild.configureTarget('test') {
+    ant.java(classname: 'TestSystemIn', fork: 'true') {
+        classpath {
+            pathelement(location: abuild.resolve('testin-jar'))
+        }
+    }
 }
