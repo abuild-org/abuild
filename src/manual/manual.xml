@@ -3617,6 +3617,15 @@ C:\cygwin\cygwin.bat
          all items in the build tree containing the item in the
          current directory as well as all items in any of its tree
          dependencies
+         <footnote>
+          <para>
+           This is what the <optional>all</optional> build set did in
+           &abuild; 1.0.  In &abuild; 1.1, <optional>all</optional>
+           may be more expansive since &abuild; now actually knows
+           about all trees in the forest, not just those referenced by
+           the current tree.
+          </para>
+         </footnote>
         </para>
        </listitem>
       </varlistentry>
@@ -3664,13 +3673,13 @@ C:\cygwin\cygwin.bat
        <command>clean</command> target to the backend, but &abuild;
        version 1.1 handles this <command>clean</command> invocation
        internally as it does for other <command>clean</command>
-       invocations.  The other way is to use the
-       <option>--clean-platforms</option> option, which may be
-       followed by a shell-style regular expression that is matched
-       against the platform portion of the output directory name.
-       Examples are shown below.
+       invocations.
       </para>
      </footnote>
+     The other way is to use the <option>--clean-platforms</option>
+     option, which may be followed by a shell-style regular expression
+     that is matched against the platform portion of the output
+     directory name.  Examples are shown below.
     </para>
     <sect2 id="ref.build-set.invocation-examples">
      <title>Example Build Set Invocations</title>
@@ -3817,7 +3826,7 @@ C:\cygwin\cygwin.bat
        <listitem>
         <para>
          builds the <command>all</command> target for all build items
-         in all known trees
+         in all known trees in the forest
         </para>
        </listitem>
       </varlistentry>
@@ -3878,8 +3887,8 @@ C:\cygwin\cygwin.bat
       </listitem>
      </itemizedlist>
      Whenever you want building of one build item to result in
-     building of another build item, but the first item need to use
-     anything from the ones whose builds it triggers, it is
+     building of another build item and the first item doesn't need to
+     use anything from the items it causes to be built, it is
      appropriate to use <property>build-also</property> instead of a
      dependency.
     </para>
