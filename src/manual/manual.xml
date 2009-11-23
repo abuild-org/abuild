@@ -1643,7 +1643,7 @@ C:\cygwin\cygwin.bat
      end.
     </para>
     <para>
-     After setting these two build item-specific variables, we assign
+     After setting these two build-item-specific variables, we assign
      to two built-in variables: <varname>abuild.classpath</varname>,
      and <varname>abuild.classpath.manifest</varname>.  Most simple
      JAR-providing build items will do this.  &Abuild; actually
@@ -5173,7 +5173,7 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     </para>
     <para>
      Although we don't present any examples of using
-     <property>deleted-key</property>, it works in a very similar
+     <property>deleted-tree</property>, it works in a very similar
      fashion.  Ordinarily, any build tree you do not have locally will
      be inherited from the backing area.  If your intention is to
      change the code so that it no longer uses a particular tree, and
@@ -5789,10 +5789,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
       <listitem>
        <para>
         Specify which build items should be built.  The default is to
-        have no build set specified.  In that case, &abuild; just
-        builds in the local directory without attempting to build any
-        dependencies.  For additional details including a list of
-        valid values for <replaceable>set</replaceable>, see <xref
+        use the build set <option>current</option>, which builds the
+        current item and all of its dependencies.  For additional
+        details including a list of valid values for
+        <replaceable>set</replaceable>, see <xref
         linkend="ref.what-to-build"/>.
        </para>
       </listitem>
@@ -5804,10 +5804,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         Run <command>abuild clean</command> in all items in the build
         set.  The same build sets are defined as with the
         <option>--build</option> option.  Unlike build sets, clean
-        sets are not expanded to include dependencies, and build
-        items are not cleaned in dependency order.  No targets may be
-        specified in conjunction with this option.  For additional
-        details including a list of valid values for
+        sets are not expanded to include dependencies (unless
+        <option>--apply-targets-to-deps</option> is specified), and
+        build items are not cleaned in dependency order.  No targets
+        may be specified in conjunction with this option.  For
+        additional details including a list of valid values for
         <replaceable>set</replaceable>, see <xref
         linkend="ref.what-to-build"/>.  See also the description of
         the <option>--clean-platforms</option> (in <xref
@@ -6319,10 +6320,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          particular configuration.
         </para>
         <para>
-         If a child directory contains more than one path element,
-         the intermediate directories may not contain their own
+         If a child directory contains more than one path element, the
+         intermediate directories may not contain their own
          <filename>Abuild.conf</filename> files.  (In other words, you
-         can skip over a directory that has an
+         can't skip over a directory that has an
          <filename>Abuild.conf</filename> file in it.)
         </para>
        </listitem>
@@ -6345,7 +6346,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          <option>-platform=<replaceable>selector</replaceable></option>
          option to a dependency to specify which of the dependency's
          platforms applies to this dependency (see <xref
-         linkend="ref.cross-platform-dependencies"/>).
+         linkend="ref.cross-platform-dependencies"/>).  Dependencies
+         may be specified as optional by following the dependency name
+         with the <option>-optional</option> flag (see <xref
+         linkend="ref.optional-dependencies"/>).
         </para>
        </listitem>
       </varlistentry>
@@ -6377,11 +6381,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          segment consists of one or more alphanumeric characters,
          dashes, or underscores.  Some
          <filename>Abuild.conf</filename> files exist just to connect
-         parent directories with child directories in the file system,
-         as shown in examples below.  In those cases, the
-         <property>name</property> key may be omitted.  The
-         <property>name</property> key is also optional for root build
-         items that don't build anything themselves.
+         parent directories with child directories in the file system.
+         In those cases, the <property>name</property> key may be
+         omitted.  The <property>name</property> key is also optional
+         for root build items that don't build anything themselves.
         </para>
        </listitem>
       </varlistentry>
@@ -6408,7 +6411,11 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          This key is valid only in a root build item.  It is used to
          specify the list of build items that are treated plugins by
          this tree.  For information about plugins, see <xref
-         linkend="ref.plugins"/>.
+         linkend="ref.plugins"/>.  A plugin name may be followed by
+         the option <option>-global</option> which makes it apply to
+         all build trees in the forest.  Use this feature very
+         sparingly.  For details, see <xref
+         linkend="ref.global-plugins"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -6461,7 +6468,10 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
          This key is valid only in a root build item.  It contains a
          list of the names of trees on which this tree depends.  For
          information about tree dependencies, see <xref
-         linkend="ref.multiple-trees"/>.
+         linkend="ref.multiple-trees"/>.  Tree dependencies may be
+         declared optional by following the name of the dependency
+         with <option>-optional</option> (see <xref
+         linkend="ref.optional-dependencies"/>).
         </para>
        </listitem>
       </varlistentry>
@@ -6562,13 +6572,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         This key's value is a space-separated list of build trees that
         should be inherited from the backing area.  Any build item in
         any build tree listed here will not be made available from the
-        backing, and the build tree will not be considered a member of
-        the local forest.  Note that, unlike with deleted items, it is
-        permissible to create a new build tree locally with the same
-        name as a deleted tree.  The new tree is not related to the
-        old tree in any way, and the new tree will not inherit build
-        items from an instance of the deleted tree in the backing
-        areas.
+        backing area, and the build tree will not be considered a
+        member of the local forest.  Note that, unlike with deleted
+        items, it is permissible to create a new build tree locally
+        with the same name as a deleted tree.  The new tree is not
+        related to the old tree in any way, and the new tree will not
+        inherit build items from an instance of the deleted tree in
+        the backing areas.
        </para>
       </listitem>
      </varlistentry>
@@ -7106,8 +7116,9 @@ LIBS = lib3 lib4
       <listitem>
        <para>
         List and scalar variables can both be reset.  After a variable
-        is reset, its value becomes uninitialized just as if it had
-        just been declared.  The syntax for resetting a variable is
+        is reset, its value becomes uninitialized (for scalars) or
+        empty (for lists) just as if it had just been declared.  The
+        syntax for resetting a variable is
 
         <programlisting>reset <replaceable>variable</replaceable>
 </programlisting>
@@ -7215,6 +7226,8 @@ LIBS = lib3 lib4
         automatically generated interface data.  For an example of
         that use, see <xref linkend="ref.example.autoconf"/>.
        </para>
+       <para>
+       </para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -7277,19 +7290,19 @@ endif
 
         <programlisting>$(<replaceable>variable</replaceable>)
 </programlisting>
-        where <replaceable>variable</replaceable> is a boolean
-        variable, or
+        where <replaceable>variable</replaceable> is a
+        <type>boolean</type> variable, or
 
         <programlisting><replaceable>function</replaceable>(<replaceable>arg</replaceable>, <replaceable>arg</replaceable>, ...)
 </programlisting>
         where <replaceable>function</replaceable> is a valid
         <filename>Abuild.interface</filename> conditional function and
         each <replaceable>arg</replaceable> consists of one or more
-        words.  Only variables declared as Boolean and specific
-        conditional functions, described in the next section, are
-        permitted in conditionals.  There are no relational operators,
-        and variables of other types whose values happen to be valid
-        boolean values are not allowed in conditionals.
+        words.  Only variables declared as <type>boolean</type> and
+        specific conditional functions, described in the next section,
+        are permitted in conditionals.  There are no relational
+        operators, and variables of other types whose values happen to
+        be valid boolean values are not allowed in conditionals.
        </para>
       </listitem>
      </varlistentry>
@@ -7752,10 +7765,11 @@ endif
      </warning>
      <para>
       Note that the various <varname>FLAGS</varname> variables above
-      can also be set in <filename>Abuild.mk</filename> files, as can
-      additional variables to control flags on a per-file basis.
-      Please run <command>abuild rules-help</command> in a C/C++ build
-      item or see <xref linkend="ref.ccxx"/> for details.
+      can also be set (or, more likely, appended to) in
+      <filename>Abuild.mk</filename> files, as can additional
+      variables to control flags on a per-file basis.  Please run
+      <command>abuild rules-help</command> in a C/C++ build item or
+      see <xref linkend="ref.ccxx"/> for details.
      </para>
     </sect2>
     <sect2 id="ref.interface.java">
@@ -7825,7 +7839,11 @@ endif
           probably don't need to use this variable at all.  Java EE
           applications should use this primarily for JAR files that
           are required at compile time by are provided by default by
-          the application server or runtime environment.
+          the application server or runtime environment.  As with
+          <varname>abuild.classpath</varname>, Values assigned to
+          <varname>abuild.classpath.external</varname> will usually
+          also have to be assigned to
+          <varname>abuild.classpath.manifest</varname>.
          </para>
         </listitem>
        </varlistentry>
@@ -7949,7 +7967,8 @@ endif
      may contain any valid <application>GNU Make</application> code.
      If you have written the same local rule in more than one or two
      places, you are probably doing something wrong and should be
-     using build item-specific rules or plugins (<xref
+     using build-item-specific rules (<xref
+     linkend="ref.code-generators"/>) or plugins (<xref
      linkend="ref.plugins"/>) instead.
     </para>
     <para>
@@ -7989,7 +8008,8 @@ endif
       targets.
      </para>
      <para>
-      The flex and bison rules can take advantage of &abuild;'s
+      A note about flex and bison before we get to the main event: the
+      flex and bison rules can take advantage of &abuild;'s
       <command>codegen-wrapper</command> utility.  If you set the
       variable <varname>FLEX_CACHE</varname>, &abuild; will cache
       generated flex output files and input file checksums making it
@@ -8060,7 +8080,7 @@ endif
       <filename>.cpp</filename> are considered to be C++ code.
       Although you can have any mixture of binary and library targets
       in a build item, no single source file should be listed in more
-      than one target.  Additionally, &Abuild; will automatically
+      than one target.  Additionally, &abuild; will automatically
       include any library targets at the beginning of the library list
       when linking any binary targets in the build item.  All targets
       are created directly in the &abuild; output directory.
@@ -8260,12 +8280,13 @@ endif
      <para>
       Ordinarily, &abuild; uses a C++ compiler or linker to link all
       executables and shared libraries.  If you are writing straight C
-      code that doesn't make any call to C libraries and you want to
-      link your program as a C program to avoid runtime dependencies
-      on the C++ standard libraries, set the variable
-      <varname>LINK_AS_C</varname> to some non-empty value in your
-      <filename>Abuild.mk</filename>.  This applies to all shared
-      libraries and executables in the build item.
+      code that doesn't make any calls to C++ functions including
+      those in external libraries and you want to link your program as
+      a C program to avoid runtime dependencies on the C++ standard
+      libraries, set the variable <varname>LINK_AS_C</varname> to some
+      non-empty value in your <filename>Abuild.mk</filename>.  This
+      applies to all shared libraries and executables in the build
+      item.
      </para>
      <para>
       Most of the time, &abuild; manages all the dependencies of the
@@ -8600,7 +8621,7 @@ endif
    </sect1>
   </chapter>
   <chapter id="ref.abuild.groovy">
-   <title>The <application>Groovy</application> backend</title>
+   <title>The <application>Groovy</application> Backend</title>
    <note>
     <para>
      This part of the manual is not as narrative and thorough as it
