@@ -1,11 +1,15 @@
 1.1
 ===
 
+ * Deal with chapter 19 (Groovy Backend)
+
  * Figure out a way to create "native" compilers that aren't really
    native.  Must pass something to configure to make it think it's a
    cross compiler.  Probably have some way of registering a "native"
    compiler as not really being native and having this cause some
-   variable to be set that rules can use.
+   variable to be set that rules can use.  If this can't be done,
+   mention it in known limitations and mention the autoconf thing.
+   Probably also mention it in the compilers section.
 
  * Change build time message to avoid making error message parsers
    think it's an error message.  Maybe go with mm:ss for builds less
