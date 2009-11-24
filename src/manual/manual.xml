@@ -10286,7 +10286,10 @@ f {
      some systems (like Linux), you can also add directories to
      <filename>/etc/ld.so.conf</filename>.  On Windows, you can
      colocate the DLL files with the executables, or you can add the
-     directories containing the DLL files to your path.
+     directories containing the DLL files to your path.  When building
+     DLLs and executables with MSVC versions greater than or equal to
+     .NET 2005, &abuild; automatically embeds the manifest file in the
+     DLL or executable with the <command>mt</command> command.
     </para>
    </sect1>
    <sect1 id="ref.example.shared-library">
@@ -10560,9 +10563,9 @@ f {
      <classname>File</classname> objects that represent the build item
      directory and output directory of the item on behalf of which the
      rules are being invoked.  If the rules need to reference a file
-     inside of the build item that is
-     <emphasis>providing</emphasis>the rules, it should either set an
-     interface variable or access its location by name using
+     inside of the build item that is <emphasis>providing</emphasis>
+     the rules, it should either set an interface variable or access
+     its location by name using
      <varname>abuild.itemPaths[<replaceable>item-name</replaceable>]</varname>,
      where <replaceable>item-name</replaceable> is the name of the
      build item providing the rules.  &Abuild; only provides locations
@@ -10678,17 +10681,19 @@ f {
      something is happening, we generate a useful output message using
      <varname>@$(PRINT)</varname>.  The use of
      <varname>@$(PRINT)</varname> ensures that we don't see the actual
-     echo command even when running with <option>--verbose</option>,
-     and that we don't see the output at all when we're running with
-     <option>--silent</option>.  All informational messages should be
-     generated this way.  Note also that we invoke the code generator
-     with <command>perl</command> rather than assuming that it is
-     executable (since some version control systems or file systems
-     make it hard to preserve execute permissions) and that we specify
-     the path to the code generator in terms of
-     <varname>$(abDIR_derived-code-generator)</varname>.  Also notice
-     that we have to prefix the name of the input file with
-     <varname>$(SRCDIR)</varname> when we pass it to the code
+     echo command even when running with <option>--verbose</option>
+     (since otherwise, we'd see the <command>echo</command> command
+     immediately followed by the output of the <command>echo</command>
+     command), and that we don't see the output at all when we're
+     running with <option>--silent</option>.  All informational
+     messages should be generated this way.  Note also that we invoke
+     the code generator with <command>perl</command> rather than
+     assuming that it is executable (since some version control
+     systems or file systems make it hard to preserve execute
+     permissions) and that we specify the path to the code generator
+     in terms of <varname>$(abDIR_derived-code-generator)</varname>.
+     Also notice that we have to prefix the name of the input file
+     with <varname>$(SRCDIR)</varname> when we pass it to the code
      generator since we are running from the &abuild; output
      directory.  The <varname>VPATH</varname> variable tells
      <application>make</application> where to look, but it doesn't
