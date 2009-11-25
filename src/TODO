@@ -1,6 +1,13 @@
 1.1
 ===
 
+ * Manual
+
+   Write incomplete sections of Java/Groovy chapter
+   java example is not fully covered
+
+   main manual: continue from "dependency on a make variable"
+
  * Deal with chapter 19 (Groovy Backend)
 
  * Figure out a way to create "native" compilers that aren't really
