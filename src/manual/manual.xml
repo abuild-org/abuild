@@ -9843,8 +9843,10 @@ parameters {
      parameter, which &abuild; will automatically export to the
      environment.  &Abuild; also automatically exports
      <varname>TESTS</varname>, so you can pass it on the
-     <command>abuild</command> command line if you want to run a
-     subset of your tests.
+     <command>abuild</command> command line (e.g. <command>abuild
+     TESTS="one two"</command> to run <filename>one.test</filename>
+     and <filename>two.test</filename>) if you want to run a subset of
+     your tests.
     </para>
     <para>
      The easiest way to pass information from your build into your
@@ -9885,7 +9887,7 @@ parameters {
      are available to rule programmers.
     </para>
     <sect2 id="ref.java.abuild-object-interface">
-     <title>Interface to <classname>abuild</classname> Object</title>
+     <title>Interface to the <classname>abuild</classname> Object</title>
      <para>
       The <varname>abuild</varname> variable, provided in the Groovy
       binding to all scripts run in &abuild;, is the primary object
@@ -10738,6 +10740,7 @@ parameters {
      along with the files whose contents are show below.)
      <?example java/code-generator/rules/java/codegenerator-help.txt?>
      <?example java/library/Abuild.groovy?>
+     <?example java/executable/Abuild.groovy?>
      <?example java/code-generator/Abuild.conf?>
      <?example java/code-generator/Abuild.groovy?>
      <?example java/code-generator/Abuild.interface?>
