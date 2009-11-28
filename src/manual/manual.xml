@@ -9463,7 +9463,11 @@ parameters {
       At this time, this manual does not include any examples of
       creating high-level archives or signed JAR files.  To see
       examples, you may refer to &abuild;'s test suite, which fully
-      exercises all available functionality.
+      exercises all available functionality.  The most comprehensive
+      example that uses the Groovy framework is the code generator
+      example (<xref linkend="ref.example.code-generator.groovy"/>),
+      which also illustrates a few other aspects of the Groovy
+      framework.
      </para>
     </note>
     <sect2 id="ref.java.compile">
@@ -9549,10 +9553,8 @@ parameters {
       It is possible to have &abuild; generate multiple wrapper
       scripts that invoke the application using different
       <function>main</function> classes.  For details, see <xref
-      linkend="ref.groovy.advanced-java"/>.  Additionally, the Java
-      executable that is part of the Java code generation example
-      (<xref linkend="ref.example.code-generator.groovy"/>) creates
-      multiple wrapper scripts.
+      linkend="ref.groovy.advanced-java"/>.  For an example, see
+      (<xref linkend="ref.example.multiple-wrapper-scripts"/>).
      </para>
     </sect2>
     <sect2 id="ref.java.junit">
@@ -10865,24 +10867,256 @@ parameters {
    </sect1>
    <sect1 id="ref.example.code-generator.groovy">
     <title>Code Generator Example for Groovy</title>
+    <!--  Search for xrefs to this section.  The general Groovy    -->
+    <!--  documentation mentions that this is where a more         -->
+    <!--  comprehensive example can be found.  If better Groovy    -->
+    <!--  examples are eventually added, that disclaimer can       -->
+    <!--  probably be removed.                                     -->
     <para>
      The build tree containing the Java code generator example, built
      using the Groovy framework, can be found in the tree located at
      <filename>java</filename>.  The code generator itself is at
-     <filename>java/code-generator</filename>.
+     <filename>java/code-generator</filename>.  This example discusses
+     the code generator, and it also serves as a general example for
+     several aspects of the Groovy framework.
     </para>
     <para>
-     <!-- XXX -->
-     (Incomplete; for now, please read the comments and following
-     along with the files whose contents are show below.)
-     <?example java/code-generator/rules/java/codegenerator-help.txt?>
-     <?example java/library/Abuild.groovy?>
-     <?example java/executable/Abuild.groovy?>
+     In any situation in which code generators are used, there will
+     always be one build item that provides the code generator and one
+     or more build items that use the code generator.  In some cases,
+     the provider and user will be the same build item, but in the
+     most general case, the code generator will usually be provided by
+     a build item whose sole purpose is to provide the code generator.
+     In the Java world, a useful and common way to perform code
+     generation is through providing a custom ant task, which is what
+     we do here.
+    </para>
+    <para>
+     We'll start our examination by looking at the build item that
+     provides the code generator.  We provide a simple build item
+     whose name is just <filename>code-generator</filename>.  (In a
+     real implementation, you would obviously want to give this a more
+     specific name.)  Its <filename>Abuild.conf</filename> and
+     <filename>Abuild.groovy</filename> files reveal a very ordinary
+     build item:
      <?example java/code-generator/Abuild.conf?>
      <?example java/code-generator/Abuild.groovy?>
+     This build item generates a JAR file, but unlike most Java build
+     items, this JAR file is not intended to be added to the
+     compile-time, run-time, or package-time class paths.  Instead, we
+     just assign it to a specific interface variable so that it can be
+     used in the <command>taskdef</command> statement of the rules
+     implementation.  Here is the
+     <filename>Abuild.interface</filename> file:
      <?example java/code-generator/Abuild.interface?>
-     <?example java/code-generator/rules/java/codegenerator.groovy?>
+    </para>
+    <para>
+     Next, let's look at the example task itself.  This is just a
+     regular Java implementation of an ant task.  There's nothing
+     &abuild;-specific about it, but we'll show it here for
+     completeness.  This task just creates a class with a public
+     <function>negate</function> method that returns the opposite of
+     the number passed in.  The task takes the fully qualified class
+     name and the source directory into which the class should be
+     written as arguments.  Here is the implementation:
      <?example java/code-generator/src/java/com/example/codeGenerator/ExampleTask.java?>
+    </para>
+    <para>
+     To make this task available for use by other Java build items, we
+     have to provide an implementation of the appropriate rules.  The
+     implementation of the rules can be found in the file
+     <filename>rules/java/codegenerator.groovy</filename>.  This means
+     that people can use these rules by ensuring that
+     <filename>codegenerator</filename> appears in
+     <varname>abuild.Rules</varname>, almost certainly along with
+     <filename>java</filename>.  As is always advisable, we also
+     provide a rules help file, which is
+     <filename>rules/java/codegenerator-help.txt</filename>, is shown
+     here:
+     <?example java/code-generator/rules/java/codegenerator-help.txt?>
+    </para>
+    <para>
+     The implementation of the rules is heavily commented, but we'll
+     also provide some additional discussion following the text.  You
+     may wish to follow the implementation as you read the text in the
+     rest of this section.  Here is the code generator implementation:
+     <?example java/code-generator/rules/java/codegenerator.groovy?>
+    </para>
+    <para>
+     <!-- XXX HERE -->
+     In the Groovy programming language, a
+     <firstterm>script</firstterm> is a special type of class that has
+     access to read and modify variables in the
+     <firstterm>binding</firstterm>.  This is a powerful facility that
+     makes it easy to communicate between the script and the caller of
+     the script.  &Abuild; makes use of the binding to provide the ant
+     project and other state to rules implementations.  However, one
+     downside is that any undeclared variable becomes part of the
+     binding, which may not be what you intended.  To minimize
+     unintended consequences of using undeclared variables, we
+     recommend the practice of doing most of the work inside a class.
+     For any script that contains any code other than a single class
+     implementation, Groovy automatically creates a class named after
+     the file.  Since our rules implementation defines a class and
+     then also contains other code, we set the name of the class
+     explicitly to something other than the name of the file.  This
+     this case, the base part of the file name is
+     <filename>codegenerator</filename>, but we name the class inside
+     of it <classname>CodeGenerator</classname>.  Our class's
+     constructor takes as arguments a reference to the
+     <classname>abuild</classname> object (see <xref
+     linkend="ref.java.abuild-object-interface"/>) and to the ant
+     project (see <xref linkend="ref.groovy.ant-project"/>).  This is
+     a common pattern suitable for use for just about any rule
+     implementation.  The constructor performs global setup.  In this
+     case, we just call <function>ant.taskdef</function>, as would be
+     done by virtually any task-providing custom rules.  Other things
+     that would be appropriate to do in your constructor would be
+     initializing additional fields of your object or doing any other
+     types of operations that would be common in class constructors.
+     The main things you should <emphasis>not</emphasis> do are to
+     perform operations that depend on users' parameter settings or on
+     state of an in-progress build since, at the this is loaded, not
+     all initialization is necessarily in place.
+    </para>
+    <para>
+     Right after the constructor, we have the implementation of
+     <function>codegenTarget</function>.  This method will be used as
+     the closure for the target provided by these rules.  This target
+     follows the pattern expected to be used for all but the most
+     trivial rules: it sets up a default attributes list whose fields
+     are initialized from parameters intended to be set in users'
+     <filename>Abuild.groovy</filename> files.  Here, we initialize
+     the <option>classname</option> field from the
+     <varname>codeGenerator.classname</varname> parameter.  This is
+     what makes it possible for the user to specify the name of the
+     class to be generated by setting that parameter or,
+     alternatively, by providing lists of maps containing the
+     <option>classname</option> key.  Once we provide our default
+     attributes, we can just call
+     <function>abuild.runActions</function>.  The
+     <function>abuild.runActions</function> method takes three
+     arguments: the name of the control parameter, a closure that
+     implements the required actions, and the default attributes.  The
+     closure, which here uses the Groovy method closure syntax of
+     <literal><replaceable>object</replaceable>.&amp;<replaceable>method</replaceable></literal>
+     syntax, will be invoked with a map.  This map will always have
+     any keys in it that are defined in the
+     <varname>defaultAttrs</varname> argument.
+    </para>
+    <para>
+     The next significant chunk of code here is the
+     <function>codegen</function> method.  This is the method that
+     actually does the work.  Everything up to this point has just
+     been scaffolding.  The <function>codegen</function> method takes
+     a single parameter: a map of attributes.  Any key provided in the
+     default attributes is known to be defined.  Any other keys can be
+     used at the discretion of the code.  A common convention, which
+     is used by most of &abuild;'s built-in targets, is to take extra
+     attributes and just pass them along to whichever underlying ant
+     task is doing the real work.  In this case, we simply ignore
+     extra attributes since the work is being done by a custom task,
+     and we have already handled all available options.  In this code,
+     we set the <varname>className</varname> variable to a field of
+     the <varname>attributes</varname> element.  Other common idioms
+     would be to set something conditionally upon whether something is
+     defined or to set something and also to delete the attribute.
+     For examples of these, please refer to the implementation of the
+     built-in <filename>java</filename> rules (<xref
+     linkend="ref.rules.java.groovy"/>).  The actual implementation of
+     our code generator target just does a few sanity checks and then
+     invokes the task using the task we've provided.  Notice that we
+     use <varname>java.dir.generatedSrc</varname> as the directory in
+     which to write the generated class.  This is what all code
+     generators should do.  By using
+     <function>abuild.resolve</function> to get the value at this
+     point, we ensure that any changes the user may have made to the
+     value of that parameter will be properly accounted for.
+     Resolving the parameter as needed is a better implementation
+     choice than reading the parameter value in the constructor and
+     stashing it in a field as it prevents rules from ignoring late
+     changes to the value of the parameter.
+    </para>
+    <para>
+     Finally, we come to the code that resides outside the
+     <classname>CodeGenerator</classname> class.  This code just
+     creates an instance of the class, passing to it the
+     <varname>abuild</varname> and <varname>ant</varname> objects from
+     the binding, and then adds the <function>codegenTarget</function>
+     method as a closure for the <command>generate</command> target,
+     again using Groovy's method closure syntax.  Sometimes you might
+     want to do other checks here, such as making sure other required
+     rules have been loaded.  &Abuild;'s built-in
+     <filename>groovy</filename> rules do this.  The implementation of
+     those rules is included in <xref
+     linkend="ref.rules.java.groovy"/>.
+    </para>
+    <para>
+     Now that we've seen how the rules are implemented, we can see how
+     the rules are used.  The good news is that using the rules is
+     much simpler than implementing them.  This is as it should be:
+     creation of rules is a much more advanced operation that needs to
+     be performed by people with more in-depth knowledge of &abuild;.
+     Using rules should be very simple.  Our
+     <filename>library</filename> build item in
+     <filename>java/library</filename> makes use of the cod
+     generator.  To do this, it must declare a dependency on the
+     <filename>code-generator</filename> build item:
+     <?example java/library/Abuild.conf?>
+     and it must set the required parameter to generate the class.  In
+     this case, we use
+     <classname>com.example.library.Negator</classname> as the fully
+     qualified class name, as you can see by looking at the
+     <filename>Abuild.groovy</filename> file:
+     <?example java/library/Abuild.groovy?>
+     We also include one statically coded Java source file which,
+     along with the generated class, will be packaged into
+     <filename>example-library.jar</filename>.  Here, for
+     completeness, is the text of the additional source file, which
+     just wraps around the generated class:
+     <?example java/library/src/java/com/example/library/Library.java?>
+     Finally, as for any well-behaved Java build item that exports a
+     JAR file, we add the JAR file to the regular compile-time class
+     path as well as to the manifest class path.  We do this here by
+     following
+     <varname>archiveName</varname>/<varname>archivePath</varname>
+     convention first discussed in <xref
+     linkend="ref.example.basic.java-library"/> and by adding the
+     archive file to both <varname>abuild.classpath</varname> and
+     <varname>abuild.classpath.manifest</varname>.  Here is the
+     <filename>Abuild.interface</filename> file:
+     <?example java/library/Abuild.interface?>
+     The example in <xref
+     linkend="ref.example.multiple-wrapper-scripts"/> creates an
+     executable that tests this library.
+    </para>
+   </sect1>
+   <sect1 id="ref.example.multiple-wrapper-scripts">
+    <title>Multiple Wrapper Scripts</title>
+    <para>
+     This example illustrates use of a target's control parameter to
+     cause that target to be run multiple times.  In this case, we set
+     the <varname>java.wrapper</varname> parameter to a list of maps
+     so that we can generate two wrapper scripts.  One of them is used
+     to test the library and code generator discussed in <xref
+     linkend="ref.example.code-generator.groovy"/>, and also
+     illustrates reading a file that was placed in the JAR by placing
+     it in <filename>src/resources</filename>.  The other
+     <function>main</function> just prints a message.
+     Here is the very ordinary <filename>Abuild.conf</filename>:
+     <?example java/executable/Abuild.conf?>
+     Here is the first main class:
+     <?example java/executable/src/java/com/example/executable/Executable.java?>
+     Here is the file it reads from resources:
+     <?example java/executable/src/resources/com/example/file.txt?>
+     Here is the second main class:
+     <?example java/executable/src/java/com/example/executable/Other.java?>
+     Finally, here is the <filename>Abuild.groovy</filename> file.
+     Observe here how we set the <varname>java.wrapper</varname>
+     parameter to a list of maps by appending one map at a time.  This
+     is one of many syntaxes that could be used, but it uses less
+     extraneous punctuation than many of the other choices:
+     <?example java/executable/Abuild.groovy?>
     </para>
    </sect1>
    <sect1 id="ref.example.auto-from-variable">
@@ -11337,8 +11571,7 @@ parameters {
      </para>
     </sect2>
    </sect1>
-  </chapter>
-  <chapter id="ref.interface-flags">
+  </chapter>  <chapter id="ref.interface-flags">
    <!--  This chapter must follow the backing areas chapter since  -->
    <!--  the private interface flags examples are in a tree with   -->
    <!--  a backing area.                                           -->
@@ -21606,12 +21839,17 @@ Y = $(X)
    <?include-file rules/object-code/ccxx.mk?>
   </appendix>
   <appendix id="ref.rules.java.groovy">
-   <title>The <filename>java.groovy</filename> File</title>
+   <title>
+    The <filename>java.groovy</filename> and
+    <filename>groovy.grooyv</filename> Files
+   </title>
    <para>
     Here we include a complete copy of
-    <filename>rules/groovy/java.groovy</filename>.
+    <filename>rules/groovy/java.groovy</filename> and
+    <filename>rules/groovy/groovy.groovy</filename>.
    </para>
    <?include-file rules/java/java.groovy?>
+   <?include-file rules/java/groovy.groovy?>
   </appendix>
   <appendix id="ref.deprecated-ant">
    <title>The Deprecated XML-based Ant Backend</title>

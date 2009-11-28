@@ -1,1 +1,5 @@
-abuild.classpath = $(ABUILD_OUTPUT_DIR)/dist/example-library.jar
+declare library.archiveName string = example-library.jar
+declare library.archivePath filename = \
+   $(ABUILD_OUTPUT_DIR)/dist/$(library.archiveName)
+abuild.classpath = $(library.archivePath)
+abuild.classpath.manifest = $(library.archivePath)

@@ -50,11 +50,12 @@ class CodeGenerator
         // runActions will call the closure with the default
         // attributes.  Otherwise, the control parameter must contain
         // a list.  Each element of the list is either a map or a
-        // closure.  If it is a map, any keys in defaultAttrs that are
-        // not present in the map will be added to the map.  Then the
-        // default closure will be called with the resulting map.  If
-        // the element is a closure, the closure will be called, and
-        // the default closure and attributes will be ignored.
+        // closure and will cause some action to be performed.  If it
+        // is a map, any keys in defaultAttrs that are not present in
+        // the map will be added to the map.  Then the default closure
+        // will be called with the resulting map.  If the element is a
+        // closure, the closure will be called, and the default
+        // closure and attributes will be ignored.
         abuild.runActions('codeGenerator.codegen', this.&codegen, defaultAttrs)
     }
 
