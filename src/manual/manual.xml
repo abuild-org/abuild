@@ -4710,6 +4710,26 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      classpath.
     </para>
    </sect1>
+   <sect1 id="ref.custom-test-framework">
+    <title>Integration with Custom Test Frameworks</title>
+    <para>
+     Adding support for your additional test frameworks is
+     straightforward and can be done by creating a plugin that adds
+     the appropriate code to the appropriate targets.  For make-based
+     items, you must make sure that your tests are run by the
+     <command>check</command>, <command>test</command>, and
+     <command>test-only</command> targets.  For Groovy-based items,
+     you must make sure that your tests are run by the
+     <command>test-only</command> target, and &abuild; will take care
+     of making sure it is run by the <command>test</command> and
+     <command>check</command> targets.  For details on plugins, see
+     <xref linkend="ref.plugins"/>.  For details on writing make
+     rules, see <xref
+     linkend="ref.guidelines-for-make-rule-authors"/>.  For details on
+     writing rules for the Groovy backend, see <xref
+     linkend="ref.guidelines-for-groovy-target-authors"/>.
+    </para>
+   </sect1>
   </chapter>
   <chapter id="ref.backing-areas">
    <!--  This chapter must precede the interface flags chapter     -->
@@ -9091,7 +9111,7 @@ parameters {
      that it uses by convention when performing Java builds.  It is
      possible to override all of these paths by setting specific
      parameters as described in <xref
-     linkend="ref.java.file-locations"/>.  In this section, we just
+     linkend="ref.groovy.advanced-java"/>.  In this section, we just
      provide a quick overview of the default paths.
     </para>
     <para>
@@ -9254,272 +9274,6 @@ parameters {
      </tgroup>
     </table>
    </sect1>
-   <sect1 id="ref.groovy.basic-java">
-    <title>Basic Java Rules Functionality</title>
-    <para>
-     Virtually all Java-based build items will set the
-     <varname>abuild.rules</varname> parameter to the value
-     <literal>'java'</literal> or to a list that includes that value.
-     The <filename>java</filename> rules are quite flexible and give
-     you considerable leeway on how things should work.  In this
-     section, we will describe only the most basic use of the
-     <filename>java</filename> rules.  When using the rules in this
-     way, you control everything that you are going to build by
-     setting a few simple parameters, and you set up your build
-     item's directory structure according to &abuild;'s conventions.
-     In later sections, we will discuss various ways to customize or
-     override &abuild;'s default behavior.
-    </para>
-    <para>
-     The <filename>java</filename> rules perform a variety of
-     functions, most of which must be enabled by setting one or more
-     parameters.  With appropriate parameters, the
-     <filename>java</filename> rules can perform the following tasks:
-     <itemizedlist>
-      <listitem>
-       <para>
-        Compiling Java source code into class files
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Generating Javadoc documentation
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Creating JAR files populated by class files and other
-        arbitrary contents
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Creating simple wrapper scripts that run executable JAR files
-        in the context of the source tree; these wrapper scripts are
-        useful for testing within the source tree, but not for
-        installation or deployment
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Creating WAR files that contain locally produced files as well
-        as signed JAR files or other content
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Producing higher-level JAR-like archives, such as RAR files,
-        that may contain other JAR files
-       </para>
-      </listitem>
-      <listitem>
-       <para>
-        Creating EAR files that may contain locally produced files
-        including other archives as well as other content
-       </para>
-      </listitem>
-     </itemizedlist>
-     We will discuss each of these briefly in turn.  In the
-     discussions below, we describe the default behavior of each of
-     these capabilities.  Keep in mind that virtually every aspect of
-     them, including all the default paths and file locations, can be
-     customized.  We will be describing how to customize and override
-     the default behavior in later sections.
-    </para>
-    <para>
-     The sections below include prose descriptions of the default
-     locations of files.  To see all this presented in one place,
-     please refer to <xref linkend="ref.groovy.directory-structure"/>.
-    </para>
-    <sect2 id="ref.java.compile">
-     <title>Compiling Java Source Code</title>
-     <para>
-      By default, Java compilation involves compiling with
-      <command>javac</command> every <filename>.java</filename> file
-      found in <filename>src/java</filename> and writing the output
-      files into <filename>abuild-java/classes</filename>.  In
-      addition to <filename>src/java</filename>, &abuild; also looks
-      for Java sources in <filename>abuild-java/src/java</filename>,
-      which is where automatic code generators are expected to put
-      generated Java sources.  If you wish to specify additional
-      locations in which &abuild; should look for Java sources, you
-      may append those paths to the parameter
-      <varname>java.dir.extraSrc</varname>.  You can also override the
-      normal location where &abuild; looks for your hand-coded Java
-      sources and for generated sources as well as the location where
-      it writes class files.  For information, see <xref
-      linkend="ref.java.file-locations"/>.
-     </para>
-     <para>
-      By default, &abuild; invokes <command>javac</command> with
-      <option>debug</option> and <option>deprecation</option> turned
-      on and with the additional arguments <option>-Xlint</option> and
-      <option>-Xlint:-path</option>.  These can be customized by using
-      the more advanced control parameter-based customization method
-      as discussed in <xref linkend="ref.java.control-parameters"/>.
-     </para>
-    </sect2>
-    <sect2 id="ref.java.jar">
-     <title>Building Basic Jar Files</title>
-     <para>
-      If the <varname>java.jarName</varname> parameter is set,
-      &abuild; will create a JAR file with the indicated name.  For an
-      example of this, see <xref
-      linkend="ref.example.basic.java-library"/>.  By default, you are
-      expected to put any hand-created files other than class files in
-      <filename>src/resources</filename>.  Build items that
-      automatically generate additional files to include in the JAR
-      file should place those files in
-      <filename>abuild-java/src/resources</filename>.  All files in
-      <filename>src/resources</filename>,
-      <filename>abuild-java/classes</filename>, and
-      <filename>abuild-java/src/resources</filename>, subject to the
-      usual ant exclusions (version control directories, editor backup
-      files, etc.), will be included in the JAR file.  You may specify
-      additional directories whose contents should be included by
-      appending the names of the directories to the parameter
-      <varname>java.dir.extraResources</varname>.  Additionally, any
-      files in the <filename>src/conf/META-INF</filename> and
-      <filename>abuild-java/src/conf/META-INF</filename> directories
-      will be included in the <filename>META-INF</filename> directory
-      of the JAR file.  You can specify additional META-INF
-      directories by setting the parameter
-      <varname>java.dir.extraMetainf</varname>.
-     </para>
-     <para>
-      As always, all default path names may be overridden; see <xref
-      linkend="ref.java.file-locations"/>.  It is also possible to
-      provide additional arguments to the <command>jar</command> task,
-      to set additional keys in the <filename>manifest</filename>, and
-      to create multiple JAR targets.  These customizations can be
-      performed using the control parameter, as described in <xref
-      linkend="ref.java.control-parameters"/>.
-     </para>
-    </sect2>
-    <sect2 id="ref.java.wrapper-scripts">
-     <title>Wrapper Scripts</title>
-     <para>
-      If the <varname>java.wrapperName</varname> and
-      <varname>java.mainClass</varname> parameters are set in addition
-      to the <varname>java.jarname</varname> parameter, &abuild; will
-      generate a simple wrapper script that will invoke
-      <command>java</command> on the JAR file using the specified main
-      class.  For an example of this, see <xref
-      linkend="ref.example.basic.java-program"/>. The wrapper script
-      is placed directly in the &abuild; output directory.  Using the
-      control parameter (<xref
-      linkend="ref.java.control-parameters"/>), it is possible to
-      create multiple wrapper scripts.  We also illustrate this in
-      <xref linkend="ref.example.code-generator.groovy"/>.<!-- XXX
-      maybe we should pull the multiple wrappers out into a separate
-      example section, though it can stay in the same tree -->
-     </para>
-    </sect2>
-    <sect2 id="ref.java.junit">
-     <title>Testing with JUnit</title>
-     <para>
-      If you have implemented JUnit tests suites, you can run them
-      using either the <command>test</command> or
-      <command>batchtest</command> nested tasks of the
-      <command>junit</command> ant task.  If you have a single test
-      suite that you want to run, you can set the
-      <varname>java.junitTestsuite</varname> parameter to the name of
-      the class that implements the test suite.  If you want to run
-      multiple test suites using the <command>batchtest</command>
-      task, you can set the parameter
-      <varname>java.junitBatchIncludes</varname> and optionally also
-      <varname>java.junitBatchExcludes</varname> to patterns that will
-      be matched against the classes in
-      <filename>abuild-java/classes</filename>.  You may provide
-      values for all of these if you wish, in which case &abuild; will
-      run all test specified.  &Abuild; will write XML test output to
-      the <filename>abuild-java/junit</filename> directory and,
-      whether the tests pass or fail, will also generate an HTML
-      report in <filename>abuild-java/junit/html</filename>.  By
-      default, if the test fails, the &ldquo;build&rdquo; of the
-      <command>test</command> target for the item will fail.  This and
-      other behavior can be overridden using a control parameter
-      (<xref linkend="ref.java.control-parameters"/>).
-     </para>
-    </sect2>
-    <sect2 id="ref.java.jar-signing">
-     <title>JAR Signing</title>
-     <para>
-      <!-- XXX Remember to mention that lazy JAR signing is true by
-           default (even though it is false by default in the ant
-           task) in order to have idempotent builds. -->
-      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
-      Search for <literal>TARGET: sign-jars</literal>.)
-     </para>
-    </sect2>
-    <sect2 id="ref.java.war">
-     <title>WAR Files</title>
-     <para>
-      If you wish to build a WAR file, you must set the
-      <varname>java.warname</varname> parameter to the name of the WAR
-      file and the <varname>java.webxml</varname> parameter to the
-      path to the <filename>web.xml</filename> file for that WAR.  The
-      <varname>java.webxml</varname> parameter may be set to a
-      relative path, in which case it is resolved relative to the
-      build item's top-level directory (the directory containing
-      <filename>Abuild.groovy</filename>).  By default, &abuild; will
-      package into <filename>WEB-INF/classes</filename> the contents
-      of <filename>src/resources</filename>,
-      <filename>abuild-java/classes</filename>,
-      <filename>abuild-java/src/resources</filename> and any
-      additional directories named in
-      <varname>java.dir.extraResources</varname>.  It will also
-      package at the root of the WAR file any files in
-      <filename>src/web/content</filename>,
-      <filename>abuild-java/src/web/content</filename>, and any
-      directories named in
-      <varname>java.dir.extraWebContent</varname>.  It will populate
-      <filename>META-INF</filename> exactly as it does for JAR files.
-      The <filename>WEB-INF</filename> directory will be populated
-      from <filename>src/web/WEB-INF</filename>,
-      <filename>abuild-java/src/web/WEB-INF</filename>, and any
-      directories named in <varname>java.dir.extraWebinf</varname>.
-     </para>
-     <para>
-      <!-- XXX -->
-      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
-      Search for <literal>TARGET: package-war</literal>.)
-     </para>
-    </sect2>
-    <sect2 id="ref.java.high-level-archives">
-     <title>High Level Archives</title>
-     <para>
-      <!-- XXX -->
-      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
-      Search for <literal>TARGET: package-high-level-archive</literal>.)
-     </para>
-    </sect2>
-    <sect2 id="ref.java.ear">
-     <title>EAR Files</title>
-     <para>
-      <!-- XXX -->
-      (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
-      Search for <literal>TARGET: package-ear</literal>.)
-     </para>
-    </sect2>
-   </sect1>
-   <sect1 id="ref.java.file-locations">
-    <title>Advanced Customization: Overriding File Locations</title>
-    <para>
-     <!-- XXX -->
-     (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
-     Search for <literal>DEFAULT PARAMETERS</literal>.)
-    </para>
-   </sect1>
-   <sect1 id="ref.java.control-parameters">
-    <title>Advanced Customization: Control Parameters</title>
-    <para>
-     <!-- XXX -->
-     (Incomplete; for now, see <xref linkend="ref.help.rule.java"/>.
-     Layers of customization is described at the beginning of
-     <literal>GENERAL INFORMATION</literal>.)
-    </para>
-   </sect1>
    <sect1 id="ref.groovy.java-classpaths">
     <title>Class Paths and Class Path Variables</title>
     <para>
@@ -9622,9 +9376,363 @@ parameters {
      The other way these can be overridden is to specifically override
      the classpath that is used by each target.  This can be done by
      using control parameters, as discussed in <xref
-     linkend="ref.java.control-parameters"/>.  Each target's
+     linkend="ref.groovy.advanced-java"/>.  Each target's
      attributes map contains a key that can be set to supply a new
      value for whichever classpaths need to be changed.
+    </para>
+   </sect1>
+   <sect1 id="ref.groovy.basic-java">
+    <title>Basic Java Rules Functionality</title>
+    <para>
+     Virtually all Java-based build items will set the
+     <varname>abuild.rules</varname> parameter to the value
+     <literal>'java'</literal> or to a list that includes that value.
+     The <filename>java</filename> rules are quite flexible and give
+     you considerable leeway on how things should work.  In this
+     section, we will describe only the most basic use of the
+     <filename>java</filename> rules.  When using the rules in this
+     way, you control everything that you are going to build by
+     setting a few simple parameters, and you set up your build item's
+     directory structure according to &abuild;'s conventions.  In
+     later sections, we will discuss other more general ways to
+     customize or override &abuild;'s default behavior.
+    </para>
+    <para>
+     The <filename>java</filename> rules perform a variety of
+     functions, most of which must be enabled by setting one or more
+     parameters.  With appropriate parameters, the
+     <filename>java</filename> rules can perform the following tasks:
+     <itemizedlist>
+      <listitem>
+       <para>
+        Compiling Java source code into class files
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Generating Javadoc documentation
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating JAR files populated by class files and other
+        arbitrary contents
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating simple wrapper scripts that run executable JAR files
+        in the context of the source tree; these wrapper scripts are
+        useful for testing within the source tree, but not for
+        installation or deployment
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating WAR files that contain locally produced files as well
+        as signed JAR files or other content
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Producing higher-level JAR-like archives, such as RAR files,
+        that may contain other JAR files
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Creating EAR files that may contain locally produced files
+        including other archives as well as other content
+       </para>
+      </listitem>
+     </itemizedlist>
+     We will discuss each of these briefly in turn.  In the
+     discussions below, we describe the default behavior of each of
+     these capabilities.  Keep in mind that virtually every aspect of
+     them, including all the default paths and file locations, can be
+     customized.  We will be describing how to customize and override
+     the default behavior in later sections.
+    </para>
+    <para>
+     The sections below include prose descriptions of the default
+     locations of files.  To see all this presented in one place,
+     please refer to <xref linkend="ref.groovy.directory-structure"/>.
+    </para>
+    <note>
+     <para>
+      At this time, this manual does not include any examples of
+      creating high-level archives or signed JAR files.  To see
+      examples, you may refer to &abuild;'s test suite, which fully
+      exercises all available functionality.
+     </para>
+    </note>
+    <sect2 id="ref.java.compile">
+     <title>Compiling Java Source Code</title>
+     <para>
+      By default, Java compilation involves compiling with
+      <command>javac</command> every <filename>.java</filename> file
+      found in <filename>src/java</filename> and writing the output
+      files into <filename>abuild-java/classes</filename>.  In
+      addition to <filename>src/java</filename>, &abuild; also looks
+      for Java sources in <filename>abuild-java/src/java</filename>,
+      which is where automatic code generators are expected to put
+      generated Java sources.  You may add additional directories in
+      which &abuild; will search for <filename>.java</filename> files
+      to compile by adding the names of the directories to the
+      <varname>java.dir.extraSrc</varname> parameter.
+     </para>
+     <para>
+      By default, &abuild; invokes <command>javac</command> with
+      <option>debug</option> and <option>deprecation</option> turned
+      on and with the additional arguments <option>-Xlint</option> and
+      <option>-Xlint:-path</option>.
+     </para>
+     <para>
+      You may customize Java compilation in several ways including
+      changing the locations in which &abuild; finds source files or
+      writes output files, changing the compile-time classpath, or
+      changing the attributes passed to the ant
+      <command>javac</command> task.  For details, see <xref
+      linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.jar">
+     <title>Building Basic Jar Files</title>
+     <para>
+      If the <varname>java.jarName</varname> parameter is set,
+      &abuild; will create a JAR file with the indicated name.  For an
+      example of this, see <xref
+      linkend="ref.example.basic.java-library"/>.  By default, you are
+      expected to put any hand-created files other than class files in
+      <filename>src/resources</filename>.  Build items that
+      automatically generate additional files to include in the JAR
+      file should place those files in
+      <filename>abuild-java/src/resources</filename>.  All files in
+      <filename>src/resources</filename>,
+      <filename>abuild-java/classes</filename>, and
+      <filename>abuild-java/src/resources</filename>, subject to the
+      usual ant exclusions (version control directories, editor backup
+      files, etc.), will be included in the JAR file.  You may specify
+      additional directories whose contents should be included by
+      appending the names of the directories to the parameter
+      <varname>java.dir.extraResources</varname>.  Additionally, any
+      files in the <filename>src/conf/META-INF</filename> and
+      <filename>abuild-java/src/conf/META-INF</filename> directories
+      will be included in the <filename>META-INF</filename> directory
+      of the JAR file.  You can specify additional META-INF
+      directories by setting the parameter
+      <varname>java.dir.extraMetainf</varname>.
+     </para>
+     <para>
+      As always, all default path names may be overridden.  It is also
+      possible to provide additional arguments to the
+      <command>jar</command> task, to set additional keys in the
+      <filename>manifest</filename>, and to create multiple JAR
+      targets.  For details, see <xref
+      linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.wrapper-scripts">
+     <title>Wrapper Scripts</title>
+     <para>
+      If the <varname>java.wrapperName</varname> and
+      <varname>java.mainClass</varname> parameters are set in addition
+      to the <varname>java.jarName</varname> parameter, &abuild; will
+      generate a simple wrapper script that will invoke
+      <command>java</command> on the JAR file using the specified main
+      class and with the calculated or specified runtime class path.
+      For an example of this, see <xref
+      linkend="ref.example.basic.java-program"/>. The wrapper script
+      is placed directly in the &abuild; output directory.
+     </para>
+     <para>
+      It is possible to have &abuild; generate multiple wrapper
+      scripts that invoke the application using different
+      <function>main</function> classes.  For details, see <xref
+      linkend="ref.groovy.advanced-java"/>.  Additionally, the Java
+      executable that is part of the Java code generation example
+      (<xref linkend="ref.example.code-generator.groovy"/>) creates
+      multiple wrapper scripts.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.junit">
+     <title>Testing with JUnit</title>
+     <para>
+      If you have implemented JUnit tests suites, you can run them
+      using either the <command>test</command> or
+      <command>batchtest</command> nested tasks of the
+      <command>junit</command> ant task.  If you have a single test
+      suite that you want to run, you can set the
+      <varname>java.junitTestsuite</varname> parameter to the name of
+      the class that implements the test suite.  If you want to run
+      multiple test suites using the <command>batchtest</command>
+      task, you can set the parameter
+      <varname>java.junitBatchIncludes</varname> and optionally also
+      <varname>java.junitBatchExcludes</varname> to patterns that will
+      be matched against the classes in
+      <filename>abuild-java/classes</filename>.  You may provide
+      values for all of these if you wish, in which case &abuild; will
+      run all test specified.  &Abuild; will write XML test output to
+      the <filename>abuild-java/junit</filename> directory and,
+      whether the tests pass or fail, will also generate an HTML
+      report in <filename>abuild-java/junit/html</filename>.  By
+      default, if the test fails, the &ldquo;build&rdquo; of the
+      <command>test</command> target for the item will fail.  This and
+      other behavior can be overridden; see <xref
+      linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.jar-signing">
+     <title>JAR Signing</title>
+     <para>
+      When creating WAR files, EAR files, or other high-level archives
+      that may contain other JAR files, JAR signing is available by
+      default.  In order for &abuild; to sign any JAR files, you must
+      set the <varname>java.sign.alias</varname> and
+      <varname>java.sign.storepass</varname> parameters, which
+      correspond to the mandatory <option>alias</option> and
+      <option>storepass</option> attributes of the
+      <command>signjar</command> ant task.  You will usually also want
+      to set the <varname>java.sign.keystore</varname> and
+      <varname>java.sign.keypass</varname> parameters, corresponding
+      to the <option>keystore</option> and <option>keypass</option>
+      attributes to the <command>signjar</command> task.  In most
+      cases, you will set these parameters in one place.  This place
+      can be either a plugin or a single build item that all build
+      items that sign JARs will depend on.  It's okay to put these in
+      a plugin if all JARs in your project will be signed in the same
+      way.
+     </para>
+     <para>
+      Setting the above parameters is necessary in order to have any
+      JARs be signed, but it is not sufficient; you must also indicate
+      which JARs are to be signed, which you will generally do in the
+      higher-level archive build item that actually does the signing.
+      The usual way to do this is to set the
+      <varname>java.jarsToSign</varname> parameter to a list of paths
+      to JAR files that should be signed.  Although these JARs are
+      typically created by other build items, you should never have
+      your build item's <filename>Abuild.groovy</filename> file refer
+      to JARs created by other build items directly by path even using
+      a relative path.  Instead, you should always have the build item
+      that creates the JAR file provide the path to the JAR file with
+      an &abuild; interface variable, and you should add that to the
+      <varname>java.jarsToSign</varname> parameter by calling
+      <function>abuild.resolve</function> on the interface variable.
+      This way, your build item will continue to work even if the one
+      that provides the JAR file moves or is resolved in a backing
+      area.
+     </para>
+     <para>
+      It is also possible to arrange for JARs to be signed by having
+      them appear in the <filename>abuild-java/signed-jars</filename>
+      directory.  This case can be useful if the same build item that
+      is signing the JAR files is also creating them, either because
+      it is actually compiling Java code itself or because it is
+      repackaging other JAR files.  However, if you find yourself
+      writing code that just copies other JAR files into
+      <filename>abuild-java/signed-jars</filename>, then you should
+      probably be assigning the paths to the those JAR files to the
+      <varname>java.jarsToSign</varname> parameter instead.
+     </para>
+     <para>
+      Whichever method you use, or even if you use both methods
+      together, the signed JARs will be placed in the
+      <filename>abuild-java/signed-jars</filename> directory.  Since
+      &abuild; will sign unsigned JARs in that directory, &abuild;
+      invokes the <command>signjar</command> task with lazy JAR
+      signing by default.  If it didn't, then every time you invoked
+      &abuild;, it would re-sign all JAR files in that directory even
+      if they were already signed.  Lazy JAR signing allows &abuild;
+      to avoid repeatedly signing the same JARs, which makes it
+      possible to have &abuild; do nothing if invoked on an area that
+      is fully built.  (In other words, this allows builds to be
+      <emphasis>idempotent</emphasis>.)  If you have a reason not to
+      use lazy JAR signing, it is possible to disable it and override
+      the JAR signing behavior to avoid re-signing the JARs, but this
+      should seldom if ever be required.  For details on the full
+      range of customization opportunities available, please see <xref
+      linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.war">
+     <title>WAR Files</title>
+     <para>
+      If you wish to build a WAR file, you must set the
+      <varname>java.warname</varname> parameter to the name of the WAR
+      file and the <varname>java.webxml</varname> parameter to the
+      path to the <filename>web.xml</filename> file for that WAR.  The
+      <varname>java.webxml</varname> parameter may be set to a
+      relative path, in which case it is resolved relative to the
+      build item's top-level directory (the directory containing
+      <filename>Abuild.groovy</filename>).  By default, &abuild; will
+      package into <filename>WEB-INF/classes</filename> the contents
+      of <filename>src/resources</filename>,
+      <filename>abuild-java/classes</filename>,
+      <filename>abuild-java/src/resources</filename> and any
+      additional directories named in
+      <varname>java.dir.extraResources</varname>.  It will also
+      package at the root of the WAR file any files in
+      <filename>src/web/content</filename>,
+      <filename>abuild-java/src/web/content</filename>, and any
+      directories named in
+      <varname>java.dir.extraWebContent</varname>.  It will populate
+      <filename>META-INF</filename> exactly as it does for JAR files.
+      The <filename>WEB-INF</filename> directory will be populated
+      from <filename>src/web/WEB-INF</filename>,
+      <filename>abuild-java/src/web/WEB-INF</filename>, and any
+      directories named in <varname>java.dir.extraWebinf</varname>.
+      For additional information about creating WAR files, please see
+      <xref linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.high-level-archives">
+     <title>High Level Archives</title>
+     <para>
+      &Abuild; includes default rules for creation of high-level
+      archives, in addition to WAR and EAR files, that may contain
+      other JAR files, including signed JARs.  To create a JAR-like
+      high-level archive, set the parameter
+      <varname>java.highLevelArchiveName</varname> to the name of the
+      archive to be created.  By default, the archive is populated
+      exactly as a regular JAR file is, including pulling files from
+      all the same places.  In addition, by default, high-level
+      archives contain all archives in the package class path at the
+      root of the archive.  The list of additional files to package in
+      the high-level archive can be customized along with all the
+      things that can be customized for regular JAR files.  For
+      details, see <xref linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+    <sect2 id="ref.java.ear">
+     <title>EAR Files</title>
+     <para>
+      To create an EAR file, you must set the
+      <varname>java.earName</varname> and
+      <varname>java.appxml</varname> parameters.  EAR files are
+      populated with the same files from the same places as high-level
+      JAR-like archives, including packaging all items from the
+      package class path at the root of the EAR file,
+      <emphasis>except</emphasis> that they to not contain files from
+      <filename>abuild-java/classes</filename>.  For additional
+      information about customizing creation of EAR files, see <xref
+      linkend="ref.groovy.advanced-java"/>.
+     </para>
+    </sect2>
+   </sect1>
+   <sect1 id="ref.groovy.advanced-java">
+    <title>Advanced Customization of Java Rules</title>
+    <para>
+     &Abuild;'s Java rules can be customized using a layered approach.
+     At the most basic level, you can set specific parameters that
+     tell &abuild; how to run its normal rules.  As you need more
+     advanced functionality, you can override the locations that
+     &abuild; uses for various types of files, pass additional
+     arguments to various underlying ant tasks, cause targets to be
+     run multiple times, or even supply your own Groovy closures to be
+     run for specific tasks.  This is also described in &abuild;'s
+     built-in help for the Java rules.  The help text is included in
+     this document as well; see <xref linkend="ref.help.rule.java"/>.
     </para>
    </sect1>
    <sect1 id="ref.groovy.environment">
@@ -9736,7 +9844,13 @@ parameters {
       running in one JVM, &abuild; cannot change the current
       directory.  All well-behaved ant tasks are supposed to resolve
       relative paths to <varname>basedir</varname> anyway though, so
-      this should generally not matter.
+      this should generally not matter.  If you find builds failing
+      with odd messages about missing files or directories below where
+      you happened to start &abuild;, it may be because of relative
+      paths being passed to incorrectly implemented ant tasks.  In
+      this case, you can usually just prepend
+      <literal>${basedir}/</literal> to the relative path you are
+      providing as an attribute.
      </para>
      <para>
       Note that, although &abuild; makes full use of ant tasks through
@@ -9801,22 +9915,23 @@ parameters {
        </listitem>
       </itemizedlist>
       When you append to a parameter in a parameter block (or by
-      calling <function>abuild.appendParameter</function>, &abuild; if
-      there is no parameter with the name of the variable that you are
+      calling <function>abuild.appendParameter</function>), if there
+      is no parameter with the name of the variable that you are
       appending to, &abuild; will first try to initialize the
-      parameter by calling resolve.  This means that if you initialize
-      something as an interface variable and then append to it in a
-      parameter block, <function>resolve</function> will return a
-      value that is the interface variable's value appended with the
-      changes made in your parameters block.  However, since
-      definitions take precedence over both interface variables and
-      parameters, if you specify the value of a variable on the
-      command line, the affect of modifying a parameter by the same
-      name will be ignored by future calls to
-      <function>resolve</function>.  What this all means is that
-      variables defined on the command line effectively override any
-      values specified in the interface or build files.  This is
-      equivalent to the behavior you would see with make or ant.
+      parameter by calling <function>resolve</function>.  This means
+      that if you initialize something as an interface variable and
+      then append to it in a parameter block,
+      <function>resolve</function> will return a value that is the
+      interface variable's value appended with the changes made in
+      your parameter block.  However, since definitions take
+      precedence over both interface variables and parameters, if you
+      specify the value of a variable on the command line, the affect
+      of modifying a parameter by the same name will be ignored by
+      future calls to <function>resolve</function>.  What this all
+      means is that variables defined on the command line effectively
+      override any values specified in the interface or build files.
+      This is equivalent to the behavior you would see with make or
+      ant.
       <footnote>
        <para>
         It is possible to get at the interface, definitions, and
@@ -9875,9 +9990,31 @@ parameters {
    <sect1 id="ref.java.groovy">
     <title>Groovy Rules</title>
     <para>
-     <!-- XXX -->
-     (Incomplete; for now, see <xref linkend="ref.help.rule.groovy"/>.
-     Search for <literal>DEFAULT PARAMETERS</literal>.)
+     The <filename>groovy</filename> rule set, available by setting
+     <varname>abuild.rules</varname> to <literal>['java',
+     'groovy']</literal>, adds the ability to build Groovy code to the
+     functionality of the <filename>java</filename> rules.  The basic
+     functionality is that all <filename>.groovy</filename> files in
+     the <filename>src/groovy</filename> and
+     <filename>abuild-java/src/groovy</filename> directories are
+     compiled to <filename>.class</filename> files and written to the
+     <filename>abuild-java/classes</filename> directory.  The order in
+     which Java and Groovy sources are compiled is determined by the
+     order in which <filename>java</filename> and
+     <filename>groovy</filename> are added to
+     <varname>abuild.rules</varname>, but you must include
+     <filename>java</filename> if you include
+     <filename>groovy</filename>.  If you have a build item that
+     builds both Java and Groovy code, you should avoid having
+     circular dependencies between your Java and Groovy code.  If your
+     Groovy classes make calls into your Java code, list
+     <filename>java</filename> in your <varname>abuild.rules</varname>
+     parameter first.  If your Java code makes calls to your Groovy
+     code, then include <varname>groovy</varname> first.  For
+     additional information on how to customize compilation of Groovy
+     code, refer to &abuild;'s online help for the
+     <filename>groovy</filename> rules.  This help text is included in
+     <xref linkend="ref.help.rule.groovy"/>.
     </para>
    </sect1>
    <sect1 id="ref.java.for-rule-authors">
