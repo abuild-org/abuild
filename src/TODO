@@ -1,8 +1,7 @@
 1.1
 ===
 
- * manual: read "interface to the abuild object", then continue
-   from "dependency on a make variable"
+ * manual: "dependency on a make variable"
 
  * Figure out a way to create "native" compilers that aren't really
    native.  Must pass something to configure to make it think it's a
