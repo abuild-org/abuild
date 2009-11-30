@@ -613,7 +613,7 @@ cd("work/a/aa/aaa");
 $td->runtest("build time message",
 	     {$td->COMMAND => "abuild"}, # NO FILTER!
 	     {$td->REGEXP => "abuild: aaa \\(abuild-indep\\): all\n" .
-		  "abuild: total build time: 00:00:\\d\\d\n",
+		  "abuild: total build time: \\d+s\n",
 		  $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
