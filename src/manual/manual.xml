@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.b6">
-<!ENTITY lastreleased "November 10, 2009">
+<!ENTITY swversion "1.1.b6 + doc updates">
+<!ENTITY lastreleased "November 30, 2009">
 ]>
 <!--
 
@@ -5546,11 +5546,13 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
         which may be either <literal>1.0</literal> or
         <literal>1.1</literal>.  You may also place the compatibility
         level version in the <envar>ABUILD_COMPAT_LEVEL</envar>
-        environment variable.  By default, &abuild; attempts to detect
-        deprecated constructs from older versions and issue warnings
-        about their use.  Setting the compatibility level to a given
-        version causes &abuild; to not recognize constructs deprecated
-        by that version at all.  For example, in compatibility level
+        environment variable.  By default, early pre-release versions
+        of &abuild; attempt to detect deprecated constructs from older
+        versions and issue warnings about their use, while final
+        versions operate with deprecation support disabled by default.
+        Setting the compatibility level to a given version causes
+        &abuild; to not recognize constructs deprecated by that
+        version at all.  For example, in compatibility level
         <literal>1.1</literal>, use of the <property>this</property>
         key in <filename>Abuild.conf</filename> would result in an
         error about an unknown key rather than being treated as if it
@@ -20645,13 +20647,13 @@ Y = $(X)
    <warning>
     <para>
      Please do not use the list below to try to upgrade your build
-     trees automatically.  You shouldn't go through this list and
-     start manually fixing your <filename>Abuild.conf</filename>
-     files.  Doing this will only waste your time and making the
-     automated upgrade process less reliable.  There is a lot of
-     complex logic involved in doing the upgrades, so you're best off
-     leaving it to &abuild; which has the benefit of knowing the
-     entire build tree structure of all your trees.  Refer to <xref
+     trees manually.  You shouldn't go through this list and start
+     manually fixing your <filename>Abuild.conf</filename> files.
+     Doing this will only waste your time and making the automated
+     upgrade process less reliable.  There is a lot of complex logic
+     involved in doing the upgrades, so you're best off leaving it to
+     &abuild; which has the benefit of knowing the entire build tree
+     structure of all your trees.  Refer to <xref
      linkend="ref.upgrading-to-1.1"/> for details.
     </para>
    </warning>
@@ -20996,7 +20998,7 @@ Y = $(X)
        The new <filename>Abuild.conf</filename> key
        <property>name</property> replaces <property>this</property> as
        the way to provide the name of a build item.  Note that you
-       should go around replacing <property>this</property> with
+       should not go around replacing <property>this</property> with
        <property>name</property> manually in existing
        <filename>Abuild.conf</filename> files as &abuild; will do this
        automatically when you run <command>abuild
@@ -21034,7 +21036,8 @@ Y = $(X)
        <envar>ABUILD_FORCE_64BIT</envar> has been added to encourage
        &abuild; to generate code of the specified word size.  It is
        initially only supported for builds that use the
-       <command>gcc</command> compiler.
+       <command>gcc</command> compiler.  A future version of &abuild;
+       may offer a better solution.
       </para>
      </listitem>
      <listitem>
@@ -21088,11 +21091,24 @@ Y = $(X)
      </listitem>
      <listitem>
       <para>
+       Some build sets will build more items in an upgraded forest
+       than they would have in version 1.0.  For example, the build
+       set <option>all</option> now really builds all items including
+       those in trees that your starting build item's tree doesn't
+       depend on.  Also, the build set <option>desc</option> will
+       really include all build items at or below the current
+       directory even if they are in trees that are not dependencies
+       of the current tree.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
        A new build set, <option>deptrees</option>, has been added.
        This build set includes all items in the current tree and its
-       tree dependencies.  These concepts are described in <xref
-       linkend="ref.multiple-trees"/>.  See also <xref
-       linkend="ref.new11.new-tree-structure"/>.
+       tree dependencies.  It essentially does what
+       <option>all</option> did in version 1.0.  These concepts are
+       described in <xref linkend="ref.multiple-trees"/>.  See also
+       <xref linkend="ref.new11.new-tree-structure"/>.
       </para>
      </listitem>
      <listitem>
@@ -21258,8 +21274,8 @@ Y = $(X)
         file, and that file will be located at the root of the forest.
         In 1.0 compatibility mode, &abuild; will still use information
         from old style <filename>Abuild.backing</filename> files at
-        the roots of trees in the forest, though such files are
-        considered deprecated.
+        the roots of not-yet-upgraded trees in the forest, though such
+        files are considered deprecated.
        </para>
       </listitem>
       <listitem>
@@ -21308,6 +21324,18 @@ Y = $(X)
   </appendix>
   <appendix id="ref.upgrading-to-1.1">
    <title>Upgrading from 1.0 to Version 1.1</title>
+   <note>
+    <para>
+     &Abuild; is purposely stealth about pinpointing specific
+     locations of outdated constructs in trees that are not upgraded
+     to encourage you to use the automated upgrade process.  If you
+     are working in a previously upgraded tree and some deprecated
+     feature has snuck back in but you can't find where it is, the
+     easiest way to find it is to run in 1.1-compatibility mode.  Most
+     outdated constructs will generate errors in 1.1-compatibility
+     mode.
+    </para>
+   </note>
    <para>
     &Abuild; 1.1 offers many new capabilities relative to 1.0.  These
     are summarized in <xref linkend="ref.changes-in-1.1"/>.  Among the
