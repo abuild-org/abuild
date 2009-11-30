@@ -11,10 +11,6 @@
    mention it in known limitations and mention the autoconf thing.
    Probably also mention it in the compilers section.
 
- * Change build time message to avoid making error message parsers
-   think it's an error message.  Maybe go with mm:ss for builds less
-   than an hour, or maybe go with NNh NNm NNs or something like that.
-
  * Groovy: maybe add resolveAsPath and resolveAsFile (and/or
    resolveAsFiles).  Alternatively, consider adding something to
    org.abuild.groovy.Util to do some of this.

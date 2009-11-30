@@ -305,7 +305,19 @@ Abuild::runInternal()
     if ((! this->dump_build_graph) && build_time.get())
     {
 	std::ostringstream time;
-	time << "total build time: " << *build_time;
+	time << "total build time:";
+	long h = build_time->hours();
+	long m = build_time->minutes();
+	long s = build_time->seconds();
+	if (h)
+	{
+	    time << " " << h << "h";
+	}
+	if (h || m)
+	{
+	    time << " " << m << "m";
+	}
+	time << " " << s << "s";
 	info(time.str());
     }
 

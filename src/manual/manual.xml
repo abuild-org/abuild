@@ -16370,6 +16370,13 @@ Y = $(X)
            location more likely to handle those conditions.
           </para>
          </listitem>
+         <listitem>
+          <para>
+           The format of the build duration has been changed to
+           something that is not mistakenly interpreted as an error
+           message by <application>vim</application>.
+          </para>
+         </listitem>
         </itemizedlist>
        </listitem>
       </itemizedlist>
@@ -21047,6 +21054,13 @@ Y = $(X)
        flags, making it possible to build applications that statically
        link the runtime environment or work with the .NET framework.
        For details, see <xref linkend="ref.msvc"/>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Shared library version information is now partially supported
+       when building DLL files.  For details, see <xref
+       linkend="ref.shared-libraries"/>.
       </para>
      </listitem>
      <listitem>
