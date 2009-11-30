@@ -1,13 +1,81 @@
 
 ** Help for users of abuild.rules = ['java'] **
 
-If you're familiar with the general structure of the java rules and
-you just need to be reminded about specific parameters and control
-parameter attribute map keys, search for SPECIFIC PARAMETERS below.
+BASIC USAGE
+===========
+
+(For advanced usage, see below -- many options are available beyond
+what is described in this section.)
+
+JAR files
+---------
+
+Required for all JAR files:
+
+  java.jarName = 'name-of-jar-file.jar'
+
+To add a Main-Class attribute key:
+
+  java.mainClass = 'class.containing.main'
+
+To create a wrapper script:
+
+  java.wrapperName = 'name-of-wrapper-script'
+
+
+WAR files
+---------
+
+Required for all WAR files:
+
+  java.warName = 'name-of-war-file.war'
+  java.webxml = 'path-to-config.xml'
+
+EAR files
+---------
+
+Required for all EAR files:
+
+  java.earName = 'name-of-ear-file.ear'
+  java.appxml = 'path-to-application.xml'
+
+High-level JAR-like archives
+----------------------------
+
+  java.highLevelArchiveName = 'name-of-archive.ext'
+
+JAR signing
+-----------
+
+  java.sign.alias - required "alias" attribute of signjar task
+  java.sign.storepass - required "storepass" attibute of signjar task
+  java.sign.keystore - "keystore" attribute of signjar task
+  java.sign.keypass - "keypass" attribute of signjar task
+  java.jarsToSign - JAR files to sign; usually set from
+       values of interface variables
+
+
+JUnit
+-----
+
+  java.junitTestSuite - name of class with JUnit test suite
+  java.junitBatchIncludes - pattern matching classes with test suites
+  java.junitBatchExcludes - pattern to filter out classes to search
+       for test suites
+
+
+javadoc
+-------
+
+  java.javadocTitle: Doctitle and Windowtitle
 
 
 GENERAL INFORMATION
 ===================
+
+If you're familiar with the general structure of the java rules and
+you just need to be reminded about specific parameters and control
+parameter attribute map keys, search for SPECIFIC PARAMETERS below.
 
 The general pattern is that the behavior all targets can customized in
 layers.  Implementation of this pattern is achieved through using the
