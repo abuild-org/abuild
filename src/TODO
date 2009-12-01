@@ -30,6 +30,14 @@ Abuild Lint
 
  * Notice Rules.mk and any other deprecated files.
 
+ * Detect path duplicated within a file, consider detecting two build
+   items exporting libraries with the same name or with a name that
+   conflicts with something on the system.
+
+ * Make abuild-lint's output more like lintian with a table of error
+   messages and optional explanations.  Have abuild-lint gather up all
+   error messages and, at the top of its output, provide detailed
+   descriptions of each one that it's going to write out.
 
 GUI
 ===
