@@ -16357,6 +16357,29 @@ Y = $(X)
       <itemizedlist>
        <listitem>
         <para>
+         Compatibility Mode
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; version 1.1.0 runs at compatibility level 1.1 by
+           default.  You can still turn on backward compatibility with
+           1.0 by running &abuild; with the
+           <option>--compat-level=1.0</option> flag or by setting that
+           <envar>ABUILD_COMPAT_LEVEL</envar> environment variable,
+           though it is recommended that you do this only while
+           upgrading trees to avoid accidentally re-introducing
+           deprecated features.  Also, &abuild; will often be able to
+           give a clearer error message with backward compatibility
+           mode turned off.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+      <itemizedlist>
+       <listitem>
+        <para>
          Usability Improvements
         </para>
         <itemizedlist>
@@ -21394,15 +21417,19 @@ Y = $(X)
     <para>
      The next thing you should do is to make sure your build still
      works with &abuild; 1.1 running in 1.0-compatibility mode, which
-     is its default.  There are a small number of non-compatible
-     changes (<xref linkend="ref.new11.non-compatible"/>).  If your
-     build trees run into any of those, you should try to fix them in
-     a way that is still compatible with &abuild; 1.0.  You should
-     fairly quickly be able to reach a point where you have a build
-     tree that builds the same way under 1.0 and 1.1.  Only when you
-     have reached this stage should you attempt to upgrade.  If you
-     run into trouble during this process, ask for help or consult
-     <xref linkend="ref.upgrade11.caveats"/>.
+     you can enable by passing <option>--compat-level="1.0"</option>
+     on the command line or by setting the environment variable
+     <envar>ABUILD_COMPAT_LEVEL</envar> to
+     &ldquo;<literal>1.0</literal>&rdquo;.  There are a small number
+     of non-compatible changes (<xref
+     linkend="ref.new11.non-compatible"/>).  If your build trees run
+     into any of those, you should try to fix them in a way that is
+     still compatible with &abuild; 1.0.  You should fairly quickly be
+     able to reach a point where you have a build tree that builds the
+     same way under 1.0 and 1.1.  Only when you have reached this
+     stage should you attempt to upgrade.  If you run into trouble
+     during this process, ask for help or consult <xref
+     linkend="ref.upgrade11.caveats"/>.
     </para>
     <para>
      Once you have your build trees in a state where your build
@@ -21456,7 +21483,7 @@ Y = $(X)
     </para>
     <para>
      When you think you have eliminated all deprecation warnings, you
-     should retry your build with the
+     should retry your build in 1.0-compatibility mode with the
      <option>--deprecation-is-error</option> flag.  In this mode, any
      deprecated features will be reported as errors instead of
      warnings.  Once your build gets past this point, then you can be
@@ -21491,11 +21518,13 @@ Y = $(X)
      one last check that you are not using any deprecated features.
      Once that passes, you are finally ready to try running in
      1.1-compatibility mode.  To do this, either run &abuild; with
-     <option>--compat-level=1.1</option>, or set the
+     <option>--compat-level=1.1</option>, set the
      <envar>ABUILD_COMPAT_LEVEL</envar> environment variable to the
-     value &ldquo;<literal>1.1</literal>&rdquo;.  If all goes well,
-     you should see no difference.  Once you have reached this point,
-     you can be sure that your upgrade process is complete.
+     value &ldquo;<literal>1.1</literal>&rdquo;, or just unset
+     <envar>ABUILD_COMPAT_LEVEL</envar> and don't specify a
+     compatibility level on the command line.  If all goes well, you
+     should see no difference.  Once you have reached this point, you
+     can be sure that your upgrade process is complete.
     </para>
    </sect1>
    <sect1 id="ref.upgrade11.caveats">

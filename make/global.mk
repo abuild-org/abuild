@@ -48,7 +48,7 @@ CODEGEN_WRAPPER = perl $(ABUILD_TOP)/util/codegen-wrapper --src $(SRCDIR)
 
 # Define some useful utility functions and common variables
 
-ABUILD_SUPPORT_1_0 ?= 1
+ABUILD_SUPPORT_1_0 ?= 0
 
 # It's hard to get a space in make for substitution, so we define one
 _space := $(subst a,,a a)

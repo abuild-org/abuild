@@ -20,6 +20,8 @@ my $filters = get_filters();
 
 setup($td);
 
+$ENV{'ABUILD_COMPAT_LEVEL'} = '1.0';
+
 $td->runtest("abuild errors",
 	     {$td->COMMAND => "abuild --build=all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},

@@ -15,9 +15,6 @@
    resolveAsFiles).  Alternatively, consider adding something to
    org.abuild.groovy.Util to do some of this.
 
- * Make compatibility mode 1.1 by default; update the manual to
-   explain this
-
 
 Abuild Lint
 ==============

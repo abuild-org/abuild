@@ -93,7 +93,7 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     apply_targets_to_deps(false),
     with_rdeps(false),
     repeat_expansion(false),
-    compat_level(CompatLevel::cl_1_0),
+    compat_level(CompatLevel::cl_1_1),
     default_writable(true),
     local_build(false),
     error_handler(whoami),
@@ -355,7 +355,7 @@ Abuild::parseArgv()
     std::string compat_level_version;
     if (! Util::getEnv("ABUILD_COMPAT_LEVEL", &compat_level_version))
     {
-	compat_level_version = "1.0";
+	compat_level_version = "1.1";
     }
 
     // for backward compatibility
@@ -529,6 +529,7 @@ Abuild::parseArgv()
     if (compat_level_version == "1.0")
     {
 	this->compat_level.setLevel(CompatLevel::cl_1_0);
+	this->make_args.push_back("ABUILD_SUPPORT_1_0=1");
     }
     else if (compat_level_version == "1.1")
     {

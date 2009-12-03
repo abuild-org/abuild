@@ -121,6 +121,8 @@ my $native_out = get_native_out();
 
 setup($td);
 
+$ENV{'ABUILD_COMPAT_LEVEL'} = '1.0';
+
 # errors
 
 cd("work/errors/cycle");

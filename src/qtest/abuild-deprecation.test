@@ -21,6 +21,8 @@ my $platform_native = get_native_platform();
 
 setup($td);
 
+$ENV{'ABUILD_COMPAT_LEVEL'} = '1.0';
+
 cd("work/build-item-rules");
 
 $td->runtest("build-item-rules",

@@ -16,6 +16,7 @@ bool
 Abuild::upgradeTrees()
 {
     // Creating UpgradeData object reads the upgrade configuration file.
+    this->compat_level.setLevel(CompatLevel::cl_1_0);
     UpgradeData ud(this->error_handler);
     exitIfErrors();
 

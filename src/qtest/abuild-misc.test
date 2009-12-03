@@ -380,7 +380,7 @@ if (! in_windows())
     symlink "target", "link" or die;
     symlink "ext.target", "ext" or die;
     $td->runtest("symlinked externals",
-		 {$td->COMMAND => "abuild --dump-data",
+		 {$td->COMMAND => "abuild --compat-level=1.0 --dump-data",
 		  $td->FILTER => "perl $filters/filter-abuild.pl"},
 		 {$td->FILE => "$top/symlinked-external.out",
 		  $td->EXIT_STATUS => 0},
