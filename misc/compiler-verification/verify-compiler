@@ -591,13 +591,14 @@ sub usage
 {
     die "
 Usage: $whoami options
-  --plugin-tree-location path        absolute path of tree with compiler plugin
-  --plugin-tree-name tree-name       name of tree containing compiler plugin
-  --plugin-name plugin-name          name of compiler plugin
-  --platform-type platform-type      platform type to test
-  --compiler compiler[.option]       compiler to test
-  --verbose                          pass --verbose to abuild
-  --save-tree                        save build tree used for testing
+  --plugin-tree-location path       absolute path of tree with compiler plugin
+  --plugin-tree-name tree-name     name of tree containing compiler plugin
+  --plugin-name plugin-name        name of compiler plugin
+  --platform-type platform-type    platform type to test
+  --compiler compiler[.option]     compiler to test
+  --cross                          force treatment of compiler as cross compiler
+  --verbose                        pass --verbose to abuild
+  --save-tree                      save build tree used for testing
 
 Runs a series of tests to verify that a compiler support plugin is
 properly supports all functionality expected by abuild.  With no
@@ -617,6 +618,14 @@ program will create a deprecated build tree that uses a 1.0-compatible
 backed external to access the plugin's tree.  This makes it possible
 to use verify-compiler from abuild version 1.1 to verify a compiler
 defined in a tree that has not been upgraded.
+
+Ordinarily, $whoami treats compilers in platform-type \"native\"
+as native compilers and others as cross compilers.  In some cases, you
+may have a cross compiler whose platform type is \"native\".  In those
+cases, you must use the --cross option to tell $whoami
+to ask you to run test executables instead of running them itself.
+The abuild documentation discusses this in more detail; search for
+verify-compiler in the manual.
 
 ";
 }

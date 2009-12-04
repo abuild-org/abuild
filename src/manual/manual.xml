@@ -14225,6 +14225,72 @@ native-compiler [-lowpri] <replaceable>compiler[.option]</replaceable>
      <filename>misc/compiler-verification/README.txt</filename> for
      additional details.
     </para>
+    <para>
+     Ordinarily, a toolchain in platform type <type>native</type> is a
+     native compiler, and a toolchain in a platform type other than
+     <type>native</type> is a cross-compiler.  There are, however,
+     some instances in which it may make sense to have something in
+     platform type <type>native</type> be treated as a cross compiler:
+     specifically, you will want to do this when the compiler cannot
+     create executables that run on your current platform.  Here are
+     some examples of where this may occur:
+     <itemizedlist>
+      <listitem>
+       <para>
+        You are writing a compiler plugin for a static analyzer that
+        is a drop-in replacement for the compiler but that produces
+        reports instead of actual executables
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        You are building 64-bit executables on a 32-bit system
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        You are cross-compiling for a different architecture of the
+        same operating system or at least of an operating system that
+        is essentially compatible with your code base and could just
+        as well support a native compiler; <emphasis>e.g.</emphasis>
+        executables for a low-memory or slow embedded Linux without a
+        native development toolchain might be built using a regular
+        desktop Linux environment and a cross compiler
+       </para>
+      </listitem>
+     </itemizedlist>
+     Most of &abuild; will work just fine if the compiler you add to
+     the <type>native</type> platform type is actually a cross
+     compiler, but there are two notable exceptions: the
+     <filename>autoconf</filename> rules, and the
+     <command>verify-compiler</command> program.  For the
+     <filename>autoconf</filename> rules, you just need to make sure
+     <command>./configure</command> gets executed with some
+     <option>--host</option> option.  This can be done by simply
+     adding this single line:
+
+     <programlisting>CONFIGURE_ARGS += --host=non-native
+</programlisting>
+     to your
+     <filename><replaceable>compiler</replaceable>.mk</filename> file.
+     Passing some value to <option>--host</option> that doesn't match
+     what autoconf determines your current host to be tells autoconf
+     that you are cross compiling.  There's nothing special about the
+     specific value &ldquo;<literal>non-native</literal>&rdquo;.  When
+     running <command>verify-compiler</command>, you will have to pass
+     the <option>--cross</option> option to the
+     <command>verify-compiler</command> command so that it will ask
+     you to run the test executables instead of running them itself.
+     The <option>--cross</option> option is not required if your new
+     compiler is not in the <type>native</type> platform type.  In
+     this case, &abuild; will automatically figure out that it is a
+     cross compiler, just as it does in the
+     <filename>autoconf</filename> rules.  Although these are the only
+     cases within &abuild; that care whether the compiler can create
+     native executables, you may run into others (such as ability to
+     run test suites), so just keep this in mind when using a
+     non-native compiler in the <type>native</type> platform type.
+    </para>
    </sect1>
    <sect1 id="ref.example.plugin">
     <title>Plugin Examples</title>
@@ -16390,6 +16456,15 @@ Y = $(X)
          <listitem>
           <para>
            The embedded version of Groovy has been updated to 1.6.7.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <command>verify-compiler</command> command now accepts
+           the <option>--cross</option> option to better support cross
+           compilers that are in the <type>native</type> platform
+           type.  See <xref linkend="ref.adding-toolchains"/> for a
+           discussion.
           </para>
          </listitem>
         </itemizedlist>
@@ -21216,7 +21291,15 @@ Y = $(X)
        to do so.
       </para>
      </listitem>
-    </itemizedlist>
+     <listitem>
+      <para>
+       The <command>verify-compiler</command> command now accepts the
+       <option>--cross</option> option to better support cross
+       compilers that are in the <type>native</type> platform type.
+       See <xref linkend="ref.adding-toolchains"/> for a discussion.
+      </para>
+     </listitem>
+   </itemizedlist>
    </sect1>
    <sect1 id="ref.new11.groovy-backend">
     <title>Groovy-based Backend for Java Builds</title>

@@ -3,14 +3,6 @@
 
  * manual: "dependency on a make variable"
 
- * Figure out a way to create "native" compilers that aren't really
-   native.  Must pass something to configure to make it think it's a
-   cross compiler.  Probably have some way of registering a "native"
-   compiler as not really being native and having this cause some
-   variable to be set that rules can use.  If this can't be done,
-   mention it in known limitations and mention the autoconf thing.
-   Probably also mention it in the compilers section.
-
  * Groovy: maybe add resolveAsPath and resolveAsFile (and/or
    resolveAsFiles).  Alternatively, consider adding something to
    org.abuild.groovy.Util to do some of this.
