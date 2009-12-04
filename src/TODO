@@ -3,10 +3,6 @@
 
  * manual: "dependency on a make variable"
 
- * Groovy: maybe add resolveAsPath and resolveAsFile (and/or
-   resolveAsFiles).  Alternatively, consider adding something to
-   org.abuild.groovy.Util to do some of this.
-
 
 Abuild Lint
 ==============
