@@ -50,6 +50,7 @@ my $plugin_tree_name = "";
 my $plugin_name = "";
 my $compiler = "";
 my $verbose = "";
+my $force_cross = 0;
 
 while (@ARGV)
 {
@@ -83,6 +84,10 @@ while (@ARGV)
     {
 	usage() unless @ARGV;
 	$compiler = shift(@ARGV);
+    }
+    elsif ($arg eq '--cross')
+    {
+	$force_cross = 1;
     }
     elsif ($arg eq '--verbose')
     {
@@ -238,6 +243,7 @@ my $abuild_out = undef;
     open(P, "abuild --list-platforms|") or
 	die "$whoami: can't run abuild --list-platformns: $!\n";
     my $in_forest = 0;
+    my $in_tree = 0;
     my $in_platform_type = 0;
     while (<P>)
     {
@@ -247,16 +253,23 @@ my $abuild_out = undef;
 	}
 	elsif ($in_forest)
 	{
-	    if (m/platform type (\S+)/)
+	    if (m/tree compiler-verification/)
 	    {
-		$in_platform_type = ($1 eq $platform_type);
+		$in_tree = 1;
 	    }
-	    elsif ($in_platform_type)
+	    elsif ($in_tree)
 	    {
-		if (m/platform (\S+);.*: yes/)
+		if (m/platform type (\S+)/)
 		{
-		    $abuild_out = "abuild-$1";
-		    last;
+		    $in_platform_type = ($1 eq $platform_type);
+		}
+		elsif ($in_platform_type)
+		{
+		    if (m/platform (\S+);.*: yes/)
+		    {
+			$abuild_out = "abuild-$1";
+			last;
+		    }
 		}
 	    }
 	}
@@ -276,7 +289,7 @@ my $abuild_out = undef;
 }
 
 my $cross = 'no';
-if ($platform_type ne 'native')
+if ($force_cross || ($platform_type ne 'native'))
 {
     $cross = 'yes';
     ask("NON-NATIVE COMPILER");
@@ -453,7 +466,7 @@ sub check_build
 sub check_prog
 {
     my $expected = shift;
-    if ($platform_type eq 'native')
+    if ($cross eq 'no')
     {
 	my $cmd = prepend_pathvar($shlib_runtime_variable, $old_pathval,
 				  ["../b/$abuild_out", $abuild_out]);

@@ -107,6 +107,20 @@ $td->runtest("cross compiler plugin",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("pseudo-cross compiler plugin",
+	     {$td->COMMAND =>
+		  " $abuild_top/misc/compiler-verification/verify-compiler" .
+		  " </dev/null" .
+		  " --plugin-tree-location $top/plugins" .
+		  " --plugin-tree-name compiler-plugins" .
+		  " --plugin-name pseudo-cross" .
+		  " --cross" .
+		  " --compiler zyx",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/pseudo-cross-plugin.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("1.0 compatibility",
 	     {$td->COMMAND =>
 		  "ABUILD_COMPAT_LEVEL=1.0" .
@@ -123,4 +137,4 @@ $td->runtest("1.0 compatibility",
 
 cleanup();
 
-$td->report(4 + (in_windows() ? 1 : 0));
+$td->report(5 + (in_windows() ? 1 : 0));

@@ -1,4 +1,4 @@
-CC = $(abDIR_cross)/xcc
+CC = $(abDIR_cross)/../fake-compiler
 CCPP = $(CC)
 CXX = $(CC)
 CXXPP = $(CC)
