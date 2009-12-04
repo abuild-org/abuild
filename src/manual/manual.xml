@@ -1012,6 +1012,19 @@ following checks:
      </footnote>
     </para>
     <para>
+     As of &abuild; version 1.1.0, &abuild; is known to work with
+     Groovy versions 1.6.7 and 1.7-RC-1, which were the latest
+     available versions at the time of the release.  Upgrading
+     &abuild;'s embedded version of Groovy is as simple as just
+     replacing the embeddable Groovy JAR file inside of &abuild;'s lib
+     directory.  Just delete the old one and copy the new one in.
+     &abuild; will automatically find it even though its name will
+     have changed to include the later version number.  Ideally, you
+     should also rebuild &abuild;'s java support from source and rerun
+     &abuild;'s test suite just to be sure &abuild; still works
+     properly with the latest Groovy.
+    </para>
+    <para>
      Since &abuild; determines where it is being run from when it is
      invoked, a binary distribution of &abuild; is not tied to a
      particular installation path.  It finds the root of its
@@ -16352,12 +16365,12 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.xxx: XXX</term>
+     <term>1.1.0: XXX</term>
      <listitem>
       <itemizedlist>
        <listitem>
         <para>
-         Compatibility Mode
+         Miscellaneous Changes
         </para>
         <itemizedlist>
          <listitem>
@@ -16372,6 +16385,11 @@ Y = $(X)
            deprecated features.  Also, &abuild; will often be able to
            give a clearer error message with backward compatibility
            mode turned off.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The embedded version of Groovy has been updated to 1.6.7.
           </para>
          </listitem>
         </itemizedlist>
