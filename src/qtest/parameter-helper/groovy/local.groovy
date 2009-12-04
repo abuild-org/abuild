@@ -43,7 +43,7 @@ parameters {
     }
     catch (Exception e)
     {
-        assert e.cause.class.name == 'org.abuild.groovy.BuildFailure'
+        assert e.class.name == 'org.abuild.groovy.BuildFailure'
         assert e.message =~ /resolve/
     }
     yet_another_value = resolve(other.ifc.variable)
