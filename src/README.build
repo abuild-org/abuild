@@ -74,66 +74,6 @@ multiple compilers, abuild may guess wrong which one to use.  In this
 case, you may need to override the value of BOOST_LIB_SUFFIX.
 
 
-MAKING A BINARY DISTRIBUTION
-============================
-
-Note that there is a script called make-binary-distribution that
-automatically does most of what's described here.  It is described in
-more detail below.
-
-
-UNIX BUILD
-==========
-
-Abuild may be built with abuild or with gnu make.  To build with gnu
-make if no version of abuild is available, run
-
-make -f Makefile.bootstrap
-
-Then follow the steps in "COMMON" below.
-
-
-WINDOWS BUILD
-=============
-
-To build on Windows, perform the following steps:
-
- * have Visual C++ environment variables and path set (by running the
-   batch file provided with Visual C++)
-
- * Set the BOOST_TOP envirionment variable to the location of your
-   boost installation as a Windows absolute path using forward slash
-   (/) rather than backslash (\) as the path separator
-
- * Run
-
-   make -f Makefile.bootstrap
-
- * Follow the "COMMON" instructions below.
-
-
-COMMON
-======
-
-If you are buildling Java support, you must run
-
-./BootstrapJava.groovy
-
-In order to run BootstrapJava.groovy, you must have JAVA_HOME set, and
-you must have groovy 1.5.7 or newer in your path.  If you have
-GROOVY_HOME set, you can alsoj ust run $GROOVY_HOME/bin/grooyv
-BootstrapJava.groovy without having groovy in your path.
-
-If you are building documentation, run "./<output-dir>/abuild -C
-manual" where "<output-dir>" is replaced by the abuild output
-directory, which will start with "abuild-".
-
-Building the documentation requires some additional tools to be
-available.  See manual/README for additional requirements for building
-the documentation.  You can download pre-built documentation from the
-&abuild; download site.
-
-
 CREATION OF SOURCE RELEASE
 ==========================
 
@@ -194,6 +134,69 @@ Basic steps:
  * If this is an official release, remember to update the
    web-accessible copies of the documentation and create a tag in the
    version control system.
+
+
+BUILDING MANUALLY
+=================
+
+The steps below describe the process of building manually.  These
+steps are not needed if you use make-binary-distribution to build from
+a source release.  If you downloaded a source release, you can extract
+the make-binary-distribution script from it and, if needed, download
+the saved doc distribution so that you can use
+make-binary-distribution to create your own builds.  See above.
+
+
+UNIX BUILD
+==========
+
+Abuild may be built with abuild or with gnu make.  To build with gnu
+make if no version of abuild is available, run
+
+make -f Makefile.bootstrap
+
+Then follow the steps in "COMMON" below.
+
+
+WINDOWS BUILD
+=============
+
+To build on Windows, perform the following steps:
+
+ * have Visual C++ environment variables and path set (by running the
+   batch file provided with Visual C++)
+
+ * Set the BOOST_TOP envirionment variable to the location of your
+   boost installation as a Windows absolute path using forward slash
+   (/) rather than backslash (\) as the path separator
+
+ * Run
+
+   make -f Makefile.bootstrap
+
+ * Follow the "COMMON" instructions below.
+
+
+COMMON
+======
+
+If you are buildling Java support, you must run
+
+./BootstrapJava.groovy
+
+In order to run BootstrapJava.groovy, you must have JAVA_HOME set, and
+you must have groovy 1.5.7 or newer in your path.  If you have
+GROOVY_HOME set, you can alsoj ust run $GROOVY_HOME/bin/grooyv
+BootstrapJava.groovy without having groovy in your path.
+
+If you are building documentation, run "./<output-dir>/abuild -C
+manual" where "<output-dir>" is replaced by the abuild output
+directory, which will start with "abuild-".
+
+Building the documentation requires some additional tools to be
+available.  See manual/README for additional requirements for building
+the documentation.  You can download pre-built documentation from the
+&abuild; download site.
 
 
 BUILD NOTES
