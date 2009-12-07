@@ -21,6 +21,7 @@ if (! $test_java)
 		 {$td->STRING => "skip"},
 		 {$td->STRING => "skip"});
     fake_qtc($td, 'infer (ANT|JAVA)_HOME');
+    fake_qtc($td, 'ERR ant unknown');
     $td->report(1);
     exit 0;
 }

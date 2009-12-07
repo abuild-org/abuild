@@ -9,11 +9,12 @@ for it as described in the documentation.  Though this is generally not
 difficult, it is not as easy as just passing a different compiler name
 to a configure script.
 
-Although abuild supports use of autoconf, it does not use autoconf
-itself, mainly for bootstrapping reasons.  There is some manual
-configuration that may be required.  Abuild has not yet been ported to
-very many systems, but the code is quite portable and should work on
-multiple platforms relative easily.
+Abuild makes slight use of autoconf primarily to find boost.  If you
+have boost installed in a nonstandard location, you can set the
+environment variable BOOST_TOP to the path into which boost was
+installed.  Boost version >= 1.35 is required.  Abuild has not yet
+been ported to very many systems, but the code is quite portable and
+should work on multiple platforms relative easily.
 
 Patches are welcome.  If there is sufficient interest or demand,
 support for some kind of automatic configuration and/or additional
@@ -42,26 +43,26 @@ newer):
 
 To build abuild's Java support, you must also have the following
 
- * Groovy >= 1.5.7
+ * Groovy >= 1.5.7; recommended >= 1.6.7
 
 Note that you do not need a fully groovy installation to run abuild's
-Java support, but you do need one for the bootstrap build.
+Java support since the embeddable version of Groovy is included in the
+abuild distribution, but you do need one for the bootstrap build.
 
 In addition, you must have a working ant with antcontrib in your path
 or in a location pointed to by ANT_HOME.  NOTE: If you do not have ant
 and java, you can set the environment variable ABUILD_NO_JAVA=1 before
 running the test suite.  This will cause all java related tests to
-become expected failures.  Skip the abuild --build=all step in the
-bootstrapping to avoid trying to build the ant library.  If you obtain
-a java environment later, you do not need to recompile abuild.  Just
-build the ant library and rerun the test suite without the
-ABUILD_NO_JAVA variable set.  The test suite includes some tests of
-JUnit support.  In order for them to run, you must set the
-ABUILD_JUNIT_JAR environment variable to the full path of a junit jar
-file.  (On Windows, this should be a Windows path, not a Cygwin path.)
-JUnit 4.4 is known to be sufficient.  It is likey that other JUnit 4
-versions will also work.  If this environment variable is not set, the
-test suite will issue a warning and skip the JUnit tests.
+become expected failures.  If you obtain a java environment later, you
+do not need to recompile abuild.  Just build the java support library
+and rerun the test suite without the ABUILD_NO_JAVA variable set.  The
+test suite includes some tests of JUnit support.  In order for them to
+run, you must set the ABUILD_JUNIT_JAR environment variable to the
+full path of a junit jar file.  (On Windows, this should be a Windows
+path, not a Cygwin path.)  JUnit 4.4 is known to be sufficient.  It is
+likey that other JUnit 4 versions will also work.  If this environment
+variable is not set, the test suite will issue a warning and skip the
+JUnit tests.
 
 If your boost libraries are not installed in the default location, you
 may need to set BOOST_TOP to a location that has a boost installation.
@@ -71,6 +72,14 @@ $BOOST_TOP/lib.  On Windows, BOOST_TOP should use forward slash (/) as
 the path separator.  If your boost installation includes support for
 multiple compilers, abuild may guess wrong which one to use.  In this
 case, you may need to override the value of BOOST_LIB_SUFFIX.
+
+
+MAKING A BINARY DISTRIBUTION
+============================
+
+Note that there is a script called make-binary-distribution that
+automatically does most of what's described here.  It is described in
+more detail below.
 
 
 UNIX BUILD
@@ -96,15 +105,6 @@ To build on Windows, perform the following steps:
    boost installation as a Windows absolute path using forward slash
    (/) rather than backslash (\) as the path separator
 
- * Determine the name of the platform directory by running
-   ../private/bin/bootstrap_native_platform If you are on a 32-bit
-   Intel system running Windows XP, you will see the result
-   "abuild-windows.ix86.nt5-cygwin.msvc".  Other systems should see
-   similar results.
-
- * Create the abuild output directory (e.g., "mkdir
-   abuild-windows.ix86.nt5-cygwin.msvc")
-
  * Run
 
    make -f Makefile.bootstrap
@@ -120,14 +120,18 @@ If you are buildling Java support, you must run
 ./BootstrapJava.groovy
 
 In order to run BootstrapJava.groovy, you must have JAVA_HOME set, and
-you must have groovy 1.5.7 or newer in your path.
+you must have groovy 1.5.7 or newer in your path.  If you have
+GROOVY_HOME set, you can alsoj ust run $GROOVY_HOME/bin/grooyv
+BootstrapJava.groovy without having groovy in your path.
 
 If you are building documentation, run "./<output-dir>/abuild -C
 manual" where "<output-dir>" is replaced by the abuild output
 directory, which will start with "abuild-".
 
-See manual/README for additional requirements for building the
-documentation.
+Building the documentation requires some additional tools to be
+available.  See manual/README for additional requirements for building
+the documentation.  You can download pre-built documentation from the
+&abuild; download site.
 
 
 CREATION OF SOURCE RELEASE
@@ -135,9 +139,9 @@ CREATION OF SOURCE RELEASE
 
 Do a clean export of abuild from the version control system.  Rename
 abuild to abuild-version.  Create abuild-version.tar.bz2 (and/or
-abuild-version.tar.gz) containing that directory.  Note that, as of
-the 1.0 release, the source repository is not publicly available, but
-it could be made available if there is a need to do so.
+abuild-version.tar.gz) containing that directory.  Note that the
+source repository is not publicly available, but it could be made
+available if there is a need to do so.
 
 
 INSTALLATION/CREATION OF BINARY RELEASE
@@ -167,14 +171,21 @@ Basic steps:
 
  * run
 
- ./make-binary-distribution abuild-version.tar.bz2 --make-java-dist \
-       --make-doc-dist --make-static
+  ./make-binary-distribution abuild-version.tar.bz2 --make-doc-dist
 
- * save the binary distribution or distributions
+   You can also pass --make-java-dist to have it save the Java portion
+   of the code, though this is not recommended -- you should really
+   rebuild and retest the Java support on each platform using that
+   platform's native JVM.
 
- * Distribute the source distribution, java distribution, and doc
-   distribution, and make-binary-distribution as needed to the build
-   hosts
+   You can pass --make-static to create a statically linked binary if
+   needed.
+
+ * Save the binary distribution or distributions
+
+ * Distribute the source distribution, java distribution (if saved),
+   and doc distribution, and make-binary-distribution script as needed
+   to the build hosts
 
  * For each build host, run make-binary-distribution on each build
    host.  Pass the doc-dist and/or java-dist files as arguments as
@@ -190,7 +201,9 @@ BUILD NOTES
 
 By default, abuild's build includes -Werror if building with gcc.  You
 may set ABUILD_SKIP_WERROR if you are getting compiler warnings and
-are not in a position to fix them.
+are not in a position to fix them.  For example, boost and/or flex
+files may give warnings on some systems with some compilers, and it
+may not be feasible to work around this.
 
 The scanner and parser for abuild interface files is implemented using
 flex and bison.  flex version 2.5.33 or newer is required, and the

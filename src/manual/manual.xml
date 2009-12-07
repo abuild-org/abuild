@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.b6 + doc updates">
-<!ENTITY lastreleased "November 30, 2009">
+<!ENTITY swversion "1.1.0">
+<!ENTITY lastreleased "December 7, 2009">
 ]>
 <!--
 
@@ -12564,14 +12564,15 @@ flag private INCLUDES = private-include
      command line with two exceptions: the <type>criteria</type> field
      may be omitted, and the selector only ever matches a single
      platform even if <literal>*</literal> appears as one of the
-     fields.  Also, &abuild; ignores any platform specifiers given on
-     the command line or in the environment when resolving
-     cross-platform dependencies.  The rationale for this is that
-     platform selectors specified on the command line or the
-     environment should only ever affect what is actually built.  It
-     should never affect the shape of the internal dependency graph.
-     (For details on the internal, platform-aware dependency graph,
-     see <xref linkend="ref.construction-of-build-graph"/>.)
+     fields.  &Abuild; versions prior to 1.1 ignored any platform
+     specifiers given on the command line or in the environment when
+     resolving cross-platform dependencies, but the &abuild; does take
+     them into consideration.  If you want to specify a
+     platform-specific dependency on the default platform for a given
+     platform type <emphasis>regardless of any platform
+     selectors</emphasis>, you can specify
+     <type><replaceable>platform-type</replaceable>:default</type> as
+     the <option>-platform</option> option to your dependency.
     </para>
     <para>
      The other situation in which a build item may depend on another
@@ -16431,7 +16432,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.0: XXX</term>
+     <term>1.1.0: December 7, 2009</term>
      <listitem>
       <itemizedlist>
        <listitem>
