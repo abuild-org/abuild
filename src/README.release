@@ -11,18 +11,26 @@ Abuild release checklist
  * Update release date at top of manual.xml and also in the release
    notes section for the current release
 
- * On Solaris, make sure LD_LIBRARY_PATH contains /opt/tps/lib and the
-   BOOST variables in Abuild.mk are set properly.
+ * If boost >= 1.35 is not present in the compiler's default search
+   path, set BOOST_TOP to the installation path of boost >= 1.35 and
+   set LD_LIBRARY_PATH to a directory that contains the corresponding
+   runtime libraries.
 
- * On Windows, make sure qtest-driver --version works.
+ * Make sure qtest-driver is in your path and qtest-driver --version
+   works.
 
- * When building Java, make sure ABUILD_JUNIT_JAR is set.  On Windows,
-   it's a Windows path, not a cygwin path.
+ * Set ABUILD_JUNIT_JAR to the full path to a JUnit (>= 4.4) JAR file.
+   On Windows, it's a Windows path, not a cygwin path.
 
- * Make sure JAVA_HOME is set and $JAVA_HOME/bin/java is the first
-   java in path when building manual
+ * Set JAVA_HOME and ensure that $JAVA_HOME/bin/java is the first java
+   in path when building the manual
 
- * Follow source and binary release instructions in README.build
+ * Set ANT_HOME.
+
+ * Verify that the test suite passes when ABUILD_NO_JAVA is set.
+
+ * Follow source and binary release instructions in README.build for
+   building source and binary distributions.
 
 
 After release is built
