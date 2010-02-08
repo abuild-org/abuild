@@ -1,3 +1,10 @@
+Bugs
+====
+
+ * Java rules (java.groovy:193),  manifestClassPath is being joined by
+   the path separator.  It should be joined by a space.
+
+
 Abuild Lint
 ==============
 
