@@ -381,7 +381,7 @@ $td->runtest("bad named items",
 	     $td->NORMALIZE_NEWLINES);
 
 $td->runtest("bad pattern",
-	     {$td->COMMAND => "abuild --build=pattern:C++ check",
+	     {$td->COMMAND => "abuild --build=pattern:'C+(+' check",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/bad-pattern.out",
 	      $td->EXIT_STATUS => 2},

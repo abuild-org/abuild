@@ -2,8 +2,14 @@ Bugs
 ====
 
  * Java rules (java.groovy:193),  manifestClassPath is being joined by
-   the path separator.  It should be joined by a space.
+   the path separator.  It should be joined by a space.  [Fixed,
+   update release notes]
 
+ * With boost 1.42, -pthread must be passed on the gcc commandline on
+   Solaris, but autoconf fails to detect this.  You can pass
+   -DBOOST_THREAD_PLATFORM_PTHREAD to work around this or just make
+   sure -pthread is on the gcc command line even though the autoconf
+   test for pthread doesn't seem to think it's necessary.
 
 Abuild Lint
 ==============
