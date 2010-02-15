@@ -402,8 +402,16 @@
             value="built-classpath">
   <isset property="abuild.ear-name"/>
  </condition>
+ <condition property="abuild.private.classpath-to-copy.exception"
+            value="${abuild.ear-name}">
+  <isset property="abuild.ear-name"/>
+ </condition>
  <condition property="abuild.private.classpath-to-copy"
             value="built-classpath-jar">
+  <isset property="abuild.war-name"/>
+ </condition>
+ <condition property="abuild.private.classpath-to-copy.exception"
+            value="${abuild.war-name}.jar">
   <isset property="abuild.war-name"/>
  </condition>
 
@@ -411,7 +419,12 @@
   <delete dir="${abuild.private.dir.classpath}"/>
   <mkdir dir="${abuild.private.dir.classpath}"/>
   <copy flatten="true" todir="${abuild.private.dir.classpath}">
-   <path refid="${abuild.private.classpath-to-copy}"/>
+   <restrict xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors">
+    <path refid="${abuild.private.classpath-to-copy}"/>
+    <rsel:not>
+     <rsel:name name="${abuild.private.dir.dist}/${abuild.private.classpath-to-copy.exception}"/>
+    </rsel:not>
+   </restrict>
   </copy>
  </target>
 
