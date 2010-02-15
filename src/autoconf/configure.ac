@@ -5,6 +5,10 @@ dnl  abuild interface after-build file rather than a makefile
 dnl  fragment, but we generate a makefile fragment here for
 dnl  bootstrapping purposes.
 AC_CONFIG_FILES([autoconf-bootstrap.mk])
+
+dnl we need AC_CANONICAL_HOST for variables used for the pthread tests
+AC_CANONICAL_HOST
+
 AC_PROG_CC
 AC_PROG_CXX
 
@@ -35,6 +39,8 @@ AC_ARG_WITH(msvc,
 AC_LANG([C])
 if test "$USE_MSVC" = "0"; then
   ACX_PTHREAD
+  CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+  CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
 fi
 AC_SEARCH_LIBS([connect],[socket],[],[],[])
 
