@@ -191,7 +191,7 @@ class JavaRules
                 if (manifestClassPath)
                 {
                     attribute('name' : 'Class-Path',
-                              'value' : manifestClassPath.join(pathSep))
+                              'value' : manifestClassPath.join(' '))
                 }
                 if (mainclass)
                 {
