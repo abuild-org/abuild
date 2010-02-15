@@ -11179,13 +11179,17 @@ parameters {
      build item:
      <?example java/code-generator/Abuild.conf?>
      <?example java/code-generator/Abuild.groovy?>
-     This build item generates a JAR file, but unlike most Java build
-     items, this JAR file is not intended to be added to the
-     compile-time, run-time, or package-time class paths.  Instead, we
-     just assign it to a specific interface variable so that it can be
-     used in the <command>taskdef</command> statement of the rules
-     implementation.  Here is the
-     <filename>Abuild.interface</filename> file:
+     The only thing unusual about this
+     <filename>Abuild.groovy</filename> file is that it sets the
+     parameter <varname>java.includeAntRuntime</varname> to
+     <option>true</option>.  This is necessary for any build item that
+     uses ant's API, such as when adding a new ant task.  This build
+     item generates a JAR file, but unlike most Java build items, this
+     JAR file is not intended to be added to the compile-time,
+     run-time, or package-time class paths.  Instead, we just assign
+     it to a specific interface variable so that it can be used in the
+     <command>taskdef</command> statement of the rules implementation.
+     Here is the <filename>Abuild.interface</filename> file:
      <?example java/code-generator/Abuild.interface?>
     </para>
     <para>
@@ -16431,6 +16435,55 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.1: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The Groovy-based Java backend was separating elements of
+           the manifest classpath with the path separator rather than
+           a space character.  Thanks to Brian Reid for the fix.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Other Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           For compatibility with &abuild; 1.0 and to reduce warnings
+           with ant version 1.8.0, the Groovy backend sets
+           <option>includeantruntime</option> to
+           <option>false</option> by default in the
+           <command>javac</command> task.  This can be overridden by
+           setting the <varname>java.includeAntRuntime</varname>
+           parameter in <filename>Abuild.groovy</filename>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Minor fixes were made to &abuild;'s ant backend to make it
+           work properly with ant version 1.8.0.  Due to a bug in ant,
+           &abuild;'s test suite may fail in spite of proper
+           operation.  For details, please see <ulink
+           url="https://issues.apache.org/bugzilla/show_bug.cgi?id=48746">ant
+           bug 48746</ulink> for details.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.0: December 7, 2009</term>
      <listitem>

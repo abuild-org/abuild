@@ -237,6 +237,11 @@ from WEB-INF locations in the same manner.
 DEFAULT PARAMETERS
 ==================
 
+The following parameters control behavior of specific tasks:
+
+  java.includeAntRuntime -- value of the includeantruntime attribute
+          to the javac task; default is false
+
 The following parameters can be used to add locations in which
 abuild look for specific types of files.  You can append to these in
 your Abuild.groovy file (e.g., java.dir.extraSrc << 'src/java2').  All
@@ -377,6 +382,8 @@ classpath (compile classpath): compile-time classpath
 compilerargs (['-Xlint', '-Xlint:-path']): additional arguments to javac
 debug (true): value of the debug attribute to the javac ant task
 deprecation (on): value of the deprecation attribute to the javac ant task
+includeantruntime (java.includeAntRuntime): value of the includeantruntime
+        attribute to the javac ant task
 
 Any additional keys are treated passed as additional attributes to the
 javac ant task.

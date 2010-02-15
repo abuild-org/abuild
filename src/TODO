@@ -1,13 +1,6 @@
 Bugs
 ====
 
- * Java rules (java.groovy:193),  manifestClassPath is being joined by
-   the path separator.  It should be joined by a space.  [Fixed,
-   update release notes]
-
- * ant 1.8.0: includeantruntime is explicitly off by default; can be
-   overridden with java.includeAntRuntime
-
  * With boost 1.42, -pthread must be passed on the gcc commandline on
    Solaris, but autoconf fails to detect this.  You can pass
    -DBOOST_THREAD_PLATFORM_PTHREAD to work around this or just make
