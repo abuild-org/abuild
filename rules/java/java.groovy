@@ -133,7 +133,9 @@ class JavaRules
             // Would be nice to turn path warnings back on
             'compilerargs': ['-Xlint', '-Xlint:-path'],
             'debug': 'true',
-            'deprecation': 'on'
+            'deprecation': 'on',
+            'includeantruntime':
+                abuild.resolveAsString('java.includeAntRuntime')
         ]
         abuild.runActions('java.compile', this.&compile, defaultAttrs)
     }

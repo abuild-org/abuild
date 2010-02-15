@@ -6,6 +6,8 @@ def buildDir = abuild.buildDirectory.absolutePath
 
 // Set parameters for directory structure and other global information.
 parameters {
+    java.includeAntRuntime = "false"
+
     java.dir.src = "${itemDir}/src/java"
     java.dir.resources = "${itemDir}/src/resources"
     java.dir.metainf = "${itemDir}/src/conf/META-INF"
