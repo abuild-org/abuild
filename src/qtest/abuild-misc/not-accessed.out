@@ -1,2 +1,10 @@
 work/.now
 work/double-dep/bad/a/Abuild.mk
+work/set-details/a/a1/Abuild.mk
+work/set-details/a/a1/c/c1/Abuild.mk
+work/set-details/a/a1/c/c2/Abuild.mk
+work/set-details/a/a1/d/d1/Abuild.mk
+work/set-details/a/a1/d/d2/Abuild.mk
+work/set-details/a/a2/Abuild.mk
+work/set-details/b/b1/Abuild.mk
+work/set-details/b/b2/Abuild.mk

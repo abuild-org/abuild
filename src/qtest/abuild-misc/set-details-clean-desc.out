@@ -1,0 +1,5 @@
+abuild: cleaning a1 in .
+abuild: cleaning c1 in c/c1
+abuild: cleaning c2 in c/c2
+abuild: cleaning d1 in d/d1
+abuild: cleaning d2 in d/d2

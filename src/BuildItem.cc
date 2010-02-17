@@ -197,6 +197,13 @@ BuildItem::isInTrees(std::set<std::string> const& trees) const
     return (trees.count(this->tree_name) != 0);
 }
 
+bool
+BuildItem::isInTreesAndAtOrBelowPath(std::set<std::string> const& trees,
+				     std::string const& path) const
+{
+    return (isInTrees(trees) && isAtOrBelowPath(path));
+}
+
 std::set<std::string> const&
 BuildItem::getShadowedReferences() const
 {
@@ -324,15 +331,7 @@ bool
 BuildItem::isAtOrBelowPath(std::string const& path) const
 {
     std::string const& absolute_path = getAbsolutePath();
-    if (path == absolute_path)
-    {
-	return true;
-    }
-    else if (absolute_path.substr(0, path.length() + 1) == (path + "/"))
-    {
-	return true;
-    }
-    return false;
+    return Util::isDirUnder(absolute_path, path);
 }
 
 bool

@@ -3643,6 +3643,29 @@ C:\cygwin\cygwin.bat
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term><option>descdeptrees</option></term>
+       <listitem>
+        <para>
+         all build items that are located at or below the current
+         directory and are either in the current build tree or one of
+         its dependencies&mdash;effectively the intersection between
+         <option>desc</option> and <option>deptrees</option>
+         <footnote>
+          <para>
+           This is what the <optional>desc</optional> build set did in
+           &abuild; 1.0.  In &abuild; 1.1, <optional>desc</optional>
+           includes <emphasis>all</emphasis> build items at or below
+           the current directory, but in &abuild; 1.0, &abuild; didn't
+           know about those not in the dependency chain of the current
+           tree.  This build set is provided so there is an equivalent
+           in &abuild; 1.1 to every build set from &abuild; 1.0.
+           There are relatively few reasons to ever use it.
+          </para>
+         </footnote>
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term><option>all</option></term>
        <listitem>
         <para>
@@ -16484,6 +16507,17 @@ Y = $(X)
            Minor fixes were made to &abuild;'s build so that it works
            properly on systems that require special arguments to use
            pthread.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           A new build set <option>descdeptrees</option> has been
+           added.  This is the intersection of <option>desc</option>
+           and <option>deptrees</option>.  It does what
+           <option>desc</option> did in &abuild; 1.0 and was added
+           just so that there was a 1.1 equivalent to &abuild; 1.0's
+           <option>desc</option> build set.  Most users will never
+           need to use this build set.
           </para>
          </listitem>
         </itemizedlist>

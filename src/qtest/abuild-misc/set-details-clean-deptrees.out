@@ -1,0 +1,6 @@
+abuild: cleaning a1 in .
+abuild: cleaning a2 in ../a2
+abuild: cleaning b1 in ../../b/b1
+abuild: cleaning b2 in ../../b/b2
+abuild: cleaning c1 in c/c1
+abuild: cleaning c2 in c/c2

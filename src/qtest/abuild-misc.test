@@ -363,6 +363,40 @@ for (my $i = 1; $i <= 2; ++$i)
     copy("Abuild-with-t3.conf", "Abuild.conf") or die;
 }
 
+# This test checks a case where the all, desc, local, deptrees, and
+# descdeptrees build sets are all different from each other.
+#
+#  * Four trees: a, b, c, d
+#  * a depends on b and c but not d; d depends on a
+#  * c and d are under a, but b is not
+#  * an item in a depends on an item in b but not all items in b
+#
+# We run from a subdirectory of a such that there are items in a not
+# below that directory but that c and d are below that directory.
+#
+#  * all gets all items in all trees
+#  * local gets all items in a with dependencies in b
+#  * desc gets all items in c and d and those in a below the current directory
+#  * deptrees gets all items in a, b, and c but not those in d
+#  * descdeptrees gets the same as desc except not items in d
+
+cd("work/set-details/a/a1");
+foreach my $set (qw(all local deptrees desc descdeptrees))
+{
+    $td->runtest("build set details: $set",
+		 {$td->COMMAND => "abuild -b $set no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/set-details-build-$set.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+    $td->runtest("clean set details: $set",
+		 {$td->COMMAND => "abuild -c $set",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/set-details-clean-$set.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 cd("work/global-plugin");
 
 # Make sure global plugins work backwards across tree dependencies
@@ -423,7 +457,7 @@ foreach my $d (['serial', 'serial', ''],
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(49 +
+$td->report(59 +
 	    (in_windows() ? 0 : 3) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));

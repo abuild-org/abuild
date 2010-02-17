@@ -359,6 +359,7 @@ class Abuild
     static std::string const FILE_INTERFACE_DUMP;
     static std::string const b_ALL;
     static std::string const b_DEPTREES;
+    static std::string const b_DESCDEPTREES;
     static std::string const b_LOCAL;
     static std::string const b_DESC;
     static std::string const b_DEPS;

@@ -49,6 +49,8 @@ class BuildItem
     bool isLocal() const;
     bool isInTree(std::string const& tree) const;
     bool isInTrees(std::set<std::string> const& trees) const;
+    bool isInTreesAndAtOrBelowPath(std::set<std::string> const& trees,
+				   std::string const& path) const;
     std::set<std::string> const& getShadowedReferences() const;
     std::set<std::string> getPlatformTypes() const;
     std::string const& getPlatformType(std::string const& platform) const;

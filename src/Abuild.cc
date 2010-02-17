@@ -29,6 +29,7 @@ std::string const Abuild::FILE_DYNAMIC_GROOVY = ".ab-dynamic.groovy";
 std::string const Abuild::FILE_INTERFACE_DUMP = ".ab-interface-dump";
 std::string const Abuild::b_ALL = "all";
 std::string const Abuild::b_DEPTREES = "deptrees";
+std::string const Abuild::b_DESCDEPTREES = "descdeptrees";
 std::string const Abuild::b_LOCAL = "local";
 std::string const Abuild::b_DESC = "desc";
 std::string const Abuild::b_DEPS = "deps";
@@ -125,6 +126,7 @@ Abuild::initializeStatics()
 {
     valid_buildsets.insert(b_ALL);
     valid_buildsets.insert(b_DEPTREES);
+    valid_buildsets.insert(b_DESCDEPTREES);
     valid_buildsets.insert(b_LOCAL);
     valid_buildsets.insert(b_DESC);
     valid_buildsets.insert(b_DEPS);
@@ -4766,7 +4768,9 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	cleaning = (! this->cleanset_name.empty());
 
 	if (this->local_tree.empty() &&
-	    ((set_name == b_DEPTREES) || (set_name == b_LOCAL)))
+	    ((set_name == b_DEPTREES) ||
+	     (set_name == b_LOCAL) ||
+	     (set_name == b_DESCDEPTREES)))
 	{
 	    QTC::TC("abuild", "Abuild ERR bad tree-based build set");
 	    error("build set \"" + set_name + "\" is invalid when"
@@ -4812,6 +4816,18 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    trees.insert(this->local_tree);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isInTrees, _1, trees));
+        }
+	else if (set_name == b_DESCDEPTREES)
+        {
+            QTC::TC("abuild", "Abuild buildset descdeptrees", cleaning ? 1 : 0);
+	    std::set<std::string> trees;
+	    std::list<std::string> const& deptrees =
+		this_buildtree->getExpandedTreeDeps();
+	    trees.insert(deptrees.begin(), deptrees.end());
+	    trees.insert(this->local_tree);
+	    populateBuildset(builditems,
+			     boost::bind(&BuildItem::isInTreesAndAtOrBelowPath,
+					 _1, trees, this->current_directory));
         }
         else if (set_name == b_LOCAL)
         {
