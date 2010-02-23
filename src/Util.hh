@@ -90,7 +90,7 @@ namespace Util
 			  std::set<std::string> const& set);
 
     // Return a list of lines from the given file.  All newline
-    // terminators are removed unless otherwised specified.
+    // terminators are removed unless otherwise specified.
     std::list<std::string> readLinesFromFile(
 	std::string const& filename, bool strip_newlines = true);
     std::list<std::string> readLinesFromFile(
