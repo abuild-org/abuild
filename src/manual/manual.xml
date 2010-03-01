@@ -16521,10 +16521,11 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           The Groovy backend was not including the classes directory
-           in the compile-time classpath.  This prevented java and
-           groovy compiles in the same build item from being able to
-           see each other's classes.
+           The Groovy backend was not including the
+           <filename>classes</filename> directory in the compile-time
+           classpath.  This prevented java and groovy compiles in the
+           same build item from being able to see each other's
+           classes.
           </para>
          </listitem>
         </itemizedlist>
