@@ -1,0 +1,12 @@
+abuild: a (abuild-java): all
+    [mkdir] Created dir: --topdir--/java-groovy-interdep/a/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/java-groovy-interdep/a/abuild-java/classes
+  [groovyc] Compiling 1 source file to --topdir--/java-groovy-interdep/a/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java-groovy-interdep/a/abuild-java/dist
+      [jar] Building jar: --topdir--/java-groovy-interdep/a/abuild-java/dist/a.jar
+abuild: b (abuild-java): all
+    [mkdir] Created dir: --topdir--/java-groovy-interdep/b/abuild-java/classes
+  [groovyc] Compiling 1 source file to --topdir--/java-groovy-interdep/b/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/java-groovy-interdep/b/abuild-java/classes
+    [mkdir] Created dir: --topdir--/java-groovy-interdep/b/abuild-java/dist
+      [jar] Building jar: --topdir--/java-groovy-interdep/b/abuild-java/dist/b.jar

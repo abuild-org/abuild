@@ -63,7 +63,9 @@ class GroovyRules
         def srcdirs = attributes.remove('srcdirs')
 
         def groovycArgs = attributes
-        groovycArgs['classpath'] = compileClassPath.join(pathSep)
+        groovycArgs['classpath'] =
+            getPathVariable('classes', 'java') + pathSep +
+            compileClassPath.join(pathSep)
         ant.mkdir('dir' : attributes['destdir'])
         ant.groovyc(groovycArgs) {
             srcdirs.each { dir -> src('path' : dir) }
