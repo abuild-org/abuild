@@ -49,8 +49,7 @@ class JavaBuilder
 	this.socket = factory.createSocket("127.0.0.1", port);
 	this.responseStream = new PrintStream(this.socket.getOutputStream());
 	this.antRunner = new AntRunner();
-	this.groovyRunner = new GroovyRunner(
-	    abuildTop + "/groovy/AbuildMain.groovy");
+	this.groovyRunner = new GroovyRunner();
     }
 
     public static void main(String[] args)

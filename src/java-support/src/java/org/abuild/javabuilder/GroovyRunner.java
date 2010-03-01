@@ -13,7 +13,7 @@ public class GroovyRunner implements BuildRunner
 
     Class groovyClass = null;
 
-    public GroovyRunner(String buildFileName)
+    public GroovyRunner()
     {
 	try
 	{
