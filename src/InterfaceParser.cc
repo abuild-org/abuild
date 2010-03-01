@@ -12,6 +12,7 @@ std::map<std::string,
 	     FileLocation const&,
 	     std::vector<nt_Argument const*> const&,
 	     bool&)> InterfaceParser::function_evaluators;
+std::map<std::string, std::string> InterfaceParser::parameters;
 
 extern int interfacedebug;
 
@@ -65,6 +66,12 @@ InterfaceParser::InterfaceParser(std::string const& item_name,
 
     this->_interface.reset(new Interface(item_name, item_platform,
 					 error_handler, local_dir));
+}
+
+void
+InterfaceParser::setParameters(std::map<std::string, std::string> const& p)
+{
+    parameters = p;
 }
 
 bool
@@ -677,6 +684,10 @@ InterfaceParser::evaluateWord(nt_Word const* word,
 	    result.back() += evaluateEnvironment(token);
 	    break;
 
+	  case nt_Word::w_parameter:
+	    result.back() += evaluateParameter(token);
+	    break;
+
 	  case nt_Word::w_string:
 	    result.back() += evaluateToken(token);
 	    break;
@@ -699,13 +710,21 @@ InterfaceParser::evaluateToken(Token const* token)
 std::string
 InterfaceParser::evaluateEnvironment(Token const* token)
 {
-    boost::regex env_re("\\$\\(ENV:(.*?)\\)");
-    std::string variable = getFirstMatch(token, env_re);
+    boost::regex env_re("\\$\\(ENV:(.*?)(?::(.*?))?\\)");
+    std::string variable;
+    bool have_default = false;
+    std::string dfault;
+    getFirstAndSecondMatch(token, env_re, variable, have_default, dfault);
     std::string value;
 
     if (Util::getEnv(variable, &value))
     {
 	QTC::TC("abuild", "InterfaceParser environment variable");
+    }
+    else if (have_default)
+    {
+	QTC::TC("abuild", "InterfaceParser env default");
+	value = dfault;
     }
     else
     {
@@ -714,6 +733,36 @@ InterfaceParser::evaluateEnvironment(Token const* token)
 	      "unknown environment variable " + variable);
     }
 
+
+    return value;
+}
+
+std::string
+InterfaceParser::evaluateParameter(Token const* token)
+{
+    boost::regex env_re("\\$\\(PARAM:(.*?)(?::(.*?))?\\)");
+    std::string parameter;
+    bool have_default = false;
+    std::string dfault;
+    getFirstAndSecondMatch(token, env_re, parameter, have_default, dfault);
+    std::string value;
+
+    if (this->parameters.count(parameter))
+    {
+	value = this->parameters[parameter];
+	QTC::TC("abuild", "InterfaceParser parameter");
+    }
+    else if (have_default)
+    {
+	QTC::TC("abuild", "InterfaceParser parameter default");
+	value = dfault;
+    }
+    else
+    {
+	QTC::TC("abuild", "InterfaceParser ERR invalid parameter");
+	error(token->getLocation(),
+	      "unknown parameter " + parameter);
+    }
 
     return value;
 }
@@ -878,6 +927,32 @@ InterfaceParser::getFirstMatch(Token const* token, boost::regex& expression)
     boost::smatch match;
     assert(boost::regex_match(value, match, expression));
     return match[1].str();
+}
+
+void
+InterfaceParser::getFirstAndSecondMatch(Token const* token,
+					boost::regex& expression,
+					std::string& match1,
+					bool& have_match2,
+					std::string& match2)
+{
+    // Fill in the first submatch, and if present, the second submatch
+    // from matching the token value with the given expression.  This
+    // method must be called only when a match is certain and the
+    // first submatch is guaranteed to be present.
+    std::string const& value = token->getValue();
+    boost::smatch match;
+    assert(boost::regex_match(value, match, expression));
+    match1 = match[1].str();
+    have_match2 = match[2].matched;
+    if (have_match2)
+    {
+	match2 = match[2].str();
+    }
+    else
+    {
+	match2.clear();
+    }
 }
 
 bool
@@ -1315,6 +1390,10 @@ InterfaceParser::checkStringOrFilenameArgument(
 
 		  case nt_Word::w_environment:
 		    value += evaluateEnvironment(token);
+		    break;
+
+		  case nt_Word::w_parameter:
+		    value += evaluateParameter(token);
 		    break;
 
 		  case nt_Word::w_string:

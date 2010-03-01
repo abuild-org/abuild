@@ -1,0 +1,4 @@
+declare I1 string = $(ENV:E1:I1-default)
+declare I2 string = $(ENV:E2:I2-default)
+declare I3 string = $(PARAM:P1:I3-default)
+declare I4 string = $(PARAM:P2:I4-default)

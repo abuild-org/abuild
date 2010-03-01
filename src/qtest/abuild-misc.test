@@ -455,9 +455,17 @@ foreach my $d (['serial', 'serial', ''],
 		 $td->NORMALIZE_NEWLINES);
 }
 
+cd("work/env-and-parameter");
+$td->runtest("environment variables and parameters",
+	     {$td->COMMAND => "E1=E1-value abuild P1=P1-value",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/env-and-parameter.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(59 +
+$td->report(60 +
 	    (in_windows() ? 0 : 3) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));

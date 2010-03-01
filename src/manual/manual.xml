@@ -6818,15 +6818,52 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      <varname>$(ENV:VARIABLE)</varname>.  Unlike many other systems
      which treat undefined environment variables as the empty string,
      &abuild; will trigger an error condition if the environment
-     variable does not exist.  This can be useful for having &abuild;
-     interface files initialize interface variables from the
-     environment.  Use this feature sparingly as it is possible to
-     make a build become overly dependent on the environment in this
-     way.  (Even without this feature, there are other ways to fall
-     into this trap that are even worse.)  Note that environment
-     variables are not &abuild; variables.  They are expanded as
-     strings and can be used in the interface file wherever ordinary
-     strings can be used.
+     variable does not exist unless a default value is provided.  A
+     default value can be provided using the syntax
+     <varname>$(ENV:VARIABLE:default-value)</varname>.  The
+     <replaceable>default-value</replaceable> portion of the string
+     may not contain spaces, tabs, or parentheses.
+     <footnote>
+      <para>
+       This syntax restriction is somewhat arbitrary, but it makes it
+       less likely that syntax errors in specifying environment
+       variable references will create hard-to-solve parsing errors in
+       interface files.  If this restriction is in your way, you're
+       probably abusing this feature and may need to rethink why
+       you're accessing environment variables to begin with.
+      </para>
+     </footnote>
+     Although it can sometimes be useful to have &abuild; interface
+     files initialize interface variables from the environment, this
+     feature should be used sparingly as it is possible to make a
+     build become overly dependent on the environment in this way.
+     (Even without this feature, there are other ways to fall into
+     this trap that are even worse.)  Note that environment variables
+     are not &abuild; variables.  They are expanded as strings and can
+     be used in the interface file wherever ordinary strings can be
+     used.
+    </para>
+    <para>
+     In addition, starting in version 1.1.1, &abuild; can access
+     command-line parameters of the form
+     <replaceable>VAR=val</replaceable> from interface files.  This
+     works identically to environment variables.  Parameter references
+     are of the form <varname>$(PARAM:PARAMETER)</varname> or
+     <varname>$(PARAM:PARMETER:default-value)</varname>.  As with
+     environment variable references, accessing an unspecified
+     parameter without a default is an error, and parameter expansions
+     are treated as strings by the interface parser.  This feature
+     should also be used sparingly as it can create plenty of
+     opportunity for unpredictable builds.  The main valid use case
+     for accessing parameters from an interface file would be to allow
+     special debugging changes that allow modifying build behavior
+     from the command-line for particular circumstances.  Keep in mind
+     that changing parameters on the command line has no impact on
+     dependencies, so gratuitous and careless use of this feature can
+     lead to unreproducible builds.  That said, this feature does not
+     make &abuild; inherently less safe since it has always been
+     possible to access parameters and the environment directly from
+     make code.
     </para>
     <para>
      Variables may contain single scalar values or they may contain
@@ -16534,6 +16571,25 @@ Y = $(X)
            just so that there was a 1.1 equivalent to &abuild; 1.0's
            <option>desc</option> build set.  Most users will never
            need to use this build set.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Environment variable references in interface files may now
+           be specified with defaults.  To do this, use
+           <varname>$(ENV:VARIABLE:default-value)</varname>.  The
+           <replaceable>default-value</replaceable> portion of the
+           variable reference may not contain spaces or parentheses.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Command line parameters may now also be referenced from
+           interface files.  To do this, use
+           <varname>$(PARAM:PARAMETER)</varname> or
+           <varname>$(PARAM:PARAMETER:default-value)</varname>.  The
+           <replaceable>default-value</replaceable> portion of the
+           variable reference may not contain spaces or parentheses.
           </para>
          </listitem>
         </itemizedlist>

@@ -63,6 +63,7 @@
 %token <token> tok_kw_targettype
 %token <token> tok_identifier
 %token <token> tok_environment
+%token <token> tok_parameter
 %token <token> tok_function
 %token <token> tok_variable
 %token <token> tok_other
@@ -474,6 +475,11 @@ wordfragment : tok_variable
 	  {
 	      $$ = parser->createWord();
 	      $$->appendEnvironment($1);
+	  }
+	| tok_parameter
+	  {
+	      $$ = parser->createWord();
+	      $$->appendParameter($1);
 	  }
 	| tok_other
 	  {

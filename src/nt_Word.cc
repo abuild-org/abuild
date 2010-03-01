@@ -39,6 +39,13 @@ nt_Word::appendEnvironment(Token const* t)
 }
 
 void
+nt_Word::appendParameter(Token const* t)
+{
+    maybeSetLocation(t);
+    this->tokens.push_back(std::make_pair(t, w_parameter));
+}
+
+void
 nt_Word::maybeSetLocation(Token const* t)
 {
     if (this->tokens.empty())

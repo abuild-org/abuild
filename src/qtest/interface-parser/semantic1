@@ -59,3 +59,4 @@ declare empty_bool boolean =
 declare empty_filename filename =
 override empty_bool =
 override empty_filename =
+override a = $(PARAM:NO_SUCH_PARAMETER)

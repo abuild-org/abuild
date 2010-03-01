@@ -233,6 +233,7 @@ Abuild::runInternal()
 	return true;
     }
 
+    InterfaceParser::setParameters(this->defines);
     initializePlatforms();
     exitIfErrors();
 

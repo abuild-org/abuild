@@ -14,13 +14,14 @@ class nt_Word: public NonTerminal
     nt_Word();
     virtual ~nt_Word();
 
-    enum word_type_e { w_string, w_variable, w_environment };
+    enum word_type_e { w_string, w_variable, w_environment, w_parameter };
     typedef std::pair<Token const*, word_type_e> word_t;
 
     void appendWord(nt_Word const* w);
     void appendString(Token const* t);
     void appendVariable(Token const* t);
     void appendEnvironment(Token const* t);
+    void appendParameter(Token const* t);
 
     std::list<word_t> const& getTokens() const;
 

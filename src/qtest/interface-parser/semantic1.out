@@ -18,6 +18,7 @@ semantic1:58:29: ERROR: value  is invalid for boolean variable empty_bool
 semantic1:59:34: ERROR: the empty string may not be used as a value for filename variable empty_filename
 semantic1:60:10: ERROR: value  is invalid for boolean variable empty_bool
 semantic1:61:10: ERROR: the empty string may not be used as a value for filename variable empty_filename
+semantic1:62:14: ERROR: unknown parameter NO_SUCH_PARAMETER
 parse(semantic1): failure
 dumping interface semantic1
   a: string, target type object-code = 

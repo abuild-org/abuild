@@ -57,6 +57,9 @@ class InterfaceParser: public Parser
     virtual void setToken(Token* t);
     void acceptParseTree(nt_Blocks*);
 
+    // Provides parameters for $(PARAM:...) expansion
+    static void setParameters(std::map<std::string, std::string> const&);
+
     // Imports the given interface into our internal interface
     bool importInterface(Interface const&);
 
@@ -117,6 +120,7 @@ class InterfaceParser: public Parser
     void evaluateWord(nt_Word const*, std::deque<std::string>& result);
     std::string evaluateToken(Token const*);
     std::string evaluateEnvironment(Token const*);
+    std::string evaluateParameter(Token const*);
     bool evaluateConditional(nt_Conditional const*, bool evaluating,
 			     bool& istrue);
     bool evaluateBooleanOrFunction(
@@ -129,6 +133,10 @@ class InterfaceParser: public Parser
     std::string getVariableName(Token const*);
     std::string getFunctionName(Token const*);
     std::string getFirstMatch(Token const*, boost::regex&);
+    void getFirstAndSecondMatch(Token const*, boost::regex&,
+				std::string& match1,
+				bool& have_match2,
+				std::string& match2);
     bool evaluateFunctionAnd(
 	FileLocation const&, std::vector<nt_Argument const*> const&,
 	bool& function_true);
@@ -194,6 +202,7 @@ class InterfaceParser: public Parser
 			FileLocation const&,
 			std::vector<nt_Argument const*> const&,
 			bool& /* function_true */)> function_evaluators;
+    static std::map<std::string, std::string> parameters;
 
     YYSTYPE* yydata;
     nt_Blocks* parse_tree;

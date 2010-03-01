@@ -103,6 +103,7 @@ tok_kw_targettype	target-type
 tok_function	[_[:alnum:]\.-]+[ \t]*+\([ \t]*
 tok_identifier	[_[:alnum:]\.-]+
 tok_variable	\$\([_[:alnum:]\.-]+\)
-tok_environment	\$\(ENV:[_[:alnum:]]+\)
+tok_environment	\$\(ENV:[_[:alnum:]]+(:[^ \t\(\)]*)?\)
+tok_parameter	\$\(PARAM:[_[:alnum:]]+(:[^ \t\(\)]*)?\)
 tok_spaces	([ \t]|\\\r?\n)([ \t]*|(\\\r?\n))*
 tok_other	.

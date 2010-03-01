@@ -69,9 +69,10 @@
      tok_kw_targettype = 285,
      tok_identifier = 286,
      tok_environment = 287,
-     tok_function = 288,
-     tok_variable = 289,
-     tok_other = 290
+     tok_parameter = 288,
+     tok_function = 289,
+     tok_variable = 290,
+     tok_other = 291
    };
 #endif
 /* Tokens.  */
@@ -105,9 +106,10 @@
 #define tok_kw_targettype 285
 #define tok_identifier 286
 #define tok_environment 287
-#define tok_function 288
-#define tok_variable 289
-#define tok_other 290
+#define tok_parameter 288
+#define tok_function 289
+#define tok_variable 290
+#define tok_other 291
 
 
 
@@ -137,7 +139,7 @@ typedef union YYSTYPE
     nt_IfClauses* ifclauses;
 }
 /* Line 1529 of yacc.c.  */
-#line 141 "interface.tab.hh"
+#line 143 "interface.tab.hh"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
