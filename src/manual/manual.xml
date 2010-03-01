@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.0">
-<!ENTITY lastreleased "December 7, 2009">
+<!ENTITY swversion "1.1.1">
+<!ENTITY lastreleased "March 1, 2010">
 ]>
 <!--
 
@@ -140,7 +140,7 @@ following checks:
    <firstname>Jay</firstname><surname>Berkenbilt</surname>
   </author>
   <copyright>
-   <year>2007-2009</year>
+   <year>2007-2010</year>
    <holder>Jay Berkenbilt, Argon ST</holder>
   </copyright>
   <legalnotice>
@@ -16496,7 +16496,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.1: XXX</term>
+     <term>1.1.1: March 1, 2010</term>
      <listitem>
       <itemizedlist>
        <listitem>

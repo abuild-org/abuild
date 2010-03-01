@@ -1,5 +1,4 @@
 #include <Abuild.hh>
-
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
@@ -21,7 +20,7 @@
 #include <cstdio>
 #include <assert.h>
 
-std::string const Abuild::ABUILD_VERSION = "1.1.0";
+std::string const Abuild::ABUILD_VERSION = "1.1.1";
 std::string const Abuild::OUTPUT_DIR_PREFIX = "abuild-";
 std::string const Abuild::FILE_DYNAMIC_MK = ".ab-dynamic.mk";
 std::string const Abuild::FILE_DYNAMIC_ANT = ".ab-dynamic-ant.properties";
@@ -172,7 +171,7 @@ Abuild::runInternal()
 	{
 	    l(this->whoami + " version " + ABUILD_VERSION);
 	    l("");
-	    l("Copyright (c) 2007-2009 Jay Berkenbilt, Argon ST");
+	    l("Copyright (c) 2007-2010 Jay Berkenbilt, Argon ST");
 	    l("This software may be distributed under the terms of version 2 of");
 	    l("the Artistic License which may be found in the source and binary");
 	    l("distributions.  It is provided \"as is\" without express or");
