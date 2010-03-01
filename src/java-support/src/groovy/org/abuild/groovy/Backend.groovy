@@ -170,11 +170,7 @@ class Backend implements GroovyBackend
         }
         try
         {
-            if (! this.classCache.containsKey(file))
-            {
-                this.classCache[file] = loader.parseClass(file)
-            }
-            Class groovyClass = this.classCache[file]
+            Class groovyClass = parseClass(file)
             if (groovyClass)
             {
                 GroovyObject groovyObject = groovyClass.newInstance()
@@ -189,6 +185,20 @@ class Backend implements GroovyBackend
             buildState.error("file ${file.path} had compilation errors")
             throw e
         }
+    }
+
+    private parseClass(File file)
+    {
+        Class c
+        synchronized (this.classCache)
+        {
+            if (! this.classCache.containsKey(file))
+            {
+                this.classCache[file] = this.loader.parseClass(file)
+            }
+            c = this.classCache[file]
+        }
+        c
     }
 
     private runScript(file, object)
