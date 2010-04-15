@@ -12,17 +12,39 @@
 
     - Have abuild monitor its use of permgen space and restart if it
       starts to get too high.  This will be hard to get right.
-      java-builder will have to send a message back to abuild that
-      says that it has to shut down and can't accept any more jobs.
-      Then abuid will have to block waiting for java-builder to
-      restart.  The next job will automatically restart it.
 
-      http://java.sun.com/javase/6/docs/api/
-      MemoryPoolMXBean
+      import java.lang.management.ManagementFactory;
+      import java.lang.management.MemoryPoolMXBean;
+      import java.lang.management.MemoryUsage;
+      import java.util.List;
 
-      http://stackoverflow.com/questions/697336/how-do-i-programmatically-find-out-my-permgen-space-usage
+      public class PermGen
+      {
+	  public static void main(String[] args)
+	  {
+	      List<MemoryPoolMXBean> poolbeans =
+		  ManagementFactory.getMemoryPoolMXBeans();
+	      for (MemoryPoolMXBean bean: poolbeans)
+	      {
+		  if ("PS Perm Gen".equals(bean.getName()))
+		  {
+		      MemoryUsage usage = bean.getUsage();
+		      long used = usage.getUsed();
+		      long max = usage.getMax();
+		      long available = max - used;
+		      System.out.println("perm gen available: " + available);
+		  }
+	      }
+	  }
+      }
 
-
+      To handle restart, java-builder will have to send a message back
+      to abuild that says that it has to shut down and can't accept
+      any more jobs.  Then abuid will have to block waiting for
+      java-builder to restart.  The next job will automatically
+      restart it.  This seems like it might be too much trouble to
+      bother with.  Note that the above only works with the Sun JDK.
+      The IBM JDK doesn't have a pool called "PS Perm Gen".
 
 Abuild Lint
 ===========
