@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 import org.abuild.ant.AbuildLogger;
 import org.abuild.ant.Deprecate;
 import org.apache.tools.ant.MagicNames;
@@ -31,12 +33,12 @@ class JavaBuilder
     static private final Pattern defines_re =
 	Pattern.compile("([^-][^=]*)=(.*)");
     private Socket socket;
-    private PrintStream responseStream;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     private AntRunner antRunner = null;
     private GroovyRunner groovyRunner = null;
     private Map<String, String> defines;
     private BuildArgs buildArgs;
+    private Responder responder;
 
     JavaBuilder(String abuildTop, int port,
 		BuildArgs buildArgs,
@@ -47,7 +49,6 @@ class JavaBuilder
 	this.defines = defines;
 	SocketFactory factory = SocketFactory.getDefault();
 	this.socket = factory.createSocket("127.0.0.1", port);
-	this.responseStream = new PrintStream(this.socket.getOutputStream());
 	this.antRunner = new AntRunner();
 	this.groovyRunner = new GroovyRunner();
     }
@@ -103,6 +104,11 @@ class JavaBuilder
 	    e.printStackTrace(System.err);
 	    System.exit(2);
 	}
+	catch (InterruptedException e)
+	{
+	    e.printStackTrace(System.err);
+	    System.exit(2);
+	}
     }
 
     private static void usage()
@@ -112,12 +118,13 @@ class JavaBuilder
     }
 
     private boolean handleInput(String line)
-	throws IOException
+	throws IOException, InterruptedException
     {
 	boolean result = false;
 	if (line.equals("shutdown"))
 	{
 	    this.threadPool.shutdownNow();
+	    this.responder.shutdown();
 	}
 	else
 	{
@@ -140,19 +147,21 @@ class JavaBuilder
 
     private synchronized void sendResponse(String number, boolean result)
     {
-	// Synchronize writing responses, including a flush, in hopes
-	// of avoiding sending interleaved responses.  Even with this,
-	// interleaved responses seem to appear once in a blue moon.
-	// The best fix would be to have a responder thread that reads
-	// responses off of a therad-safe queue and sends them out
-	// serially.
-	responseStream.println(number + " " + (result ? "true" : "false"));
-	responseStream.flush();
+	try
+	{
+	    this.responder.sendResponse(number, result);
+	}
+	catch (InterruptedException e)
+	{
+	    e.printStackTrace(System.err);
+	    System.exit(2);
+	}
     }
 
     private void run()
-	throws IOException
+	throws IOException, InterruptedException
     {
+	this.responder = new Responder(this.socket);
 	LineNumberReader r =
 	    new LineNumberReader(
 		new InputStreamReader(this.socket.getInputStream()));
@@ -322,6 +331,57 @@ class JavaBuilder
 		e.printStackTrace(System.err);
 	    }
 	    JavaBuilder.this.sendResponse(number, status);
+	}
+    }
+
+    class Responder implements Runnable
+    {
+	private PrintStream responseStream;
+	private BlockingQueue<String> responseQueue;
+	private Thread thread;
+
+	public Responder(Socket s)
+	    throws IOException
+	{
+	    this.responseStream = new PrintStream(s.getOutputStream());
+	    this.responseQueue = new ArrayBlockingQueue<String>(1);
+	    this.thread = new Thread(this);
+	    this.thread.start();
+	}
+
+	public void sendResponse(String number, boolean result)
+	    throws InterruptedException
+	{
+	    responseQueue.put(number + " " + (result ? "true" : "false"));
+	}
+
+	public void shutdown()
+	    throws InterruptedException
+	{
+	    responseQueue.put("");
+	    this.thread.join();
+	}
+
+	public void run()
+	{
+	    try
+	    {
+		while (true)
+		{
+		    String response = this.responseQueue.take();
+		    if ("".equals(response))
+		    {
+			break;
+		    }
+		    responseStream.println(response);
+		    responseStream.flush();
+		}
+	    }
+	    catch (InterruptedException e)
+	    {
+		e.printStackTrace(System.err);
+		System.exit(2);
+	    }
 	}
     }
 }
