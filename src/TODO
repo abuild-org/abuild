@@ -1,3 +1,29 @@
+1.1.2
+=====
+
+ * Deal with PermGen space problems:
+
+    - Invoke java with additional permgen space, e.g.
+
+      -XX:MaxPermSize=128m
+
+    - Add a flag to abuild that takes additional flags to pass to the
+      jvm.
+
+    - Have abuild monitor its use of permgen space and restart if it
+      starts to get too high.  This will be hard to get right.
+      java-builder will have to send a message back to abuild that
+      says that it has to shut down and can't accept any more jobs.
+      Then abuid will have to block waiting for java-builder to
+      restart.  The next job will automatically restart it.
+
+      http://java.sun.com/javase/6/docs/api/
+      MemoryPoolMXBean
+
+      http://stackoverflow.com/questions/697336/how-do-i-programmatically-find-out-my-permgen-space-usage
+
+
+
 Abuild Lint
 ===========
 
