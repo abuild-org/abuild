@@ -86,9 +86,9 @@ class Abuild
     void argSetKeepGoing();
     void argSetNoOp();
     void argSetEmacs();
-    void argSetMakeArgs(std::vector<std::string> const&);
     void argSetBackendArgs(std::vector<std::string> const&,
 			   std::list<std::string>&);
+    void argSetJVMXargs(std::vector<std::string> const&, bool replace);
     void argSetDeprecationIsError();
     void argSetVerbose();
     void argSetSilent();
@@ -394,6 +394,7 @@ class Abuild
     int make_njobs;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
+    std::list<std::string> jvm_xargs;
     bool test_java_builder_bad_java;
     std::map<std::string, std::string> defines;
     std::string start_dir;

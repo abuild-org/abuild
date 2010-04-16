@@ -26,11 +26,27 @@ if (! $test_java)
     exit 0;
 }
 
-# This test contains basic groovy-specific functionality tests
+# This test contains basic groovy-specific functionality tests and a
+# few general java backend tests.
 
 setup($td);
 
 cd("work/util");
+
+$td->runtest("jvm-append-args",
+	     {$td->COMMAND => "abuild --jvm-append-args -oops1 -oops2" .
+		  " --end-jvm-args --verbose",
+		  $td->FILTER => "grep 'invoking java:'"},
+	     {$td->REGEXP =>
+		  ".*/java -XX:MaxPermSize\\S+ -oops1 -oops2 -classpath .*",
+	      $td->EXIT_STATUS => undef});
+
+$td->runtest("jvm-replace-args",
+	     {$td->COMMAND => "abuild --jvm-replace-args -oops1 -oops2" .
+		  " --end-jvm-args --verbose",
+		  $td->FILTER => "grep 'invoking java:'"},
+	     {$td->REGEXP => ".*/java -oops1 -oops2 -classpath .*",
+	      $td->EXIT_STATUS => undef});
 
 $td->runtest("groovy Util",
 	     {$td->COMMAND => "abuild",
@@ -137,4 +153,4 @@ $td->runtest("Groovy/Java interdependence",
 
 check_work_accessed($td);
 
-$td->report(14);
+$td->report(16);

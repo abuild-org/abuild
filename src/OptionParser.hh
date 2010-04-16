@@ -35,9 +35,11 @@
 //    Numeric options are always required to be positive numbers.
 //
 //  * Arguments that are lists of strings may optionally have a
-//    termination regular expression.  The first argument that matches
-//    this regular expression is considered to FOLLOW the list and is not
-//    part of the list.
+//    termination regular expression.  All strings up to but not
+//    including the first argument that matches the termination
+//    expression are included in the list.  If discard_term_arg is
+//    true, the termination argument will be discarded.  Otherwise, it
+//    weill considered as a normal argument after the end of the list.
 //
 //
 // Recognition of arguments to options:
@@ -86,7 +88,7 @@ class OptionParser
     void registerListArg(
 	std::string const& option,
 	std::string const& term_regex,
-	bool consume_term_arg,
+	bool discard_term_arg,
 	boost::function<void(std::vector<std::string> const&)> callback);
     void registerSynonym(
 	std::string const& option,
@@ -113,13 +115,13 @@ class OptionParser
 	ArgumentSpecification() :
 	    arg_type(at_none),
 	    default_value(0),
-	    consume_term_arg(false)
+	    discard_term_arg(false)
 	{
 	}
 
 	arg_type_e arg_type;
 	int default_value;	// at_optional_numeric
-	bool consume_term_arg;	// at_list
+	bool discard_term_arg;	// at_list
 	boost::regex regex;	// at_regex, at_list
 
 	// Only one of these will be defined.  It's up to the code to

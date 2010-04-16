@@ -79,14 +79,14 @@ void
 OptionParser::registerListArg(
     std::string const& option,
     std::string const& term_regex,
-    bool consume_term_arg,
+    bool discard_term_arg,
     boost::function<void(std::vector<std::string> const&)> callback)
 {
     assert(this->arguments.count(option) == 0);
     ArgumentSpecification a;
     a.arg_type = at_list;
     a.regex = boost::regex(term_regex);
-    a.consume_term_arg = consume_term_arg;
+    a.discard_term_arg = discard_term_arg;
     a.cb_vector = callback;
     this->arguments[option] = a;
 }
@@ -283,34 +283,36 @@ OptionParser::handleOption(
 		if (*(arg + 1) == 0)
 		{
 		    QTC::TC("abuild", "OptionParser list to end of args",
-			    arg_data.consume_term_arg ? 0 : 1);
+			    arg_data.discard_term_arg ? 0 : 1);
 		    done = true;
 		}
 		else
 		{
 		    bool consume = true;
+		    bool discard = false;
 		    std::string next_arg = *(arg + 1);
 		    if (boost::regex_match(next_arg, m, arg_data.regex))
 		    {
 			QTC::TC("abuild", "OptionParser found term arg",
-				arg_data.consume_term_arg ? 0 : 1);
+				arg_data.discard_term_arg ? 0 : 1);
 			done = true;
-			if (! arg_data.consume_term_arg)
-			{
-			    consume = false;
-			}
+			consume = false;
+			discard = arg_data.discard_term_arg;
 		    }
 		    if (consume)
 		    {
-			// Consume arg
 			++arg;
 			args.push_back(next_arg);
+		    }
+		    else if (discard)
+		    {
+			++arg;
 		    }
 		}
 	    }
 	    QTC::TC("abuild", "OptionParser call vector callback",
 		    has_attached_arg ? 0 :
-		    args.empty() ? (arg_data.consume_term_arg ? 1 : 2) :
+		    args.empty() ? (arg_data.discard_term_arg ? 1 : 2) :
 		    3);
 	    arg_data.cb_vector(args);
 	}

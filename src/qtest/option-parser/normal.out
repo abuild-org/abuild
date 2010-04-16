@@ -18,7 +18,6 @@ potato type: fully roasted
 help args:
   "help"
   "topic"
-  "--end-help"
 end of help args
 words:
   "moo"

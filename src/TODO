@@ -10,42 +10,6 @@
     - Add a flag to abuild that takes additional flags to pass to the
       jvm.
 
-    - Have abuild monitor its use of permgen space and restart if it
-      starts to get too high.  This will be hard to get right.
-
-      import java.lang.management.ManagementFactory;
-      import java.lang.management.MemoryPoolMXBean;
-      import java.lang.management.MemoryUsage;
-      import java.util.List;
-
-      public class PermGen
-      {
-	  public static void main(String[] args)
-	  {
-	      List<MemoryPoolMXBean> poolbeans =
-		  ManagementFactory.getMemoryPoolMXBeans();
-	      for (MemoryPoolMXBean bean: poolbeans)
-	      {
-		  if ("PS Perm Gen".equals(bean.getName()))
-		  {
-		      MemoryUsage usage = bean.getUsage();
-		      long used = usage.getUsed();
-		      long max = usage.getMax();
-		      long available = max - used;
-		      System.out.println("perm gen available: " + available);
-		  }
-	      }
-	  }
-      }
-
-      To handle restart, java-builder will have to send a message back
-      to abuild that says that it has to shut down and can't accept
-      any more jobs.  Then abuid will have to block waiting for
-      java-builder to restart.  The next job will automatically
-      restart it.  This seems like it might be too much trouble to
-      bother with.  Note that the above only works with the Sun JDK.
-      The IBM JDK doesn't have a pool called "PS Perm Gen".
-
 Abuild Lint
 ===========
 
@@ -304,6 +268,68 @@ Java Problems
    able to control on a per-build-item basis whether it is an error
    condition or just a warning, probably having "error" be the
    default.
+
+ * Since abuild's java side loads lots of classes (through ant with
+   both backends), it is prone to running out of PermGen space.  This
+   may only be an issue with Sun's JDK.  We have studied the issue and
+   believe that abuild itself is not leaking PermGen space, but it's
+   possible that some ant tasks might be.  Either way, even without
+   leaks, the default 64M is insufficient.  Starting with version
+   1.1.2, abuild invokes java with a higher PermGen space, but it does
+   so using an unsupported extension that is subject to change.
+
+   If PermGen space becomes a problem, abuild's java-builder could
+   monitor its use of PermGen space and try to restart when it is
+   running low.  There are two parts to this: monitoring PermGen space
+   and cleanly restarting in the middle of a build.
+
+   To monitor PermGen space, you can use something like the following:
+
+    import java.lang.management.ManagementFactory;
+    import java.lang.management.MemoryPoolMXBean;
+    import java.lang.management.MemoryUsage;
+    import java.util.List;
+
+    public class PermGen
+    {
+        public static void main(String[] args)
+        {
+            List<MemoryPoolMXBean> poolbeans =
+                ManagementFactory.getMemoryPoolMXBeans();
+            for (MemoryPoolMXBean bean: poolbeans)
+            {
+                if ("PS Perm Gen".equals(bean.getName()))
+                {
+                    MemoryUsage usage = bean.getUsage();
+                    long used = usage.getUsed();
+                    long max = usage.getMax();
+                    long available = max - used;
+                    System.out.println("perm gen available: " + available);
+                }
+            }
+        }
+    }
+
+   The above is fragile and implementation specific.  It is known to
+   work with Sun's JDK 1.6.  It doesn't do anything with the IBM JDK
+   since there is no pool called "PS Perm Gen" and a quick glance
+   doesn't expose any pools that seem to serve the same function.
+   However, just iterating through the list and looking at
+   bean.getName() and bean.toString() may reveal additional
+   information.  Then there's still the question of when to monitor
+   and when to restart.  But all the information is there.
+
+   To handle restart, we will have to extend the protocol between
+   abuild and java-builder to allow a restart.  java-builder will have
+   to send a message back to abuild that says that it has to shut down
+   and can't accept any more jobs.  Then abuild will have to block
+   waiting for java-builder to exit.  The next job will automatically
+   restart it.  This will temporarily serialize the build (at least
+   with respect to Java jobs), but it is probably better than starting
+   a second instance of the java builder, though I suppose that's also
+   an option.  In any case, it will add extra complexity to the
+   already fragile JavaBuilder.cc code and would be best avoided if
+   possible.
 
 
 Known Bugs

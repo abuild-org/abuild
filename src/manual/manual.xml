@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.1">
-<!ENTITY lastreleased "March 1, 2010">
+<!ENTITY swversion "1.1.2">
+<!ENTITY lastreleased "April 16, 2010">
 ]>
 <!--
 
@@ -5674,6 +5674,34 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
        </para>
       </listitem>
      </varlistentry>
+     <varlistentry>
+      <term>--jvm-append-args ... --end-jvm-args</term>
+      <listitem>
+       <para>
+        Appends any arguments between
+        <option>--jvm-append-args</option> and
+        <option>--end-jvm-args</option> to the list of extra arguments
+        that &abuild; passes to the JVM when it invokes the java
+        builder backend.  This option is intended for use in debugging
+        &abuild;.  If you have to use it to make your build work,
+        please report this as a bug.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>--jvm-replace-args ... --end-jvm-args</term>
+      <listitem>
+       <para>
+        Replaces &abuild;'s internal list of extra JVM arguments with
+        any arguments between <option>--jvm-replace-args</option> and
+        <option>--end-jvm-args</option>.  This option is intended for
+        use in debugging &abuild;.  If you have to use it to make your
+        build work, please report this as a bug.
+       </para>
+      </listitem>
+     </varlistentry>
+
+
      <varlistentry>
       <term>-k | --keep-going</term>
       <listitem>
@@ -16495,6 +16523,51 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.2: April 16, 2010</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Java Backend Implementation Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           A minor improvement has been made to how abuild
+           communicates with its java backends.  This is not a
+           user-visible change, but should eliminate any possibility
+           of protocol errors between abuild and its backend.  This
+           problem has never been reported in production, but there
+           was a race condition under which it was possible.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           &Abuild; invokes the JVM that runs the Java backends with a
+           parameter that sets the maximum PermGen space to 200
+           megabytes, overriding the default of 64 megabytes.  This
+           should hopefully eliminate the out of memory problems that
+           are sometimes encountered with large builds.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           New command line arguments <option>--jvm-append-args
+           ... --end-jvm-args</option> and <option>--jvm-replace-args
+           ... --end-jvm-args</option> have been added to provide
+           finer control over how the JVM that runs &abuild;'s java
+           backends is invoked.  These options are intended for use in
+           debugging &abuild;.  If you have to use them to make your
+           build work, you should submit a bug report with the
+           details.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.1: March 1, 2010</term>
      <listitem>

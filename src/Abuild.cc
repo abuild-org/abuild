@@ -360,6 +360,10 @@ Abuild::parseArgv()
 	compat_level_version = "1.1";
     }
 
+    // Increase max PermGen space.  This option is understood by Sun's
+    // JVM and appears to be (harmlessly) ignored by others.
+    this->jvm_xargs.push_back("-XX:MaxPermSize=200m");
+
     // for backward compatibility
     std::list<std::string> ant_args;
     boost::regex ant_define_re("-D([^-][^=]*)=(.*)");
@@ -411,6 +415,12 @@ Abuild::parseArgv()
 	"ant", "-?-make", false,
 	boost::bind(&Abuild::argSetBackendArgs, this, _1,
 		    boost::ref(ant_args)));
+    op.registerListArg(
+	"jvm-append-args", "-?-end-jvm-args", true,
+	boost::bind(&Abuild::argSetJVMXargs, this, _1, false));
+    op.registerListArg(
+	"jvm-replace-args", "-?-end-jvm-args", true,
+	boost::bind(&Abuild::argSetJVMXargs, this, _1, true));
     op.registerStringArg(
 	"platform-selector",
 	boost::bind(&std::list<std::string>::push_back,
@@ -819,6 +829,16 @@ Abuild::argSetBackendArgs(std::vector<std::string> const& from,
 			  std::list<std::string>& to)
 {
     to.insert(to.end(), from.begin(), from.end());
+}
+
+void
+Abuild::argSetJVMXargs(std::vector<std::string> const& val, bool replace)
+{
+    if (replace)
+    {
+	this->jvm_xargs.clear();
+    }
+    this->jvm_xargs.insert(this->jvm_xargs.end(), val.begin(), val.end());
 }
 
 void
@@ -5903,7 +5923,7 @@ Abuild::findJava()
 	    this->error_handler,
 	    boost::bind(&Abuild::verbose, this, _1),
 	    this->abuild_top, java, java_home, ant_home,
-	    java_libs, this->envp,
+	    java_libs, this->envp, this->jvm_xargs,
 	    this->java_builder_args, this->defines));
 }
 

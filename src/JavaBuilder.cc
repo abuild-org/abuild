@@ -22,6 +22,7 @@ JavaBuilder::JavaBuilder(Error& error,
 			 std::string const& ant_home,
 			 std::list<std::string> const& java_libs,
 			 char** envp,
+			 std::list<std::string> const& jvm_xargs,
 			 std::list<std::string> const& build_args,
 			 std::map<std::string, std::string> const& defines) :
     error(error),
@@ -33,6 +34,7 @@ JavaBuilder::JavaBuilder(Error& error,
     ant_home(ant_home),
     java_libs(java_libs),
     envp(envp),
+    jvm_xargs(jvm_xargs),
     build_args(build_args),
     defines(defines),
     last_request(0),
@@ -424,6 +426,12 @@ JavaBuilder::runJava(unsigned short port)
     // is not in its path, so set argv[0] to the full path rather than
     // just "java".
     args.push_back(this->java);
+    for (std::list<std::string>::const_iterator iter =
+	     this->jvm_xargs.begin();
+	 iter != this->jvm_xargs.end(); ++iter)
+    {
+	args.push_back(*iter);
+    }
     args.push_back("-classpath");
     args.push_back(Util::join(Util::pathSeparator(), jars));
     args.push_back("org.abuild.javabuilder.JavaBuilder");

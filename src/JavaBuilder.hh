@@ -30,6 +30,7 @@ class JavaBuilder
 		std::string const& ant_home,
 		std::list<std::string> const& java_libs,
 		char* envp[],
+		std::list<std::string> const& jvm_xargs,
 		std::list<std::string> const& build_args,
 		std::map<std::string, std::string> const& defines);
     bool invoke(std::string const& backend,
@@ -76,6 +77,7 @@ class JavaBuilder
     std::string ant_home;
     std::list<std::string> java_libs;
     char** envp;
+    std::list<std::string> jvm_xargs;
     std::list<std::string> build_args;
     std::map<std::string, std::string> defines;
     static unsigned int const max_data_size = 1024;
