@@ -46,6 +46,12 @@ OPTIONS
                     that contains Abuild.conf and run abuild from there
   --full-integrity  check integrity for all items, not just items being built
   --jobs=n | -jn    build up to n build items in parallel
+  --jvm-append-args ... --end-jvm-args    append to the list of extra
+                    arguments passed to the java builder JVM; for
+                    debugging only
+  --jvm-replace-args ... --end-jvm-args   replace the list of extra
+                    arguments passed to the java builder JVM; for
+                    debugging only
   --keep-going |    don't stop when a build item fails; also tells backend
     -k              not to stop on failure
   --list-platforms  list all object-code platforms
