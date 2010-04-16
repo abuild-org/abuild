@@ -1,15 +1,3 @@
-1.1.2
-=====
-
- * Deal with PermGen space problems:
-
-    - Invoke java with additional permgen space, e.g.
-
-      -XX:MaxPermSize=128m
-
-    - Add a flag to abuild that takes additional flags to pass to the
-      jvm.
-
 Abuild Lint
 ===========
 
