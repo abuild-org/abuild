@@ -3,6 +3,8 @@ Next
 
  * Fix doc for global-plugin: search for "-plugin"....
 
+ * When abuild runs a list_platforms command and the command fails,
+   actually check to see whether the line endings are wrong.
 
 Abuild Lint
 ===========
