@@ -340,6 +340,11 @@ Known Bugs
    filesets add the same directory.  This is reported:
    https://issues.apache.org/bugzilla/show_bug.cgi?id=45902
 
+ * With ant 1.8.0, there are sometimes extraneous newlines in the
+   output of the exec task.  This was fixed for ant 1.8.1, but the bug
+   was subsequently reopened as additional problems were found.
+   https://issues.apache.org/bugzilla/show_bug.cgi?id=48746
+
 
 Capture of Backend Output
 =========================
