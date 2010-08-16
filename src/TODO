@@ -70,6 +70,30 @@ swing-based GUI that could be started from a Java (or maybe Groovy or
 Groovy + Java) program that would communicate with abuild through a
 socket.
 
+Dependency Visualization
+------------------------
+
+In any dependency visualization, whether static or as part of
+monitoring, it's useful to provide ways to collapse self-contained
+groups of nodes.  There are approaches in graph theory to deal with
+this.  In particular, a node X dominates a node Y if all paths from
+the root to Y cross through X.  Node X is said to be an immediate
+dominator of node Y if X dominates Y but doesn't dominate any other
+node that dominates Y.  (It is the closest dominator to Y.)  A
+dominator tree is a tree in which each node's children are the nodes
+it immediately dominates.  There's good discussion of this on
+Wikipedia under "Dominator (graph theory)".  There's also a paper that
+discusses use of dominator trees in visualization of software
+dependencies Google search for "The Dominance Tree in Visualizing
+Software Dependencies" for a good paper on this.
+
+It turns out that Boost.Graph actually contains an implementation of
+the Lengauer Tarjan Fast Dominator Tree algorithm.
+
+If we compute a dominator tree for the build graph or item graph,
+would visually represent the graph such that all nodes that dominate
+other nodes can be collapsed.
+
 
 Windows Issues
 ==============
