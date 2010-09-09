@@ -6,6 +6,13 @@ Next
  * When abuild runs a list_platforms command and the command fails,
    actually check to see whether the line endings are wrong.
 
+ * Jeremy Trimble suggests adding --ignore-line-endings as an option
+   to codegen_wrapper.  See email from 2010-07-23.
+
+ * abuild -p compiler=xyz doesn't complain if compiler xyz doesn't
+   exist anywhere.  This is probably by design, but it seems
+   undesirable.
+
 Abuild Lint
 ===========
 
