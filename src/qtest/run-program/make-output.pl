@@ -11,8 +11,16 @@ if (@ARGV && ($ARGV[0] eq '-no-child'))
 
 my $indent = $run_child ? "" : "  ";
 
+my $in = scalar(<STDIN>);
+if (defined $in)
+{
+    warn "stdin was not empty\n";
+}
+
 print "${indent}line 1\n";
 pause();
+# Write to stdout with stderr interleaved.  The output handler will
+# de-interleave them.
 print "${indent}out";
 warn "${indent}error\n";
 pause();
