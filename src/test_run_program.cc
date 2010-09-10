@@ -1,9 +1,59 @@
 #include <Util.hh>
 
+#include <boost/bind.hpp>
 #include <iostream>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+class OutputHandler
+{
+  public:
+    void handler(bool is_error, char const* buf, int len);
+
+  private:
+    void flush(bool is_error, std::string& line);
+
+    std::string output_line;
+    std::string error_line;
+};
+
+void
+OutputHandler::handler(bool is_error, char const* buf, int len)
+{
+    std::string& line = (is_error ? this->error_line : this->output_line);
+    if (len == 0)
+    {
+	if ((! line.empty()) && (*(line.rbegin()) != '\n'))
+	{
+	    line += "[no newline]\n";
+	}
+	if (! line.empty())
+	{
+	    flush(is_error, line);
+	}
+    }
+    else
+    {
+	for (int i = 0; i < len; ++i)
+	{
+	    line.append(1, buf[i]);
+	    if (buf[i] == '\n')
+	    {
+		flush(is_error, line);
+	    }
+	}
+    }
+}
+
+void
+OutputHandler::flush(bool is_error, std::string& line)
+{
+    std::ostream& out = (is_error ? std::cerr : std::cout);
+    char const* prefix = (is_error ? "E " : "O ");
+    out << prefix << line;
+    line.clear();
+}
 
 int main(int argc, char* argv[], char* envp[])
 {
@@ -18,6 +68,22 @@ int main(int argc, char* argv[], char* envp[])
 	env["VAR"] = "potato";
 	bool status = Util::runProgram(batfile, args, env, 0, ".");
 	std::cout << "status: " << status << std::endl << std::endl;
+    }
+    else if ((argc > 2) && (strcmp(argv[1], "-handle-output") == 0))
+    {
+	std::string progname;
+	std::vector<std::string> args;
+	std::map<std::string, std::string> env;
+	assert(Util::getProgramFullPath(argv[2], progname));
+	for (int i = 2; i < argc; ++i)
+	{
+	    args.push_back(argv[i]);
+	}
+	OutputHandler oh;
+	bool status = Util::runProgram(
+	    progname, args, env, envp, ".",
+	    boost::bind(&OutputHandler::handler, &oh, _1, _2, _3));
+	std::cout << "status: " << status << std::endl;
     }
     else if (argc > 2)
     {

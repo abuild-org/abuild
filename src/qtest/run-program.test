@@ -30,7 +30,13 @@ if ($in_windows)
 		 $td->NORMALIZE_NEWLINES);
 }
 
-$td->report(1 + ($in_windows ? 1 : 0));
+$td->runtest("capture output",
+	     {$td->COMMAND =>
+		  "test_run_program -handle-output perl make-output.pl"},
+	     {$td->FILE => "captured-output.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(2 + ($in_windows ? 1 : 0));
 
 sub windir
 {

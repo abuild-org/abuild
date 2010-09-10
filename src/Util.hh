@@ -11,6 +11,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <boost/function.hpp>
 
 namespace Util
 {
@@ -188,17 +189,28 @@ namespace Util
     // running programs like uname.
     std::string getProgramOutput(std::string cmd);
 
+    // Output handler type for runProgram.  Arguments are bool
+    // is_error, char const* data, int len.  Usage is described below.
+    typedef boost::function<void (bool, char const*, int)> output_handler_t;
+
     // Run a program given by progname with the given args and
     // environment and with its current directory set to dir.  If
     // old_env is passed in, it is the existing environment, which
     // will be preserved.  If old_env is NULL, the existing
-    // environment will not be preserved.  Returns true iff the
-    // program exited normally.
+    // environment will not be preserved.  If an output handler is
+    // provided, runProgram will run the child program with stdout and
+    // stderr sent through separate pipes, and will call the handler
+    // every time output is received from the child program, including
+    // calling with len == 0 on EOF for each pipe.  If no output
+    // handler is provided, the program's output will not be trapped
+    // and will just go to whatever stdout and stderr are inherited.
+    // Returns true iff the program exited normally.
     bool runProgram(std::string const& progname,
 		    std::vector<std::string> const& args,
 		    std::map<std::string, std::string> const& environment,
 		    char* old_env[],
-		    std::string const& dir);
+		    std::string const& dir,
+		    output_handler_t output_handler = 0);
 
     // Return the list of entries in a given directory.  This method
     // includes . and .. and does not prepend the path name.  It

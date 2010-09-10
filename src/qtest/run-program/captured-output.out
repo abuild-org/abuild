@@ -1,0 +1,11 @@
+O line 1
+E error
+O output
+O running child
+O   line 1
+E   error
+O   output
+O   not running child
+O   bye
+O bye
+status: 1

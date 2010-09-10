@@ -12,8 +12,11 @@
 #else
 # include <unistd.h>
 # include <dirent.h>
+# include <fcntl.h>
 # include <sys/stat.h>
+# include <sys/select.h>
 # include <sys/wait.h>
+# include <sys/file.h>
 #endif
 
 #include <assert.h>
@@ -24,6 +27,7 @@
 #include <set>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 #include <boost/thread/mutex.hpp>
 #include <boost/regex.hpp>
 #include "QTC.hh"
@@ -927,11 +931,42 @@ ctrlHandler(DWORD ctrl_type)
         case CTRL_C_EVENT:
         case CTRL_CLOSE_EVENT:
         case CTRL_BREAK_EVENT:
+	  // XXX flush logger
 	  waitForProcessesAndExit();
 	  return TRUE;
 
         default:
 	  return FALSE;
+    }
+}
+
+#else // _WIN32
+
+static void add_to_read_set(fd_set& read_set, int& nfds, int fd)
+{
+    if (fd != -1)
+    {
+	FD_SET(fd, &read_set);
+	nfds = std::max(nfds, 1 + fd);
+    }
+}
+
+static void handle_output(fd_set& read_set, int& fd,
+			  std::string const& description,
+			  Util::output_handler_t handler, bool is_error)
+{
+    char buf[1024];
+    int len = 0;
+    if (FD_ISSET(fd, &read_set))
+    {
+	len = QEXC::errno_wrapper("read " + description,
+				  read(fd, buf, sizeof(buf)));
+	handler(is_error, buf, len);
+	if (len == 0)
+	{
+	    close(fd);
+	    fd = -1;
+	}
     }
 }
 
@@ -942,20 +977,24 @@ Util::runProgram(std::string const& progname,
 		 std::vector<std::string> const& args,
 		 std::map<std::string, std::string> const& environment,
 		 char* old_env[],
-		 std::string const& dir)
+		 std::string const& dir,
+		 output_handler_t output_handler)
 {
     bool status = true;
 
 #ifdef _WIN32
     static bool installed_ctrl_handler = false;
 
-    if (! installed_ctrl_handler)
-    {
-	if (! SetConsoleCtrlHandler((PHANDLER_ROUTINE) ctrlHandler, TRUE))
+    { // private scope
+	boost::mutex::scoped_lock lock(running_process_mutex);
+	if (! installed_ctrl_handler)
 	{
-	    throw QEXC::General("could not set control handler");
+	    if (! SetConsoleCtrlHandler((PHANDLER_ROUTINE) ctrlHandler, TRUE))
+	    {
+		throw QEXC::General("could not set control handler");
+	    }
+	    installed_ctrl_handler = true;
 	}
-	installed_ctrl_handler = true;
     }
 
     std::string progpath = progname;
@@ -1067,6 +1106,10 @@ Util::runProgram(std::string const& progname,
 	running_processes.insert(&pi);
     }
 
+    if (output_handler != 0)
+    {
+	assert(false);	// XXX
+    }
     WaitForSingleObject(pi.hProcess, INFINITE);
 
     { // private scope
@@ -1075,6 +1118,20 @@ Util::runProgram(std::string const& progname,
 	status = cleanProcess(&pi);
     }
 #else
+    // XXX need to install SIGINT handler on UNIX to flush logger
+
+    int output_pipe[2];
+    int error_pipe[2];
+    output_pipe[0] = -1;
+    output_pipe[1] = -1;
+    error_pipe[0] = -1;
+    error_pipe[1] = -1;
+    if (output_handler)
+    {
+	QEXC::errno_wrapper("create output pipe", pipe(output_pipe));
+	QEXC::errno_wrapper("create error pipe", pipe(error_pipe));
+    }
+
     int pid = fork();
     if (pid == -1)
     {
@@ -1085,6 +1142,15 @@ Util::runProgram(std::string const& progname,
 	if (chdir(dir.c_str()) == -1)
 	{
 	    _exit(1);
+	}
+
+	int stdin_fd = -1;
+	if (output_handler)
+	{
+	    close(output_pipe[0]);
+	    close(error_pipe[0]);
+	    stdin_fd = QEXC::errno_wrapper("open /dev/null",
+					   open("/dev/null", O_RDONLY));
 	}
 
 	int nvars = environment.size();
@@ -1127,12 +1193,55 @@ Util::runProgram(std::string const& progname,
 	}
 	*argp = 0;
 
+	if (output_handler)
+	{
+	    dup2(stdin_fd, 0);
+	    dup2(output_pipe[1], 1);
+	    dup2(error_pipe[1], 2);
+	}
+
 	execve(progname.c_str(), argv, env);
 	_exit(1);
     }
     else
     {
 	int exit_status;
+	if (output_handler)
+	{
+	    close(output_pipe[1]);
+	    close(error_pipe[1]);
+	    int child_out = output_pipe[0];
+	    int child_err = error_pipe[0];
+	    while (! ((child_out == -1) && (child_err == -1)))
+	    {
+		fd_set read_set;
+		int nfds = 0;
+		FD_ZERO(&read_set);
+		add_to_read_set(read_set, nfds, child_out);
+		add_to_read_set(read_set, nfds, child_err);
+		switch(select(nfds, &read_set, 0, 0, 0))
+		{
+		  case 0:
+		    // timeout
+		    throw QEXC::Internal("select timed out with timeout = 0");
+		    break;
+
+		  case -1:
+		    // ignore interrupted system calls; just restart
+		    if (errno != EINTR)
+		    {
+			throw QEXC::System("select failed", errno);
+		    }
+		    break;
+
+		  default:
+		    handle_output(read_set, child_out, "child's stdout",
+				  output_handler, false);
+		    handle_output(read_set, child_err, "child's stderr",
+				  output_handler, true);
+		}
+	    }
+	}
 	if (waitpid(pid, &exit_status, 0) != pid)
 	{
 	    return false;

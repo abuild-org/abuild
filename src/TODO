@@ -423,6 +423,33 @@ classes (CreateJobObject).  This may provide a better solution than
 our current CTRL-C handling.  As of version boost version 1.38, there
 is nothing in boost that can do this.
 
+------
+
+Logger should be able to accept a build designator.  If given, the
+output is associated with the build designator instead of written out.
+Abuild is single-threaded at the time a build is starting or ending.
+When a build starts, the fact that it is starting is logged.  When it
+ends, display the output delimited by indication of the build item it
+applies to.  On interrupt, flush all pending output.  Code so that
+other options are also possible, such as prefixing each line of output
+from a build by an indication of the build item.  Probably a numeric
+prefix that is associated with the item/platform pair would be best to
+make the output usable.  Also be sure to be able to differentiate
+between stderr and stdout.  This can all be done with pipes rather
+than messing with ptys.  After all, most automated builds are going to
+be run through pipes or files anyway.
+
+In this mode, have no stdin.  We will also need separate java builder
+processes for each thread.  Maybe we can use a pool of processes,
+starting one up if no java builder is available.  That logic is
+already partially in place.
+
+We'll need a separate thread to monitor pipes associated with
+different builds.  This will have to gather output or error into lines
+and send it via the logger to the appropriate build.
+
+------
+
 
 Issues, Enhancement Ideas
 =========================
