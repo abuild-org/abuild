@@ -386,44 +386,26 @@ prefixing output lines with the name/platform of the item being built,
 indenting all non-error output so that error output only is
 left-justified, etc.
 
-There are a number of roadblocks that make this difficult.  For one
-thing, java builds are all run from a single process with different
-threads possibly all generating output.  Some of this output might be
-generated with direct prints to stdout or stderr and, as such, cannot
-be separated by which build item they are running on behalf of.  It
-would potentially be possible to isolate output from each make
-invocation or to isolate all java output together.  It would be
-possible to sort java output by build item if we ran a separate java
-builder for each potential simultaneous build (creating a number equal
-to the number of build threads), but this seems like excessive
-overhead and complication just to filter output for a multithreaded
-build.
+In support of this goal, runProgram has been modified to take an
+optional output handler argument.  If this is provided, it will run
+the child program and send its stdout and stderr separately to two
+pipes.  Each time output or error is read, it will be passed to a
+callback function that can do whatever it wants.  Using a pipe rather
+than a tty is okay for several reasons.  For one thing, getting tty
+code to work portably is pretty tricky, and there's no equivalent to
+this on Windows.  For another thing, most large, multithreaded builds
+are going to be run in an automated environment where stdout is not
+going to be a tty anyway.  Most build tools, probably for that reason,
+do a good job of unbuffering or line buffering their output.  The
+output handler can easily de-interleave stdout and stderr at the line
+level.  The test suite in test_run_program already does this.  Also
+this mode of runProgram runs the program without an empty standard
+input.
 
-It seems to be very difficult to emulate the behavior of a command
-writing to a tty in a portable fashion, especially in Windows.  It so
-happens that make doesn't buffer its output, so running it through a
-pipe works fine, but this is not necessarily the case for things it
-invokes.  There's also the question of what to do with stdin.  There
-are some interactive test suites, for example, that want access to
-stdin, and it would be a shame if running through abuild disabled
-this functionality.
-
-General separation of stdout and stderr could probably be achieved
-with a stand-alone program.  That program may not even have to be
-portable -- it would just be usable on those platforms for which the
-functionality exists.
-
-If we did want to capture backend output, here are some notes.  It is
-possible to create pipe-like handles with CreatePipe in Windows and to
-use them to initialize hStdInput, hStdOutput, and hStdError fields of
-the startupinfo parameter to CreateProcess.  There is an example at
-http://lists.trolltech.com/qt-interest/1999-09/thread00282-0.html
-There is also some kind of Win32 Job API used by the perl Win32::Job
+There is some kind of Win32 Job API used by the perl Win32::Job
 classes (CreateJobObject).  This may provide a better solution than
 our current CTRL-C handling.  As of version boost version 1.38, there
 is nothing in boost that can do this.
-
-------
 
 Logger should be able to accept a build designator.  If given, the
 output is associated with the build designator instead of written out.
@@ -435,20 +417,11 @@ other options are also possible, such as prefixing each line of output
 from a build by an indication of the build item.  Probably a numeric
 prefix that is associated with the item/platform pair would be best to
 make the output usable.  Also be sure to be able to differentiate
-between stderr and stdout.  This can all be done with pipes rather
-than messing with ptys.  After all, most automated builds are going to
-be run through pipes or files anyway.
+between stderr and stdout.
 
-In this mode, have no stdin.  We will also need separate java builder
-processes for each thread.  Maybe we can use a pool of processes,
-starting one up if no java builder is available.  That logic is
-already partially in place.
-
-We'll need a separate thread to monitor pipes associated with
-different builds.  This will have to gather output or error into lines
-and send it via the logger to the appropriate build.
-
-------
+We will need separate java builder processes for each thread.  Maybe
+we can use a pool of processes, starting one up if no java builder is
+available.  That logic is already partially in place.
 
 
 Issues, Enhancement Ideas
