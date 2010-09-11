@@ -28,10 +28,34 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
+#include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/regex.hpp>
+#include <boost/bind.hpp>
 #include "QTC.hh"
 #include "QEXC.hh"
+
+#ifdef _WIN32
+static std::string windows_error_string()
+{
+    LPVOID lpMsgBuf;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+	GetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+    std::string msg = (LPTSTR) lpMsgBuf;
+    LocalFree(lpMsgBuf);
+
+    Util::stripTrailingNewline(msg);
+
+    return msg;
+}
+#endif
 
 std::string
 Util::intToString(int num)
@@ -130,6 +154,19 @@ void
 Util::stripTrailingSlash(std::string& str)
 {
     if ((! str.empty()) && ((*(str.rbegin())) == '/'))
+    {
+	str.erase(str.length() - 1);
+    }
+}
+
+void
+Util::stripTrailingNewline(std::string& str)
+{
+    if (str.length() && (*(str.rbegin()) == '\n'))
+    {
+	str.erase(str.length() - 1);
+    }
+    if (str.length() && (*(str.rbegin()) == '\r'))
     {
 	str.erase(str.length() - 1);
     }
@@ -858,14 +895,7 @@ Util::getProgramOutput(std::string cmd)
 	    cmd + " failed with status " + intToString(status));
     }
 
-    if (result.length() && (*(result.rbegin()) == '\n'))
-    {
-	result.erase(result.length() - 1);
-    }
-    if (result.length() && (*(result.rbegin()) == '\r'))
-    {
-	result.erase(result.length() - 1);
-    }
+    stripTrailingNewline(result);
 
     return result;
 }
@@ -940,6 +970,39 @@ ctrlHandler(DWORD ctrl_type)
     }
 }
 
+static void read_pipe(boost::mutex& mutex,
+		      Util::output_handler_t output_handler,
+		      bool is_error, HANDLE pipe)
+{
+    char buf[1024];
+    DWORD len;
+    while (pipe)
+    {
+	if (! ReadFile(pipe, buf, sizeof(buf), &len, NULL))
+	{
+	    if (GetLastError() == ERROR_BROKEN_PIPE)
+	    {
+		len = 0;
+	    }
+	    else
+	    {
+		throw QEXC::General("failure reading from pipe: " +
+				    windows_error_string());
+	    }
+	}
+	{ // private scope
+	    boost::mutex::scoped_lock lock(mutex);
+	    output_handler(is_error, buf, (int) len);
+	}
+	if (len == 0)
+	{
+	    CloseHandle(pipe);
+	    pipe = NULL;
+	}
+    }
+}
+
+
 #else // _WIN32
 
 static void add_to_read_set(fd_set& read_set, int& nfds, int fd)
@@ -991,7 +1054,8 @@ Util::runProgram(std::string const& progname,
 	{
 	    if (! SetConsoleCtrlHandler((PHANDLER_ROUTINE) ctrlHandler, TRUE))
 	    {
-		throw QEXC::General("could not set control handler");
+		throw QEXC::General("could not set control handler: " +
+				    windows_error_string());
 	    }
 	    installed_ctrl_handler = true;
 	}
@@ -1016,14 +1080,16 @@ Util::runProgram(std::string const& progname,
 	if (! (CreatePipe(&child_out_r, &child_out_w, &saAttr, 0) &&
 	       CreatePipe(&child_err_r, &child_err_w, &saAttr, 0)))
 	{
-	    throw QEXC::General("CreatePipe failed for child I/O");
+	    throw QEXC::General("CreatePipe failed for child I/O: " +
+				windows_error_string());
 	}
 	child_in = CreateFile("NUL", GENERIC_READ, FILE_SHARE_WRITE, &saAttr,
 			      OPEN_EXISTING, FILE_ATTRIBUTE_READONLY,
 			      NULL);
 	if (child_in == INVALID_HANDLE_VALUE)
 	{
-	    throw QEXC::General("unable to open NUL");
+	    throw QEXC::General("unable to open NUL: " +
+				windows_error_string());
 	}
     }
 
@@ -1150,66 +1216,17 @@ Util::runProgram(std::string const& progname,
 	CloseHandle(child_err_w);
 	CloseHandle(child_in);
 
-	int nhandles = 2;
-	HANDLE handles[2];
-	handles[0] = child_out_r;
-	handles[1] = child_err_r;
-
-	while (nhandles > 0)
-	{
-	    char buf[1024];
-	    DWORD len;
-	    DWORD avail;
-	    // XXX This doesn't block waiting for available output.
-	    // The handles are all shown to have signalled as long as
-	    // the pipes are open.  Instead, we need to read stderr
-	    // from a separate thread and synchronize calls to the
-	    // output handler.
-	    DWORD wait_result =
-		WaitForMultipleObjects(nhandles, handles, FALSE, INFINITE);
-	    if (wait_result == WAIT_FAILED)
-	    {
-		throw QEXC::General("WaitForMultipleObjects failed");
-	    }
-	    for (int i = wait_result; i < nhandles; ++i)
-	    {
-		DWORD peek = PeekNamedPipe(
-		    handles[i], NULL, 0, NULL, &avail, NULL);
-		if ((peek == 0) || (avail > 0))
-		{
-		    if (! ReadFile(handles[i], buf, sizeof(buf), &len, NULL))
-		    {
-			if (GetLastError() == ERROR_BROKEN_PIPE)
-			{
-			    len = 0;
-			}
-			else
-			{
-			    throw QEXC::General("failure reading from pipe");
-			}
-		    }
-		    bool is_error = (handles[i] == child_err_r);
-		    output_handler(is_error, buf, (int) len);
-		    if (len == 0)
-		    {
-			CloseHandle(handles[i]);
-			handles[i] = NULL;
-		    }
-		}
-	    }
-	    for (int i = 0; i < nhandles; ++i)
-	    {
-		if (handles[i] == NULL)
-		{
-		    --nhandles;
-		}
-	    }
-	    if ((nhandles == 1) && (handles[0] == NULL))
-	    {
-		handles[0] = handles[1];
-		handles[1] = NULL;
-	    }
-	}
+	// Read stdout and stderr in separate threads.  Considerable
+	// research suggests that there's no way to do the equivalent
+	// of a blocking select on anonymous pipes.
+	// WaitForSingleObject and WaitForMultipleObjects show the
+	// pipe to be signaled as long the pipe is open.
+	boost::mutex output_mutex;
+	boost::thread error_th(
+	    boost::bind(read_pipe, boost::ref(output_mutex), output_handler,
+			true, child_err_r));
+	read_pipe(output_mutex, output_handler, false, child_out_r);
+	error_th.join();
     }
     WaitForSingleObject(pi.hProcess, INFINITE);
 
@@ -1384,7 +1401,8 @@ Util::getDirEntries(std::string const& path)
 		else
 		{
 		    throw QEXC::General(
-			"FindNextFile failed while reading " + path);
+			"FindNextFile failed while reading " + path + ": " +
+			windows_error_string());
 		}
 	    }
 	}

@@ -32,6 +32,9 @@ namespace Util
     // < s2, -1 if s1 > s2, or 0 otherwise.
     int strCaseCmp(std::string const& s1, std::string const& s2);
 
+    // Strip trailing \n or \r\n from the end of a string
+    void stripTrailingNewline(std::string& str);
+
     // Strip a trailing slash from the end of a string
     void stripTrailingSlash(std::string& str);
 
