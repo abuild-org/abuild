@@ -55,7 +55,7 @@ OutputHandler::flush(bool is_error, std::string& line)
     line.clear();
 }
 
-int main(int argc, char* argv[], char* envp[])
+static int run(int argc, char* argv[], char* envp[])
 {
     if ((argc == 2) && (strcmp(argv[1], "-win32") == 0))
     {
@@ -173,4 +173,17 @@ int main(int argc, char* argv[], char* envp[])
     }
 
     return 0;
+}
+
+int main(int argc, char* argv[], char* envp[])
+{
+    try
+    {
+	return run(argc, argv, envp);
+    }
+    catch (std::exception& e)
+    {
+	std::cerr << "exception: " << e.what() << std::endl;
+    }
+    return 2;
 }
