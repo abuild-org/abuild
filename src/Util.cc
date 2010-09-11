@@ -997,6 +997,36 @@ Util::runProgram(std::string const& progname,
 	}
     }
 
+    // Pipe handling code is mostly taken from
+    // http://msdn.microsoft.com/en-us/library/ms682499%28VS.85%29.aspx
+
+    HANDLE child_in = NULL;
+    HANDLE child_out_r = NULL;
+    HANDLE child_out_w = NULL;
+    HANDLE child_err_r = NULL;
+    HANDLE child_err_w = NULL;
+
+    if (output_handler)
+    {
+	// Create inheritable pipes
+	SECURITY_ATTRIBUTES saAttr;
+	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+	if (! (CreatePipe(&child_out_r, &child_out_w, &saAttr, 0) &&
+	       CreatePipe(&child_err_r, &child_err_w, &saAttr, 0)))
+	{
+	    throw QEXC::General("CreatePipe failed for child I/O");
+	}
+	child_in = CreateFile("NUL", GENERIC_READ, FILE_SHARE_WRITE, &saAttr,
+			      OPEN_EXISTING, FILE_ATTRIBUTE_READONLY,
+			      NULL);
+	if (child_in == INVALID_HANDLE_VALUE)
+	{
+	    throw QEXC::General("unable to open NUL");
+	}
+    }
+
     std::string progpath = progname;
     appendExe(progpath);
     std::string suffix = getExtension(progpath);
@@ -1063,6 +1093,13 @@ Util::runProgram(std::string const& progname,
 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
+    if (output_handler)
+    {
+	si.hStdError = child_err_w;
+	si.hStdOutput = child_out_w;
+	si.hStdInput = child_in;
+	si.dwFlags |= STARTF_USESTDHANDLES;
+    }
     ZeroMemory(&pi, sizeof(pi));
 
     std::string comspec;
@@ -1106,9 +1143,73 @@ Util::runProgram(std::string const& progname,
 	running_processes.insert(&pi);
     }
 
-    if (output_handler != 0)
+    if (output_handler)
     {
-	assert(false);	// XXX
+	// Close child side of pipes
+	CloseHandle(child_out_w);
+	CloseHandle(child_err_w);
+	CloseHandle(child_in);
+
+	int nhandles = 2;
+	HANDLE handles[2];
+	handles[0] = child_out_r;
+	handles[1] = child_err_r;
+
+	while (nhandles > 0)
+	{
+	    char buf[1024];
+	    DWORD len;
+	    DWORD avail;
+	    // XXX This doesn't block waiting for available output.
+	    // The handles are all shown to have signalled as long as
+	    // the pipes are open.  Instead, we need to read stderr
+	    // from a separate thread and synchronize calls to the
+	    // output handler.
+	    DWORD wait_result =
+		WaitForMultipleObjects(nhandles, handles, FALSE, INFINITE);
+	    if (wait_result == WAIT_FAILED)
+	    {
+		throw QEXC::General("WaitForMultipleObjects failed");
+	    }
+	    for (int i = wait_result; i < nhandles; ++i)
+	    {
+		DWORD peek = PeekNamedPipe(
+		    handles[i], NULL, 0, NULL, &avail, NULL);
+		if ((peek == 0) || (avail > 0))
+		{
+		    if (! ReadFile(handles[i], buf, sizeof(buf), &len, NULL))
+		    {
+			if (GetLastError() == ERROR_BROKEN_PIPE)
+			{
+			    len = 0;
+			}
+			else
+			{
+			    throw QEXC::General("failure reading from pipe");
+			}
+		    }
+		    bool is_error = (handles[i] == child_err_r);
+		    output_handler(is_error, buf, (int) len);
+		    if (len == 0)
+		    {
+			CloseHandle(handles[i]);
+			handles[i] = NULL;
+		    }
+		}
+	    }
+	    for (int i = 0; i < nhandles; ++i)
+	    {
+		if (handles[i] == NULL)
+		{
+		    --nhandles;
+		}
+	    }
+	    if ((nhandles == 1) && (handles[0] == NULL))
+	    {
+		handles[0] = handles[1];
+		handles[1] = NULL;
+	    }
+	}
     }
     WaitForSingleObject(pi.hProcess, INFINITE);
 
