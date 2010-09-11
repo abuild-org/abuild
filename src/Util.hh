@@ -204,10 +204,11 @@ namespace Util
     // provided, runProgram will run the child program with stdout and
     // stderr sent through separate pipes, and will call the handler
     // every time output is received from the child program, including
-    // calling with len == 0 on EOF for each pipe.  If no output
-    // handler is provided, the program's output will not be trapped
-    // and will just go to whatever stdout and stderr are inherited.
-    // Returns true iff the program exited normally.
+    // calling with len == 0 on EOF for each pipe.  Additionally,
+    // stdin is the null device.  If no output handler is provided,
+    // the program's output will not be trapped and will just go to
+    // whatever stdout and stderr are inherited.  Returns true iff the
+    // program exited normally.
     bool runProgram(std::string const& progname,
 		    std::vector<std::string> const& args,
 		    std::map<std::string, std::string> const& environment,
