@@ -55,7 +55,7 @@ if ($test_java)
     # application is running so that the delay of starting it up
     # doesn't count toward the overall delay.
     $td->runtest("uses multiple threads",
-		 {$td->COMMAND => "abuild -b all --silent -j4"},
+		 {$td->COMMAND => "abuild --raw-output -b all --silent -j4"},
 		 {$td->FILE => "$top/multiple-threads.out",
 		  $td->EXIT_STATUS => 0,
 		  $td->THREAD_DATA =>
