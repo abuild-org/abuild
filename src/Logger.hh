@@ -25,6 +25,9 @@ class Logger
     // thing before the logger is stopped.
     static void stopLogger(std::string const& error_message = "");
 
+    void setPrefixes(std::string const& output_prefix,
+		     std::string const& error_prefix);
+
     typedef int job_handle_t;
     static job_handle_t const NO_JOB = 0;
 
@@ -36,7 +39,7 @@ class Logger
     // received.
     job_handle_t requestJobHandle(
 	std::string const& job_name, bool buffer_output,
-	std::string const& output_prefix, std::string const& error_prefix);
+	std::string const& job_prefix);
 
     // Return an output handler for the given job suitable for passing
     // to ProcessHandler::runProgram.
@@ -68,8 +71,9 @@ class Logger
       public:
 	JobData(
 	    Logger&,
-	    std::string const& job_name, bool buffer_output,
-	    std::string const& output_prefix, std::string const& error_prefix);
+	    std::string const& job_name,
+	    bool buffer_output,
+	    std::string const& job_prefix);
 	void handle_output(bool is_error, char const* data, int len);
 	void flush();
 
@@ -79,8 +83,7 @@ class Logger
 	Logger& logger;
 	std::string job_name;
 	bool buffer_output;
-	std::string output_prefix;
-	std::string error_prefix;
+	std::string job_prefix;
 	std::string output_line;
 	std::string error_line;
 	std::list<std::pair<Logger::message_type_e, std::string> > buffer;
@@ -94,6 +97,8 @@ class Logger
 	std::list<std::pair<message_type_e, std::string> > const&);
 
     static Logger* the_instance;
+    std::string output_prefix;
+    std::string error_prefix;
     boost::shared_ptr<boost::thread> thread;
     boost::mutex queue_write_mutex;
     ThreadSafeQueue<std::pair<message_type_e, std::string> > logger_queue;

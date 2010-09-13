@@ -2,19 +2,21 @@
 
 #include <iostream>
 #include <boost/bind.hpp>
+#include <Util.hh>
 #include <QEXC.hh>
 
 Logger* Logger::the_instance = 0;
 
 Logger::JobData::JobData(
     Logger& logger,
-    std::string const& job_name, bool buffer_output,
-    std::string const& output_prefix, std::string const& error_prefix) :
+    std::string const& job_name,
+    bool buffer_output,
+    std::string const& job_prefix)
+    :
     logger(logger),
     job_name(job_name),
     buffer_output(buffer_output),
-    output_prefix(output_prefix),
-    error_prefix(error_prefix)
+    job_prefix(job_prefix)
 {
 }
 
@@ -70,9 +72,7 @@ void
 Logger::JobData::completeLine(bool is_error, std::string& line)
 {
     Logger::message_type_e message_type = (is_error ? m_error : m_info);
-    std::string const& prefix =
-	(is_error ? this->error_prefix : this->output_prefix);
-    std::string message = prefix + line;
+    std::string message = this->job_prefix + line;
     line.clear();
 
     if (this->buffer_output)
@@ -116,14 +116,22 @@ Logger::stopLogger(std::string const& error_message)
     }
 }
 
+void
+Logger::setPrefixes(std::string const& output_prefix,
+		    std::string const& error_prefix)
+{
+    this->output_prefix = output_prefix;
+    this->error_prefix = error_prefix;
+}
+
 Logger::job_handle_t
 Logger::requestJobHandle(
     std::string const& job_name, bool buffer_output,
-    std::string const& output_prefix, std::string const& error_prefix)
+    std::string const& job_prefix)
 {
     job_handle_t job = this->next_job++;
-    this->jobs[job].reset(new JobData(*this, job_name, buffer_output,
-				      output_prefix, error_prefix));
+    this->jobs[job].reset(
+	new JobData(*this, job_name, buffer_output, job_prefix));
     return job;
 }
 
@@ -210,6 +218,21 @@ Logger::writeToLogger(
     }
 }
 
+// This is a static function to avoid having to include <iostream> in
+// Logger.hh
+static void output_lines(std::ostream& out, std::string const& prefix,
+			 std::string msg)
+{
+    Util::stripTrailingNewline(msg);
+    std::list<std::string> lines = Util::split('\n', msg);
+    for (std::list<std::string>::iterator iter = lines.begin();
+	 iter != lines.end(); ++iter)
+    {
+	out << prefix << *iter << std::endl;
+    }
+    out.flush();
+}
+
 void
 Logger::loggerMain()
 {
@@ -218,21 +241,21 @@ Logger::loggerMain()
     while (! done)
     {
 	msg = this->logger_queue.head();
+	message_type_e message_type = msg.first;
+	std::string message = msg.second;
 	// omit default so gcc will warn for missing case tags
-	switch (msg.first)
+	switch (message_type)
 	{
 	  case m_shutdown:
 	    done = true;
 	    break;
 
 	  case m_info:
-	    std::cout << msg.second;
-	    std::cout.flush();
+	    output_lines(std::cout, this->output_prefix, message);
 	    break;
 
 	  case m_error:
-	    std::cerr << msg.second;
-	    std::cerr.flush();
+	    output_lines(std::cerr, this->error_prefix, message);
 	    break;
 	}
 	// Wait until after we've flushed to deque the message.

@@ -402,10 +402,10 @@ class Abuild
     int make_njobs;
     bool raw_output_set;
     bool raw_output;
-    bool job_error_prefix_set;
-    std::string job_error_prefix;
-    bool job_output_prefix_set;
-    std::string job_output_prefix;
+    bool error_prefix_set;
+    std::string error_prefix;
+    bool output_prefix_set;
+    std::string output_prefix;
     bool interleave_output;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;

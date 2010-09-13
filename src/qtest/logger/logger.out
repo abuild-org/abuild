@@ -1,19 +1,19 @@
-message 1
-message 2
-[J2]   job 2 output line 1
-[J2]!! job 2 error line 1
-message 3
-[J2]!! job 2 error line 2
-[J2]   job 2 output line 2
-job 3: BEGIN OUTPUT
-  job 3 output line
-**job 3 error line
-job 3: END OUTPUT
-job 1: BEGIN OUTPUT
+O message 1
+E message 2
+O [J2] job 2 output line 1
+E [J2] job 2 error line 1
+O message 3
+E [J2] job 2 error line 2
+O [J2] job 2 output line 2
+O job 3: BEGIN OUTPUT
+O job 3 output line
+E job 3 error line
+O job 3: END OUTPUT
+O job 1: BEGIN OUTPUT
 E job 1 error line 1
 O job 1 output line 1
 E job 1 error line 2
 O job 1 output line 2
 O job 1 partial output line[no newline]
-job 1: END OUTPUT
-error message
+O job 1: END OUTPUT
+E error message

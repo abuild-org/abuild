@@ -1,7 +1,7 @@
-message 2
-[J2]!! job 2 error line 1
-[J2]!! job 2 error line 2
-**job 3 error line
+E message 2
+E [J2] job 2 error line 1
+E [J2] job 2 error line 2
+E job 3 error line
 E job 1 error line 1
 E job 1 error line 2
-error message
+E error message

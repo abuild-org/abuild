@@ -386,9 +386,9 @@ XXX help
 
 --raw-output: default true for j1, false otherwise
 
---job-{error,output}-prefix: default empty.  If error set prefix
-contains a non-space character and output is not set, output defaults
-to spaces equal in length to error prefix
+--{error,output}-prefix: default empty.  If error set prefix contains
+a non-space character and output is not set, output defaults to spaces
+equal in length to error prefix
 
 --interleave-output: default false
 

@@ -19,12 +19,13 @@ bind_handler(boost::function<void(bool, char const*, int)> fn)
 int main()
 {
     Logger* logger = Logger::getInstance();
+    logger->setPrefixes("O ", "E ");
     Logger::job_handle_t j1 = logger->requestJobHandle(
-	"job 1", true, "O ", "E ");
+	"job 1", true, "");
     Logger::job_handle_t j2 = logger->requestJobHandle(
-	"job 2", false, "[J2]   ", "[J2]!! ");
+	"job 2", false, "[J2] ");
     Logger::job_handle_t j3 = logger->requestJobHandle(
-	"job 3", true, "  ", "**");
+	"job 3", true, "");
 
     logger->logInfo("message 1");
     logger->logError("message 2");
