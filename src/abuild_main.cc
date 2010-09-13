@@ -3,9 +3,10 @@
 
 int main(int argc, char* argv[], char* envp[])
 {
-    Logger* logger = Logger::getInstance();
+    Logger::getInstance();
 
     int status = 0;
+    std::string exception;
     try
     {
 	if (! Abuild(argc, argv, envp).run())
@@ -15,10 +16,10 @@ int main(int argc, char* argv[], char* envp[])
     }
     catch (std::exception& e)
     {
-	logger->logError(e.what());
+	exception = e.what();
 	status = 2;
     }
 
-    Logger::stopLogger();
+    Logger::stopLogger(exception);
     return status;
 }
