@@ -52,6 +52,7 @@ OutputHandler::flush(bool is_error, std::string& line)
     std::ostream& out = (is_error ? std::cerr : std::cout);
     char const* prefix = (is_error ? "E " : "O ");
     out << prefix << line;
+    out.flush();
     line.clear();
 }
 
