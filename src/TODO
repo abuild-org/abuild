@@ -13,6 +13,54 @@ Next
    exist anywhere.  This is probably by design, but it seems
    undesirable.
 
+
+Capture of Backend Output
+=========================
+
+We will need separate java builder processes for each thread.  Maybe
+we can use a pool of processes, starting one up if no java builder is
+available.  That logic is already partially in place.
+
+documentation fodder
+--------------------
+
+Remember to update help
+
+--raw-output: default true for j1, false otherwise
+
+--{error,output}-prefix: default empty.  If error prefix is set and
+contains a non-space character and output is not set, output defaults
+to spaces equal in length to error prefix.  Applies to all log
+messages.
+
+--interleave-output: default false
+
+Document: if you hit CTRL-C,  you will lose any partial output.  To
+avoid, use raw-output or interleave-output.
+
+There have been a number of ideas about improving abuild's output,
+such as de-interleaving build outputs for multithreaded builds,
+prefixing output lines with the name/platform of the item being built,
+indenting all non-error output so that error output only is
+left-justified, etc.
+
+In support of this goal, runProgram has been modified to take an
+optional output handler argument.  If this is provided, it will run
+the child program and send its stdout and stderr separately to two
+pipes.  Each time output or error is read, it will be passed to a
+callback function that can do whatever it wants.  Using a pipe rather
+than a tty is okay for several reasons.  For one thing, getting tty
+code to work portably is pretty tricky, and there's no equivalent to
+this on Windows.  For another thing, most large, multithreaded builds
+are going to be run in an automated environment where stdout is not
+going to be a tty anyway.  Most build tools, probably for that reason,
+do a good job of unbuffering or line buffering their output.  The
+output handler can easily de-interleave stdout and stderr at the line
+level.  The test suite in test_run_program already does this.  Also
+this mode of runProgram runs the program without an empty standard
+input.
+
+
 Abuild Lint
 ===========
 
@@ -375,65 +423,6 @@ Known Bugs
    output of the exec task.  This was fixed for ant 1.8.1, but the bug
    was subsequently reopened as additional problems were found.
    https://issues.apache.org/bugzilla/show_bug.cgi?id=48746
-
-
-Capture of Backend Output
-=========================
-
-XXX make test suite for this not timing-sensitive.
-
-XXX help
-
---raw-output: default true for j1, false otherwise
-
---{error,output}-prefix: default empty.  If error set prefix contains
-a non-space character and output is not set, output defaults to spaces
-equal in length to error prefix
-
---interleave-output: default false
-
-There have been a number of ideas about improving abuild's output,
-such as de-interleaving build outputs for multithreaded builds,
-prefixing output lines with the name/platform of the item being built,
-indenting all non-error output so that error output only is
-left-justified, etc.
-
-In support of this goal, runProgram has been modified to take an
-optional output handler argument.  If this is provided, it will run
-the child program and send its stdout and stderr separately to two
-pipes.  Each time output or error is read, it will be passed to a
-callback function that can do whatever it wants.  Using a pipe rather
-than a tty is okay for several reasons.  For one thing, getting tty
-code to work portably is pretty tricky, and there's no equivalent to
-this on Windows.  For another thing, most large, multithreaded builds
-are going to be run in an automated environment where stdout is not
-going to be a tty anyway.  Most build tools, probably for that reason,
-do a good job of unbuffering or line buffering their output.  The
-output handler can easily de-interleave stdout and stderr at the line
-level.  The test suite in test_run_program already does this.  Also
-this mode of runProgram runs the program without an empty standard
-input.
-
-There is some kind of Win32 Job API used by the perl Win32::Job
-classes (CreateJobObject).  This may provide a better solution than
-our current CTRL-C handling.  As of version boost version 1.38, there
-is nothing in boost that can do this.
-
-Logger should be able to accept a build designator.  If given, the
-output is associated with the build designator instead of written out.
-Abuild is single-threaded at the time a build is starting or ending.
-When a build starts, the fact that it is starting is logged.  When it
-ends, display the output delimited by indication of the build item it
-applies to.  On interrupt, flush all pending output.  Code so that
-other options are also possible, such as prefixing each line of output
-from a build by an indication of the build item.  Probably a numeric
-prefix that is associated with the item/platform pair would be best to
-make the output usable.  Also be sure to be able to differentiate
-between stderr and stdout.
-
-We will need separate java builder processes for each thread.  Maybe
-we can use a pool of processes, starting one up if no java builder is
-available.  That logic is already partially in place.
 
 
 Issues, Enhancement Ideas
