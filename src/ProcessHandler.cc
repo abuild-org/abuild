@@ -47,6 +47,8 @@ ProcessHandler::getInstance()
     return *the_instance;
 }
 
+#ifdef _WIN32
+
 // On Windows, if we run a child process that shares the console with
 // this program and if that child process is a batch file, we will run
 // into trouble if the user hits CTRL-C.  Our process will exit
@@ -145,7 +147,6 @@ static void read_pipe(boost::mutex& mutex,
 	}
     }
 }
-
 
 #else // _WIN32
 
@@ -420,9 +421,9 @@ ProcessHandler::runProgram(
 	}
 
 	int nvars = environment.size();
-	if (old_env)
+	if (preserve_env)
 	{
-	    for (char** envp = old_env; *envp; ++envp)
+	    for (char** envp = this->env; *envp; ++envp)
 	    {
 		++nvars;
 	    }
@@ -439,9 +440,9 @@ ProcessHandler::runProgram(
 	    strcpy(vp, v.c_str());
 	    *envp++ = vp;
 	}
-	if (old_env)
+	if (preserve_env)
 	{
-	    for (char** oenvp = old_env; *oenvp; ++oenvp)
+	    for (char** oenvp = this->env; *oenvp; ++oenvp)
 	    {
 		*envp++ = *oenvp;
 	    }
