@@ -16,7 +16,7 @@
 // Recognition of options:
 //
 //  * An option may be a single alphabetic character or two or more
-//    alphanumeric characters, undescores, or dashes starting with an
+//    alphanumeric characters, underscores, or dashes starting with an
 //    alphabetic character.
 //
 //  * Single character options are recognized only when preceded by a
@@ -39,7 +39,7 @@
 //    including the first argument that matches the termination
 //    expression are included in the list.  If discard_term_arg is
 //    true, the termination argument will be discarded.  Otherwise, it
-//    weill considered as a normal argument after the end of the list.
+//    will considered as a normal argument after the end of the list.
 //
 //
 // Recognition of arguments to options:
