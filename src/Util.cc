@@ -919,8 +919,6 @@ Util::getProgramOutput(std::string cmd)
     return result;
 }
 
-#ifdef _WIN32
-
 // On Windows, if we run a child process that shares the console with
 // this program and if that child process is a batch file, we will run
 // into trouble if the user hits CTRL-C.  Our process will exit
@@ -933,10 +931,28 @@ Util::getProgramOutput(std::string cmd)
 // child processes that we are running and wait for all of them to
 // exit before exiting ourselves if the user has hit CTRL-C.
 
-// To achieve this, we keep a mutex-protected set of running process
-// information pointers.  Whenever a process is created or destroyed,
-// it must be done while holding the mutex.
+// On UNIX systems, if abuild runs with a controlling terminal,
+// everything should be okay since hitting CTRL-C will interrupt all
+// processes in the process group.
+
+// On either system, an explicit kill will leave child processes
+// around.  If possible, we'd like to at least show any buffered
+// output we might have captured, so we trap signals where possible.
+// We are not trying to handle all possible cases here...just trying
+// to make sure that we don't hose the console in Windows and that we
+// get as much build output as we can on Windows and UNIX.
+
+// The code below contains platform-specific process and pipe handling
+// logic.
+
 static boost::mutex running_process_mutex;
+
+#ifdef _WIN32
+
+// To keep track of child processes, we keep a mutex-protected set of
+// running process information.  Whenever a process is created or
+// destroyed, it must be done while holding the mutex.
+
 static std::set<PROCESS_INFORMATION*> running_processes;
 
 static bool
@@ -955,7 +971,7 @@ cleanProcess(PROCESS_INFORMATION* pi)
 }
 
 static void
-waitForProcessesAndExit()
+terminateProcessesAndExit()
 {
     // Wait for all processes to exit, and then force the process to
     // exit.
@@ -964,10 +980,10 @@ waitForProcessesAndExit()
     {
 	PROCESS_INFORMATION* pi = *(running_processes.begin());
 	running_processes.erase(pi);
+	TerminateProcess(pi->hProcess, 2);
 	WaitForSingleObject(pi->hProcess, INFINITE);
 	cleanProcess(pi);
     }
-    ExitProcess(2);
 }
 
 static BOOL
@@ -980,8 +996,7 @@ ctrlHandler(DWORD ctrl_type)
         case CTRL_C_EVENT:
         case CTRL_CLOSE_EVENT:
         case CTRL_BREAK_EVENT:
-	  // XXX flush logger
-	  waitForProcessesAndExit();
+	  terminateProcessesAndExit();
 	  return TRUE;
 
         default:
@@ -1021,8 +1036,23 @@ static void read_pipe(boost::mutex& mutex,
     }
 }
 
-
 #else // _WIN32
+
+static void interrupt_handler(int)
+{
+    static bool interrupted = false;
+    int pid = getpid();
+    int pgid = getpgid(pid);
+    if (interrupted || (pid != pgid))
+    {
+	exit(2);
+    }
+    else
+    {
+	killpg(SIGINT, pgid);
+	interrupted = true;
+    }
+}
 
 static void add_to_read_set(fd_set& read_set, int& nfds, int fd)
 {
@@ -1067,20 +1097,20 @@ Util::runProgram(std::string const& progname,
 		 output_handler_t output_handler)
 {
     bool status = true;
+    static bool installed_interrupt_handler = false;
 
 #ifdef _WIN32
-    static bool installed_ctrl_handler = false;
 
     { // private scope
 	boost::mutex::scoped_lock lock(running_process_mutex);
-	if (! installed_ctrl_handler)
+	if (! installed_interrupt_handler)
 	{
 	    if (! SetConsoleCtrlHandler((PHANDLER_ROUTINE) ctrlHandler, TRUE))
 	    {
 		throw QEXC::General("could not set control handler: " +
 				    windows_error_string());
 	    }
-	    installed_ctrl_handler = true;
+	    installed_interrupt_handler = true;
 	}
     }
 
@@ -1259,7 +1289,12 @@ Util::runProgram(std::string const& progname,
 	status = cleanProcess(&pi);
     }
 #else
-    // XXX need to install SIGINT handler on UNIX to flush logger
+    if (! installed_interrupt_handler)
+    {
+	boost::mutex::scoped_lock lock(running_process_mutex);
+	signal(SIGINT, interrupt_handler);
+	installed_interrupt_handler = true;
+    }
 
     int output_pipe[2];
     int error_pipe[2];
