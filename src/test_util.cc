@@ -37,7 +37,12 @@ static void test_strip_trailing_slash(std::string const& str)
 int main()
 {
     std::cout << Util::intToString(5) << " "
-	      << Util::intToString(-12) << std::endl;
+	      << Util::intToString(-12) << " "
+	      << Util::intToString(123, 2) << " "
+	      << Util::intToString(123, 3) << " "
+	      << Util::intToString(123, 4) << std::endl;
+
+    std::cout << Util::digitsIn(16059) << std::endl;
 
     std::cout << Util::dirname("/") << std::endl
 	      << Util::dirname("a") << std::endl
