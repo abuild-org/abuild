@@ -15,4 +15,16 @@ $td->runtest("full test",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->report(1);
+$td->runtest("full test: output only",
+	     {$td->COMMAND => "test_logger 2> /dev/null"},
+	     {$td->FILE => "logger.stdout",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("full test: error only",
+	     {$td->COMMAND => "test_logger 1>/dev/null"},
+	     {$td->FILE => "logger.stderr",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(3);
