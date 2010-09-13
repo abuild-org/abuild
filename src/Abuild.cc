@@ -77,6 +77,11 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
     stdout_is_tty(Util::stdoutIsTty()),
     max_workers(1),
     make_njobs(1),
+    raw_output_set(false),
+    raw_output(true),
+    job_error_prefix_set(false),
+    job_output_prefix_set(false),
+    interleave_output(false),
     test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
@@ -400,6 +405,23 @@ Abuild::parseArgv()
 	boost::bind(&Abuild::argSetBool, this,
 		    boost::ref(this->no_dep_failures), true));
     op.registerNoArg(
+	"raw-output",
+	boost::bind(&Abuild::argSetRawOutput, this));
+    op.registerStringArg(
+	"job-error-prefix",
+	boost::bind(&Abuild::argSetOutputPrefix, this,
+		    boost::ref(this->job_error_prefix_set),
+		    boost::ref(this->job_error_prefix), _1));
+    op.registerStringArg(
+	"job-output-prefix",
+	boost::bind(&Abuild::argSetOutputPrefix, this,
+		    boost::ref(this->job_output_prefix_set),
+		    boost::ref(this->job_output_prefix), _1));
+    op.registerNoArg(
+	"interleave-output",
+	boost::bind(&Abuild::argSetBool, this,
+		    boost::ref(this->interleave_output), true));
+    op.registerNoArg(
 	"n",
 	boost::bind(&Abuild::argSetNoOp, this));
     op.registerNoArg(
@@ -582,6 +604,39 @@ Abuild::parseArgv()
 	    QTC::TC("abuild", "Abuild ERR ant unknown");
 	    usage("unknown option \"ant\"");
 	}
+    }
+
+    // Job output/error handling
+    if (! this->raw_output_set)
+    {
+	// Capture output if an error or output prefix was specified.
+	// Otherwise, capture build output for multithreaded builds
+	// unless raw output was specifically requested.
+	if (this->job_output_prefix_set || this->job_error_prefix_set)
+	{
+	    this->raw_output = false;
+	}
+	else
+	{
+	    this->raw_output = (this->max_workers == 1);
+	}
+    }
+    if (this->job_error_prefix_set && (! this->job_output_prefix_set) &&
+	(this->job_error_prefix.find_first_not_of(' ') != std::string::npos))
+    {
+	// If we are prefixing errors with something containing a
+	// non-space and have not explicit set an output prefix, set
+	// the output prefix to indent to the same number of
+	// characters.
+	QTC::TC("abuild", "Abuild set output prefix from error prefix");
+	this->job_output_prefix.append(this->job_error_prefix.length(), ' ');
+    }
+    if (! this->raw_output)
+    {
+	QTC::TC("abuild", "Abuild output capture parameters",
+		(this->interleave_output ? 0 : 1) |
+		(this->job_output_prefix.empty() ? 0 : 2) |
+		(this->job_error_prefix.empty() ? 0 : 4));
     }
 
     // called after changing directories
@@ -809,6 +864,21 @@ Abuild::argSetKeepGoing()
     this->make_args.push_back("-k");
     this->java_builder_args.push_back("-k");
     this->keep_going = true;
+}
+
+void
+Abuild::argSetRawOutput()
+{
+    this->raw_output_set = true;
+    this->raw_output = true;
+}
+
+void
+Abuild::argSetOutputPrefix(bool& prefix_set, std::string& prefix,
+			   std::string const& val)
+{
+    prefix_set = true;
+    prefix = val;
 }
 
 void

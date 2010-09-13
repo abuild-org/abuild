@@ -84,6 +84,9 @@ class Abuild
     void argSetJobs(unsigned int);
     void argSetMakeJobs(unsigned int);
     void argSetKeepGoing();
+    void argSetRawOutput();
+    void argSetOutputPrefix(bool& prefix_set, std::string& prefix,
+			    std::string const& val);
     void argSetNoOp();
     void argSetEmacs();
     void argSetBackendArgs(std::vector<std::string> const&,
@@ -392,6 +395,13 @@ class Abuild
     std::string rules_help_topic;
     unsigned int max_workers;
     int make_njobs;
+    bool raw_output_set;
+    bool raw_output;
+    bool job_error_prefix_set;
+    std::string job_error_prefix;
+    bool job_output_prefix_set;
+    std::string job_output_prefix;
+    bool interleave_output;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
     std::list<std::string> jvm_xargs;
