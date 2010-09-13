@@ -15,7 +15,13 @@
 
 namespace Util
 {
-    std::string intToString(int num);
+    // Converts an integer to a string, prepending with zeroes if the
+    // result is shorter than min_digits.  Padding with zeroes doesn't
+    // work for negative numbers.
+    std::string intToString(int num, size_t min_digits = 0);
+
+    // Returns number of digits in num.
+    size_t digitsIn(unsigned int num);
 
     // Returns true iff stdout is a tty.
     bool stdoutIsTty();

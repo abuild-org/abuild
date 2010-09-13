@@ -58,11 +58,30 @@ static std::string windows_error_string()
 #endif
 
 std::string
-Util::intToString(int num)
+Util::intToString(int num, size_t min_digits)
 {
     std::ostringstream buf;
     buf << num;
-    return buf.str();
+    std::string result;
+    if (buf.str().length() < min_digits)
+    {
+	result.append(min_digits - buf.str().length(), '0');
+    }
+    result += buf.str();
+    return result;
+}
+
+size_t
+Util::digitsIn(unsigned int num)
+{
+    unsigned int ndigits = 1;
+    unsigned int upper = 10;
+    while (num >= upper)
+    {
+	upper *= 10;
+	++ndigits;
+    }
+    return ndigits;
 }
 
 bool
