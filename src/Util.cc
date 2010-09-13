@@ -1018,6 +1018,10 @@ static void handle_output(fd_set& read_set, int& fd,
 			  std::string const& description,
 			  Util::output_handler_t handler, bool is_error)
 {
+    if (fd == -1)
+    {
+	return;
+    }
     char buf[1024];
     int len = 0;
     if (FD_ISSET(fd, &read_set))
