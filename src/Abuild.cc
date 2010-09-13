@@ -6005,6 +6005,7 @@ Abuild::findJava()
     this->java_builder.reset(
 	new JavaBuilder(
 	    this->error_handler,
+	    ! this->raw_output,
 	    boost::bind(&Abuild::verbose, this, _1),
 	    this->abuild_top, java, java_home, ant_home,
 	    java_libs, this->jvm_xargs,
@@ -6087,10 +6088,11 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    assert(this->buildgraph_item_prefixes.count(builder_string));
 	    job_prefix = this->buildgraph_item_prefixes[builder_string];
 	    notice(item_label + " build prefix: " + job_prefix);
+	    job_prefix.append(1, ' ');
 	}
 	logger_job = this->logger.requestJobHandle(
 	    this->whoami + ": " + item_label,
-	    ! this->interleave_output, job_prefix + " ");
+	    ! this->interleave_output, job_prefix);
     }
 
     if (use_interfaces)
@@ -7155,11 +7157,13 @@ Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
 	verbose("  targets: " + Util::join(" ", targets));
     }
 
+    ProcessHandler::output_handler_t output_handler =
+	this->logger.getOutputHandler(logger_job);
     // Explicitly unlock the build lock during invocation of the
     // backend
     ScopedUnlock unlock(build_lock);
-    // XXX logger_job
-    return this->java_builder->invoke(backend, build_file, dir, targets);
+    return this->java_builder->invoke(
+	backend, build_file, dir, targets, output_handler);
 }
 
 bool
@@ -7179,7 +7183,7 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 	verbose("running " + Util::join(" ", args));
     }
 
-    boost::function<void(bool, char const*, int)> output_handler =
+    ProcessHandler::output_handler_t output_handler =
 	this->logger.getOutputHandler(logger_job);
     // Explicitly unlock the build lock during invocation of the
     // backend
@@ -7191,8 +7195,7 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 void
 Abuild::flushLogIfSingleThreaded()
 {
-    // XXX
-    if (this->max_workers == 1)
+    if ((this->max_workers == 1) && (this->raw_output))
     {
         // If we have only one thread, then only one thread is using
         // the logger.  Flush the logger before we run the backend to

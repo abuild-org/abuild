@@ -24,6 +24,7 @@ class JavaBuilder
 {
   public:
     JavaBuilder(Error& error,
+		bool capture_output,
 		boost::function<void(std::string const&)> verbose,
 		std::string const& abuild_top,
 		std::string const& java,
@@ -36,7 +37,8 @@ class JavaBuilder
     bool invoke(std::string const& backend,
 		std::string const& build_file,
 		std::string const& dir,
-		std::list<std::string> const& targets);
+		std::list<std::string> const& targets,
+		ProcessHandler::output_handler_t output_handler);
     void finish();
 
   private:
@@ -71,6 +73,7 @@ class JavaBuilder
     Error& error;
     Logger& logger;
     ProcessHandler& process_handler;
+    bool capture_output;
     boost::function<void(std::string const&)> verbose;
     std::string abuild_top;
     std::string java;

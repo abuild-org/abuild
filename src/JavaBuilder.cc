@@ -16,6 +16,7 @@
 #include <assert.h>
 
 JavaBuilder::JavaBuilder(Error& error,
+			 bool capture_output,
 			 boost::function<void(std::string const&)> verbose,
 			 std::string const& abuild_top,
 			 std::string const& java,
@@ -28,6 +29,7 @@ JavaBuilder::JavaBuilder(Error& error,
     error(error),
     logger(*(Logger::getInstance())),
     process_handler(ProcessHandler::getInstance()),
+    capture_output(capture_output),
     verbose(verbose),
     abuild_top(abuild_top),
     java(java),
@@ -46,8 +48,10 @@ bool
 JavaBuilder::invoke(std::string const& backend,
 		    std::string const& build_file,
 		    std::string const& dir,
-		    std::list<std::string> const& targets)
+		    std::list<std::string> const& targets,
+		    ProcessHandler::output_handler_t output_handler)
 {
+    // XXX output handler
     return makeRequest(backend + "\001" +
 		       build_file + "\001" +
 		       dir + "\001" +
