@@ -45,7 +45,7 @@
 // Recognition of arguments to options:
 //
 //  * Single character options' arguments must follow the option as the
-//    next work (-b all).  Special case exception: numeric arguments to
+//    next word (-b all).  Special case exception: numeric arguments to
 //    single-character options may be directly concatenated to their
 //    arguments (-j4).
 //
