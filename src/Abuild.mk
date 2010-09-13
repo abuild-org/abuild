@@ -60,6 +60,7 @@ GENERAL_SRCS := \
 	QTC.cc \
 	QEXC.cc \
 	Util.cc \
+	ProcessHandler.cc \
 	Logger.cc \
 	Error.cc \
 	KeyVal.cc \

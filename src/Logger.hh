@@ -7,8 +7,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/function.hpp>
 #include <ThreadSafeQueue.hh>
+#include <ProcessHandler.hh>
 
 class Logger
 {
@@ -39,9 +39,8 @@ class Logger
 	std::string const& output_prefix, std::string const& error_prefix);
 
     // Return an output handler for the given job suitable for passing
-    // to Util::runProgram.
-    boost::function<void (bool, char const*, int)>
-    getOutputHandler(job_handle_t job);
+    // to ProcessHandler::runProgram.
+    ProcessHandler::output_handler_t getOutputHandler(job_handle_t job);
 
     // Indicate that a given job has completed
     void closeJob(job_handle_t job);

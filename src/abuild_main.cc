@@ -1,15 +1,17 @@
 #include <Abuild.hh>
 #include <Logger.hh>
+#include <ProcessHandler.hh>
 
 int main(int argc, char* argv[], char* envp[])
 {
     Logger::getInstance();
+    ProcessHandler::createInstance(envp);
 
     int status = 0;
     std::string exception;
     try
     {
-	if (! Abuild(argc, argv, envp).run())
+	if (! Abuild(argc, argv).run())
 	{
 	    status = 2;
 	}

@@ -14,7 +14,8 @@
 #include <list>
 #include <string>
 #include <map>
-#include "ThreadSafeQueue.hh"
+#include <ThreadSafeQueue.hh>
+#include <ProcessHandler.hh>
 
 class Error;
 class Logger;
@@ -29,7 +30,6 @@ class JavaBuilder
 		std::string const& java_home,
 		std::string const& ant_home,
 		std::list<std::string> const& java_libs,
-		char* envp[],
 		std::list<std::string> const& jvm_xargs,
 		std::list<std::string> const& build_args,
 		std::map<std::string, std::string> const& defines);
@@ -70,13 +70,13 @@ class JavaBuilder
 
     Error& error;
     Logger& logger;
+    ProcessHandler& process_handler;
     boost::function<void(std::string const&)> verbose;
     std::string abuild_top;
     std::string java;
     std::string java_home;
     std::string ant_home;
     std::list<std::string> java_libs;
-    char** envp;
     std::list<std::string> jvm_xargs;
     std::list<std::string> build_args;
     std::map<std::string, std::string> defines;

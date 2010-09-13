@@ -1,3 +1,4 @@
+#include <ProcessHandler.hh>
 #include <Util.hh>
 
 #include <boost/bind.hpp>
@@ -58,6 +59,8 @@ OutputHandler::flush(bool is_error, std::string& line)
 
 static int run(int argc, char* argv[], char* envp[])
 {
+    ProcessHandler::createInstance(envp);
+    ProcessHandler& pi = ProcessHandler::getInstance();
     if ((argc == 2) && (strcmp(argv[1], "-win32") == 0))
     {
 	std::string cwd = Util::getCurrentDirectory();
@@ -67,7 +70,7 @@ static int run(int argc, char* argv[], char* envp[])
 	args.push_back("MOO");
 	std::map<std::string, std::string> env;
 	env["VAR"] = "potato";
-	bool status = Util::runProgram(batfile, args, env, 0, ".");
+	bool status = pi.runProgram(batfile, args, env, false, ".");
 	std::cout << "status: " << status << std::endl << std::endl;
     }
     else if ((argc > 2) && (strcmp(argv[1], "-handle-output") == 0))
@@ -81,8 +84,8 @@ static int run(int argc, char* argv[], char* envp[])
 	    args.push_back(argv[i]);
 	}
 	OutputHandler oh;
-	bool status = Util::runProgram(
-	    progname, args, env, envp, ".",
+	bool status = pi.runProgram(
+	    progname, args, env, true, ".",
 	    boost::bind(&OutputHandler::handler, &oh, _1, _2, _3));
 	std::cout << "status: " << status << std::endl;
     }
@@ -150,12 +153,12 @@ static int run(int argc, char* argv[], char* envp[])
 
 	args[1] = "3";
 	args[2] = "env = new";
-	status = Util::runProgram(progname, args, env, 0, ".");
+	status = pi.runProgram(progname, args, env, false, ".");
 	std::cout << "status: " << status << std::endl << std::endl;
 
 	args[1] = "0";
 	args[2] = "env = both";
-	status = Util::runProgram(progname, args, env, envp, "..");
+	status = pi.runProgram(progname, args, env, true, "..");
 	std::cout << "status: " << status << std::endl << std::endl;
 
 	args[1] = "0";
@@ -169,7 +172,7 @@ static int run(int argc, char* argv[], char* envp[])
 	{
 	    env[(*iter).first] = (*iter).second;
 	}
-	status = Util::runProgram(progname, args, env, 0, "/");
+	status = pi.runProgram(progname, args, env, false, "/");
 	std::cout << "status: " << status << std::endl << std::endl;
     }
 

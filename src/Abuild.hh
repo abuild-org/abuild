@@ -29,7 +29,7 @@ class BackingConfig;
 class Abuild
 {
   public:
-    Abuild(int argc, char* argv[], char* envp[]);
+    Abuild(int argc, char* argv[]);
     ~Abuild();
     bool run();
 
@@ -300,7 +300,6 @@ class Abuild
 		       std::string const& progname,
 		       std::vector<std::string> const& args,
 		       std::map<std::string, std::string> const& environment,
-		       char* old_env[],
 		       std::string const& dir);
     void flushLogIfSingleThreaded();
     void cleanBuildset();
@@ -393,7 +392,6 @@ class Abuild
 
     int argc;
     char** argv;
-    char** envp;
 
     // Parameters determined from the command line or at startup
     std::string whoami;
@@ -492,6 +490,7 @@ class Abuild
     std::set<std::string> deprecated_backing_files;
 
     Logger& logger;
+    ProcessHandler& process_handler;
 };
 
 #endif // __ABUILD_HH__

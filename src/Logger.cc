@@ -127,7 +127,7 @@ Logger::requestJobHandle(
     return job;
 }
 
-boost::function<void (bool, char const*, int)>
+ProcessHandler::output_handler_t
 Logger::getOutputHandler(job_handle_t job)
 {
     if (job == NO_JOB)

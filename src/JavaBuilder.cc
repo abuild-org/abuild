@@ -1,6 +1,7 @@
 #include "JavaBuilder.hh"
 
 #include <Util.hh>
+#include <ProcessHandler.hh>
 #include <QEXC.hh>
 #include <QTC.hh>
 #include <Error.hh>
@@ -21,19 +22,18 @@ JavaBuilder::JavaBuilder(Error& error,
 			 std::string const& java_home,
 			 std::string const& ant_home,
 			 std::list<std::string> const& java_libs,
-			 char** envp,
 			 std::list<std::string> const& jvm_xargs,
 			 std::list<std::string> const& build_args,
 			 std::map<std::string, std::string> const& defines) :
     error(error),
     logger(*(Logger::getInstance())),
+    process_handler(ProcessHandler::getInstance()),
     verbose(verbose),
     abuild_top(abuild_top),
     java(java),
     java_home(java_home),
     ant_home(ant_home),
     java_libs(java_libs),
-    envp(envp),
     jvm_xargs(jvm_xargs),
     build_args(build_args),
     defines(defines),
@@ -458,7 +458,7 @@ JavaBuilder::runJava(unsigned short port)
     verbose("JAVA_HOME=" + this->java_home);
     verbose("ANT_HOME=" + this->ant_home);
     verbose("invoking java: " + Util::join(" ", args));
-    Util::runProgram(this->java, args, environment, this->envp, ".");
+    process_handler.runProgram(this->java, args, environment, true, ".");
 
     boost::mutex::scoped_lock lock(this->mutex);
     if (this->run_mode == rm_starting_up)

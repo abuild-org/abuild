@@ -2,6 +2,7 @@
 #include <QTC.hh>
 #include <QEXC.hh>
 #include <Util.hh>
+#include <ProcessHandler.hh>
 #include <Logger.hh>
 #include <OptionParser.hh>
 #include <FileLocation.hh>
@@ -69,10 +70,9 @@ class ScopedUnlock
     boost::mutex::scoped_lock& l;
 };
 
-Abuild::Abuild(int argc, char* argv[], char* envp[]) :
+Abuild::Abuild(int argc, char* argv[]) :
     argc(argc),
     argv(argv),
-    envp(envp),
     whoami(Util::removeExe(Util::basename(argv[0]))),
     stdout_is_tty(Util::stdoutIsTty()),
     max_workers(1),
@@ -108,7 +108,8 @@ Abuild::Abuild(int argc, char* argv[], char* envp[]) :
 #endif
     last_assigned_tree_number(0),
     suggest_upgrade(false),
-    logger(*(Logger::getInstance()))
+    logger(*(Logger::getInstance())),
+    process_handler(ProcessHandler::getInstance())
 {
     Error::setErrorCallback(
 	boost::bind(&Abuild::monitorErrorCallback, this, _1));
@@ -6005,7 +6006,7 @@ Abuild::findJava()
 	    this->error_handler,
 	    boost::bind(&Abuild::verbose, this, _1),
 	    this->abuild_top, java, java_home, ant_home,
-	    java_libs, this->envp, this->jvm_xargs,
+	    java_libs, this->jvm_xargs,
 	    this->java_builder_args, this->defines));
 }
 
@@ -6903,8 +6904,7 @@ Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
 		     targets.begin(), targets.end());
 
     return invokeBackend(build_lock, logger_job, this->gmake, make_argv,
-			 std::map<std::string, std::string>(),
-			 this->envp, dir);
+			 std::map<std::string, std::string>(), dir);
 }
 
 bool
@@ -7169,7 +7169,6 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 		      std::string const& progname,
 		      std::vector<std::string> const& args,
 		      std::map<std::string, std::string> const& environment,
-		      char* old_env[],
 		      std::string const& dir)
 {
     flushLogIfSingleThreaded();
@@ -7186,8 +7185,8 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
     // Explicitly unlock the build lock during invocation of the
     // backend
     ScopedUnlock unlock(build_lock);
-    return Util::runProgram(progname, args, environment, old_env, dir,
-			    output_handler);
+    return process_handler.runProgram(
+	progname, args, environment, true, dir, output_handler);
 }
 
 void
