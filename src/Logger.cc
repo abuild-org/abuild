@@ -96,7 +96,7 @@ Logger::getInstance()
 }
 
 void
-Logger::stopLogger()
+Logger::stopLogger(std::string const& error_message)
 {
     if (the_instance)
     {
@@ -105,6 +105,10 @@ Logger::stopLogger()
 	    the_instance->closeJob((*(the_instance->jobs.begin())).first);
 	}
 
+	if (! error_message.empty())
+	{
+	    the_instance->logError(error_message);
+	}
 	the_instance->writeToLogger(m_shutdown, "");
 	the_instance->thread->join();
 	delete the_instance;
@@ -126,6 +130,11 @@ Logger::requestJobHandle(
 boost::function<void (bool, char const*, int)>
 Logger::getOutputHandler(job_handle_t job)
 {
+    if (job == NO_JOB)
+    {
+	return 0;
+    }
+
     std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
 	this->jobs.find(job);
     if (iter == this->jobs.end())
@@ -140,6 +149,11 @@ Logger::getOutputHandler(job_handle_t job)
 void
 Logger::closeJob(job_handle_t job)
 {
+    if (job == NO_JOB)
+    {
+	return;
+    }
+
     std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
 	this->jobs.find(job);
     if (iter == this->jobs.end())

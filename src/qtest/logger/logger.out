@@ -16,3 +16,4 @@ E job 1 error line 2
 O job 1 output line 2
 O job 1 partial output line[no newline]
 job 1: END OUTPUT
+error message

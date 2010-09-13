@@ -1,6 +1,7 @@
 #include "Logger.hh"
 #include <boost/bind.hpp>
 #include <string.h>
+#include <assert.h>
 
 static void call_with_length(
     boost::function<void(bool, char const*, int)> fn,
@@ -62,6 +63,10 @@ int main()
     logger->closeJob(j2);
     // don't close job j1 -- let stopLogger deal with it
 
-    Logger::stopLogger();
+    // Test harmless operations for NO_JOB
+    assert(logger->getOutputHandler(0) == 0);
+    logger->closeJob(0);
+
+    Logger::stopLogger("error message");
     return 0;
 }

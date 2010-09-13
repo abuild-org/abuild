@@ -20,10 +20,13 @@ class Logger
     static Logger* getInstance();
 
     // Stops the logger and destroys the singleton instance.  Any
-    // references to it will be invalid.
-    static void stopLogger();
+    // references to it will be invalid.  If the argument is
+    // non-empty, it will be printed as an error message as the last
+    // thing before the logger is stopped.
+    static void stopLogger(std::string const& error_message = "");
 
     typedef int job_handle_t;
+    static job_handle_t const NO_JOB = 0;
 
     // Request a job handle, used to associated log messages with a
     // specific job.  Each line of output is prefixed by
