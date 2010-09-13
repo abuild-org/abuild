@@ -137,6 +137,11 @@ namespace Util
     // On UNIX, return the empty string.
     std::string getExtension(std::string const& path);
 
+#ifdef _WIN32
+    // Return the last error code as a string -- Windows only
+    std::string windowsErrorString();
+#endif
+
     // If in Windows, add .bat, .com, or .exe to the end of a string
     // if it doesn't already have it and if the result is a file that
     // exists.  Otherwise, do nothing.

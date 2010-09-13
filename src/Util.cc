@@ -34,28 +34,6 @@
 #include "QTC.hh"
 #include "QEXC.hh"
 
-#ifdef _WIN32
-static std::string windows_error_string()
-{
-    LPVOID lpMsgBuf;
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-	GetLastError(),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &lpMsgBuf,
-        0, NULL );
-    std::string msg = (LPTSTR) lpMsgBuf;
-    LocalFree(lpMsgBuf);
-
-    Util::stripTrailingNewline(msg);
-
-    return msg;
-}
-#endif
-
 std::string
 Util::intToString(int num, size_t min_digits)
 {
@@ -701,6 +679,29 @@ Util::getExtension(std::string const& path)
     return extension;
 }
 
+#ifdef _WIN32
+std::string
+Util::windowsErrorString()
+{
+    LPVOID lpMsgBuf;
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+	GetLastError(),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+    std::string msg = (LPTSTR) lpMsgBuf;
+    LocalFree(lpMsgBuf);
+
+    Util::stripTrailingNewline(msg);
+
+    return msg;
+}
+#endif
+
 void
 Util::appendExe(std::string& progname)
 {
@@ -949,7 +950,7 @@ Util::getDirEntries(std::string const& path)
 		{
 		    throw QEXC::General(
 			"FindNextFile failed while reading " + path + ": " +
-			windows_error_string());
+			windowsErrorString());
 		}
 	    }
 	}

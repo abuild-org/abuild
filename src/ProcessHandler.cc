@@ -14,8 +14,11 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <set>
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <Util.hh>
 #include <QEXC.hh>
 
 ProcessHandler* ProcessHandler::the_instance = 0;
@@ -133,7 +136,7 @@ static void read_pipe(boost::mutex& mutex,
 	    else
 	    {
 		throw QEXC::General("failure reading from pipe: " +
-				    windows_error_string());
+				    Util::windowsErrorString());
 	    }
 	}
 	{ // private scope
@@ -206,7 +209,7 @@ ProcessHandler::runProgram(
 	    if (! SetConsoleCtrlHandler((PHANDLER_ROUTINE) ctrlHandler, TRUE))
 	    {
 		throw QEXC::General("could not set control handler: " +
-				    windows_error_string());
+				    Util::windowsErrorString());
 	    }
 	    installed_ctrl_handler = true;
 	}
@@ -232,7 +235,7 @@ ProcessHandler::runProgram(
 	       CreatePipe(&child_err_r, &child_err_w, &saAttr, 0)))
 	{
 	    throw QEXC::General("CreatePipe failed for child I/O: " +
-				windows_error_string());
+				Util::windowsErrorString());
 	}
 	child_in = CreateFile("NUL", GENERIC_READ, FILE_SHARE_WRITE, &saAttr,
 			      OPEN_EXISTING, FILE_ATTRIBUTE_READONLY,
@@ -240,13 +243,13 @@ ProcessHandler::runProgram(
 	if (child_in == INVALID_HANDLE_VALUE)
 	{
 	    throw QEXC::General("unable to open NUL: " +
-				windows_error_string());
+				Util::windowsErrorString());
 	}
     }
 
     std::string progpath = progname;
-    appendExe(progpath);
-    std::string suffix = getExtension(progpath);
+    Util::appendExe(progpath);
+    std::string suffix = Util::getExtension(progpath);
 
     std::string cmdline_str;
     bool first = true;
@@ -321,7 +324,7 @@ ProcessHandler::runProgram(
 
     std::string comspec;
     std::string appname = progpath;
-    if ((suffix == "bat") && getEnv("COMSPEC", &comspec))
+    if ((suffix == "bat") && Util::getEnv("COMSPEC", &comspec))
     {
 	cmdline_str = comspec + " /c " + cmdline_str;
 	appname = comspec;
