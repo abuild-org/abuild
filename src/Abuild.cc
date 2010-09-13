@@ -4768,24 +4768,34 @@ Abuild::computeTreePrefixes(std::list<std::string> const& tree_names)
     // participate in the build.  Create zero-filled, fixed length,
     // numeric prefixes for each tree.
 
-    unsigned int maxval = tree_names.size();
-    unsigned int ndigits = 1;
-    unsigned int upper = 10;
-    while (maxval >= upper)
-    {
-	upper *= 10;
-	++ndigits;
-    }
-    boost::shared_array<char> t_ptr(new char[ndigits + 1]);
-    char* t = t_ptr.get();
+    unsigned int ndigits = Util::digitsIn(tree_names.size());
     int count = 0;
     for (std::list<std::string>::const_iterator iter = tree_names.begin();
 	 iter != tree_names.end(); ++iter)
     {
 	std::string const& tree_name = *iter;
 	++count;
-	std::sprintf(t, "%0*d", ndigits, count);
-	this->buildgraph_tree_prefixes[tree_name] = t;
+	this->buildgraph_tree_prefixes[tree_name] =
+	    Util::intToString(count, ndigits);
+    }
+}
+
+void
+Abuild::computeItemPrefixes()
+{
+    // Assign a prefix for each item in the build graph.  These are
+    // used as prefixes when capturing but interleaving output of
+    // multithreaded builds.  They should be uniform length, but the
+    // order isn't important.
+
+    DependencyGraph::ItemList items = this->build_graph.getSortedGraph();
+    unsigned int ndigits = Util::digitsIn(items.size());
+    int count = 0;
+    for (DependencyGraph::ItemList::iterator iter = items.begin();
+	 iter != items.end(); ++iter)
+    {
+	this->buildgraph_item_prefixes[*iter] =
+	    "[" + Util::intToString(++count, ndigits) + "] ";
     }
 }
 
@@ -5505,6 +5515,8 @@ Abuild::buildBuildset()
 	       (this->stdout_is_tty ? "1" : "0"),
 	       Interface::a_normal));
 
+    computeItemPrefixes();
+
     // Build appropriate items in dependency order.
     DependencyRunner r(this->build_graph, this->max_workers,
 		       boost::bind(&Abuild::itemBuilder, this,
@@ -6060,6 +6072,26 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     bool status = true;
 
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
+    std::string item_label = item_name + " (" + output_dir + ")";
+
+    Logger::job_handle_t logger_job = Logger::NO_JOB;
+    if (! this->raw_output)
+    {
+	std::string prefix_prefix;
+	if (this->interleave_output)
+	{
+	    // Prepend to any existing prefix an indicator of the job
+	    // number.
+	    assert(this->buildgraph_item_prefixes.count(builder_string));
+	    prefix_prefix = this->buildgraph_item_prefixes[builder_string];
+	    notice(item_label + " build prefix: " + prefix_prefix);
+	}
+	logger_job = this->logger.requestJobHandle(
+	    this->whoami + ": " + item_label,
+	    ! this->interleave_output,
+	    prefix_prefix + this->job_output_prefix,
+	    prefix_prefix + this->job_error_prefix);
+    }
 
     if (use_interfaces)
     {
@@ -6080,14 +6112,14 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	{
 	    if (is_dep_failure)
 	    {
-		info(item_name +
-		     " (" + output_dir +
-		     ") will not be built because of failure of a dependency");
+		info(item_label +
+		     " will not be built because of failure of a dependency");
 	    }
 	    else
 	    {
 		status = buildItem(
-		    build_lock, item_name, item_platform, build_item);
+		    build_lock, logger_job,
+		    item_name, item_platform, build_item);
 	    }
 	}
 
@@ -6127,9 +6159,11 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	}
     }
 
+    this->logger.closeJob(logger_job);
+
     if (! status)
     {
-        notice(item_name + " (" + output_dir + "): build failed");
+        notice(item_label + ": build failed");
 	this->failed_builds.push_back(builder_string);
     }
 
@@ -6472,6 +6506,7 @@ Abuild::readAfterBuilds(std::string const& item_name,
 
 bool
 Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
+		  Logger::job_handle_t logger_job,
 		  std::string const& item_name,
 		  std::string const& item_platform,
 		  BuildItem& build_item)
@@ -6514,19 +6549,19 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
     switch (build_item.getBackend())
     {
       case ItemConfig::b_make:
-	result = invoke_gmake(build_lock,
+	result = invoke_gmake(build_lock, logger_job,
 			      item_name, item_platform, build_item,
 			      abs_output_dir, backend_targets);
 	break;
 
       case ItemConfig::b_ant:
-	result = invoke_ant(build_lock,
+	result = invoke_ant(build_lock, logger_job,
 			    item_name, item_platform, build_item,
 			    abs_output_dir, backend_targets);
 	break;
 
       case ItemConfig::b_groovy:
-	result = invoke_groovy(build_lock,
+	result = invoke_groovy(build_lock, logger_job,
 			       item_name, item_platform, build_item,
 			       abs_output_dir, backend_targets);
 	break;
@@ -6712,6 +6747,7 @@ Abuild::appendToolchainPaths(std::list<std::string>& toolchain_dirs,
 
 bool
 Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
+		     Logger::job_handle_t logger_job,
 		     std::string const& item_name,
 		     std::string const& item_platform,
 		     BuildItem& build_item,
@@ -6866,13 +6902,14 @@ Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
     make_argv.insert(make_argv.end(),
 		     targets.begin(), targets.end());
 
-    return invokeBackend(build_lock, this->gmake, make_argv,
+    return invokeBackend(build_lock, logger_job, this->gmake, make_argv,
 			 std::map<std::string, std::string>(),
 			 this->envp, dir);
 }
 
 bool
 Abuild::invoke_ant(boost::mutex::scoped_lock& build_lock,
+		   Logger::job_handle_t logger_job,
 		   std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item,
@@ -6970,11 +7007,13 @@ Abuild::invoke_ant(boost::mutex::scoped_lock& build_lock,
 	build_file = this->abuild_top + "/ant/abuild.xml";
     }
 
-    return invokeJavaBuilder(build_lock, "ant", build_file, dir, targets);
+    return invokeJavaBuilder(build_lock, logger_job,
+			     "ant", build_file, dir, targets);
 }
 
 bool
 Abuild::invoke_groovy(boost::mutex::scoped_lock& build_lock,
+		      Logger::job_handle_t logger_job,
 		      std::string const& item_name,
 		      std::string const& item_platform,
 		      BuildItem& build_item,
@@ -7090,11 +7129,13 @@ Abuild::invoke_groovy(boost::mutex::scoped_lock& build_lock,
 
     dyn.close();
 
-    return invokeJavaBuilder(build_lock, "groovy", "", dir, targets);
+    return invokeJavaBuilder(build_lock, logger_job,
+			     "groovy", "", dir, targets);
 }
 
 bool
 Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
+			  Logger::job_handle_t logger_job,
 			  std::string const& backend,
 			  std::string const& build_file,
 			  std::string const& dir,
@@ -7118,11 +7159,13 @@ Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
     // Explicitly unlock the build lock during invocation of the
     // backend
     ScopedUnlock unlock(build_lock);
+    // XXX logger_job
     return this->java_builder->invoke(backend, build_file, dir, targets);
 }
 
 bool
 Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
+		      Logger::job_handle_t logger_job,
 		      std::string const& progname,
 		      std::vector<std::string> const& args,
 		      std::map<std::string, std::string> const& environment,
@@ -7138,15 +7181,19 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 	verbose("running " + Util::join(" ", args));
     }
 
+    boost::function<void(bool, char const*, int)> output_handler =
+	this->logger.getOutputHandler(logger_job);
     // Explicitly unlock the build lock during invocation of the
     // backend
     ScopedUnlock unlock(build_lock);
-    return Util::runProgram(progname, args, environment, old_env, dir);
+    return Util::runProgram(progname, args, environment, old_env, dir,
+			    output_handler);
 }
 
 void
 Abuild::flushLogIfSingleThreaded()
 {
+    // XXX
     if (this->max_workers == 1)
     {
         // If we have only one thread, then only one thread is using

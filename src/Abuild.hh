@@ -19,8 +19,8 @@
 #include <JavaBuilder.hh>
 #include <CompatLevel.hh>
 #include <TargetType.hh>
+#include <Logger.hh>
 
-class Logger;
 class ItemConfig;
 class InterfaceParser;
 class UpgradeData;
@@ -197,6 +197,7 @@ class Abuild
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& forest_numbers);
     void computeTreePrefixes(std::list<std::string> const& tree_names);
+    void computeItemPrefixes();
     bool isBuildItemWritable(BuildItem const& item);
     void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
     void populateBuildset(BuildItem_map& builditems,
@@ -218,6 +219,7 @@ class Abuild
     bool itemBuilder(std::string builder_string, item_filter_t filter,
 		     bool is_dep_failure);
     bool buildItem(boost::mutex::scoped_lock& build_lock,
+		   Logger::job_handle_t logger_job,
 		   std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item);
@@ -267,29 +269,34 @@ class Abuild
     void appendToolchainPaths(std::list<std::string>& toolchain_dirs,
 			      std::string const& dir);
     bool invoke_gmake(boost::mutex::scoped_lock& build_lock,
+		      Logger::job_handle_t logger_job,
 		      std::string const& item_name,
 		      std::string const& item_platform,
 		      BuildItem& build_item,
 		      std::string const& dir,
 		      std::list<std::string> const& targets);
     bool invoke_ant(boost::mutex::scoped_lock& build_lock,
+		    Logger::job_handle_t logger_job,
 		    std::string const& item_name,
 		    std::string const& item_platform,
 		    BuildItem& build_item,
 		    std::string const& dir,
 		    std::list<std::string> const& targets);
     bool invoke_groovy(boost::mutex::scoped_lock& build_lock,
+		       Logger::job_handle_t logger_job,
 		       std::string const& item_name,
 		       std::string const& item_platform,
 		       BuildItem& build_item,
 		       std::string const& dir,
 		       std::list<std::string> const& targets);
     bool invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
+			   Logger::job_handle_t logger_job,
 			   std::string const& backend,
 			   std::string const& build_file,
 			   std::string const& dir,
 			   std::list<std::string> const& targets);
     bool invokeBackend(boost::mutex::scoped_lock& build_lock,
+		       Logger::job_handle_t logger_job,
 		       std::string const& progname,
 		       std::vector<std::string> const& args,
 		       std::map<std::string, std::string> const& environment,
@@ -467,6 +474,7 @@ class Abuild
     boost::shared_ptr<Interface> base_interface;
     std::vector<std::string> buildset_reverse_order;
     std::map<std::string, std::string> buildgraph_tree_prefixes;
+    std::map<std::string, std::string> buildgraph_item_prefixes;
     std::vector<std::string> failed_builds;
     std::string verbose_indent;
 
