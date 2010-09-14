@@ -880,6 +880,10 @@ void
 Abuild::argSetOutputPrefix(bool& prefix_set, std::string& prefix,
 			   std::string const& val)
 {
+    if (val == "")
+    {
+	QTC::TC("abuild", "Abuild explicitly empty prefix");
+    }
     prefix_set = true;
     prefix = val;
 }

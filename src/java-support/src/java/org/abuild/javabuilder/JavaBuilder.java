@@ -397,7 +397,7 @@ class JavaBuilder
 		}
 	    }
 
-	    if (! data.isEmpty())
+	    if (data.length() > 0)
 	    {
 		responseQueue.put(
 		    number + " data:" + (is_error ? "err" : "out") +
