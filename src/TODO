@@ -17,11 +17,16 @@ Next
 Capture of Backend Output
 =========================
 
-Redirect System.out and System.err to a thread-aware output stream.
-Be sure to test with non-ASCII data and data with embedded newlines.
-Test task that creates a thread and prints something.
+Test java output:
 
-Add --buffered-output
+ * partial message
+
+ * embedded newlines
+
+ * non-ASCII characters
+
+Add --buffered-output; make sure buffering options are handled in an
+alias-friendly fashion
 
 --output-prefix='' doesn't work
 
