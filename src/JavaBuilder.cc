@@ -15,6 +15,31 @@
 #include <cstdlib>
 #include <assert.h>
 
+JavaBuilder::JobData::JobData(
+    ProcessHandler::output_handler_t output_handler,
+    response_queue_ptr response_queue) :
+    output_handler(output_handler),
+    response_queue(response_queue)
+{
+}
+
+void
+JavaBuilder::JobData::respond(bool status)
+{
+    handleOutput(false, "");
+    handleOutput(true, "");
+    this->response_queue->enqueue(status);
+}
+
+void
+JavaBuilder::JobData::handleOutput(bool is_error, std::string const& message)
+{
+    if (this->output_handler)
+    {
+	this->output_handler(is_error, message.c_str(), message.length());
+    }
+}
+
 JavaBuilder::JavaBuilder(Error& error,
 			 bool capture_output,
 			 boost::function<void(std::string const&)> verbose,
@@ -51,15 +76,16 @@ JavaBuilder::invoke(std::string const& backend,
 		    std::list<std::string> const& targets,
 		    ProcessHandler::output_handler_t output_handler)
 {
-    // XXX output handler
-    return makeRequest(backend + "\001" +
+    return makeRequest(output_handler,
+		       backend + "\001" +
 		       build_file + "\001" +
 		       dir + "\001" +
 		       Util::join(" ", targets) + "\001|");
 }
 
 bool
-JavaBuilder::makeRequest(std::string const& message)
+JavaBuilder::makeRequest(ProcessHandler::output_handler_t output_handler,
+			 std::string const& message)
 {
     try
     {
@@ -77,10 +103,13 @@ JavaBuilder::makeRequest(std::string const& message)
 
     {
 	boost::mutex::scoped_lock lock(this->mutex);
-	// We're in trouble if we ever have more than 2^31 builds, but
-	// somehow, I'm not too worried about it.
+	// request_number must never be 0 since 0 is used for data not
+	// associated with a job.  We're in trouble if we ever have
+	// more than 2^31 builds, but somehow, I'm not too worried
+	// about it.
 	request_number = ++this->last_request;
-	this->response_queues[request_number] = response;
+	this->job_data[request_number].reset(
+	    new JobData(output_handler, response));
 
 	// Send message and wait for response
 	text = Util::intToString(request_number) + " " + message + "\n";
@@ -217,13 +246,13 @@ JavaBuilder::runIO()
 	}
 	else
 	{
-	    for (std::map<int, response_queue_ptr>::iterator iter =
-		     this->response_queues.begin();
-		 iter != this->response_queues.end(); ++iter)
+	    for (std::map<int, JobData_ptr>::iterator iter =
+		     this->job_data.begin();
+		 iter != this->job_data.end(); ++iter)
 	    {
-		(*iter).second->enqueue(false);
+		(*iter).second->respond(false);
 	    }
-	    this->response_queues.clear();
+	    this->job_data.clear();
 	    setRunMode(rm_stopped);
 	}
     }
@@ -324,6 +353,7 @@ void
 JavaBuilder::handleResponse()
 {
     boost::regex response_re("(\\d+) (true|false)\r?");
+    boost::regex data_re("(\\d+) data:(out|err) (\\d+)\r?");
     boost::smatch match;
 
     size_t p;
@@ -336,18 +366,73 @@ JavaBuilder::handleResponse()
 	    int request_number = std::atoi(match[1].str().c_str());
 	    std::string result_str = match[2].str();
 	    bool result = (result_str == "true");
-	    response_queue_ptr response_queue;
+	    JobData_ptr job;
+	    if (! this->job_data.count(request_number))
 	    {
-		if (! this->response_queues.count(request_number))
+		throw QEXC::General("protocol error: received response "
+				    "for unknown request " +
+				    Util::intToString(request_number));
+	    }
+	    job = this->job_data[request_number];
+	    this->job_data.erase(request_number);
+	    job->respond(result);
+	}
+	else if (this->capture_output &&
+		 boost::regex_match(response, match, data_re))
+	{
+	    int request_number = std::atoi(match[1].str().c_str());
+	    std::string message_type = match[2].str();
+	    size_t message_length = std::atoi(match[3].str().c_str());
+	    std::string message;
+	    bool have_message = false;
+	    bool is_error = (message_type == "err");
+	    if (accumulated_response.length() > message_length)
+	    {
+		std::string data =
+		    accumulated_response.substr(0, message_length);
+		std::string rest =
+		    accumulated_response.substr(message_length);
+		if ((rest.length() >= 1) && (rest[0] == '\n'))
+		{
+		    have_message = true;
+		    rest = rest.substr(1);
+		}
+		else if ((rest.length() >= 2) && (rest.substr(0, 2) == "\r\n"))
+		{
+		    have_message = true;
+		    rest = rest.substr(2);
+		}
+		if (have_message)
+		{
+		    message = data;
+		    accumulated_response = rest;
+		}
+	    }
+	    if (! have_message)
+	    {
+		QTC::TC("abuild", "JavaBuilder read partial message");
+		accumulated_response = response + "\n" + accumulated_response;
+		break;
+	    }
+
+	    if (request_number == 0)
+	    {
+		QTC::TC("abuild", "JavaBuilder data for job 0");
+		std::ostream& out = (is_error ? std::cerr : std::cout);
+		out << data;
+	    }
+	    else
+	    {
+		JobData_ptr job;
+		if (! this->job_data.count(request_number))
 		{
 		    throw QEXC::General("protocol error: received response "
 					"for unknown request " +
 					Util::intToString(request_number));
 		}
-		response_queue = this->response_queues[request_number];
-		this->response_queues.erase(request_number);
+		job = this->job_data[request_number];
+		job->handleOutput(is_error, message);
 	    }
-	    response_queue->enqueue(result);
 	}
 	else
 	{
@@ -462,7 +547,17 @@ JavaBuilder::runJava(unsigned short port)
     verbose("JAVA_HOME=" + this->java_home);
     verbose("ANT_HOME=" + this->ant_home);
     verbose("invoking java: " + Util::join(" ", args));
-    process_handler.runProgram(this->java, args, environment, true, ".");
+
+    Logger::job_handle_t logger_job = Logger::NO_JOB;
+    if (this->capture_output)
+    {
+	logger_job = this->logger.requestJobHandle(
+	    "JavaBuilder", false, "[JavaBuilder] ");
+    }
+    QTC::TC("abuild", "JavaBuilder capture output",
+	    this->capture_output ? 1 : 0);
+    process_handler.runProgram(this->java, args, environment, true, ".",
+			       this->logger.getOutputHandler(logger_job));
 
     boost::mutex::scoped_lock lock(this->mutex);
     if (this->run_mode == rm_starting_up)

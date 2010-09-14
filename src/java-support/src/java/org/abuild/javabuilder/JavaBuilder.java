@@ -33,7 +33,8 @@ class JavaBuilder
     static private final Pattern defines_re =
 	Pattern.compile("([^-][^=]*)=(.*)");
     private Socket socket;
-    private ExecutorService threadPool = Executors.newCachedThreadPool();
+    private ExecutorService threadPool =
+	Executors.newCachedThreadPool(new AbuildThreadFactory());
     private AntRunner antRunner = null;
     private GroovyRunner groovyRunner = null;
     private Map<String, String> defines;
@@ -91,6 +92,12 @@ class JavaBuilder
 	    }
 	}
 	BuildArgs buildArgs = new BuildArgs();
+
+	// Capture original stderr so we can write to it if there is a
+	// serious problem that may interfere with our socket
+	// communication back to the main abuild process.
+	PrintStream stderr = System.err;
+
 	if (! buildArgs.parseArgs(otherArgs))
 	{
 	    usage();
@@ -101,12 +108,12 @@ class JavaBuilder
 	}
 	catch (IOException e)
 	{
-	    e.printStackTrace(System.err);
+	    e.printStackTrace(stderr);
 	    System.exit(2);
 	}
 	catch (InterruptedException e)
 	{
-	    e.printStackTrace(System.err);
+	    e.printStackTrace(stderr);
 	    System.exit(2);
 	}
     }
@@ -162,6 +169,15 @@ class JavaBuilder
 	throws IOException, InterruptedException
     {
 	this.responder = new Responder(this.socket);
+	if (this.buildArgs.captureOutput)
+	{
+	    OutputHandlerStream newOut =
+		new OutputHandlerStream(false, responder);
+	    OutputHandlerStream newErr =
+		new OutputHandlerStream(true, responder);
+	    System.setOut(new PrintStream(newOut, true));
+	    System.setErr(new PrintStream(newErr, true));
+	}
 	LineNumberReader r =
 	    new LineNumberReader(
 		new InputStreamReader(this.socket.getInputStream()));
@@ -321,8 +337,18 @@ class JavaBuilder
 	{
 	    String[] args = this.command.split("\001");
 	    boolean status = false;
+
+	    ThreadGroup g = Thread.currentThread().getThreadGroup();
+	    if (! (g instanceof AbuildThreadGroup))
+	    {
+		throw new Error(
+		    "InputHandler's ThreadGroup is not AbuildThreadGroup");
+	    }
+	    AbuildThreadGroup ag = (AbuildThreadGroup) g;
+
 	    try
 	    {
+		ag.setJob(number);
 		status = JavaBuilder.this.runCommand(args);
 	    }
 	    catch (Throwable e)
@@ -331,10 +357,11 @@ class JavaBuilder
 		e.printStackTrace(System.err);
 	    }
 	    JavaBuilder.this.sendResponse(number, status);
+	    ag.setJob(null);
 	}
     }
 
-    class Responder implements Runnable
+    class Responder implements Runnable, OutputHandler
     {
 	private PrintStream responseStream;
 	private BlockingQueue<String> responseQueue;
@@ -353,6 +380,29 @@ class JavaBuilder
 	    throws InterruptedException
 	{
 	    responseQueue.put(number + " " + (result ? "true" : "false"));
+	}
+
+	public void sendOutput(boolean is_error, String data)
+	    throws InterruptedException
+	{
+	    String number = "0";
+
+	    ThreadGroup g = Thread.currentThread().getThreadGroup();
+	    if (g instanceof AbuildThreadGroup)
+	    {
+		String n = ((AbuildThreadGroup) g).getJob();
+		if (n != null)
+		{
+		    number = n;
+		}
+	    }
+
+	    if (! data.isEmpty())
+	    {
+		responseQueue.put(
+		    number + " data:" + (is_error ? "err" : "out") +
+		    " " + data.getBytes().length + "\n" + data);
+	    }
 	}
 
 	public void shutdown()

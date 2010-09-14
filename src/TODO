@@ -17,9 +17,13 @@ Next
 Capture of Backend Output
 =========================
 
-We will need separate java builder processes for each thread.  Maybe
-we can use a pool of processes, starting one up if no java builder is
-available.  That logic is already partially in place.
+Redirect System.out and System.err to a thread-aware output stream.
+Be sure to test with non-ASCII data and data with embedded newlines.
+Test task that creates a thread and prints something.
+
+Add --buffered-output
+
+--output-prefix='' doesn't work
 
 documentation fodder
 --------------------
@@ -37,6 +41,8 @@ messages.
 
 Document: if you hit CTRL-C,  you will lose any partial output.  To
 avoid, use raw-output or interleave-output.
+
+Also, possible reordering of output even in unbuffered case
 
 There have been a number of ideas about improving abuild's output,
 such as de-interleaving build outputs for multithreaded builds,

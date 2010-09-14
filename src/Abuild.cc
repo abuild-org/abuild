@@ -639,6 +639,7 @@ Abuild::parseArgv()
 		(this->output_prefix.empty() ? 0 : 2) |
 		(this->error_prefix.empty() ? 0 : 4));
 	this->logger.setPrefixes(this->output_prefix, this->error_prefix);
+	this->java_builder_args.push_back("-co");
     }
 
     // called after changing directories

@@ -55,7 +55,21 @@ class JavaBuilder
     typedef boost::shared_ptr<boost::thread> thread_ptr;
     typedef boost::shared_ptr<ThreadSafeQueue<bool> > response_queue_ptr;
 
-    bool makeRequest(std::string const& request);
+    class JobData
+    {
+      public:
+	JobData(ProcessHandler::output_handler_t output_handler,
+		response_queue_ptr response_queue);
+	void respond(bool status);
+	void handleOutput(bool, std::string const&);
+
+      private:
+	ProcessHandler::output_handler_t output_handler;
+	response_queue_ptr response_queue;
+    };
+    typedef boost::shared_ptr<JobData> JobData_ptr;
+
+    bool makeRequest(ProcessHandler::output_handler_t, std::string const&);
     void requestRead();
     void start();
     void cleanup();
@@ -95,7 +109,7 @@ class JavaBuilder
     boost::shared_ptr<boost::asio::io_service> io_service;
     socket_ptr sock;
     thread_ptr io_thread;
-    std::map<int, response_queue_ptr > response_queues;
+    std::map<int, JobData_ptr> job_data;
 };
 
 #endif // __JAVABUILDER_HH__
