@@ -77,11 +77,9 @@ Abuild::Abuild(int argc, char* argv[]) :
     stdout_is_tty(Util::stdoutIsTty()),
     max_workers(1),
     make_njobs(1),
-    raw_output_set(false),
-    raw_output(true),
+    output_mode(om_unset),
     error_prefix_set(false),
     output_prefix_set(false),
-    interleave_output(false),
     test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
@@ -407,7 +405,13 @@ Abuild::parseArgv()
 		    boost::ref(this->no_dep_failures), true));
     op.registerNoArg(
 	"raw-output",
-	boost::bind(&Abuild::argSetRawOutput, this));
+	boost::bind(&Abuild::argSetOutputMode, this, om_raw));
+    op.registerNoArg(
+	"interleave-output",
+	boost::bind(&Abuild::argSetOutputMode, this, om_interleaved));
+    op.registerNoArg(
+	"buffer-output",
+	boost::bind(&Abuild::argSetOutputMode, this, om_buffered));
     op.registerStringArg(
 	"error-prefix",
 	boost::bind(&Abuild::argSetOutputPrefix, this,
@@ -418,10 +422,6 @@ Abuild::parseArgv()
 	boost::bind(&Abuild::argSetOutputPrefix, this,
 		    boost::ref(this->output_prefix_set),
 		    boost::ref(this->output_prefix), _1));
-    op.registerNoArg(
-	"interleave-output",
-	boost::bind(&Abuild::argSetBool, this,
-		    boost::ref(this->interleave_output), true));
     op.registerNoArg(
 	"n",
 	boost::bind(&Abuild::argSetNoOp, this));
@@ -608,18 +608,18 @@ Abuild::parseArgv()
     }
 
     // Job output/error handling
-    if (! this->raw_output_set)
+    if (this->output_mode == om_unset)
     {
 	// Capture output if an error or output prefix was specified.
 	// Otherwise, capture build output for multithreaded builds
 	// unless raw output was specifically requested.
 	if (this->output_prefix_set || this->error_prefix_set)
 	{
-	    this->raw_output = false;
+	    this->output_mode = om_buffered;
 	}
 	else
 	{
-	    this->raw_output = (this->max_workers == 1);
+	    this->output_mode = (this->max_workers == 1 ? om_raw : om_buffered);
 	}
     }
     if (this->error_prefix_set && (! this->output_prefix_set) &&
@@ -632,10 +632,12 @@ Abuild::parseArgv()
 	QTC::TC("abuild", "Abuild set output prefix from error prefix");
 	this->output_prefix.append(this->error_prefix.length(), ' ');
     }
-    if (! this->raw_output)
+    if (this->output_mode != om_raw)
     {
+	assert((this->output_mode == om_buffered) ||
+	       (this->output_mode == om_interleaved));
 	QTC::TC("abuild", "Abuild output capture parameters",
-		(this->interleave_output ? 0 : 1) |
+		(this->output_mode == om_buffered ? 0 : 1) |
 		(this->output_prefix.empty() ? 0 : 2) |
 		(this->error_prefix.empty() ? 0 : 4));
 	this->logger.setPrefixes(this->output_prefix, this->error_prefix);
@@ -870,10 +872,9 @@ Abuild::argSetKeepGoing()
 }
 
 void
-Abuild::argSetRawOutput()
+Abuild::argSetOutputMode(output_mode_e mode)
 {
-    this->raw_output_set = true;
-    this->raw_output = true;
+    this->output_mode = mode;
 }
 
 void
@@ -6010,7 +6011,7 @@ Abuild::findJava()
     this->java_builder.reset(
 	new JavaBuilder(
 	    this->error_handler,
-	    ! this->raw_output,
+	    (this->output_mode != om_raw),
 	    boost::bind(&Abuild::verbose, this, _1),
 	    this->abuild_top, java, java_home, ant_home,
 	    java_libs, this->jvm_xargs,
@@ -6083,10 +6084,10 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     std::string item_label = item_name + " (" + output_dir + ")";
 
     Logger::job_handle_t logger_job = Logger::NO_JOB;
-    if (! this->raw_output)
+    if (this->output_mode != om_raw)
     {
 	std::string job_prefix;
-	if (this->interleave_output)
+	if (this->output_mode == om_interleaved)
 	{
 	    // Prepend to any existing prefix an indicator of the job
 	    // number.
@@ -6097,7 +6098,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	}
 	logger_job = this->logger.requestJobHandle(
 	    this->whoami + ": " + item_label,
-	    ! this->interleave_output, job_prefix);
+	    (this->output_mode == om_buffered), job_prefix);
     }
 
     if (use_interfaces)
@@ -7200,7 +7201,7 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 void
 Abuild::flushLogIfSingleThreaded()
 {
-    if ((this->max_workers == 1) && (this->raw_output))
+    if ((this->max_workers == 1) && (this->output_mode == om_raw))
     {
         // If we have only one thread, then only one thread is using
         // the logger.  Flush the logger before we run the backend to

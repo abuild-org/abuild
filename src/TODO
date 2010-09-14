@@ -25,9 +25,6 @@ Test java output:
 
  * non-ASCII characters
 
-Add --buffered-output; make sure buffering options are handled in an
-alias-friendly fashion
-
 --output-prefix='' doesn't work
 
 documentation fodder
@@ -43,6 +40,8 @@ to spaces equal in length to error prefix.  Applies to all log
 messages.
 
 --interleave-output: default false
+
+--buffer-output: default true for j>1, false otherwise
 
 Document: if you hit CTRL-C,  you will lose any partial output.  To
 avoid, use raw-output or interleave-output.

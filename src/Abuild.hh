@@ -37,6 +37,8 @@ class Abuild
     Abuild(Abuild const&);
     Abuild& operator=(Abuild const&);
 
+    enum output_mode_e { om_unset, om_raw, om_buffered, om_interleaved };
+
     typedef boost::shared_ptr<BuildForest> BuildForest_ptr;
     typedef std::map<std::string, BuildForest_ptr> BuildForest_map;
 
@@ -84,7 +86,7 @@ class Abuild
     void argSetJobs(unsigned int);
     void argSetMakeJobs(unsigned int);
     void argSetKeepGoing();
-    void argSetRawOutput();
+    void argSetOutputMode(output_mode_e);
     void argSetOutputPrefix(bool& prefix_set, std::string& prefix,
 			    std::string const& val);
     void argSetNoOp();
@@ -400,13 +402,11 @@ class Abuild
     std::string rules_help_topic;
     unsigned int max_workers;
     int make_njobs;
-    bool raw_output_set;
-    bool raw_output;
+    output_mode_e output_mode;
     bool error_prefix_set;
     std::string error_prefix;
     bool output_prefix_set;
     std::string output_prefix;
-    bool interleave_output;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
     std::list<std::string> jvm_xargs;
