@@ -34,14 +34,14 @@ Remember to update help
 
 --raw-output: default true for j1, false otherwise
 
+--interleave-output: default false
+
+--buffer-output: default true for j>1, false otherwise
+
 --{error,output}-prefix: default empty.  If error prefix is set and
 contains a non-space character and output is not set, output defaults
 to spaces equal in length to error prefix.  Applies to all log
 messages.
-
---interleave-output: default false
-
---buffer-output: default true for j>1, false otherwise
 
 Document: if you hit CTRL-C,  you will lose any partial output.  To
 avoid, use raw-output or interleave-output.
