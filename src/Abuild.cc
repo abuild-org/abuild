@@ -6093,7 +6093,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    // number.
 	    assert(this->buildgraph_item_prefixes.count(builder_string));
 	    job_prefix = this->buildgraph_item_prefixes[builder_string];
-	    notice(item_label + " build prefix: " + job_prefix);
+	    info(item_label + " build prefix: " + job_prefix);
 	    job_prefix.append(1, ' ');
 	}
 	logger_job = this->logger.requestJobHandle(

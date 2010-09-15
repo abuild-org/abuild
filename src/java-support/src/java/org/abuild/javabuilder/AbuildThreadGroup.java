@@ -2,18 +2,11 @@ package org.abuild.javabuilder;
 
 class AbuildThreadGroup extends ThreadGroup
 {
-    int id = 0;
     String job = null;
 
-    public AbuildThreadGroup(int id)
+    public AbuildThreadGroup()
     {
 	super("AbuildThreadGroup");
-	this.id = id;
-    }
-
-    public int getID()
-    {
-	return this.id;
     }
 
     public void setJob(String j)
