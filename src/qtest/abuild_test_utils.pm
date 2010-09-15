@@ -280,7 +280,15 @@ sub fake_qtc
     my $out = new IO::File(">>$filename") or die;
     while (<$in>)
     {
-	print $out $_ if m/$regexp/;
+	if (m/$regexp/)
+	{
+	    s/(\d+)\r?\n$// or die;
+	    my $n = $1;
+	    for (my $i = 0; $i <= $n; ++$i)
+	    {
+		print $out "$_$i\n";
+	    }
+	}
     }
     $out->close();
     $in->close();
