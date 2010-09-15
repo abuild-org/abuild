@@ -29,19 +29,8 @@ Next
    to force interleaving?  Probably not needed.
 
 
-Capture of Backend Output
-=========================
-
-Test java output:
-
- * partial message
-
- * embedded newlines
-
- * non-ASCII characters
-
-documentation fodder
---------------------
+Capture of Backend Output: to document
+======================================
 
 Remember to update help
 
