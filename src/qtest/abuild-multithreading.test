@@ -55,7 +55,9 @@ if ($test_java)
     # application is running so that the delay of starting it up
     # doesn't count toward the overall delay.
     $td->runtest("uses multiple threads",
-		 {$td->COMMAND => "abuild --raw-output -b all --silent -j4"},
+		 {$td->COMMAND =>
+		      "abuild --interleaved-output -b all --silent -j4",
+		      $td->FILTER => "perl $top/remove-interleave-prefix.pl"},
 		 {$td->FILE => "$top/multiple-threads.out",
 		  $td->EXIT_STATUS => 0,
 		  $td->THREAD_DATA =>
@@ -107,7 +109,8 @@ sub runtest
     for (my $i = 0; $i < $nreps; ++$i)
     {
 	if (! $td->runtest("$description ($i)",
-			   {$td->COMMAND => "abuild -b all -k $j $xargs",
+			   {$td->COMMAND =>
+				"abuild --buffered-output -b all -k $j $xargs",
 			    $td->FILTER =>
 				"perl $top/filter.pl f.tmp $fargs"},
 			   {$td->FILE => "$top/$out", $td->EXIT_STATUS => 2},

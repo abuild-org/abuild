@@ -15,13 +15,11 @@ open(L, ">$logfile");
 while (<STDIN>)
 {
     print L;
-    # These regexps are not anchored since they are sometimes
-    # interleaved with make output.
-    if (m/abuild: (\S+) \(abuild-.*?\): all/)
+    if (m/^abuild: (\S+) \(abuild-.*?\): all$/)
     {
 	$attempted{$1} = 1;
     }
-    elsif (m/abuild: (\S+) \(abuild-.*?\): build failed/)
+    elsif (m/^abuild: (\S+) \(abuild-.*?\): build failed$/)
     {
 	$failed{$1} = 1;
     }
