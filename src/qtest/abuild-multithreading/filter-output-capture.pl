@@ -50,19 +50,22 @@ while (<>)
 }
 
 print "saw all interleaved: $all_interleaved\n";
-print "prefix count: $prefix_count\n";
-print "begin/end count: $begin_end_count\n";
-print "full a out: -$full_a_out-\n" if defined $full_a_out;
-print "full a err: -$full_a_err-\n" if defined $full_a_err;
-print "full b out: -$full_b_out-\n" if defined $full_b_out;
-print "full b err: -$full_b_err-\n" if defined $full_b_err;
-if (defined $full_a_out)
+if (! $all_interleaved)
 {
-    my $both_err_before_out = 0;
-    if (($full_a_err_line < $full_b_out_line) &&
-	($full_b_err_line < $full_a_out_line))
+    print "prefix count: $prefix_count\n";
+    print "begin/end count: $begin_end_count\n";
+    print "full a out: -$full_a_out-\n" if defined $full_a_out;
+    print "full a err: -$full_a_err-\n" if defined $full_a_err;
+    print "full b out: -$full_b_out-\n" if defined $full_b_out;
+    print "full b err: -$full_b_err-\n" if defined $full_b_err;
+    if (defined $full_a_out)
     {
-	$both_err_before_out = 1;
+	my $both_err_before_out = 0;
+	if (($full_a_err_line < $full_b_out_line) &&
+	    ($full_b_err_line < $full_a_out_line))
+	{
+	    $both_err_before_out = 1;
+	}
+	print "both err before both out: $both_err_before_out\n";
     }
-    print "both err before both out: $both_err_before_out\n";
 }
