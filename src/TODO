@@ -17,17 +17,6 @@ Next
    interface.yy is updated relative to cache....seems like maybe the
    chaining for interface.qfl isn't quite right.
 
- * Be sure actual multithreading test is not subject to interleaved
-   output.  It seems like it probably is.  Better to change it to use
-   one of the captured output methods.  Check the whole test suite,
-   but main concern is the delays test.  I think the other ones
-   explicitly compensate, but check the logic carefully and put
-   comments explaining why it's right.  It may be necessary to look
-   for patterns in the filter and allow them to appear more than once
-   on a line.  That one should probably also capture output, though we
-   also need a raw output test.  Maybe the raw output test should try
-   to force interleaving?  Probably not needed.
-
 
 Capture of Backend Output: to document
 ======================================
