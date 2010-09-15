@@ -83,6 +83,7 @@ class JavaBuilder
     void waitForStartup();
     void waitForShutdown();
     void setRunMode(run_mode_e);
+    void handleRogueOutput(bool is_error, char const* data, int len);
 
     Error& error;
     Logger& logger;
@@ -109,6 +110,8 @@ class JavaBuilder
     boost::shared_ptr<boost::asio::io_service> io_service;
     socket_ptr sock;
     thread_ptr io_thread;
+    ProcessHandler::output_handler_t io_output_handler;
+    boost::mutex io_output_mutex;
     std::map<int, JobData_ptr> job_data;
 };
 

@@ -56,6 +56,19 @@ $td->runtest("groovy Util",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/protocol");
+
+foreach my $j ('j1', 'j2')
+{
+    $td->runtest("JavaBuilder protocol: $j",
+		 {$td->COMMAND => ['abuild', ' --test-java-builder-protocol',
+				   '--output-prefix=O ', '--error-prefix=! ',
+				   "-$j"],
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/protocol-$j.out", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 cd("work/dynamic");
 
 $td->runtest("no qtest.log",
@@ -153,4 +166,4 @@ $td->runtest("Groovy/Java interdependence",
 
 check_work_accessed($td);
 
-$td->report(16);
+$td->report(18);

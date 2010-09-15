@@ -806,6 +806,11 @@ Abuild::argPositional(std::string const& arg)
 	// undocumented option used by the test suite
 	this->test_java_builder_bad_java = true;
     }
+    else if (arg == " --test-java-builder-protocol")
+    {
+	// undocumented option used by the test suite
+	this->java_builder_args.push_back("-test-protocol");
+    }
     else if (special_targets.count(arg))
     {
 	if (! this->special_target.empty())

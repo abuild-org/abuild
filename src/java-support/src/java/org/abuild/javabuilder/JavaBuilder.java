@@ -168,15 +168,32 @@ class JavaBuilder
     private void run()
 	throws IOException, InterruptedException
     {
+	// All testProtocol code is special case code used by abuild's
+	// test suite to fully exercise the protocol between the Java
+	// and C++ sides of JavaBuilder.
+
 	this.responder = new Responder(this.socket);
+	this.responder.testProtocol = this.buildArgs.testProtocol;
 	if (this.buildArgs.captureOutput)
 	{
+	    if (this.buildArgs.testProtocol)
+	    {
+		System.out.println("rogue output from before redirection");
+		System.err.println("rogue error from before redirection");
+	    }
+
 	    OutputHandlerStream newOut =
 		new OutputHandlerStream(false, responder);
 	    OutputHandlerStream newErr =
 		new OutputHandlerStream(true, responder);
 	    System.setOut(new PrintStream(newOut, true));
 	    System.setErr(new PrintStream(newErr, true));
+
+	    if (this.buildArgs.testProtocol)
+	    {
+		System.out.println("rogue output from after redirection");
+		System.err.println("rogue error from after redirection");
+	    }
 	}
 	LineNumberReader r =
 	    new LineNumberReader(
@@ -367,6 +384,8 @@ class JavaBuilder
 	private BlockingQueue<String> responseQueue;
 	private Thread thread;
 
+	boolean testProtocol = false;
+
 	public Responder(Socket s)
 	    throws IOException
 	{
@@ -423,6 +442,29 @@ class JavaBuilder
 		    {
 			break;
 		    }
+
+		    // Special case code for test suite to fully
+		    // exercise C++ half of protocol.  Send partial
+		    // messages so we can always guarantee that we
+		    // test the logic in JavaBuilder of handling
+		    // partial messages.
+		    if (this.testProtocol && (response.charAt(0) == '1'))
+		    {
+			this.testProtocol = false;
+			responseStream.print(
+			    "1 data:out 10\r\n" +
+			    "12345");
+			responseStream.flush();
+			Thread.sleep(500);
+			responseStream.print(
+			    "6789\n\r\n" +
+			    "0 data:out 6\n" +
+			    "hello\n\n" +
+			    "0 data:err 7\n" +
+			    "potato\n\n");
+			responseStream.flush();
+		    }
+
 		    responseStream.println(response);
 		    responseStream.flush();
 		}

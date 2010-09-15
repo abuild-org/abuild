@@ -65,7 +65,8 @@ JavaBuilder::JavaBuilder(Error& error,
     build_args(build_args),
     defines(defines),
     last_request(0),
-    run_mode(rm_idle)
+    run_mode(rm_idle),
+    io_output_handler(0)
 {
 }
 
@@ -420,8 +421,7 @@ JavaBuilder::handleResponse()
 	    if (request_number == 0)
 	    {
 		QTC::TC("abuild", "JavaBuilder data for job 0");
-		std::ostream& out = (is_error ? std::cerr : std::cout);
-		out << data;
+		handleRogueOutput(is_error, message.c_str(), message.length());
 	    }
 	    else
 	    {
@@ -552,16 +552,22 @@ JavaBuilder::runJava(unsigned short port)
     verbose("ANT_HOME=" + this->ant_home);
     verbose("invoking java: " + Util::join(" ", args));
 
+    ProcessHandler::output_handler_t output_handler = 0;
     Logger::job_handle_t logger_job = Logger::NO_JOB;
     if (this->capture_output)
     {
 	logger_job = this->logger.requestJobHandle(
 	    "JavaBuilder", false, "[JavaBuilder] ", true);
+	this->io_output_handler = this->logger.getOutputHandler(logger_job);
+	output_handler = boost::bind(
+	    &JavaBuilder::handleRogueOutput, this, _1, _2, _3);
     }
     QTC::TC("abuild", "JavaBuilder capture output",
 	    this->capture_output ? 1 : 0);
     process_handler.runProgram(this->java, args, environment, true, ".",
-			       this->logger.getOutputHandler(logger_job));
+			       output_handler);
+    this->logger.closeJob(logger_job);
+    this->io_output_handler = 0;
 
     boost::mutex::scoped_lock lock(this->mutex);
     if (this->run_mode == rm_starting_up)
@@ -569,4 +575,11 @@ JavaBuilder::runJava(unsigned short port)
 	error.error(FileLocation(), "java builder backend failed to start");
 	this->io_service->stop();
     }
+}
+
+void
+JavaBuilder::handleRogueOutput(bool is_error, char const* data, int len)
+{
+    boost::mutex::scoped_lock lock(this->io_output_mutex);
+    this->io_output_handler(is_error, data, len);
 }
