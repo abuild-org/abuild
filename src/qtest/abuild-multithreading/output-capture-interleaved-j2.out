@@ -1,0 +1,7 @@
+saw all interleaved: 0
+prefix count: 4
+full a out: --
+full a err: -E -
+full b out: --
+full b err: -E -
+both err before both out: 1

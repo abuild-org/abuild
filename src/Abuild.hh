@@ -87,8 +87,6 @@ class Abuild
     void argSetMakeJobs(unsigned int);
     void argSetKeepGoing();
     void argSetOutputMode(output_mode_e);
-    void argSetOutputPrefix(bool& prefix_set, std::string& prefix,
-			    std::string const& val);
     void argSetNoOp();
     void argSetEmacs();
     void argSetBackendArgs(std::vector<std::string> const&,
@@ -222,6 +220,7 @@ class Abuild
 		     bool is_dep_failure);
     bool buildItem(boost::mutex::scoped_lock& build_lock,
 		   Logger::job_handle_t logger_job,
+		   std::string const& builder_string,
 		   std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item);
@@ -403,10 +402,8 @@ class Abuild
     unsigned int max_workers;
     int make_njobs;
     output_mode_e output_mode;
-    bool error_prefix_set;
-    std::string error_prefix;
-    bool output_prefix_set;
     std::string output_prefix;
+    std::string error_prefix;
     std::list<std::string> make_args;
     std::list<std::string> java_builder_args;
     std::list<std::string> jvm_xargs;

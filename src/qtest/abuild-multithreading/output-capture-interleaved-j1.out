@@ -1,0 +1,10 @@
+O abuild: a (abuild-indep): all; build prefix: [1]
+O [1] make: Entering directory `--topdir--/output-capture/a/abuild-indep'
+[1] a err1 a err2
+O [1] a out1 a out2
+O [1] make: Leaving directory `--topdir--/output-capture/a/abuild-indep'
+O abuild: b (abuild-indep): all; build prefix: [2]
+O [2] make: Entering directory `--topdir--/output-capture/b/abuild-indep'
+[2] b err1 b err2
+O [2] b out1 b out2
+O [2] make: Leaving directory `--topdir--/output-capture/b/abuild-indep'

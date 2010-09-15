@@ -68,9 +68,51 @@ if ($test_java)
 else
 {
     system("(tar cf - . | cat > /dev/null)");
-    $td->emphasize("The test that actually ensures multithreaded" .
-		   " builds use multiple threads");
-    $td->emphasize("is not run when not building/testing Java support.");
+}
+
+cd("work/output-capture");
+my @output_capture_tests = (
+    ['raw, j1', 'output-capture-raw-j1.out',
+     []
+    ],
+    ['interleaved, j1', 'output-capture-interleaved-j1.out',
+     ['--output-prefix=O ', '--interleaved-output']
+    ],
+    ['buffered, j1', 'output-capture-buffered-j1.out',
+     ['--error-prefix=E ', '--buffered-output']
+    ],
+    ['raw j2', 'output-capture-raw-j2.out',
+     ['--silent', '--raw-output', '-j2']
+    ],
+    ['interleaved j2', 'output-capture-interleaved-j2.out',
+     ['--silent', '--interleaved-output', '-j2', '--error-prefix=E '],
+    ],
+    ['buffered j2', 'output-capture-buffered-j2.out',
+     ['--silent', '--buffered-output', '-j2', '--output-prefix=O '],
+    ],
+    );
+foreach my $d (@output_capture_tests)
+{
+    # This test case would also fail if abuild's multithreaded mode
+    # didn't run in multiple threads.  They also have a minor timing
+    # concern with sleep.
+
+    my ($description, $outfile, $args) = @$d;
+
+    my $input = +{$td->COMMAND => [qw(abuild -b all), @$args]};
+    if (grep { m/^-j/ } @$args)
+    {
+	$input->{$td->FILTER} = "perl $top/filter-output-capture.pl";
+    }
+    else
+    {
+	$input->{$td->FILTER} = "perl $filters/filter-abuild.pl";
+    }
+
+    $td->runtest("output capture: $description",
+		 $input,
+		 {$td->FILE => "$top/$outfile", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
 }
 
 cd("work/basic");
@@ -97,7 +139,8 @@ else
 check_work_accessed($td, "not-accessed.out");
 
 $td->report(1 + ($test_java ? 10 : 0) +
-	    ($nreps * (2 + ($test_java ? 2 : 0))));
+	    ($nreps * (2 + ($test_java ? 2 : 0))) +
+	    (scalar(@output_capture_tests)));
 
 sub runtest
 {

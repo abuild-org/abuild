@@ -78,8 +78,6 @@ Abuild::Abuild(int argc, char* argv[]) :
     max_workers(1),
     make_njobs(1),
     output_mode(om_unset),
-    error_prefix_set(false),
-    output_prefix_set(false),
     test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
@@ -413,15 +411,13 @@ Abuild::parseArgv()
 	"buffered-output",
 	boost::bind(&Abuild::argSetOutputMode, this, om_buffered));
     op.registerStringArg(
-	"error-prefix",
-	boost::bind(&Abuild::argSetOutputPrefix, this,
-		    boost::ref(this->error_prefix_set),
-		    boost::ref(this->error_prefix), _1));
-    op.registerStringArg(
 	"output-prefix",
-	boost::bind(&Abuild::argSetOutputPrefix, this,
-		    boost::ref(this->output_prefix_set),
+	boost::bind(&Abuild::argSetString, this,
 		    boost::ref(this->output_prefix), _1));
+    op.registerStringArg(
+	"error-prefix",
+	boost::bind(&Abuild::argSetString, this,
+		    boost::ref(this->error_prefix), _1));
     op.registerNoArg(
 	"n",
 	boost::bind(&Abuild::argSetNoOp, this));
@@ -610,11 +606,13 @@ Abuild::parseArgv()
     // Job output/error handling
     if (this->output_mode == om_unset)
     {
-	// Capture output if an error or output prefix was specified.
-	// Otherwise, capture build output for multithreaded builds
-	// unless raw output was specifically requested.
-	if (this->output_prefix_set || this->error_prefix_set)
+	// Capture output if a non-empty error or output prefix was
+	// specified.  Otherwise, capture build output for
+	// multithreaded builds unless raw output was specifically
+	// requested.
+	if (! (this->output_prefix.empty() && this->error_prefix.empty()))
 	{
+	    QTC::TC("abuild", "Abuild set buffered from prefix");
 	    this->output_mode = om_buffered;
 	}
 	else
@@ -622,27 +620,22 @@ Abuild::parseArgv()
 	    this->output_mode = (this->max_workers == 1 ? om_raw : om_buffered);
 	}
     }
-    if (this->error_prefix_set && (! this->output_prefix_set) &&
-	(this->error_prefix.find_first_not_of(' ') != std::string::npos))
-    {
-	// If we are prefixing errors with something containing a
-	// non-space and have not explicit set an output prefix, set
-	// the output prefix to indent to the same number of
-	// characters.
-	QTC::TC("abuild", "Abuild set output prefix from error prefix");
-	this->output_prefix.append(this->error_prefix.length(), ' ');
-    }
     if (this->output_mode != om_raw)
     {
 	assert((this->output_mode == om_buffered) ||
 	       (this->output_mode == om_interleaved));
-	QTC::TC("abuild", "Abuild output capture parameters",
-		(this->output_mode == om_buffered ? 0 : 1) |
-		(this->output_prefix.empty() ? 0 : 2) |
-		(this->error_prefix.empty() ? 0 : 4));
 	this->logger.setPrefixes(this->output_prefix, this->error_prefix);
 	this->java_builder_args.push_back("-co");
     }
+    QTC::TC("abuild", "Abuild output mode",
+	    (this->output_mode == om_raw ? 0 :
+	     this->output_mode == om_interleaved ? 1 :
+	     this->output_mode == om_buffered ? 2 :
+	     999));		// can't happen
+    QTC::TC("abuild", "Abuild output prefix",
+	    this->output_prefix.empty() ? 0 : 1);
+    QTC::TC("abuild", "Abuild error prefix",
+	    this->output_prefix.empty() ? 0 : 1);
 
     // called after changing directories
     checkRoRwPaths();
@@ -875,18 +868,6 @@ void
 Abuild::argSetOutputMode(output_mode_e mode)
 {
     this->output_mode = mode;
-}
-
-void
-Abuild::argSetOutputPrefix(bool& prefix_set, std::string& prefix,
-			   std::string const& val)
-{
-    if (val == "")
-    {
-	QTC::TC("abuild", "Abuild explicitly empty prefix");
-    }
-    prefix_set = true;
-    prefix = val;
 }
 
 void
@@ -6092,9 +6073,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    // Prepend to any existing prefix an indicator of the job
 	    // number.
 	    assert(this->buildgraph_item_prefixes.count(builder_string));
-	    job_prefix = this->buildgraph_item_prefixes[builder_string];
-	    info(item_label + " build prefix: " + job_prefix);
-	    job_prefix.append(1, ' ');
+	    job_prefix = this->buildgraph_item_prefixes[builder_string] + " ";
 	}
 	logger_job = this->logger.requestJobHandle(
 	    this->whoami + ": " + item_label,
@@ -6126,7 +6105,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    else
 	    {
 		status = buildItem(
-		    build_lock, logger_job,
+		    build_lock, logger_job, builder_string,
 		    item_name, item_platform, build_item);
 	    }
 	}
@@ -6515,6 +6494,7 @@ Abuild::readAfterBuilds(std::string const& item_name,
 bool
 Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
 		  Logger::job_handle_t logger_job,
+		  std::string const& builder_string,
 		  std::string const& item_name,
 		  std::string const& item_platform,
 		  BuildItem& build_item)
@@ -6548,9 +6528,17 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
     monitorOutput("targets " +
 		  item_name + " " + item_platform + " " +
 		  Util::join(" ", backend_targets));
+
+    std::string build_prefix_info;
+    if (this->output_mode == om_interleaved)
+    {
+	build_prefix_info = "; build prefix: " +
+	    this->buildgraph_item_prefixes[builder_string];
+    }
     info(item_name + " (" + output_dir + "): " +
 	 Util::join(" ", backend_targets) +
-	 (this->verbose_mode ? " in " + rel_output_dir : ""));
+	 (this->verbose_mode ? " in " + rel_output_dir : "") +
+	 build_prefix_info);
 
     bool result = false;
 

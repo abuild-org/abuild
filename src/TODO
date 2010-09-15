@@ -40,8 +40,6 @@ Test java output:
 
  * non-ASCII characters
 
---output-prefix='' doesn't work
-
 documentation fodder
 --------------------
 

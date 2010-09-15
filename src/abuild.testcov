@@ -421,12 +421,13 @@ InterfaceParser env default 0
 InterfaceParser parameter 0
 InterfaceParser parameter default 0
 InterfaceParser ERR invalid parameter 0
-Abuild set output prefix from error prefix 0
-Abuild output capture parameters 7
+Abuild output mode 2
+Abuild output prefix 1
+Abuild error prefix 1
 JavaBuilder read partial message 0
 JavaBuilder data for job 0 0
 JavaBuilder capture output 1
-Abuild explicitly empty prefix 0
 JavaBuilder pending data 1
 JavaBuilder response ends with NL 0
 JavaBuilder response ends with CRNL 0
+Abuild set buffered from prefix 0
