@@ -427,3 +427,6 @@ JavaBuilder read partial message 0
 JavaBuilder data for job 0 0
 JavaBuilder capture output 1
 Abuild explicitly empty prefix 0
+JavaBuilder pending data 1
+JavaBuilder response ends with NL 0
+JavaBuilder response ends with CRNL 0

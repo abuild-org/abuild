@@ -407,10 +407,10 @@ Abuild::parseArgv()
 	"raw-output",
 	boost::bind(&Abuild::argSetOutputMode, this, om_raw));
     op.registerNoArg(
-	"interleave-output",
+	"interleaved-output",
 	boost::bind(&Abuild::argSetOutputMode, this, om_interleaved));
     op.registerNoArg(
-	"buffer-output",
+	"buffered-output",
 	boost::bind(&Abuild::argSetOutputMode, this, om_buffered));
     op.registerStringArg(
 	"error-prefix",

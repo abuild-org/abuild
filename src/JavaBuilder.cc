@@ -394,11 +394,13 @@ JavaBuilder::handleResponse()
 		    accumulated_response.substr(message_length);
 		if ((rest.length() >= 1) && (rest[0] == '\n'))
 		{
+		    QTC::TC("abuild", "JavaBuilder response ends with NL");
 		    have_message = true;
 		    rest = rest.substr(1);
 		}
 		else if ((rest.length() >= 2) && (rest.substr(0, 2) == "\r\n"))
 		{
+		    QTC::TC("abuild", "JavaBuilder response ends with CRNL");
 		    have_message = true;
 		    rest = rest.substr(2);
 		}
@@ -426,7 +428,7 @@ JavaBuilder::handleResponse()
 		JobData_ptr job;
 		if (! this->job_data.count(request_number))
 		{
-		    throw QEXC::General("protocol error: received response "
+		    throw QEXC::General("protocol error: received data "
 					"for unknown request " +
 					Util::intToString(request_number));
 		}
@@ -439,6 +441,8 @@ JavaBuilder::handleResponse()
 	    throw QEXC::General("protocol error: received \"" + response +
 				"\" from java JavaBuilder program");
 	}
+	QTC::TC("abuild", "JavaBuilder pending data",
+		this->accumulated_response.empty() ? 1 : 0);
     }
 }
 

@@ -13,6 +13,21 @@ Next
    exist anywhere.  This is probably by design, but it seems
    undesirable.
 
+ * Make sure dependencies are correct for when interface.qfl file or
+   interface.yy is updated relative to cache....seems like maybe the
+   chaining for interface.qfl isn't quite right.
+
+ * Be sure actual multithreading test is not subject to interleaved
+   output.  It seems like it probably is.  Better to change it to use
+   one of the captured output methods.  Check the whole test suite,
+   but main concern is the delays test.  I think the other ones
+   explicitly compensate, but check the logic carefully and put
+   comments explaining why it's right.  It may be necessary to look
+   for patterns in the filter and allow them to appear more than once
+   on a line.  That one should probably also capture output, though we
+   also need a raw output test.  Maybe the raw output test should try
+   to force interleaving?  Probably not needed.
+
 
 Capture of Backend Output
 =========================
@@ -34,19 +49,23 @@ Remember to update help
 
 --raw-output: default true for j1, false otherwise
 
---interleave-output: default false
+--interleaved-output: default false
 
---buffer-output: default true for j>1, false otherwise
+--buffered-output: default true for j>1, false otherwise
 
 --{error,output}-prefix: default empty.  If error prefix is set and
 contains a non-space character and output is not set, output defaults
 to spaces equal in length to error prefix.  Applies to all log
-messages.
+messages.  If one of raw/interleave/buffer not selected, specifying
+these options turns on buffered output.  If raw output is explicitly
+selected, these options are ignored.
 
 Document: if you hit CTRL-C,  you will lose any partial output.  To
-avoid, use raw-output or interleave-output.
+avoid, use --raw-output or --interleaved-output.
 
-Also, possible reordering of output even in unbuffered case
+Also, possible reordering of output even in unbuffered case even with
+output/error both unbuffered because of race condition from separation
+of the pipes.
 
 There have been a number of ideas about improving abuild's output,
 such as de-interleaving build outputs for multithreaded builds,
