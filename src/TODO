@@ -49,14 +49,27 @@ Remember to update help
 
 --interleaved-output: default false
 
---buffered-output: default true for j>1, false otherwise
+--buffered-output: default true for j>1, false otherwise.  If
+specified with -j1, interleaved mode is used instead.
 
---{error,output}-prefix: default empty.  If error prefix is set and
-contains a non-space character and output is not set, output defaults
-to spaces equal in length to error prefix.  Applies to all log
-messages.  If one of raw/interleave/buffer not selected, specifying
-these options turns on buffered output.  If raw output is explicitly
-selected, these options are ignored.
+--{error,output}-prefix: default empty.  If specified and no output
+mode is specified, output mode becomes interleaved for j1 and buffered
+for j>1.  If raw is expicitly specified these options are ignored.
+
+Job prefixes and begin/end markers are suppressed with j1.
+
+To parse and associate output with a build:
+
+ * "abuild: item (outputdir): targets": switch output to given build
+   item/platform pair; note build prefix if specified
+
+ * BEGIN OUTPUT: save current output; set output to referenced item
+
+ * END OUTPUT: restore output from before BEGIN
+
+ * [n] (build prefix): that line is associated with build that has
+   given prefix
+
 
 Document: if you hit CTRL-C,  you will lose any partial output.  To
 avoid, use --raw-output or --interleaved-output.

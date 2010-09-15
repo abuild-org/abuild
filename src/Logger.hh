@@ -39,7 +39,7 @@ class Logger
     // received.
     job_handle_t requestJobHandle(
 	std::string const& job_name, bool buffer_output,
-	std::string const& job_prefix);
+	std::string const& job_prefix, bool suppress_delimiters);
 
     // Return an output handler for the given job suitable for passing
     // to ProcessHandler::runProgram.
@@ -73,7 +73,8 @@ class Logger
 	    Logger&,
 	    std::string const& job_name,
 	    bool buffer_output,
-	    std::string const& job_prefix);
+	    std::string const& job_prefix,
+	    bool suppress_delimiters);
 	void handle_output(bool is_error, char const* data, int len);
 	void flush();
 
@@ -84,6 +85,7 @@ class Logger
 	std::string job_name;
 	bool buffer_output;
 	std::string job_prefix;
+	bool suppress_delimiters;
 	std::string output_line;
 	std::string error_line;
 	std::list<std::pair<Logger::message_type_e, std::string> > buffer;
@@ -101,6 +103,7 @@ class Logger
     std::string error_prefix;
     boost::shared_ptr<boost::thread> thread;
     boost::mutex queue_write_mutex;
+    boost::recursive_mutex jobdata_mutex;
     ThreadSafeQueue<std::pair<message_type_e, std::string> > logger_queue;
     job_handle_t next_job;
     std::map<job_handle_t, boost::shared_ptr<JobData> > jobs;

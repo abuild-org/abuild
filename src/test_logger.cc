@@ -21,11 +21,11 @@ int main()
     Logger* logger = Logger::getInstance();
     logger->setPrefixes("O ", "E ");
     Logger::job_handle_t j1 = logger->requestJobHandle(
-	"job 1", true, "");
+	"job 1", true, "", false);
     Logger::job_handle_t j2 = logger->requestJobHandle(
-	"job 2", false, "[J2] ");
+	"job 2", false, "[J2] ", false);
     Logger::job_handle_t j3 = logger->requestJobHandle(
-	"job 3", true, "");
+	"job 3", true, "", true);
 
     logger->logInfo("message 1");
     logger->logError("message 2");

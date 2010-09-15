@@ -76,7 +76,7 @@ my @output_capture_tests = (
      []
     ],
     ['interleaved, j1', 'output-capture-interleaved-j1.out',
-     ['--output-prefix=O ', '--interleaved-output']
+     ['--output-prefix=O ']	# interleaved is implicit
     ],
     ['buffered, j1', 'output-capture-buffered-j1.out',
      ['--error-prefix=E ', '--buffered-output']
@@ -87,8 +87,11 @@ my @output_capture_tests = (
     ['interleaved j2', 'output-capture-interleaved-j2.out',
      ['--silent', '--interleaved-output', '-j2', '--error-prefix=E '],
     ],
+    ['silent buffered j2', 'output-capture-silent-buffered-j2.out',
+     ['--silent', '-j2', '--output-prefix=O '], # buffered is implicit
+    ],
     ['buffered j2', 'output-capture-buffered-j2.out',
-     ['--silent', '--buffered-output', '-j2', '--output-prefix=O '],
+     ['-j2', '--output-prefix=O ', '--error-prefix=E '],
     ],
     );
 foreach my $d (@output_capture_tests)

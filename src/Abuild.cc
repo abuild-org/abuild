@@ -620,6 +620,19 @@ Abuild::parseArgv()
 	    this->output_mode = (this->max_workers == 1 ? om_raw : om_buffered);
 	}
     }
+    if ((this->output_mode == om_buffered) && (this->max_workers == 1))
+    {
+	// There's no value to having buffered mode with a single
+	// thread since there's nothing to interleave.  Technically,
+	// there is a slight difference in that any output from the
+	// JavaBuilder that could not be associated with a thread
+	// would now be interleaved with the output, but in most if
+	// not all cases, it would belong to the output anyway.  Note
+	// that we suppress use of the job prefix in interleaved mode
+	// in a single thread.
+	QTC::TC("abuild", "Abuild change buffered to interleaved for j1");
+	this->output_mode = om_interleaved;
+    }
     if (this->output_mode != om_raw)
     {
 	assert((this->output_mode == om_buffered) ||
@@ -6068,7 +6081,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     if (this->output_mode != om_raw)
     {
 	std::string job_prefix;
-	if (this->output_mode == om_interleaved)
+	if ((this->output_mode == om_interleaved) && (this->max_workers > 1))
 	{
 	    // Prepend to any existing prefix an indicator of the job
 	    // number.
@@ -6077,7 +6090,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	}
 	logger_job = this->logger.requestJobHandle(
 	    this->whoami + ": " + item_label,
-	    (this->output_mode == om_buffered), job_prefix);
+	    (this->output_mode == om_buffered), job_prefix, this->silent);
     }
 
     if (use_interfaces)
@@ -6530,7 +6543,7 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
 		  Util::join(" ", backend_targets));
 
     std::string build_prefix_info;
-    if (this->output_mode == om_interleaved)
+    if ((this->output_mode == om_interleaved) && (this->max_workers > 1))
     {
 	build_prefix_info = "; build prefix: " +
 	    this->buildgraph_item_prefixes[builder_string];

@@ -1,8 +1,8 @@
 saw all interleaved: 0
 prefix count: 0
-begin/end count: 4
+begin/end count: 0
 full a out: -O -
-full a err: -E -
+full a err: --
 full b out: -O -
-full b err: -E -
+full b err: --
 both err before both out: 0

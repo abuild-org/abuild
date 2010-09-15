@@ -2,9 +2,7 @@ O message 1
 O [J2] job 2 output line 1
 O message 3
 O [J2] job 2 output line 2
-O job 3: BEGIN OUTPUT
 O job 3 output line
-O job 3: END OUTPUT
 O job 1: BEGIN OUTPUT
 O job 1 output line 1
 O job 1 output line 2

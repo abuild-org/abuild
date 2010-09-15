@@ -556,7 +556,7 @@ JavaBuilder::runJava(unsigned short port)
     if (this->capture_output)
     {
 	logger_job = this->logger.requestJobHandle(
-	    "JavaBuilder", false, "[JavaBuilder] ");
+	    "JavaBuilder", false, "[JavaBuilder] ", true);
     }
     QTC::TC("abuild", "JavaBuilder capture output",
 	    this->capture_output ? 1 : 0);

@@ -11,12 +11,14 @@ Logger::JobData::JobData(
     Logger& logger,
     std::string const& job_name,
     bool buffer_output,
-    std::string const& job_prefix)
+    std::string const& job_prefix,
+    bool suppress_delimiters)
     :
     logger(logger),
     job_name(job_name),
     buffer_output(buffer_output),
-    job_prefix(job_prefix)
+    job_prefix(job_prefix),
+    suppress_delimiters(suppress_delimiters)
 {
 }
 
@@ -60,10 +62,15 @@ Logger::JobData::flush()
 	return;
     }
 
-    this->buffer.push_front(
-	std::make_pair(Logger::m_info, this->job_name + ": BEGIN OUTPUT\n"));
-    this->buffer.push_back(
-	std::make_pair(Logger::m_info, this->job_name + ": END OUTPUT\n"));
+    if (! this->suppress_delimiters)
+    {
+	this->buffer.push_front(
+	    std::make_pair(Logger::m_info,
+			   this->job_name + ": BEGIN OUTPUT\n"));
+	this->buffer.push_back(
+	    std::make_pair(Logger::m_info,
+			   this->job_name + ": END OUTPUT\n"));
+    }
     this->logger.writeToLogger(this->buffer);
     this->buffer.clear();
 }
@@ -100,9 +107,13 @@ Logger::stopLogger(std::string const& error_message)
 {
     if (the_instance)
     {
-	while (! the_instance->jobs.empty())
-	{
-	    the_instance->closeJob((*(the_instance->jobs.begin())).first);
+	{ // private scope
+	    boost::recursive_mutex::scoped_lock
+		lock(the_instance->jobdata_mutex);
+	    while (! the_instance->jobs.empty())
+	    {
+		the_instance->closeJob((*(the_instance->jobs.begin())).first);
+	    }
 	}
 
 	if (! error_message.empty())
@@ -127,11 +138,13 @@ Logger::setPrefixes(std::string const& output_prefix,
 Logger::job_handle_t
 Logger::requestJobHandle(
     std::string const& job_name, bool buffer_output,
-    std::string const& job_prefix)
+    std::string const& job_prefix, bool suppress_delimiters)
 {
+    boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
     job_handle_t job = this->next_job++;
     this->jobs[job].reset(
-	new JobData(*this, job_name, buffer_output, job_prefix));
+	new JobData(*this, job_name, buffer_output,
+		    job_prefix, suppress_delimiters));
     return job;
 }
 
@@ -143,6 +156,7 @@ Logger::getOutputHandler(job_handle_t job)
 	return 0;
     }
 
+    boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
     std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
 	this->jobs.find(job);
     if (iter == this->jobs.end())
@@ -162,6 +176,7 @@ Logger::closeJob(job_handle_t job)
 	return;
     }
 
+    boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
     std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
 	this->jobs.find(job);
     if (iter == this->jobs.end())
