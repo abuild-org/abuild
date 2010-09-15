@@ -52,6 +52,9 @@
 //  * Multi-character options' arguments may either be separated from the
 //    argument with = (--jobs=4) or may follow it (--jobs 4).
 //
+//  * The empty string may be specified as an option to a string
+//    argument by either specifying --option= or --option ''.
+//
 //  * If an option's argument is optional and is not joined to the option
 //    with =, the next command line argument will only be treated as the
 //    argument to that option if it does not start with dash.  This is

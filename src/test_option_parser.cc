@@ -111,7 +111,14 @@ OPTest::doNumber(int val)
 void
 OPTest::doPotatoName(std::string const& val)
 {
-    std::cout << "potato name: " << val << std::endl;
+    if (val.empty())
+    {
+	std::cout << "no potato name" << std::endl;
+    }
+    else
+    {
+	std::cout << "potato name: " << val << std::endl;
+    }
 }
 
 void

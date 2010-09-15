@@ -105,7 +105,7 @@ void
 OptionParser::parseOptions(char* argv[])
 {
     boost::regex short_option_re("-([a-zA-Z])(\\d+)?");
-    boost::regex long_option_re("-?-([a-zA-Z][\\w-]+)(?:=(.+))?");
+    boost::regex long_option_re("-?-([a-zA-Z][\\w-]+)(?:=(.*))?");
     boost::cmatch m;
     for (char** arg = argv; *arg; ++arg)
     {
