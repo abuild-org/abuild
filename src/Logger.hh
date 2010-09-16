@@ -78,11 +78,13 @@ class Logger
 	    bool suppress_delimiters);
 	void handle_output(bool is_error, char const* data, int len);
 	void flush();
+	void handleMessage(bool is_error, std::string const& line);
 	std::string prefixMessage(std::string const& msg);
 
       private:
 	void completeLine(bool is_error, std::string& line);
 
+	boost::recursive_mutex mutex;
 	Logger& logger;
 	Logger::job_handle_t job;
 	std::string job_name;
@@ -98,6 +100,9 @@ class Logger
 
     void loggerMain();
     std::string prefixMessage(std::string const& msg, job_handle_t job);
+    boost::shared_ptr<JobData> findJob(job_handle_t job);
+    void handleMessage(bool is_error, std::string const& msg,
+		       job_handle_t job);
     void writeToLogger(message_type_e, std::string const&,
 		       job_handle_t job);
     void writeToLogger(

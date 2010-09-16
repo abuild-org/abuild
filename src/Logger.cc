@@ -27,6 +27,7 @@ Logger::JobData::JobData(
 void
 Logger::JobData::handle_output(bool is_error, char const* data, int len)
 {
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
     std::string& line = (is_error ? this->error_line : this->output_line);
     if (len == 0)
     {
@@ -55,6 +56,8 @@ Logger::JobData::handle_output(bool is_error, char const* data, int len)
 void
 Logger::JobData::flush()
 {
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+
     // Flush any partial lines
     handle_output(false, "", 0);
     handle_output(true, "", 0);
@@ -77,6 +80,21 @@ Logger::JobData::flush()
     this->buffer.clear();
 }
 
+void
+Logger::JobData::handleMessage(bool is_error, std::string const& line)
+{
+    boost::recursive_mutex::scoped_lock lock(this->mutex);
+    Logger::message_type_e message_type = (is_error ? m_error : m_info);
+    if (this->buffer_output)
+    {
+	this->buffer.push_back(std::make_pair(message_type, line));
+    }
+    else
+    {
+	this->logger.writeToLogger(message_type, line, this->job);
+    }
+}
+
 std::string
 Logger::JobData::prefixMessage(std::string const& msg)
 {
@@ -86,18 +104,8 @@ Logger::JobData::prefixMessage(std::string const& msg)
 void
 Logger::JobData::completeLine(bool is_error, std::string& line)
 {
-    Logger::message_type_e message_type = (is_error ? m_error : m_info);
-    std::string message = line;
+    handleMessage(is_error, line);
     line.clear();
-
-    if (this->buffer_output)
-    {
-	this->buffer.push_back(std::make_pair(message_type, message));
-    }
-    else
-    {
-	this->logger.writeToLogger(message_type, message, this->job);
-    }
 }
 
 Logger*
@@ -156,6 +164,20 @@ Logger::requestJobHandle(
     return job;
 }
 
+boost::shared_ptr<Logger::JobData>
+Logger::findJob(job_handle_t job)
+{
+    boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
+    std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
+	this->jobs.find(job);
+    if (iter == this->jobs.end())
+    {
+	throw QEXC::Internal(
+	    "Logger::findJob called for non-existent job");
+    }
+    return (*iter).second;
+}
+
 ProcessHandler::output_handler_t
 Logger::getOutputHandler(job_handle_t job)
 {
@@ -164,15 +186,7 @@ Logger::getOutputHandler(job_handle_t job)
 	return 0;
     }
 
-    boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
-    std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
-	this->jobs.find(job);
-    if (iter == this->jobs.end())
-    {
-	throw QEXC::Internal(
-	    "Logger::getOutputHandler called for non-existent job");
-    }
-    boost::shared_ptr<JobData> j = (*iter).second;
+    boost::shared_ptr<JobData> j = findJob(job);
     return boost::bind(&JobData::handle_output, j.get(), _1, _2, _3);
 }
 
@@ -199,13 +213,13 @@ Logger::closeJob(job_handle_t job)
 void
 Logger::logInfo(std::string const& message, job_handle_t job)
 {
-    writeToLogger(m_info, message + "\n", job);
+    handleMessage(false, message + "\n", job);
 }
 
 void
 Logger::logError(std::string const& message, job_handle_t job)
 {
-    writeToLogger(m_error, message + "\n", job);
+    handleMessage(true, message + "\n", job);
 }
 
 void
@@ -224,6 +238,7 @@ std::string
 Logger::prefixMessage(std::string const& msg, job_handle_t job)
 {
     std::string result = msg;
+    boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
     std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
 	this->jobs.find(job);
     if (iter != this->jobs.end())
@@ -232,6 +247,21 @@ Logger::prefixMessage(std::string const& msg, job_handle_t job)
 	result = j->prefixMessage(msg);
     }
     return result;
+}
+
+void
+Logger::handleMessage(bool is_error, std::string const& msg,
+		      job_handle_t job)
+{
+    if (job == NO_JOB)
+    {
+	writeToLogger(is_error ? m_error : m_info, msg, job);
+    }
+    else
+    {
+	boost::shared_ptr<JobData> j = findJob(job);
+	j->handleMessage(is_error, msg);
+    }
 }
 
 void

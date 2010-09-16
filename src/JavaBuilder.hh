@@ -111,7 +111,6 @@ class JavaBuilder
     socket_ptr sock;
     thread_ptr io_thread;
     ProcessHandler::output_handler_t io_output_handler;
-    boost::mutex io_output_mutex;
     std::map<int, JobData_ptr> job_data;
 };
 

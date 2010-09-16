@@ -42,9 +42,12 @@ int main()
     // have output interleaved with error within and between jobs as
     // well as interleaved jobs.  The regular logInfo interrupts lines
     // of output from job2, which is not interleaved, but the logger
-    // keeps the lines together.
+    // keeps the lines together.  We also intersperse logging lines
+    // that are associated with jobs and don't come through the output
+    // handler.
 
     h1(false, "job 1 output li");
+    logger->logInfo("job 1 additional output", j1);
     h1(true,  "job 1 error line 1\n");
     h2(false, "job 2 output line 1\n");
     h1(false, "ne 1\n");

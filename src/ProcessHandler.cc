@@ -119,8 +119,7 @@ ctrlHandler(DWORD ctrl_type)
     }
 }
 
-static void read_pipe(boost::mutex& mutex,
-		      ProcessHandler::output_handler_t output_handler,
+static void read_pipe(ProcessHandler::output_handler_t output_handler,
 		      bool is_error, HANDLE pipe)
 {
     char buf[1024];
@@ -375,11 +374,9 @@ ProcessHandler::runProgram(
 	// of a blocking select on anonymous pipes.
 	// WaitForSingleObject and WaitForMultipleObjects show the
 	// pipe to be signaled as long the pipe is open.
-	boost::mutex output_mutex;
 	boost::thread error_th(
-	    boost::bind(read_pipe, boost::ref(output_mutex), output_handler,
-			true, child_err_r));
-	read_pipe(output_mutex, output_handler, false, child_out_r);
+	    boost::bind(read_pipe, output_handler, true, child_err_r));
+	read_pipe(output_handler, false, child_out_r);
 	error_th.join();
     }
     WaitForSingleObject(pi.hProcess, INFINITE);

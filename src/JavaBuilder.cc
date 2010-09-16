@@ -580,6 +580,5 @@ JavaBuilder::runJava(unsigned short port)
 void
 JavaBuilder::handleRogueOutput(bool is_error, char const* data, int len)
 {
-    boost::mutex::scoped_lock lock(this->io_output_mutex);
     this->io_output_handler(is_error, data, len);
 }
