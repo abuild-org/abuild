@@ -139,7 +139,6 @@ static void read_pipe(ProcessHandler::output_handler_t output_handler,
 	    }
 	}
 	{ // private scope
-	    boost::mutex::scoped_lock lock(mutex);
 	    output_handler(is_error, buf, (int) len);
 	}
 	if (len == 0)
