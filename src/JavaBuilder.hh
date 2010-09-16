@@ -16,15 +16,16 @@
 #include <map>
 #include <ThreadSafeQueue.hh>
 #include <ProcessHandler.hh>
+#include <Logger.hh>
 
 class Error;
-class Logger;
 
 class JavaBuilder
 {
   public:
     JavaBuilder(Error& error,
 		bool capture_output,
+		Logger::job_handle_t jb_logger_job,
 		boost::function<void(std::string const&)> verbose,
 		std::string const& abuild_top,
 		std::string const& java,
@@ -110,7 +111,8 @@ class JavaBuilder
     boost::shared_ptr<boost::asio::io_service> io_service;
     socket_ptr sock;
     thread_ptr io_thread;
-    ProcessHandler::output_handler_t io_output_handler;
+    Logger::job_handle_t jb_logger_job;
+    ProcessHandler::output_handler_t jb_output_handler;
     std::map<int, JobData_ptr> job_data;
 };
 

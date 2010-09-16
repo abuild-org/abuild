@@ -49,29 +49,51 @@ Remember to update help
 
 --raw-output: default true for j1, false otherwise
 
---interleaved-output: default false
+--interleaved-output: default true for j>1 or if error/output prefix
+are specified
 
---buffered-output: default true for j>1, false otherwise.  If
-specified with -j1, interleaved mode is used instead.
+--buffered-output: default false
 
 --{error,output}-prefix: default empty.  If specified and no output
-mode is specified, output mode becomes interleaved for j1 and buffered
-for j>1.  If raw is expicitly specified these options are ignored.
+mode is specified, output mode becomes interleaved.  If raw is
+expicitly specified these options are ignored.
 
-Job prefixes and begin/end markers are suppressed with j1.
+Job prefixes are suppressed with j1.
 
-To parse and associate output with a build:
+The build consists of a check phase, a build phase, and a summary
+phase.  The build phase is always preceded by "abuild: build starting"
+and always followed by "abuild: build complete".  Within the build
+phase, output can be associated with a build item/platform pair
+(referred to here as a "job") in the following way:
 
- * "abuild: item (outputdir): targets": switch output to given build
-   item/platform pair; note build prefix if specified
+ * If output/error prefixes are specified, strip from beginning of
+   line.  For this to work unambiguously, it is easiest if you use
+   output and error prefixes of the same length.
 
- * BEGIN OUTPUT: save current output; set output to referenced item
+ * The first line of output from a build of a given item on a given
+   platform will always contain "abuild: item (outputdir):".
 
- * END OUTPUT: restore output from before BEGIN
+    - In interleaved mode, it is the first line to start with [nnn],
+      and identifies [nnn] as the prefix for that build item/platform.
 
- * [n] (build prefix): that line is associated with build that has
-   given prefix
+    - In buffered mode, all subsequent lines until a line that
+      indicates the start of a different job or the end of the build
+      phase belong to that build item.
 
+ * In both buffered and interleaved mode, certain major errors from
+   JavaBuilder, such as abnormal termination or rogue output from the
+   java backend, can result in asynchronous output from the java
+   builder.  In interleaved builds with multiple threads, this output
+   is prefixed with the string "[JavaBuilder] ".  In buffered builds,
+   it is not marked in any way, but will always appear between output
+   of builds.  Any output of this type would indicate a serious
+   failure and will almost surely be followed by failures of java
+   build items, so handling it is a special case in a parser is most
+   likely not necessary.  Any line of output that doesn't meet the
+   expected criteria should just not be associated with any build
+   item.  Such output should still be made available to the user since
+   it probably indicates a serious problem with the build or a bug in
+   the parser.
 
 Document: if you hit CTRL-C,  you will lose any partial output.  To
 avoid, use --raw-output or --interleaved-output.

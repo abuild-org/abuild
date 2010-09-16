@@ -88,10 +88,10 @@ my @output_capture_tests = (
      ['--silent', '--interleaved-output', '-j2', '--error-prefix=E '],
     ],
     ['silent buffered j2', 'output-capture-silent-buffered-j2.out',
-     ['--silent', '-j2', '--output-prefix=O '], # buffered is implicit
+     ['--silent', '-j2', '--buffered-output', '--output-prefix=O '],
     ],
     ['buffered j2', 'output-capture-buffered-j2.out',
-     ['-j2', '--output-prefix=O ', '--error-prefix=E '],
+     ['-j2', '--output-prefix=O ', '--buffered-output', '--error-prefix=E '],
     ],
     );
 foreach my $d (@output_capture_tests)

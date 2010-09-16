@@ -430,5 +430,4 @@ JavaBuilder capture output 1
 JavaBuilder pending data 1
 JavaBuilder response ends with NL 0
 JavaBuilder response ends with CRNL 0
-Abuild set buffered from prefix 0
-Abuild change buffered to interleaved for j1 0
+Abuild set interleaved from prefix 0

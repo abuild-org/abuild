@@ -614,26 +614,14 @@ Abuild::parseArgv()
 	// requested.
 	if (! (this->output_prefix.empty() && this->error_prefix.empty()))
 	{
-	    QTC::TC("abuild", "Abuild set buffered from prefix");
-	    this->output_mode = om_buffered;
+	    QTC::TC("abuild", "Abuild set interleaved from prefix");
+	    this->output_mode = om_interleaved;
 	}
 	else
 	{
-	    this->output_mode = (this->max_workers == 1 ? om_raw : om_buffered);
+	    this->output_mode =
+		(this->max_workers == 1 ? om_raw : om_interleaved);
 	}
-    }
-    if ((this->output_mode == om_buffered) && (this->max_workers == 1))
-    {
-	// There's no value to having buffered mode with a single
-	// thread since there's nothing to interleave.  Technically,
-	// there is a slight difference in that any output from the
-	// JavaBuilder that could not be associated with a thread
-	// would now be interleaved with the output, but in most if
-	// not all cases, it would belong to the output anyway.  Note
-	// that we suppress use of the job prefix in interleaved mode
-	// in a single thread.
-	QTC::TC("abuild", "Abuild change buffered to interleaved for j1");
-	this->output_mode = om_interleaved;
     }
     if (this->output_mode != om_raw)
     {
@@ -5538,7 +5526,7 @@ Abuild::buildBuildset()
 				   _1, filter, false));
     r.setChangeCallback(boost::bind(&Abuild::stateChangeCallback,
 				    this, _1, _2, filter), true);
-    verbose("starting build");
+    info("build starting");
     this->logger.flushLog();
     bool stop_on_error = true;
     bool disable_failure_propagation = false;
@@ -5550,7 +5538,9 @@ Abuild::buildBuildset()
 	    disable_failure_propagation = true;
 	}
     }
-    return r.run(stop_on_error, disable_failure_propagation);
+    bool status = r.run(stop_on_error, disable_failure_propagation);
+    info("build complete");
+    return status;
 }
 
 bool
@@ -6015,11 +6005,15 @@ Abuild::findJava()
 	java = "/non/existent/java";
     }
 
+    Logger::job_handle_t jb_logger_job =
+	logger.requestJobHandle(
+	    false, (this->use_job_prefix ? "[JavaBuilder] " : ""));
     this->java_builder.reset(
 	new JavaBuilder(
 	    this->error_handler,
 	    (this->output_mode != om_raw),
-	    boost::bind(&Abuild::verbose, this, _1, Logger::NO_JOB),
+	    jb_logger_job,
+	    boost::bind(&Abuild::verbose, this, _1, jb_logger_job),
 	    this->abuild_top, java, java_home, ant_home,
 	    java_libs, this->jvm_xargs,
 	    this->java_builder_args, this->defines));

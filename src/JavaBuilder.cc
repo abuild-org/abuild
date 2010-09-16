@@ -42,6 +42,7 @@ JavaBuilder::JobData::handleOutput(bool is_error, std::string const& message)
 
 JavaBuilder::JavaBuilder(Error& error,
 			 bool capture_output,
+			 Logger::job_handle_t jb_logger_job,
 			 boost::function<void(std::string const&)> verbose,
 			 std::string const& abuild_top,
 			 std::string const& java,
@@ -66,7 +67,8 @@ JavaBuilder::JavaBuilder(Error& error,
     defines(defines),
     last_request(0),
     run_mode(rm_idle),
-    io_output_handler(0)
+    jb_logger_job(jb_logger_job),
+    jb_output_handler(logger.getOutputHandler(jb_logger_job))
 {
 }
 
@@ -304,7 +306,8 @@ JavaBuilder::handleRead(boost::system::error_code const& ec, size_t length)
 	    this->error.error(
 		FileLocation(),
 		"error reading from JavaBuilder: " +
-		ec.message() + "; will attempt to recover");
+		ec.message() + "; will attempt to recover",
+		this->jb_logger_job);
 	}
 
 	if ((! eof) || (this->run_mode == rm_running))
@@ -314,7 +317,8 @@ JavaBuilder::handleRead(boost::system::error_code const& ec, size_t length)
 	    QTC::TC("abuild", "JavaBuilder handle abnormal java exit");
 	    this->error.error(
 		FileLocation(),
-		"JavaBuilder exited unexpectedly; will attempt to recover");
+		"JavaBuilder exited unexpectedly; will attempt to recover",
+		this->jb_logger_job);
 	    setRunMode(rm_stopped);
 	}
     }
@@ -345,7 +349,8 @@ JavaBuilder::handleWrite(boost::system::error_code const& ec)
 	    this->error.error(
 		FileLocation(),
 		"error writing message to JavaBuilder: " +
-		ec.message() + "; will attempt to recover");
+		ec.message() + "; will attempt to recover",
+		this->jb_logger_job);
 	}
     }
 }
@@ -553,11 +558,8 @@ JavaBuilder::runJava(unsigned short port)
     verbose("invoking java: " + Util::join(" ", args));
 
     ProcessHandler::output_handler_t output_handler = 0;
-    Logger::job_handle_t logger_job = Logger::NO_JOB;
     if (this->capture_output)
     {
-	logger_job = this->logger.requestJobHandle(false, "[JavaBuilder] ");
-	this->io_output_handler = this->logger.getOutputHandler(logger_job);
 	output_handler = boost::bind(
 	    &JavaBuilder::handleRogueOutput, this, _1, _2, _3);
     }
@@ -565,13 +567,12 @@ JavaBuilder::runJava(unsigned short port)
 	    this->capture_output ? 1 : 0);
     process_handler.runProgram(this->java, args, environment, true, ".",
 			       output_handler);
-    this->logger.closeJob(logger_job);
-    this->io_output_handler = 0;
 
     boost::mutex::scoped_lock lock(this->mutex);
     if (this->run_mode == rm_starting_up)
     {
-	error.error(FileLocation(), "java builder backend failed to start");
+	error.error(FileLocation(), "java builder backend failed to start",
+		    this->jb_logger_job);
 	this->io_service->stop();
     }
 }
@@ -579,5 +580,6 @@ JavaBuilder::runJava(unsigned short port)
 void
 JavaBuilder::handleRogueOutput(bool is_error, char const* data, int len)
 {
-    this->io_output_handler(is_error, data, len);
+    assert(this->capture_output);
+    this->jb_output_handler(is_error, data, len);
 }
