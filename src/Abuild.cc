@@ -6094,6 +6094,12 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     Logger::job_handle_t logger_job = this->logger.requestJobHandle(
 	(this->output_mode == om_buffered), job_prefix);
 
+    // Job header is cleared if/when we actually start building, so
+    // this is only seen if there are interface errors or verbose
+    // output preceding the actual build.
+    this->logger.setJobHeader(
+	logger_job, this->whoami + ": " + item_label + ":");
+
     Error item_error(logger_job, this->whoami);
     std::string const& abs_path = build_item.getAbsolutePath();
     InterfaceParser parser(item_error, item_name, item_platform, abs_path);
@@ -6106,6 +6112,10 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    builder_string, item_name, item_platform, build_item,
 	    item_error, parser, logger_job);
     }
+
+    // Ready to build -- clear job header, and let the build's own
+    // output take precedence.
+    this->logger.setJobHeader(logger_job, "");
 
     if (build_item.hasBuildFile())
     {
@@ -6540,7 +6550,6 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
 	return true;
     }
 
-    // XXX move these target messages up before anything else
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
     if (this->special_target == s_NO_OP)
     {

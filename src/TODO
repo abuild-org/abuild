@@ -6,6 +6,7 @@ interface errors
 failure
 failure of dependency
 missing after-build
+verbose
 
 itemBuilder
 readAfterBuilds
@@ -22,8 +23,6 @@ invoke_groovy
 Next
 ====
 
- * this->stdout_is_tty = false; if ! om_raw
-
  * Fix doc for global-plugin: search for "-plugin"....
 
  * When abuild runs a list_platforms command and the command fails,
@@ -39,6 +38,8 @@ Next
  * Make sure dependencies are correct for when interface.qfl file or
    interface.yy is updated relative to cache....seems like maybe the
    chaining for interface.qfl isn't quite right.
+
+ * Document output change of job header before interface errors
 
 
 Capture of Backend Output: to document
