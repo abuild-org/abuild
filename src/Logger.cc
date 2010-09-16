@@ -21,6 +21,12 @@ Logger::JobData::JobData(
 }
 
 void
+Logger::JobData::setJobHeader(std::string const& job_header)
+{
+    this->job_header = job_header;
+}
+
+void
 Logger::JobData::handle_output(bool is_error, char const* data, int len)
 {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
@@ -70,6 +76,13 @@ Logger::JobData::flush()
 void
 Logger::JobData::handleMessage(bool is_error, std::string const& line)
 {
+    if (! this->job_header.empty())
+    {
+	std::string header = this->job_header + "\n";
+	this->job_header.clear();
+	handleMessage(false, header);
+    }
+
     boost::recursive_mutex::scoped_lock lock(this->mutex);
     Logger::message_type_e message_type = (is_error ? m_error : m_info);
     if (this->buffer_output)
@@ -146,6 +159,17 @@ Logger::requestJobHandle(bool buffer_output, std::string const& job_prefix)
     this->jobs[job].reset(
 	new JobData(*this, job, buffer_output, job_prefix));
     return job;
+}
+
+void
+Logger::setJobHeader(job_handle_t job, std::string const& header)
+{
+    if (job == NO_JOB)
+    {
+	return;
+    }
+    boost::shared_ptr<JobData> j = findJob(job);
+    j->setJobHeader(header);
 }
 
 boost::shared_ptr<Logger::JobData>

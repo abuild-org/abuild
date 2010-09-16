@@ -6085,20 +6085,14 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
     std::string item_label = item_name + " (" + output_dir + ")";
 
-    Logger::job_handle_t logger_job = Logger::NO_JOB;
-    if (this->output_mode != om_raw)
+    std::string job_prefix;
+    if (this->use_job_prefix)
     {
-	std::string job_prefix;
-	if ((this->output_mode == om_interleaved) && (this->max_workers > 1))
-	{
-	    // Prepend to any existing prefix an indicator of the job
-	    // number.
-	    assert(this->buildgraph_item_prefixes.count(builder_string));
-	    job_prefix = this->buildgraph_item_prefixes[builder_string] + " ";
-	}
-	logger_job = this->logger.requestJobHandle(
-	    (this->output_mode == om_buffered), job_prefix);
+	assert(this->buildgraph_item_prefixes.count(builder_string));
+	job_prefix = this->buildgraph_item_prefixes[builder_string] + " ";
     }
+    Logger::job_handle_t logger_job = this->logger.requestJobHandle(
+	(this->output_mode == om_buffered), job_prefix);
 
     Error item_error(logger_job, this->whoami);
     std::string const& abs_path = build_item.getAbsolutePath();
@@ -7185,8 +7179,11 @@ Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
 	verbose("  targets: " + Util::join(" ", targets), logger_job);
     }
 
-    ProcessHandler::output_handler_t output_handler =
-	this->logger.getOutputHandler(logger_job);
+    ProcessHandler::output_handler_t output_handler = 0;
+    if (this->capture_output)
+    {
+	output_handler = this->logger.getOutputHandler(logger_job);
+    }
     // Explicitly unlock the build lock during invocation of the
     // backend
     ScopedUnlock unlock(build_lock);
@@ -7211,8 +7208,11 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
 	verbose("running " + Util::join(" ", args), logger_job);
     }
 
-    ProcessHandler::output_handler_t output_handler =
-	this->logger.getOutputHandler(logger_job);
+    ProcessHandler::output_handler_t output_handler = 0;
+    if (this->capture_output)
+    {
+	output_handler = this->logger.getOutputHandler(logger_job);
+    }
     // Explicitly unlock the build lock during invocation of the
     // backend
     ScopedUnlock unlock(build_lock);

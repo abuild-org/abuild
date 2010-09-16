@@ -1,12 +1,12 @@
 O message 1
+O [J2] job 2 header
 O [J2] job 2 output line 1
 O message 3
 O [J2] job 2 additional output
 O [J2] job 2 output line 2
+O job 3 header
 O job 3 output line
-O job 1: BEGIN OUTPUT
 O job 1 additional output
 O job 1 output line 1
 O job 1 output line 2
 O job 1 partial output line[no newline]
-O job 1: END OUTPUT

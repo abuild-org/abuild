@@ -32,13 +32,18 @@ class Logger
     static job_handle_t const NO_JOB = 0;
 
     // Request a job handle, used to associated log messages with a
-    // specific job.  Each line of output is prefixed by
-    // output_prefix, and each line of error is prefixed by
-    // error_prefix.  If buffer_output is true, output is held until
+    // specific job.  If buffer_output is true, output is held until
     // closeJob() is called.  Otherwise, each line is output when
     // received.
     job_handle_t requestJobHandle(
 	bool buffer_output, std::string const& job_prefix);
+
+    // If a non-empty job_header is set, it will be appended with a
+    // newline and logged as output the next line of output or error,
+    // if any.  If there is no output after a call to setJobHeader(),
+    // the job header will not be output.  Setting the job header to
+    // the empty string clears it.
+    void setJobHeader(job_handle_t job, std::string const& job_header);
 
     // Return an output handler for the given job suitable for passing
     // to ProcessHandler::runProgram.
@@ -73,6 +78,7 @@ class Logger
 	    Logger::job_handle_t job,
 	    bool buffer_output,
 	    std::string const& job_prefix);
+	void setJobHeader(std::string const& job_header);
 	void handle_output(bool is_error, char const* data, int len);
 	void flush();
 	void handleMessage(bool is_error, std::string const& line);
@@ -86,6 +92,7 @@ class Logger
 	Logger::job_handle_t job;
 	bool buffer_output;
 	std::string job_prefix;
+	std::string job_header;
 	std::string output_line;
 	std::string error_line;
 	std::list<std::pair<Logger::message_type_e, std::string> > buffer;

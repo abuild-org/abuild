@@ -34,6 +34,9 @@ int main()
     boost::function<void(bool, char const*)> h3 =
 	bind_handler(logger->getOutputHandler(j3));
 
+    logger->setJobHeader(j2, "job 2 header");
+    logger->setJobHeader(j3, "job 3 header");
+
     // Do lots of interleaving from a single thread.  This simulates
     // multithreading but allows us to get predictable output.  We
     // have output interleaved with error within and between jobs as

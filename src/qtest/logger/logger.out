@@ -1,5 +1,6 @@
 O message 1
 E message 2
+O [J2] job 2 header
 O [J2] job 2 output line 1
 E [J2] job 2 error line 1
 O message 3
@@ -7,14 +8,13 @@ O [J2] job 2 additional output
 E [J2] job 2 additional error
 E [J2] job 2 error line 2
 O [J2] job 2 output line 2
+O job 3 header
 O job 3 output line
 E job 3 error line
-O job 1: BEGIN OUTPUT
 O job 1 additional output
 E job 1 error line 1
 O job 1 output line 1
 E job 1 error line 2
 O job 1 output line 2
 O job 1 partial output line[no newline]
-O job 1: END OUTPUT
 E error message
