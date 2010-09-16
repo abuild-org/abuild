@@ -26,7 +26,7 @@ class KeyVal
   public:
     // Constructs an empty KeyVal.  The getter methods are not valid
     // until readFile() has been called.
-    KeyVal(char const* filename,
+    KeyVal(Error& error_handler, char const* filename,
 	   std::set<std::string> const& keys,
 	   std::map<std::string, std::string> const& defaults);
 
@@ -78,7 +78,7 @@ class KeyVal
 	std::string after;
     };
 
-    Error error;
+    Error& error;
     std::string filename;
     std::string preferred_eol;
     std::set<std::string> keys;

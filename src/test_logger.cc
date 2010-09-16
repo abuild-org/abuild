@@ -54,6 +54,8 @@ int main()
     logger->logInfo("message 3");
     h1(true,  "job 1 error line 2\n");
     h2(true,  "job 2 er");
+    logger->logInfo("job 2 additional output", j2);
+    logger->logError("job 2 additional error", j2);
     h1(false, "job 1 output line 2\n");
     h3(true , "job 3 error line\n");
     h2(true,  "ror line 2\n");

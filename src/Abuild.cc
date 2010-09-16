@@ -97,7 +97,7 @@ Abuild::Abuild(int argc, char* argv[]) :
     compat_level(CompatLevel::cl_1_1),
     default_writable(true),
     local_build(false),
-    error_handler(whoami),
+    error_handler(Logger::NO_JOB, whoami),
     this_config(0),
 #ifdef _WIN32
     have_perl(false),
@@ -167,7 +167,7 @@ Abuild::runInternal()
     if (this->argc > 1)
     {
 	boost::function<void(std::string const&)> l =
-	    boost::bind(&Logger::logInfo, &(this->logger), _1);
+	    boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 	std::string last_arg = argv[this->argc - 1];
 	if ((last_arg == "-V") || (last_arg == "--version"))
 	{
@@ -5399,7 +5399,7 @@ Abuild::buildBuildset()
 	monitorOutput("begin-dump-build-graph");
 
 	boost::function<void(std::string const&)> o =
-	    boost::bind(&Logger::logInfo, &(this->logger), _1);
+	    boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 
 	std::string item_name;
 	std::string platform;
@@ -5481,7 +5481,8 @@ Abuild::buildBuildset()
 
     // Load base interface.  Use a name that can't possibly conflict
     // with any build item name.
-    InterfaceParser base_parser(":base", ":base", this->abuild_top);
+    InterfaceParser base_parser(
+	this->error_handler, ":base", ":base", this->abuild_top);
     if (! base_parser.parse(
 	    this->abuild_top + "/private/base.interface", false))
     {
@@ -5518,6 +5519,7 @@ Abuild::buildBuildset()
     // Set variables whose values are global for all items.
     FileLocation internal("[global-initialization]", 0, 0);
     assert(this->base_interface->assignVariable(
+	       this->error_handler,
 	       internal, "ABUILD_STDOUT_IS_TTY",
 	       (this->stdout_is_tty ? "1" : "0"),
 	       Interface::a_normal));
@@ -6011,7 +6013,7 @@ Abuild::findJava()
 	new JavaBuilder(
 	    this->error_handler,
 	    (this->output_mode != om_raw),
-	    boost::bind(&Abuild::verbose, this, _1),
+	    boost::bind(&Abuild::verbose, this, _1, Logger::NO_JOB),
 	    this->abuild_top, java, java_home, ant_home,
 	    java_libs, this->jvm_xargs,
 	    this->java_builder_args, this->defines));
@@ -6074,11 +6076,6 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     bool no_op = (this->special_target == s_NO_OP);
     bool use_interfaces = (! (no_op || is_dep_failure));
 
-    std::string const& abs_path = build_item.getAbsolutePath();
-    InterfaceParser parser(item_name, item_platform, abs_path);
-    parser.setSupportedFlags(build_item.getSupportedFlags());
-    bool status = true;
-
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
     std::string item_label = item_name + " (" + output_dir + ")";
 
@@ -6098,10 +6095,17 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    (this->output_mode == om_buffered), job_prefix, this->silent);
     }
 
+    Error item_error(logger_job, this->whoami);
+    std::string const& abs_path = build_item.getAbsolutePath();
+    InterfaceParser parser(item_error, item_name, item_platform, abs_path);
+    parser.setSupportedFlags(build_item.getSupportedFlags());
+    bool status = true;
+
     if (use_interfaces)
     {
 	status = createItemInterface(
-	    builder_string, item_name, item_platform, build_item, parser);
+	    builder_string, item_name, item_platform, build_item,
+	    item_error, parser, logger_job);
     }
 
     if (build_item.hasBuildFile())
@@ -6118,12 +6122,13 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    if (is_dep_failure)
 	    {
 		info(item_label +
-		     " will not be built because of failure of a dependency");
+		     " will not be built because of failure of a dependency",
+		     logger_job);
 	    }
 	    else
 	    {
 		status = buildItem(
-		    build_lock, logger_job, builder_string,
+		    build_lock, logger_job,
 		    item_name, item_platform, build_item);
 	    }
 	}
@@ -6133,7 +6138,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	if (status && use_interfaces)
 	{
 	    status = readAfterBuilds(
-		item_platform, item_platform, build_item, parser);
+		item_platform, item_platform, build_item, parser, logger_job);
 	}
 	if (status && use_interfaces)
 	{
@@ -6154,7 +6159,8 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 		abs_path + "/" + ItemConfig::FILE_INTERFACE;
 	    error(FileLocation(interface_file, 0, 0),
 		  "interfaces for items with no build files may not load"
-		  " after-build files");
+		  " after-build files",
+		  logger_job);
 	    status = false;
 	}
 	else
@@ -6164,13 +6170,13 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	}
     }
 
-    this->logger.closeJob(logger_job);
-
     if (! status)
     {
-        notice(item_label + ": build failed");
+        notice(item_label + ": build failed", logger_job);
 	this->failed_builds.push_back(builder_string);
     }
+
+    this->logger.closeJob(logger_job);
 
     return status;
 }
@@ -6198,9 +6204,12 @@ Abuild::createItemInterface(std::string const& builder_string,
 			    std::string const& item_name,
 			    std::string const& item_platform,
 			    BuildItem& build_item,
-			    InterfaceParser& parser)
+			    Error& item_error,
+			    InterfaceParser& parser,
+			    Logger::job_handle_t logger_job)
 {
-    verbose("creating interface for " + item_name + " on " + item_platform);
+    verbose("creating interface for " + item_name + " on " + item_platform,
+	    logger_job);
 
     // Initialize this item's interface.
     build_item.setInterface(item_platform, parser.getInterface());
@@ -6213,7 +6222,7 @@ Abuild::createItemInterface(std::string const& builder_string,
     for (std::list<std::string>::const_iterator iter = plugins.begin();
 	 iter != plugins.end(); ++iter)
     {
-	verbose("importing interface for plugin " + *iter);
+	verbose("importing interface for plugin " + *iter, logger_job);
 	if (! parser.importInterface(
 		this->buildset[*iter]->getInterface(PLUGIN_PLATFORM)))
 	{
@@ -6234,7 +6243,7 @@ Abuild::createItemInterface(std::string const& builder_string,
 	parseBuildGraphNode(*iter, dep_name, dep_platform);
 
 	BuildItem& dep_item = *(this->buildset[dep_name]);
-	verbose("importing interface for dependency " + dep_name);
+	verbose("importing interface for dependency " + dep_name, logger_job);
 	if (! parser.importInterface(dep_item.getInterface(dep_platform)))
 	{
 	    QTC::TC("abuild", "Abuild ERR import of dependent interface");
@@ -6253,29 +6262,29 @@ Abuild::createItemInterface(std::string const& builder_string,
     // We keep ABUILD_THIS around since we have no way of detecting or
     // warning for its use in backend configuration files and
     // therefore can't easily deprecate it.
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_THIS", build_item.getName(),
 			    Interface::a_override, status);
 
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_ITEM_NAME", build_item.getName(),
 			    Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_TREE_NAME",
 			    build_item.getTreeName(),
 			    Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_TARGET_TYPE",
 			    TargetType::getName(build_item.getTargetType()),
 			    Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM_TYPE",
 			    build_item.getPlatformType(item_platform),
 			    Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM", item_platform,
 			    Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_OUTPUT_DIR",
 			    OUTPUT_DIR_PREFIX + item_platform,
 			    Interface::a_override, status);
@@ -6311,22 +6320,22 @@ Abuild::createItemInterface(std::string const& builder_string,
 	}
     }
 
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM",
 			    item_platform, Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM_OS",
 			    platform_os, Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM_CPU",
 			    platform_cpu, Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM_TOOLSET",
 			    platform_toolset, Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM_COMPILER",
 			    platform_compiler, Interface::a_override, status);
-    assignInterfaceVariable(_interface,
+    assignInterfaceVariable(item_error, _interface,
 			    internal, "ABUILD_PLATFORM_OPTION",
 			    platform_option, Interface::a_override, status);
 
@@ -6342,11 +6351,12 @@ Abuild::createItemInterface(std::string const& builder_string,
 	std::string present = ((*iter).second ? "1" : "0");
 	std::string var = "ABUILD_HAVE_OPTIONAL_DEP_" + dep;
 	declareInterfaceVariable(
-	    _interface, internal, var,
+	    item_error, _interface, internal, var,
 	    Interface::s_local, Interface::t_boolean, Interface::l_scalar,
 	    status);
 	assignInterfaceVariable(
-	    _interface, internal, var, present, Interface::a_normal, status);
+	    item_error, _interface, internal,
+	    var, present, Interface::a_normal, status);
     }
 
     // Read our own interface file, if any.
@@ -6363,7 +6373,7 @@ Abuild::createItemInterface(std::string const& builder_string,
 	// trouble.  If there are actual syntax errors in the
 	// interface file, then those syntax errors will potentially
 	// be reported multiple times for a -k or multithreaded build.
-	verbose("loading " + ItemConfig::FILE_INTERFACE);
+	verbose("loading " + ItemConfig::FILE_INTERFACE, logger_job);
 	if (! parser.parse(interface_file, true))
 	{
 	    status = false;
@@ -6382,7 +6392,8 @@ Abuild::createPluginInterface(std::string const& plugin_name,
     // Initialize this item's interface.  We store this in the special
     // "platform" PLUGIN_PLATFORM which is initialized to a value that
     // can never match a real platform name.
-    InterfaceParser parser(plugin_name, PLUGIN_PLATFORM, dir);
+    InterfaceParser parser(
+	this->error_handler, plugin_name, PLUGIN_PLATFORM, dir);
     build_item.setInterface(PLUGIN_PLATFORM, parser.getInterface());
     bool status = parser.importInterface(*(this->base_interface));
 
@@ -6435,7 +6446,8 @@ Abuild::dumpInterface(std::string const& item_platform,
 }
 
 void
-Abuild::declareInterfaceVariable(Interface& _interface,
+Abuild::declareInterfaceVariable(Error& item_error,
+				 Interface& _interface,
 				 FileLocation const& location,
 				 std::string const& variable_name,
 				 Interface::scope_e scope,
@@ -6444,14 +6456,15 @@ Abuild::declareInterfaceVariable(Interface& _interface,
 				 bool& status)
 {
     if (! _interface.declareVariable(
-	    location, variable_name, scope, type, list_type))
+	    item_error, location, variable_name, scope, type, list_type))
     {
 	status = false;
     }
 }
 
 void
-Abuild::assignInterfaceVariable(Interface& _interface,
+Abuild::assignInterfaceVariable(Error& item_error,
+				Interface& _interface,
 				FileLocation const& location,
 				std::string const& variable_name,
 				std::string const& value,
@@ -6459,7 +6472,7 @@ Abuild::assignInterfaceVariable(Interface& _interface,
 				bool& status)
 {
     if (! _interface.assignVariable(
-	    location, variable_name, value, assignment_type))
+	    item_error, location, variable_name, value, assignment_type))
     {
 	status = false;
     }
@@ -6469,7 +6482,8 @@ bool
 Abuild::readAfterBuilds(std::string const& item_name,
 			std::string const& item_platform,
 			BuildItem& build_item,
-			InterfaceParser& parser)
+			InterfaceParser& parser,
+			Logger::job_handle_t logger_job)
 {
     bool status = true;
 
@@ -6484,7 +6498,8 @@ Abuild::readAfterBuilds(std::string const& item_name,
 	if (Util::fileExists(after_build))
 	{
 	    verbose("loading after build file " +
-		    Util::absToRel(after_build, abs_path));
+		    Util::absToRel(after_build, abs_path),
+		    logger_job);
 	    if (parser.parse(after_build, false))
 	    {
 		QTC::TC("abuild", "Abuild good after-build");
@@ -6501,7 +6516,8 @@ Abuild::readAfterBuilds(std::string const& item_name,
 	    error(FileLocation(interface_file, 0, 0),
 		  "after-build file " +
 		  Util::absToRel(after_build, abs_path) +
-		  " does not exist");
+		  " does not exist",
+		  logger_job);
 	    status = false;
 	}
     }
@@ -6512,7 +6528,6 @@ Abuild::readAfterBuilds(std::string const& item_name,
 bool
 Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
 		  Logger::job_handle_t logger_job,
-		  std::string const& builder_string,
 		  std::string const& item_name,
 		  std::string const& item_platform,
 		  BuildItem& build_item)
@@ -6530,7 +6545,8 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
     if (this->special_target == s_NO_OP)
     {
         QTC::TC("abuild", "Abuild no-op");
-	info(item_name + " (" + output_dir + "): " + this->special_target);
+	info(item_name + " (" + output_dir + "): " + this->special_target,
+	    logger_job);
 	return true;
     }
 
@@ -6547,16 +6563,10 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
 		  item_name + " " + item_platform + " " +
 		  Util::join(" ", backend_targets));
 
-    std::string build_prefix_info;
-    if ((this->output_mode == om_interleaved) && (this->max_workers > 1))
-    {
-	build_prefix_info = "; build prefix: " +
-	    this->buildgraph_item_prefixes[builder_string];
-    }
     info(item_name + " (" + output_dir + "): " +
 	 Util::join(" ", backend_targets) +
-	 (this->verbose_mode ? " in " + rel_output_dir : "") +
-	 build_prefix_info);
+	 (this->verbose_mode ? " in " + rel_output_dir : ""),
+	 logger_job);
 
     bool result = false;
 
@@ -6888,7 +6898,7 @@ Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
 	if (build_item.isSerial())
 	{
 	    QTC::TC("abuild", "Abuild explicit serial");
-	    verbose("invoking make serially");
+	    verbose("invoking make serially", logger_job);
 	}
 	else
 	{
@@ -7160,13 +7170,13 @@ Abuild::invokeJavaBuilder(boost::mutex::scoped_lock& build_lock,
     {
 	// Put this in the if statement to avoid the needless cal to
 	// join if not in verbose mode.
-	verbose("running JavaBuilder backend " + backend);
+	verbose("running JavaBuilder backend " + backend, logger_job);
 	if (! build_file.empty())
 	{
-	    verbose("  build file: " + build_file);
+	    verbose("  build file: " + build_file, logger_job);
 	}
-	verbose("  directory: " + dir);
-	verbose("  targets: " + Util::join(" ", targets));
+	verbose("  directory: " + dir, logger_job);
+	verbose("  targets: " + Util::join(" ", targets), logger_job);
     }
 
     ProcessHandler::output_handler_t output_handler =
@@ -7192,7 +7202,7 @@ Abuild::invokeBackend(boost::mutex::scoped_lock& build_lock,
     {
 	// Put this in the if statement to avoid the needless cal to
 	// join if not in verbose mode.
-	verbose("running " + Util::join(" ", args));
+	verbose("running " + Util::join(" ", args), logger_job);
     }
 
     ProcessHandler::output_handler_t output_handler =
@@ -7392,7 +7402,7 @@ Abuild::generalHelp()
     }
 
     boost::function<void(std::string const&)> h =
-	boost::bind(&Logger::logInfo, &(this->logger), _1);
+	boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 
     if (this->help_topic != h_HELP)
     {
@@ -7438,7 +7448,7 @@ void
 Abuild::showRulesHelpMessage()
 {
     boost::function<void(std::string const&)> h =
-	boost::bind(&Logger::logInfo, &(this->logger), _1);
+	boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 
     h("");
     h("Help is available on built-in and user-supplied rules.  To request help");
@@ -7528,7 +7538,7 @@ Abuild::rulesHelp(BuildForest& forest)
     }
 
     boost::function<void(std::string const&)> h =
-	boost::bind(&Logger::logInfo, &(this->logger), _1);
+	boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 
     if (showHelpFiles(topics[tt_toolchain], "toolchain", toolchain) ||
 	showHelpFiles(topics[tt_rule], "rule", rule))
@@ -7671,7 +7681,7 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 	displayed = true;
 
 	boost::function<void(std::string const&)> h =
-	    boost::bind(&Logger::logInfo, &(this->logger), _1);
+	    boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 
 	if (topics.count(module_name))
 	{
@@ -7733,7 +7743,7 @@ Abuild::listHelpTopics(HelpTopic_map& topics, std::string const& description,
 		       std::set<std::string>& references)
 {
     boost::function<void(std::string const&)> h =
-	boost::bind(&Logger::logInfo, &(this->logger), _1);
+	boost::bind(&Logger::logInfo, &(this->logger), _1, Logger::NO_JOB);
 
     h("");
     h("The following " + description + " are available:");
@@ -7785,18 +7795,18 @@ Abuild::exitIfErrors()
 }
 
 void
-Abuild::info(std::string const& msg)
+Abuild::info(std::string const& msg, Logger::job_handle_t job)
 {
     if (! this->silent)
     {
-	this->logger.logInfo(this->whoami + ": " + msg);
+	this->logger.logInfo(this->whoami + ": " + msg, job);
     }
 }
 
 void
-Abuild::notice(std::string const& msg)
+Abuild::notice(std::string const& msg, Logger::job_handle_t job)
 {
-    this->logger.logInfo(this->whoami + ": " + msg);
+    this->logger.logInfo(this->whoami + ": " + msg, job);
 }
 
 void
@@ -7812,12 +7822,12 @@ Abuild::decrementVerboseIndent()
 }
 
 void
-Abuild::verbose(std::string const& msg)
+Abuild::verbose(std::string const& msg, Logger::job_handle_t job)
 {
     if (this->verbose_mode)
     {
 	this->logger.logInfo(this->whoami + ": (verbose) " +
-			     this->verbose_indent + msg);
+			     this->verbose_indent + msg, job);
     }
 }
 
@@ -7837,28 +7847,31 @@ Abuild::monitorErrorCallback(std::string const& msg)
 }
 
 void
-Abuild::error(std::string const& msg)
+Abuild::error(std::string const& msg, Logger::job_handle_t job)
 {
-    error(FileLocation(), msg);
+    error(FileLocation(), msg, job);
 }
 
 void
-Abuild::error(FileLocation const& location, std::string const& msg)
+Abuild::error(FileLocation const& location, std::string const& msg,
+	      Logger::job_handle_t job)
 {
-    this->error_handler.error(location, msg);
+    this->error_handler.error(location, msg, job);
 }
 
 void
-Abuild::deprecate(std::string const& version, std::string const& msg)
+Abuild::deprecate(std::string const& version, std::string const& msg,
+		  Logger::job_handle_t job)
 {
-    deprecate(version, FileLocation(), msg);
+    deprecate(version, FileLocation(), msg, job);
 }
 
 void
 Abuild::deprecate(std::string const& version,
-		  FileLocation const& location, std::string const& msg)
+		  FileLocation const& location, std::string const& msg,
+		  Logger::job_handle_t job)
 {
-    this->error_handler.deprecate(version, location, msg);
+    this->error_handler.deprecate(version, location, msg, job);
 }
 
 void

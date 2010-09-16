@@ -42,7 +42,8 @@ class InterfaceParser: public Parser
   public:
     // The item_name and item_platform parameters are passed through
     // to the Interface created by this parser.
-    InterfaceParser(std::string const& item_name,
+    InterfaceParser(Error& error_handler,
+		    std::string const& item_name,
 		    std::string const& item_platform,
 		    std::string const& local_dir);
     virtual ~InterfaceParser();

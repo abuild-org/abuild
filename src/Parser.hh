@@ -35,7 +35,7 @@ class Parser
     FileLocation const& getLastFileLocation();
 
   protected:
-    Parser(FlexCaller&, int eof_token);
+    Parser(Error& error_handler, FlexCaller&, int eof_token);
 
     // Returns true if there were no errors.
     bool parse(std::string const& filename);
@@ -62,8 +62,8 @@ class Parser
 	return nt;
     }
 
+    Error& error_handler;
     bool debug_parser;
-    Error error_handler;
 
   private:
     Parser(Parser const&);

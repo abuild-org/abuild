@@ -31,10 +31,11 @@ InterfaceParser::~InterfaceParser()
 {
 }
 
-InterfaceParser::InterfaceParser(std::string const& item_name,
+InterfaceParser::InterfaceParser(Error& error_handler,
+				 std::string const& item_name,
 				 std::string const& item_platform,
 				 std::string const& local_dir) :
-    Parser(interfaceGetFlexCaller(), tok_EOF),
+    Parser(error_handler, interfaceGetFlexCaller(), tok_EOF),
     parse_tree(0),
     allow_after_build(false)
 {
@@ -64,8 +65,7 @@ InterfaceParser::InterfaceParser(std::string const& item_name,
 	    &InterfaceParser::evaluateFunctionContainsmatch;
     }
 
-    this->_interface.reset(new Interface(item_name, item_platform,
-					 error_handler, local_dir));
+    this->_interface.reset(new Interface(item_name, item_platform, local_dir));
 }
 
 void
@@ -299,7 +299,7 @@ InterfaceParser::acceptParseTree(nt_Blocks* blocks)
 bool
 InterfaceParser::importInterface(Interface const& _interface)
 {
-    return this->_interface->importInterface(_interface);
+    return this->_interface->importInterface(this->error_handler, _interface);
 }
 
 boost::shared_ptr<Interface>
@@ -503,7 +503,7 @@ InterfaceParser::evaluateReset(
 		if (this->protected_from_reset.count(*iter) == 0)
 		{
 		    this->_interface->resetVariable(
-			reset->getLocation(), *iter);
+			this->error_handler, reset->getLocation(), *iter);
 		}
 	    }
 	    this->protected_from_reset.clear();
@@ -536,6 +536,7 @@ InterfaceParser::evaluateAssignment(
 	nt_Words const* words = assignment->getWords();
 	std::deque<std::string> value = evaluateWords(words);
 	this->_interface->assignVariable(
+	    this->error_handler,
 	    assignment->getLocation(),
 	    assignment->getIdentifier(),
 	    value,
@@ -551,6 +552,7 @@ InterfaceParser::evaluateDeclaration(
     if (evaluating)
     {
 	this->_interface->declareVariable(
+	    this->error_handler,
 	    declaration->getLocation(),
 	    declaration->getVariableName(),
 	    declaration->getScope(),
@@ -562,6 +564,7 @@ InterfaceParser::evaluateDeclaration(
 	{
 	    std::deque<std::string> value = evaluateWords(words);
 	    this->_interface->assignVariable(
+		this->error_handler,
 		words->getLocation(),
 		declaration->getVariableName(),
 		value,

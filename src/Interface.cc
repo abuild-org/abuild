@@ -8,8 +8,7 @@
 
 Interface::Interface(std::string const& item_name,
 		     std::string const& item_platform,
-		     Error& error, std::string const& local_dir) :
-    error(error),
+		     std::string const& local_dir) :
     item_name(item_name),
     item_platform(item_platform),
     target_type(TargetType::tt_all)
@@ -26,7 +25,7 @@ Interface::setLocalDirectory(std::string const& local_dir)
 }
 
 bool
-Interface::importInterface(Interface const& other)
+Interface::importInterface(Error& error_handler, Interface const& other)
 {
     bool status = true;
 
@@ -42,7 +41,8 @@ Interface::importInterface(Interface const& other)
 	    continue;
 	}
 
-	if (this->declareVariable(var.declare_location, var.target_type,
+	if (this->declareVariable(error_handler,
+				  var.declare_location, var.target_type,
 				  var.name, var.scope,
 				  var.type, var.list_type))
 	{
@@ -58,6 +58,7 @@ Interface::importInterface(Interface const& other)
 	    {
 		Reset const& reset = *riter;
 		if (! this->resetVariable(
+			error_handler,
 			reset.location, var.name,
 			reset.item_name, reset.item_platform, false))
 		{
@@ -72,7 +73,8 @@ Interface::importInterface(Interface const& other)
 		if ((var.scope == s_recursive) ||
 		    (assignment.item_name == other.item_name))
 		{
-		    if (! this->assignVariable(assignment.location,
+		    if (! this->assignVariable(error_handler,
+					       assignment.location,
 					       var.name, assignment.value,
 					       assignment.assignment_type,
 					       assignment.flag,
@@ -100,16 +102,19 @@ Interface::setTargetType(TargetType::target_type_e target_type)
 }
 
 bool
-Interface::declareVariable(FileLocation const& location,
+Interface::declareVariable(Error& error_handler,
+			   FileLocation const& location,
 			   std::string const& variable_name,
 			   scope_e scope, type_e type, list_e list_type)
 {
-    return declareVariable(location, this->target_type, variable_name,
+    return declareVariable(error_handler, location,
+			   this->target_type, variable_name,
 			   scope, type, list_type);
 }
 
 bool
-Interface::declareVariable(FileLocation const& location,
+Interface::declareVariable(Error& error_handler,
+			   FileLocation const& location,
 			   TargetType::target_type_e target_type,
 			   std::string const& variable_name,
 			   scope_e scope, type_e type, list_e list_type)
@@ -134,10 +139,10 @@ Interface::declareVariable(FileLocation const& location,
 	{
 	    QTC::TC("abuild", "Interface ERR conflicting declaration");
 	    status = false;
-	    this->error.error(location, "variable " + variable_name +
-			      " has already been declared");
-	    this->error.error(var.declare_location,
-			      "here is the previous declaration");
+	    error_handler.error(location, "variable " + variable_name +
+				" has already been declared");
+	    error_handler.error(var.declare_location,
+				"here is the previous declaration");
 	}
     }
     else
@@ -152,33 +157,36 @@ Interface::declareVariable(FileLocation const& location,
 }
 
 bool
-Interface::assignVariable(FileLocation const& location,
+Interface::assignVariable(Error& error_handler,
+			  FileLocation const& location,
 			  std::string const& variable_name,
 			  std::string const& value,
 			  assign_e assignment_type)
 {
     std::deque<std::string> values;
     values.push_back(value);
-    return assignVariable(location, variable_name, values,
+    return assignVariable(error_handler, location, variable_name, values,
 			  assignment_type, "",
 			  this->item_name, this->item_platform);
 }
 
 bool
-Interface::assignVariable(FileLocation const& location,
+Interface::assignVariable(Error& error_handler,
+			  FileLocation const& location,
 			  std::string const& variable_name,
 			  std::deque<std::string> const& values,
 			  assign_e assignment_type,
 			  std::string const& flag)
 {
-    return assignVariable(location, variable_name, values,
+    return assignVariable(error_handler, location, variable_name, values,
 			  assignment_type, flag,
 			  this->item_name, this->item_platform);
 }
 
 
 bool
-Interface::assignVariable(FileLocation const& location,
+Interface::assignVariable(Error& error_handler,
+			  FileLocation const& location,
 			  std::string const& variable_name,
 			  std::deque<std::string> const& ovalues,
 			  assign_e assignment_type,
@@ -224,9 +232,10 @@ Interface::assignVariable(FileLocation const& location,
 	    {
 		QTC::TC("abuild", "Interface ERR multiword scalar");
 		status = false;
-		error.error(location,
-			    "multiple words may not be assigned"
-			    " to scalar variable " + variable_name);
+		error_handler.error(
+		    location,
+		    "multiple words may not be assigned"
+		    " to scalar variable " + variable_name);
 	    }
 	}
 
@@ -256,8 +265,9 @@ Interface::assignVariable(FileLocation const& location,
 		{
 		    QTC::TC("abuild", "Interface ERR bad boolean value");
 		    status = false;
-		    error.error(location, "value " + value + " is invalid for"
-				" boolean variable " + variable_name);
+		    error_handler.error(
+			location, "value " + value + " is invalid for"
+			" boolean variable " + variable_name);
 		}
 	    }
 	    else if (var.type == t_filename)
@@ -266,9 +276,10 @@ Interface::assignVariable(FileLocation const& location,
 		{
 		    QTC::TC("abuild", "Interface ERR empty filename");
 		    status = false;
-		    error.error(location, "the empty string may not be used"
-				" as a value for filename variable " +
-				variable_name);
+		    error_handler.error(
+			location, "the empty string may not be used"
+			" as a value for filename variable " +
+			variable_name);
 		}
 		else
 		{
@@ -338,12 +349,13 @@ Interface::assignVariable(FileLocation const& location,
 		    else
 		    {
 			status = false;
-			error.error(location, "variable " + variable_name +
-				    " already has a value");
+			error_handler.error(
+			    location, "variable " + variable_name +
+			    " already has a value");
 			if (same_location)
 			{
 			    QTC::TC("abuild", "Interface ERR variable assigned by other instance");
-			    error.error(
+			    error_handler.error(
 				location,
 				"conflicting assignment was made by this "
 				"build item's instance on platform " +
@@ -356,8 +368,9 @@ Interface::assignVariable(FileLocation const& location,
 			else
 			{
 			    QTC::TC("abuild", "Interface ERR variable assigned elsewhere");
-			    error.error(previous_normal_assignment->location,
-					"here is the previous assignment");
+			    error_handler.error(
+				previous_normal_assignment->location,
+				"here is the previous assignment");
 			}
 		    }
 		}
@@ -369,8 +382,9 @@ Interface::assignVariable(FileLocation const& location,
 	    {
 		status = false;
 		QTC::TC("abuild", "Interface ERR bad list assignment type");
-		error.error(location, "fallback and override assignments "
-			    "are not valid for list variables");
+		error_handler.error(
+		    location, "fallback and override assignments "
+		    "are not valid for list variables");
 	    }
 	}
 
@@ -402,23 +416,25 @@ Interface::assignVariable(FileLocation const& location,
     {
 	QTC::TC("abuild", "Interface ERR assign unknown variable");
 	status = false;
-	this->error.error(location, "assigning to unknown variable " +
-			  variable_name);
+	error_handler.error(
+	    location, "assigning to unknown variable " + variable_name);
     }
 
     return status;
 }
 
 bool
-Interface::resetVariable(FileLocation const& location,
+Interface::resetVariable(Error& error_handler,
+			 FileLocation const& location,
 			 std::string const& variable_name)
 {
-    return resetVariable(location, variable_name,
+    return resetVariable(error_handler, location, variable_name,
 			 this->item_name, this->item_platform, true);
 }
 
 bool
-Interface::resetVariable(FileLocation const& location,
+Interface::resetVariable(Error& error_handler,
+			 FileLocation const& location,
 			 std::string const& variable_name,
 			 std::string const& interface_item_name,
 			 std::string const& interface_item_platform,
@@ -456,8 +472,8 @@ Interface::resetVariable(FileLocation const& location,
     {
 	QTC::TC("abuild", "Interface ERR reset unknown variable");
 	status = false;
-	this->error.error(location, "resetting unknown variable " +
-			  variable_name);
+	error_handler.error(
+	    location, "resetting unknown variable " + variable_name);
     }
 
     return status;

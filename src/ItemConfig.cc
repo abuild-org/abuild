@@ -132,7 +132,7 @@ ItemConfig::readKeyVal(Error& error, CompatLevel const& compat_level,
     initializeStatics(compat_level);
     std::string file = dir + "/" + FILE_CONF;
     KeyVal_ptr kv(
-	new KeyVal(file.c_str(), std::set<std::string>(), valid_keys));
+	new KeyVal(error, file.c_str(), std::set<std::string>(), valid_keys));
 
     // An exception is thrown if the file does not exist.  It is the
     // caller's responsibility to ensure that it does.

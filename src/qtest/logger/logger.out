@@ -3,6 +3,8 @@ E message 2
 O [J2] job 2 output line 1
 E [J2] job 2 error line 1
 O message 3
+O [J2] job 2 additional output
+E [J2] job 2 additional error
 E [J2] job 2 error line 2
 O [J2] job 2 output line 2
 O job 3 output line

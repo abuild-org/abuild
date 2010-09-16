@@ -49,10 +49,10 @@ class Logger
     void closeJob(job_handle_t job);
 
     // Writes a message to stdout
-    void logInfo(std::string const& message);
+    void logInfo(std::string const& message, job_handle_t job = NO_JOB);
 
     // Writes a message to stderr
-    void logError(std::string const& message);
+    void logError(std::string const& message, job_handle_t job = NO_JOB);
 
     // Waits for the logger queue to be empty.  Warning: this could
     // take an arbitrarily long time if lots of threads are writing to
@@ -71,17 +71,20 @@ class Logger
       public:
 	JobData(
 	    Logger&,
+	    Logger::job_handle_t job,
 	    std::string const& job_name,
 	    bool buffer_output,
 	    std::string const& job_prefix,
 	    bool suppress_delimiters);
 	void handle_output(bool is_error, char const* data, int len);
 	void flush();
+	std::string prefixMessage(std::string const& msg);
 
       private:
 	void completeLine(bool is_error, std::string& line);
 
 	Logger& logger;
+	Logger::job_handle_t job;
 	std::string job_name;
 	bool buffer_output;
 	std::string job_prefix;
@@ -94,9 +97,12 @@ class Logger
     Logger();
 
     void loggerMain();
-    void writeToLogger(message_type_e, std::string const&);
+    std::string prefixMessage(std::string const& msg, job_handle_t job);
+    void writeToLogger(message_type_e, std::string const&,
+		       job_handle_t job);
     void writeToLogger(
-	std::list<std::pair<message_type_e, std::string> > const&);
+	std::list<std::pair<message_type_e, std::string> > const&,
+	job_handle_t job);
 
     static Logger* the_instance;
     std::string output_prefix;

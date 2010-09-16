@@ -8,6 +8,7 @@
 
 static Logger* logger = 0;
 static char const* whoami = 0;
+static Error error(Logger::NO_JOB);
 
 static std::string
 unparse_values(std::deque<std::string> const& value)
@@ -29,7 +30,7 @@ declare(Interface& _interface, FileLocation const& location,
     logger->logInfo("declaring " + variable_name + ": " +
 		    Interface::unparse_type(scope, type, list_type));
     bool status = _interface.declareVariable(
-	location, variable_name, scope, type, list_type);
+	error, location, variable_name, scope, type, list_type);
     logger->logInfo(status ? "success" : "failure");
 }
 
@@ -45,7 +46,7 @@ assign(Interface& _interface, FileLocation const& location,
 		    " " + flag_info + "assignment to " + variable_name +
 		    " =" + unparse_values(value));
     bool status = _interface.assignVariable(
-	location, variable_name, value, assignment_type, flag);
+	error, location, variable_name, value, assignment_type, flag);
     logger->logInfo(status ? "success" : "failure");
 }
 
@@ -54,7 +55,7 @@ reset(Interface& _interface, FileLocation const& location,
       std::string const& variable_name)
 {
     logger->logInfo("resetting " + variable_name);
-    bool status = _interface.resetVariable(location, variable_name);
+    bool status = _interface.resetVariable(error, location, variable_name);
     logger->logInfo(status ? "success" : "failure");
 }
 
@@ -128,7 +129,6 @@ int main(int argc, char* argv[])
 
     std::string current_directory = argv[1];
     logger = Logger::getInstance();
-    Error error;
     FlagData empty_flag_data;
 
     // Ordinarily, the Interface class would be populated mostly by
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
     // FileLocation objects to simulate this.
 
     // Simulate base interface.  Predefine a few variables.
-    Interface base("base", "base", error, current_directory);
+    Interface base("base", "base", current_directory);
     base.setTargetType(TargetType::tt_all);
 
     // Simulate some internal variable definitions.
@@ -168,10 +168,10 @@ int main(int argc, char* argv[])
 
     // Simulate item4 -> item3, item2; item3 -> item1; item2 -> item1.
 
-    Interface item1("item1", "indep", error, current_directory + "/item1");
+    Interface item1("item1", "indep", current_directory + "/item1");
     item1.setTargetType(TargetType::tt_object_code);
 
-    item1.importInterface(base);
+    item1.importInterface(error, base);
     assign(item1, FileLocation("item1", 1, 1),
 	   "INCLUDES", make_deque(".", "include"), Interface::a_normal);
     assign(item1, FileLocation("item1", 2, 1),
@@ -198,10 +198,10 @@ int main(int argc, char* argv[])
 
     // Create items 2 and 3 that import item1
 
-    Interface item2("item2", "indep", error, current_directory + "/item2");
+    Interface item2("item2", "indep", current_directory + "/item2");
     item2.setTargetType(TargetType::tt_object_code);
 
-    item2.importInterface(item1);
+    item2.importInterface(error, item1);
     assign(item2, FileLocation("item2", 1, 1),
 	   "INCLUDES", make_deque(".", "include"), Interface::a_normal);
     assign(item2, FileLocation("item2", 2, 1),
@@ -226,10 +226,10 @@ int main(int argc, char* argv[])
 
     dump_interface("item2", item2, empty_flag_data);
 
-    Interface item3("item3", "indep", error, current_directory + "/item3");
+    Interface item3("item3", "indep", current_directory + "/item3");
     item3.setTargetType(TargetType::tt_object_code);
 
-    item3.importInterface(item1);
+    item3.importInterface(error, item1);
     assign(item3, FileLocation("item3", 1, 1),
 	   "INCLUDES", make_deque("."), Interface::a_normal);
     assign(item3, FileLocation("item3", 2, 1),
@@ -241,11 +241,11 @@ int main(int argc, char* argv[])
 
     // Create item 4 that imports items 2 and 3.
 
-    Interface item4("item4", "indep", error, current_directory + "/item4");
+    Interface item4("item4", "indep", current_directory + "/item4");
     item4.setTargetType(TargetType::tt_object_code);
 
-    item4.importInterface(item2);
-    item4.importInterface(item3);
+    item4.importInterface(error, item2);
+    item4.importInterface(error, item3);
     assign(item4, FileLocation("item4", 1, 1),
 	   "INCLUDES", make_deque("."), Interface::a_normal);
     assign(item4, FileLocation("item4", 2, 1),
@@ -267,10 +267,10 @@ int main(int argc, char* argv[])
     // Create item5 that creates a conflict with item1.  This is okay
     // until something imports both.
 
-    Interface item5("item5", "indep", error, current_directory + "/item5");
+    Interface item5("item5", "indep", current_directory + "/item5");
     item5.setTargetType(TargetType::tt_object_code);
 
-    item5.importInterface(base);
+    item5.importInterface(error, base);
     declare(item5, FileLocation("item5", 1, 1),
 	    "MOO", Interface::s_recursive,
 	    Interface::t_string, Interface::l_scalar);
@@ -281,11 +281,11 @@ int main(int argc, char* argv[])
 
     // Create a bunch of errors including the conflict between item1
     // and item5.
-    Interface bad1("bad1", "indep", error, current_directory + "/bad1");
+    Interface bad1("bad1", "indep", current_directory + "/bad1");
 
-    bad1.importInterface(item1);
+    bad1.importInterface(error, item1);
     logger->logInfo("importing item5 with conflicts");
-    bad1.importInterface(item5);
+    bad1.importInterface(error, item5);
     logger->logInfo("finished importing item5");
 
     // Now do a bunch of bad things.
@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
     // Do this bad assignment with the string form of assignVariable
     // so we exercise it in the test suite.
     logger->logInfo("bad assignment to OINK");
-    bad1.assignVariable(FileLocation("bad1", 1, 1),
+    bad1.assignVariable(error, FileLocation("bad1", 1, 1),
 			"OINK", "moo", Interface::a_normal);
     // non-normal assignment to list
     assign(bad1, FileLocation("bad1", 2, 1),
@@ -321,11 +321,11 @@ int main(int argc, char* argv[])
     // Create item6 that loads item2 and reset some things that were
     // imported from item1 and some things that were created in item2.
     // It also includes some flag-based assignments.
-    Interface item6("item6", "indep", error, current_directory + "/item6");
+    Interface item6("item6", "indep", current_directory + "/item6");
     item6.setTargetType(TargetType::tt_object_code);
 
-    item6.importInterface(item1);
-    item6.importInterface(item2);
+    item6.importInterface(error, item1);
+    item6.importInterface(error, item2);
     reset(item6, FileLocation("item6", 1, 1), "MOO");
     reset(item6, FileLocation("item6", 2, 1), "THINGS");
     reset(item6, FileLocation("item6", 3, 1), "UNKNOWN_VARIABLE");
@@ -365,10 +365,10 @@ int main(int argc, char* argv[])
     // things in item2 that were reset by item6.  Also observe that
     // assignments to non-recursive items in item2 are not visible in
     // item7, but assignments made from item6 are.
-    Interface item7("item7", "indep", error, current_directory + "/item7");
+    Interface item7("item7", "indep", current_directory + "/item7");
 
-    item7.importInterface(item1);
-    item7.importInterface(item6);
+    item7.importInterface(error, item1);
+    item7.importInterface(error, item6);
 
     dump_interface("item7", item7, empty_flag_data);
 
@@ -389,7 +389,7 @@ int main(int argc, char* argv[])
     dump_interface("item7", item7, empty_flag_data);
 
     // Exercise fallback/override logic more thoroughly
-    Interface item8("item8", "indep", error, current_directory + "/item8");
+    Interface item8("item8", "indep", current_directory + "/item8");
     declare(item8, FileLocation("item8", 1, 1),
 	    "A", Interface::s_recursive,
 	    Interface::t_string, Interface::l_scalar);

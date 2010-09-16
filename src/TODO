@@ -1,5 +1,28 @@
+verbose, info, notice, error, deprecate
+
+XXX to test for new logger stuff
+
+interface errors
+failure
+failure of dependency
+missing after-build
+
+itemBuilder
+readAfterBuilds
+parseBuildGraphNode
+createItemInterface
+dumpInterface
+buildItem
+invoke_gmake
+invoke_ant
+invoke_groovy
+
+
+
 Next
 ====
+
+ * this->stdout_is_tty = false; if ! om_raw
 
  * Fix doc for global-plugin: search for "-plugin"....
 

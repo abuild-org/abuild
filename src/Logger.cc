@@ -9,12 +9,14 @@ Logger* Logger::the_instance = 0;
 
 Logger::JobData::JobData(
     Logger& logger,
+    Logger::job_handle_t job,
     std::string const& job_name,
     bool buffer_output,
     std::string const& job_prefix,
     bool suppress_delimiters)
     :
     logger(logger),
+    job(job),
     job_name(job_name),
     buffer_output(buffer_output),
     job_prefix(job_prefix),
@@ -71,15 +73,21 @@ Logger::JobData::flush()
 	    std::make_pair(Logger::m_info,
 			   this->job_name + ": END OUTPUT\n"));
     }
-    this->logger.writeToLogger(this->buffer);
+    this->logger.writeToLogger(this->buffer, this->job);
     this->buffer.clear();
+}
+
+std::string
+Logger::JobData::prefixMessage(std::string const& msg)
+{
+    return this->job_prefix + msg;
 }
 
 void
 Logger::JobData::completeLine(bool is_error, std::string& line)
 {
     Logger::message_type_e message_type = (is_error ? m_error : m_info);
-    std::string message = this->job_prefix + line;
+    std::string message = line;
     line.clear();
 
     if (this->buffer_output)
@@ -88,7 +96,7 @@ Logger::JobData::completeLine(bool is_error, std::string& line)
     }
     else
     {
-	this->logger.writeToLogger(message_type, message);
+	this->logger.writeToLogger(message_type, message, this->job);
     }
 }
 
@@ -118,9 +126,9 @@ Logger::stopLogger(std::string const& error_message)
 
 	if (! error_message.empty())
 	{
-	    the_instance->logError(error_message);
+	    the_instance->logError(error_message, NO_JOB);
 	}
-	the_instance->writeToLogger(m_shutdown, "");
+	the_instance->writeToLogger(m_shutdown, "", NO_JOB);
 	the_instance->thread->join();
 	delete the_instance;
 	the_instance = 0;
@@ -143,7 +151,7 @@ Logger::requestJobHandle(
     boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
     job_handle_t job = this->next_job++;
     this->jobs[job].reset(
-	new JobData(*this, job_name, buffer_output,
+	new JobData(*this, job, job_name, buffer_output,
 		    job_prefix, suppress_delimiters));
     return job;
 }
@@ -189,15 +197,15 @@ Logger::closeJob(job_handle_t job)
 }
 
 void
-Logger::logInfo(std::string const& message)
+Logger::logInfo(std::string const& message, job_handle_t job)
 {
-    writeToLogger(m_info, message + "\n");
+    writeToLogger(m_info, message + "\n", job);
 }
 
 void
-Logger::logError(std::string const& message)
+Logger::logError(std::string const& message, job_handle_t job)
 {
-    writeToLogger(m_error, message + "\n");
+    writeToLogger(m_error, message + "\n", job);
 }
 
 void
@@ -212,16 +220,34 @@ Logger::Logger() :
     thread.reset(new boost::thread(boost::bind(&Logger::loggerMain, this)));
 }
 
+std::string
+Logger::prefixMessage(std::string const& msg, job_handle_t job)
+{
+    std::string result = msg;
+    std::map<job_handle_t, boost::shared_ptr<JobData> >::iterator iter =
+	this->jobs.find(job);
+    if (iter != this->jobs.end())
+    {
+	boost::shared_ptr<JobData> j = (*iter).second;
+	result = j->prefixMessage(msg);
+    }
+    return result;
+}
+
 void
-Logger::writeToLogger(message_type_e message_type, std::string const& msg)
+Logger::writeToLogger(message_type_e message_type, std::string const& msg,
+		      job_handle_t job)
 {
     boost::mutex::scoped_lock l(this->queue_write_mutex);
-    this->logger_queue.enqueue(std::make_pair(message_type, msg));
+    this->logger_queue.enqueue(
+	std::make_pair(message_type,
+		       prefixMessage(msg, job)));
 }
 
 void
 Logger::writeToLogger(
-    std::list<std::pair<message_type_e, std::string> > const& messages)
+    std::list<std::pair<message_type_e, std::string> > const& messages,
+    job_handle_t job)
 {
     boost::mutex::scoped_lock l(this->queue_write_mutex);
     for (std::list<std::pair<message_type_e,
@@ -229,7 +255,9 @@ Logger::writeToLogger(
 	     messages.begin();
 	 iter != messages.end(); ++iter)
     {
-	this->logger_queue.enqueue(*iter);
+	this->logger_queue.enqueue(
+	    std::make_pair((*iter).first,
+			   prefixMessage((*iter).second, job)));
     }
 }
 

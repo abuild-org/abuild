@@ -76,7 +76,7 @@ BackingConfig::validate()
     if (! (this->compat_level.allow_1_0() && readOldFormat()))
     {
 	std::string file = dir + "/" + FILE_BACKING;
-	KeyVal kv(file.c_str(), required_keys, defaulted_keys);
+	KeyVal kv(this->error, file.c_str(), required_keys, defaulted_keys);
 	if (! kv.readFile())
 	{
 	    // An error message has already been issued

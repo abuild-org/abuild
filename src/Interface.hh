@@ -86,7 +86,7 @@ class Interface
     // evaluate the assignment once for each platform.
     Interface(std::string const& item_name,
 	      std::string const& item_platform,
-	      Error&, std::string const& local_directory);
+	      std::string const& local_directory);
 
     // Reset the local directory.  This has no impact on already
     // established values; it affects only future assignments.
@@ -96,7 +96,7 @@ class Interface
     // with this one.  Returns true iff there are no errors.  Any
     // errors found are reported via the Error object of the receiving
     // iterator.
-    bool importInterface(Interface const& other);
+    bool importInterface(Error&, Interface const& other);
 
     // Set the target type to which subsequent declarations apply.
     void setTargetType(TargetType::target_type_e);
@@ -109,13 +109,15 @@ class Interface
 
     // Declare a variable.  It is an error if the variable is already
     // declared.  See also private declareVariable.
-    bool declareVariable(FileLocation const&,
+    bool declareVariable(Error&,
+			 FileLocation const&,
 			 std::string const& variable_name,
 			 scope_e scope, type_e type, list_e list_type);
 
     // Assign a value to a scalar variable.  Calls the deque form of
     // assignVariable with a single-element deque.
-    bool assignVariable(FileLocation const&,
+    bool assignVariable(Error&,
+			FileLocation const&,
 			std::string const& variable_name,
 			std::string const& value,
 			assign_e assignment_type);
@@ -130,7 +132,8 @@ class Interface
     // a_fallback.  If flag is a non-empty string, this assignment
     // will be visible only when this flag associated with this
     // interface name in a call to getVariable().
-    bool assignVariable(FileLocation const&,
+    bool assignVariable(Error&,
+			FileLocation const&,
 			std::string const& variable_name,
 			std::deque<std::string> const& values,
 			assign_e assignment_type,
@@ -144,7 +147,8 @@ class Interface
     // interface S has E and F, if R imports Q and then resets B and
     // D, and then S imports Q and R, S will still see B, but it will
     // not get D.
-    bool resetVariable(FileLocation const&,
+    bool resetVariable(Error&,
+		       FileLocation const&,
 		       std::string const& variable_name);
 
     // Get the value of a variable and its type information.  The
@@ -183,7 +187,8 @@ class Interface
     Interface(Interface const&);
     Interface& operator=(Interface const&);
 
-    bool assignVariable(FileLocation const&,
+    bool assignVariable(Error&,
+			FileLocation const&,
 			std::string const& variable_name,
 			std::deque<std::string> const& values,
 			assign_e assignment_type,
@@ -273,18 +278,19 @@ class Interface
     };
 
     // The real declareVariable -- also takes a target type
-    bool declareVariable(FileLocation const&,
+    bool declareVariable(Error&,
+			 FileLocation const&,
 			 TargetType::target_type_e target_type,
 			 std::string const& variable_name,
 			 scope_e scope, type_e type, list_e list_type);
     // The real resetVariable
-    bool resetVariable(FileLocation const&,
+    bool resetVariable(Error&,
+		       FileLocation const&,
 		       std::string const& variable_name,
 		       std::string const& item_name,
 		       std::string const& item_platform,
 		       bool clear_assignment_history);
 
-    Error& error;
     std::string item_name;
     std::string item_platform;
     std::map<std::string, Variable> symbol_table;

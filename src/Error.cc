@@ -2,7 +2,6 @@
 #include <Error.hh>
 
 #include <sstream>
-#include <Logger.hh>
 #include <FileLocation.hh>
 #include <QEXC.hh>
 
@@ -10,8 +9,10 @@ bool Error::any_errors = false;
 bool Error::deprecate_is_error = false;
 boost::function<void (std::string const&)> Error::error_callback;
 
-Error::Error(std::string const& default_prefix) :
+Error::Error(Logger::job_handle_t default_logger_job,
+	     std::string const& default_prefix) :
     default_prefix(default_prefix),
+    default_logger_job(default_logger_job),
     num_errors(0),
     logger(*(Logger::getInstance()))
 {
@@ -36,8 +37,13 @@ Error::clearErrorCallback()
 }
 
 void
-Error::logText(FileLocation const& location, std::string const& msg)
+Error::logText(FileLocation const& location, std::string const& msg,
+	       Logger::job_handle_t job)
 {
+    if (job == Logger::NO_JOB)
+    {
+	job = this->default_logger_job;
+    }
     std::ostringstream fullmsg;
     if (location == FileLocation())
     {
@@ -51,7 +57,7 @@ Error::logText(FileLocation const& location, std::string const& msg)
 	fullmsg << location << ": ";
     }
     fullmsg << msg;
-    this->logger.logError(fullmsg.str());
+    this->logger.logError(fullmsg.str(), job);
     if (error_callback)
     {
 	error_callback(fullmsg.str());
@@ -59,26 +65,28 @@ Error::logText(FileLocation const& location, std::string const& msg)
 }
 
 void
-Error::error(FileLocation const& location, std::string const& msg)
+Error::error(FileLocation const& location, std::string const& msg,
+	     Logger::job_handle_t job)
 {
     any_errors = true;
     ++this->num_errors;
-    logText(location, "ERROR: " + msg);
+    logText(location, "ERROR: " + msg, job);
 }
 
 void
 Error::deprecate(std::string const& version,
-		 FileLocation const& location, std::string const& orig_message)
+		 FileLocation const& location, std::string const& orig_message,
+		 Logger::job_handle_t job)
 {
     std::string message = "*** DEPRECATION WARNING *** (abuild version " +
 	version + "): " + orig_message;
     if (deprecate_is_error)
     {
-	error(location, message);
+	error(location, message, job);
     }
     else
     {
-	logText(location, message);
+	logText(location, message, job);
     }
 }
 

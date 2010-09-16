@@ -25,6 +25,7 @@ dump_keyval(KeyVal const& kv)
 int main(int argc, char* argv[])
 {
     logger = Logger::getInstance();
+    Error error(Logger::NO_JOB, "KeyVal");
 
     char* filename = argv[1];
 
@@ -52,14 +53,14 @@ int main(int argc, char* argv[])
     try
     {
 	logger->logInfo("no defaults");
-	KeyVal kv1(filename, keys, std::map<std::string, std::string>());
+	KeyVal kv1(error, filename, keys, std::map<std::string, std::string>());
 	if (kv1.readFile())
 	{
 	    dump_keyval(kv1);
 	}
 
 	logger->logInfo("defaults");
-	KeyVal kv2(filename, keys, defaults);
+	KeyVal kv2(error, filename, keys, defaults);
 	if (kv2.readFile())
 	{
 	    dump_keyval(kv2);

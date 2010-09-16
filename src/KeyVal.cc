@@ -10,10 +10,10 @@
 #include <Util.hh>
 #include <FileLocation.hh>
 
-KeyVal::KeyVal(char const* filename,
+KeyVal::KeyVal(Error& error_handler, char const* filename,
 	       std::set<std::string> const& keys,
 	       std::map<std::string, std::string> const& defaults) :
-    error("KeyVal"),
+    error(error_handler),
     filename(filename),
     preferred_eol("\n"),
     keys(keys),
@@ -42,6 +42,8 @@ KeyVal::KeyVal(char const* filename,
 bool
 KeyVal::readFile()
 {
+    int orig_errors = this->error.numErrors();
+
     boost::regex comment_line("\\s*#.*");
     boost::regex kv_line("(\\s*)([^\\s:]+)(\\s*:\\s*(.*?)(\\\\?)\\s*)");
     boost::regex content_re("\\s*(.*?)(\\\\?)\\s*");
@@ -196,7 +198,7 @@ KeyVal::readFile()
 	this->error.error(FileLocation(this->filename, 0, 0), message);
     }
 
-    return (this->error.numErrors() == 0);
+    return (this->error.numErrors() == orig_errors);
 }
 
 std::string

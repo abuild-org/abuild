@@ -7,7 +7,8 @@
 #include <Logger.hh>
 #include <FlexCaller.hh>
 
-Parser::Parser(FlexCaller& flex_caller, int eof_token) :
+Parser::Parser(Error& error_handler, FlexCaller& flex_caller, int eof_token) :
+    error_handler(error_handler),
     debug_parser(false),
     flex_caller(flex_caller),
     scanner(0),
@@ -80,6 +81,7 @@ Parser::parse(std::string const& filename)
 	throw QEXC::System(std::string("failed to open ") + filename, errno);
     }
 
+    int orig_errors = this->error_handler.numErrors();
     this->flex_caller.init_extra(this, &this->scanner);
     this->flex_caller.set_in(input, this->scanner);
     this->token_factory.reset();
@@ -93,5 +95,5 @@ Parser::parse(std::string const& filename)
     this->heap.clear();
     this->flex_caller.lex_destroy(this->scanner);
     this->scanner = 0;
-    return (this->error_handler.numErrors() == 0);
+    return (this->error_handler.numErrors() == orig_errors);
 }

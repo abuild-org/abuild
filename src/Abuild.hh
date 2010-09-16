@@ -220,7 +220,6 @@ class Abuild
 		     bool is_dep_failure);
     bool buildItem(boost::mutex::scoped_lock& build_lock,
 		   Logger::job_handle_t logger_job,
-		   std::string const& builder_string,
 		   std::string const& item_name,
 		   std::string const& item_platform,
 		   BuildItem& build_item);
@@ -233,19 +232,21 @@ class Abuild
 			     std::string const& item_name,
 			     std::string const& item_platform,
 			     BuildItem& build_item,
-			     InterfaceParser& parser);
+			     Error& item_error,
+			     InterfaceParser& parser,
+			     Logger::job_handle_t logger_job);
     bool createPluginInterface(std::string const& plugin_name,
 			       BuildItem& build_item);
     void dumpInterface(std::string const& item_platform,
 		       BuildItem& build_item,
 		       std::string const& suffix = "");
-    void declareInterfaceVariable(Interface&, FileLocation const&,
+    void declareInterfaceVariable(Error&, Interface&, FileLocation const&,
 				  std::string const& variable_name,
 				  Interface::scope_e scope,
 				  Interface::type_e type,
 				  Interface::list_e list_type,
 				  bool& status);
-    void assignInterfaceVariable(Interface&, FileLocation const&,
+    void assignInterfaceVariable(Error&, Interface&, FileLocation const&,
 				 std::string const& variable_name,
 				 std::string const& value,
 				 Interface::assign_e assignment_type,
@@ -253,7 +254,8 @@ class Abuild
     bool readAfterBuilds(std::string const& item_name,
 			 std::string const& item_platform,
 			 BuildItem& build_item,
-			 InterfaceParser& parser);
+			 InterfaceParser& parser,
+			 Logger::job_handle_t logger_job);
     std::list<std::string> getRulePaths(
 	std::string const& item_name,
 	BuildItem& build_item,
@@ -330,20 +332,27 @@ class Abuild
 			std::set<std::string>& references);
     void usage(std::string const& msg);
     void exitIfErrors();
-    void info(std::string const& msg);
-    void notice(std::string const& msg);
+    void info(std::string const& msg,
+	      Logger::job_handle_t = Logger::NO_JOB);
+    void notice(std::string const& msg,
+		Logger::job_handle_t = Logger::NO_JOB);
     void incrementVerboseIndent();
     void decrementVerboseIndent();
-    void verbose(std::string const& msg);
+    void verbose(std::string const& msg,
+		 Logger::job_handle_t = Logger::NO_JOB);
     void monitorOutput(std::string const& msg);
     void monitorErrorCallback(std::string const& msg);
-    void error(std::string const& msg);
-    void error(FileLocation const&, std::string const& msg);
+    void error(std::string const& msg,
+	       Logger::job_handle_t = Logger::NO_JOB);
+    void error(FileLocation const&, std::string const& msg,
+	       Logger::job_handle_t = Logger::NO_JOB);
     void deprecate(std::string const& version,
-		   std::string const& msg);
+		   std::string const& msg,
+		   Logger::job_handle_t = Logger::NO_JOB);
     void deprecate(std::string const& version,
 		   FileLocation const& location,
-		   std::string const& msg);
+		   std::string const& msg,
+		   Logger::job_handle_t = Logger::NO_JOB);
     void suggestUpgrade();
     void fatal(std::string const& msg);
 

@@ -3,21 +3,24 @@
 
 #include <string>
 #include <boost/function.hpp>
+#include <Logger.hh>
 
 class FileLocation;
-class Logger;
 
 class Error
 {
   public:
-    Error(std::string const& default_prefix = "");
+    Error(Logger::job_handle_t default_logger_job,
+	  std::string const& default_prefix = "");
 
     // Writes an error message using the logger
-    void error(FileLocation const&, std::string const&);
+    void error(FileLocation const&, std::string const&,
+	       Logger::job_handle_t job = Logger::NO_JOB);
 
     // Writes a deprecation error or warning
     void deprecate(std::string const& version,
-		   FileLocation const&, std::string const&);
+		   FileLocation const&, std::string const&,
+		   Logger::job_handle_t job = Logger::NO_JOB);
 
     // Set globally whether or not deprecation messages are considered
     // errors.  By default, they are warnings.
@@ -32,13 +35,15 @@ class Error
     static bool anyErrors();
 
   private:
-    void logText(FileLocation const&, std::string const&);
+    void logText(FileLocation const&, std::string const&,
+		 Logger::job_handle_t job);
 
     static bool any_errors;
     static bool deprecate_is_error;
     static boost::function<void (std::string const&)> error_callback;
 
     std::string default_prefix;
+    Logger::job_handle_t default_logger_job;
     int num_errors;
     Logger& logger;
 };
