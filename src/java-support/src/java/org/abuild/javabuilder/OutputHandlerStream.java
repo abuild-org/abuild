@@ -33,7 +33,9 @@ class OutputHandlerStream extends ByteArrayOutputStream
 	    }
 	    catch (InterruptedException e)
 	    {
-		throw new IOException(e);
+		// IOException(Throwable) constructor is not present
+		// in JDK 1.5.
+		throw new IOException(e.toString());
 	    }
 	}
     }
