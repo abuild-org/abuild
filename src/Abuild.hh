@@ -411,6 +411,8 @@ class Abuild
     unsigned int max_workers;
     int make_njobs;
     output_mode_e output_mode;
+    bool capture_output;
+    bool use_job_prefix;
     std::string output_prefix;
     std::string error_prefix;
     std::list<std::string> make_args;

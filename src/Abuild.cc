@@ -78,6 +78,8 @@ Abuild::Abuild(int argc, char* argv[]) :
     max_workers(1),
     make_njobs(1),
     output_mode(om_unset),
+    capture_output(false),
+    use_job_prefix(false),
     test_java_builder_bad_java(false),
     keep_going(false),
     no_dep_failures(false),
@@ -640,6 +642,9 @@ Abuild::parseArgv()
 	this->stdout_is_tty = false;
 	this->logger.setPrefixes(this->output_prefix, this->error_prefix);
 	this->java_builder_args.push_back("-co");
+	this->capture_output = true;
+	this->use_job_prefix =
+	    ((this->output_mode == om_interleaved) && (this->max_workers > 1));
     }
     QTC::TC("abuild", "Abuild output mode",
 	    (this->output_mode == om_raw ? 0 :
@@ -6092,8 +6097,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    job_prefix = this->buildgraph_item_prefixes[builder_string] + " ";
 	}
 	logger_job = this->logger.requestJobHandle(
-	    this->whoami + ": " + item_label,
-	    (this->output_mode == om_buffered), job_prefix, this->silent);
+	    (this->output_mode == om_buffered), job_prefix);
     }
 
     Error item_error(logger_job, this->whoami);
@@ -6542,6 +6546,7 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
 	return true;
     }
 
+    // XXX move these target messages up before anything else
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
     if (this->special_target == s_NO_OP)
     {

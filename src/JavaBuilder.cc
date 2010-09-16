@@ -556,8 +556,7 @@ JavaBuilder::runJava(unsigned short port)
     Logger::job_handle_t logger_job = Logger::NO_JOB;
     if (this->capture_output)
     {
-	logger_job = this->logger.requestJobHandle(
-	    "JavaBuilder", false, "[JavaBuilder] ", true);
+	logger_job = this->logger.requestJobHandle(false, "[JavaBuilder] ");
 	this->io_output_handler = this->logger.getOutputHandler(logger_job);
 	output_handler = boost::bind(
 	    &JavaBuilder::handleRogueOutput, this, _1, _2, _3);

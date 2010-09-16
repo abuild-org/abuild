@@ -1,6 +1,5 @@
 saw all interleaved: 0
 prefix count: 0
-begin/end count: 0
 full a out: -O -
 full a err: --
 full b out: -O -

@@ -10,17 +10,13 @@ Logger* Logger::the_instance = 0;
 Logger::JobData::JobData(
     Logger& logger,
     Logger::job_handle_t job,
-    std::string const& job_name,
     bool buffer_output,
-    std::string const& job_prefix,
-    bool suppress_delimiters)
+    std::string const& job_prefix)
     :
     logger(logger),
     job(job),
-    job_name(job_name),
     buffer_output(buffer_output),
-    job_prefix(job_prefix),
-    suppress_delimiters(suppress_delimiters)
+    job_prefix(job_prefix)
 {
 }
 
@@ -67,15 +63,6 @@ Logger::JobData::flush()
 	return;
     }
 
-    if (! this->suppress_delimiters)
-    {
-	this->buffer.push_front(
-	    std::make_pair(Logger::m_info,
-			   this->job_name + ": BEGIN OUTPUT\n"));
-	this->buffer.push_back(
-	    std::make_pair(Logger::m_info,
-			   this->job_name + ": END OUTPUT\n"));
-    }
     this->logger.writeToLogger(this->buffer, this->job);
     this->buffer.clear();
 }
@@ -152,15 +139,12 @@ Logger::setPrefixes(std::string const& output_prefix,
 }
 
 Logger::job_handle_t
-Logger::requestJobHandle(
-    std::string const& job_name, bool buffer_output,
-    std::string const& job_prefix, bool suppress_delimiters)
+Logger::requestJobHandle(bool buffer_output, std::string const& job_prefix)
 {
     boost::recursive_mutex::scoped_lock lock(this->jobdata_mutex);
     job_handle_t job = this->next_job++;
     this->jobs[job].reset(
-	new JobData(*this, job, job_name, buffer_output,
-		    job_prefix, suppress_delimiters));
+	new JobData(*this, job, buffer_output, job_prefix));
     return job;
 }
 

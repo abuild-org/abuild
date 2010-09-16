@@ -38,8 +38,7 @@ class Logger
     // closeJob() is called.  Otherwise, each line is output when
     // received.
     job_handle_t requestJobHandle(
-	std::string const& job_name, bool buffer_output,
-	std::string const& job_prefix, bool suppress_delimiters);
+	bool buffer_output, std::string const& job_prefix);
 
     // Return an output handler for the given job suitable for passing
     // to ProcessHandler::runProgram.
@@ -72,10 +71,8 @@ class Logger
 	JobData(
 	    Logger&,
 	    Logger::job_handle_t job,
-	    std::string const& job_name,
 	    bool buffer_output,
-	    std::string const& job_prefix,
-	    bool suppress_delimiters);
+	    std::string const& job_prefix);
 	void handle_output(bool is_error, char const* data, int len);
 	void flush();
 	void handleMessage(bool is_error, std::string const& line);
@@ -87,10 +84,8 @@ class Logger
 	boost::recursive_mutex mutex;
 	Logger& logger;
 	Logger::job_handle_t job;
-	std::string job_name;
 	bool buffer_output;
 	std::string job_prefix;
-	bool suppress_delimiters;
 	std::string output_line;
 	std::string error_line;
 	std::list<std::pair<Logger::message_type_e, std::string> > buffer;

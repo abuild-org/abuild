@@ -11,17 +11,12 @@ my $full_a_err_line = 0;
 my $full_b_out_line = 0;
 my $full_b_err_line = 0;
 my $prefix_count = 0;
-my $begin_end_count = 0;
 
 while (<>)
 {
     if (m/a out1/ && m/a err1/ && m/b out1/ && m/b err1/ && m/err2/)
     {
 	$all_interleaved = 1;
-    }
-    if (m/(BEGIN|END) OUTPUT/)
-    {
-	++$begin_end_count;
     }
     if (m/^(.*?)(\[1\] )?a out1 a out2\r?$/)
     {
@@ -53,7 +48,6 @@ print "saw all interleaved: $all_interleaved\n";
 if (! $all_interleaved)
 {
     print "prefix count: $prefix_count\n";
-    print "begin/end count: $begin_end_count\n";
     print "full a out: -$full_a_out-\n" if defined $full_a_out;
     print "full a err: -$full_a_err-\n" if defined $full_a_err;
     print "full b out: -$full_b_out-\n" if defined $full_b_out;
