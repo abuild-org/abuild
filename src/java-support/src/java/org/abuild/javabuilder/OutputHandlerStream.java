@@ -33,7 +33,7 @@ class OutputHandlerStream extends ByteArrayOutputStream
 	    }
 	    catch (InterruptedException e)
 	    {
-		throw new IOException(e.toString());
+		throw new IOException(e);
 	    }
 	}
     }
