@@ -637,6 +637,7 @@ Abuild::parseArgv()
     {
 	assert((this->output_mode == om_buffered) ||
 	       (this->output_mode == om_interleaved));
+	this->stdout_is_tty = false;
 	this->logger.setPrefixes(this->output_prefix, this->error_prefix);
 	this->java_builder_args.push_back("-co");
     }
