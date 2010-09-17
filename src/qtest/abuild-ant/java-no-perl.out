@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: java (abuild-java): all
 Buildfile: --abuild.xml--
 
@@ -18,3 +19,4 @@ init:
 
 BUILD SUCCESSFUL
 Total time: <time>
+abuild: build complete

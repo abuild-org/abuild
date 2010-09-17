@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: groovy-runtime (abuild-java): all
 abuild: lib1 (abuild-java): all
     [mkdir] Created dir: --topdir--/jars/simple/lib1/abuild-java/classes
@@ -23,3 +24,4 @@ abuild: prog (abuild-java): all
     [javac] Compiling 1 source file to --topdir--/jars/simple/prog/abuild-java/classes
     [mkdir] Created dir: --topdir--/jars/simple/prog/abuild-java/dist
       [jar] Building jar: --topdir--/jars/simple/prog/abuild-java/dist/java-program.jar
+abuild: build complete
