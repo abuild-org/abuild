@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: util (abuild-<native>): all
 make: Entering directory `--topdir--/util/abuild-<native>'
 Compiling ../File2.cpp as C++
@@ -7,3 +8,4 @@ abuild: main (abuild-<native>): all
 make: Entering directory `--topdir--/main/abuild-<native>'
 Creating main executable
 make: Leaving directory `--topdir--/main/abuild-<native>'
+abuild: build complete

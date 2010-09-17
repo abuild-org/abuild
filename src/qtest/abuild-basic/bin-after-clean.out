@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: e.lib (abuild-zz_os.cpu.toolset.echo): bin-bin1
 CCXX_GEN_DEPS echo PREPROCESS_c -include- .. -include- . -dflags- -oflags- -wflags-  -xcppflags-  ../bin1-src1.c bin1-src1.o bin1-src1.dep
 Compiling ../bin1-src1.c as C
@@ -110,3 +111,4 @@ contents of bin-bin1:
 ** end of lib lib2 **
 ** end of bin bin1 **
 end contents of bin-bin1
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: c1a (abuild-indep): all
 make: Entering directory `--topdir--/non-recursive/c1a/abuild-indep'
 NONRECVAR=c1a-1 c1a-2
@@ -26,3 +27,4 @@ abuild: a (abuild-indep): all
 make: Entering directory `--topdir--/non-recursive/a/abuild-indep'
 NONRECVAR=b1-1 b1-2 b2-1 b2-2 a1 a2
 make: Leaving directory `--topdir--/non-recursive/a/abuild-indep'
+abuild: build complete

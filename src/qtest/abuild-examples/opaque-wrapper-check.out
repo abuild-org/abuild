@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: opaque-hidden (abuild-<native>): check
 make: Entering directory `--topdir--/opaque-wrapper/hidden/abuild-<native>'
 Compiling ../Hidden.cc as C++
@@ -34,3 +35,4 @@ Missing Tests: 0
 Extra Tests: 0
 
 make: Leaving directory `--topdir--/opaque-wrapper/client/abuild-<native>'
+abuild: build complete

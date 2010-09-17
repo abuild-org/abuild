@@ -1,3 +1,5 @@
+abuild: build starting
 abuild: project-lib.src (abuild-<native>): no-op
 abuild: project-lib.test (abuild-<native>): no-op
 abuild: project-main.src (abuild-<native>): no-op
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: f2-b (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest1/F2C2/util/f2/b/abuild-indep'
 IFC1: F2C2-f2-b-ifc
@@ -28,3 +29,4 @@ make: Entering directory `--topdir--/1.0/forest1/F2C2/util/tests/int/abuild-inde
 IFC1: UTIL0-f1-a-ifc UTIL0-f1-b-ifc UTIL0-f2-a-ifc F2C2-f2-b-ifc F2C2-f2-c-ifc
 IMPL1: UTIL0-f1-a-impl UTIL0-f1-b-impl UTIL0-f2-a-impl F2C2-f2-b-impl F2C2-f2-c-impl F2C2-util-int
 make: Leaving directory `--topdir--/1.0/forest1/F2C2/util/tests/int/abuild-indep'
+abuild: build complete

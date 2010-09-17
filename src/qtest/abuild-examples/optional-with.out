@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: xdriver (abuild-<native>): all
 make: Entering directory `--topdir--/optional-dep/xdriver/abuild-<native>'
 Compiling ../xdriver.cc as C++
@@ -8,3 +9,4 @@ make: Entering directory `--topdir--/optional-dep/prog/abuild-<native>'
 Compiling ../prog.cc as C++
 Creating prog executable
 make: Leaving directory `--topdir--/optional-dep/prog/abuild-<native>'
+abuild: build complete

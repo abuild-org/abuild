@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: thing1 (abuild-<native>): all
 make: Entering directory `--topdir--/whole-library/lib1/abuild-<native>'
 Compiling ../thing1.cc as C++
@@ -13,3 +14,4 @@ make: Entering directory `--topdir--/whole-library/bin/abuild-<native>'
 Compiling ../main.cc as C++
 Creating main executable
 make: Leaving directory `--topdir--/whole-library/bin/abuild-<native>'
+abuild: build complete

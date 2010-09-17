@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: b (abuild-indep): all
 abuild: c (abuild-indep): all
 abuild: a (abuild-indep): all
 make: Entering directory `--topdir--/optional-deps/t1/a/abuild-indep'
 a_deps: b c
 make: Leaving directory `--topdir--/optional-deps/t1/a/abuild-indep'
+abuild: build complete

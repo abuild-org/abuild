@@ -1,2 +1,4 @@
+abuild: build starting
 abuild: lib (abuild-<native>): all
 abuild: lib (abuild-<native-os-data>.qcc): all
+abuild: build complete

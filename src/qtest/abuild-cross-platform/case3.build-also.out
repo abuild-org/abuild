@@ -1,4 +1,6 @@
+abuild: build starting
 abuild: indep2 (abuild-indep): check
 abuild: java1 (abuild-java): check
 abuild: java2 (abuild-java): check
 abuild: native2 (abuild-<native>): check
+abuild: build complete

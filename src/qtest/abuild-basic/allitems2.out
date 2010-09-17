@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: bb (abuild-indep): all
 abuild: ca (abuild-<native>): all
 abuild: aa (abuild-<native>): all
@@ -23,3 +24,4 @@ make: Entering directory `--topdir--/ext/abuild-<native>'
 Compiling ../ext.cc as C++
 Creating ext executable
 make: Leaving directory `--topdir--/ext/abuild-<native>'
+abuild: build complete

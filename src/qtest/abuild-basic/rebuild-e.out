@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: e.lib (abuild-zz_os.cpu.toolset.echo): all
 make: Entering directory `--topdir--/e/lib/abuild-zz_os.cpu.toolset.echo'
 CCXX_GEN_DEPS echo PREPROCESS_cxx -include- .. -include- . -bin2-dflags- -bin2-oflags- -bin2-wflags-  -xcppflags- -bin2-xcppflags- ../bin2.cc bin2.o bin2.dep
@@ -297,3 +298,4 @@ contents of bin-bin:
 ** end of bin bin **
 end contents of bin-bin
 make: Leaving directory `--topdir--/e/shlib2/abuild-zz_os.cpu.toolset.echo'
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: lib (abuild-<native>): all
 make: Entering directory `--topdir--/cross-platform/lib/abuild-<native>'
 Compiling ../lib.cc as C++
@@ -24,3 +25,4 @@ Compiling generate.cc as C++
 Compiling ../main.cc as C++
 Creating prog executable
 make: Leaving directory `--topdir--/cross-platform/prog/abuild-<native>'
+abuild: build complete

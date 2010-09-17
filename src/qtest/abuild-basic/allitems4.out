@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: aaa (abuild-indep): all
 abuild: ab (abuild-indep): all
 abuild: ac (abuild-indep): all
@@ -14,3 +15,4 @@ abuild: e.global (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.multi (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.shlib2 (abuild-zz_os.cpu.toolset.echo): all
 abuild: root (abuild-indep): all
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: bb (abuild-indep): all
 abuild: ca (abuild-<native>): all
 abuild: aa (abuild-<native>): all
@@ -18,3 +19,4 @@ abuild: e.multi (abuild-<native>): all
 abuild: e.multi (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.shlib2 (abuild-zz_os.cpu.toolset.echo): all
 abuild: root (abuild-indep): all
+abuild: build complete

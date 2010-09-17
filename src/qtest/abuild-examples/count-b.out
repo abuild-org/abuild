@@ -1,4 +1,6 @@
+abuild: build starting
 abuild: indep-b (abuild-indep): count
 make: Entering directory `--topdir--/plugin/other/indep/b/abuild-indep'
 10 ../../a/a-file
 make: Leaving directory `--topdir--/plugin/other/indep/b/abuild-indep'
+abuild: build complete

@@ -1,1 +1,3 @@
+abuild: build starting
 abuild: aa (abuild-<native>): no-op
+abuild: build complete

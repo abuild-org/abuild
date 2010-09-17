@@ -1,1 +1,3 @@
+abuild: build starting
 abuild: targets (abuild-<native>): all
+abuild: build complete

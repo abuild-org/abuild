@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: a (abuild-<native>): all
 make: Entering directory `--topdir--/good/a/abuild-<native>'
 Compiling ../a.cc as C++
@@ -8,3 +9,4 @@ make: Entering directory `--topdir--/good/b/abuild-<native>'
 Compiling ../b.cc as C++
 Creating b library
 make: Leaving directory `--topdir--/good/b/abuild-<native>'
+abuild: build complete

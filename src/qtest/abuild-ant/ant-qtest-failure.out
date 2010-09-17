@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: java-item (abuild-java): check
 Buildfile: --abuild.xml--
 
@@ -40,5 +41,6 @@ BUILD FAILED
 
 Total time: <time>
 abuild: java-item (abuild-java): build failed
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: java-item on platform java

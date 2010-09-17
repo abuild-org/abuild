@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: common-lib1.src (abuild-<native>): check
 abuild: common-lib1.test (abuild-<native>): check
 make: Entering directory `--topdir--/general/reference/common/lib1/test/abuild-<native>'
@@ -156,3 +157,4 @@ Missing Tests: 0
 Extra Tests: 0
 
 make: Leaving directory `--topdir--/general/reference/derived/main/src/abuild-<native>'
+abuild: build complete

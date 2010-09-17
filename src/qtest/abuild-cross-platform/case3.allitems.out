@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: indep1 (abuild-indep): all
 abuild: java1 (abuild-java): all
 abuild: native1 (abuild-<native>): all
@@ -5,3 +6,4 @@ abuild: everything (abuild-indep): all
 abuild: indep2 (abuild-indep): all
 abuild: java2 (abuild-java): all
 abuild: native2 (abuild-<native>): all
+abuild: build complete

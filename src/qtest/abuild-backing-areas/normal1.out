@@ -1,5 +1,7 @@
+abuild: build starting
 abuild: product-bin (abuild-<native>): all
 make: Entering directory `--topdir--/1/product/bin/abuild-<native>'
 Compiling ../pbin.cc as C++
 Creating pbin executable
 make: Leaving directory `--topdir--/1/product/bin/abuild-<native>'
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: qwer (abuild-indep): check
 one two three
 first value
@@ -32,3 +33,4 @@ first value
      [exec] Missing Tests: 0
      [exec] Extra Tests: 0
      [exec] 
+abuild: build complete

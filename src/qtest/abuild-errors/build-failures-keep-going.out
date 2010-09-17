@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: a (abuild-indep): all
 make: Entering directory `--topdir--/g/a/abuild-indep'
 make: *** [all] Error 1
@@ -7,5 +8,6 @@ abuild: b (abuild-indep) will not be built because of failure of a dependency
 abuild: c (abuild-indep): all
 make: Entering directory `--topdir--/g/c/abuild-indep'
 make: Leaving directory `--topdir--/g/c/abuild-indep'
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: a on platform indep

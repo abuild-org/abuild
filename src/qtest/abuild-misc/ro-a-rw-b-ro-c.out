@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: b (abuild-indep): all
 make: Entering directory `--topdir--/ro-rw-path/a/b/abuild-indep'
 ro-rw b
@@ -18,3 +19,4 @@ abuild: top (abuild-indep): all
 make: Entering directory `--topdir--/ro-rw-path/abuild-indep'
 ro-rw top
 make: Leaving directory `--topdir--/ro-rw-path/abuild-indep'
+abuild: build complete

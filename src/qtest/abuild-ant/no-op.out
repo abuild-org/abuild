@@ -1,2 +1,4 @@
+abuild: build starting
 abuild: defines (abuild-java): all
 JavaBuilder: would build targets: all
+abuild: build complete

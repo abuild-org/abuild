@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: echo-a (abuild-indep): all
 make: Entering directory `--topdir--/plugin/echo/a/abuild-indep'
 This is a message from the echoer plugin.
@@ -14,3 +15,4 @@ abuild: echo-c (abuild-indep): all
 abuild: echo-d (abuild-indep): all
      [echo] This is a message from the echoer plugin.
      [echo] The value of echo.message is default message with modifications
+abuild: build complete

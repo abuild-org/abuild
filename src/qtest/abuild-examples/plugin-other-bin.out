@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: lib (abuild-<native>): all
 make: Entering directory `--topdir--/plugin/other/lib/abuild-<native>'
 This is a message from the echoer plugin.
@@ -26,3 +27,4 @@ The value of ECHO_MESSAGE is default message
 Compiling ../main.cc as C++
 Creating program executable
 make: Leaving directory `--topdir--/plugin/other/bin/abuild-zzprinter.any.test-suite.abc'
+abuild: build complete

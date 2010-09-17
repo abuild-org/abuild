@@ -1,2 +1,4 @@
+abuild: build starting
 abuild: gtest (abuild-indep): all
 assertions passed
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: e.lib (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.shlib (abuild-zz_os.cpu.toolset.echo): all
 abuild: e.bin (abuild-zz_os.cpu.toolset.echo): all
@@ -1123,3 +1124,4 @@ contents of bin-bin:
 ** end of bin bin **
 end contents of bin-bin
 make: Leaving directory `--topdir--/e/bin/abuild-zz_os.cpu.toolset.echo.release'
+abuild: build complete

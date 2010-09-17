@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: java-main (abuild-java): all
      [echo] This is a message from the echoer plugin.
      [echo] The value of echo.message is default message
@@ -5,3 +6,4 @@ abuild: java-main (abuild-java): all
     [javac] Compiling 1 source file to --topdir--/plugin/java/code/abuild-java/classes
     [mkdir] Created dir: --topdir--/plugin/java/code/abuild-java/dist
       [jar] Building jar: --topdir--/plugin/java/code/abuild-java/dist/code.jar
+abuild: build complete

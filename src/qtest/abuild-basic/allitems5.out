@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: aaa (abuild-indep): all
 abuild: ab (abuild-indep): all
 abuild: ac (abuild-indep): all
@@ -8,3 +9,4 @@ abuild: bb (abuild-indep): all
 abuild: bc (abuild-indep): all
 abuild: cc (abuild-indep): all
 abuild: root (abuild-indep): all
+abuild: build complete

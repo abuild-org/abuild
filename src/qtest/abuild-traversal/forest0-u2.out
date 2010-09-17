@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: c1 (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest0/PROJ0/proj/c1/ifc/abuild-indep'
 IFC1: PROJ0-c1-ifc
@@ -61,3 +62,4 @@ make: Entering directory `--topdir--/1.0/forest0/UTIL0/util/tests/int/abuild-ind
 IFC1: UTIL0-f1-a-ifc UTIL0-f1-b-ifc UTIL0-f2-a-ifc UTIL0-f2-b-ifc
 IMPL1: UTIL0-f1-a-impl UTIL0-f1-b-impl UTIL0-f2-a-impl UTIL0-f2-b-impl UTIL0-util-int
 make: Leaving directory `--topdir--/1.0/forest0/UTIL0/util/tests/int/abuild-indep'
+abuild: build complete

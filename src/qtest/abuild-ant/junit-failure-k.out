@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: code (abuild-java): test
 Buildfile: --abuild.xml--
 
@@ -69,5 +70,6 @@ init:
 
 BUILD SUCCESSFUL
 Total time: <time>
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: failing on platform java

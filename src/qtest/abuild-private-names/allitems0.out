@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: util.src2 (abuild-<native>): all
 make: Entering directory `--topdir--/util/src2/abuild-<native>'
 Compiling ../src2.cpp as C++
@@ -16,3 +17,4 @@ make: Entering directory `--topdir--/main/abuild-<native>'
 Compiling ../main.cpp as C++
 Creating main executable
 make: Leaving directory `--topdir--/main/abuild-<native>'
+abuild: build complete

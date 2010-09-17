@@ -47,6 +47,7 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild: build starting
 abuild: a (abuild-zz_os.cpu.toolset.xcc): all
 make: Entering directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset.xcc'
 Compiling ../A.cc as C++
@@ -78,6 +79,7 @@ Compiling ../main.cc as C++
 Compiling ../other.cc as C++
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
+abuild: build complete
 
 ===> BUILD OKAY <===
 
@@ -114,11 +116,13 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild: build starting
 abuild: a (abuild-zz_os.cpu.toolset.xcc): all
 abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
 abuild: b (abuild-zz_os.cpu.toolset.xcc): all
 abuild: x (abuild-zz_os.cpu.toolset.xcc): all
 abuild: src (abuild-zz_os.cpu.toolset.xcc): all
+abuild: build complete
 
 ===> BUILD OKAY <===
 
@@ -140,6 +144,7 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild: build starting
 abuild: a (abuild-zz_os.cpu.toolset.xcc): all
 abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
 abuild: b (abuild-zz_os.cpu.toolset.xcc): all
@@ -152,6 +157,7 @@ Creating Z1 shared library
 Creating Z2 shared library
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset.xcc'
+abuild: build complete
 
 ===> BUILD OKAY <===
 
@@ -187,11 +193,13 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild: build starting
 abuild: a (abuild-zz_os.cpu.toolset.xcc): all
 abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
 abuild: b (abuild-zz_os.cpu.toolset.xcc): all
 abuild: x (abuild-zz_os.cpu.toolset.xcc): all
 abuild: src (abuild-zz_os.cpu.toolset.xcc): all
+abuild: build complete
 
 ===> BUILD INCORRECT <===
 
@@ -234,11 +242,13 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild: build starting
 abuild: a (abuild-zz_os.cpu.toolset.xcc): all
 abuild: auto (abuild-zz_os.cpu.toolset.xcc): all
 abuild: b (abuild-zz_os.cpu.toolset.xcc): all
 abuild: x (abuild-zz_os.cpu.toolset.xcc): all
 abuild: src (abuild-zz_os.cpu.toolset.xcc): all
+abuild: build complete
 
 ===> BUILD OKAY <===
 

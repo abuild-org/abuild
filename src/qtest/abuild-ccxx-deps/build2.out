@@ -1,2 +1,4 @@
+abuild: build starting
 abuild: util (abuild-<native>): all
 abuild: main (abuild-<native>): all
+abuild: build complete

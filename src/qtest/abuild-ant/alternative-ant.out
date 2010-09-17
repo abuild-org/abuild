@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: alternative (abuild-java): run
 Buildfile: --topdir--/basic/alternative/Abuild-ant.xml
 
@@ -12,3 +13,4 @@ run:
 
 BUILD SUCCESSFUL
 Total time: <time>
+abuild: build complete

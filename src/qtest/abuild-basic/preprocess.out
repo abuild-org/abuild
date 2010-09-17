@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: cb (abuild-<native>): CB1.i CB2.i CB3.i
 make: Entering directory `--topdir--/c/cb/abuild-<native>'
 Preprocessing ../CB1.cc as C++ to CB1.i
 Preprocessing ../CB2.cpp as C++ to CB2.i
 Preprocessing ../CB3.c as C to CB3.i
 make: Leaving directory `--topdir--/c/cb/abuild-<native>'
+abuild: build complete

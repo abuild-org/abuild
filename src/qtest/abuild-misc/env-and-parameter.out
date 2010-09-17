@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: env-and-parameter (abuild-indep): all
 make: Entering directory `--topdir--/env-and-parameter/abuild-indep'
 I1=E1-value
@@ -5,3 +6,4 @@ I2=I2-default
 I3=P1-value
 I4=I4-default
 make: Leaving directory `--topdir--/env-and-parameter/abuild-indep'
+abuild: build complete

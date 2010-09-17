@@ -1,8 +1,10 @@
+abuild: build starting
 abuild: z (abuild-indep): all
 make: Entering directory `--topdir--/codegen-wrapper/abuild-indep'
 generating in2 from ../in2.in
 make: *** [in2] Error 1
 make: Leaving directory `--topdir--/codegen-wrapper/abuild-indep'
 abuild: z (abuild-indep): build failed
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: z on platform indep

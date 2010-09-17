@@ -1,4 +1,6 @@
+abuild: build starting
 abuild: user (abuild-indep): all
 make: Entering directory `--topdir--/pre-plugin/user/abuild-indep'
 potato spackle
 make: Leaving directory `--topdir--/pre-plugin/user/abuild-indep'
+abuild: build complete

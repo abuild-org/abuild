@@ -1,2 +1,4 @@
+abuild: build starting
 abuild: user (abuild-indep): special
 new special closure
+abuild: build complete

@@ -1,3 +1,5 @@
+abuild: build starting
 abuild: indep1 (abuild-indep): check
 abuild: indep2 (abuild-indep): all
 abuild: java1 (abuild-java): all
+abuild: build complete

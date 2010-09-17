@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: 03-object-code (abuild-<native>): all
 make: Entering directory `--topdir--/case1/03-object-code/abuild-<native>'
 
@@ -16,3 +17,4 @@ make: Entering directory `--topdir--/case1/01-object-code/abuild-<native>'
 *** 01-object-code ***
 
 make: Leaving directory `--topdir--/case1/01-object-code/abuild-<native>'
+abuild: build complete

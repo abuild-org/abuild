@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: consumers.interface (abuild-java): test
     [mkdir] Created dir: --topdir--/mixed-classification/public/consumers/interface/abuild-java/classes
     [javac] Compiling 3 source files to --topdir--/mixed-classification/public/consumers/interface/abuild-java/classes
@@ -90,3 +91,4 @@ abuild: executable.sensitive (abuild-java): test
      [exec] Missing Tests: 0
      [exec] Extra Tests: 0
      [exec] 
+abuild: build complete

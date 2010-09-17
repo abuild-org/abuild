@@ -12,6 +12,7 @@ For details, please see "Upgrading Build Trees from 1.0 to 1.1" in
 the user's manual
 ******************** abuild ********************
 
+abuild: build starting
 abuild: c1-a (abuild-indep): all
 make: Entering directory `--topdir--/1.0/forest2/C3/proj/c1/impl/a/abuild-indep'
 IFC1: PROJ0-c1-ifc
@@ -41,3 +42,4 @@ make: Entering directory `--topdir--/1.0/forest2/C3/proj/tests/int/abuild-indep'
 IFC1: PROJ0-c1-ifc PROJ0-c2-ifc F2C2-f2-b-ifc F2C2-f2-c-ifc C3-c3-ifc
 IMPL1: C3-c1-a-impl PROJ0-c1-b-impl F2C2-f2-b-impl F2C2-c2-a-impl F2C2-f2-c-impl C3-c2-b-impl C3-c3-a-impl C3-c3-b-impl C3-proj-int
 make: Leaving directory `--topdir--/1.0/forest2/C3/proj/tests/int/abuild-indep'
+abuild: build complete

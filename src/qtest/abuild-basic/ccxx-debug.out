@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: cb (abuild-<native>): ccxx_debug
 make: Entering directory `--topdir--/c/cb/abuild-<native>'
 INCLUDES = ../../ca/include
 LIBDIRS = ../../ca/abuild-<native>
 LIBS = ca
 make: Leaving directory `--topdir--/c/cb/abuild-<native>'
+abuild: build complete

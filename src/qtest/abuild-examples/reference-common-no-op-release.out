@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: common-lib1.src (abuild-<native>.release): no-op
 abuild: common-lib1.test (abuild-<native>.release): no-op
 abuild: common-lib3.src (abuild-<native>.release): no-op
 abuild: common-lib2.src (abuild-<native>.release): no-op
 abuild: common-lib2.test (abuild-<native>.release): no-op
 abuild: common-lib3.test (abuild-<native>.release): no-op
+abuild: build complete

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: ca (abuild-<native>): all
 make: Entering directory `--topdir--/c/ca/abuild-<native>'
 Compiling ../C1.cpp as C++
@@ -6,3 +7,4 @@ Compiling ../C2.cpp as C++
 Compiling ../main.cpp as C++
 Creating ca executable
 make: Leaving directory `--topdir--/c/ca/abuild-<native>'
+abuild: build complete

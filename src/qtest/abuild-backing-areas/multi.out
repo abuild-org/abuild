@@ -1,4 +1,6 @@
+abuild: build starting
 abuild: product (abuild-<native>): all
 make: Entering directory `--topdir--/multi/product/abuild-<native>'
 common b a c
 make: Leaving directory `--topdir--/multi/product/abuild-<native>'
+abuild: build complete

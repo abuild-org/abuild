@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: common-lib1 (abuild-<native>): all
 make: Entering directory `--topdir--/shared/common/libs/lib1/abuild-<native>'
 Compiling ../lib1.cc as C++
@@ -13,3 +14,4 @@ make: Entering directory `--topdir--/shared/common/libs/lib3/abuild-<native>'
 Compiling ../lib3.cc as C++
 Creating lib3 library
 make: Leaving directory `--topdir--/shared/common/libs/lib3/abuild-<native>'
+abuild: build complete

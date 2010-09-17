@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: common-lib1 (abuild-<native>): all
 abuild: common-lib2 (abuild-<native>): all
 abuild: common-lib3 (abuild-<native>): all
@@ -16,3 +17,4 @@ make: Entering directory `--topdir--/shared/product/bin/abuild-<native>'
 Compiling ../pbin.cc as C++
 Creating pbin executable
 make: Leaving directory `--topdir--/shared/product/bin/abuild-<native>'
+abuild: build complete

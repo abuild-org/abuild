@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: opaque-client (abuild-<native>): ccxx_debug
 make: Entering directory `--topdir--/opaque-wrapper/client/abuild-<native>'
 INCLUDES = ../../public
 LIBDIRS = ../../public/abuild-<native> ../../hidden/abuild-<native>
 LIBS = opaque-public opaque-hidden
 make: Leaving directory `--topdir--/opaque-wrapper/client/abuild-<native>'
+abuild: build complete

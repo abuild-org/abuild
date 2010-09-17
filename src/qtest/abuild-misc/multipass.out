@@ -1,5 +1,7 @@
+abuild: build starting
 abuild: e (abuild-indep): all
 abuild: d (abuild-indep): check
 abuild: c (abuild-indep): check
 abuild: b (abuild-indep): check
 abuild: z (abuild-indep): check
+abuild: build complete

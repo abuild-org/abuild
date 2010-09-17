@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: bb (abuild-indep): all
 abuild: ca (abuild-<native>): all
 abuild: aa (abuild-<native>): all
@@ -12,3 +13,4 @@ abuild: cb (abuild-<native>): all
 abuild: cc (abuild-indep): all
 abuild: e.multi (abuild-<native>): all
 abuild: root (abuild-indep): all
+abuild: build complete

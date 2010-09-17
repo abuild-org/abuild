@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: a (abuild-indep): all
 abuild-groovy: ERROR: unknown target unknown
      [echo] other all
@@ -43,6 +44,7 @@ abuild: g (abuild-indep): build failed
 abuild: h (abuild-indep): all
 abuild-groovy: ERROR: configureTarget: unknown parameter moo in file --topdir--/failures/h/h_rules.groovy
 abuild: h (abuild-indep): build failed
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: a on platform indep
 abuild: ERROR: build failure: b on platform indep

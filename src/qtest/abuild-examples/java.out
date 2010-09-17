@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: code-generator (abuild-java): test
     [mkdir] Created dir: --topdir--/java/code-generator/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/java/code-generator/abuild-java/classes
@@ -39,3 +40,4 @@ abuild: executable (abuild-java): test
      [exec] Missing Tests: 0
      [exec] Extra Tests: 0
      [exec] 
+abuild: build complete

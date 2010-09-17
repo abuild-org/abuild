@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: prog (abuild-<native>): ccxx_debug
 make: Entering directory `--topdir--/cross-platform/prog/abuild-<native>'
 INCLUDES =
 LIBDIRS =
 LIBS =
 make: Leaving directory `--topdir--/cross-platform/prog/abuild-<native>'
+abuild: build complete

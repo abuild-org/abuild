@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: common (abuild-indep): all
 abuild: A-dep (abuild-indep): all
 abuild: A (abuild-indep): all
@@ -7,3 +8,4 @@ abuild: A-eater-painter (abuild-indep): eat
 abuild: B (abuild-indep): all
 abuild: AB-eater (abuild-indep): eat
 abuild: B-eater (abuild-indep): eat
+abuild: build complete

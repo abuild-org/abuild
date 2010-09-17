@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: old1 (abuild-indep): all
 make: Entering directory `--topdir--/build-item-rules/old/abuild-indep'
 --abuild-dir--/make/abuild.mk:nn: *** DEPRECATION WARNING *** (abuild version 1.1): BUILD_ITEM_RULES is deprecated; use named rules from the rules directory instead
@@ -10,6 +11,7 @@ make: Entering directory `--topdir--/build-item-rules/old2/abuild-indep'
 --abuild-dir--/make/abuild.mk:nn: *** deprecation error mode; failing.  Stop.
 make: Leaving directory `--topdir--/build-item-rules/old2/abuild-indep'
 abuild: old2 (abuild-indep): build failed
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: old1 on platform indep
 abuild: ERROR: build failure: old2 on platform indep

@@ -6107,12 +6107,12 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    item_error, parser, logger_job);
     }
 
-    // Ready to build -- clear job header, and let the build's own
-    // output take precedence.
-    this->logger.setJobHeader(logger_job, "");
-
     if (build_item.hasBuildFile())
     {
+	// Ready to build -- clear job header, and let the build's own
+	// output take precedence.
+	this->logger.setJobHeader(logger_job, "");
+
 	if (status && use_interfaces)
 	{
 	    dumpInterface(item_platform, build_item, ".before-build");

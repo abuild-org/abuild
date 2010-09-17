@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: code-generator (abuild-java): test
 Buildfile: --abuild.xml--
 
@@ -71,3 +72,4 @@ Buildfile: --abuild.xml--
 
 BUILD SUCCESSFUL
 Total time: <time>
+abuild: build complete

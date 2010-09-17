@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: a (abuild-java): all
     [mkdir] Created dir: --topdir--/java-groovy-interdep/a/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/java-groovy-interdep/a/abuild-java/classes
@@ -10,3 +11,4 @@ abuild: b (abuild-java): all
     [javac] Compiling 1 source file to --topdir--/java-groovy-interdep/b/abuild-java/classes
     [mkdir] Created dir: --topdir--/java-groovy-interdep/b/abuild-java/dist
       [jar] Building jar: --topdir--/java-groovy-interdep/b/abuild-java/dist/b.jar
+abuild: build complete

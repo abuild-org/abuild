@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: e.lib (abuild-zz_os.cpu.toolset.echo): bin-bin1
 Creating lib1 library
 make-lib objects: lib1-src1.lo lib1-src2.lo lib1-src3.lo
@@ -34,3 +35,4 @@ contents of bin-bin1:
 ** end of lib lib2 **
 ** end of bin bin1 **
 end contents of bin-bin1
+abuild: build complete

@@ -1,3 +1,4 @@
+O abuild: build starting
 O abuild: a (abuild-indep): all
 O make: Entering directory `--topdir--/output-capture/a/abuild-indep'
 a err1 a err2
@@ -8,3 +9,4 @@ O make: Entering directory `--topdir--/output-capture/b/abuild-indep'
 b err1 b err2
 O b out1 b out2
 O make: Leaving directory `--topdir--/output-capture/b/abuild-indep'
+O abuild: build complete

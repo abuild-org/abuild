@@ -128,6 +128,7 @@ abuild-monitor: end-dump-build-graph
 abuild-monitor: state-change af indep waiting
 abuild-monitor: state-change af-dep indep ready
 abuild-monitor: state-change af-rdep indep waiting
+abuild: build starting
 abuild-monitor: state-change af-dep indep running
 abuild-monitor: targets af-dep indep all
 abuild: af-dep (abuild-indep): all
@@ -144,6 +145,7 @@ abuild: af (abuild-indep): build failed
 abuild-monitor: state-change af indep failed
 abuild-monitor: state-change af-rdep indep dependency-failed
 abuild: af-rdep (abuild-indep) will not be built because of failure of a dependency
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild-monitor: error abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: af on platform indep

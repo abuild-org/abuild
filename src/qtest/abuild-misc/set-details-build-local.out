@@ -1,3 +1,5 @@
+abuild: build starting
 abuild: b1 (abuild-indep): no-op
 abuild: a1 (abuild-indep): no-op
 abuild: a2 (abuild-indep): no-op
+abuild: build complete

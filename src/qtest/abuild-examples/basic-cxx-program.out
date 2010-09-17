@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: cxx-library (abuild-<native>): all
 make: Entering directory `--topdir--/basic/cxx-library/abuild-<native>'
 Compiling ../BasicLibrary.cc as C++
@@ -8,3 +9,4 @@ make: Entering directory `--topdir--/basic/cxx-program/abuild-<native>'
 Compiling ../program.cc as C++
 Creating cxx-program executable
 make: Leaving directory `--topdir--/basic/cxx-program/abuild-<native>'
+abuild: build complete

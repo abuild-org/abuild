@@ -51,8 +51,11 @@ $td->runtest("jvm-replace-args",
 $td->runtest("groovy Util",
 	     {$td->COMMAND => "abuild",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
-	     {$td->STRING => "abuild: util (abuild-indep): all\n"  .
-		  "assertions passed\n",
+	     {$td->STRING =>
+		  "abuild: build starting\n" .
+		  "abuild: util (abuild-indep): all\n"  .
+		  "assertions passed\n" .
+		  "abuild: build complete\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: lib (abuild-<native>): all
 abuild: lib (abuild-<native>.debug): all
 make: Entering directory `--topdir--/native-compiler/lib/abuild-<native>.debug'
@@ -24,3 +25,4 @@ make-obj lib.o
 Creating lib library
 make-lib lib-lib
 make: Leaving directory `--topdir--/native-compiler/lib/abuild-<native-os-data>.qcc.release'
+abuild: build complete

@@ -25,6 +25,7 @@ Hit return to continue.
 
 ===> RUNNING INITIAL BUILD <===
 
+abuild: build starting
 abuild: a (abuild-<native-os-data>.zyx): all
 make: Entering directory `--topdir--/.verify-tmp/a/abuild-<native-os-data>.zyx'
 Compiling ../A.cc as C++
@@ -56,6 +57,7 @@ Compiling ../main.cc as C++
 Compiling ../other.cc as C++
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.zyx'
+abuild: build complete
 
 ===> BUILD OKAY <===
 
@@ -77,17 +79,20 @@ Hit return to continue.
 
 ===> REBUILD WHEN UP TO DATE <===
 
+abuild: build starting
 abuild: a (abuild-<native-os-data>.zyx): all
 abuild: auto (abuild-<native-os-data>.zyx): all
 abuild: b (abuild-<native-os-data>.zyx): all
 abuild: x (abuild-<native-os-data>.zyx): all
 abuild: src (abuild-<native-os-data>.zyx): all
+abuild: build complete
 
 ===> BUILD OKAY <===
 
 
 ===> RUNNING BUILD AFTER REMOVING SOURCE <===
 
+abuild: build starting
 abuild: a (abuild-<native-os-data>.zyx): all
 abuild: auto (abuild-<native-os-data>.zyx): all
 abuild: b (abuild-<native-os-data>.zyx): all
@@ -100,6 +105,7 @@ Creating Z1 shared library
 Creating Z2 shared library
 Creating main executable
 make: Leaving directory `--topdir--/.verify-tmp/src/abuild-<native-os-data>.zyx'
+abuild: build complete
 
 ===> BUILD OKAY <===
 
@@ -120,11 +126,13 @@ Hit return to continue.
 
 ===> RUNNING BUILD AFTER MOVING HEADER <===
 
+abuild: build starting
 abuild: a (abuild-<native-os-data>.zyx): all
 abuild: auto (abuild-<native-os-data>.zyx): all
 abuild: b (abuild-<native-os-data>.zyx): all
 abuild: x (abuild-<native-os-data>.zyx): all
 abuild: src (abuild-<native-os-data>.zyx): all
+abuild: build complete
 
 ===> BUILD INCORRECT <===
 
@@ -152,11 +160,13 @@ Hit return to continue.
 
 ===> REBUILD WHEN UP TO DATE <===
 
+abuild: build starting
 abuild: a (abuild-<native-os-data>.zyx): all
 abuild: auto (abuild-<native-os-data>.zyx): all
 abuild: b (abuild-<native-os-data>.zyx): all
 abuild: x (abuild-<native-os-data>.zyx): all
 abuild: src (abuild-<native-os-data>.zyx): all
+abuild: build complete
 
 ===> BUILD OKAY <===
 

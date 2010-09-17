@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: targets (abuild-<native>): all
 make: Entering directory `--topdir--/extra-targets/abuild-<native>'
 Compiling ../lib1_1.cc as C++
@@ -19,3 +20,4 @@ Compiling ../bin2_1.cc as C++
 Compiling ../bin2_2.cc as C++
 Creating bin2 executable
 make: Leaving directory `--topdir--/extra-targets/abuild-<native>'
+abuild: build complete

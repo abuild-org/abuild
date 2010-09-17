@@ -1,6 +1,8 @@
+abuild: build starting
 abuild: groovy-runtime (abuild-java): all
 abuild: lib1 (abuild-java): all
 abuild: lib2 (abuild-java): all
 abuild: multijar (abuild-java): all
      [echo] This is a compile closure.
 abuild: prog (abuild-java): all
+abuild: build complete

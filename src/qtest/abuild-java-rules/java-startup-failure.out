@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: groovy-runtime (abuild-java): all
 abuild: ERROR: java builder backend failed to start
 abuild: groovy-runtime (abuild-java): build failed
@@ -9,6 +10,7 @@ abuild: multijar (abuild-java): all
 abuild: multijar (abuild-java): build failed
 abuild: prog (abuild-java): all
 abuild: prog (abuild-java): build failed
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: groovy-runtime on platform java
 abuild: ERROR: build failure: lib1 on platform java

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: code (abuild-java): test
     [mkdir] Created dir: --topdir--/junit/code/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/junit/code/abuild-java/classes
@@ -15,5 +16,6 @@ abuild: failing (abuild-java): test
 abuild-groovy: ERROR: ant build failure: Test com.example.FailingTest failed
 abuild-groovy: ERROR: not building target "test-only" because of failure of its dependencies
 abuild: failing (abuild-java): build failed
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: failing on platform java

@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: flex-bison (abuild-<native>): all
 make: Entering directory `--topdir--/flex-bison/abuild-<native>'
 Generating fbtest.tab.hh from ../fbtest.yy
@@ -8,3 +9,4 @@ Compiling fbtest.fl.cc as C++
 Compiling fbtest.tab.cc as C++
 Creating flex-bison library
 make: Leaving directory `--topdir--/flex-bison/abuild-<native>'
+abuild: build complete

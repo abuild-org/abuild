@@ -1,27 +1,26 @@
-verbose, info, notice, error, deprecate
+1.1.3
+=====
 
-XXX to test for new logger stuff
+ * Test for new logger stuff
 
-interface errors
-failure
-failure of dependency
-missing after-build
-verbose
+     interface errors
+     failure
+     failure of dependency
+     missing after-build
+     interface only after-build
+     verbose
 
-itemBuilder
-readAfterBuilds
-parseBuildGraphNode
-createItemInterface
-dumpInterface
-buildItem
-invoke_gmake
-invoke_ant
-invoke_groovy
+     Check for other errors in these functions:
 
-
-
-Next
-====
+     itemBuilder
+     readAfterBuilds
+     parseBuildGraphNode
+     createItemInterface
+     dumpInterface
+     buildItem
+     invoke_gmake
+     invoke_ant
+     invoke_groovy
 
  * Fix doc for global-plugin: search for "-plugin"....
 

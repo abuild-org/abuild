@@ -1,2 +1,4 @@
+abuild: build starting
 abuild: targets (abuild-<native>): all
 Removing extraneous dep files
+abuild: build complete

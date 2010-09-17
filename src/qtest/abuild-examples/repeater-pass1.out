@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: user1 (abuild-indep): all
 make: Entering directory `--topdir--/codegen-wrapper/user1/abuild-indep'
 Generating file1.rpt from ../file1 with repeater
@@ -10,3 +11,4 @@ codegen-wrapper: generation succeeded; cache updated
 Generating file2.rpt from ../file2 with repeater
 codegen-wrapper: generation succeeded; cache updated
 make: Leaving directory `--topdir--/codegen-wrapper/user2/abuild-indep'
+abuild: build complete

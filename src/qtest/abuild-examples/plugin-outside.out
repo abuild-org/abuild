@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: lib (abuild-<native>): all
 make: Entering directory `--topdir--/plugin/other/lib/abuild-<native>'
 This is a message from the echoer plugin.
@@ -13,3 +14,4 @@ make: Entering directory `--topdir--/plugin/outside/prog2/abuild-<native>'
 Compiling ../main.cc as C++
 Creating prog2 executable
 make: Leaving directory `--topdir--/plugin/outside/prog2/abuild-<native>'
+abuild: build complete

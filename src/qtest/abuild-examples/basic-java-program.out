@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: java-library (abuild-java): all
     [mkdir] Created dir: --topdir--/basic/java-library/abuild-java/classes
     [javac] Compiling 1 source file to --topdir--/basic/java-library/abuild-java/classes
@@ -8,3 +9,4 @@ abuild: java-program (abuild-java): all
     [javac] Compiling 1 source file to --topdir--/basic/java-program/abuild-java/classes
     [mkdir] Created dir: --topdir--/basic/java-program/abuild-java/dist
       [jar] Building jar: --topdir--/basic/java-program/abuild-java/dist/java-program.jar
+abuild: build complete

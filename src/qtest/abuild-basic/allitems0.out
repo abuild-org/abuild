@@ -612,6 +612,7 @@ abuild-monitor: state-change e.multi zz_os.cpu.toolset.echo ready
 abuild-monitor: state-change e.shlib zz_os.cpu.toolset.echo waiting
 abuild-monitor: state-change e.shlib2 zz_os.cpu.toolset.echo waiting
 abuild-monitor: state-change root indep ready
+abuild: build starting
 abuild-monitor: state-change bb indep running
 abuild-monitor: targets bb indep all
 abuild: bb (abuild-indep): all
@@ -1367,3 +1368,4 @@ abuild-monitor: state-change root indep running
 abuild-monitor: targets root indep all
 abuild: root (abuild-indep): all
 abuild-monitor: state-change root indep completed
+abuild: build complete

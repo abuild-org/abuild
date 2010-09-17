@@ -1,1 +1,3 @@
+abuild: build starting
 abuild: e.lib (abuild-zz_os.cpu.toolset.echo): bin-bin1
+abuild: build complete

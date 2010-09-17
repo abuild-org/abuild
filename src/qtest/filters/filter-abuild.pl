@@ -91,7 +91,7 @@ while (<>)
     s/^(Total time: ).*/$1<time>/;
     s/(\[junit\].*Time elapsed: ).*/$1<time>/;
     s/(tree.\d+.-)\d+(-)/${1}RND${2}/g;
-    next if m/^(?:O )?abuild: (build (starting|complete)|total build time: )/;
+    next if m/^(?:O )?abuild: total build time: /;
     if (m,--begin stack trace--,)
     {
 	$in_stacktrace = 1;

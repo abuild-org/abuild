@@ -1,5 +1,8 @@
+abuild: build starting
+abuild: aaib (abuild-indep):
 --topdir--/a/aa/aai/aaib/Abuild.interface:1: ERROR: interfaces for items with no build files may not load after-build files
 abuild: aaib (abuild-indep): build failed
 abuild: aaia (abuild-indep) will not be built because of failure of a dependency
+abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
 abuild: ERROR: build failure: aaib on platform indep

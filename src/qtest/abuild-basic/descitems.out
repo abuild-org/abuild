@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: bb (abuild-indep): all
 abuild: ca (abuild-<native>): all
 make: Entering directory `--topdir--/c/ca/abuild-<native>'
@@ -15,3 +16,4 @@ Pretending to compile ../d1/c.q as Q
 Prentending to link moo
 make: Leaving directory `--topdir--/a/aa/abuild-<native>'
 abuild: aaa (abuild-indep): all
+abuild: build complete

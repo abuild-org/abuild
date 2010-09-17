@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: shared.impl1 (abuild-<native>): all
 make: Entering directory `--topdir--/shared-library/shared/impl1/abuild-<native>'
 Compiling ../Shared.cc as C++
@@ -18,3 +19,4 @@ make: Entering directory `--topdir--/shared-library/shared/impl2/abuild-<native>
 Compiling ../Shared.cc as C++
 Creating shared shared library
 make: Leaving directory `--topdir--/shared-library/shared/impl2/abuild-<native>'
+abuild: build complete

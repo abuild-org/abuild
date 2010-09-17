@@ -1,3 +1,4 @@
+abuild: build starting
 abuild: coverage (abuild-indep): check
 make: Entering directory `--topdir--/coverage/abuild-indep'
 
@@ -25,3 +26,4 @@ Missing Tests: 0
 Extra Tests: 0
 
 make: Leaving directory `--topdir--/coverage/abuild-indep'
+abuild: build complete
