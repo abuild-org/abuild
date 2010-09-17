@@ -295,6 +295,8 @@ Abuild::runInternal()
     if (! okay)
     {
 	error("at least one build failure occurred; summary follows");
+	// Sort for consistent output in test suite.
+	std::sort(this->failed_builds.begin(), this->failed_builds.end());
 	assert(! this->failed_builds.empty());
 	for (std::vector<std::string>::iterator iter =
 		 this->failed_builds.begin();
