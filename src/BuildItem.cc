@@ -490,9 +490,9 @@ BuildItem::setShadowedReferences(
 
 void
 BuildItem::setInterface(std::string const& platform,
-			boost::shared_ptr<Interface> interface)
+			boost::shared_ptr<Interface> _interface)
 {
-    this->interfaces[platform] = interface;
+    this->interfaces[platform] = _interface;
 }
 
 void
