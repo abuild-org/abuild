@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
-
 require 5.008;
-BEGIN { $^W = 1; }
+use warnings;
 use strict;
 
 require TestDriver;
