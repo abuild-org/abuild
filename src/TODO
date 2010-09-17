@@ -1,6 +1,16 @@
 1.1.3
 =====
 
+XXX strategy for abuild-capture-output:
+
+   run a single-threaded abuild -b all and use that manually to
+   generate output after checking it against the list below to make
+   sure everything is there.  Need to filter enough stuff out of
+   verbose.  Try to keep what we can...definitely filter out all the
+   stuff that depends on groovy, ant, and java's locations.  Be
+   careful about timing with reversal of out and err lines.  There
+   hopefully shouldn't be any.
+
  * Test new logger stuff.  Use parse-build-output.  Test interleaved
    and buffered with and without error/output prefixes.  Go through
    code and make a list of coverage cases but don't actually use the
@@ -13,6 +23,7 @@
      missing after-build
      interface only after-build
      javabuilder errors
+     verbose
 
      Check for other errors in these functions:
 
@@ -43,6 +54,8 @@
    chaining for interface.qfl isn't quite right.
 
  * Document output change of job header before interface errors
+
+ * Add help for configuring targets in groovy.
 
 
 Capture of Backend Output: to document

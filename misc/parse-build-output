@@ -65,7 +65,7 @@ if (defined $output_prefix)
 }
 if (! defined $file)
 {
-    usage("file must be specified");
+    usage("file must be specified; use - for stdin");
 }
 
 # $allocations{item}{platform} = [[all_lines], [error_lines]];
@@ -81,7 +81,14 @@ show_allocations();
 
 sub process_file
 {
-    open(IN, "<", $file) or die "$whoami: can't read $file: $!\n";
+    if ($file eq '-')
+    {
+	open(IN, "<&STDIN");
+    }
+    else
+    {
+	open(IN, "<", $file) or die "$whoami: can't read $file: $!\n";
+    }
     binmode IN;
     my $last_item = undef; 	# [item, platform]
     my $phase = 'before';
@@ -304,7 +311,7 @@ parse abuild's output.
 
 The given file is expected to contain the complete output of an abuild
 run with either buffered or interleaved output.  If interleaved,
-specify -i.  If buffered, specify -b.
+specify -i.  If buffered, specify -b.  To parse stdin, give - as file.
 
 If the original build was run without output or error prefixes, these
 must be given to this program with the -o and -e options.  This script

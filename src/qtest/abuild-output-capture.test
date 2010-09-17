@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-output-capture") or die;
+
+my $td = new TestDriver("output capture");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
+
+if (! $test_java)
+{
+    $td->runtest("skipping output capture",
+		 {$td->STRING => "skip"},
+		 {$td->STRING => "skip"});
+    $td->report(1);
+    exit 0;
+}
+
+# This test exercises various aspects of abuild's output capture
+# capabilities and also serves to test the parse-build-output script.
+
+setup($td);
+
+cd("work/t1");
+
+# Each element is [prefixes, interleaved, verbose]
+my @tests = ();
+for my $interleaved (0..1)
+{
+    for my $prefixes (0..1)
+    {
+	push(@tests, [$prefixes, $interleaved, 0]);
+    }
+    push(@tests, [1, $interleaved, 1]);
+}
+
+foreach my $t (@tests)
+{
+    my ($prefixes, $interleaved, $verbose) = @$t;
+    my $p_args = ($interleaved ? '-i' : '-b') . ' -';
+    if ($prefixes)
+    {
+	$p_args .= ' -o "O " -e "E "';
+    }
+    my $filter = "perl $top/../../../misc/parse-build-output $p_args" .
+	" | perl $filters/filter-abuild.pl";
+    if ($verbose)
+    {
+	$filter .= " | perl $top/filter-verbose.pl";
+    }
+    my @flags = qw(-j20 -b all -k);
+    push(@flags, '--verbose') if $verbose;
+    push(@flags, $interleaved ? '--interleaved-output' : '--buffered-output');
+    push(@flags, '--output-prefix=O ', '--error-prefix=E ') if $prefixes;
+    my $description = +('verbose: ' . ($verbose ? 'y' : 'n') . ', ' .
+			'prefixes: ' . ($prefixes ? 'y' : 'n') . ', ' .
+			($interleaved ? 'interleaved' : 'buffered'));
+    my $outfile = "p$prefixes-i$interleaved-v$verbose.out";
+    $td->runtest($description,
+		 {$td->COMMAND => ['abuild', @flags],
+		  $td->FILTER => $filter},
+		 {$td->FILE => $outfile, $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+}
+
+
+check_work_accessed($td);
+
+$td->report(1 + @tests);
