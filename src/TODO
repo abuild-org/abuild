@@ -1,14 +1,18 @@
 1.1.3
 =====
 
- * Test for new logger stuff
+ * Test new logger stuff.  Use parse-build-output.  Test interleaved
+   and buffered with and without error/output prefixes.  Go through
+   code and make a list of coverage cases but don't actually use the
+   coverage system...people will be copying and modifying this script.
 
+     Abuild.conf errors/other pre-build errors
      interface errors
      failure
      failure of dependency
      missing after-build
      interface only after-build
-     verbose
+     javabuilder errors
 
      Check for other errors in these functions:
 

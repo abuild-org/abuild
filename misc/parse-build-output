@@ -1,0 +1,317 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Basename;
+
+# See usage() for a description of how to use this script.
+
+my $whoami = basename($0);
+
+my $output_prefix = undef;
+my $error_prefix = undef;
+my $interleaved = undef;
+my $file = undef;
+
+while (@ARGV)
+{
+    my $arg = shift(@ARGV);
+    if ($arg eq '-o')
+    {
+	usage("-o requires an argument") unless @ARGV;
+	$output_prefix = shift(@ARGV);
+    }
+    elsif ($arg eq '-e')
+    {
+	usage("-e requires an argument") unless @ARGV;
+	$error_prefix = shift(@ARGV);
+    }
+    elsif ($arg eq '-b')
+    {
+	$interleaved = 0;
+    }
+    elsif ($arg eq '-i')
+    {
+	$interleaved = 1;
+    }
+    elsif (! defined $file)
+    {
+	$file = $arg;
+    }
+    else
+    {
+	usage("unknown argument $arg");
+    }
+}
+
+if (! defined $interleaved)
+{
+    usage("one of -b or -i must be specified");
+}
+if ((defined $output_prefix) != (defined $error_prefix))
+{
+    usage("-e and -o must either both be specified or both be not specified");
+}
+if (defined $output_prefix)
+{
+    if (length($output_prefix) != length($error_prefix))
+    {
+	usage("output and error prefix must be the same length");
+    }
+    if ($output_prefix eq $error_prefix)
+    {
+	usage("output and error prefixes must be different");
+    }
+}
+if (! defined $file)
+{
+    usage("file must be specified");
+}
+
+# $allocations{item}{platform} = [[all_lines], [error_lines]];
+# $allocations{''}{'before'} contains output before the build phase
+# $allocations{''}{'during'} contains unallocated output from inside the build
+# $allocations{''}{'after'} contains output after the build phase
+my %allocations = ();
+my @other_errors = ();
+
+binmode STDOUT;
+process_file();
+show_allocations();
+
+sub process_file
+{
+    open(IN, "<", $file) or die "$whoami: can't read $file: $!\n";
+    binmode IN;
+    my $last_item = undef; 	# [item, platform]
+    my $phase = 'before';
+    my %prefixes = ();		# $prefixes{prefix} = [item, platform]
+    while (defined(my $line = <IN>))
+    {
+	my $is_error = 0;
+	my $item = $last_item;
+	if (defined $output_prefix)
+	{
+	    # Strip output or error/prefix to classify as output or
+	    # error.  This simple approach is unambiguous in the case
+	    # of output and error prefixes being different strings
+	    # with the same length.
+	    if ($line =~ s/^\Q$output_prefix\E//)
+	    {
+		# output
+	    }
+	    elsif ($line =~ s/^\Q$error_prefix\E//)
+	    {
+		$is_error = 1;
+	    }
+	    else
+	    {
+		# Something's wrong...probably an internal error or
+		# assertion failure.  Treat it as a general error.
+		push(@other_errors, $line);
+		next;
+	    }
+	}
+	else
+	{
+	    # treat as output since we can't tell output from error
+	}
+
+	# Build complete line indicates end of build phase.  Change
+	# phase now to avoid trying to associate it with a specific
+	# item.
+	if (($phase eq 'during') &&
+	    ($line =~ m/^abuild: build complete/))
+	{
+	    $phase = 'after';
+	}
+
+	# Associate the line with a build item/platform pair or one of
+	# our pseudo item/platforms.  This if block must result in an
+	# assignment to $item.
+	if ($phase eq 'during')
+	{
+	    if ($interleaved)
+	    {
+		# In interleaved mode, all build output lines start
+		# with a job prefix.
+		my $prefix = undef;
+		if ($line =~ s/^(\[\d+\]) //)
+		{
+		    $prefix = $1;
+		    if (exists $prefixes{$prefix})
+		    {
+			# We've already seen this prefix...use
+			# whichever item we decided before.
+			$item = $prefixes{$prefix};
+		    }
+		    elsif ($line =~ m/^abuild: (\S+?) \(abuild-(\S+?)\)/)
+		    {
+			# The first line of output from any build item
+			# should always match the above regular
+			# expression.
+			$item = [$1, $2];
+			$prefixes{$prefix} = $item;
+		    }
+		    else
+		    {
+			die "$file:$.: first line with prefix $prefix" .
+			    " doesn't indicate item/platform\n$line";
+		    }
+		}
+		else
+		{
+		    # Output does not appear to be associated with any
+		    # build item.  It could be a JavaBuilder error or
+		    # some other kind of internal abuild message
+		    # that's not associated with any build.
+		    $item = ['', $phase];
+		}
+	    }
+	    else
+	    {
+		# In buffered mode, all build items' output lines are
+		# contiguous.  Any line that looks like the expression
+		# below identifies the item to which the build
+		# belongs.  The first line of output should always
+		# match this, and other lines may also match it.
+		if ($line =~ m/^abuild: (\S+?) \(abuild-(\S+?)\)/)
+		{
+		    $item = [$1, $2];
+		    $last_item = $item;
+		}
+		elsif (defined $last_item)
+		{
+		    $item = $last_item;
+		}
+		else
+		{
+		    # Strange output after build started and before
+		    # output from first build item....should not be
+		    # possible.
+		    $item = ['', $phase];
+		}
+	    }
+	}
+	else
+	{
+	    # We're not in the build phase...just associate this line
+	    # with either being before the build phase or after it.
+	    $item = ['', $phase];
+	}
+
+	# If we just saw a build starting line, the next line of
+	# output will be part of the build phase.
+	if (($phase eq 'before') &&
+	    ($line =~ m/^abuild: build starting/))
+	{
+	    $phase = 'during';
+	}
+
+	if (! defined $item)
+	{
+	    die "$whoami: INTERNAL ERROR: failed to assign line to item: $line";
+	}
+
+	# Allocate the line to a item/platform pair.
+	my ($i1, $i2) = @$item;
+	if (! exists $allocations{$i1}{$i2})
+	{
+	    $allocations{$i1}{$i2} = [[], []];
+	}
+	my $lines = $allocations{$i1}{$i2};
+	# Add to the list of all lines for this item
+	push(@{$lines->[0]}, $line);
+	if ($is_error)
+	{
+	    # Add to the list of error lines for this item
+	    push(@{$lines->[1]}, $line);
+	}
+    }
+    close(IN);
+}
+
+sub show_allocations
+{
+    if (@other_errors)
+    {
+	print "Major failure lines\n";
+	print "-------------------\n";
+	for (@other_errors)
+	{
+	    print;
+	}
+	print "\n";
+    }
+    my $special = $allocations{''};
+    delete $allocations{''};
+    if (exists $special->{'before'})
+    {
+	dump_lines("Output preceding build phase",
+		   $special->{'before'});
+    }
+    if (exists $special->{'during'})
+    {
+	dump_lines("Unallocated output during build phase",
+		   $special->{'during'});
+    }
+    if (exists $special->{'after'})
+    {
+	dump_lines("Output following build phase",
+		   $special->{'after'});
+    }
+    foreach my $item (sort keys %allocations)
+    {
+	foreach my $platform (sort keys %{$allocations{$item}})
+	{
+	    dump_lines("Output for $item on $platform",
+		       $allocations{$item}{$platform});
+	}
+    }
+}
+
+sub dump_lines
+{
+    my ($description, $lines) = @_;
+    my ($all_lines, $error_lines) = @$lines;
+    print $description, "\n";
+    print '-' x (length $description), "\n";
+    if (@$error_lines)
+    {
+	print "ERROR SUMMARY:\n";
+	for (@$error_lines)
+	{
+	    print;
+	}
+	print "COMPLETE OUTPUT:\n";
+    }
+    for (@$all_lines)
+    {
+	print;
+    }
+    print "\n";
+}
+
+sub usage
+{
+    my $msg = shift;
+    warn "$whoami: $msg\n\n" if defined $msg;
+    die "
+Usage: $whoami { -b | -i } [ -o out_prefix -e err_prefix ] file
+
+The purpose of this script is primary to serve as an example of how to
+parse abuild's output.
+
+The given file is expected to contain the complete output of an abuild
+run with either buffered or interleaved output.  If interleaved,
+specify -i.  If buffered, specify -b.
+
+If the original build was run without output or error prefixes, these
+must be given to this program with the -o and -e options.  This script
+only works if the output and error prefix are the same length and are
+different from each other, though other strategies could also be
+implemented.  This program allocates lines to build items and prints a
+summary.
+
+";
+}
