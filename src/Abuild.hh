@@ -8,6 +8,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/regex.hpp>
+#include <JavaBuilder.hh>
 #include <Error.hh>
 #include <QEXC.hh>
 #include <BuildForest.hh>
@@ -16,7 +17,6 @@
 #include <Interface.hh>
 #include <PlatformData.hh>
 #include <PlatformSelector.hh>
-#include <JavaBuilder.hh>
 #include <CompatLevel.hh>
 #include <TargetType.hh>
 #include <Logger.hh>
