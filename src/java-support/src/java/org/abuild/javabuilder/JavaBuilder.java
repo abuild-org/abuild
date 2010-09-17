@@ -179,6 +179,8 @@ class JavaBuilder
 	    if (this.buildArgs.testProtocol)
 	    {
 		System.out.println("rogue output from before redirection");
+		System.out.flush();
+		Thread.sleep(500);
 		System.err.println("rogue error from before redirection");
 	    }
 
@@ -192,6 +194,8 @@ class JavaBuilder
 	    if (this.buildArgs.testProtocol)
 	    {
 		System.out.println("rogue output from after redirection");
+		System.out.flush();
+		Thread.sleep(500);
 		System.err.println("rogue error from after redirection");
 	    }
 	}
