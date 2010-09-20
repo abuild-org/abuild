@@ -5,5 +5,19 @@ use strict;
 
 while (<>)
 {
-    print;
+    if (m/abuild: \(verbose\)/)
+    {
+	if (m/looking for top|top-search|travers|backing/)
+	{
+	    print;
+	}
+	elsif (m/(creating|importing) interface/)
+	{
+	    print;
+	}
+    }
+    else
+    {
+	print;
+    }
 }

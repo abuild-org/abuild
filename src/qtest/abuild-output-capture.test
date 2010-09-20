@@ -51,19 +51,26 @@ foreach my $t (@tests)
 	$p_args .= ' -o "O " -e "E "';
     }
     my $filter = "perl $top/../../../misc/parse-build-output $p_args" .
-	" | perl $filters/filter-abuild.pl";
+	" | perl $filters/filter-abuild.pl" .
+	" | perl $top/filter-output.pl";
     if ($verbose)
     {
 	$filter .= " | perl $top/filter-verbose.pl";
     }
-    my @flags = qw(-j20 -b all -k);
-    push(@flags, '--verbose') if $verbose;
+    my @flags = qw(-j20 -b all -k -p option=*);
+    if ($verbose)
+    {
+	push(@flags, '--verbose');
+	push(@flags, '--only-with-traits', 'make');
+    }
     push(@flags, $interleaved ? '--interleaved-output' : '--buffered-output');
+    push(@flags, 'MISBEHAVE=1') if $interleaved;
     push(@flags, '--output-prefix=O ', '--error-prefix=E ') if $prefixes;
     my $description = +('verbose: ' . ($verbose ? 'y' : 'n') . ', ' .
 			'prefixes: ' . ($prefixes ? 'y' : 'n') . ', ' .
 			($interleaved ? 'interleaved' : 'buffered'));
-    my $outfile = "p$prefixes-i$interleaved-v$verbose.out";
+    my $outfile = "$top/p$prefixes-i$interleaved-v$verbose.out";
+    $outfile =~ s/-i.// if $verbose;
     $td->runtest($description,
 		 {$td->COMMAND => ['abuild', @flags],
 		  $td->FILTER => $filter},
@@ -72,6 +79,6 @@ foreach my $t (@tests)
 }
 
 
-check_work_accessed($td);
+check_work_accessed($td, "not-accessed.out");
 
 $td->report(1 + @tests);

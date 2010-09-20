@@ -1,3 +1,6 @@
 abuild.addTargetClosure('all') {
-    System.exit(1)
+    if (abuild.resolve('MISBEHAVE'))
+    {
+        System.exit(1)
+    }
 }

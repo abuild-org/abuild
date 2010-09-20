@@ -1,0 +1,75 @@
+Output preceding build phase
+------------------------------
+abuild: build starting
+
+Output following build phase
+------------------------------
+abuild: build complete
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: c on platform indep
+abuild: ERROR: build failure: d on platform indep
+abuild: ERROR: build failure: e1 on platform indep
+
+Output for c on indep
+------------------------------
+abuild: c (abuild-indep):
+--topdir--/t1/b/Abuild.interface:1:9: ERROR: variable X has already been declared
+--topdir--/t1/a/Abuild.interface:1:9: ERROR: here is the previous declaration
+abuild: c (abuild-indep): build failed
+
+Output for d on indep
+------------------------------
+abuild: d (abuild-indep): all
+make: Entering directory `--topdir--/t1/d/abuild-indep'
+hello from d
+make: Leaving directory `--topdir--/t1/d/abuild-indep'
+--topdir--/t1/d/after1:1:9: ERROR: variable X has already been declared
+--topdir--/t1/a/Abuild.interface:1:9: ERROR: here is the previous declaration
+--topdir--/t1/d/after1:1:20: ERROR: variable X already has a value
+--topdir--/t1/a/Abuild.interface:1:20: ERROR: here is the previous assignment
+--topdir--/t1/d/Abuild.interface:1: ERROR: after-build file after2 does not exist
+abuild: d (abuild-indep): build failed
+
+Output for e on indep
+------------------------------
+abuild: e (abuild-indep) will not be built because of failure of a dependency
+
+Output for e1 on indep
+------------------------------
+abuild: e1 (abuild-indep):
+--topdir--/t1/e/e1/Abuild.interface:1: ERROR: interfaces for items with no build files may not load after-build files
+abuild: e1 (abuild-indep): build failed
+
+Output for f on indep
+------------------------------
+abuild: f (abuild-indep): all
+oink[no newline]
+
+Output for g on indep
+------------------------------
+abuild: g (abuild-indep): all
+
+Output for h on <native>
+------------------------------
+abuild: h (abuild-<native>): all
+make: Entering directory `--topdir--/t1/h/abuild-<native>'
+output
+error
+make: Leaving directory `--topdir--/t1/h/abuild-<native>'
+
+Output for h on <native>.debug
+------------------------------
+abuild: h (abuild-<native>.debug): all
+make: Entering directory `--topdir--/t1/h/abuild-<native>.debug'
+output
+error
+make: Leaving directory `--topdir--/t1/h/abuild-<native>.debug'
+
+Output for h on <native>.release
+------------------------------
+abuild: h (abuild-<native>.release): all
+make: Entering directory `--topdir--/t1/h/abuild-<native>.release'
+output
+error
+make: Leaving directory `--topdir--/t1/h/abuild-<native>.release'
+

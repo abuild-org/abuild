@@ -1,0 +1,127 @@
+Output preceding build phase
+------------------------------
+abuild: (verbose) looking for top of build forest "local forest"
+abuild: (verbose)  top-search: checking --topdir--/t1
+abuild: (verbose) top-search: --topdir--/t1 is forest root
+abuild: (verbose) traversing forest from --topdir--/t1: "root of local forest"
+abuild: (verbose)  traversing items for --topdir--/t1
+abuild: (verbose)  done traversing items for --topdir--/t1
+abuild: (verbose)  checking for backing areas
+abuild: (verbose)  done with all backing areas of --topdir--/t1
+abuild: (verbose) done traversing forest from --topdir--/t1
+abuild: build starting
+
+Output following build phase
+------------------------------
+ERROR SUMMARY:
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: c on platform indep
+abuild: ERROR: build failure: d on platform indep
+abuild: ERROR: build failure: e1 on platform indep
+COMPLETE OUTPUT:
+abuild: build complete
+abuild: ERROR: at least one build failure occurred; summary follows
+abuild: ERROR: build failure: c on platform indep
+abuild: ERROR: build failure: d on platform indep
+abuild: ERROR: build failure: e1 on platform indep
+
+Output for a on indep
+------------------------------
+abuild: a (abuild-indep):
+abuild: (verbose) creating interface for a on indep
+
+Output for b on indep
+------------------------------
+abuild: b (abuild-indep):
+abuild: (verbose) creating interface for b on indep
+
+Output for c on indep
+------------------------------
+ERROR SUMMARY:
+--topdir--/t1/b/Abuild.interface:1:9: ERROR: variable X has already been declared
+--topdir--/t1/a/Abuild.interface:1:9: ERROR: here is the previous declaration
+COMPLETE OUTPUT:
+abuild: c (abuild-indep):
+abuild: (verbose) creating interface for c on indep
+abuild: (verbose) importing interface for dependency a
+abuild: (verbose) importing interface for dependency b
+--topdir--/t1/b/Abuild.interface:1:9: ERROR: variable X has already been declared
+--topdir--/t1/a/Abuild.interface:1:9: ERROR: here is the previous declaration
+abuild: c (abuild-indep): build failed
+
+Output for d on indep
+------------------------------
+ERROR SUMMARY:
+--topdir--/t1/d/after1:1:9: ERROR: variable X has already been declared
+--topdir--/t1/a/Abuild.interface:1:9: ERROR: here is the previous declaration
+--topdir--/t1/d/after1:1:20: ERROR: variable X already has a value
+--topdir--/t1/a/Abuild.interface:1:20: ERROR: here is the previous assignment
+--topdir--/t1/d/Abuild.interface:1: ERROR: after-build file after2 does not exist
+COMPLETE OUTPUT:
+abuild: d (abuild-indep):
+abuild: (verbose) creating interface for d on indep
+abuild: (verbose) importing interface for dependency a
+abuild: d (abuild-indep): all in d/abuild-indep
+make: Entering directory `--topdir--/t1/d/abuild-indep'
+hello from d
+make: Leaving directory `--topdir--/t1/d/abuild-indep'
+--topdir--/t1/d/after1:1:9: ERROR: variable X has already been declared
+--topdir--/t1/a/Abuild.interface:1:9: ERROR: here is the previous declaration
+--topdir--/t1/d/after1:1:20: ERROR: variable X already has a value
+--topdir--/t1/a/Abuild.interface:1:20: ERROR: here is the previous assignment
+--topdir--/t1/d/Abuild.interface:1: ERROR: after-build file after2 does not exist
+abuild: d (abuild-indep): build failed
+
+Output for e on indep
+------------------------------
+abuild: e (abuild-indep) will not be built because of failure of a dependency
+
+Output for e1 on indep
+------------------------------
+ERROR SUMMARY:
+--topdir--/t1/e/e1/Abuild.interface:1: ERROR: interfaces for items with no build files may not load after-build files
+COMPLETE OUTPUT:
+abuild: e1 (abuild-indep):
+abuild: (verbose) creating interface for e1 on indep
+--topdir--/t1/e/e1/Abuild.interface:1: ERROR: interfaces for items with no build files may not load after-build files
+abuild: e1 (abuild-indep): build failed
+
+Output for h on <native>
+------------------------------
+ERROR SUMMARY:
+error
+COMPLETE OUTPUT:
+abuild: h (abuild-<native>):
+abuild: (verbose) creating interface for h on <native>
+abuild: h (abuild-<native>): all in h/abuild-<native>
+make: Entering directory `--topdir--/t1/h/abuild-<native>'
+output
+error
+make: Leaving directory `--topdir--/t1/h/abuild-<native>'
+
+Output for h on <native>.debug
+------------------------------
+ERROR SUMMARY:
+error
+COMPLETE OUTPUT:
+abuild: h (abuild-<native>.debug):
+abuild: (verbose) creating interface for h on <native>.debug
+abuild: h (abuild-<native>.debug): all in h/abuild-<native>.debug
+make: Entering directory `--topdir--/t1/h/abuild-<native>.debug'
+output
+error
+make: Leaving directory `--topdir--/t1/h/abuild-<native>.debug'
+
+Output for h on <native>.release
+------------------------------
+ERROR SUMMARY:
+error
+COMPLETE OUTPUT:
+abuild: h (abuild-<native>.release):
+abuild: (verbose) creating interface for h on <native>.release
+abuild: h (abuild-<native>.release): all in h/abuild-<native>.release
+make: Entering directory `--topdir--/t1/h/abuild-<native>.release'
+output
+error
+make: Leaving directory `--topdir--/t1/h/abuild-<native>.release'
+

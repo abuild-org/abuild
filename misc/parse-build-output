@@ -282,7 +282,7 @@ sub dump_lines
     my ($description, $lines) = @_;
     my ($all_lines, $error_lines) = @$lines;
     print $description, "\n";
-    print '-' x (length $description), "\n";
+    print "------------------------------\n";
     if (@$error_lines)
     {
 	print "ERROR SUMMARY:\n";
