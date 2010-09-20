@@ -152,6 +152,7 @@ JavaBuilder::finish()
 	boost::mutex::scoped_lock lock(this->mutex);
 	setRunMode(rm_idle);
     }
+    this->logger.closeJob(this->jb_logger_job);
 }
 
 void
