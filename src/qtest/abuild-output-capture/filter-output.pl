@@ -15,7 +15,7 @@ while (<>)
 	$section = $1;
     }
 
-    if (m/JavaBuilder exited unexpectedly/)
+    if (m/JavaBuilder.*will attempt/)
     {
 	$unexp_section = $section;
     }
