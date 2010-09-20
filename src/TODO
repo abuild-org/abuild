@@ -1,42 +1,6 @@
 1.1.3
 =====
 
-XXX strategy for abuild-capture-output:
-
-   run a single-threaded abuild -b all and use that manually to
-   generate output after checking it against the list below to make
-   sure everything is there.  Need to filter enough stuff out of
-   verbose.  Try to keep what we can...definitely filter out all the
-   stuff that depends on groovy, ant, and java's locations.  Be
-   careful about timing with reversal of out and err lines.  There
-   hopefully shouldn't be any.
-
- * Test new logger stuff.  Use parse-build-output.  Test interleaved
-   and buffered with and without error/output prefixes.  Go through
-   code and make a list of coverage cases but don't actually use the
-   coverage system...people will be copying and modifying this script.
-
-     Abuild.conf errors/other pre-build errors
-     interface errors
-     failure
-     failure of dependency
-     missing after-build
-     interface only after-build
-     javabuilder errors
-     verbose
-
-     Check for other errors in these functions:
-
-     itemBuilder
-     readAfterBuilds
-     parseBuildGraphNode
-     createItemInterface
-     dumpInterface
-     buildItem
-     invoke_gmake
-     invoke_ant
-     invoke_groovy
-
  * Fix doc for global-plugin: search for "-plugin"....
 
  * When abuild runs a list_platforms command and the command fails,
