@@ -468,6 +468,7 @@ class Abuild
     std::string local_tree;
     ItemConfig* this_config;
     PlatformData internal_platform_data;
+    std::map<std::string, std::string> unused_platform_selectors;
     std::set<std::string> valid_traits;
     BuildItem_map buildset;
     std::set<std::string> plugins;

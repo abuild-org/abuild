@@ -27,8 +27,14 @@ class PlatformData
 		     std::string const& platform_type,
 		     bool lowpri);
     // check() must be called after adding platforms and platform
-    // types and before calling any of the querying methods.
-    void check(std::map<std::string, PlatformSelector> const&);
+    // types and before calling any of the querying methods.  If a
+    // given platform selector from selectors is used and the key
+    // appears in unused_selectors, the corresponding entry will be
+    // removed from unused_selectors.  This way we can keep a running
+    // tab on whether any platform selectors are unused across all
+    // trees.
+    void check(std::map<std::string, PlatformSelector> const& selectors,
+	       std::map<std::string, std::string>& unused_selectors);
 
     // check() must have been called.
     bool isPlatformTypeValid(std::string const&) const;

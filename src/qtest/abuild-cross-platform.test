@@ -181,6 +181,15 @@ foreach my $d (['none', 'none', ''],
 		 $td->NORMALIZE_NEWLINES);
 }
 
+$td->runtest("unused platform selectors",
+	     {$td->COMMAND =>
+		  [qw(abuild -p native:compiler=oink -p option=al),
+		   qw(-p oink:skip -p moo:default)],
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/unused-selectors.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 # dumpdata to exercise global-tree-deps and global-plugins
 
 $td->runtest("dump data",
@@ -203,4 +212,4 @@ $td->runtest("list_platforms --native-data",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(30);
+$td->report(31);

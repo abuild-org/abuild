@@ -740,15 +740,9 @@ Abuild::parseArgv()
 	PlatformSelector p;
 	if (p.initialize(*iter))
 	{
-	    // Don't validate the platform type or any of the fields
-	    // themselves.  It's not incorrect to reference
-	    // non-existent platforms or platform types here.  That
-	    // way, people can set the ABUILD_PLATFORM_SELECTORS
-	    // environment variable based on some build tree they work
-	    // in and not worry about it if they build in a different
-	    // tree that doesn't have all the same platforms and
-	    // platform types.
-	    this->platform_selectors[p.getPlatformType()] = p;
+	    std::string platform_type = p.getPlatformType();
+	    this->platform_selectors[platform_type] = p;
+	    this->unused_platform_selectors[platform_type] = *iter;
 	}
 	else
 	{
@@ -1370,7 +1364,8 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 
     try
     {
-	platform_data.check(this->platform_selectors);
+	platform_data.check(this->platform_selectors,
+			    this->unused_platform_selectors);
     }
     catch (QEXC::General& e)
     {
@@ -1421,6 +1416,24 @@ Abuild::readConfigs()
     // additional discussion.
     BuildForest_map forests;
     traverse(forests, local_top);
+
+    // Report any platform selectors that were not used in any tree.
+    // This check can't be done until after all forests are traversed
+    // since each tree can potentially have different platforms and
+    // platform types.
+    if (! this->unused_platform_selectors.empty())
+    {
+	QTC::TC("abuild", "Abuild unused platform selector");
+	error("the following platform selectors were never used for"
+	      " platform selection and may refer to unknown"
+	      " platform types, compilers, or options:");
+	for (std::map<std::string, std::string>::const_iterator iter =
+		 this->unused_platform_selectors.begin();
+	     iter != this->unused_platform_selectors.end(); ++iter)
+	{
+	    error("  " + (*iter).second);
+	}
+    }
 
     // Compute the list of all known traits.  This routine also
     // validates to make sure that any traits specified on the command

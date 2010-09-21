@@ -9,9 +9,19 @@
  * Document: --normalize-line-endings option to codegen-wrapper,
    suggested by Jeremy Trimble
 
- * abuild -p compiler=xyz doesn't complain if compiler xyz doesn't
-   exist anywhere.  This is probably by design, but it seems
-   undesirable.
+ * abuild -p compiler=xyz didn't complain if compiler xyz doesn't
+   exist anywhere.  Old comment:
+
+   // Don't validate the platform type or any of the fields
+   // themselves.  It's not incorrect to reference
+   // non-existent platforms or platform types here.  That
+   // way, people can set the ABUILD_PLATFORM_SELECTORS
+   // environment variable based on some build tree they work
+   // in and not worry about it if they build in a different
+   // tree that doesn't have all the same platforms and
+   // platform types.
+
+   In retrospect, this is wrong.
 
  * Document output change of job header before interface errors
 

@@ -92,7 +92,8 @@ PlatformData::addPlatform(std::string const& platform,
 }
 
 void
-PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
+PlatformData::check(std::map<std::string, PlatformSelector> const& selectors,
+		    std::map<std::string, std::string>& unused_selectors)
 {
     this->checked = true;
     if (! this->platform_graph.check())
@@ -148,14 +149,18 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 	std::string const& platform_type = (*iter).first;
 	TargetType::target_type_e target_type = (*iter).second;
 	PlatformSelector const* ps = 0;
+	bool used_selector = false;
+	std::string which_selector;
 	if (selectors.count(platform_type) != 0)
 	{
 	    ps = &((*(selectors.find(platform_type))).second);
+	    which_selector = platform_type;
 	}
 	else if ((target_type == TargetType::tt_object_code) &&
 		 selectors.count(PlatformSelector::ANY))
 	{
 	    ps = &((*(selectors.find(PlatformSelector::ANY))).second);
+	    which_selector = PlatformSelector::ANY;
 	}
 	if (ps && (! ps->isSkip()) &&
 	    (target_type != TargetType::tt_object_code))
@@ -191,18 +196,24 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 		      boost::bind(&PlatformData::declarationOrder,
 				  this, _1, _2));
 
-	    if (ps && ps->isSkip())
+	    bool select_default = true;
+	    if (ps)
 	    {
-		// Ignore all platforms in this platform type.  Do this
-		// after the above assignment since it has the side effect
-		// of instantiating the platform type.
-		QTC::TC("abuild", "PlatformData skipping platform type");
-	    }
-	    else
-	    {
-		bool any_selected = false;
-		if (ps && (! ps->isDefault()))
+		if (ps->isSkip())
 		{
+		    // Ignore all platforms in this platform type.
+		    QTC::TC("abuild", "PlatformData skipping platform type");
+		    select_default = false;
+		    used_selector = true;
+		}
+		else if (ps->isDefault())
+		{
+		    used_selector = true;
+		}
+		else
+		{
+		    bool any_selected = false;
+
 		    // If we have selection criteria, mark each
 		    // matching platform.  We must do this after the
 		    // initial sort because we need to know what would
@@ -219,14 +230,26 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors)
 			    any_selected = true;
 			}
 		    }
-		}
 
-		// Make sure at least one platform is selected
-		if (! any_selected)
-		{
-		    platforms[0].second = true;
+		    if (any_selected)
+		    {
+			select_default = false;
+			used_selector = true;
+		    }
 		}
 	    }
+
+	    // If no explicit selection (including skip) has been mde,
+	    // select the first platform.
+	    if (select_default)
+	    {
+		platforms[0].second = true;
+	    }
+	}
+
+	if (ps && used_selector)
+	{
+	    unused_selectors.erase(which_selector);
 	}
     }
 }

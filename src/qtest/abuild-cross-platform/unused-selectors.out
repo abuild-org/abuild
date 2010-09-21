@@ -1,0 +1,6 @@
+abuild: ERROR: the following platform selectors were never used for platform selection and may refer to unknown platform types, compilers, or options:
+abuild: ERROR:   option=al
+abuild: ERROR:   moo:default
+abuild: ERROR:   native:compiler=oink
+abuild: ERROR:   oink:skip
+abuild: ERROR: errors detected; exiting
