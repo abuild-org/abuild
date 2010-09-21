@@ -1,6 +1,7 @@
+# Use printf here since Solaris lacks echo -n
 all::
-	@echo -n $(ABUILD_ITEM_NAME) 'out1 '
-	@echo -n 1>&2 $(ABUILD_ITEM_NAME) 'err1 '
+	@printf "$(ABUILD_ITEM_NAME) out1 "
+	@printf 1>&2 "$(ABUILD_ITEM_NAME) err1 "
 	@sleep 1
 	@echo 1>&2 $(ABUILD_ITEM_NAME) err2
 	@sleep 1
