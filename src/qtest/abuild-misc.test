@@ -509,7 +509,7 @@ $td->runtest("environment variables and parameters",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(63 +
+$td->report(62 +
 	    (in_windows() ? 0 : 4) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));
