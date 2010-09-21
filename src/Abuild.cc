@@ -1293,7 +1293,24 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	cmd += " --native-data " + this->native_os + " " +
 	    this->native_cpu + " " + this->native_toolset;
 	FileLocation location(list_platforms, 0, 0);
-	std::string platform_data_output = Util::getProgramOutput(cmd);
+	std::string platform_data_output;
+	try
+	{
+	    platform_data_output = Util::getProgramOutput(cmd);
+	}
+	catch (QEXC::General& e)
+	{
+	    std::list<std::string> lines =
+		Util::readLinesFromFile(list_platforms, false);
+	    if ((! lines.empty()) &&
+		((*(lines.begin())).find('\r') != std::string::npos))
+	    {
+		QTC::TC("abuild", "Abuild windows nl in list_platforms");
+		error(location, "Windows-style line endings found;"
+		      " please ensure this file uses UNIX line endings");
+	    }
+	    throw e;
+	}
 	std::istringstream in(platform_data_output);
 	std::list<std::string> lines = Util::readLinesFromFile(in);
 	for (std::list<std::string>::iterator iter = lines.begin();

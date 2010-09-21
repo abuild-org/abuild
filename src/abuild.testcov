@@ -431,3 +431,4 @@ JavaBuilder pending data 1
 JavaBuilder response ends with NL 0
 JavaBuilder response ends with CRNL 0
 Abuild set interleaved from prefix 0
+Abuild windows nl in list_platforms 0
