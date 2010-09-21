@@ -1,0 +1,15 @@
+O abuild: build starting
+O abuild: support-utf8 (abuild-indep): all
+O rogue output from before redirection
+! rogue error from before redirection
+O rogue output from after redirection
+! rogue error from after redirection
+O 123456789
+O hello
+! potato
+O abuild: protocol (abuild-indep): all
+O hello from groovy
+O hello from groovy thread
+O Would you like
+O a piece of pi?
+O abuild: build complete

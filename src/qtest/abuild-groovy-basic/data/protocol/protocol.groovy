@@ -3,5 +3,12 @@ abuild.configureTarget('all') {
     Thread.start {
         println "hello from groovy thread"
     }.join()
-    println "¿Would you like\na πiece of π?";
+    if (abuild.resolve('SUPPORT_UTF8') == '1')
+    {
+        println "¿Would you like\na πiece of π?";
+    }
+    else
+    {
+        println "Would you like\na piece of pi?";
+    }
 }

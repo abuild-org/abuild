@@ -60,14 +60,29 @@ $td->runtest("groovy Util",
 
 cd("work/protocol");
 
+chop(my $support_utf8 = `abuild --silent -b name:print-utf8`);
 foreach my $j ('j1', 'j2')
 {
-    $td->runtest("JavaBuilder protocol: $j",
-		 {$td->COMMAND => ['abuild', ' --test-java-builder-protocol',
-				   '--output-prefix=O ', '--error-prefix=! ',
-				   "-$j"],
-		  $td->FILTER => "perl $filters/filter-abuild.pl"},
-		 {$td->FILE => "$top/protocol-$j.out", $td->EXIT_STATUS => 0},
+    if ($support_utf8)
+    {
+	$td->runtest("JavaBuilder protocol (utf8): $j",
+		     {$td->COMMAND =>
+			  ['abuild', ' --test-java-builder-protocol',
+			   '--output-prefix=O ', '--error-prefix=! ',
+			   "-$j"],
+			  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/protocol-$j.utf8.out",
+		      $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+    $td->runtest("JavaBuilder protocol (ascii): $j",
+		 {$td->COMMAND =>
+		      ['abuild', ' --test-java-builder-protocol',
+		       '--output-prefix=O ', '--error-prefix=! ',
+		       "-$j", 'FORCE_ASCII=1'],
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/protocol-$j.ascii.out",
+		  $td->EXIT_STATUS => 0},
 		 $td->NORMALIZE_NEWLINES);
 }
 
@@ -168,4 +183,4 @@ $td->runtest("Groovy/Java interdependence",
 
 check_work_accessed($td);
 
-$td->report(18);
+$td->report(18 + ($support_utf8 ? 2 : 0));
