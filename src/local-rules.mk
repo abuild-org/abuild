@@ -1,7 +1,7 @@
-.PRECIOUS: %.fl
+.PRECIOUS: interface.fl
 
 # Generate .fl from .qfl file
-%.fl: %.qfl $(SRCDIR)/gen_flex %.yy
+interface.fl: interface.qfl $(SRCDIR)/gen_flex interface.yy
 	@$(PRINT) Generating $@ from $<
 	perl $(SRCDIR)/gen_flex $< $@
 
