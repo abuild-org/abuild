@@ -1,8 +1,10 @@
 COPY=cp
+IGNORE_NEWLINES ?=
 
 in2: in2.in
 	@$(PRINT) generating $@ from $^
 	$(CODEGEN_WRAPPER) --cache cache \
+		$(and $(IGNORE_NEWLINES), --normalize-line-endings) \
 		--input $^ --output $@ \
 		--command $(COPY) $< $@
 

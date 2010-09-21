@@ -39,7 +39,7 @@ for my $i (1, 2)
 
     if (! in_windows())
     {
-	$td->runtest("check executable",
+	$td->runtest("check executable permission",
 		     {$td->STRING =>
 			  (-x "abuild-indep/b/out1" ? "yes\n" : "no\n")},
 		     {$td->STRING => "yes\n"});
@@ -55,14 +55,45 @@ for my $i (1, 2)
 		     $td->NORMALIZE_NEWLINES);
     }
 
+    # no NORMALIZE_NEWLINES
     $td->runtest("check cache",
 		 {$td->COMMAND => "find cache -type f -print | LANG=C sort"},
 		 {$td->FILE => "$top/cache-contents.out",
-		  $td->EXIT_STATUS => 0},
-		 $td->NORMALIZE_NEWLINES);
+		  $td->EXIT_STATUS => 0});
 
     if ($i == 2)
     {
+	sleep 1;
+	open(F, "<in2.in") or die;
+	my @lines = <F>;
+	close(F);
+	die if (grep { m/\r/ } @lines);
+	for (@lines)
+	{
+	    s/\n/\r\n/g;
+	}
+	die unless (grep { m/\r/ } @lines);
+	open(F, ">in2.in") or die;
+	for (@lines)
+	{
+	    print F;
+	}
+	close(F);
+
+	$td->runtest("line endings changed",
+		     {$td->COMMAND => "abuild COPY=false",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/codegen-wrapper-command-failure.out",
+		      $td->EXIT_STATUS => 2},
+		     $td->NORMALIZE_NEWLINES);
+
+	$td->runtest("ignore line endings",
+		     {$td->COMMAND => "abuild COPY=false IGNORE_NEWLINES=1",
+		      $td->FILTER => "perl $filters/filter-abuild.pl"},
+		     {$td->FILE => "$top/codegen-wrapper-newlines-changed.out",
+			  $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+
 	sleep 1;
 	# Update input file
 	open(F, ">>in2.in") or die;
@@ -464,7 +495,7 @@ $td->runtest("environment variables and parameters",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(60 +
+$td->report(62 +
 	    (in_windows() ? 0 : 3) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));
