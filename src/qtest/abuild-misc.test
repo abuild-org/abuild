@@ -123,16 +123,19 @@ for my $i (1, 2)
 		 $td->NORMALIZE_NEWLINES);
 }
 
-# Detect windows line endings in list_platforms
-cd("work/windows-nl");
-$td->runtest("detect windows line endings",
-	     {$td->COMMAND => "abuild",
-	      $td->FILTER =>
-		  "perl $filters/filter-abuild.pl" .
-		  "| perl $top/filter-list-platforms.pl"},
-	     {$td->FILE => "$top/windows-nl-list_platforms.out",
-	      $td->EXIT_STATUS => 2},
-	     $td->NORMALIZE_NEWLINES);
+if (! in_windows())
+{
+    # Detect windows line endings in list_platforms
+    cd("work/windows-nl");
+    $td->runtest("detect windows line endings",
+		 {$td->COMMAND => "abuild",
+		  $td->FILTER =>
+		      "perl $filters/filter-abuild.pl" .
+		      "| perl $top/filter-list-platforms.pl"},
+		 {$td->FILE => "$top/windows-nl-list_platforms.out",
+		  $td->EXIT_STATUS => 2},
+		 $td->NORMALIZE_NEWLINES);
+}
 
 # Test built-in code generator support.  We don't bother with these if
 # we're on Windows since we'd most likely be finding cygwin versions
@@ -507,6 +510,6 @@ $td->runtest("environment variables and parameters",
 check_work_accessed($td, "not-accessed.out");
 
 $td->report(63 +
-	    (in_windows() ? 0 : 3) +
+	    (in_windows() ? 0 : 4) +
 	    ($have_rpcgen ? 2 : 1) +
 	    ($have_flex_bison ? 7 : 1));
