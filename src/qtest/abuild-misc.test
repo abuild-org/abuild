@@ -123,10 +123,10 @@ for my $i (1, 2)
 		 $td->NORMALIZE_NEWLINES);
 }
 
+cd("work/windows-nl");
 if (! in_windows())
 {
     # Detect windows line endings in list_platforms
-    cd("work/windows-nl");
     $td->runtest("detect windows line endings",
 		 {$td->COMMAND => "abuild",
 		  $td->FILTER =>
@@ -135,6 +135,10 @@ if (! in_windows())
 		 {$td->FILE => "$top/windows-nl-list_platforms.out",
 		  $td->EXIT_STATUS => 2},
 		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    system("(tar cf - . | cat > /dev/null)");
 }
 
 # Test built-in code generator support.  We don't bother with these if
