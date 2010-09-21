@@ -498,7 +498,8 @@ See also "Known Limitations" in the documentation.
 
  * ccxx: Consider enforcing that no object file may appear both as a
    program and a library object file and that no object file may be
-   generated from more than one source file (with different suffixes)
+   generated from more than one source file (with different suffixes).
+   This would break some existing builds.
 
  * In the manual, it would be nice if we could use higher resolution
    figures for the PDF than for the HTML.  There is plenty of material
