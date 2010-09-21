@@ -13,10 +13,6 @@
    exist anywhere.  This is probably by design, but it seems
    undesirable.
 
- * Make sure dependencies are correct for when interface.qfl file or
-   interface.yy is updated relative to cache....seems like maybe the
-   chaining for interface.qfl isn't quite right.
-
  * Document output change of job header before interface errors
 
  * Add help for configuring targets in groovy.
