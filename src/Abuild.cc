@@ -1299,6 +1299,9 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	    if ((! lines.empty()) &&
 		((*(lines.begin())).find('\r') != std::string::npos))
 	    {
+		// This coverage case is referenced in
+		// abuild-misc.test; update call to fake_qtc if it
+		// changes.
 		QTC::TC("abuild", "Abuild windows nl in list_platforms");
 		error(location, "Windows-style line endings found;"
 		      " please ensure this file uses UNIX line endings");
