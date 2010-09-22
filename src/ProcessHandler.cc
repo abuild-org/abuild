@@ -505,11 +505,12 @@ ProcessHandler::runProgram(
 			if (waitpid_status != 0)
 			{
 			    // The process has exited
-			    pid = -1;
 			    if (waitpid_status != pid)
 			    {
 				exit_status = !0;
 			    }
+			    // Prevent calling waitpid again
+			    pid = -1;
 
 			    if (child_out != -1)
 			    {
