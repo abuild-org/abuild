@@ -12408,6 +12408,11 @@ flag private INCLUDES = private-include
       </listitem>
       <listitem>
        <para>
+        <type>default</type>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
         <type>skip</type>
        </para>
       </listitem>
@@ -12423,6 +12428,12 @@ flag private INCLUDES = private-include
      embedded builds, for example.  This is the only selector that can
      be used with the <type>indep</type> or <type>java</type> platform
      types.
+    </para>
+    <para>
+     The <type>default</type> selector means to select whichever
+     platform would be selected if no platform specifier were given.
+     This is useful to direct &abuild; to use the default for a given
+     platform type when a general specifier was used.
     </para>
     <para>
      The other selectors are translated into an (<type>os</type>,
@@ -12488,41 +12499,46 @@ flag private INCLUDES = private-include
      selectors along with a description of what they mean:
      <variablelist>
       <varlistentry>
-       <term><type>type=native:option=debug</type></term>
+       <term><type>native:option=debug</type></term>
        <listitem>
         <para>
-         on the native platform type, build with the first platform
+         On the native platform type, build with the first platform
          that has the <type>debug</type> option.  If none, build with
          the first platform regardless of its options.  (This is
          always the behavior when there are no platforms that fit the
          criteria, so this will not repeated for each example.)  In
          this case, we would build <type>native</type> items on
-         <type>linux.x86.rhel4.xlc.debug</type>.
+         <type>linux.x86.rhel4.xlc.debug</type>.  Build the default
+         platform for <type>vxworks</type>.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=native:compiler=gcc.release</type></term>
+       <term><type>native:compiler=gcc.release</type></term>
        <listitem>
         <para>
          On the native platform type, build with compiler
          <type>gcc</type> with the <type>release</type> option.  In
          this case, that would be
-         <type>linux.x86.rhel4.gcc.release</type>.
+         <type>linux.x86.rhel4.gcc.release</type>.  Build the default
+         platform for vxworks.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=native:compiler=gcc</type></term>
+       <term><type>compiler=gcc vxworks:default</type></term>
        <listitem>
         <para>
-         On the native platform type, build with <type>gcc</type> with
-         no options, <type>linux.x86.rhel4.gcc</type>.
+         On all <type>object-code</type> platform types except
+         <type>vxworks</type>, build with <type>gcc</type> with no
+         options.  For <type>native</type>, this is
+         <type>linux.x86.rhel4.gcc</type>.  Explicitly build the
+         default platform for <type>vxworks</type>.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=native:compiler=gcc.*</type></term>
+       <term><type>native:compiler=gcc.*</type></term>
        <listitem>
         <para>
          On the native platform type, build all <type>gcc</type>
@@ -12530,23 +12546,25 @@ flag private INCLUDES = private-include
          platform without any options.  That would include
          <type>linux.x86.rhel4.gcc</type>,
          <type>linux.x86.rhel4.gcc.debug</type>, and
-         <type>linux.x86.rhel4.gcc.release</type>.
+         <type>linux.x86.rhel4.gcc.release</type>.  Build the default
+         platform for vxworks.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=native:compiler=*.debug</type></term>
+       <term><type>native:compiler=*.debug</type></term>
        <listitem>
         <para>
          On the native platform type, build all platforms that have
          the <type>debug</type> option:
          <type>linux.x86.rhel4.xlc.debug</type> and
-         <type>linux.x86.rhel4.gcc.debug</type>.
+         <type>linux.x86.rhel4.gcc.debug</type>.  Build the default
+         platform for vxworks.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=native:compiler=*.*</type></term>
+       <term><type>native:compiler=*.*</type></term>
        <listitem>
         <para>
          On the native platform type, build all platforms:
@@ -12555,22 +12573,24 @@ flag private INCLUDES = private-include
          <type>linux.x86.rhel4.xlc.release</type>,
          <type>linux.x86.rhel4.gcc</type>,
          <type>linux.x86.rhel4.gcc.debug</type>, and
-         <type>linux.x86.rhel4.gcc.release</type>.
+         <type>linux.x86.rhel4.gcc.release</type>.  Build the default
+         for vxworks.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=vxworks:platform=*.*.*.*.debug</type></term>
+       <term><type>vxworks:platform=*.*.*.*.debug</type></term>
        <listitem>
         <para>
          On vxworks, build for all platforms that have the
          <type>debug</type> option:
-         <type>vxworks.x86.6_3.vxgcc.debug</type>.
+         <type>vxworks.x86.6_3.vxgcc.debug</type>.  Build the default
+         platform for native.
         </para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=vxworks:platform=*.x86.*.*.*</type></term>
+       <term><type>vxworks:platform=*.x86.*.*.*</type></term>
        <listitem>
         <para>
          On vxworks, build all platforms that have <type>x86</type> as
@@ -12581,11 +12601,12 @@ flag private INCLUDES = private-include
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><type>type=vxworks:skip</type></term>
+       <term><type>vxworks:skip</type></term>
        <listitem>
         <para>
          Skip the vxworks platform type; no vxworks builds will be
-         done under any circumstances.
+         done except as needed to satisfy platform-specific
+         dependencies.  Native builds are done normally.
         </para>
        </listitem>
       </varlistentry>
