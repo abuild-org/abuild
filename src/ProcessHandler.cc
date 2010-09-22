@@ -471,7 +471,10 @@ ProcessHandler::runProgram(
     }
     else
     {
-	int exit_status;
+	// Initialize exit_status to a non-zero value so that we'll
+	// see the process as having failed if we are never able to
+	// read its exit status.
+	int exit_status = !0;
 	if (output_handler)
 	{
 	    close(output_pipe[1]);
@@ -485,11 +488,41 @@ ProcessHandler::runProgram(
 		FD_ZERO(&read_set);
 		add_to_read_set(read_set, nfds, child_out);
 		add_to_read_set(read_set, nfds, child_err);
-		switch(select(nfds, &read_set, 0, 0, 0))
+		struct timeval tv;
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+		switch(select(nfds, &read_set, 0, 0, &tv))
 		{
 		  case 0:
-		    // timeout
-		    throw QEXC::Internal("select timed out with timeout = 0");
+		    {
+			// On Solaris, sometimes select doesn't show
+			// that the file descriptors are readable
+			// after the child process exits, so
+			// periodically check to see if the process is
+			// still running.
+			int waitpid_status =
+			    waitpid(pid, &exit_status, WNOHANG);
+			if (waitpid_status != 0)
+			{
+			    // The process has exited
+			    pid = -1;
+			    if (waitpid_status != pid)
+			    {
+				exit_status = !0;
+			    }
+
+			    if (child_out != -1)
+			    {
+				close(child_out);
+				child_out = -1;
+			    }
+			    if (child_err != -1)
+			    {
+				close(child_err);
+				child_err = -1;
+			    }
+			}
+		    }
 		    break;
 
 		  case -1:
@@ -508,9 +541,14 @@ ProcessHandler::runProgram(
 		}
 	    }
 	}
-	if (waitpid(pid, &exit_status, 0) != pid)
+	if (pid != -1)
 	{
-	    return false;
+	    if (waitpid(pid, &exit_status, 0) != pid)
+	    {
+		// If we can't get the exit status, treat the process
+		// as having failed.
+		exit_status = !0;
+	    }
 	}
 	status = (exit_status == 0);
     }
