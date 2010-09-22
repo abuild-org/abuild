@@ -138,6 +138,7 @@ if (! in_windows())
 }
 else
 {
+    # Windows line endings don't cause a problem in Windows.
     fake_qtc($td, '^Abuild windows nl in list_platforms');
     system("(tar cf - . | cat > /dev/null)");
 }

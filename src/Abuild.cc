@@ -1294,6 +1294,13 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	}
 	catch (QEXC::General& e)
 	{
+#ifndef _WIN32
+	    // On non-Windows systems, Windows newlines in a perl
+	    // script cause problems.  This situation has caused
+	    // confusion a number of times for people who do checkouts
+	    // on Windows and access the results on UNIX.  We only
+	    // test for this on non-Windows systems to avoid a
+	    // misleading error message on a Windows system.
 	    std::list<std::string> lines =
 		Util::readLinesFromFile(list_platforms, false);
 	    if ((! lines.empty()) &&
@@ -1306,6 +1313,7 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 		error(location, "Windows-style line endings found;"
 		      " please ensure this file uses UNIX line endings");
 	    }
+#endif
 	    throw e;
 	}
 	std::istringstream in(platform_data_output);
