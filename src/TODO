@@ -1,11 +1,6 @@
 1.1.3
 =====
 
- * output capture tests might hang.  From
-   qtest/abuild-output-capture/data/t1, we can hang just with this:
-
-   abuild -b all -j20 -k --buffered-output
-
  * Fix doc for global-plugin: search for "-plugin"....
 
  * Document: When abuild runs a list_platforms command and the command
