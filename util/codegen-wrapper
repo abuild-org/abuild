@@ -322,6 +322,7 @@ Usage: $whoami options
   --cache cache-directory
   --input input files
   --output output files
+  [--normalize-line-endings]
   --command command [ args ... ]
 
 The --command option must be the last option specified.  All remaining
@@ -344,12 +345,14 @@ to be the abuild output directory.
 
 For every output file Y, make sure cache-directory/Y exists.  If so,
 then for every input file X, compare X's md5 checksum with the value
-stored in cache-directory/X.md5.  If all the checksums match, copy
-each cached output file to the current directory.  If not, run
-command, which is presumed to generate the output files from the input
-files.  If command fails, fail.  Otherwise, if command succeeds and
-some output file Y does not exist, fail.  Otherwise, copy each output
-file Y to cache-directory and update each input file's checksum.
+stored in cache-directory/X.md5.  If the --normalize-line-endings flag
+is provided, the checksum calculation disregards differences in
+Windows vs. UNIX line endings.  If all the checksums match, copy each
+cached output file to the current directory.  If not, run command,
+which is presumed to generate the output files from the input files.
+If command fails, fail.  Otherwise, if command succeeds and some
+output file Y does not exist, fail.  Otherwise, copy each output file
+Y to cache-directory and update each input file's checksum.
 
 Note that command is run as provided from the current directory.  This
 means that, in many cases, the names of input files or output files
