@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.2">
-<!ENTITY lastreleased "April 16, 2010">
+<!ENTITY swversion "1.1.3">
+<!ENTITY lastreleased "September XXX, 2010">
 ]>
 <!--
 
@@ -6132,6 +6132,22 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
     remaining chapters:
     <variablelist>
      <varlistentry>
+      <term>Controlling and Processing &Abuild;'s Output</term>
+      <listitem>
+       <para>
+        &Abuild;'s output is primary intended to be useful to human
+        readers, but there are a number of capabilities (introduced in
+        version 1.1.3) that can make it easier to programmatically
+        parse &abuild;'s output or to help make it easier to look at
+        the output of a large build.  In <xref
+        linkend="ref.output-processing"/>, we discuss ways to
+        distinguish normal output from error messages and ways to
+        clearly associate each line of &abuild;'s output with the
+        build item whose build produced it.
+       </para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
       <term>Shared Libraries</term>
       <listitem>
        <para>
@@ -10596,6 +10612,12 @@ parameters {
     </sect2>
    </sect1>
   </chapter>
+  <chapter id="ref.output-processing">
+   <title>Controlling and Processing &Abuild;'s Output</title>
+   <para>
+    XXX
+   </para>
+  </chapter>
   <chapter id="ref.shared-libraries">
    <title>Shared Libraries</title>
    <para>
@@ -11677,12 +11699,13 @@ parameters {
     <para>
      The <command>codegen-wrapper</command> command can handle the
      situation described above for relatively simple cases, but it is
-     likely to be good enough for many situations.  It works as
-     follows:
+     likely to be good enough for many situations.  For details on its
+     syntax, please run it with no options to get a summary.  It works
+     as follows:
      <itemizedlist>
       <listitem>
        <para>
-        The <command>codegen-wrapper</command> command takes four
+        The <command>codegen-wrapper</command> command the following
         inputs:
         <itemizedlist>
          <listitem>
@@ -11718,7 +11741,11 @@ parameters {
            For each input file <filename>infile</filename>, see if the
            file <filename>infile.md5</filename> exists in the cache
            directory and contains the md5 checksum of
-           <filename>infile</filename>.
+           <filename>infile</filename>.  You may pass the
+           <option>--normalize-line-endings</option> flag to
+           <command>codegen-wrapper</command> to have it disregard
+           differences in line endings (carriage return + newline
+           vs. newline) when computing checksums.
           </para>
          </listitem>
          <listitem>
@@ -14063,17 +14090,17 @@ flag private INCLUDES = private-include
      are some cases in which their use may be appropriate.  For
      example, if a particular project requires certain environment
      setup to be done, it would be possible to create a global plugin
-     that checks to make sure it is correct.  It may also be
-     appropriate, in some cases, to define additional integrity
-     checking rules or additional platforms and platform types in
-     global plugins.
+     that checks to make sure it is correct.  It is often also
+     appropriate to declare platform or platform type plugins globally
+     so that dependent trees can be built with the declared compiler
+     plugin.
     </para>
     <para>
      A build tree can declare one of its plugins to be global by
      following the plugin name with <option>-global</option> in the
      <property>plugins</property> entry of
      <filename>Abuild.conf</filename>, as in
-     <programlisting>plugins: global-plugin -plugin
+     <programlisting>plugins: global-plugin -global
 </programlisting>
      When a build item is declared as a global plugin, &abuild;
      disregards access checks based on tree dependencies.  In this
@@ -16544,6 +16571,126 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.3: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Output Capture
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           &Abuild; is now able to capture the output of builds and
+           associate each line of output with the build item that
+           produced it.  For additional details, please see <xref
+           linkend="ref.output-processing"/>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           It is now possible to have &abuild; prefix every line of
+           normal output and/or every line of error output with fixed
+           prefixes.  For details, see <xref
+           linkend="ref.output-processing"/>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Miscellaneous Enhancements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <command>codegen-wrapper</command> command now accepts
+           the <option>--normalize-line-endings</option> flag, which
+           tells it to disregard differences in line endings when
+           checking cached files to see whether their sources have
+           changed.  Thanks to Jeremy Trimble for the suggestion.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When a platform plugin's <command>list_platforms</command>
+           script had Windows-style line endings, &abuild; (or, more
+           accurately, the underlying system) would produce a
+           confusing error message when trying to execute the script.
+           On non-Windows systems, &abuild; now explicitly calls your
+           attention to the incorrect line endings if
+           <command>list_platforms</command> fails.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The first line of output produced by the processing of any
+           build item now always includes an indication of the build
+           item name and output directory.  In prior versions, there
+           were certain rare instances in which this would not
+           happen.  For example, if an interface-only build item
+           depended on two other items whose
+           <filename>Abuild.interface</filename> files declared
+           conflicting variables, &abuild; would complain about the
+           conflict and indicate where it occurred, but it would not
+           provide any hint as to what build item caused the two
+           interface files to be loaded together.  Now &abuild; will
+           always indicate which build item is responsible for causing
+           the problem to be detected.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When a platform selector specifies a platform type,
+           platform, compiler, or option specification that doesn't
+           match any items anywhere in the entire forest, &abuild; now
+           reports that as an error.  It remains (and must remain)
+           perfectly normal for platform selectors to apply to only a
+           subset of the trees or items in a forest since most plugins
+           only apply to subsets of the forest.  The previous behavior
+           of ignoring invalid platform types in platform selectors
+           was intended to allow the same platform selectors to work
+           across multiple forests, but in practice, having &abuild;
+           tell you about potential typos in platform selectors is
+           much more important functionality, and it's not really
+           practical to use the same platform selectors across
+           multiple forests in general anyway.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Documentation Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           New help topics, <filename>make</filename> and
+           <filename>groovy</filename>, provide brief reminders of
+           things you can do in <filename>Abuild.mk</filename> and
+           <filename>Abuild.groovy</filename> files or local rules
+           files that they reference.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Fix errors in documentation for global plugins and platform
+           selectors.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           Create new section on capturing and parsing &abuild;'s
+           output.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.2: April 16, 2010</term>
      <listitem>
