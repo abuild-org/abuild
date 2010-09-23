@@ -2,7 +2,7 @@
 =====
 
  * Add help for configuring targets in make and groovy ('make' and
-   'groovy' topics)
+   'groovy' topics).  Remember that this might impact test suite.
 
 
 Abuild Lint
