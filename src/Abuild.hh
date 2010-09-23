@@ -20,6 +20,7 @@
 #include <CompatLevel.hh>
 #include <TargetType.hh>
 #include <Logger.hh>
+#include <Util.hh>
 
 class ItemConfig;
 class InterfaceParser;
@@ -74,7 +75,8 @@ class Abuild
 	std::string filename;
     };
     typedef std::vector<HelpTopic> HelpTopic_vec;
-    typedef std::map<std::string, HelpTopic_vec> HelpTopic_map;
+    typedef std::map<std::string, HelpTopic_vec,
+		     Util::StringCaseLess> HelpTopic_map;
 
     bool runInternal();
     void getThisPlatform();

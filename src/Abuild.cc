@@ -7421,7 +7421,7 @@ Abuild::generalHelp()
 
     std::string helpdir = this->abuild_top + "/help";
     std::vector<std::string> entries = Util::getDirEntries(helpdir);
-    std::map<std::string, std::string> topics;
+    std::map<std::string, std::string, Util::StringCaseLess> topics;
     for (std::vector<std::string>::iterator iter = entries.begin();
 	 iter != entries.end(); ++iter)
     {
