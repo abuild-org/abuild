@@ -21,7 +21,7 @@ BEFORE EACH RELEASE
  * Update copyright notice, if needed, in this file, Abuild.cc, and
    README.source-distribution.
 
-Possible fop/stylesheet bugs (as of fop 0.94):
+Possible fop/stylesheet bugs (as of fop 1.0, stylesheets 1.73.2):
 
  * A line break can occur before either of the +'s in "C++" and
    after hyphens in command-line options
@@ -10683,110 +10683,432 @@ parameters {
   <chapter id="ref.output-processing">
    <title>Controlling and Processing &Abuild;'s Output</title>
    <para>
-
-
-
-
-
-XXX
-
-
-
-Remember to update help
-
---raw-output: default true for j1, false otherwise
-
---interleaved-output: default true for j>1 or if error/output prefix
-are specified
-
---buffered-output: default false
-
---{error,output}-prefix: default empty.  If specified and no output
-mode is specified, output mode becomes interleaved.  If raw is
-expicitly specified these options are ignored.
-
-Job prefixes are suppressed with j1.
-
-The build consists of a check phase, a build phase, and a summary
-phase.  The build phase is always preceded by "abuild: build starting"
-and always followed by "abuild: build complete".  Within the build
-phase, output can be associated with a build item/platform pair
-(referred to here as a "job") in the following way:
-
- * If output/error prefixes are specified, strip from beginning of
-   line.  For this to work unambiguously, it is easiest if you use
-   output and error prefixes of the same length.
-
- * The first line of output from a build of a given item on a given
-   platform will always contain "abuild: item (outputdir):".
-
-    - In interleaved mode, it is the first line to start with [nnn],
-      and identifies [nnn] as the prefix for that build item/platform.
-
-    - In buffered mode, all subsequent lines until a line that
-      indicates the start of a different job or the end of the build
-      phase belong to that build item.
-
- * In both buffered and interleaved mode, certain major errors from
-   JavaBuilder, such as abnormal termination or rogue output from the
-   java backend, can result in asynchronous output from the java
-   builder.  In interleaved builds with multiple threads, this output
-   is prefixed with the string "[JavaBuilder] ".  In buffered builds,
-   it is not marked in any way, but will always appear between output
-   of builds.  Any output of this type would indicate a serious
-   failure and will almost surely be followed by failures of java
-   build items, so handling it is a special case in a parser is most
-   likely not necessary.  Any line of output that doesn't meet the
-   expected criteria should just not be associated with any build
-   item.  Such output should still be made available to the user since
-   it probably indicates a serious problem with the build or a bug in
-   the parser.
-
-Document: if you hit CTRL-C,  you will lose any partial output.  To
-avoid, use --raw-output or --interleaved-output.
-
-Also, possible reordering of output even in unbuffered case even with
-output/error both unbuffered because of race condition from separation
-of the pipes.
-
-There have been a number of ideas about improving abuild's output,
-such as de-interleaving build outputs for multithreaded builds,
-prefixing output lines with the name/platform of the item being built,
-indenting all non-error output so that error output only is
-left-justified, etc.
-
-In support of this goal, runProgram has been modified to take an
-optional output handler argument.  If this is provided, it will run
-the child program and send its stdout and stderr separately to two
-pipes.  Each time output or error is read, it will be passed to a
-callback function that can do whatever it wants.  Using a pipe rather
-than a tty is okay for several reasons.  For one thing, getting tty
-code to work portably is pretty tricky, and there's no equivalent to
-this on Windows.  For another thing, most large, multithreaded builds
-are going to be run in an automated environment where stdout is not
-going to be a tty anyway.  Most build tools, probably for that reason,
-do a good job of unbuffering or line buffering their output.  The
-output handler can easily de-interleave stdout and stderr at the line
-level.  The test suite in test_run_program already does this.  Also
-this mode of runProgram runs the program without an empty standard
-input.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    When examining the output of a large build, it is desirable to be
+    able to scan the output of the build to look for errors and
+    warnings, and even to be able to associate specific lines of
+    output with the build items that produced them.  In versions of
+    &abuild; prior to 1.1.3, the output of a multithreaded build would
+    consist of outputs from the builds of multiple build items all
+    interleaved with each other in arbitrary ways.  This would make
+    the output virtually impossible to parse programmatically and even
+    tricky for a human reader to fully understand.  This chapter
+    introduces features that help to improve the usability of
+    &abuild;'s output.  They are most useful for multithreaded builds,
+    but in some cases, they can help with single-threaded builds as
+    well.
    </para>
+   <sect1 id="ref.output-processing.introduction">
+    <title>Introduction and Terminology</title>
+    <para>
+     When &abuild; is used to perform a build, the overall build
+     process consists of several <firstterm>phases</firstterm>: a
+     check phase, a build phase, and a summary phase.  In the check
+     phase, &abuild; reads and validates
+     <filename>Abuild.conf</filename> files, performs integrity
+     checks, and so forth.  In the build phase, &abuild; walks through
+     the dependency graph and invokes backend processes to perform the
+     actual build steps.  After the build phase is complete, the
+     summary phase includes a summary of any failures as well as an
+     indication of elapsed time.
+    </para>
+    <para>
+     During the build phase, &abuild; invokes various backend programs
+     to individually build each item on each of its platforms.  For
+     purposes of discussion, we refer to those individual builds as
+     <firstterm>jobs</firstterm>.  A job always corresponds to a
+     specific build item being built on a specific platform.
+    </para>
+    <para>
+     When &abuild; invokes backend processes to do the actual build
+     steps, it may either capture the output of the backend processes
+     or it may let the backend processes inherit standard input,
+     standard output, and standard error from &abuild; itself.  We
+     refer to the way in which &abuild; handles the output of its
+     backend programs as its <firstterm>output mode</firstterm>.
+    </para>
+   </sect1>
+   <sect1 id="ref.output-processing.output-modes">
+    <title>Output Modes</title>
+    <para>
+     <indexterm>
+      <primary>output modes</primary>
+     </indexterm>
+     Each line of &abuild;'s output can come from one of two sources:
+     either &abuild; can generate the output itself, or the output can
+     come from one of the backends invoked on behalf of the individual
+     job.  The backend output would include output from programs like
+     make or ant or from anything they may invoke, such as compilers.
+     &Abuild; can either capture and process output from its backends,
+     or it can just let the backends use the same standard input,
+     output, and error as &abuild; itself.  We refer to what &abuild;
+     does with its output as its <firstterm>output mode</firstterm>.
+    </para>
+    <para>
+     &Abuild; has three output modes: <firstterm>raw mode</firstterm>,
+     <firstterm>interleaved mode</firstterm>, and <firstterm>buffered
+     mode</firstterm>.  In interleaved and buffered modes, each job is
+     run with standard input connected to the null device
+     (<filename>/dev/null</filename> in UNIX environments and
+     <filename>NUL</filename> in Windows environments) and with
+     standard output and standard error redirected to two separate
+     pipes.  &Abuild; reads from each job's output and error pipes and
+     process the results with its own logging facility.
+    </para>
+    <para>
+     In raw mode, &abuild; invokes backend processes without capturing
+     their output.  The backend processes just write to the same
+     standard output and standard error as &abuild; itself uses.
+     Additionally, each backend has access to &abuild;'s standard
+     input, which makes it possible for builds to prompt the user for
+     input.  For single-threaded builds, &abuild;'s default behavior
+     is to run in the raw mode.  This was the only output mode
+     available in versions of &abuild; prior to 1.1.3.  To explicitly
+     tell &abuild; to use raw output mode, specify the
+     <option>--raw-output</option> flag when invoking &abuild;.
+    </para>
+    <para>
+     In interleaved mode, every job is assigned a specific
+     <firstterm>job prefix</firstterm>, which is a fixed-length
+     (possibly zero-filled) number enclosed in square brackets.  Every
+     line of output generated by &abuild; itself, as well as every
+     complete line generated by the backend, is prefixed with the job
+     prefix and then written to &abuild;'s standard output or standard
+     error as appropriate.  Messages generated by &abuild; are written
+     immediately, and lines generated by the jobs' backends are
+     written as soon as they are received through the pipes.  By using
+     the job prefix, it is possible to unambiguously associate each
+     line of &abuild;'s output with the job (build item/platform) that
+     generated it while still having each line of output written as
+     soon as it is generated.
+    </para>
+    <para>
+     For multithreaded builds, &abuild; runs in interleaved mode by
+     default.  Interleaved mode may be specifically requested by
+     passing the <option>--interleaved-output</option> flag to
+     &abuild;.  If <option>--interleaved-output</option> is specified
+     for a single-threaded build, &abuild; still runs the backend
+     through pipes and disconnected from standard input, but it does
+     not prepend each line with a job prefix.
+    </para>
+    <para>
+     In buffered mode, rather than prefixing lines with a job prefix
+     and outputting them as soon as they are available, &abuild; saves
+     up (buffers) all the output from a particular job and outputs it
+     all at once when the job completes.  This ensures that, even for
+     a multithreaded build, there is no interleaving of output from
+     the builds of different build items.  To enable buffered output,
+     invoke &abuild; with the <option>--buffered-output</option> flag.
+    </para>
+   </sect1>
+   <sect1 id="ref.output-processing.output-prefixes">
+    <title>Output Prefixes</title>
+    <para>
+     When &abuild; invokes a backend, anything that the backend writes
+     to its standard error will ultimately be written to &abuild;'s
+     standard error, and likewise, anything the backend writes to
+     standard output will end up on &abuild;'s standard output.  This
+     makes it possible to use shell redirection for standard output
+     and standard error even when using interleaved or buffered output
+     modes.  However, separation of standard output from standard
+     error removes needed context from error messages, so it's very
+     useful to be able to distinguish output lines from error lines
+     when looking at the complete output of a build.
+    </para>
+    <para>
+     This can be achieved by setting a specific prefix to be prepended
+     to all normal output lines and/or all error output lines.  To
+     specify a prefix to be prepended to non-error output lines, use
+     the
+     <option>--output-prefix=<replaceable>prefix</replaceable></option>
+     option.  To specify a prefix to be prefix to error lines, use
+     <option>--error-prefix=<replaceable>prefix</replaceable></option>.
+     If either of these options is specified and no output mode has
+     been explicitly selected, &abuild; will use interleaved output
+     mode, even for single-threaded builds.  If raw output mode is
+     explicitly selected, then any output or error prefix
+     specifications will be ignored.
+    </para>
+    <para>
+     To make programmatic distinction of output lines from error lines
+     in &abuild;'s output, it is recommended that you specify output
+     and error prefixes of the same length.  To make error messages
+     stand out, you could run &abuild; with
+     <option>--error-prefix=<literal>'E&nbsp;&nbsp;&nbsp;'</literal>
+     --output-prefix=<literal>'&nbsp;&nbsp;&nbsp;&nbsp;'</literal></option>
+     (setting the output prefix to a number of spaces equal in length
+     to the size of the error prefix).  This way, you could be sure
+     that all lines as originally created by &abuild; or its backends
+     would start in the same column of the prefixed output, and that
+     the first column of the prefixed output would contain
+     <literal>E</literal> for any error or warning.  Another way to
+     make error messages stand out would be to omit the error prefix
+     entirely and to specify an output prefix consisting of several
+     space characters.  This would cause all output lines to be
+     indented, making it easy to visually scan the build output for
+     error messages.  Note that this approach is not unambiguous
+     because you can't tell output lines from error lines that happen
+     to start with several spaces.  But for a human reader, it may be
+     more to your preference.
+    </para>
+   </sect1>
+   <sect1 id="ref.output-processing.output-parsing">
+    <title>Parsing Output</title>
+    <para>
+     A principal goal of adding output capture modes, output prefixes,
+     and error prefixes to &abuild; was to make it easier to
+     programmatically parse &abuild;'s output.  By combining these
+     features, it is possible to run &abuild; in batch mode and to
+     then unambiguously associate each line of &abuild;'s output with
+     the specific platform build of the specific build item that was
+     responsible for producing that line of output.
+    </para>
+    <para>
+     This section describes how such a parser could be implemented.
+     You can also find an example parser implementation in
+     <filename>misc/parse-build-output</filename> relative to the top
+     of your &abuild; distribution.  (You can always find the top of
+     the &abuild; distribution by running <command>abuild
+     --print-abuild-top</command>.)  Since a Perl script is worth a
+     thousand words (as they say), and since the
+     <command>parse-build-output</command> script is actually tested
+     in &abuild;'s test suite, it can serve as a tool for helping you
+     understand the details of &abuild;'s output as well as being a
+     great starting point for writing your own parser.
+    </para>
+    <para>
+     When &abuild; performs a build, the overall build consists of a
+     check phase, a build phase, and a summary phase.  In the check
+     phase, &abuild; reads and validates
+     <filename>Abuild.conf</filename> files, performs integrity
+     checks, and so forth.  Under normal conditions, the check phase
+     doesn't produce any output.  If everything is in order at the end
+     of the check phase, the build phase begins.  Immediately before
+     beginning the build phase, &abuild; always outputs the line
+
+     <programlisting>abuild: build starting
+</programlisting>
+     Immediately following the build phase, &abuild; outputs the line
+
+     <programlisting>abuild: build complete
+</programlisting>
+     After the build phase is complete, &abuild; will output a summary
+     of any failures that may have occurred as well as a report of the
+     total duration of the build.  Parsers may use the <literal>build
+     starting</literal> and <literal>build complete</literal> lines as
+     shown above to demarcate the build phase.
+    </para>
+    <para>
+     Within the build phase, output can be associated with a build
+     item/platform pair (referred to here as a
+     <firstterm>job</firstterm>) in the following way:
+     <itemizedlist>
+      <listitem>
+       <para>
+        If output/error prefixes are specified, they always precede
+        any job prefixes generated in interleaved mode.  Strip them
+        from the beginning of each line.  For this to work
+        unambiguously, it is easiest if you use output and error
+        prefixes of the same length.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        In interleaved mode, all lines of output that are part of a
+        build start with a number enclosed in square brackets and
+        followed by a single space.  It is possible for some lines not
+        to start this way, but such cases indicate an unusual error or
+        failure condition and are discussed later in this section.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The first line of output from a build of a given item on a
+        given platform will always start with
+
+        <programlisting>abuild: <replaceable>item-name</replaceable> (<replaceable>abuild-output-directory</replaceable>)
+</programlisting>
+        possibly followed by other text or punctuation.  This will
+        always be at the beginning of the line, after removing any
+        output, error, or job prefixes.
+       </para>
+       <para>
+        In interleaved mode, the above can be parsed the first time a
+        line appears with a given job prefix to associate the job
+        prefix with the job.
+       </para>
+       <para>
+        In buffered mode, if a line that matches the above pattern is
+        the first line to mention a specific item/platform pair, it
+        marks the beginning of output for that job, and all subsequent
+        lines until a line that indicates the start of a different job
+        or the end of the build phase belong to that job.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+    <para>
+     There are a few exceptions to the above rules, but they only
+     happen in cases of serious errors, and most parsers can safely
+     ignore them, as long as they treat unexpected input as general
+     error conditions.  (The sample parser actually does take these
+     cases into consideration.)  Specifically, in both buffered and
+     interleaved mode, certain major errors from the java builder
+     process, such as abnormal termination or &ldquo;rogue
+     output&rdquo; from the java backend, can result in asynchronous
+     output from the java builder.
+     <footnote>
+      <para>
+       The java builder process may run multiple ant jobs in separate
+       threads.  It separates the output of different projects by
+       creating each ant thread in a separate thread group and
+       associating a job identifier with the thread group.  There are
+       two ways the java builder process could create rogue output:
+       one is for an ant task to create a thread in a separate thread
+       group and to have that thread write something to standard
+       output or standard error, and the other is for the java builder
+       process itself to generate output.  The former case is very
+       unlikely, and the latter case would indicate a bug in the java
+       builder process, or a severe error such as failure of the JVM.
+       Additionally, if the java builder process crashes, &abuild;
+       will generate a message that indicates this, and that message
+       would not be associated with any build.
+      </para>
+     </footnote>
+     In interleaved builds with multiple threads, this output is
+     prefixed with the string
+     &ldquo;<literal>[JavaBuilder]&nbsp;</literal>&rdquo;.  In
+     buffered builds, it is not marked in any way, but will always
+     appear between the uninterrupted outputs from individual jobs.
+     Most parsers would probably end up associating such output with
+     the job that had most recently completed, which would probably be
+     wrong, but again, this is a very rare case.  In a single-threaded
+     build, any rogue output from the java builder process would have
+     to be related to the job that is in progress, so the fact that it
+     is unmarked doesn't pose any problems.
+    </para>
+    <para>
+     In any case, any line of output that doesn't conform to the
+     output that the parser expects should just be treated as a
+     general error from &abuild;.  Such a line either indicates a
+     serious problem with &abuild; itself (such as an assertion
+     failure or abnormal termination, probably indicating a bug in
+     &abuild; or a system error) or a bug in the parser.  Either way,
+     the output should be preserved.
+    </para>
+   </sect1>
+   <sect1 id="ref.output-processing.caveats">
+    <title>Caveats and Subtleties of Output Capture</title>
+    <para>
+     When &abuild; is running in one of the output capture modes
+     (interleaved or buffered), it sends the outputs of any backend
+     build commands through a pair of pipes (one for standard output
+     and one for standard error), reads from those pipes, and sends
+     the results through its own logging facility.  This is usually
+     harmless, but there are several minor issues that can result:
+     <itemizedlist>
+      <listitem>
+       <para>
+        By default, standard output is usually block-buffered when
+        output is written to a pipe, while standard error is usually
+        unbuffered.  This means that, unless a program takes explicit
+        action to flush (or unbuffer) its output, error messages could
+        appear in the output earlier than they otherwise would.
+       </para>
+       <para>
+        In practice, this is not expected to be a real problem.  The
+        reason is that it is extremely common to run builds with
+        output redirected to pipes or files&mdash;virtually all
+        continuous integration packages or automated build scripts do
+        this.  As such, virtually every commonly used build program
+        already unbuffers its output.  If you have been previously
+        running &abuild; with its output going to a pipe or into a
+        file and haven't noticed any re-ordering of output and error,
+        then this issue is not likely to affect you.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Even if the program that &abuild; invokes unbuffers its
+        output, there's still a possibility that an individual error
+        line may appear earlier or later by a small distance than it
+        would under ordinary conditions.  The reason for this is that
+        &abuild; runs with standard output and standard error
+        redirected through two separate pipes, which opens up the
+        possibility of a race condition.  If, as &abuild; reads data
+        from the two pipes, both pipes have data ready to be readb at
+        the same time, it is possible that &abuild; may read them in a
+        different order from the order in which the pipes were
+        written.  There is no solution to this problem as the
+        information about when the pipes were written is simply not
+        available.  This is a necessary cost of being able to
+        distinguish standard output from standard error.  In practice,
+        it doesn't usually pose any real problems&mdash;the misplaced
+        error line will still be unambiguously associated with a
+        specific job.
+       </para>
+      </listitem>
+     </itemizedlist>
+     <itemizedlist>
+      <listitem>
+       <para>
+        As &abuild; reads the output and error pipes of the programs
+        it invokes, it sends them to &abuild;'s output or error
+        streams a line at a time.  Although it is rare for a program
+        to interleave standard output and standard error within a
+        single line, if it does, &abuild; will end up separating the
+        text onto separate lines.  This is an inevitable consequence
+        of the fact that &abuild; uses separate pipes for standard
+        output and standard error, and it may actually be desirable in
+        some instances.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        If the last line of output (or error) from a program that
+        &abuild; invokes does not end with a newline, &abuild; will
+        append the string <literal>[no newline]</literal> followed by
+        a newline to the line.  This way all lines output by &abuild;
+        end with a newline.  This ensures that &abuild;'s own output
+        is always anchored to the beginning of a line.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        If you interrupt &abuild; abnormally, for example, by hitting
+        CTRL-C, &abuild; will let the operating system terminate it in
+        the usual way.  This means that any partially read output from
+        a pipe will be lost.  In interleaved mode, any lost output
+        would generally be less than one line of output, though it
+        could be more in the (unlikely )case of unbuffered pipes.  In
+        buffered mode, all the output from any partially completed job
+        will be lost.  Note that no output is ever lost if &abuild; is
+        allowed to terminate on its own, unless it terminates as a
+        result of an internal error or assertion failure, which would
+        never occur during routine operation.  (An error in a specific
+        build would never cause that to happen.)
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        In buffered mode, since &abuild; doesn't output anything for a
+        given item's build until that item's build is completed, it is
+        possible that &abuild; could sit for a long time without
+        generating any output.  &Abuild; gives no indication of
+        in-progress builds in buffered mode.  If you need continuous
+        feedback, use interleaved mode instead.  (This is the main
+        reason that interleaved mode is the default for multithreaded
+        builds even though buffered output is a little easier to
+        read.)  Note that monitored mode (<xref
+        linkend="ref.monitored-mode"/>) can be combined with
+        interleaved or buffered mode, and that any output generated by
+        monitored mode will be interleaved between item builds when
+        &abuild; is running in buffered mode.  The sample parser makes
+        no provisions for handling monitored mode output.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+   </sect1>
   </chapter>
   <chapter id="ref.shared-libraries">
    <title>Shared Libraries</title>

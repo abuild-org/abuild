@@ -1,114 +1,8 @@
 1.1.3
 =====
 
- * Fix doc for global-plugin: search for "-plugin"....
-
- * Document: When abuild runs a list_platforms command and the command
-   fails, actually check to see whether the line endings are wrong.
-
- * Document: --normalize-line-endings option to codegen-wrapper,
-   suggested by Jeremy Trimble
-
- * abuild -p compiler=xyz didn't complain if compiler xyz doesn't
-   exist anywhere.  Old comment:
-
-   // Don't validate the platform type or any of the fields
-   // themselves.  It's not incorrect to reference
-   // non-existent platforms or platform types here.  That
-   // way, people can set the ABUILD_PLATFORM_SELECTORS
-   // environment variable based on some build tree they work
-   // in and not worry about it if they build in a different
-   // tree that doesn't have all the same platforms and
-   // platform types.
-
-   In retrospect, this is wrong.
-
- * Document output change of job header before interface errors
-
- * Add help for configuring targets in groovy.
-
-
-Capture of Backend Output: to document
-======================================
-
-Remember to update help
-
---raw-output: default true for j1, false otherwise
-
---interleaved-output: default true for j>1 or if error/output prefix
-are specified
-
---buffered-output: default false
-
---{error,output}-prefix: default empty.  If specified and no output
-mode is specified, output mode becomes interleaved.  If raw is
-expicitly specified these options are ignored.
-
-Job prefixes are suppressed with j1.
-
-The build consists of a check phase, a build phase, and a summary
-phase.  The build phase is always preceded by "abuild: build starting"
-and always followed by "abuild: build complete".  Within the build
-phase, output can be associated with a build item/platform pair
-(referred to here as a "job") in the following way:
-
- * If output/error prefixes are specified, strip from beginning of
-   line.  For this to work unambiguously, it is easiest if you use
-   output and error prefixes of the same length.
-
- * The first line of output from a build of a given item on a given
-   platform will always contain "abuild: item (outputdir):".
-
-    - In interleaved mode, it is the first line to start with [nnn],
-      and identifies [nnn] as the prefix for that build item/platform.
-
-    - In buffered mode, all subsequent lines until a line that
-      indicates the start of a different job or the end of the build
-      phase belong to that build item.
-
- * In both buffered and interleaved mode, certain major errors from
-   JavaBuilder, such as abnormal termination or rogue output from the
-   java backend, can result in asynchronous output from the java
-   builder.  In interleaved builds with multiple threads, this output
-   is prefixed with the string "[JavaBuilder] ".  In buffered builds,
-   it is not marked in any way, but will always appear between output
-   of builds.  Any output of this type would indicate a serious
-   failure and will almost surely be followed by failures of java
-   build items, so handling it is a special case in a parser is most
-   likely not necessary.  Any line of output that doesn't meet the
-   expected criteria should just not be associated with any build
-   item.  Such output should still be made available to the user since
-   it probably indicates a serious problem with the build or a bug in
-   the parser.
-
-Document: if you hit CTRL-C,  you will lose any partial output.  To
-avoid, use --raw-output or --interleaved-output.
-
-Also, possible reordering of output even in unbuffered case even with
-output/error both unbuffered because of race condition from separation
-of the pipes.
-
-There have been a number of ideas about improving abuild's output,
-such as de-interleaving build outputs for multithreaded builds,
-prefixing output lines with the name/platform of the item being built,
-indenting all non-error output so that error output only is
-left-justified, etc.
-
-In support of this goal, runProgram has been modified to take an
-optional output handler argument.  If this is provided, it will run
-the child program and send its stdout and stderr separately to two
-pipes.  Each time output or error is read, it will be passed to a
-callback function that can do whatever it wants.  Using a pipe rather
-than a tty is okay for several reasons.  For one thing, getting tty
-code to work portably is pretty tricky, and there's no equivalent to
-this on Windows.  For another thing, most large, multithreaded builds
-are going to be run in an automated environment where stdout is not
-going to be a tty anyway.  Most build tools, probably for that reason,
-do a good job of unbuffering or line buffering their output.  The
-output handler can easily de-interleave stdout and stderr at the line
-level.  The test suite in test_run_program already does this.  Also
-this mode of runProgram runs the program without an empty standard
-input.
+ * Add help for configuring targets in make and groovy ('make' and
+   'groovy' topics)
 
 
 Abuild Lint
@@ -169,6 +63,11 @@ be able to do the following things:
  * In montored mode, each node should have a color indicating its
    dependency runner state (waiting, ready, running, completed,
    failed, depfailed) so one can watch the overall build progress.
+
+ * Using error/output prefixes and interleaved mode, we could actually
+   associate the output of each build item's build with the item and
+   even show error messages in a different color or otherwise
+   highlighted.
 
 Probably the best way to implement these would be through a
 swing-based GUI that could be started from a Java (or maybe Groovy or
