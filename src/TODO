@@ -130,6 +130,11 @@ Windows Issues
    Windows/C++.  For non-Windows systems, requiring perl is not a big
    deal.
 
+ * There is some kind of Win32 Job API used by the perl Win32::Job
+   classes (CreateJobObject).  This may provide a better solution than
+   our current CTRL-C handling.  As of version boost version 1.38,
+   there is nothing in boost that can do this.
+
 
 Information Extraction
 ======================
