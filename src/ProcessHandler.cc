@@ -50,6 +50,8 @@ ProcessHandler::getInstance()
     return *the_instance;
 }
 
+static boost::mutex running_process_mutex;
+
 #ifdef _WIN32
 
 // On Windows, if we run a child process that shares the console with
@@ -67,7 +69,6 @@ ProcessHandler::getInstance()
 // To achieve this, we keep a mutex-protected set of running process
 // information pointers.  Whenever a process is created or destroyed,
 // it must be done while holding the mutex.
-static boost::mutex running_process_mutex;
 static std::set<PROCESS_INFORMATION*> running_processes;
 
 static bool
@@ -160,7 +161,7 @@ static void add_to_read_set(fd_set& read_set, int& nfds, int fd)
     }
 }
 
-static void handle_output(fd_set& read_set, int& fd,
+static void handle_output(fd_set* read_set, int& fd,
 			  std::string const& description,
 			  ProcessHandler::output_handler_t handler,
 			  bool is_error)
@@ -171,16 +172,34 @@ static void handle_output(fd_set& read_set, int& fd,
     }
     char buf[1024];
     int len = 0;
-    if (FD_ISSET(fd, &read_set))
+    if (read_set)
     {
-	len = QEXC::errno_wrapper("read " + description,
-				  read(fd, buf, sizeof(buf)));
-	handler(is_error, buf, len);
-	if (len == 0)
+	if (FD_ISSET(fd, read_set))
 	{
-	    close(fd);
-	    fd = -1;
+	    len = QEXC::errno_wrapper("read " + description,
+				      read(fd, buf, sizeof(buf)));
+	    handler(is_error, buf, len);
+	    if (len == 0)
+	    {
+		close(fd);
+		fd = -1;
+	    }
 	}
+    }
+    else
+    {
+	QEXC::errno_wrapper("set " + description + " to non-blocking I/O",
+			    fcntl(fd, F_SETFL, O_NONBLOCK));
+	while ((len = read(fd, buf, sizeof(buf))) >= 0)
+	{
+	    handler(is_error, buf, len);
+	    if (len == 0)
+	    {
+		break;
+	    }
+	}
+	close(fd);
+	fd = -1;
     }
 }
 
@@ -398,7 +417,17 @@ ProcessHandler::runProgram(
 	QEXC::errno_wrapper("create error pipe", pipe(error_pipe));
     }
 
-    int pid = fork();
+    int pid = -1;
+    {
+	// Although fork() is suppsed to be thread-safe, I have seen
+	// Solaris 8 hang inside the call to fork() when multiple
+	// threads are calling fork() in close succession.  What
+	// appears to happen is that the child process is created, but
+	// neither the parent nor the child actually return from
+	// fork().  To avoid this, mutex-protect calls to fork().
+	boost::mutex::scoped_lock lock(running_process_mutex);
+	pid = fork();
+    }
     if (pid == -1)
     {
 	return false;
@@ -509,19 +538,15 @@ ProcessHandler::runProgram(
 			    {
 				exit_status = !0;
 			    }
+
+			    // Read any remaining data
+			    handle_output(0, child_out, "child's stdout",
+					  output_handler, false);
+			    handle_output(0, child_err, "child's stderr",
+					  output_handler, true);
+
 			    // Prevent calling waitpid again
 			    pid = -1;
-
-			    if (child_out != -1)
-			    {
-				close(child_out);
-				child_out = -1;
-			    }
-			    if (child_err != -1)
-			    {
-				close(child_err);
-				child_err = -1;
-			    }
 			}
 		    }
 		    break;
@@ -535,9 +560,9 @@ ProcessHandler::runProgram(
 		    break;
 
 		  default:
-		    handle_output(read_set, child_out, "child's stdout",
+		    handle_output(&read_set, child_out, "child's stdout",
 				  output_handler, false);
-		    handle_output(read_set, child_err, "child's stderr",
+		    handle_output(&read_set, child_err, "child's stderr",
 				  output_handler, true);
 		}
 	    }
