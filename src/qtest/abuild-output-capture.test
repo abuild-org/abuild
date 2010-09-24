@@ -17,6 +17,10 @@ my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 
 if (! $test_java)
 {
+    # With the exception of the parse-build-output script, all
+    # functionality responsible for abuild's output capture is tested
+    # elsewhere.  Since these tests require JavaBuilder, we skip them
+    # safely when Java is not available.
     $td->runtest("skipping output capture",
 		 {$td->STRING => "skip"},
 		 {$td->STRING => "skip"});
