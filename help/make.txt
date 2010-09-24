@@ -1,3 +1,72 @@
 ## description: quick help for Abuild.mk files
 
-xxx
+This help file provides a quick reminder on using Abuild.mk files.
+For additional details, please consult the abuild manual.
+
+General Abuild.mk Help
+----------------------
+
+The Abuild.mk file is parsed by GNU Make and therefore has GNU
+Makefile syntax.  It is intended to contain make code but not to
+contain any make targets.  Custom targets should be added to build
+item-supplied rules files or local rules files.  Most Abuild.mk files
+contain only variable settings.
+
+Every Abuild.mk file must set either RULES or LOCAL_RULES and may set
+both.  Most Abuild.mk files will set RULES and not set LOCAL_RULES.
+
+If RULES is set, it should be set to the name of a rule set.  To see
+what rules are available, run
+
+abuild --help rules list
+
+To get help on a specific set of rules, run
+
+abuild --help rules rule:rule-set-name
+
+For example
+
+abuild --help rules rule:ccxx
+
+Most Abuild.mk files will include
+
+RULES := ccxx
+
+along with other variable settings required by the ccxx rules, which
+are described in the help file for the ccxx rules.
+
+Conditionals
+------------
+
+All Abuild.interface variables defined by a build item and its
+dependencies are available as make variables within Abuild.mk.  When
+writing conditional code, remember that you have to use GNU Make
+syntax, not abuild interface syntax.  For example, you could add the
+-Werror flag to WFLAGS when running gcc with
+
+ifeq ($(ABUILD_PLATFORM_COMPILER), gcc)
+WFLAGS += -Werror
+endif
+
+Consult the GNU Make documentation for additional details.
+
+Custom Targets
+--------------
+
+When adding custom targets or custom behavior, set LOCAL_RULES to the
+name of a file that contains the make code.  For example:
+
+LOCAL_RULES := local.mk
+
+would tell abuild to load local.mk for additional make code.  If you
+want to add something to the default target, you would define your own
+"all" target.  You must use two colons when defining the target, which
+tells GNU Make to allow other definitions of the target.  For example:
+
+all::
+	your-rules-here
+
+would add an additional action to be run with the "all" target.  Bear
+in mind that, in a parallel build, your all target can be run
+simultaneously with other targets, so you can't rely on its being
+invoked in any particular sequence.

@@ -1,3 +1,65 @@
 ## description: quick help for Abuild.groovy files
 
-xxx
+This help file provides a quick reminder on using Abuild.groovy files.
+For additional details, please consult the abuild manual.
+
+General Abuild.groovy Help
+--------------------------
+
+Abuild.groovy files are interpreted by groovy and contain groovy code.
+Most Abuild.groovy files should do nothing other than setting abuild
+parameters.  All Abuild.groovy files must set either abuild.rules or
+abuild.localRules.  The preferred syntax is
+
+parameters {
+    abuild.rules = 'rulename'
+}
+
+The abuild.rules parameter should be set to the name of a rule set.
+
+To see what rules are available, run
+
+abuild --help rules list
+
+To get help on a specific set of rules, run
+
+abuild --help rules rule:rulesetname
+
+For example
+
+abuild --help rules rule:java
+
+Most Abuild.groovy files will include a parameter block that sets
+abuild.rules to 'java' and sets additional parameters as required by
+the 'java' rule set.
+
+Custom Targets
+--------------
+
+When adding custom targets, set abuild.localRules to the name of a
+file that contains the rules.  For example:
+
+parameters {
+    abuild.localRules = 'local.groovy'
+}
+
+Abuild targets defined within groovy have associated dependencies and
+closures.  From the context of a groovy rules file, you can always
+access the abuild object under the name "abuild" and the current ant
+project as a groovy ant builder under the name "ant".
+
+The abuild object offers a number of methods for configuring targets.
+A commonly used one is "addTargetClosure", which adds additional code
+to be run when a given target is invoked.  For example, the following
+block of code in a local rules file would invoke ant's "echo" task
+with the message 'hello' when the "all" abuild target is built:
+
+abuild.addTargetClosure('all') {
+    ant.echo('message': 'hello')
+}
+
+You can access parameters and interface variables by using the
+abuild.resolve method.  For example, abuild.resolve('VAR') would
+provide the value of the VAR parameter or interface variable.
+
+For additional details, please consult the abuild manual.
