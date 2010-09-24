@@ -2,8 +2,10 @@
 To request help on a specific topic, run "abuild --help topic".
 Help is available on the following topics:
 
+  groovy: quick help for Abuild.groovy files
   help: the help system (this topic)
   helpfiles: help file format
+  make: quick help for Abuild.mk files
   rules: rule-specific help (see below)
   usage: abuild command invocation
   vars: built-in interface variables
