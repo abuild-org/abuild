@@ -7482,7 +7482,8 @@ Abuild::generalHelp()
       this->whoami + " --help topic\".");
     h("Help is available on the following topics:");
     h("");
-    for (std::map<std::string, std::string>::iterator iter = topics.begin();
+    for (std::map<std::string, std::string, Util::StringCaseLess>::iterator
+	     iter = topics.begin();
 	 iter != topics.end(); ++iter)
     {
 	std::string line = "  " + (*iter).first;
