@@ -10,13 +10,13 @@ CCPP = gcc -E
 CXX = g++ $(GDFLAGS)
 CXXPP = g++ -E
 
-ifeq ($(value ABUILD_FORCE_32BIT),1)
+ifeq ($(call value_if_defined,ABUILD_FORCE_32BIT,0),1)
  CC += -m32
  CCPP += -m32
  CXX += -m32
  CXXPP += -m32
 endif
-ifeq ($(value ABUILD_FORCE_64BIT),1)
+ifeq ($(call value_if_defined,ABUILD_FORCE_64BIT,0),1)
  CC += -m64
  CCPP += -m64
  CXX += -m64

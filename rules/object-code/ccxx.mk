@@ -223,28 +223,28 @@ endef
 # These functions expand to the complete list of "extra" flags that
 # apply to a specific file.  They are, from general to specific:
 # XCPPFLAGS, then XCPPFLAGS_file (and similar for CFLAGS and
-# CXXFLAGS).  We use $(value ...) to access the file-specific
-# variables to avoid the undefined variable warning for each undefined
-# variable since not defining these is the usual case.
+# CXXFLAGS).  We use $(call value_if_defined ...) to access the
+# file-specific variables to avoid the undefined variable warning for
+# each undefined variable since not defining these is the usual case.
 
 # Usage: $(call file_cppflags,src)
 define file_cppflags
-$(call include_flags,$(INCLUDES) $(SRCDIR) .) $(call file_dowflags,$(1)) $(XCPPFLAGS) $(value XCPPFLAGS_$(call strip_srcdir,$(1)))
+$(call include_flags,$(INCLUDES) $(SRCDIR) .) $(call file_dowflags,$(1)) $(XCPPFLAGS) $(call value_if_defined,XCPPFLAGS_$(call strip_srcdir,$(1)),)
 endef
 
 # Usage: $(call file_cflags,src)
 define file_cflags
-$(call file_cppflags,$(1)) $(XCFLAGS) $(value XCFLAGS_$(call strip_srcdir,$(1)))
+$(call file_cppflags,$(1)) $(XCFLAGS) $(call value_if_defined,XCFLAGS_$(call strip_srcdir,$(1)),)
 endef
 
 # Usage: $(call file_cxxflags,src)
 define file_cxxflags
-$(call file_cflags,$(1)) $(XCXXFLAGS) $(value XCXXFLAGS_$(call strip_srcdir,$(1)))
+$(call file_cflags,$(1)) $(XCXXFLAGS) $(call value_if_defined,XCXXFLAGS_$(call strip_srcdir,$(1)),)
 endef
 
 # Usage: $(call use_pic,src): determines the value of pic to pass to make_obj
 define use_pic
-$(and $(filter $(call strip_srcdir,$(<)), $(_lib_SRCS)), $(if $(value NOPIC_$(call strip_srcdir,$(<))),,1))
+$(and $(filter $(call strip_srcdir,$(<)), $(_lib_SRCS)), $(if $(call value_if_defined,NOPIC_$(call strip_srcdir,$(<)),),,1))
 endef
 
 LANGNAME_c := C

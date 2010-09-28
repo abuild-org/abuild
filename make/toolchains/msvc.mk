@@ -82,7 +82,7 @@ LINK_c = $(CC)
 LINK_cxx = $(CC)
 
 define link_with
-$(if $(value WHOLE_lib_$(1)),\
+$(if $(call value_if_defined,WHOLE_lib_$(1),),\
     $(error WHOLE_lib is not supported by $(CCXX_TOOLCHAIN)),\
     $(1).lib)
 endef

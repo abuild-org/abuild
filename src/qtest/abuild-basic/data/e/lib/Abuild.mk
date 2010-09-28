@@ -24,9 +24,10 @@ XCFLAGS_lib1-src1.c := -lib1-src1-xcflags-
 XCXXFLAGS_lib1-src1.c := -not-seen-
 
 # Extend all extra flags for bin2.cc
-XCPPFLAGS_bin2.cc := -bin2-xcppflags-
-XCFLAGS_bin2.cc := -bin2-xcflags-
-XCXXFLAGS_bin2.cc := -bin2-xcxxflags-
+EXPANSION_TEST = bin2-
+XCPPFLAGS_bin2.cc = -$(EXPANSION_TEST)xcppflags-
+XCFLAGS_bin2.cc = -$(EXPANSION_TEST)xcflags-
+XCXXFLAGS_bin2.cc = -$(EXPANSION_TEST)xcxxflags-
 
 # Overall extra flags
 XCPPFLAGS += -xcppflags-

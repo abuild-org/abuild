@@ -8,7 +8,7 @@
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
 <!ENTITY swversion "1.1.3">
-<!ENTITY lastreleased "September 24, 2010">
+<!ENTITY lastreleased "September 28, 2010">
 ]>
 <!--
 
@@ -17064,7 +17064,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.3: September 24, 2010</term>
+     <term>1.1.3: September 28, 2010</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -17086,6 +17086,23 @@ Y = $(X)
            normal output and/or every line of error output with fixed
            prefixes.  For details, see <xref
            linkend="ref.output-processing"/>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           File-specific variables for <varname>XCPPFLAGS</varname>,
+           <varname>XCFLAGS</varname>, and
+           <varname>XCXXFLAGS</varname> were referenced in a manner
+           that prevented them from being properly expanded.  They are
+           now properly expanded, so their values may include
+           references to other variables.
           </para>
          </listitem>
         </itemizedlist>

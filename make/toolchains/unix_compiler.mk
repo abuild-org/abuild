@@ -81,7 +81,7 @@ endef
 whole_link_with = -l$(1)
 
 define link_with
-$(if $(value WHOLE_lib_$(1)),\
+$(if $(call value_if_defined,WHOLE_lib_$(1),),\
      $(call whole_link_with,$(1)),\
      -l$(1))
 endef
