@@ -48,7 +48,8 @@ TEST_PROGS := \
 	test_dependency_evaluator \
 	test_dependency_runner \
 	test_interface \
-	test_interface_parser
+	test_interface_parser \
+	test_threaded_fork
 
 TARGETS_bin := abuild $(TEST_PROGS)
 TARGETS_lib := abuild

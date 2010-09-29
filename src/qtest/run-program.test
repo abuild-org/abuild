@@ -36,7 +36,13 @@ $td->runtest("capture output",
 	     {$td->FILE => "captured-output.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
-$td->report(2 + ($in_windows ? 1 : 0));
+$td->runtest("threaded fork",
+	     {$td->COMMAND => "test_threaded_fork",
+	      $td->FILTER => "sort -n"},
+	     {$td->FILE => "threaded-fork.out", $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->report(3 + ($in_windows ? 1 : 0));
 
 sub windir
 {
