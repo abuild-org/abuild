@@ -161,7 +161,7 @@ static void add_to_read_set(fd_set& read_set, int& nfds, int fd)
     }
 }
 
-static void handle_output(fd_set* read_set, int& fd,
+static void handle_output(fd_set& read_set, int& fd,
 			  std::string const& description,
 			  ProcessHandler::output_handler_t handler,
 			  bool is_error)
@@ -172,34 +172,16 @@ static void handle_output(fd_set* read_set, int& fd,
     }
     char buf[1024];
     int len = 0;
-    if (read_set)
+    if (FD_ISSET(fd, &read_set))
     {
-	if (FD_ISSET(fd, read_set))
+	len = QEXC::errno_wrapper("read " + description,
+				  read(fd, buf, sizeof(buf)));
+	handler(is_error, buf, len);
+	if (len == 0)
 	{
-	    len = QEXC::errno_wrapper("read " + description,
-				      read(fd, buf, sizeof(buf)));
-	    handler(is_error, buf, len);
-	    if (len == 0)
-	    {
-		close(fd);
-		fd = -1;
-	    }
+	    close(fd);
+	    fd = -1;
 	}
-    }
-    else
-    {
-	QEXC::errno_wrapper("set " + description + " to non-blocking I/O",
-			    fcntl(fd, F_SETFL, O_NONBLOCK));
-	while ((len = read(fd, buf, sizeof(buf))) >= 0)
-	{
-	    handler(is_error, buf, len);
-	    if (len == 0)
-	    {
-		break;
-	    }
-	}
-	close(fd);
-	fd = -1;
     }
 }
 
@@ -411,21 +393,30 @@ ProcessHandler::runProgram(
     output_pipe[1] = -1;
     error_pipe[0] = -1;
     error_pipe[1] = -1;
-    if (output_handler)
-    {
-	QEXC::errno_wrapper("create output pipe", pipe(output_pipe));
-	QEXC::errno_wrapper("create error pipe", pipe(error_pipe));
-    }
 
     int pid = -1;
-    {
-	// Although fork() is suppsed to be thread-safe, I have seen
-	// Solaris 8 hang inside the call to fork() when multiple
-	// threads are calling fork() in close succession.  What
-	// appears to happen is that the child process is created, but
-	// neither the parent nor the child actually return from
-	// fork().  To avoid this, mutex-protect calls to fork().
+
+    { // private scope
+	// Make sure we set the close on exec flag for all our pipes
+	// before we call fork.  Otherwise, we end up with lots of
+	// pipes open in child processes, which causes all sorts of
+	// problems including fork() hanging and EOF not appearing on
+	// pipes when processes exit.
 	boost::mutex::scoped_lock lock(running_process_mutex);
+	if (output_handler)
+	{
+	    QEXC::errno_wrapper("create output pipe", pipe(output_pipe));
+	    QEXC::errno_wrapper("create error pipe", pipe(error_pipe));
+	    QEXC::errno_wrapper("set close on exec",
+				fcntl(output_pipe[0], F_SETFD, FD_CLOEXEC));
+	    QEXC::errno_wrapper("set close on exec",
+				fcntl(output_pipe[1], F_SETFD, FD_CLOEXEC));
+	    QEXC::errno_wrapper("set close on exec",
+				fcntl(error_pipe[0], F_SETFD, FD_CLOEXEC));
+	    QEXC::errno_wrapper("set close on exec",
+				fcntl(error_pipe[1], F_SETFD, FD_CLOEXEC));
+	}
+
 	pid = fork();
     }
     if (pid == -1)
@@ -517,38 +508,11 @@ ProcessHandler::runProgram(
 		FD_ZERO(&read_set);
 		add_to_read_set(read_set, nfds, child_out);
 		add_to_read_set(read_set, nfds, child_err);
-		struct timeval tv;
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
-		switch(select(nfds, &read_set, 0, 0, &tv))
+		switch(select(nfds, &read_set, 0, 0, 0))
 		{
 		  case 0:
-		    {
-			// On Solaris, sometimes select doesn't show
-			// that the file descriptors are readable
-			// after the child process exits, so
-			// periodically check to see if the process is
-			// still running.
-			int waitpid_status =
-			    waitpid(pid, &exit_status, WNOHANG);
-			if (waitpid_status != 0)
-			{
-			    // The process has exited
-			    if (waitpid_status != pid)
-			    {
-				exit_status = !0;
-			    }
-
-			    // Read any remaining data
-			    handle_output(0, child_out, "child's stdout",
-					  output_handler, false);
-			    handle_output(0, child_err, "child's stderr",
-					  output_handler, true);
-
-			    // Prevent calling waitpid again
-			    pid = -1;
-			}
-		    }
+		    // timeout
+		    throw QEXC::Internal("select timed out with timeout = 0");
 		    break;
 
 		  case -1:
@@ -560,21 +524,18 @@ ProcessHandler::runProgram(
 		    break;
 
 		  default:
-		    handle_output(&read_set, child_out, "child's stdout",
+		    handle_output(read_set, child_out, "child's stdout",
 				  output_handler, false);
-		    handle_output(&read_set, child_err, "child's stderr",
+		    handle_output(read_set, child_err, "child's stderr",
 				  output_handler, true);
 		}
 	    }
 	}
-	if (pid != -1)
+	if (waitpid(pid, &exit_status, 0) != pid)
 	{
-	    if (waitpid(pid, &exit_status, 0) != pid)
-	    {
-		// If we can't get the exit status, treat the process
-		// as having failed.
-		exit_status = !0;
-	    }
+	    // If we can't get the exit status, treat the process
+	    // as having failed.
+	    exit_status = !0;
 	}
 	status = (exit_status == 0);
     }
