@@ -5,11 +5,12 @@ use strict;
 use Cwd;
 use File::Basename;
 
+require TestDriver;
+require abuild_test_utils;
+
 my $top = windir(getcwd());
 
 chdir("run-program") or die "chdir testdir failed: $!\n";
-
-require TestDriver;
 
 my $td = new TestDriver('run program');
 
@@ -36,8 +37,9 @@ $td->runtest("capture output",
 	     {$td->FILE => "captured-output.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+my $echo = windir(find_in_path('echo'));
 $td->runtest("threaded fork",
-	     {$td->COMMAND => "test_threaded_fork",
+	     {$td->COMMAND => "test_threaded_fork $echo",
 	      $td->FILTER => "sort -n"},
 	     {$td->FILE => "threaded-fork.out", $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);

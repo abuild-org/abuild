@@ -7,6 +7,7 @@
 
 static int const nthreads = 20;
 static int const nperthread = 100;
+static std::string echo;
 
 static void run_program(std::string const& prefix)
 {
@@ -19,7 +20,7 @@ static void run_program(std::string const& prefix)
     args.push_back("echo");
     args.push_back(prefix);
     std::map<std::string, std::string> env;
-    ph.runProgram("/bin/echo", args, env, true, ".",
+    ph.runProgram(echo, args, env, true, ".",
 		  logger.getOutputHandler(h));
 
     logger.closeJob(h);
@@ -37,6 +38,12 @@ int main(int argc, char* argv[], char* envp[])
 {
     ProcessHandler::createInstance(envp);
     Logger::getInstance();
+
+    echo = "/bin/echo";
+    if (argc > 1)
+    {
+	echo = argv[1];
+    }
 
     std::vector<boost::shared_ptr<boost::thread> > threads(nthreads);
     for (int i = 0; i < nthreads; ++i)
