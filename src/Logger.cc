@@ -339,7 +339,9 @@ Logger::loggerMain()
 	    output_lines(std::cerr, this->error_prefix, message);
 	    break;
 	}
-	// Wait until after we've flushed to deque the message.
+	// Wait until after we've flushed to deque the message so that
+	// flushLog doesn't return until after we've actually acted on
+	// everything in the queue.
 	this->logger_queue.dequeue();
     }
 }
