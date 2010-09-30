@@ -38,13 +38,16 @@ $td->runtest("capture output",
 	     $td->NORMALIZE_NEWLINES);
 
 my $echo = windir(find_in_path('echo'));
-$td->runtest("threaded fork",
-	     {$td->COMMAND => "test_threaded_fork $echo",
-	      $td->FILTER => "sort -n"},
-	     {$td->FILE => "threaded-fork.out", $td->EXIT_STATUS => 0},
-	     $td->NORMALIZE_NEWLINES);
+foreach my $i (1..5)
+{
+    $td->runtest("threaded fork ($i)",
+		 {$td->COMMAND => "test_threaded_fork $echo",
+		  $td->FILTER => "sort -n"},
+		 {$td->FILE => "threaded-fork.out", $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
 
-$td->report(3 + ($in_windows ? 1 : 0));
+$td->report(7 + ($in_windows ? 1 : 0));
 
 sub windir
 {

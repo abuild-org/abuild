@@ -102,10 +102,23 @@ ProcessHandler_unix::runProgram(
     }
     if (pid == -1)
     {
+	if (output_handler)
+	{
+	    close(output_pipe[0]);
+	    close(output_pipe[1]);
+	    close(error_pipe[0]);
+	    close(error_pipe[1]);
+	}
 	return false;
     }
     if (pid == 0)
     {
+	// This code must take care not to allocate or free any memory
+	// through STL.  In particular, creating and destroying
+	// instances of std::string appears to cause lockups on
+	// Solaris.  Avoid creating exceptions or using non-const
+	// access to STL containers.
+
 	if (chdir(dir.c_str()) == -1)
 	{
 	    _exit(1);
@@ -116,8 +129,11 @@ ProcessHandler_unix::runProgram(
 	{
 	    close(output_pipe[0]);
 	    close(error_pipe[0]);
-	    stdin_fd = QEXC::errno_wrapper("open /dev/null",
-					   open("/dev/null", O_RDONLY));
+	    stdin_fd = open("/dev/null", O_RDONLY);
+	    if (stdin_fd == -1)
+	    {
+		_exit(1);
+	    }
 	}
 
 	int nvars = environment.size();
@@ -135,9 +151,11 @@ ProcessHandler_unix::runProgram(
 		 environment.begin();
 	     iter != environment.end(); ++iter)
 	{
-	    std::string v = (*iter).first + "=" + (*iter).second;
-	    char* vp = new char[v.length() + 1];
-	    strcpy(vp, v.c_str());
+	    char* vp = new char[(*iter).first.length() + 1 +
+				(*iter).second.length() + 1];
+	    strcpy(vp, (*iter).first.c_str());
+	    strcat(vp, "=");
+	    strcat(vp, (*iter).second.c_str());
 	    *envp++ = vp;
 	}
 	if (preserve_env)
@@ -165,6 +183,9 @@ ProcessHandler_unix::runProgram(
 	    dup2(stdin_fd, 0);
 	    dup2(output_pipe[1], 1);
 	    dup2(error_pipe[1], 2);
+	    close(stdin_fd);
+	    close(output_pipe[1]);
+	    close(error_pipe[1]);
 	}
 
 	execve(progname.c_str(), argv, env);
