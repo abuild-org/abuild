@@ -9,6 +9,8 @@
 class ProcessHandler
 {
   public:
+    virtual ~ProcessHandler();
+
     // Create the singleton instance of ProcessHandler.  The argument
     // is the original environment of the calling program.  This
     // function must be called exactly one time.
@@ -34,14 +36,15 @@ class ProcessHandler
     // will not be trapped and will just go to whatever stdout and
     // stderr are inherited.  Returns true iff the program exited
     // normally.
-    bool runProgram(std::string const& progname,
-		    std::vector<std::string> const& args,
-		    std::map<std::string, std::string> const& environment,
-		    bool preserve_env,
-		    std::string const& dir,
-		    output_handler_t output_handler = 0);
+    virtual bool runProgram(
+	std::string const& progname,
+	std::vector<std::string> const& args,
+	std::map<std::string, std::string> const& environment,
+	bool preserve_env,
+	std::string const& dir,
+	output_handler_t output_handler = 0) = 0;
 
-  private:
+  protected:
     ProcessHandler(char* env[]);
 
     static ProcessHandler* the_instance;

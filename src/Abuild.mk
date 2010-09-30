@@ -57,11 +57,17 @@ TARGETS_lib := abuild
 $(foreach P,$(TEST_PROGS),$(eval SRCS_bin_$(P) := $(P).cc))
 
 # Sources that are not specific to abuild
+ifeq ($(ABUILD_PLATFORM_OS), windows)
+  PROCESS_HANDLER_OS := windows
+else
+  PROCESS_HANDLER_OS := unix
+endif
 GENERAL_SRCS := \
 	QTC.cc \
 	QEXC.cc \
 	Util.cc \
 	ProcessHandler.cc \
+	ProcessHandler_$(PROCESS_HANDLER_OS).cc \
 	Logger.cc \
 	Error.cc \
 	KeyVal.cc \
