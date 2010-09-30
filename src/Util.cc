@@ -1239,3 +1239,13 @@ Util::pathSeparator()
     return ":";
 #endif
 }
+
+void
+Util::msleep(int milliseconds)
+{
+#ifdef _WIN32
+    Sleep(milliseconds);
+#else
+    usleep(1000 * milliseconds);
+#endif
+}

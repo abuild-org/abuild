@@ -231,6 +231,9 @@ namespace Util
 
     // Return the Java path separator appropriate for this platform
     std::string pathSeparator();
+
+    // Delay the given number of miliseconds
+    void msleep(int milliseconds);
 };
 
 #endif // __UTIL_HH__
