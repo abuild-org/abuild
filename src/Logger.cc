@@ -119,7 +119,7 @@ Logger::getInstance()
 }
 
 void
-Logger::stopLogger()
+Logger::stopLogger(std::string const& error_message)
 {
     if (the_instance)
     {
@@ -132,10 +132,21 @@ Logger::stopLogger()
 	    }
 	}
 
+	if (! error_message.empty())
+	{
+	    the_instance->logError(error_message, NO_JOB);
+	}
 	the_instance->writeToLogger(m_shutdown, "", NO_JOB);
 	the_instance->thread->join();
-	delete the_instance;
-	the_instance = 0;
+
+	// Don't delete the logger if we're shutting down abnormally
+	// since this means there may still be other threads accessing
+	// it.
+	if (error_message.empty())
+	{
+	    delete the_instance;
+	    the_instance = 0;
+	}
     }
 }
 
