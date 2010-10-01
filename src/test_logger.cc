@@ -73,6 +73,6 @@ int main()
     assert(logger->getOutputHandler(0) == 0);
     logger->closeJob(0);
 
-    Logger::stopLogger("error message");
+    Logger::stopLogger();
     return 0;
 }

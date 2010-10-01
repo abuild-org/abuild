@@ -34,6 +34,13 @@ ProcessHandler::createInstance(char* env[])
 #endif
 }
 
+void
+ProcessHandler::destroyInstance()
+{
+    delete the_instance;
+    the_instance = 0;
+}
+
 ProcessHandler&
 ProcessHandler::getInstance()
 {

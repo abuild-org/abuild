@@ -176,6 +176,7 @@ static int run(int argc, char* argv[], char* envp[])
 	std::cout << "status: " << status << std::endl << std::endl;
     }
 
+    ProcessHandler::destroyInstance();
     return 0;
 }
 

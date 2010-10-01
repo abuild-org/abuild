@@ -90,5 +90,6 @@ int main(int argc, char* argv[], char* envp[])
     }
 
     Logger::stopLogger();
+    ProcessHandler::destroyInstance();
     return 0;
 }

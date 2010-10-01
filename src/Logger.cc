@@ -119,7 +119,7 @@ Logger::getInstance()
 }
 
 void
-Logger::stopLogger(std::string const& error_message)
+Logger::stopLogger()
 {
     if (the_instance)
     {
@@ -132,10 +132,6 @@ Logger::stopLogger(std::string const& error_message)
 	    }
 	}
 
-	if (! error_message.empty())
-	{
-	    the_instance->logError(error_message, NO_JOB);
-	}
 	the_instance->writeToLogger(m_shutdown, "", NO_JOB);
 	the_instance->thread->join();
 	delete the_instance;

@@ -20,10 +20,10 @@ class Logger
     static Logger* getInstance();
 
     // Stops the logger and destroys the singleton instance.  Any
-    // references to it will be invalid.  If the argument is
-    // non-empty, it will be printed as an error message as the last
-    // thing before the logger is stopped.
-    static void stopLogger(std::string const& error_message = "");
+    // references to it will be invalid, so this function should not
+    // be called unless it is known that no threads are accessing the
+    // logger.
+    static void stopLogger();
 
     void setPrefixes(std::string const& output_prefix,
 		     std::string const& error_prefix);

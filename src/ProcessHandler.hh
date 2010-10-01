@@ -16,6 +16,11 @@ class ProcessHandler
     // function must be called exactly one time.
     static void createInstance(char* env[]);
 
+    // Destroys the singleton instance of ProcessHandler.  Do not call
+    // this method unless it is known that no processes are being
+    // waited for.
+    static void destroyInstance();
+
     // Return a reference to the singleton instance of ProcessHandler
     static ProcessHandler& getInstance();
 
