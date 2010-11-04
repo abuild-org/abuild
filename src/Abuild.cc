@@ -348,6 +348,15 @@ Abuild::getThisPlatform()
     }
 }
 
+// This helper function works around a problem with boost 1.44.0 and
+// VC10 (Visual C++ 2010) that prevents boost::bind from working on
+// std::list<std::string>::push_back.
+static void
+list_string_push_back(std::list<std::string>& l, std::string const& s)
+{
+    l.push_back(s);
+}
+
 void
 Abuild::parseArgv()
 {
@@ -446,13 +455,13 @@ Abuild::parseArgv()
 	boost::bind(&Abuild::argSetJVMXargs, this, _1, true));
     op.registerStringArg(
 	"platform-selector",
-	boost::bind(&std::list<std::string>::push_back,
+	boost::bind(list_string_push_back,
 		    boost::ref(platform_selector_strings),
 		    _1));
     op.registerSynonym("p", "platform-selector");
     op.registerStringArg(
 	"clean-platforms",
-	boost::bind(&std::list<std::string>::push_back,
+	boost::bind(list_string_push_back,
 		    boost::ref(clean_platform_strings),
 		    _1));
     op.registerNoArg(
