@@ -60,7 +60,7 @@ test suite includes some tests of JUnit support.  In order for them to
 run, you must set the ABUILD_JUNIT_JAR environment variable to the
 full path of a junit jar file.  (On Windows, this should be a Windows
 path, not a Cygwin path.)  JUnit 4.4 is known to be sufficient.  It is
-likey that other JUnit 4 versions will also work.  If this environment
+likely that other JUnit 4 versions will also work.  If this environment
 variable is not set, the test suite will issue a warning and skip the
 JUnit tests.
 
@@ -146,6 +146,11 @@ the make-binary-distribution script from it and, if needed, download
 the saved doc distribution so that you can use
 make-binary-distribution to create your own builds.  See above.
 
+You should have JAVA_HOME and ANT_HOME set, and you should also have
+$JAVA_HOME/bin and $ANT_HOME/bin in your path in order for the test
+suite to pass.  (There are a few test cases that unset JAVA_HOME and
+ANT_HOME to exercise use of path as a fallback.)
+
 
 UNIX BUILD
 ==========
@@ -166,9 +171,13 @@ To build on Windows, perform the following steps:
  * have Visual C++ environment variables and path set (by running the
    batch file provided with Visual C++)
 
- * Set the BOOST_TOP envirionment variable to the location of your
+ * Set the BOOST_TOP environment variable to the location of your
    boost installation as a Windows absolute path using forward slash
    (/) rather than backslash (\) as the path separator
+
+ * Make sure you have xmllint and gcc with mingw support from cygwin
+   installed in order for the tests that exercise those functions to
+   be able to pass
 
  * Run
 
@@ -180,13 +189,13 @@ To build on Windows, perform the following steps:
 COMMON
 ======
 
-If you are buildling Java support, you must run
+If you are building Java support, you must run
 
 ./BootstrapJava.groovy
 
 In order to run BootstrapJava.groovy, you must have JAVA_HOME set, and
 you must have groovy 1.5.7 or newer in your path.  If you have
-GROOVY_HOME set, you can alsoj ust run $GROOVY_HOME/bin/grooyv
+GROOVY_HOME set, you can also just run $GROOVY_HOME/bin/groovy
 BootstrapJava.groovy without having groovy in your path.
 
 If you are building documentation, run "./<output-dir>/abuild -C
