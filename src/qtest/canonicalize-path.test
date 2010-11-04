@@ -34,13 +34,13 @@ if ($^O =~ m/^(cygwin|MSWin32)$/)
     my $win_sys_root = $ENV{'SYSTEMROOT'};
     my $sys_root = realdir($win_sys_root);
     chdir $sys_root or die;
-    $win_sys_root =~ s/^(.)/\L$1\E/;
+    $win_sys_root =~ s/^(.:)/\L$1\E/;
     $win_sys_root =~ s,\\,/,g;
-
+    my $sys_root_out = `test_canonicalize_path .`;
+    $sys_root_out =~ s/(-> .:)/\L$1\E/;
     $td->runtest("system root",
-		 {$td->COMMAND => "test_canonicalize_path ."},
-		 {$td->STRING => ". -> $win_sys_root\n",
-		  $td->EXIT_STATUS => 0},
+		 {$td->STRING => $sys_root_out},
+		 {$td->STRING => ". -> $win_sys_root\n"},
 		 $td->NORMALIZE_NEWLINES);
 
     my $drive = substr($win_sys_root, 0, 2);
