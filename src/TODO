@@ -1,3 +1,11 @@
+Next
+====
+
+ * Release notes: mention that abuild has been tested with MSVC 2010;
+   test suite changes were required because of differences in the
+   newer MSVC, and one code change was required to work around an
+   issue with MSVC 2010, but no functionality changes were needed.
+
 Abuild Lint
 ===========
 
