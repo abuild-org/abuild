@@ -259,8 +259,26 @@ $td->runtest("global plugins",
 
 # To actually bump into the root directory while finding the top of
 # the tree, we need to create a directory outside of the abuild source
-# tree.  Otherwise, abuild's own Abuild.conf will block us.
+# tree.  Otherwise, abuild's own Abuild.conf will block us.  This test
+# case will pass but result in a coverage failure if /Abuild.conf or
+# /tmp/Abuild.conf exist, so we explicitly check for it to avoid
+# confusion.
 my $dir = tempdir();
+if ($dir =~ m,^/tmp/[^/]+$,)
+{
+    my $okay = (((-e "/Abuild.conf") || (-e "/tmp/Abuild.conf"))
+		? "see comments in abuild-errors.test\n"
+		: "okay\n");
+    $td->runtest("no Abuild.conf files above $dir",
+		 {$td->STRING => "okay\n"},
+		 {$td->STRING => $okay});
+}
+else
+{
+    $td->runtest("tempdir() not in /tmp",
+		 {$td->STRING => ""},
+		 {$td->STRING => "see comments in abuild-errors.test\n"});
+}
 my $windir = windir($dir);
 open(F, ">$dir/Abuild.conf") or die;
 print F "tree-name: hello\n";
@@ -363,4 +381,4 @@ else
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(40 + (in_windows() ? 0 : 2));
+$td->report(41 + (in_windows() ? 0 : 2));
