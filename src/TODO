@@ -6,6 +6,9 @@ Next
    newer MSVC, and one code change was required to work around an
    issue with MSVC 2010, but no functionality changes were needed.
 
+ * Make sure documentation spells out (in human-readable terms) that
+   platform type names must conform to [a-zA-Z0-9_-]+.
+
 Abuild Lint
 ===========
 
@@ -159,6 +162,22 @@ Information Extraction
    load.  For example, the SQL can enforce uniqueness and referential
    integrity constraints even though they may not be satisfied when
    there are errors.
+
+
+Hierarchical Platform Types
+===========================
+
+Consider whether there should be some generalization of the idea that
+anyone can depend on indep.  For example, vxworks-6_8-base may be
+appropriate for non-board-specific vxworks 6.8 items such that we may
+want it so that vxworks-6_8-av5 could depend on vxworks-6_8-base but
+not the other way around.  Ideally, it should work that if X is
+building on vxworks-6_8-av5, vxworks-6_8-1905, vxworks-6_3-base, and
+vxworks-6_3-mv6100 and Y depends on vxworks-6_3-base and
+vxworks-6_8-base, abuild should automatically associate the 6.8 types
+with the 6.8 base and the 6.3 types, including base, with the 6.3
+base.  Then the hard-coding of indep's special status could be removed
+by making everything else a "child" of indep.
 
 
 Compiler/Platform Configuration
