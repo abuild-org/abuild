@@ -9,6 +9,56 @@ Next
  * Make sure documentation spells out (in human-readable terms) that
    platform type names must conform to [a-zA-Z0-9_-]+.
 
+ * It would be nice if there were a way to say build only on specific
+   platform types (or skip all but some platform type), so you could
+   do a build of only indep and java, for example, without having to
+   enumerate all the possible platform types to skip.
+
+ * Some kind of progress report during a large build might be nice.
+   This is especially tempting with the numbered prefixes in a -jn
+   build.  Consider a --progress flag that causes something like
+
+   abuild: item (output-dir) [k of n]: ...
+
+   to be printed for each item.  Ideally, n should be the total number
+   of items that will actually build, but maybe it's okay to be sloppy
+   and count interface-only items.  Unlike job numbers used as
+   prefixes, these numbers are non-deterministic for a multithreaded
+   build since they will be assigned as an item is built.  If we count
+   all items that have job numbers and increment the counter whenever
+   itemBuilder is invoked but print the number only in buildItem, it
+   will still give us a good idea of progress and will have very light
+   impact on the code (an item counter, and a flag indicating whether
+   we print its value).  One potential problem would be confusion over
+   the fact that k would almost never match the prefix in a
+   multithreaded build.  A less confusing option might be to give a
+   percentage of items that have completed.  Round down to the nearest
+   integer so we never exceed 99%.  Yet another option would be to not
+   care that the actual order may not match the prefix and to just
+   always use the prefix as k and not care that they come out of
+   order.
+
+ * Consider implementing hierarchical platform types
+
+ * Expand build-also to make it possible to create arbitrarily
+   complicated build sets combining the following:
+
+    - item-name (or item:item-name) -- build the named item
+
+    - tree:tree-name [ -with-tree-deps ] -- build all items in the
+      named tree; if -with-tree-deps is given, build all items in the
+      named tree and all of its tree dependencies
+
+    - itemdesc:[item-name] -- build all items at or below the path of
+      the named item; if item-name is omitted (the colon must be
+      present, however), build all items at or below the path of this
+      item
+
+    - treedesc:tree-name [ -with-tree-deps ] -- build all items in the
+      all trees at or below the path of the root of the named tree; if
+      -with-tree-deps is given, build all items in all of those trees'
+      tree dependencies as well
+
 Abuild Lint
 ===========
 
