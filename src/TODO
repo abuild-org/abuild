@@ -1,8 +1,6 @@
 Next
 ====
 
- * Check headers in Abuild-*.cc after building with a newer compiler
-
  * Update coverage cases after splitting Abuild.cc
 
  * If item A on platform X depends on item B and item B doesn't build

@@ -2,8 +2,6 @@
 // parsing, etc.  Also includes constructor/destructor and top-level
 // run function.
 
-// XXX headers
-
 #include <Abuild.hh>
 #include <QTC.hh>
 #include <QEXC.hh>
@@ -11,17 +9,10 @@
 #include <ProcessHandler.hh>
 #include <Logger.hh>
 #include <OptionParser.hh>
-//#include <FileLocation.hh>
-//#include <ItemConfig.hh>
-//#include <BackingConfig.hh>
 #include <InterfaceParser.hh>
-//#include <DependencyRunner.hh>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-//#include <fstream>
-//#include <sstream>
-//#include <algorithm>
 #include <cstdlib>
 #include <cstdio>
 #include <assert.h>
