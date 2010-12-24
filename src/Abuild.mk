@@ -135,8 +135,14 @@ SRCS_bin_abuild := \
 	BuildItem.cc \
 	JavaBuilder.cc \
 	UpgradeData.cc \
+	Abuild-misc.cc \
+	Abuild-init.cc \
+	Abuild-help.cc \
+	Abuild-dump.cc \
+	Abuild-traverse.cc \
+	Abuild-buildset.cc \
+	Abuild-build.cc \
 	Abuild-upgrade.cc \
-	Abuild.cc \
 	abuild_main.cc
 
 # If not defined or empty, coverage cases will not be invoked in the
