@@ -51,37 +51,37 @@ ItemConfig ERR deps without name 0
 ItemConfig ERR external on non-root 0
 ItemConfig ERR invalid parent 0
 ItemConfig ERR absolute child 0
-Abuild ERR unknown platform type 0
-Abuild ERR incompatible platform types 0
-Abuild ERR inaccessible dep 0
-Abuild multiple target types 1
-Abuild empty build set 0
-Abuild integrity errors in buildset 0
-Abuild ERR backing cycle 0
-Abuild ERR external not root 0
-Abuild ERR invalid backing file 0
-Abuild traverse backing without conf 0
-Abuild external in backing area 1
-Abuild ERR can't resolve external 0
-Abuild ERR item multiple locations 0
-Abuild ERR no child config 0
-Abuild sparse tree 0
-Abuild ERR can't resolve child 0
-Abuild override build item 0
-Abuild ERR unknown dependency 0
-Abuild ERR circular dependency 0
-Abuild ERR dep inconsistency 0
-Abuild buildset all 1
-Abuild buildset local 1
-Abuild buildset desc 1
-Abuild buildset deps 1
-Abuild buildset current 1
-Abuild empty buildset 0
-Abuild clean 0
-Abuild no local build 0
-Abuild not building read-only build item 1
-Abuild not building with no build file 1
-Abuild no-op 0
+Abuild-traverse ERR unknown platform type 0
+Abuild-traverse ERR incompatible platform types 0
+Abuild-traverse ERR inaccessible dep 0
+Abuild-traverse multiple target types 1
+Abuild-traverse empty build set 0
+Abuild-traverse integrity errors in buildset 0
+Abuild-traverse ERR backing cycle 0
+Abuild-traverse ERR external not root 0
+Abuild-traverse ERR invalid backing file 0
+Abuild-traverse traverse backing without conf 0
+Abuild-traverse external in backing area 1
+Abuild-traverse ERR can't resolve external 0
+Abuild-traverse ERR item multiple locations 0
+Abuild-traverse ERR no child config 0
+Abuild-traverse sparse tree 0
+Abuild-traverse ERR can't resolve child 0
+Abuild-traverse override build item 0
+Abuild-traverse ERR unknown dependency 0
+Abuild-traverse ERR circular dependency 0
+Abuild-traverse ERR dep inconsistency 0
+Abuild-buildset buildset all 1
+Abuild-buildset buildset local 1
+Abuild-buildset buildset desc 1
+Abuild-buildset buildset deps 1
+Abuild-buildset buildset current 1
+Abuild-buildset empty buildset 0
+Abuild-init clean 0
+Abuild-build no local build 0
+Abuild-build not building read-only build item 1
+Abuild-build not building with no build file 1
+Abuild-build no-op 0
 ccxx.mk ccxx_compile 0
 ccxx.mk ccxx_make_static_lib 0
 ccxx.mk ccxx_make_shared_lib 0
@@ -91,13 +91,13 @@ ccxx.mk undefined variables 0
 ccxx.mk no targets 0
 abuild.mk BUILD_ITEM_RULES 0
 abuild.mk LOCAL_RULES 0
-Abuild ERR no abuild.conf 0
-Abuild item added twice 0
-Abuild ERR missing after-build 0
-Abuild good after-build 0
+Abuild-traverse ERR no abuild.conf 0
+Abuild-traverse item added twice 0
+Abuild-build ERR missing after-build 0
+Abuild-build good after-build 0
 ItemConfig ERR multiple build files 0
 ItemConfig ERR platform-types without name 0
-Abuild ERR after-build with no build file 0
+Abuild-build ERR after-build with no build file 0
 ItemConfig ERR config files without name 0
 ItemConfig ERR no platform types 0
 ItemConfig ERR platforms without build files 0
@@ -106,10 +106,10 @@ InterfaceParser environment variable 0
 ItemConfig ERR invalid visible-to 0
 ItemConfig ERR visible-to for public item 0
 ItemConfig ERR visible-to not ancestor 0
-Abuild globally visible item 0
-Abuild accessor sees ancestor 1
-Abuild accessor sees child 0
-Abuild set scope from visibility 0
+Abuild-traverse globally visible item 0
+Abuild-traverse accessor sees ancestor 1
+Abuild-traverse accessor sees child 0
+Abuild-traverse set scope from visibility 0
 ItemConfig ERR visible-to too long 0
 Interface ERR reset unknown variable 0
 InterfaceParser no-reset 0
@@ -120,9 +120,9 @@ ItemConfig ERR supported-flags without name 0
 ItemConfig ERR invalid flag 0
 ItemConfig ERR bad dep 0
 ItemConfig ERR flag without dep 0
-Abuild ERR unsupported flag 0
-Abuild skipping flag for unknown dep 0
-Abuild flag made variable uninitialized 0
+Abuild-traverse ERR unsupported flag 0
+Abuild-traverse skipping flag for unknown dep 0
+Interface flag made variable uninitialized 0
 InterfaceParser ERR bad flag 0
 ItemConfig ERR traits without name 0
 ItemConfig ERR supported-traits on non-root 0
@@ -131,47 +131,47 @@ ItemConfig ERR duplicate trait 0
 ItemConfig ERR duplicate flag 0
 ItemConfig ERR bad trait 0
 ItemConfig ERR item without trait 0
-Abuild ERR unsupported trait 0
-Abuild ERR inaccessible trait referent 0
-Abuild listTraits with no traits 0
-Abuild listTraits 0
-Abuild expand by trait 1
-Abuild ERR unknown trait 0
+Abuild-traverse ERR unsupported trait 0
+Abuild-traverse ERR inaccessible trait referent 0
+Abuild-traverse listTraits with no traits 0
+Abuild-traverse listTraits 0
+Abuild-buildset expand by trait 1
+Abuild-traverse ERR unknown trait 0
 ItemConfig ERR duplicate platform type 0
 ItemConfig ERR deleted on non-1.0-root 0
 ItemConfig ERR duplicate deleted item 0
 ItemConfig ERR duplicate plugins item 0
 ItemConfig ERR plugins on non-root 0
-Abuild ERR invalid plugin 0
-Abuild ERR plugin with dependencies 0
-Abuild ERR item depends on plugin 0
-Abuild ERR plugin with target type !all 0
-Abuild ERR plugin integrity 0
-Abuild ERR import of plugin interface 0
-Abuild ERR import of dependent interface 0
-Abuild ERR error loading plugin interface 0
+Abuild-traverse ERR invalid plugin 0
+Abuild-traverse ERR plugin with dependencies 0
+Abuild-traverse ERR item depends on plugin 0
+Abuild-traverse ERR plugin with target type !all 0
+Abuild-traverse ERR plugin integrity 0
+Abuild-build ERR import of plugin interface 0
+Abuild-build ERR import of dependent interface 0
+Abuild-build ERR error loading plugin interface 0
 InterfaceParser ERR disallowed after-build 0
-Abuild ERR bad platform type specification 0
-Abuild ERR addPlatformType error 0
-Abuild ERR addPlatform error 0
-Abuild ERR bad platform specification 0
-Abuild ERR add compiler error 0
-Abuild non-trivial update platform types 0
-Abuild platform type difference 0
-Abuild inherit platform types 0
-Abuild ERR unmatched platform 0
+Abuild-init ERR bad platform type specification 0
+Abuild-init ERR addPlatformType error 0
+Abuild-init ERR addPlatform error 0
+Abuild-init ERR bad platform specification 0
+Abuild-init ERR add compiler error 0
+Abuild-traverse non-trivial update platform types 0
+Abuild-traverse platform type difference 0
+Abuild-traverse inherit platform types 0
+Abuild-build ERR unmatched platform 0
 ItemConfig ERR ptype without dep 0
 ItemConfig ERR duplicate dep ptype 0
-Abuild ERR dep doesn't have dep ptype 0
-Abuild ERR all with ptype deps 0
-Abuild ERR dep ptype indep 0
-Abuild ERR no override platform 0
-Abuild ignoring all's dep without platform 0
-Abuild item -> indep 1
-Abuild override platform 0
-Abuild A:p -> B:p 1
-Abuild ABUILD_PLATFORM_SELECTORS 0
-Abuild ERR invalid platform selector 0
+Abuild-traverse ERR dep doesn't have dep ptype 0
+Abuild-traverse ERR all with ptype deps 0
+Abuild-traverse ERR dep ptype indep 0
+Abuild-build ERR no override platform 0
+Abuild-build ignoring all's dep without platform 0
+Abuild-build item -> indep 1
+Abuild-build override platform 0
+Abuild-build A:p -> B:p 1
+Abuild-init ABUILD_PLATFORM_SELECTORS 0
+Abuild-init ERR invalid platform selector 0
 PlatformSelector option 1
 PlatformSelector skip 0
 PlatformSelector all 0
@@ -184,44 +184,44 @@ ItemConfig ptype is selector 0
 ItemConfig bad ptype selector 0
 BuildItem used selector for type 0
 BuildItem used first for type 1
-Abuild buildset names 1
-Abuild ERR unknown items in set 0
-Abuild ERR bad buildset pattern 0
-Abuild buildset pattern 1
-Abuild add selected to explicit targets 0
-Abuild add all to explicit targets 1
+Abuild-buildset buildset names 1
+Abuild-buildset ERR unknown items in set 0
+Abuild-init ERR bad buildset pattern 0
+Abuild-buildset buildset pattern 1
+Abuild-buildset add selected to explicit targets 0
+Abuild-buildset add all to explicit targets 1
 ccxx.mk remove extra deps 0
 ccxx.mk found extra objs 0
 ccxx.mk found extra other 0
-Abuild add platform 1
-Abuild add native compiler 1
+Abuild-init add platform 1
+Abuild-init add native compiler 1
 ccxx.mk ERR .. in srcs 0
 ItemConfig ERR ro without external 0
 ItemConfig ERR winpath 0
 ItemConfig read-only external 0
-Abuild some native items skipped 0
-Abuild some items skipped 0
+Abuild-build some native items skipped 0
+Abuild-build some items skipped 0
 Interface same location, not instance 0
 Interface ERR variable assigned by other instance 0
 Interface duplicate assignment different platform same value 0
-Abuild dumpInterface ignoring read-only build item 0
+Abuild-build dumpInterface ignoring read-only build item 0
 Interface dump reset history 0
 Interface dump unassigned 0
 Interface dump flag 0
-Abuild replace build set alias 0
+Abuild-init replace build set alias 0
 PlatformData bad non-object-code selector 0
-Abuild ERR invalid build also 0
+Abuild-traverse ERR invalid build also 0
 ItemConfig ERR bad build-also 0
 ItemConfig ERR build-also without name 0
-Abuild ERR plugin with build-also 0
-Abuild non-trivial trait expansion 0
-Abuild non-trivial dep expansion 0
-Abuild additional build-also expansion 0
-Abuild non-trivial build-also 0
-Abuild ERR bad clean platform 0
+Abuild-traverse ERR plugin with build-also 0
+Abuild-buildset non-trivial trait expansion 0
+Abuild-buildset non-trivial dep expansion 0
+Abuild-buildset additional build-also expansion 0
+Abuild-buildset non-trivial build-also 0
+Abuild-init ERR bad clean platform 0
 JavaBuilder handle abnormal java exit 0
-Abuild infer ANT_HOME 0
-Abuild infer JAVA_HOME 0
+Abuild-build infer ANT_HOME 0
+Abuild-build infer JAVA_HOME 0
 groovy ERR graph errors 0
 JavaBuilder.java noOp 0
 groovy ERR runTarget during init 0
@@ -241,7 +241,7 @@ groovy ERR configureTarget after init 0
 ItemConfig ERR .. in child 0
 ItemConfig ERR no parent Abuild.conf 0
 ItemConfig ERR interleaved Abuild.conf 0
-Abuild ERR can't find top 0
+Abuild-traverse ERR can't find top 0
 ItemConfig ERR interleaved child Abuild.conf 0
 ItemConfig ERR absolute external 0
 ItemConfig found root searching for parent 0
@@ -262,7 +262,7 @@ UpgradeData ERR duplicate 0
 UpgradeData orphan names 0
 BackingConfig ERR invalid backing file 0
 Abuild-upgrade ERR local backing 0
-Abuild backing without conf 0
+Abuild-traverse backing without conf 0
 Abuild-upgrade ERR external not root 0
 UpgradeData ERR tree not directory 0
 Abuild-upgrade ERR unknown external 0
@@ -272,42 +272,42 @@ Abuild-upgrade ERR tree-dep graph error 0
 ItemConfig ERR tree-deps on non-root 0
 Abuild-upgrade ERR duplicate name 0
 Abuild-upgrade ERR invalid name 0
-Abuild ERR can't find local top 0
+Abuild-traverse ERR can't find local top 0
 ItemConfig ERR Abuild.backing non-forest root 0
-Abuild previously assigned tree name 0
-Abuild ERR named item outside of tree 0
+Abuild-traverse previously assigned tree name 0
+Abuild-traverse ERR named item outside of tree 0
 ItemConfig ERR bad tree dep 0
-Abuild ERR duplicate tree 0
-Abuild ERR findTop from external 0
-Abuild forest has already been seen 0
+Abuild-traverse ERR duplicate tree 0
+Abuild-traverse ERR findTop from external 0
+Abuild-traverse forest has already been seen 0
 BackingConfig ERR no Abuild.conf 0
-Abuild ERR can't find backing top 0
-Abuild duplicate backing area 0
-Abuild ERR unknown tree dependency 0
-Abuild ERR circular tree dependency 0
-Abuild not copying item from deleted tree 0
-Abuild not copying deleted item 0
-Abuild ERR depend on invisible item 0
-Abuild ERR plugin in invisible tree 0
-Abuild ERR build-also invisible item 0
-Abuild ERR invisible trait referent 0
-Abuild ERR deleted item exists locally 0
-Abuild ERR deleting non-existent item 0
-Abuild ERR deleting non-existent tree 0
-Abuild not copying deleted tree 0
-Abuild deleted tree exists locally 0
-Abuild override build tree 0
-Abuild inherit tree name from backing 0
-Abuild trying backing of backing 0
-Abuild replace item from deleted tree 0
-Abuild forest merge required 0
-Abuild ERR backing area loop 0
-Abuild ERR external_graph failure 0
-Abuild ERR backs explicitly to self 0
-Abuild ERR backs implicitly to self 0
-Abuild skipping covered backing area 0
-Abuild backing depth > 1 0
-Abuild ERR item multiple backing areas 0
+Abuild-traverse ERR can't find backing top 0
+Abuild-traverse duplicate backing area 0
+Abuild-traverse ERR unknown tree dependency 0
+Abuild-traverse ERR circular tree dependency 0
+Abuild-traverse not copying item from deleted tree 0
+Abuild-traverse not copying deleted item 0
+Abuild-traverse ERR depend on invisible item 0
+Abuild-traverse ERR plugin in invisible tree 0
+Abuild-traverse ERR build-also invisible item 0
+Abuild-traverse ERR invisible trait referent 0
+Abuild-traverse ERR deleted item exists locally 0
+Abuild-traverse ERR deleting non-existent item 0
+Abuild-traverse ERR deleting non-existent tree 0
+Abuild-traverse not copying deleted tree 0
+Abuild-traverse deleted tree exists locally 0
+Abuild-traverse override build tree 0
+Abuild-traverse inherit tree name from backing 0
+Abuild-traverse trying backing of backing 0
+Abuild-traverse replace item from deleted tree 0
+Abuild-traverse forest merge required 0
+Abuild-traverse ERR backing area loop 0
+Abuild-traverse ERR external_graph failure 0
+Abuild-traverse ERR backs explicitly to self 0
+Abuild-traverse ERR backs implicitly to self 0
+Abuild-traverse skipping covered backing area 0
+Abuild-traverse backing depth > 1 0
+Abuild-traverse ERR item multiple backing areas 0
 Abuild-upgrade ERR backed external 0
 Abuild-upgrade ERR invalid forest root 0
 Abuild-upgrade create new root Abuild.conf 1
@@ -321,64 +321,64 @@ ItemConfig replace externals 0
 ItemConfig add tree_deps 0
 ItemConfig replace tree_deps 0
 ItemConfig preserve externals 0
-Abuild delete unused empty top-level tree 0
+Abuild-traverse delete unused empty top-level tree 0
 Abuild-upgrade ignore useless empty tree 0
 ItemConfig delete externals 0
 Abuild-upgrade get name from backing 0
-Abuild basic deprecation warning 0
-Abuild ERR bad tree-based build set 0
-Abuild buildset deptrees 1
-Abuild clear local tree 0
+Abuild-traverse basic deprecation warning 0
+Abuild-buildset ERR bad tree-based build set 0
+Abuild-buildset buildset deptrees 1
+Abuild-traverse clear local tree 0
 ItemConfig allowing deprecated deleted 0
-Abuild ERR invalid trait referent 0
+Abuild-traverse ERR invalid trait referent 0
 Abuild-upgrade ERR start below root 0
-Abuild multiple backing areas 0
-Abuild ERR tree multiple backing areas 0
-Abuild ro/rw path with start dir 0
-Abuild ERR crossing ro/rw paths 0
-Abuild only rw paths 0
-Abuild ro on top 0
-Abuild rw on top 0
-Abuild ERR invalid ro/rw path 0
-Abuild only ro paths 0
+Abuild-traverse multiple backing areas 0
+Abuild-traverse ERR tree multiple backing areas 0
+Abuild-init ro/rw path with start dir 0
+Abuild-init ERR crossing ro/rw paths 0
+Abuild-init only rw paths 0
+Abuild-init ro on top 0
+Abuild-init rw on top 0
+Abuild-init ERR invalid ro/rw path 0
+Abuild-init only ro paths 0
 ItemConfig ERR description without name 0
-Abuild backing area points below root 0
-Abuild no_deps 0
-Abuild build current by default 0
-Abuild clean from output directory 0
-Abuild as-needed platform selection 1
-Abuild platform dependency with selector 0
-Abuild specific platform selector 0
-Abuild default platform selector 0
-Abuild no platform selector 0
-Abuild ignoring skip selector 0
+Abuild-traverse backing area points below root 0
+Abuild-init no_deps 0
+Abuild-init build current by default 0
+Abuild-init clean from output directory 0
+Abuild-build as-needed platform selection 1
+Abuild-build platform dependency with selector 0
+Abuild-build specific platform selector 0
+Abuild-build default platform selector 0
+Abuild-build no platform selector 0
+Abuild-build ignoring skip selector 0
 PlatformSelector default 0
 ItemConfig ERR invalid attribute 0
-Abuild ERR error for global plugin 0
-Abuild add global plugin 0
-Abuild item in unnamed root 0
-Abuild expand by rdeps 0
-Abuild non-trivial rdep expansion 0
+Abuild-traverse ERR error for global plugin 0
+Abuild-traverse add global plugin 0
+Abuild-traverse item in unnamed root 0
+Abuild-buildset expand by rdeps 0
+Abuild-buildset non-trivial rdep expansion 0
 ItemConfig ERR optional without treedep 0
 ItemConfig ERR optional without dep 0
-Abuild skipping optional tree dependency 0
-Abuild skipping optional dependency 0
+Abuild-traverse skipping optional tree dependency 0
+Abuild-traverse skipping optional dependency 0
 BuildItem remove dependency 0
 BackingConfig ERR backing area doesn't exist 0
 Interface ERR multiword scalar 0
-Abuild ERR bad rules help topic 0
-Abuild ERR bad help topic 0
-Abuild rules help with/without build item 1
-Abuild helpfile found 0
-Abuild module without helpfile found 0
-Abuild module stray helpfile found 0
-Abuild help for unknown module 0
-Abuild no help for item 0
-Abuild show item help file 1
+Abuild-help ERR bad rules help topic 0
+Abuild-help ERR bad help topic 0
+Abuild-help rules help with/without build item 1
+Abuild-help helpfile found 0
+Abuild-help module without helpfile found 0
+Abuild-help module stray helpfile found 0
+Abuild-help help for unknown module 0
+Abuild-help no help for item 0
+Abuild-help show item help file 1
 Abuild-upgrade ERR external symlinks 0
 ItemConfig ERR serial without make 0
-Abuild make_njobs 1
-Abuild explicit serial 0
+Abuild-build make_njobs 1
+Abuild-build explicit serial 0
 OptionParser ERR unknown option 0
 OptionParser ERR unknown argument 0
 OptionParser positional argument 0
@@ -396,40 +396,40 @@ OptionParser call regex callback 0
 OptionParser call vector callback 3
 OptionParser found term arg 1
 OptionParser list to end of args 1
-Abuild ERR usage compatibility level 0
-Abuild ERR ant unknown 0
-Abuild ERR usage traits without set 0
-Abuild ERR usage rdeps without set 0
-Abuild ERR usage --clean with targets 0
-Abuild ERR usage special with targets 0
-Abuild ERR usage special or set in output 0
-Abuild ERR usage multiple special targets 0
-Abuild ERR usage invalid help 0
-Abuild ERR usage j = 0 0
-Abuild ERR usage invalid build set 0
-Abuild ERR global plugins with externals 0
-Abuild allow access to global plugin 0
+Abuild-init ERR usage compatibility level 0
+Abuild-init ERR ant unknown 0
+Abuild-init ERR usage traits without set 0
+Abuild-init ERR usage rdeps without set 0
+Abuild-init ERR usage --clean with targets 0
+Abuild-init ERR usage special with targets 0
+Abuild-init ERR usage special or set in output 0
+Abuild-init ERR usage multiple special targets 0
+Abuild-init ERR usage invalid help 0
+Abuild-init ERR usage j = 0 0
+Abuild-init ERR usage invalid build set 0
+Abuild-traverse ERR global plugins with externals 0
+Abuild-traverse allow access to global plugin 0
 Abuild-upgrade ERR interleaved forests 0
-Abuild ignoring missing optional child 0
+Abuild-traverse ignoring missing optional child 0
 ItemConfig ERR optional without child 0
 ItemConfig ERR global without plugin 0
 ItemConfig global plugin 0
 Interface empty scalar assignment 0
-Abuild backing deprecation warning 0
-Abuild buildset descdeptrees 1
+Abuild-misc backing deprecation warning 0
+Abuild-buildset buildset descdeptrees 1
 InterfaceParser env default 0
 InterfaceParser parameter 0
 InterfaceParser parameter default 0
 InterfaceParser ERR invalid parameter 0
-Abuild output mode 2
-Abuild output prefix 1
-Abuild error prefix 1
+Abuild-init output mode 2
+Abuild-init output prefix 1
+Abuild-init error prefix 1
 JavaBuilder read partial message 0
 JavaBuilder data for job 0 0
 JavaBuilder capture output 1
 JavaBuilder pending data 1
 JavaBuilder response ends with NL 0
 JavaBuilder response ends with CRNL 0
-Abuild set interleaved from prefix 0
-Abuild windows nl in list_platforms 0
-Abuild unused platform selector 0
+Abuild-init set interleaved from prefix 0
+Abuild-init windows nl in list_platforms 0
+Abuild-traverse unused platform selector 0

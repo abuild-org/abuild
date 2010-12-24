@@ -239,7 +239,7 @@ Abuild::runInternal()
     bool okay = true;
     if (this->special_target == s_CLEAN)
     {
-        QTC::TC("abuild", "Abuild clean");
+        QTC::TC("abuild", "Abuild-init clean");
 	if (! this->this_platform.empty())
 	{
 	    cleanOutputDir();
@@ -414,13 +414,13 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 		}
 		catch (QEXC::General& e)
 		{
-		    QTC::TC("abuild", "Abuild ERR addPlatformType error");
+		    QTC::TC("abuild", "Abuild-init ERR addPlatformType error");
 		    error(location, e.what());
 		}
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR bad platform type specification");
+		QTC::TC("abuild", "Abuild-init ERR bad platform type specification");
 		error(location, "invalid platform type specification");
 	    }
 	}
@@ -468,7 +468,7 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 		// This coverage case is referenced in
 		// abuild-misc.test; update call to fake_qtc if it
 		// changes.
-		QTC::TC("abuild", "Abuild windows nl in list_platforms");
+		QTC::TC("abuild", "Abuild-init windows nl in list_platforms");
 		error(location, "Windows-style line endings found;"
 		      " please ensure this file uses UNIX line endings");
 	    }
@@ -493,12 +493,12 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 		try
 		{
 		    platform_data.addPlatform(platform, type, lowpri);
-		    QTC::TC("abuild", "Abuild add platform",
+		    QTC::TC("abuild", "Abuild-init add platform",
 			    lowpri ? 0 : 1);
 		}
 		catch (QEXC::General& e)
 		{
-		    QTC::TC("abuild", "Abuild ERR addPlatform error");
+		    QTC::TC("abuild", "Abuild-init ERR addPlatform error");
 		    error(location, e.what());
 		}
 	    }
@@ -515,18 +515,18 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 		{
 		    platform_data.addPlatform(
 			platform, PlatformData::pt_NATIVE, lowpri);
-		    QTC::TC("abuild", "Abuild add native compiler",
+		    QTC::TC("abuild", "Abuild-init add native compiler",
 			    lowpri ? 0 : 1);
 		}
 		catch (QEXC::General& e)
 		{
-		    QTC::TC("abuild", "Abuild ERR add compiler error");
+		    QTC::TC("abuild", "Abuild-init ERR add compiler error");
 		    error(location, e.what());
 		}
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR bad platform specification");
+		QTC::TC("abuild", "Abuild-init ERR bad platform specification");
 		error(location, "invalid syntax in list_platforms output");
 	    }
 	}
@@ -577,7 +577,7 @@ Abuild::parseArgv()
     std::string platform_selector_env;
     if (Util::getEnv("ABUILD_PLATFORM_SELECTORS", &platform_selector_env))
     {
-	QTC::TC("abuild", "Abuild ABUILD_PLATFORM_SELECTORS");
+	QTC::TC("abuild", "Abuild-init ABUILD_PLATFORM_SELECTORS");
 	platform_selector_strings = Util::splitBySpace(platform_selector_env);
     }
     std::string compat_level_version;
@@ -794,7 +794,7 @@ Abuild::parseArgv()
     }
     else
     {
-	QTC::TC("abuild", "Abuild ERR usage compatibility level");
+	QTC::TC("abuild", "Abuild-init ERR usage compatibility level");
 	usage("invalid compatibility level " + compat_level_version);
     }
 
@@ -822,7 +822,7 @@ Abuild::parseArgv()
 	else
 	{
 	    // Pretend we just didn't recognize the option at all
-	    QTC::TC("abuild", "Abuild ERR ant unknown");
+	    QTC::TC("abuild", "Abuild-init ERR ant unknown");
 	    usage("unknown option \"ant\"");
 	}
     }
@@ -836,7 +836,7 @@ Abuild::parseArgv()
 	// requested.
 	if (! (this->output_prefix.empty() && this->error_prefix.empty()))
 	{
-	    QTC::TC("abuild", "Abuild set interleaved from prefix");
+	    QTC::TC("abuild", "Abuild-init set interleaved from prefix");
 	    this->output_mode = om_interleaved;
 	}
 	else
@@ -856,14 +856,14 @@ Abuild::parseArgv()
 	this->use_job_prefix =
 	    ((this->output_mode == om_interleaved) && (this->max_workers > 1));
     }
-    QTC::TC("abuild", "Abuild output mode",
+    QTC::TC("abuild", "Abuild-init output mode",
 	    (this->output_mode == om_raw ? 0 :
 	     this->output_mode == om_interleaved ? 1 :
 	     this->output_mode == om_buffered ? 2 :
 	     999));		// can't happen
-    QTC::TC("abuild", "Abuild output prefix",
+    QTC::TC("abuild", "Abuild-init output prefix",
 	    this->output_prefix.empty() ? 0 : 1);
-    QTC::TC("abuild", "Abuild error prefix",
+    QTC::TC("abuild", "Abuild-init error prefix",
 	    this->output_prefix.empty() ? 0 : 1);
 
     // called after changing directories
@@ -891,7 +891,7 @@ Abuild::parseArgv()
     if ((! (explicit_buildset || (special_target == s_CLEAN))) &&
 	this->this_platform.empty())
     {
-	QTC::TC("abuild", "Abuild build current by default");
+	QTC::TC("abuild", "Abuild-init build current by default");
 	this->buildset_name = b_CURRENT;
     }
 
@@ -903,13 +903,13 @@ Abuild::parseArgv()
 	if (! (this->only_with_traits.empty() &&
 	       this->related_by_traits.empty()))
 	{
-	    QTC::TC("abuild", "Abuild ERR usage traits without set");
+	    QTC::TC("abuild", "Abuild-init ERR usage traits without set");
 	    usage("--only-with-traits and --related-by-traits may"
 		  " not be used without a build set");
 	}
 	if (this->with_rdeps)
 	{
-	    QTC::TC("abuild", "Abuild ERR usage rdeps without set");
+	    QTC::TC("abuild", "Abuild-init ERR usage rdeps without set");
 	    usage("--with-rdeps may not be used without a build set");
 	}
     }
@@ -920,7 +920,7 @@ Abuild::parseArgv()
 	if ((! this->targets.empty()) ||
 	    (! this->special_target.empty()))
 	{
-	    QTC::TC("abuild", "Abuild ERR usage --clean with targets");
+	    QTC::TC("abuild", "Abuild-init ERR usage --clean with targets");
 	    usage("--clean may not be combined with other targets");
 	}
     }
@@ -928,7 +928,7 @@ Abuild::parseArgv()
     {
 	if (! this->targets.empty())
 	{
-	    QTC::TC("abuild", "Abuild ERR usage special with targets");
+	    QTC::TC("abuild", "Abuild-init ERR usage special with targets");
 	    usage("\"" + this->special_target + "\" may not be combined"
 		  " with any other targets");
 	}
@@ -940,13 +940,13 @@ Abuild::parseArgv()
 	{
 	    // Special case: allow clean to be run from an output
 	    // directory.
-	    QTC::TC("abuild", "Abuild clean from output directory");
+	    QTC::TC("abuild", "Abuild-init clean from output directory");
 	}
 	else if (! (this->special_target.empty() &&
 		    this->buildset_name.empty() &&
 		    this->cleanset_name.empty()))
 	{
-	    QTC::TC("abuild", "Abuild ERR usage special or set in output");
+	    QTC::TC("abuild", "Abuild-init ERR usage special or set in output");
 	    usage("special targets, build sets, and clean sets may not be"
 		  " specified when running inside an output directory");
 	}
@@ -966,7 +966,7 @@ Abuild::parseArgv()
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild ERR invalid platform selector");
+	    QTC::TC("abuild", "Abuild-init ERR invalid platform selector");
 	    error("invalid platform selector " + *iter);
 	}
     }
@@ -983,7 +983,7 @@ Abuild::parseArgv()
 	}
 	catch (QEXC::General& e)
 	{
-	    QTC::TC("abuild", "Abuild ERR bad clean platform");
+	    QTC::TC("abuild", "Abuild-init ERR bad clean platform");
 	    error("invalid clean platform selector " + *iter + ": " + e.what());
 	}
     }
@@ -997,7 +997,7 @@ Abuild::parseArgv()
     // from incorrect usage....
     if (this->buildset_name.empty() && this->this_platform.empty())
     {
-	QTC::TC("abuild", "Abuild no_deps");
+	QTC::TC("abuild", "Abuild-init no_deps");
     }
 }
 
@@ -1025,7 +1025,7 @@ Abuild::argPositional(std::string const& arg)
     {
 	if (! this->special_target.empty())
 	{
-	    QTC::TC("abuild", "Abuild ERR usage multiple special targets");
+	    QTC::TC("abuild", "Abuild-init ERR usage multiple special targets");
 	    usage("only one special target may be specified");
 	}
 	this->special_target = arg;
@@ -1041,7 +1041,7 @@ Abuild::argHelp(std::vector<std::string> const& args)
 {
     if ((args.empty() || (args.size() > 2)))
     {
-	QTC::TC("abuild", "Abuild ERR usage invalid help");
+	QTC::TC("abuild", "Abuild-init ERR usage invalid help");
 	usage("invalid --help invocation");
     }
     this->help_topic = args[0];
@@ -1069,7 +1069,7 @@ Abuild::argSetJobs(unsigned int arg)
 {
     if (arg == 0)
     {
-	QTC::TC("abuild", "Abuild ERR usage j = 0");
+	QTC::TC("abuild", "Abuild-init ERR usage j = 0");
 	usage("-j's argument must be > 0");
     }
     else
@@ -1213,7 +1213,7 @@ Abuild::checkRoRwPaths()
 
     if (! this->start_dir.empty())
     {
-	QTC::TC("abuild", "Abuild ro/rw path with start dir");
+	QTC::TC("abuild", "Abuild-init ro/rw path with start dir");
     }
 
     checkValidPaths(this->ro_paths);
@@ -1221,14 +1221,14 @@ Abuild::checkRoRwPaths()
 
     if (this->ro_paths.empty())
     {
-	QTC::TC("abuild", "Abuild only rw paths");
+	QTC::TC("abuild", "Abuild-init only rw paths");
 	this->default_writable = false;
 	return;
     }
 
     if (this->rw_paths.empty())
     {
-	QTC::TC("abuild", "Abuild only ro paths");
+	QTC::TC("abuild", "Abuild-init only ro paths");
 	this->default_writable = true;
 	return;
     }
@@ -1240,7 +1240,7 @@ Abuild::checkRoRwPaths()
 
     if (any_ro_not_under_some_rw && any_rw_not_under_some_ro)
     {
-	QTC::TC("abuild", "Abuild ERR crossing ro/rw paths");
+	QTC::TC("abuild", "Abuild-init ERR crossing ro/rw paths");
 	error("when both --ro-path and --rw-path are specified, EITHER"
 	      " each ro path must be under some rw path OR"
 	      " each rw path must be under some ro path");
@@ -1249,13 +1249,13 @@ Abuild::checkRoRwPaths()
 
     if (! any_rw_not_under_some_ro)
     {
-	QTC::TC("abuild", "Abuild ro on top");
+	QTC::TC("abuild", "Abuild-init ro on top");
 	this->default_writable = true;
     }
     else
     {
 	assert(! any_ro_not_under_some_rw);
-	QTC::TC("abuild", "Abuild rw on top");
+	QTC::TC("abuild", "Abuild-init rw on top");
 	this->default_writable = false;
     }
 }
@@ -1274,7 +1274,7 @@ Abuild::checkValidPaths(std::set<std::string>& paths)
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild ERR invalid ro/rw path");
+	    QTC::TC("abuild", "Abuild-init ERR invalid ro/rw path");
 	    error("ro/rw path \"" + path + "\" does not exist"
 		  " or is not a directory");
 	}
@@ -1331,18 +1331,18 @@ Abuild::checkBuildsetName(std::string const& kind, std::string& name)
 	}
 	catch (boost::bad_expression)
 	{
-	    QTC::TC("abuild", "Abuild ERR bad buildset pattern");
+	    QTC::TC("abuild", "Abuild-init ERR bad buildset pattern");
 	    usage("invalid regular expression " + pattern);
 	}
     }
     else if (buildset_aliases.count(name) != 0)
     {
-	QTC::TC("abuild", "Abuild replace build set alias");
+	QTC::TC("abuild", "Abuild-init replace build set alias");
 	name = buildset_aliases[name];
     }
     else if (valid_buildsets.count(name) == 0)
     {
-	QTC::TC("abuild", "Abuild ERR usage invalid build set");
+	QTC::TC("abuild", "Abuild-init ERR usage invalid build set");
 	usage("unknown " + kind + " set " + name);
     }
 }

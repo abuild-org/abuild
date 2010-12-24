@@ -78,12 +78,12 @@ Abuild::generalHelp()
 	h("");
 	if (this->help_topic == h_RULES)
 	{
-	    QTC::TC("abuild", "Abuild ERR bad rules help topic");
+	    QTC::TC("abuild", "Abuild-help ERR bad rules help topic");
 	    h("Invalid rules help topic \"" + this->rules_help_topic + "\"");
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild ERR bad help topic");
+	    QTC::TC("abuild", "Abuild-help ERR bad help topic");
 	    h("Invalid help topic \"" + this->help_topic + "\"");
 	}
 	// fall through to description of help system
@@ -166,7 +166,7 @@ Abuild::rulesHelp(BuildForest& forest)
     {
         this_builditem = builditems[this_name];
     }
-    QTC::TC("abuild", "Abuild rules help with/without build item",
+    QTC::TC("abuild", "Abuild-help rules help with/without build item",
 	    this_builditem.get() ? 0 : 1);
 
     // Create a table of available topics.
@@ -314,7 +314,7 @@ Abuild::appendHelpTopics(HelpTopic_map& topics,
 	std::string const& module = *iter;
 	if (helpfiles.count(module))
 	{
-	    QTC::TC("abuild", "Abuild helpfile found");
+	    QTC::TC("abuild", "Abuild-help helpfile found");
 	    helpfiles.erase(module);
 	    topics[module].push_back(
 		HelpTopic(
@@ -323,7 +323,7 @@ Abuild::appendHelpTopics(HelpTopic_map& topics,
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild module without helpfile found");
+	    QTC::TC("abuild", "Abuild-help module without helpfile found");
 	    topics[module].push_back(
 		HelpTopic(item_name, tree_name, target_type, ""));
 	}
@@ -331,7 +331,7 @@ Abuild::appendHelpTopics(HelpTopic_map& topics,
     for (std::set<std::string>::iterator iter = helpfiles.begin();
 	 iter != helpfiles.end(); ++iter)
     {
-	QTC::TC("abuild", "Abuild module stray helpfile found");
+	QTC::TC("abuild", "Abuild-help module stray helpfile found");
 	notice("WARNING: help file \"" +
 	       dir + "/" + *iter + "-help.txt\""
 	       " does not correspond to any implementation file");
@@ -375,13 +375,13 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 		}
 		h("applies to target type " +
 		  TargetType::getName(ht.target_type));
-		QTC::TC("abuild", "Abuild show item help file",
+		QTC::TC("abuild", "Abuild-help show item help file",
 			ht.filename.empty() ? 1 : 0);
 		if (ht.filename.empty())
 		{
 		    if (! ht.item_name.empty())
 		    {
-			QTC::TC("abuild", "Abuild no help for item");
+			QTC::TC("abuild", "Abuild-help no help for item");
 		    }
 		    h("No help file has been provided for this item.");
 		}
@@ -396,7 +396,7 @@ Abuild::showHelpFiles(HelpTopic_map& topics,
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild help for unknown module");
+	    QTC::TC("abuild", "Abuild-help help for unknown module");
 	    h("");
 	    h(module_type + " \"" + module_name + "\" is not known");
 	    h("");

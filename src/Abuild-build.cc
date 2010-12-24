@@ -43,7 +43,7 @@ Abuild::buildBuildset()
         (this_name.empty() ||
 	 (! this_config->hasBuildFile())))
     {
-        QTC::TC("abuild", "Abuild no local build");
+        QTC::TC("abuild", "Abuild-build no local build");
         notice("nothing to build in this directory");
         return true;
     }
@@ -91,7 +91,7 @@ Abuild::buildBuildset()
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild some items skipped");
+	    QTC::TC("abuild", "Abuild-build some items skipped");
 	    verbose("skipping build item " + item_name +
 		    " because there are no platforms for its platform types");
 	    std::set<std::string> const& platform_types =
@@ -105,7 +105,7 @@ Abuild::buildBuildset()
 
     if ((! need_java) && (! need_gmake) && some_native_items_skipped)
     {
-	QTC::TC("abuild", "Abuild some native items skipped");
+	QTC::TC("abuild", "Abuild-build some native items skipped");
 	info("some native items were skipped because there are"
 	     " no valid native platforms");
 #ifdef _WIN32
@@ -410,7 +410,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	{
 	    if (ps)
 	    {
-		QTC::TC("abuild", "Abuild platform dependency with selector");
+		QTC::TC("abuild", "Abuild-build platform dependency with selector");
 	    }
 	    else
 	    {
@@ -419,21 +419,21 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// general selectors.
 		if (this->platform_selectors.count(dep_platform_type))
 		{
-		    QTC::TC("abuild", "Abuild specific platform selector");
+		    QTC::TC("abuild", "Abuild-build specific platform selector");
 		    ps = &(this->platform_selectors[dep_platform_type]);
 		}
 		else if (this->platform_selectors.count(PlatformSelector::ANY))
 		{
-		    QTC::TC("abuild", "Abuild default platform selector");
+		    QTC::TC("abuild", "Abuild-build default platform selector");
 		    ps = &(this->platform_selectors[PlatformSelector::ANY]);
 		}
 		else
 		{
-		    QTC::TC("abuild", "Abuild no platform selector");
+		    QTC::TC("abuild", "Abuild-build no platform selector");
 		}
 		if (ps && ps->isSkip())
 		{
-		    QTC::TC("abuild", "Abuild ignoring skip selector");
+		    QTC::TC("abuild", "Abuild-build ignoring skip selector");
 		    ps = 0;
 		}
 	    }
@@ -451,7 +451,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		dep_item.getBestPlatformForType(dep_platform_type, ps);
 	    if (override_platform.empty())
 	    {
-		QTC::TC("abuild", "Abuild ERR no override platform");
+		QTC::TC("abuild", "Abuild-build ERR no override platform");
 		error(item.getLocation(),
 		      "\"" + item_name + "\" wants dependency \"" + dep +
 		      "\" on platform type \"" + dep_platform_type +
@@ -475,7 +475,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    {
 		// Allow any item to depend on a platform-independent
 		// item
-		QTC::TC("abuild", "Abuild item -> indep",
+		QTC::TC("abuild", "Abuild-build item -> indep",
 			((item_platform == PlatformData::PLATFORM_INDEP)
 			 ? 0 : 1));
 		this->build_graph.addDependency(
@@ -487,7 +487,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// If an override platform is available (a specific
 		// platform type was declared on this dependency),
 		// create a dependency on that specific platform.
-		QTC::TC("abuild", "Abuild override platform");
+		QTC::TC("abuild", "Abuild-build override platform");
 		dep_item.addBuildPlatform(override_platform);
 		this->build_graph.addDependency(
 		    platform_item, createBuildGraphNode(
@@ -504,11 +504,11 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// explicitly add the platform to the dependency's
 		// build platform list.  This is how as-needed
 		// platform selection happens.
-		QTC::TC("abuild", "Abuild A:p -> B:p",
+		QTC::TC("abuild", "Abuild-build A:p -> B:p",
 			((dep_type == TargetType::tt_all) ? 0 : 1));
 		if (dep_item.getBuildPlatforms().count(item_platform) == 0)
 		{
-		    QTC::TC("abuild", "Abuild as-needed platform selection",
+		    QTC::TC("abuild", "Abuild-build as-needed platform selection",
 			    ((dep_type == TargetType::tt_all) ? 0 : 1));
 		    dep_item.addBuildPlatform(item_platform);
 		}
@@ -521,11 +521,11 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// If an item is of type all, ignore the case of a
 		// dependency not having this platform.  This is how
 		// pass-through build items work.
-		QTC::TC("abuild", "Abuild ignoring all's dep without platform");
+		QTC::TC("abuild", "Abuild-build ignoring all's dep without platform");
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR unmatched platform");
+		QTC::TC("abuild", "Abuild-build ERR unmatched platform");
 		error(item.getLocation(),
 		      "\"" + item_name + "\" is being built on platform \"" +
 		      item_platform + "\", but its dependency \"" +
@@ -671,7 +671,7 @@ Abuild::findJava()
 	    java_home =  Util::getProgramOutput(
 		"\"" + candidate + "\" -cp " +
 		java_support_jar + " org.abuild.javabuilder.PrintJavaHome");
-	    QTC::TC("abuild", "Abuild infer JAVA_HOME");
+	    QTC::TC("abuild", "Abuild-build infer JAVA_HOME");
 	    verbose("inferred value for JAVA_HOME: " + java_home);
 	}
 	catch (QEXC::General)
@@ -715,7 +715,7 @@ Abuild::findJava()
 	    if (boost::regex_match(output, match, ant_home_re))
 	    {
 		ant_home = Util::canonicalizePath(match.str(1));
-		QTC::TC("abuild", "Abuild infer ANT_HOME");
+		QTC::TC("abuild", "Abuild-build infer ANT_HOME");
 		verbose("inferred value for ANT_HOME: " + ant_home);
 	    }
 	    else
@@ -893,7 +893,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 
 	if (! parser.getAfterBuilds().empty())
 	{
-	    QTC::TC("abuild", "Abuild ERR after-build with no build file");
+	    QTC::TC("abuild", "Abuild-build ERR after-build with no build file");
 	    std::string interface_file =
 		abs_path + "/" + ItemConfig::FILE_INTERFACE;
 	    error(FileLocation(interface_file, 0, 0),
@@ -904,7 +904,7 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild not building with no build file",
+	    QTC::TC("abuild", "Abuild-build not building with no build file",
 		    build_item.getTargetType() == TargetType::tt_all ? 0 : 1);
 	}
     }
@@ -965,7 +965,7 @@ Abuild::createItemInterface(std::string const& builder_string,
 	if (! parser.importInterface(
 		this->buildset[*iter]->getInterface(PLUGIN_PLATFORM)))
 	{
-	    QTC::TC("abuild", "Abuild ERR import of plugin interface");
+	    QTC::TC("abuild", "Abuild-build ERR import of plugin interface");
 	    status = false;
 	}
     }
@@ -985,7 +985,7 @@ Abuild::createItemInterface(std::string const& builder_string,
 	verbose("importing interface for dependency " + dep_name, logger_job);
 	if (! parser.importInterface(dep_item.getInterface(dep_platform)))
 	{
-	    QTC::TC("abuild", "Abuild ERR import of dependent interface");
+	    QTC::TC("abuild", "Abuild-build ERR import of dependent interface");
 	    status = false;
 	}
     }
@@ -1142,7 +1142,7 @@ Abuild::createPluginInterface(std::string const& plugin_name,
 	// Load the interface file
 	if (! parser.parse(interface_file, false))
 	{
-	    QTC::TC("abuild", "Abuild ERR error loading plugin interface");
+	    QTC::TC("abuild", "Abuild-build ERR error loading plugin interface");
 	    status = false;
 	}
     }
@@ -1162,7 +1162,7 @@ Abuild::dumpInterface(std::string const& item_platform,
 
     if (! isBuildItemWritable(build_item))
     {
-	QTC::TC("abuild", "Abuild dumpInterface ignoring read-only build item");
+	QTC::TC("abuild", "Abuild-build dumpInterface ignoring read-only build item");
 	return;
     }
 
@@ -1241,7 +1241,7 @@ Abuild::readAfterBuilds(std::string const& item_name,
 		    logger_job);
 	    if (parser.parse(after_build, false))
 	    {
-		QTC::TC("abuild", "Abuild good after-build");
+		QTC::TC("abuild", "Abuild-build good after-build");
 	    }
 	    else
 	    {
@@ -1251,7 +1251,7 @@ Abuild::readAfterBuilds(std::string const& item_name,
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild ERR missing after-build");
+	    QTC::TC("abuild", "Abuild-build ERR missing after-build");
 	    error(FileLocation(interface_file, 0, 0),
 		  "after-build file " +
 		  Util::absToRel(after_build, abs_path) +
@@ -1275,7 +1275,7 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
     {
 	// Assume that this item has previously been built
 	// successfully.
-	QTC::TC("abuild", "Abuild not building read-only build item",
+	QTC::TC("abuild", "Abuild-build not building read-only build item",
 		(build_item.getBackingDepth() == 0) ? 0 : 1);
 	return true;
     }
@@ -1283,7 +1283,7 @@ Abuild::buildItem(boost::mutex::scoped_lock& build_lock,
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
     if (this->special_target == s_NO_OP)
     {
-        QTC::TC("abuild", "Abuild no-op");
+        QTC::TC("abuild", "Abuild-build no-op");
 	info(item_name + " (" + output_dir + "): " + this->special_target,
 	    logger_job);
 	return true;
@@ -1636,12 +1636,12 @@ Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
     {
 	if (build_item.isSerial())
 	{
-	    QTC::TC("abuild", "Abuild explicit serial");
+	    QTC::TC("abuild", "Abuild-build explicit serial");
 	    verbose("invoking make serially", logger_job);
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild make_njobs",
+	    QTC::TC("abuild", "Abuild-build make_njobs",
 		    (this->make_njobs < 0) ? 0 : 1);
 	    if (this->make_njobs > 1)
 	    {

@@ -30,7 +30,7 @@ Abuild::readConfigs()
 
     if (! Util::isFile(this->this_config_dir + "/" + ItemConfig::FILE_CONF))
     {
-	QTC::TC("abuild", "Abuild ERR no abuild.conf");
+	QTC::TC("abuild", "Abuild-traverse ERR no abuild.conf");
 	fatal(ItemConfig::FILE_CONF + " not found");
     }
     this->this_config = readConfig(this->this_config_dir, "");
@@ -39,7 +39,7 @@ Abuild::readConfigs()
 	this->this_config_dir, "local forest");
     if (local_top.empty())
     {
-	QTC::TC("abuild", "Abuild ERR can't find local top");
+	QTC::TC("abuild", "Abuild-traverse ERR can't find local top");
 	fatal("unable to find root of local forest");
     }
 
@@ -63,7 +63,7 @@ Abuild::readConfigs()
     // platform types.
     if (! this->unused_platform_selectors.empty())
     {
-	QTC::TC("abuild", "Abuild unused platform selector");
+	QTC::TC("abuild", "Abuild-traverse unused platform selector");
 	error("the following platform selectors were never used for"
 	      " platform selection and may refer to unknown"
 	      " platform types, compilers, or options:");
@@ -159,7 +159,7 @@ Abuild::readConfigs()
 	reportIntegrityErrors(forests, this->buildset, local_top);
 	if (Error::anyErrors())
 	{
-	    QTC::TC("abuild", "Abuild integrity errors in buildset");
+	    QTC::TC("abuild", "Abuild-traverse integrity errors in buildset");
 	}
 	exitIfErrors();
     }
@@ -170,7 +170,7 @@ Abuild::readConfigs()
     if ((! (this->buildset_name.empty() && this->cleanset_name.empty())) &&
 	this->buildset.empty())
     {
-	QTC::TC("abuild", "Abuild empty build set");
+	QTC::TC("abuild", "Abuild-traverse empty build set");
 	notice("build set contains no items");
 	return true;
     }
@@ -286,13 +286,13 @@ Abuild::readExternalConfig(std::string const& start_dir,
 	    // the backing chain.  If the external exists, we're
 	    // traversing its backing chain.  Otherwise, we're
 	    // traversing the original directory's backing chain.
-	    QTC::TC("abuild", "Abuild backing without conf");
+	    QTC::TC("abuild", "Abuild-traverse backing without conf");
 	    verbose("checking backing areas of \"" + dir + "\"");
 	    std::list<std::string> const& backing_areas =
 		readBacking(dir)->getBackingAreas();
 	    if (! backing_areas.empty())
 	    {
-		QTC::TC("abuild", "Abuild external in backing area",
+		QTC::TC("abuild", "Abuild-traverse external in backing area",
 			(ext.empty() ? 0 : 1));
 		for (std::list<std::string>::const_iterator iter =
 			 backing_areas.begin();
@@ -354,7 +354,7 @@ Abuild::findTop(std::string const& start_dir,
 
     if (top.empty())
     {
-	QTC::TC("abuild", "Abuild ERR can't find top");
+	QTC::TC("abuild", "Abuild-traverse ERR can't find top");
 	error("unable to find top of build forest containing \"" +
 	      start_dir + "\" (" + description + ");"
 	      " run with --verbose for details");
@@ -391,7 +391,7 @@ Abuild::traverse(BuildForest_map& forests, std::string const& top_path)
 
 	if (! external_graph.check())
 	{
-	    QTC::TC("abuild", "Abuild ERR external_graph failure");
+	    QTC::TC("abuild", "Abuild-traverse ERR external_graph failure");
 	    error("1.0 compatibility mode was unable to determine"
 		  " proper relationships among externals; some errors"
 		  " about unknown tree dependencies may be spurious and"
@@ -489,7 +489,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 {
     if (visiting.count(top_path))
     {
-        QTC::TC("abuild", "Abuild ERR backing cycle");
+        QTC::TC("abuild", "Abuild-traverse ERR backing cycle");
         fatal("backing area cycle detected for " + top_path +
 	      " (" + description + ")");
     }
@@ -558,7 +558,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 		if (Util::isFile(file_backing) &&
 		    (! Util::isFile(file_conf)))
 		{
-		    QTC::TC("abuild", "Abuild traverse backing without conf");
+		    QTC::TC("abuild", "Abuild-traverse traverse backing without conf");
 		    verbose("getting backing data from and then"
 			    " skipping backed external " + edecl);
 		    appendBackingData(
@@ -573,7 +573,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 			    dir + "\"");
 		if (ext_top.empty())
 		{
-		    QTC::TC("abuild", "Abuild ERR findTop from external");
+		    QTC::TC("abuild", "Abuild-traverse ERR findTop from external");
 		    // An error was already issued by findTop
 		    continue;
 		}
@@ -625,7 +625,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 	    {
 		if (! this->suggest_upgrade)
 		{
-		    QTC::TC("abuild", "Abuild backing area points below root");
+		    QTC::TC("abuild", "Abuild-traverse backing area points below root");
 		}
 		verbose("this is actually " + btop);
 	    }
@@ -639,12 +639,12 @@ Abuild::traverseForests(BuildForest_map& forests,
 		    top_path + "/" + BackingConfig::FILE_BACKING, 0, 0);
 		if (*iter == btop)
 		{
-		    QTC::TC("abuild", "Abuild ERR backs explicitly to self");
+		    QTC::TC("abuild", "Abuild-traverse ERR backs explicitly to self");
 		    error(l, "this forest lists itself as a backing area");
 		}
 		else
 		{
-		    QTC::TC("abuild", "Abuild ERR backs implicitly to self");
+		    QTC::TC("abuild", "Abuild-traverse ERR backs implicitly to self");
 		    error(l, "backing area " + *iter +
 			  " belongs to this forest");
 		}
@@ -652,7 +652,7 @@ Abuild::traverseForests(BuildForest_map& forests,
 	    else if (seen.count(btop))
 	    {
 		verbose("this is a duplicate backing area; ignoring");
-		QTC::TC("abuild", "Abuild duplicate backing area");
+		QTC::TC("abuild", "Abuild-traverse duplicate backing area");
 	    }
 	    else
 	    {
@@ -733,7 +733,7 @@ Abuild::mergeForests(BuildForest_map& forests,
 	{
 	    continue;
 	}
-	QTC::TC("abuild", "Abuild forest merge required");
+	QTC::TC("abuild", "Abuild-traverse forest merge required");
 	std::string first = merge.back();
 	merge.pop_back();
 	forest_merges[first] = merge;
@@ -908,7 +908,7 @@ Abuild::removeEmptyTrees(BuildForest_map& forests)
 
 	if (! to_delete.empty())
 	{
-	    QTC::TC("abuild", "Abuild delete unused empty top-level tree");
+	    QTC::TC("abuild", "Abuild-traverse delete unused empty top-level tree");
 	    for (std::set<std::string>::iterator iter = to_delete.begin();
 		 iter != to_delete.end(); ++iter)
 	    {
@@ -918,7 +918,7 @@ Abuild::removeEmptyTrees(BuildForest_map& forests)
 	    }
 	    if (to_delete.count(this->local_tree))
 	    {
-		QTC::TC("abuild", "Abuild clear local tree");
+		QTC::TC("abuild", "Abuild-traverse clear local tree");
 		this->local_tree.clear();
 	    }
 	}
@@ -937,7 +937,7 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
     {
 	if (this->items_traversed.count(top_path))
 	{
-	    QTC::TC("abuild", "Abuild forest has already been seen");
+	    QTC::TC("abuild", "Abuild-traverse forest has already been seen");
 	    return;
 	}
 	external_graph.addItem(top_path);
@@ -1007,7 +1007,7 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		this->suggest_upgrade = true;
 		if (upgraded_tree_roots.count(tree_root))
 		{
-		    QTC::TC("abuild", "Abuild basic deprecation warning");
+		    QTC::TC("abuild", "Abuild-traverse basic deprecation warning");
 		    deprecate("1.1", config->getLocation(),
 			      "this file uses deprecated features, and"
 			      " this build item belongs to a tree that"
@@ -1045,7 +1045,7 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
                 }
                 else
                 {
-                    QTC::TC("abuild", "Abuild ERR no child config");
+                    QTC::TC("abuild", "Abuild-traverse ERR no child config");
                     error(location, "child " + child_conf + " is missing");
                 }
             }
@@ -1054,20 +1054,20 @@ Abuild::traverseItems(BuildForest& forest, DependencyGraph& external_graph,
 		// Allow sparse trees if we have a backing area.
 		// No validation is required for the child
 		// directory.
-		QTC::TC("abuild", "Abuild sparse tree");
+		QTC::TC("abuild", "Abuild-traverse sparse tree");
 		verbose("ignoring non-existence of child dir " +
 			*iter + " from " + Util::absToRel(dir) +
 			" in a tree with a backing area");
 	    }
 	    else if (config->childIsOptional(*iter))
 	    {
-		QTC::TC("abuild", "Abuild ignoring missing optional child");
+		QTC::TC("abuild", "Abuild-traverse ignoring missing optional child");
 		verbose("ignoring non-existence of optional child dir " +
 			*iter + " from " + Util::absToRel(dir));
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR can't resolve child");
+		QTC::TC("abuild", "Abuild-traverse ERR can't resolve child");
 		error(location, "unable to find child " + *iter);
 	    }
 	}
@@ -1095,11 +1095,11 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
 	    // an intervening Abuild.conf.  Don't report this an error
 	    // so we avoid reporting the same condition with multiple
 	    // error messages.
-	    QTC::TC("abuild", "Abuild item added twice");
+	    QTC::TC("abuild", "Abuild-traverse item added twice");
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild ERR item multiple locations");
+	    QTC::TC("abuild", "Abuild-traverse ERR item multiple locations");
 	    error(loc, "build item " + item_name +
 		  " appears in multiple locations");
 	    error(other_loc, "here is another location");
@@ -1107,7 +1107,7 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
     }
     else if (item->getTreeName().empty())
     {
-	QTC::TC("abuild", "Abuild ERR named item outside of tree");
+	QTC::TC("abuild", "Abuild-traverse ERR named item outside of tree");
 	error(item->getLocation(),
 	      "named build items are not allowed outside of"
 	      " named build trees");
@@ -1126,7 +1126,7 @@ Abuild::addItemToForest(BuildForest& forest, std::string const& item_name,
 		{
 		    if (! this->suggest_upgrade)
 		    {
-			QTC::TC("abuild", "Abuild item in unnamed root");
+			QTC::TC("abuild", "Abuild-traverse item in unnamed root");
 			this->suggest_upgrade = true;
 		    }
 		}
@@ -1193,7 +1193,7 @@ Abuild::registerBuildTree(BuildForest& forest,
 		}
 		else
 		{
-		    QTC::TC("abuild", "Abuild ERR external not root");
+		    QTC::TC("abuild", "Abuild-traverse ERR external not root");
 		    error(FileLocation(epath + "/" +
 				       ItemConfig::FILE_CONF, 0, 0),
 			  "this build item does not appear to be"
@@ -1205,7 +1205,7 @@ Abuild::registerBuildTree(BuildForest& forest,
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR can't resolve external");
+		QTC::TC("abuild", "Abuild-traverse ERR can't resolve external");
 		error(config->getLocation(),
 		      "unable to locate or resolve external \"" +
 		      edecl + "\"");
@@ -1226,7 +1226,7 @@ Abuild::registerBuildTree(BuildForest& forest,
     addTreeToForest(forest, tree_name, tree);
     if (config->hasGlobalPlugins())
     {
-	QTC::TC("abuild", "Abuild add global plugin");
+	QTC::TC("abuild", "Abuild-traverse add global plugin");
 	std::set<std::string>& global_plugins = forest.getGlobalPlugins();
 	std::set<std::string> const& t_global_plugins =
 	    config->getGlobalPlugins();
@@ -1252,7 +1252,7 @@ Abuild::addTreeToForest(BuildForest& forest, std::string const& tree_name,
 	}
 	else
 	{
-	    QTC::TC("abuild", "Abuild ERR duplicate tree");
+	    QTC::TC("abuild", "Abuild-traverse ERR duplicate tree");
 	    error(tree->getLocation(),
 		  "another tree with the name \"" + tree_name + "\" has been"
 		  " found in this forest");
@@ -1275,7 +1275,7 @@ Abuild::getAssignedTreeName(std::string const& dir,
 
     if (this->assigned_tree_names.count(dir))
     {
-	QTC::TC("abuild", "Abuild previously assigned tree name");
+	QTC::TC("abuild", "Abuild-traverse previously assigned tree name");
 	return this->assigned_tree_names[dir];
     }
 
@@ -1334,7 +1334,7 @@ Abuild::getAssignedTreeName(std::string const& dir,
 	    tree_name = config->getTreeName();
 	    if (! tree_name.empty())
 	    {
-		QTC::TC("abuild", "Abuild inherit tree name from backing");
+		QTC::TC("abuild", "Abuild-traverse inherit tree name from backing");
 	    }
 	    else if (this->assigned_tree_names.count(backing_area))
 	    {
@@ -1346,13 +1346,13 @@ Abuild::getAssignedTreeName(std::string const& dir,
 	    {
 		if (visiting.count(backing_area))
 		{
-		    QTC::TC("abuild", "Abuild ERR backing area loop");
+		    QTC::TC("abuild", "Abuild-traverse ERR backing area loop");
 		    fatal("backing area loop found for " + backing_area +
 			  ", a backing area of " + dir);
 		}
 		else
 		{
-		    QTC::TC("abuild", "Abuild trying backing of backing");
+		    QTC::TC("abuild", "Abuild-traverse trying backing of backing");
 		    tree_name = getAssignedTreeName(
 			backing_area, visiting, use_backing_name_only);
 		}
@@ -1445,7 +1445,7 @@ Abuild::checkTreeDependencies(BuildForest& forest)
 	    if (optional_tree_deps.count(tree_dep) &&
 		buildtrees.count(tree_dep) == 0)
 	    {
-		QTC::TC("abuild", "Abuild skipping optional tree dependency");
+		QTC::TC("abuild", "Abuild-traverse skipping optional tree dependency");
 		tree.removeTreeDep(tree_dep);
 		continue;
 	    }
@@ -1493,7 +1493,7 @@ Abuild::checkTreeDependencies(BuildForest& forest)
 		 i2 != unknown_items.end(); ++i2)
 	    {
 		std::string const& unknown = *i2;
-		QTC::TC("abuild", "Abuild ERR unknown tree dependency");
+		QTC::TC("abuild", "Abuild-traverse ERR unknown tree dependency");
 		error(buildtrees[node]->getLocation(),
 		      "tree " + node + " depends on unknown build tree " +
 		      unknown);
@@ -1506,7 +1506,7 @@ Abuild::checkTreeDependencies(BuildForest& forest)
 	     iter != cycles.end(); ++iter)
 	{
 	    DependencyGraph::ItemList const& data = *iter;
-	    QTC::TC("abuild", "Abuild ERR circular tree dependency");
+	    QTC::TC("abuild", "Abuild-traverse ERR circular tree dependency");
 	    std::string cycle = Util::join(" -> ", data);
 	    cycle += " -> " + data.front();
 	    error("circular dependency detected among build trees: " + cycle);
@@ -1581,7 +1581,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		// we are able to work around this safely and the
 		// situation is not harmful, issuing a warning would
 		// just be an annoyance.
-		QTC::TC("abuild", "Abuild skipping covered backing area");
+		QTC::TC("abuild", "Abuild-traverse skipping covered backing area");
 		verbose("backing area " + *iter + " is being removed because"
 			" it is covered by another backing area");
 		backing_areas.erase(iter, next);
@@ -1591,7 +1591,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
     }
     if (backing_areas.size() > 1)
     {
-	QTC::TC("abuild", "Abuild multiple backing areas");
+	QTC::TC("abuild", "Abuild-traverse multiple backing areas");
     }
 
     // Copy trees and items from the backing areas.  Exclude any
@@ -1608,7 +1608,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    BuildTree const& tree = *((*tree_iter).second);
 	    if (trees_to_delete.count(tree_name))
 	    {
-		QTC::TC("abuild", "Abuild not copying deleted tree");
+		QTC::TC("abuild", "Abuild-traverse not copying deleted tree");
 		trees_not_deleted.erase(tree_name);
 		if (buildtrees.count(tree_name))
 		{
@@ -1619,14 +1619,14 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		    // different -- replacing an item is sufficient to
 		    // get rid of the old one.  You don't have t do
 		    // delete it too.
-		    QTC::TC("abuild", "Abuild deleted tree exists locally");
+		    QTC::TC("abuild", "Abuild-traverse deleted tree exists locally");
 		}
 	    }
 	    else if (buildtrees.count(tree_name))
 	    {
 		if (buildtrees[tree_name]->isLocal())
 		{
-		    QTC::TC("abuild", "Abuild override build tree");
+		    QTC::TC("abuild", "Abuild-traverse override build tree");
 		}
 		else
 		{
@@ -1636,7 +1636,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		    // See comment near this same check for build
 		    // items for why this assertion pass.
 		    assert(! (loc == other_loc));
-		    QTC::TC("abuild", "Abuild ERR tree multiple backing areas");
+		    QTC::TC("abuild", "Abuild-traverse ERR tree multiple backing areas");
 		    error(loc, "this tree appears in multiple backing areas");
 		    error(other_loc, "here is another location for this tree");
 		}
@@ -1659,20 +1659,20 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    std::string const& tree_name = item.getTreeName();
 	    if (trees_to_delete.count(tree_name))
 	    {
-		QTC::TC("abuild", "Abuild not copying item from deleted tree");
+		QTC::TC("abuild", "Abuild-traverse not copying item from deleted tree");
 		if (builditems.count(item_name) &&
 		    builditems[item_name]->getTreeName() != tree_name)
 		{
-		    QTC::TC("abuild", "Abuild replace item from deleted tree");
+		    QTC::TC("abuild", "Abuild-traverse replace item from deleted tree");
 		}
 	    }
 	    else if (items_to_delete.count(item_name))
 	    {
-		QTC::TC("abuild", "Abuild not copying deleted item");
+		QTC::TC("abuild", "Abuild-traverse not copying deleted item");
 		items_not_deleted.erase(item_name);
 		if (builditems.count(item_name))
 		{
-		    QTC::TC("abuild", "Abuild ERR deleted item exists locally");
+		    QTC::TC("abuild", "Abuild-traverse ERR deleted item exists locally");
 		    error(location,
 			  "item \"" + item_name + "\" is marked for"
 			  " deletion, but it appears locally in this"
@@ -1686,7 +1686,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 	    {
 		if (builditems[item_name]->isLocal())
 		{
-		    QTC::TC("abuild", "Abuild override build item");
+		    QTC::TC("abuild", "Abuild-traverse override build item");
 		}
 		else
 		{
@@ -1702,7 +1702,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		    // fails, there is probably a logic error either
 		    // there or in merging forests.
 		    assert(! (loc == other_loc));
-		    QTC::TC("abuild", "Abuild ERR item multiple backing areas");
+		    QTC::TC("abuild", "Abuild-traverse ERR item multiple backing areas");
 		    error(loc, "this item appears in multiple backing areas");
 		    error(other_loc, "here is another location for this item");
 		}
@@ -1715,7 +1715,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
 		new_item.incrementBackingDepth();
 		if (new_item.getBackingDepth() > 1)
 		{
-		    QTC::TC("abuild", "Abuild backing depth > 1");
+		    QTC::TC("abuild", "Abuild-traverse backing depth > 1");
 		}
 	    }
         }
@@ -1724,7 +1724,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
     for (std::set<std::string>::iterator iter = trees_not_deleted.begin();
 	 iter != trees_not_deleted.end(); ++iter)
     {
-	QTC::TC("abuild", "Abuild ERR deleting non-existent tree");
+	QTC::TC("abuild", "Abuild-traverse ERR deleting non-existent tree");
 	error(location,
 	      "tree \"" + *iter + "\" was marked for deletion"
 	      " but was not seen in a backing area");
@@ -1732,7 +1732,7 @@ Abuild::resolveFromBackingAreas(BuildForest_map& forests,
     for (std::set<std::string>::iterator iter = items_not_deleted.begin();
 	 iter != items_not_deleted.end(); ++iter)
     {
-	QTC::TC("abuild", "Abuild ERR deleting non-existent item");
+	QTC::TC("abuild", "Abuild-traverse ERR deleting non-existent item");
 	error(location,
 	      "item \"" + *iter + "\" was marked for deletion"
 	      " but was not seen in a backing area");
@@ -1769,7 +1769,7 @@ Abuild::checkDepTreeAccess(BuildForest& forest)
 	    BuildItem& dep_item = *(builditems[dep_name]);
 	    if (! checkAllowedTree(forest, item, dep_item, "depend on"))
 	    {
-		QTC::TC("abuild", "Abuild ERR depend on invisible item");
+		QTC::TC("abuild", "Abuild-traverse ERR depend on invisible item");
 	    }
 	}
     }
@@ -1845,7 +1845,7 @@ Abuild::checkPlugins(BuildForest& forest)
     {
 	if (! global_plugins.empty() && forest.hasExternals())
 	{
-	    QTC::TC("abuild", "Abuild ERR global plugins with externals");
+	    QTC::TC("abuild", "Abuild-traverse ERR global plugins with externals");
 	    error("at least one build tree in the forest rooted at " +
 		  forest.getRootPath() + " uses external-dirs, and "
 		  " global plugins are in use; global plugins may not"
@@ -1878,7 +1878,7 @@ Abuild::checkPlugins(BuildForest& forest)
 	    std::string const& item_name = *iter;
 	    if (builditems.count(item_name) == 0)
 	    {
-		QTC::TC("abuild", "Abuild ERR invalid plugin");
+		QTC::TC("abuild", "Abuild-traverse ERR invalid plugin");
 		error(tree.getLocation(),
 		      "plugin \"" + item_name + "\" does not exist");
 		continue;
@@ -1887,11 +1887,11 @@ Abuild::checkPlugins(BuildForest& forest)
 	    std::string const& item_tree = item.getTreeName();
 	    if (global_plugins.count(item_name))
 	    {
-		QTC::TC("abuild", "Abuild allow access to global plugin");
+		QTC::TC("abuild", "Abuild-traverse allow access to global plugin");
 	    }
 	    else if (allowed_trees.count(item_tree) == 0)
 	    {
-		QTC::TC("abuild", "Abuild ERR plugin in invisible tree");
+		QTC::TC("abuild", "Abuild-traverse ERR plugin in invisible tree");
 		error(tree.getLocation(),
 		      "this tree may not declare item \"" +
 		      item_name + "\" as a plugin because because its"
@@ -1909,7 +1909,7 @@ Abuild::checkPlugins(BuildForest& forest)
 	    // is.
 	    if (! item.getDeps().empty())
 	    {
-		QTC::TC("abuild", "Abuild ERR plugin with dependencies");
+		QTC::TC("abuild", "Abuild-traverse ERR plugin with dependencies");
 		item_error = true;
 		error(tree.getLocation(),
 		      "item \"" + item_name + "\" is declared as a plugin,"
@@ -1917,7 +1917,7 @@ Abuild::checkPlugins(BuildForest& forest)
 	    }
 	    if (! item.getBuildAlso().empty())
 	    {
-		QTC::TC("abuild", "Abuild ERR plugin with build-also");
+		QTC::TC("abuild", "Abuild-traverse ERR plugin with build-also");
 		item_error = true;
 		error(tree.getLocation(),
 		      "item \"" + item_name + "\" is declared as a plugin,"
@@ -1930,7 +1930,7 @@ Abuild::checkPlugins(BuildForest& forest)
 	    // have an Abuild.interface file.
 	    if (item.getTargetType() != TargetType::tt_all)
 	    {
-		QTC::TC("abuild", "Abuild ERR plugin with target type !all");
+		QTC::TC("abuild", "Abuild-traverse ERR plugin with target type !all");
 		item_error = true;
 		error(tree.getLocation(),
 		      "item \"" + item_name + "\" is declared as a plugin,"
@@ -1954,7 +1954,7 @@ Abuild::checkPlugins(BuildForest& forest)
 		    // to repeat all these checks separately for
 		    // global plugins would needlessly complicate the
 		    // code for a rather obscure error condition.
-		    QTC::TC("abuild", "Abuild ERR error for global plugin");
+		    QTC::TC("abuild", "Abuild-traverse ERR error for global plugin");
 		    error(item.getLocation(),
 			  "NOTE: this item declares itself as a global plugin,"
 			  " so some of the above error messages may be"
@@ -1997,7 +1997,7 @@ Abuild::checkPlugins(BuildForest& forest)
 	    {
 		if (plugin_data[tree_name].count(dep_name))
 		{
-		    QTC::TC("abuild", "Abuild ERR item depends on plugin");
+		    QTC::TC("abuild", "Abuild-traverse ERR item depends on plugin");
 		    error(item.getLocation(),
 			  "this item depends on \"" + dep_name + "\","
 			  " which is declared as a plugin");
@@ -2095,7 +2095,7 @@ Abuild::checkPlatformTypes(BuildForest& forest)
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR unknown platform type");
+		QTC::TC("abuild", "Abuild-traverse ERR unknown platform type");
 		error(location,
 		      "unknown platform type \"" + *iter + "\"");
 	    }
@@ -2103,12 +2103,12 @@ Abuild::checkPlatformTypes(BuildForest& forest)
 	if (target_types.size() == 1)
 	{
 	    target_type = (*(target_types.begin())).first;
-	    QTC::TC("abuild", "Abuild multiple target types",
+	    QTC::TC("abuild", "Abuild-traverse multiple target types",
 		    (*(target_types.begin())).second == 1 ? 0 : 1);
 	}
 	else if (target_types.size() > 1)
 	{
-	    QTC::TC("abuild", "Abuild ERR incompatible platform types");
+	    QTC::TC("abuild", "Abuild-traverse ERR incompatible platform types");
 	    error(location,
 		  "platforms in different target types may not be mixed");
 	}
@@ -2140,7 +2140,7 @@ Abuild::checkItemNames(BuildForest& forest)
 	    std::string const& dep = *diter;
 	    if (! accessibleFrom(builditems, item_name, dep))
 	    {
-		QTC::TC("abuild", "Abuild ERR inaccessible dep");
+		QTC::TC("abuild", "Abuild-traverse ERR inaccessible dep");
 		error(item_location,
 		      item_name + " may not depend on " + dep +
 		      " because it is private to another scope");
@@ -2172,7 +2172,7 @@ Abuild::checkBuildAlso(BuildForest& forest)
 	    std::string const& other_item = *biter;
 	    if (builditems.count(other_item) == 0)
 	    {
-		QTC::TC("abuild", "Abuild ERR invalid build also");
+		QTC::TC("abuild", "Abuild-traverse ERR invalid build also");
 		error(item_location,
 		      item_name + " requests building of unknown build item " +
 		      other_item);
@@ -2181,7 +2181,7 @@ Abuild::checkBuildAlso(BuildForest& forest)
 	    if (! checkAllowedTree(forest, item, *(builditems[other_item]),
 				   "request build of"))
 	    {
-		QTC::TC("abuild", "Abuild ERR build-also invisible item");
+		QTC::TC("abuild", "Abuild-traverse ERR build-also invisible item");
 	    }
 	}
     }
@@ -2211,26 +2211,26 @@ Abuild::accessibleFrom(BuildItem_map& builditems,
 	if (visibility == "*")
 	{
 	    // This item is globally visible
-	    QTC::TC("abuild", "Abuild globally visible item");
+	    QTC::TC("abuild", "Abuild-traverse globally visible item");
 	    scope.clear();
 	}
 	else if (! visibility.empty())
 	{
 	    // Removing the trailing * from the visibility gives us
 	    // the actual scope.
-	    QTC::TC("abuild", "Abuild set scope from visibility");
+	    QTC::TC("abuild", "Abuild-traverse set scope from visibility");
 	    assert(*(visibility.rbegin()) == '*');
 	    scope = visibility.substr(0, visibility.length() - 1);
 	}
 
 	if (accessor_name.substr(0, scope.length()) == scope)
 	{
-	    QTC::TC("abuild", "Abuild accessor sees ancestor",
+	    QTC::TC("abuild", "Abuild-traverse accessor sees ancestor",
 		    (visibility.length() > 1) ? 1 : 0);
 	}
 	else if (scope == accessor_name + ".")
 	{
-	    QTC::TC("abuild", "Abuild accessor sees child");
+	    QTC::TC("abuild", "Abuild-traverse accessor sees child");
 	}
 	else
 	{
@@ -2275,7 +2275,7 @@ Abuild::checkItemDependencies(BuildForest& forest)
 		item.setOptionalDependencyPresence(dep, present);
 		if (! present)
 		{
-		    QTC::TC("abuild", "Abuild skipping optional dependency");
+		    QTC::TC("abuild", "Abuild-traverse skipping optional dependency");
 		    continue;
 		}
 	    }
@@ -2313,7 +2313,7 @@ Abuild::checkItemDependencies(BuildForest& forest)
 		 i2 != unknown_items.end(); ++i2)
 	    {
 		std::string const& unknown = *i2;
-		QTC::TC("abuild", "Abuild ERR unknown dependency");
+		QTC::TC("abuild", "Abuild-traverse ERR unknown dependency");
 		error(builditems[node]->getLocation(),
 		      node + " depends on unknown build item " + unknown);
 	    }
@@ -2328,7 +2328,7 @@ Abuild::checkItemDependencies(BuildForest& forest)
 	    // discussion of circular dependencies and how to resolve
 	    // them.
 	    DependencyGraph::ItemList const& data = *iter;
-	    QTC::TC("abuild", "Abuild ERR circular dependency");
+	    QTC::TC("abuild", "Abuild-traverse ERR circular dependency");
 	    std::string cycle = Util::join(" -> ", data);
 	    cycle += " -> " + data.front();
 	    error("circular dependency detected: " + cycle);
@@ -2403,11 +2403,11 @@ Abuild::updatePlatformTypes(BuildForest& forest)
 	    }
 	    else if (dep_platform_types == platform_types)
 	    {
-		QTC::TC("abuild", "Abuild non-trivial update platform types");
+		QTC::TC("abuild", "Abuild-traverse non-trivial update platform types");
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild platform type difference");
+		QTC::TC("abuild", "Abuild-traverse platform type difference");
 		candidate = false;
 		break;
 	    }
@@ -2420,7 +2420,7 @@ Abuild::updatePlatformTypes(BuildForest& forest)
 	// All of this item's dependencies have the same list of
 	// platform types as each other.  Inherit platform types and
 	// target type from this item.
-	QTC::TC("abuild", "Abuild inherit platform types");
+	QTC::TC("abuild", "Abuild-traverse inherit platform types");
 	// First build item is known to exist and be valid
 	assert(builditems.count(deps.front()));
 	BuildItem& first_dep = *(builditems[deps.front()]);
@@ -2471,13 +2471,13 @@ Abuild::checkDependencyPlatformTypes(BuildForest& forest)
 	    BuildItem& dep = *(builditems[dep_name]);
 	    if (dep_platform_type == PlatformData::pt_INDEP)
 	    {
-		QTC::TC("abuild", "Abuild ERR dep ptype indep");
+		QTC::TC("abuild", "Abuild-traverse ERR dep ptype indep");
 		error(item_location, "dependencies may not be declared"
 		      " with platform type \"" + dep_platform_type + "\"");
 	    }
 	    else if (dep.getPlatformTypes().count(dep_platform_type) == 0)
 	    {
-		QTC::TC("abuild", "Abuild ERR dep doesn't have dep ptype");
+		QTC::TC("abuild", "Abuild-traverse ERR dep doesn't have dep ptype");
 		error(item_location, "dependency \"" + dep_name + "\" declared"
 		      " with platform type \"" + dep_platform_type + "\" "
 		      ", which dependency does not have");
@@ -2486,7 +2486,7 @@ Abuild::checkDependencyPlatformTypes(BuildForest& forest)
 	if (has_any_dep_platform_types &&
 	    (item.getTargetType() == TargetType::tt_all))
 	{
-	    QTC::TC("abuild", "Abuild ERR all with ptype deps");
+	    QTC::TC("abuild", "Abuild-traverse ERR all with ptype deps");
 	    error(item_location, "this item has no platform types, so it may"
 		  " not declare platform types on its dependencies");
 	}
@@ -2513,7 +2513,7 @@ Abuild::checkFlags(BuildForest& forest)
 	    if (builditems.count(dep_name) == 0)
 	    {
 		// error already reported
-		QTC::TC("abuild", "Abuild skipping flag for unknown dep");
+		QTC::TC("abuild", "Abuild-traverse skipping flag for unknown dep");
 		continue;
 	    }
 	    BuildItem const& dep_item = *(builditems[dep_name]);
@@ -2523,7 +2523,7 @@ Abuild::checkFlags(BuildForest& forest)
 	    {
 		if (! dep_item.supportsFlag(*fiter))
 		{
-		    QTC::TC("abuild", "Abuild ERR unsupported flag");
+		    QTC::TC("abuild", "Abuild-traverse ERR unsupported flag");
 		    error(item_location,
 			  item_name + " may not specify flag " +
 			  *fiter + " for dependency " + dep_name +
@@ -2565,7 +2565,7 @@ Abuild::checkTraits(BuildForest& forest)
 	    std::string const& trait = (*titer).first;
 	    if (supported_traits.count(trait) == 0)
 	    {
-		QTC::TC("abuild", "Abuild ERR unsupported trait");
+		QTC::TC("abuild", "Abuild-traverse ERR unsupported trait");
 		error(location, "trait " + trait +
 		      " is not supported in this item's build tree");
 	    }
@@ -2576,14 +2576,14 @@ Abuild::checkTraits(BuildForest& forest)
 		std::string const& referent_item = *iiter;
 		if (! accessibleFrom(builditems, item_name, referent_item))
 		{
-		    QTC::TC("abuild", "Abuild ERR inaccessible trait referent");
+		    QTC::TC("abuild", "Abuild-traverse ERR inaccessible trait referent");
 		    error(location, "trait " + trait +
 			  " refers to item " + referent_item +
 			  " which is private to another scope");
 		}
 		if (builditems.count(referent_item) == 0)
 		{
-		    QTC::TC("abuild", "Abuild ERR invalid trait referent");
+		    QTC::TC("abuild", "Abuild-traverse ERR invalid trait referent");
 		    error(location, "trait " + trait +
 			  " refers to item " + referent_item +
 			  " which does not exist");
@@ -2592,7 +2592,7 @@ Abuild::checkTraits(BuildForest& forest)
 			     forest, item, *builditems[referent_item],
 			     "refer by trait to"))
 		{
-		    QTC::TC("abuild", "Abuild ERR invisible trait referent");
+		    QTC::TC("abuild", "Abuild-traverse ERR invisible trait referent");
 		}
 	    }
 	}
@@ -2690,7 +2690,7 @@ Abuild::reportIntegrityErrors(BuildForest_map& forests,
 	    BuildItem& ref = *(builditems[ref_name]);
 	    if (plugins.count(ref_name))
 	    {
-		QTC::TC("abuild", "Abuild ERR plugin integrity");
+		QTC::TC("abuild", "Abuild-traverse ERR plugin integrity");
 		error(item.getLocation(), "build item \"" + item_name +
 		      "\" in tree \"" + item.getTreeName() +
 		      "\" uses plugin \"" + ref_name +
@@ -2698,7 +2698,7 @@ Abuild::reportIntegrityErrors(BuildForest_map& forests,
 	    }
 	    else
 	    {
-		QTC::TC("abuild", "Abuild ERR dep inconsistency");
+		QTC::TC("abuild", "Abuild-traverse ERR dep inconsistency");
 		error(item.getLocation(), "build item \"" + item_name +
 		      "\" depends on \"" + ref_name + "\", which is shadowed");
 	    }
@@ -2793,7 +2793,7 @@ Abuild::appendBackingData(std::string const& dir,
 		"\" from \"" + file_backing + "\"");
 	    if (btop.empty())
 	    {
-		QTC::TC("abuild", "Abuild ERR can't find backing top");
+		QTC::TC("abuild", "Abuild-traverse ERR can't find backing top");
 		error(backing->getLocation(),
 		      "unable to determine top of forest containing"
 		      " backing area \"" + bdir + "\"");
@@ -2825,7 +2825,7 @@ Abuild::readBacking(std::string const& dir)
     std::list<std::string> const& backing_areas = backing->getBackingAreas();
     if (backing_areas.empty())
     {
-        QTC::TC("abuild", "Abuild ERR invalid backing file");
+        QTC::TC("abuild", "Abuild-traverse ERR invalid backing file");
         error(FileLocation(dir + "/" + BackingConfig::FILE_BACKING, 0, 0),
 	      "unable to get backing area data");
     }
@@ -2857,7 +2857,7 @@ Abuild::computeValidTraits(BuildForest_map& forests)
     {
 	if (this->valid_traits.count(*iter) == 0)
 	{
-	    QTC::TC("abuild", "Abuild ERR unknown trait");
+	    QTC::TC("abuild", "Abuild-traverse ERR unknown trait");
 	    error("trait " + *iter + " is unknown");
 	}
     }
@@ -2868,12 +2868,12 @@ Abuild::listTraits()
 {
     if (this->valid_traits.empty())
     {
-	QTC::TC("abuild", "Abuild listTraits with no traits");
+	QTC::TC("abuild", "Abuild-traverse listTraits with no traits");
 	std::cout << "No traits are supported." << std::endl;
     }
     else
     {
-	QTC::TC("abuild", "Abuild listTraits");
+	QTC::TC("abuild", "Abuild-traverse listTraits");
 	std::cout << "The following traits are supported:" << std::endl;
 	for (std::set<std::string>::iterator iter = this->valid_traits.begin();
 	     iter != this->valid_traits.end(); ++iter)

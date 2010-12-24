@@ -519,7 +519,7 @@ Interface::getVariable(std::string const& variable_name,
 	    if (assignment_history.empty() &&
 		(! var.assignment_history.empty()))
 	    {
-		QTC::TC("abuild", "Abuild flag made variable uninitialized");
+		QTC::TC("abuild", "Interface flag made variable uninitialized");
 	    }
 	}
 

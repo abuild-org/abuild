@@ -52,7 +52,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	     (set_name == b_LOCAL) ||
 	     (set_name == b_DESCDEPTREES)))
 	{
-	    QTC::TC("abuild", "Abuild ERR bad tree-based build set");
+	    QTC::TC("abuild", "Abuild-buildset ERR bad tree-based build set");
 	    error("build set \"" + set_name + "\" is invalid when"
 		  " the current build item is not part of any tree");
 	}
@@ -60,14 +60,15 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	{
 	    std::set<std::string> named_items =
 		this->buildset_named_items;
-            QTC::TC("abuild", "Abuild buildset names", cleaning ? 1 : 0);
+            QTC::TC("abuild", "Abuild-buildset buildset names",
+		    cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isNamed, _1,
 					 boost::ref(named_items)));
 	    if (! named_items.empty())
 	    {
 		std::string unknown_items = Util::join(", ", named_items);
-		QTC::TC("abuild", "Abuild ERR unknown items in set");
+		QTC::TC("abuild", "Abuild-buildset ERR unknown items in set");
 		error("unable to add unknown build items to build set: " +
 		      unknown_items);
 	    }
@@ -75,20 +76,22 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	else if (! this->buildset_pattern.empty())
 	{
 	    boost::regex pattern(this->buildset_pattern);
-	    QTC::TC("abuild", "Abuild buildset pattern", cleaning ? 1 : 0);
+	    QTC::TC("abuild", "Abuild-buildset buildset pattern", cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::matchesPattern, _1,
 					 pattern));
 	}
 	else if (set_name == b_ALL)
         {
-            QTC::TC("abuild", "Abuild buildset all", cleaning ? 1 : 0);
+            QTC::TC("abuild", "Abuild-buildset buildset all",
+		    cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isLocal, _1));
         }
 	else if (set_name == b_DEPTREES)
         {
-            QTC::TC("abuild", "Abuild buildset deptrees", cleaning ? 1 : 0);
+            QTC::TC("abuild", "Abuild-buildset buildset deptrees",
+		    cleaning ? 1 : 0);
 	    std::set<std::string> trees;
 	    std::list<std::string> const& deptrees =
 		this_buildtree->getExpandedTreeDeps();
@@ -99,7 +102,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         }
 	else if (set_name == b_DESCDEPTREES)
         {
-            QTC::TC("abuild", "Abuild buildset descdeptrees", cleaning ? 1 : 0);
+            QTC::TC("abuild", "Abuild-buildset buildset descdeptrees",
+		    cleaning ? 1 : 0);
 	    std::set<std::string> trees;
 	    std::list<std::string> const& deptrees =
 		this_buildtree->getExpandedTreeDeps();
@@ -111,14 +115,16 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         }
         else if (set_name == b_LOCAL)
         {
-            QTC::TC("abuild", "Abuild buildset local", cleaning ? 1 : 0);
+            QTC::TC("abuild", "Abuild-buildset buildset local",
+		    cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isInTree, _1,
 					 this->local_tree));
         }
         else if (set_name == b_DESC)
         {
-            QTC::TC("abuild", "Abuild buildset desc", cleaning ? 1 : 0);
+            QTC::TC("abuild", "Abuild-buildset buildset desc",
+		    cleaning ? 1 : 0);
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isAtOrBelowPath,
 					 _1, this->current_directory));
@@ -127,7 +133,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         {
             if (this_builditem.get())
             {
-                QTC::TC("abuild", "Abuild buildset deps", cleaning ? 1 : 0);
+                QTC::TC("abuild", "Abuild-buildset buildset deps",
+			cleaning ? 1 : 0);
 		std::list<std::string> const& deps =
 		    this_builditem->getExpandedDependencies();
 		for (std::list<std::string>::const_iterator iter =
@@ -143,7 +150,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         {
             if (this_builditem.get())
             {
-                QTC::TC("abuild", "Abuild buildset current", cleaning ? 1 : 0);
+                QTC::TC("abuild", "Abuild-buildset buildset current",
+			cleaning ? 1 : 0);
 		this->buildset[this_name] = this_builditem;
             }
         }
@@ -160,7 +168,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 
     if (addBuildAlsoToBuildset(builditems))
     {
-	QTC::TC("abuild", "Abuild non-trivial build-also");
+	QTC::TC("abuild", "Abuild-buildset non-trivial build-also");
     }
 
     if ((! this->apply_targets_to_deps) &&
@@ -174,7 +182,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	for (BuildItem_map::iterator iter = this->buildset.begin();
 	     iter != this->buildset.end(); ++iter)
 	{
-	    QTC::TC("abuild", "Abuild add selected to explicit targets");
+	    QTC::TC("abuild", "Abuild-buildset add selected to explicit targets");
 	    this->explicit_target_items.insert((*iter).first);
 	}
     }
@@ -226,7 +234,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    {
 		if (this->buildset.count(*iter) == 0)
 		{
-		    QTC::TC("abuild", "Abuild non-trivial dep expansion");
+		    QTC::TC("abuild", "Abuild-buildset non-trivial dep expansion");
 		    expanding = true;
 		    this->buildset[*iter] = builditems[*iter];
 		}
@@ -235,7 +243,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 
 	if (addBuildAlsoToBuildset(builditems))
 	{
-	    QTC::TC("abuild", "Abuild additional build-also expansion");
+	    QTC::TC("abuild", "Abuild-buildset additional build-also expansion");
 	    expanding = true;
 	}
 
@@ -250,7 +258,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    while (adding_rdeps)
 	    {
 		adding_rdeps = false;
-		QTC::TC("abuild", "Abuild expand by rdeps");
+		QTC::TC("abuild", "Abuild-buildset expand by rdeps");
 
 		// Add to the build set any item that has a dependency on
 		// any item already in the build set.
@@ -282,7 +290,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 		{
 		    if (this->buildset.count(*iter) == 0)
 		    {
-			QTC::TC("abuild", "Abuild non-trivial rdep expansion");
+			QTC::TC("abuild", "Abuild-buildset non-trivial rdep expansion");
 			expanding = true;
 			adding_rdeps = true;
 			this->buildset[*iter] = builditems[*iter];
@@ -293,7 +301,8 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 
 	if (! this->related_by_traits.empty())
 	{
-	    QTC::TC("abuild", "Abuild expand by trait", cleaning ? 1 : 0);
+	    QTC::TC("abuild", "Abuild-buildset expand by trait",
+		    cleaning ? 1 : 0);
 
 	    // Add to the build set any item that has all the traits
 	    // named in the related by traits in reference any item
@@ -359,7 +368,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 		// targets.
 		if (this->buildset.count(*iter) == 0)
 		{
-		    QTC::TC("abuild", "Abuild non-trivial trait expansion");
+		    QTC::TC("abuild", "Abuild-buildset non-trivial trait expansion");
 		    expanding = true;
 		    this->buildset[*iter] = builditems[*iter];
 		}
@@ -399,14 +408,14 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 
     if (this->buildset.empty())
     {
-        QTC::TC("abuild", "Abuild empty buildset");
+        QTC::TC("abuild", "Abuild-buildset empty buildset");
     }
 
     if (this->apply_targets_to_deps)
     {
 	// If all items get explicit targets, add all items now that
 	// we've completed construction of the build set.
-	QTC::TC("abuild", "Abuild add all to explicit targets",
+	QTC::TC("abuild", "Abuild-buildset add all to explicit targets",
 		cleaning ? 0 : 1);
 	for (BuildItem_map::iterator iter = this->buildset.begin();
 	     iter != this->buildset.end(); ++iter)

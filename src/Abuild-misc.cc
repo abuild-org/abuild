@@ -162,7 +162,7 @@ Abuild::suggestUpgrade()
     {
 	// Only complain specifically about deprecated backing files
 	// if there aren't other upgrade suggestions.
-	QTC::TC("abuild", "Abuild backing deprecation warning");
+	QTC::TC("abuild", "Abuild-misc backing deprecation warning");
 	for (std::set<std::string>::iterator iter =
 		 this->deprecated_backing_files.begin();
 	     iter != this->deprecated_backing_files.end(); ++iter)

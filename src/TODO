@@ -1,8 +1,6 @@
 Next
 ====
 
- * Update coverage cases after splitting Abuild.cc
-
  * If item A on platform X depends on item B and item B doesn't build
    on platform X, treat this as a failure of B on X so that it doesn't
    impact the build more broadly.
