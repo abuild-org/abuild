@@ -461,12 +461,16 @@ Abuild::addBuildAlsoToBuildset(BuildItem_map& builditems)
 	     iter != this->buildset.end(); ++iter)
 	{
 	    BuildItem& item = *((*iter).second);
-	    std::list<std::string> const& build_also = item.getBuildAlso();
-	    for (std::list<std::string>::const_iterator biter =
+	    std::list<ItemConfig::BuildAlso> const& build_also =
+		item.getBuildAlso();
+	    for (std::list<ItemConfig::BuildAlso>::const_iterator biter =
 		     build_also.begin();
 		 biter != build_also.end(); ++biter)
 	    {
-		to_add.insert(*biter);
+		std::string name;
+		bool xxx1, xxx2, xxx3;
+		(*biter).getDetails(name, xxx1, xxx2, xxx3);
+		to_add.insert(name);
 	    }
 	}
 	for (std::set<std::string>::iterator iter = to_add.begin();

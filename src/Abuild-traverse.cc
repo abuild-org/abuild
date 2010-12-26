@@ -2164,12 +2164,15 @@ Abuild::checkBuildAlso(BuildForest& forest)
 	std::string const& item_name = (*iter).first;
 	FileLocation const& item_location = item.getLocation();
 
-	std::list<std::string> const& build_also = item.getBuildAlso();
-	for (std::list<std::string>::const_iterator biter =
+	std::list<ItemConfig::BuildAlso> const& build_also =
+	    item.getBuildAlso();
+	for (std::list<ItemConfig::BuildAlso>::const_iterator biter =
 		 build_also.begin();
 	     biter != build_also.end(); ++biter)
 	{
-	    std::string const& other_item = *biter;
+	    std::string other_item;
+	    bool xxx1, xxx2, xxx3;
+	    (*biter).getDetails(other_item, xxx1, xxx2, xxx3);
 	    if (builditems.count(other_item) == 0)
 	    {
 		QTC::TC("abuild", "Abuild-traverse ERR invalid build also");

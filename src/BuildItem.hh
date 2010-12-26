@@ -21,7 +21,7 @@ class BuildItem
     std::string const& getName() const;
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
-    std::list<std::string> const& getBuildAlso() const;
+    std::list<ItemConfig::BuildAlso> const& getBuildAlso() const;
     std::string const& getDepPlatformType(std::string const&) const;
     std::string const& getDepPlatformType(
 	std::string const&, PlatformSelector const*&) const;

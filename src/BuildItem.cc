@@ -45,7 +45,7 @@ BuildItem::getChildren() const
     return this->config->getChildren();
 }
 
-std::list<std::string> const&
+std::list<ItemConfig::BuildAlso> const&
 BuildItem::getBuildAlso() const
 {
     return this->config->getBuildAlso();

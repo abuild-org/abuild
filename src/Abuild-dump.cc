@@ -281,7 +281,7 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 
     std::string description = Util::XMLify(item.getDescription(), true);
     std::string visible_to = item.getVisibleTo();
-    std::list<std::string> const& build_also =
+    std::list<ItemConfig::BuildAlso> const& build_also =
 	item.getBuildAlso();
     std::list<std::string> const& declared_dependencies =
 	item.getDeps();
@@ -357,12 +357,16 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 	o << "   >" << std::endl;
 	if (! build_also.empty())
 	{
+	    // XXX
 	    o << "    <build-also-items>" << std::endl;
-	    for (std::list<std::string>::const_iterator biter =
+	    for (std::list<ItemConfig::BuildAlso>::const_iterator biter =
 		     build_also.begin();
 		 biter != build_also.end(); ++biter)
 	    {
-		o << "     <build-also name=\"" << *biter << "\"/>"
+		std::string name;
+		bool xxx1, xxx2, xxx3;
+		(*biter).getDetails(name, xxx1, xxx2, xxx3);
+		o << "     <build-also name=\"" << name << "\"/>"
 		  << std::endl;
 	    }
 	    o << "    </build-also-items>" << std::endl;

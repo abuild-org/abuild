@@ -50,6 +50,13 @@ std::string const ItemConfig::k_ATTRIBUTES = "attributes";
 //    separate the build item from the platform in the build graph
 //    nodes
 //
+//  * Colon: some places where build items are allowed can also take
+//    items like item:name or tree:name.
+//
+// Additionally, a build item name may never start with dash (-)
+// because some Abuild.conf keys take build item names possibly
+// followed by options that start with dash.
+//
 // Carefully consider the implications of adding new legal characters
 // to the names of build items.  As currently specified, build item
 // names are always valid file names and can always be specified on
@@ -59,6 +66,37 @@ std::string const ItemConfig::ITEM_NAME_RE =
     "[a-zA-Z0-9_][a-zA-Z0-9_-]*(?:\\.[a-zA-Z0-9_-]+)*";
 
 std::string const ItemConfig::PARENT_RE = "\\.\\.(?:/\\.\\.)*";
+
+ItemConfig::BuildAlso::BuildAlso(std::string const& name, bool is_tree) :
+    name(name),
+    is_tree(is_tree),
+    desc(false),
+    with_tree_deps(false)
+{
+}
+
+void
+ItemConfig::BuildAlso::setDesc()
+{
+    this->desc = true;
+}
+
+void
+ItemConfig::BuildAlso::setWithTreeDeps()
+{
+    this->with_tree_deps = true;
+}
+
+void
+ItemConfig::BuildAlso::getDetails(
+    std::string& name, bool& is_tree,
+    bool& desc, bool& with_tree_deps) const
+{
+    name = this->name;
+    is_tree = this->is_tree;
+    desc = this->desc;
+    with_tree_deps= this->with_tree_deps;
+}
 
 std::map<std::string, std::string> ItemConfig::valid_keys;
 bool ItemConfig::statics_initialized = false;
@@ -622,22 +660,23 @@ ItemConfig::checkBuildAlso()
     boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
 
-    this->build_also = Util::splitBySpace(this->kv.getVal(k_BUILD_ALSO));
+    std::list<std::string> args =
+	Util::splitBySpace(this->kv.getVal(k_BUILD_ALSO));
 
-    std::list<std::string>::iterator iter = this->build_also.begin();
-    while (iter != this->build_also.end())
+    for (std::list<std::string>::iterator iter = args.begin();
+	 iter != args.end(); ++iter)
     {
-	std::list<std::string>::iterator next = iter;
-	++next;
-	if (! boost::regex_match(*iter, match, item_name_re))
+	if (boost::regex_match(*iter, match, item_name_re))
+	{
+	    this->build_also.push_back(BuildAlso(*iter, false));
+	}
+	else
 	{
 	    QTC::TC("abuild", "ItemConfig ERR bad build-also");
 	    this->error.error(this->location,
 			      "invalid " + k_BUILD_ALSO +
 			      " build item name " + *iter);
-	    this->build_also.erase(iter, next);
 	}
-	iter = next;
     }
 }
 
@@ -1387,7 +1426,7 @@ ItemConfig::getExternals() const
     return this->externals;
 }
 
-std::list<std::string> const&
+std::list<ItemConfig::BuildAlso> const&
 ItemConfig::getBuildAlso() const
 {
     return this->build_also;

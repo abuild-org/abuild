@@ -31,6 +31,25 @@ class ItemConfig
 	b_ant
     };
 
+    class BuildAlso
+    {
+      public:
+	BuildAlso(std::string const& name, bool is_tree);
+	void setDesc();
+	void setWithTreeDeps();
+
+	void getDetails(std::string& name,
+			bool& is_tree,
+			bool& desc,
+			bool& with_tree_deps) const;
+
+      private:
+	std::string name;
+	bool is_tree;
+	bool desc;
+	bool with_tree_deps;
+    };
+
     // Read the FILE_CONF file in dir and return a pointer to it.  The
     // ItemConfig class manages the memory.  The "dir" parameter must
     // be a canonical path.  For efficiency, this is not checked.
@@ -74,7 +93,7 @@ class ItemConfig
     std::string const& getDescription() const;
     std::list<std::string> const& getChildren() const;
     std::list<std::string> const& getExternals() const;
-    std::list<std::string> const& getBuildAlso() const;
+    std::list<BuildAlso> const& getBuildAlso() const;
     std::list<std::string> const& getDeps() const;
     std::list<std::string> const& getTreeDeps() const;
     std::set<std::string> const& getOptionalDeps() const;
@@ -195,7 +214,7 @@ class ItemConfig
     // Information read from the file
     std::string name;
     std::list<std::string> children;
-    std::list<std::string> build_also;
+    std::list<BuildAlso> build_also;
     std::list<std::string> deps;
     std::list<std::string> tree_deps;
     FlagData flag_data;
