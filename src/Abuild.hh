@@ -158,10 +158,14 @@ class Abuild
     void resolveFromBackingAreas(BuildForest_map& forests,
 				 std::string const& top_path);
     void checkTreeDependencies(BuildForest& forest);
-    bool checkAllowedTree(BuildForest& forest,
-			  BuildItem& referrer,
-			  BuildItem& referent,
-			  std::string const& action);
+    bool checkAllowedTreeItem(BuildForest& forest,
+			      BuildItem& referrer_item,
+			      BuildItem& referent_item,
+			      std::string const& action);
+    bool checkAllowedTreeTree(BuildForest& forest,
+			      BuildItem& referrer_item,
+			      std::string const& referent_tree,
+			      std::string const& action);
     void resolveTraits(BuildForest& forest);
     void checkPlugins(BuildForest& forest);
     bool isPlugin(std::string const& item_name);
@@ -198,13 +202,20 @@ class Abuild
 		       std::map<std::string, int>& forest_numbers);
     void dumpBuildItem(BuildItem& item, std::string const& item_name,
 		       std::map<std::string, int>& forest_numbers);
+    void dumpBuildAlso(bool trees,
+		       std::list<ItemConfig::BuildAlso> const& data);
     void computeTreePrefixes(std::list<std::string> const& tree_names);
     void computeItemPrefixes();
     bool isBuildItemWritable(BuildItem const& item);
     void computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems);
-    void populateBuildset(BuildItem_map& builditems,
+    bool populateBuildset(BuildItem_map& builditems,
 			  boost::function<bool(BuildItem const*)> pred);
-    bool addBuildAlsoToBuildset(BuildItem_map& builditems);
+    bool addBuildAlsoToBuildset(BuildTree_map& buildtrees,
+				BuildItem_map& builditems);
+    bool itemIsInBuildAlso(
+	BuildItem const* item,
+	BuildTree_map& buildtrees, BuildItem_map& builditems,
+	std::set<ItemConfig::BuildAlso> const& build_also);
     bool buildBuildset();
     bool addItemToBuildGraph(std::string const& item_name, BuildItem& item);
     std::string createBuildGraphNode(std::string const& item_name,

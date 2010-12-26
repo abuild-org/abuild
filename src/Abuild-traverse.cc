@@ -1767,7 +1767,7 @@ Abuild::checkDepTreeAccess(BuildForest& forest)
 		continue;
 	    }
 	    BuildItem& dep_item = *(builditems[dep_name]);
-	    if (! checkAllowedTree(forest, item, dep_item, "depend on"))
+	    if (! checkAllowedTreeItem(forest, item, dep_item, "depend on"))
 	    {
 		QTC::TC("abuild", "Abuild-traverse ERR depend on invisible item");
 	    }
@@ -1776,10 +1776,10 @@ Abuild::checkDepTreeAccess(BuildForest& forest)
 }
 
 bool
-Abuild::checkAllowedTree(BuildForest& forest,
-			 BuildItem& referrer,
-			 BuildItem& referent,
-			 std::string const& action)
+Abuild::checkAllowedTreeItem(BuildForest& forest,
+			     BuildItem& referrer,
+			     BuildItem& referent,
+			     std::string const& action)
 {
     bool okay = true;
     std::map<std::string, std::set<std::string> > const& tree_access_table =
@@ -1800,6 +1800,32 @@ Abuild::checkAllowedTree(BuildForest& forest,
 	      referrer_name + "\"'s tree (\"" + referrer_tree +
 	      "\") does not depend on \"" + referent_name +
 	      "\"'s tree (\"" + referent_tree + "\")");
+    }
+    return okay;
+}
+
+bool
+Abuild::checkAllowedTreeTree(BuildForest& forest,
+			     BuildItem& referrer,
+			     std::string const& referent_tree,
+			     std::string const& action)
+{
+    bool okay = true;
+    std::map<std::string, std::set<std::string> > const& tree_access_table =
+	forest.getTreeAccessTable();
+    std::string const& referrer_name = referrer.getName();
+    std::string const& referrer_tree = referrer.getTreeName();
+
+    std::set<std::string> const& allowed_trees =
+	(*(tree_access_table.find(referrer_tree))).second;
+    if (allowed_trees.count(referent_tree) == 0)
+    {
+	okay = false;
+	error(referrer.getLocation(),
+	      "build item \"" + referrer_name + "\" may not " +
+	      action + " build tree \"" + referent_tree + "\" because \"" +
+	      referrer_name + "\"'s tree (\"" + referrer_tree +
+	      "\") does not depend on it");
     }
     return okay;
 }
@@ -2152,6 +2178,7 @@ Abuild::checkItemNames(BuildForest& forest)
 void
 Abuild::checkBuildAlso(BuildForest& forest)
 {
+    BuildTree_map& buildtrees = forest.getBuildTrees();
     BuildItem_map& builditems = forest.getBuildItems();
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
@@ -2171,20 +2198,43 @@ Abuild::checkBuildAlso(BuildForest& forest)
 	     biter != build_also.end(); ++biter)
 	{
 	    std::string other_item;
-	    bool xxx1, xxx2, xxx3;
-	    (*biter).getDetails(other_item, xxx1, xxx2, xxx3);
-	    if (builditems.count(other_item) == 0)
+	    bool is_tree;
+	    bool desc;
+	    bool with_tree_deps;
+	    (*biter).getDetails(other_item, is_tree, desc, with_tree_deps);
+	    if (is_tree)
 	    {
-		QTC::TC("abuild", "Abuild-traverse ERR invalid build also");
-		error(item_location,
-		      item_name + " requests building of unknown build item " +
-		      other_item);
-		continue;
+		if (buildtrees.count(other_item) == 0)
+		{
+		    QTC::TC("abuild", "Abuild-traverse ERR invalid build also tree");
+		    error(item_location,
+			  item_name +
+			  " requests build of unknown build tree " +
+			  other_item);
+		}
+		else if (! checkAllowedTreeTree(
+			     forest, item, other_item,
+			     "request build of"))
+		{
+		    QTC::TC("abuild", "Abuild-traverse ERR build-also invisible tree");
+		}
 	    }
-	    if (! checkAllowedTree(forest, item, *(builditems[other_item]),
-				   "request build of"))
+	    else
 	    {
-		QTC::TC("abuild", "Abuild-traverse ERR build-also invisible item");
+		if (builditems.count(other_item) == 0)
+		{
+		    QTC::TC("abuild", "Abuild-traverse ERR invalid build also");
+		    error(item_location,
+			  item_name +
+			  " requests building of unknown build item " +
+			  other_item);
+		}
+		else if (! checkAllowedTreeItem(
+			     forest, item, *(builditems[other_item]),
+			     "request build of"))
+		{
+		    QTC::TC("abuild", "Abuild-traverse ERR build-also invisible item");
+		}
 	    }
 	}
     }
@@ -2591,7 +2641,7 @@ Abuild::checkTraits(BuildForest& forest)
 			  " refers to item " + referent_item +
 			  " which does not exist");
 		}
-		else if (! checkAllowedTree(
+		else if (! checkAllowedTreeItem(
 			     forest, item, *builditems[referent_item],
 			     "refer by trait to"))
 		{

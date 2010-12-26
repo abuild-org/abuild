@@ -64,6 +64,8 @@ std::string const ItemConfig::k_ATTRIBUTES = "attributes";
 // features.
 std::string const ItemConfig::ITEM_NAME_RE =
     "[a-zA-Z0-9_][a-zA-Z0-9_-]*(?:\\.[a-zA-Z0-9_-]+)*";
+std::string const ItemConfig::BUILD_ALSO_RE =
+    "(?:(item|tree):)?(" + ItemConfig::ITEM_NAME_RE + ")";
 
 std::string const ItemConfig::PARENT_RE = "\\.\\.(?:/\\.\\.)*";
 
@@ -87,6 +89,12 @@ ItemConfig::BuildAlso::setWithTreeDeps()
     this->with_tree_deps = true;
 }
 
+bool
+ItemConfig::BuildAlso::isTree() const
+{
+    return this->is_tree;
+}
+
 void
 ItemConfig::BuildAlso::getDetails(
     std::string& name, bool& is_tree,
@@ -96,6 +104,46 @@ ItemConfig::BuildAlso::getDetails(
     is_tree = this->is_tree;
     desc = this->desc;
     with_tree_deps= this->with_tree_deps;
+}
+
+bool
+ItemConfig::BuildAlso::operator==(BuildAlso const& rhs) const
+{
+    return ((this->name == rhs.name) &&
+	    (this->is_tree == rhs.is_tree) &&
+	    (this->desc == rhs.desc) &&
+	    (this->with_tree_deps == rhs.with_tree_deps));
+}
+
+unsigned int
+ItemConfig::BuildAlso::getOrderNum() const
+{
+    // Combine non-string fields into a number that can be compared.
+    return ((this->is_tree        ? 1 : 0) |
+	    (this->desc           ? 2 : 0) |
+	    (this->with_tree_deps ? 4 : 0));
+}
+
+bool
+ItemConfig::BuildAlso::operator<(BuildAlso const& rhs) const
+{
+    // We don't care what the ordering is; we just care that it is
+    // well defined.
+    int this_num = this->getOrderNum();
+    int rhs_num = rhs.getOrderNum();
+
+    if (this_num < rhs_num)
+    {
+	return true;
+    }
+    else if (this_num > rhs_num)
+    {
+	return false;
+    }
+    else
+    {
+	return this->name < rhs.name;
+    }
 }
 
 std::map<std::string, std::string> ItemConfig::valid_keys;
@@ -657,7 +705,7 @@ ItemConfig::checkChildren()
 void
 ItemConfig::checkBuildAlso()
 {
-    boost::regex item_name_re(ITEM_NAME_RE);
+    boost::regex build_also_re(BUILD_ALSO_RE);
     boost::smatch match;
 
     std::list<std::string> args =
@@ -666,16 +714,66 @@ ItemConfig::checkBuildAlso()
     for (std::list<std::string>::iterator iter = args.begin();
 	 iter != args.end(); ++iter)
     {
-	if (boost::regex_match(*iter, match, item_name_re))
+	std::string const& arg = *iter;
+	assert(! arg.empty());
+	if (arg[0] == '-')
 	{
-	    this->build_also.push_back(BuildAlso(*iter, false));
+	    if (this->build_also.empty())
+	    {
+		QTC::TC("abuild", "ItemConfig ERR build_also arg first");
+		this->error.error(this->location,
+				  "build also option must follow a build"
+				  " also item or tree specification");
+	    }
+	    else
+	    {
+		BuildAlso& ba = this->build_also.back();
+		if (arg == "-desc")
+		{
+		    QTC::TC("abuild", "ItemConfig build_also -desc",
+			    ba.isTree() ? 0 : 1);
+		    ba.setDesc();
+		}
+		else if (arg == "-with-tree-deps")
+		{
+		    if (ba.isTree())
+		    {
+			QTC::TC("abuild", "ItemConfig build_also -with-tree-deps");
+			ba.setWithTreeDeps();
+		    }
+		    else
+		    {
+			QTC::TC("abuild", "ItemConfig ERR build_also -with-tree-deps but not tree");
+			this->error.error(
+			    this->location,
+			    "-with-tree-deps is valid only for non-tree"
+			    " build-also items");
+		    }
+		}
+		else
+		{
+		    QTC::TC("abuild", "ItemConfig ERR bad build_also option");
+		    this->error.error(
+			this->location,
+			"invalid build_also option \"" + arg + "\"");
+		}
+	    }
+	}
+	else if (boost::regex_match(arg, match, build_also_re))
+	{
+	    bool is_tree = match[0].matched && (match[0].str() == "tree");
+	    QTC::TC("abuild", "ItemConfig build_also item type",
+		    is_tree ? 0 :	   // tree
+		    match[0].matched ? 1 : // explicit item
+		    2);			   // implicit item
+	    this->build_also.push_back(BuildAlso(arg, is_tree));
 	}
 	else
 	{
 	    QTC::TC("abuild", "ItemConfig ERR bad build-also");
 	    this->error.error(this->location,
 			      "invalid " + k_BUILD_ALSO +
-			      " build item name " + *iter);
+			      " build item name " + arg);
 	}
     }
 }

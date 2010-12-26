@@ -357,19 +357,23 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
 	o << "   >" << std::endl;
 	if (! build_also.empty())
 	{
-	    // XXX
-	    o << "    <build-also-items>" << std::endl;
+	    std::list<ItemConfig::BuildAlso> build_also_items;
+	    std::list<ItemConfig::BuildAlso> build_also_trees;
 	    for (std::list<ItemConfig::BuildAlso>::const_iterator biter =
 		     build_also.begin();
 		 biter != build_also.end(); ++biter)
 	    {
-		std::string name;
-		bool xxx1, xxx2, xxx3;
-		(*biter).getDetails(name, xxx1, xxx2, xxx3);
-		o << "     <build-also name=\"" << name << "\"/>"
-		  << std::endl;
+		if ((*biter).isTree())
+		{
+		    build_also_trees.push_back(*biter);
+		}
+		else
+		{
+		    build_also_items.push_back(*biter);
+		}
 	    }
-	    o << "    </build-also-items>" << std::endl;
+	    dumpBuildAlso(true, build_also_trees);
+	    dumpBuildAlso(false, build_also_items);
 	}
 	if (! declared_dependencies.empty())
 	{
@@ -501,4 +505,60 @@ Abuild::dumpBuildItem(BuildItem& item, std::string const& name,
     {
 	o << "   />" << std::endl;
     }
+}
+
+void
+Abuild::dumpBuildAlso(bool trees,
+		      std::list<ItemConfig::BuildAlso> const& data)
+{
+    if (data.empty())
+    {
+	return;
+    }
+
+    std::ostream& o = std::cout;
+    char const* tag = (trees ? "build-also-trees" : "build-also-items");
+    o << "    <" << tag << ">" << std::endl;
+    for (std::list<ItemConfig::BuildAlso>::const_iterator biter = data.begin();
+	 biter != data.end(); ++biter)
+    {
+	std::string name;
+	bool is_tree;
+	bool desc;
+	bool with_tree_deps;
+	(*biter).getDetails(name, is_tree, desc, with_tree_deps);
+	assert(is_tree == trees);
+	o << "     <build-also name=\"" << name;
+	if (! (is_tree || desc || with_tree_deps))
+	{
+	    // Add new attributes to condition here and to else block
+	    // below.
+	    QTC::TC("abuild", "Abuild-dump build-also just item");
+	}
+	else
+	{
+	    // Having these conditions in an else block helps ensure
+	    // that above no-attribute condition doesn't accidentally
+	    // become true if we add more attributes in the future.
+	    if (is_tree)
+	    {
+		// For backward compatibility, only output is-tree
+		// attribute if true -- see comments in abuild_data.dtd.
+		o << " is-tree=\"1\"";
+		QTC::TC("abuild", "Abuild-dump build-also is-tree");
+	    }
+	    if (desc)
+	    {
+		o << " desc=\"1\"";
+		QTC::TC("abuild", "Abuild-dump build-also desc");
+	    }
+	    if (with_tree_deps)
+	    {
+		o << " with-tree-deps=\"1\"";
+		QTC::TC("abuild", "Abuild-dump build-also with-tree-deps");
+	    }
+	}
+	o << "\"/>" << std::endl;
+    }
+    o << "    </" << tag << ">" << std::endl;
 }

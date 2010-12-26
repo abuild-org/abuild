@@ -433,3 +433,21 @@ JavaBuilder response ends with CRNL 0
 Abuild-init set interleaved from prefix 0
 Abuild-init windows nl in list_platforms 0
 Abuild-traverse unused platform selector 0
+ItemConfig ERR build_also arg first 0
+ItemConfig build_also -desc 1
+ItemConfig build_also -with-tree-deps 0
+ItemConfig ERR build_also -with-tree-deps but not tree 0
+ItemConfig ERR bad build_also option 0
+ItemConfig build_also item type 2
+Abuild-dump build-also is-tree 0
+Abuild-dump build-also desc 0
+Abuild-dump build-also with-tree-deps 0
+Abuild-dump build-also just item 0
+Abuild-traverse ERR invalid build also tree 0
+Abuild-traverse ERR build-also invisible tree 0
+Abuild-buildset add build-also by item name 0
+Abuild-buildset add build-also by item desc 0
+Abuild-buildset add build-also by tree name 0
+Abuild-buildset add build-also by descdeptrees 0
+Abuild-buildset add build-also by deptrees 0
+Abuild-buildset add build-also by tree desc 0

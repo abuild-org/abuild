@@ -38,12 +38,19 @@ class ItemConfig
 	void setDesc();
 	void setWithTreeDeps();
 
+	bool isTree() const;
 	void getDetails(std::string& name,
 			bool& is_tree,
 			bool& desc,
 			bool& with_tree_deps) const;
+	// Define a sensible ordering so BuildAlso objects can be map
+	// keys or stored in sets.
+	bool operator==(BuildAlso const&) const;
+	bool operator<(BuildAlso const&) const;
 
       private:
+	unsigned int getOrderNum() const;
+
 	std::string name;
 	bool is_tree;
 	bool desc;
@@ -78,6 +85,7 @@ class ItemConfig
     static std::string const k_PLUGINS;
     static std::string const k_ATTRIBUTES;
     static std::string const ITEM_NAME_RE;
+    static std::string const BUILD_ALSO_RE;
     static std::string const PARENT_RE;
     static std::map<std::string, std::string> valid_keys;
 

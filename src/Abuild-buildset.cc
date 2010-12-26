@@ -92,26 +92,22 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         {
             QTC::TC("abuild", "Abuild-buildset buildset deptrees",
 		    cleaning ? 1 : 0);
-	    std::set<std::string> trees;
-	    std::list<std::string> const& deptrees =
-		this_buildtree->getExpandedTreeDeps();
-	    trees.insert(deptrees.begin(), deptrees.end());
-	    trees.insert(this->local_tree);
+	    std::set<std::string> const& trees =
+		this_buildtree->getExpandedTreeDepsAndLocal();
 	    populateBuildset(builditems,
-			     boost::bind(&BuildItem::isInTrees, _1, trees));
+			     boost::bind(&BuildItem::isInTrees, _1,
+					 boost::ref(trees)));
         }
 	else if (set_name == b_DESCDEPTREES)
         {
             QTC::TC("abuild", "Abuild-buildset buildset descdeptrees",
 		    cleaning ? 1 : 0);
-	    std::set<std::string> trees;
-	    std::list<std::string> const& deptrees =
-		this_buildtree->getExpandedTreeDeps();
-	    trees.insert(deptrees.begin(), deptrees.end());
-	    trees.insert(this->local_tree);
+	    std::set<std::string> const& trees =
+		this_buildtree->getExpandedTreeDepsAndLocal();
 	    populateBuildset(builditems,
 			     boost::bind(&BuildItem::isInTreesAndAtOrBelowPath,
-					 _1, trees, this->current_directory));
+					 _1, boost::ref(trees),
+					 this->current_directory));
         }
         else if (set_name == b_LOCAL)
         {
@@ -166,7 +162,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
         this->buildset[this_name] = this_builditem;
     }
 
-    if (addBuildAlsoToBuildset(builditems))
+    if (addBuildAlsoToBuildset(buildtrees, builditems))
     {
 	QTC::TC("abuild", "Abuild-buildset non-trivial build-also");
     }
@@ -241,7 +237,7 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
 	    }
 	}
 
-	if (addBuildAlsoToBuildset(builditems))
+	if (addBuildAlsoToBuildset(buildtrees, builditems))
 	{
 	    QTC::TC("abuild", "Abuild-buildset additional build-also expansion");
 	    expanding = true;
@@ -425,10 +421,11 @@ Abuild::computeBuildset(BuildTree_map& buildtrees, BuildItem_map& builditems)
     }
 }
 
-void
+bool
 Abuild::populateBuildset(BuildItem_map& builditems,
 			 boost::function<bool(BuildItem const*)> pred)
 {
+    bool added_any = false;
     for (BuildItem_map::iterator iter = builditems.begin();
 	 iter != builditems.end(); ++iter)
     {
@@ -438,16 +435,20 @@ Abuild::populateBuildset(BuildItem_map& builditems,
 	// build set, though they will be added, if needed, to satisfy
 	// dependencies.  This helps to reduce extraneous integrity
 	// errors when not running in full integrity mode.
-	if (pred(item_ptr.get()) && item_ptr->isLocal() &&
+	if ((this->buildset.count(item_name) == 0) &&
+	    pred(item_ptr.get()) && item_ptr->isLocal() &&
 	    item_ptr->hasTraits(this->only_with_traits))
 	{
+	    added_any = true;
 	    this->buildset[item_name] = item_ptr;
 	}
     }
+    return added_any;
 }
 
 bool
-Abuild::addBuildAlsoToBuildset(BuildItem_map& builditems)
+Abuild::addBuildAlsoToBuildset(BuildTree_map& buildtrees,
+			       BuildItem_map& builditems)
 {
     // For every item in the build set, if that item specifies any
     // other items to build, add them as well.
@@ -456,37 +457,111 @@ Abuild::addBuildAlsoToBuildset(BuildItem_map& builditems)
     while (adding)
     {
 	adding = false;
-	std::set<std::string> to_add;
+	std::set<ItemConfig::BuildAlso> to_add;
 	for (BuildItem_map::iterator iter = this->buildset.begin();
 	     iter != this->buildset.end(); ++iter)
 	{
 	    BuildItem& item = *((*iter).second);
 	    std::list<ItemConfig::BuildAlso> const& build_also =
 		item.getBuildAlso();
-	    for (std::list<ItemConfig::BuildAlso>::const_iterator biter =
-		     build_also.begin();
-		 biter != build_also.end(); ++biter)
-	    {
-		std::string name;
-		bool xxx1, xxx2, xxx3;
-		(*biter).getDetails(name, xxx1, xxx2, xxx3);
-		to_add.insert(name);
-	    }
+	    to_add.insert(build_also.begin(), build_also.end());
 	}
-	for (std::set<std::string>::iterator iter = to_add.begin();
-	     iter != to_add.end(); ++iter)
-	{
-	    if ((this->buildset.count(*iter) == 0) &&
-		builditems[*iter]->hasTraits(this->only_with_traits))
-	    {
-		adding = true;
-		this->buildset[*iter] = builditems[*iter];
-	    }
-	}
+	adding = populateBuildset(
+	    builditems,
+	    boost::bind(&Abuild::itemIsInBuildAlso, this, _1,
+			boost::ref(buildtrees),
+			boost::ref(builditems),
+			boost::ref(to_add)));
 	if (adding)
 	{
 	    added_any = true;
 	}
     }
     return added_any;
+}
+
+bool
+Abuild::itemIsInBuildAlso(
+    BuildItem const* item,
+    BuildTree_map& buildtrees, BuildItem_map& builditems,
+    std::set<ItemConfig::BuildAlso> const& build_also)
+{
+    for (std::set<ItemConfig::BuildAlso>::const_iterator iter =
+	     build_also.begin();
+	 iter != build_also.end(); ++iter)
+    {
+	ItemConfig::BuildAlso const& ba = (*iter);
+	std::string name;
+	bool is_tree;
+	bool desc;
+	bool with_tree_deps;
+	ba.getDetails(name, is_tree, desc, with_tree_deps);
+	if (is_tree)
+	{
+	    BuildTree const& bt = *(buildtrees[name]);
+
+	    if (with_tree_deps)
+	    {
+		std::set<std::string> const& trees =
+		    bt.getExpandedTreeDepsAndLocal();
+		if (desc)
+		{
+		    if (item->isInTreesAndAtOrBelowPath(
+			    trees, bt.getRootPath()))
+		    {
+			QTC::TC("abuild", "Abuild-buildset add build-also by descdeptrees");
+			return true;
+		    }
+		}
+		else
+		{
+		    if (item->isInTrees(trees))
+		    {
+			QTC::TC("abuild", "Abuild-buildset add build-also by deptrees");
+			return true;
+		    }
+		}
+	    }
+	    else if (desc)
+	    {
+		if (item->isAtOrBelowPath(bt.getRootPath()))
+		{
+		    QTC::TC("abuild", "Abuild-buildset add build-also by tree desc");
+		    return true;
+		}
+	    }
+	    else
+	    {
+		if (item->isInTree(name))
+		{
+		    QTC::TC("abuild", "Abuild-buildset add build-also by tree name");
+		    return true;
+		}
+	    }
+	}
+	else
+	{
+	    assert(! with_tree_deps);
+	    BuildItem const& bi = *(builditems[name]);
+	    if (desc)
+	    {
+		if (item->isAtOrBelowPath(bi.getAbsolutePath()))
+		{
+		    QTC::TC("abuild", "Abuild-buildset add build-also by item desc");
+		    return true;
+		}
+	    }
+	    else
+	    {
+		if (item->getName() == name)
+		{
+		    QTC::TC("abuild", "Abuild-buildset add build-also by item name");
+		    return true;
+		}
+	    }
+	}
+
+    }
+
+    return false;
 }

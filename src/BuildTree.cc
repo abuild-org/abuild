@@ -77,6 +77,12 @@ BuildTree::getExpandedTreeDeps() const
 }
 
 std::set<std::string> const&
+BuildTree::getExpandedTreeDepsAndLocal() const
+{
+    return this->expanded_tree_deps_and_local;
+}
+
+std::set<std::string> const&
 BuildTree::getOptionalTreeDeps() const
 {
     return this->optional_tree_deps;
@@ -126,6 +132,10 @@ BuildTree::setExpandedTreeDeps(std::list<std::string> const& exp)
     {
 	this->expanded_tree_deps.pop_back();
     }
+    this->expanded_tree_deps_and_local.insert(
+	this->expanded_tree_deps.begin(),
+	this->expanded_tree_deps.end());
+    this->expanded_tree_deps_and_local.insert(this->name);
 }
 
 void

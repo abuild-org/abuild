@@ -29,6 +29,7 @@ class BuildTree
     std::set<std::string> const& getSupportedTraits() const;
     std::list<std::string> const& getPlugins() const;
     std::list<std::string> const& getExpandedTreeDeps() const;
+    std::set<std::string> const& getExpandedTreeDepsAndLocal() const;
     std::set<std::string> const& getOptionalTreeDeps() const;
     std::set<std::string> const& getOmittedTreeDeps() const;
 
@@ -50,6 +51,7 @@ class BuildTree
     FileLocation location;
     std::list<std::string> tree_deps;
     std::list<std::string> expanded_tree_deps;
+    std::set<std::string> expanded_tree_deps_and_local;
     std::set<std::string> optional_tree_deps;
     std::set<std::string> omitted_tree_deps;
     std::set<std::string> supported_traits;
