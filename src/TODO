@@ -44,7 +44,7 @@ Next
 
  * Consider implementing hierarchical platform types
 
- * (Implemented but not tested or documented): Expand build-also to
+ * (Implemented and tested but not documented): Expand build-also to
    make it possible to create arbitrarily complicated build sets
    combining the following:
 

@@ -761,12 +761,12 @@ ItemConfig::checkBuildAlso()
 	}
 	else if (boost::regex_match(arg, match, build_also_re))
 	{
-	    bool is_tree = match[0].matched && (match[0].str() == "tree");
+	    bool is_tree = match[1].matched && (match[1].str() == "tree");
 	    QTC::TC("abuild", "ItemConfig build_also item type",
 		    is_tree ? 0 :	   // tree
-		    match[0].matched ? 1 : // explicit item
+		    match[1].matched ? 1 : // explicit item
 		    2);			   // implicit item
-	    this->build_also.push_back(BuildAlso(arg, is_tree));
+	    this->build_also.push_back(BuildAlso(match[2].str(), is_tree));
 	}
 	else
 	{

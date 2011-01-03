@@ -3,6 +3,8 @@ abuild: ERROR: unable to find top of build forest containing "--topdir--/wrong-t
 --topdir--/wrong-tree/main/Abuild.backing:1: ERROR: unable to determine top of forest containing backing area "--topdir--/wrong-tree/junk"
 --topdir--/wrong-tree/backing/t1/Abuild.conf:1: ERROR: this tree may not declare item "i2" as a plugin because because its tree does not depend on "i2"'s tree ("t2")
 --topdir--/wrong-tree/backing/t1/Abuild.conf:1: ERROR: build item "i1" may not request build of build item "i2" because "i1"'s tree ("t1") does not depend on "i2"'s tree ("t2")
+--topdir--/wrong-tree/backing/t1/Abuild.conf:1: ERROR: build item "i1" may not request build of build tree "t2" because "i1"'s tree ("t1") does not depend on it
+--topdir--/wrong-tree/backing/t1/Abuild.conf:1: ERROR: i1 requests build of unknown build tree "missing"
 --topdir--/wrong-tree/backing/t1/Abuild.conf:1: ERROR: build item "i1" may not depend on build item "i2" because "i1"'s tree ("t1") does not depend on "i2"'s tree ("t2")
 --topdir--/wrong-tree/backing/t1/Abuild.conf:1: ERROR: build item "i1" may not refer by trait to build item "i2" because "i1"'s tree ("t1") does not depend on "i2"'s tree ("t2")
 --topdir--/wrong-tree/main/Abuild.backing:1: ERROR: item "i2" is marked for deletion, but it appears locally in this forest

@@ -6,7 +6,9 @@
 --topdir--/a/ab/Abuild.conf:1: ERROR: "external-dirs" may only appear in a root build item
 --topdir--/a/ab/Abuild.conf:1: ERROR: "plugins" may only appear in a root build item
 --topdir--/a/ab/Abuild.conf:1: ERROR: -optional is not preceded by a child directory
+--topdir--/a/ab/Abuild.conf:1: ERROR: build also option must follow a build also item or tree specification
 --topdir--/a/ab/Abuild.conf:1: ERROR: invalid build-also build item name !oops!
+--topdir--/a/ab/Abuild.conf:1: ERROR: invalid build_also option "-quack"
 --topdir--/a/ab/Abuild.conf:1: ERROR: -optional is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf:1: ERROR: flag -flag=moo is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf:1: ERROR: platform declaration -platform=oink is not preceded by a build item name
@@ -21,6 +23,7 @@
 --topdir--/a/ac/Abuild.conf:1: ERROR: file ended with continuation line
 --topdir--/a/ac/Abuild.conf:1: ERROR: "build-also" is not permitted for unnamed build items
 --topdir--/a/ac/Abuild.conf:1: ERROR: "deps" is not permitted for unnamed build items
+--topdir--/a/ac/Abuild.conf:1: ERROR: -with-tree-deps is valid only for non-tree build-also items
 --topdir--/a/ac/Abuild.conf:1: ERROR: the "serial" attribute may only be applied to items built with make
 --topdir--/a/ad/Abuild.conf:1: ERROR: "platform-types" is not permitted for unnamed build items
 --topdir--/a/ad/Abuild.conf:1: ERROR: "platform-types" may not appear if there are no build or interface files
@@ -67,7 +70,7 @@
 --topdir--/a/ab/Abuild.conf:1: ERROR: ab depends on unknown build item b.private
 --topdir--/c/ca/Abuild.conf:1: ERROR: ca depends on unknown build item cc
 --topdir--/c/cc/Abuild.conf:1: ERROR: cc.private depends on unknown build item cc
---topdir--/a/ab/Abuild.conf:1: ERROR: ab requests building of unknown build item does-not-exist
+--topdir--/a/ab/Abuild.conf:1: ERROR: ab requests building of unknown build item "does-not-exist"
 --topdir--/d/a/Abuild.conf:1: ERROR: d.a may not specify flag oink for dependency d.a.a because d.a.a does not support that flag
 --topdir--/a/ab/Abuild.conf:1: ERROR: trait trait1 refers to item b.private which is private to another scope
 --topdir--/a/ab/Abuild.conf:1: ERROR: trait trait1 refers to item b.private which does not exist

@@ -528,7 +528,7 @@ Abuild::dumpBuildAlso(bool trees,
 	bool with_tree_deps;
 	(*biter).getDetails(name, is_tree, desc, with_tree_deps);
 	assert(is_tree == trees);
-	o << "     <build-also name=\"" << name;
+	o << "     <build-also name=\"" << name << "\"";
 	if (! (is_tree || desc || with_tree_deps))
 	{
 	    // Add new attributes to condition here and to else block
@@ -558,7 +558,7 @@ Abuild::dumpBuildAlso(bool trees,
 		QTC::TC("abuild", "Abuild-dump build-also with-tree-deps");
 	    }
 	}
-	o << "\"/>" << std::endl;
+	o << "/>" << std::endl;
     }
     o << "    </" << tag << ">" << std::endl;
 }

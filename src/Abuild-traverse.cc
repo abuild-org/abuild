@@ -2209,8 +2209,8 @@ Abuild::checkBuildAlso(BuildForest& forest)
 		    QTC::TC("abuild", "Abuild-traverse ERR invalid build also tree");
 		    error(item_location,
 			  item_name +
-			  " requests build of unknown build tree " +
-			  other_item);
+			  " requests build of unknown build tree \"" +
+			  other_item + "\"");
 		}
 		else if (! checkAllowedTreeTree(
 			     forest, item, other_item,
@@ -2226,8 +2226,8 @@ Abuild::checkBuildAlso(BuildForest& forest)
 		    QTC::TC("abuild", "Abuild-traverse ERR invalid build also");
 		    error(item_location,
 			  item_name +
-			  " requests building of unknown build item " +
-			  other_item);
+			  " requests building of unknown build item \"" +
+			  other_item + "\"");
 		}
 		else if (! checkAllowedTreeItem(
 			     forest, item, *(builditems[other_item]),

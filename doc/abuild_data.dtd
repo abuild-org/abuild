@@ -217,8 +217,9 @@
 <!--  serial true if the item is declared to be serial; absent     -->
 <!--  otherwise.                                                   -->
 
-<!ELEMENT build-item (build-also-items?, declared-dependencies?,
-                      expanded-dependencies?, omitted-dependencies?,
+<!ELEMENT build-item (build-also-trees?, build-also-items?,
+                      declared-dependencies?, expanded-dependencies?,
+                      omitted-dependencies?,
                       platform-types?, buildable-platforms?,
                       supported-flags?, traits?)>
 <!ATTLIST build-item
@@ -234,14 +235,23 @@
   serial                  %boolean; #IMPLIED
 >
 
-<!--  build-also-items contains the list of build items named in   -->
-<!--  the build-also key.  Each item appears in a nested           -->
-<!--  build-also element.  There is no guarantee that the build    -->
-<!--  item has appeared.                                           -->
+<!--  build-also-trees and build-also-items contain the list of    -->
+<!--  build trees/items named in the build-also key.  Each item    -->
+<!--  appears in a nested build-also element.  There is no         -->
+<!--  guarantee that the build item has appeared.  Build-also      -->
+<!--  trees as well as the desc and with-tree-deps options were    -->
+<!--  added in abuild 1.1.4.  For clarity, is-tree="1" always      -->
+<!--  appears with build also trees, and for backward              -->
+<!--  compatibility, the attribute is omitted for build also       -->
+<!--  items.                                                       -->
 <!ELEMENT build-also-items (build-also+)>
+<!ELEMENT build-also-trees (build-also+)>
 <!ELEMENT build-also EMPTY>
 <!ATTLIST build-also
    name                   CDATA     #REQUIRED
+   is-tree                %boolean; "0"
+   desc                   %boolean; "0"
+   with-tree-deps         %boolean; "0"
 >
 
 <!--  declared-dependencies contains the list of direct            -->

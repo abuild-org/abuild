@@ -1,0 +1,138 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Copy;
+use File::Basename;
+
+require TestDriver;
+require abuild_test_utils;
+
+chdir("abuild-build-also") or die;
+
+my $td = new TestDriver("build-also");
+test_setup();
+
+my $top = get_top();
+my $filters = get_filters();
+
+# These tests test abuild's enhanced build-also keyword as introduced
+# in abuild 1.1.4.  We have a series of builder items that have
+# build-also keywords that do builds equivalent to building particular
+# build sets from particular locations.  The general structure of the
+# tests are to do the same build in two different ways and to make
+# sure the same items are visited.  We have the following directory
+# structure:
+#
+#  top
+#  |-- T1
+#  |   |-- A
+#  |   |   |-- B
+#  |   |   `-- C
+#  |   |-- T3
+#  |   |   `-- D
+#  |   `-- T4
+#  |-- T2
+#  |   |-- E
+#  |   |-- F
+#  |   `-- G
+#  `-- builders
+#      |-- b1
+#      |-- b2
+#      |-- b3
+#      |-- b4
+#      |-- b5
+#      |-- b6
+#      `-- b7
+#
+# The "builders" directory and the "T*" directories are trees, and the
+# remaining directories are regular items.  All the tree directories
+# are also items.  A global plugin provides a rule that just prints
+# the name of the build item as the build step.
+#
+# The following dependencies exist:
+#
+#   tree dependencies: { T3, builders } -> T1 -> { T2, T4 }
+#
+#   item dependencies: A -> E; D -> F
+#
+# Directory structure and dependencies are set up so that all the test
+# builds contain a different collection of items.  In particular:
+#
+#  * T3 is under T1, but T1 does not depend on T3.  This means T3 is
+#    part of desc from T1 but not part of deptrees or descdeptrees from
+#    T1.
+#
+#  * T4 is under T1, and T1 depends on T4.  This means that T4 is part
+#    of desc, deptrees, and descdeptrees from T1 but not part of local
+#    from T1.
+#
+#  * The builders tree has a tree dependency on T1 but not on T3.
+#    Although T3 is not in the expanded tree dependency path of
+#    builders, items in T3 can still build when added indirectly
+#    because of the build-also key.
+#
+#  * Item dependencies are all from things under T1 to things under T2
+#    to indicate dependencies causing things to be pulled in from other
+#    trees.
+#
+#  * Item G under T2 has no reverse dependencies; its absence from
+#    certain builds is important.
+#
+# Builds are run through a filter that generates the list of items
+# that were built in the order in which they were built.
+
+setup($td);
+
+my $abuild = 'abuild --output-prefix="  " --error-prefix="E "';
+
+cd("work/top");
+
+# Baseline: build all items
+run_build(".", "all", undef, "E F G T2 T4 A B C T1 D T3");
+
+# Basic buildset equilvalence
+run_build("T1/A", "current", "b1", "E A");
+run_build("T1/A", "desc", "b2", "E A B C");
+run_build("T1", "local", "b3", "E A B C T1");
+run_build("T1", "desc", "b4", "E F T4 A B C T1 D T3");
+run_build("T1", "deptrees", "b5", "E F G T2 T4 A B C T1");
+run_build("T1", "descdeptrees", "b6", "E T4 A B C T1");
+
+# Combinations of things
+run_build(undef, undef, "b7", "E F G T2 A B C T1");
+run_build(undef, undef, "b8", "E G A B C T1");
+
+validate_dump_data($td);
+
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+check_work_accessed($td);
+
+$td->report(18);
+
+sub run_build
+{
+    my ($dir, $buildset, $builder, $output) = @_;
+    if (defined $dir)
+    {
+	$td->runtest("build $buildset in $dir",
+		     {$td->COMMAND => "$abuild -C $dir -b $buildset",
+		      $td->FILTER => "perl $top/get-names.pl"},
+		     {$td->STRING => "$output\n", $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+    if (defined $builder)
+    {
+	$td->runtest("build $builder",
+		     {$td->COMMAND => "$abuild -b name:$builder",
+		      $td->FILTER => "perl $top/get-names.pl"},
+		     {$td->STRING => "$output\n", $td->EXIT_STATUS => 0},
+		     $td->NORMALIZE_NEWLINES);
+    }
+}
