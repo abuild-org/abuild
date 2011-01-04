@@ -18,8 +18,8 @@ BEFORE EACH RELEASE
 
  * make sure a real date has been included in the release notes
 
- * Update copyright notice, if needed, in this file, Abuild.cc, and
-   README.source-distribution.
+ * Update copyright notice, if needed, in this file, Abuild-init.cc,
+   LICENSE.txt, and README.source-distribution.
 
 Possible fop/stylesheet bugs (as of fop 1.0, stylesheets 1.73.2):
 
@@ -140,7 +140,7 @@ following checks:
    <firstname>Jay</firstname><surname>Berkenbilt</surname>
   </author>
   <copyright>
-   <year>2007-2010</year>
+   <year>2007-2011</year>
    <holder>Jay Berkenbilt, Argon ST</holder>
   </copyright>
   <legalnotice>

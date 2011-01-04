@@ -4,9 +4,10 @@ Abuild release checklist
 
  * Update copyright years in all files that contain a copyright if
    this is the first release of the calendar year.  Do a
-   case-insensitive search for "copyright".  Last update: 2010.
+   case-insensitive search for "copyright".  A list of files that
+   contain the copyright appears in manual.xml.  Last update: 2011.
 
- * Update version numbers in Abuild.cc and manual.xml
+ * Update version numbers in Abuild-init.cc and manual.xml
 
  * Update release date at top of manual.xml and also in the release
    notes section for the current release

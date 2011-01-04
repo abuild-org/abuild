@@ -154,7 +154,7 @@ Abuild::runInternal()
 	{
 	    l(this->whoami + " version " + ABUILD_VERSION);
 	    l("");
-	    l("Copyright (c) 2007-2010 Jay Berkenbilt, Argon ST");
+	    l("Copyright (c) 2007-2011 Jay Berkenbilt, Argon ST");
 	    l("This software may be distributed under the terms of version 2 of");
 	    l("the Artistic License which may be found in the source and binary");
 	    l("distributions.  It is provided \"as is\" without express or");
