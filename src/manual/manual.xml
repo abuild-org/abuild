@@ -19,7 +19,7 @@ BEFORE EACH RELEASE
  * make sure a real date has been included in the release notes
 
  * Update copyright notice, if needed, in this file, Abuild-init.cc,
-   LICENSE.txt, and README.source-distribution.
+   LICENSE.txt, README.source-distribution, and README.release.
 
 Possible fop/stylesheet bugs (as of fop 1.0, stylesheets 1.73.2):
 
