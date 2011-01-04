@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.3">
-<!ENTITY lastreleased "October 1, 2010">
+<!ENTITY swversion "1.1.4">
+<!ENTITY lastreleased "January 4, 2011">
 ]>
 <!--
 
@@ -3884,10 +3884,14 @@ C:\cygwin\cygwin.bat
      Starting with &abuild; version 1.0.3, it is possible to list
      other build items in the <property>build-also</property> key of
      any named build item's <filename>Abuild.conf</filename> file.
-     When &abuild; adds any build item to the build set, if that build
-     item has a <property>build-also</property> key, then any build
-     items listed there are also added to the build set.  The
-     operation of expanding initial build set membership using the
+     Starting with &abuild; version 1.1.4,
+     <property>build-also</property> keys can list entire trees and
+     also add options to include tree dependencies or other items at
+     or below the item's directory.  When &abuild; adds any build item
+     to the build set, if that build item has a
+     <property>build-also</property> key, then any build items listed
+     there are also added to the build set.  The operation of
+     expanding initial build set membership using the
      <property>build-also</property> key is applied iteratively until
      no more build items are added.  The principal intended use of
      this feature is to aid with setting up virtual
@@ -3895,9 +3899,92 @@ C:\cygwin\cygwin.bat
      consisted of multiple, independent subsystems and you wanted to
      build all of them, you could create a build item that lists the
      main items for each subsystem in a
-     <property>build-also</property> key.  In older versions of
-     &abuild; it was necessary to use dependencies for this purpose,
-     but this had several disadvantages, including the following:
+     <property>build-also</property> key.
+    </para>
+    <para>
+     Arguments to <property>build-also</property> may be as follows:
+     <variablelist>
+      <varlistentry>
+       <term>
+        [<literal>item:</literal>]<replaceable>item-name</replaceable> [<option>-desc</option>]
+       </term>
+       <listitem>
+        <para>
+         Add <replaceable>item-name</replaceable> to the build set.
+         The literal <literal>item:</literal> prefix may be omitted
+         for backward compatibility.
+        </para>
+        <para>
+         If the <option>-desc</option> option is given, all items at
+         or below the directory containing
+         <replaceable>item-name</replaceable> are also added to the
+         build set.  This is equivalent to running <command>abuild
+         --build=desc</command> from
+         <replaceable>item-name</replaceable>'s directory.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>
+        <literal>tree:</literal><replaceable>tree-name</replaceable>
+        [<option>-desc</option>]
+        [<option>-with-tree-deps</option>]
+       </term>
+       <listitem>
+        <para>
+         If
+         <literal>tree:</literal><replaceable>tree-name</replaceable>
+         is specified by itself, all items in the build tree named
+         <replaceable>tree-name</replaceable> are added to the build
+         set.  This is equivalent to running <command>abuild
+         --build=local</command> somewhere in that tree.
+        </para>
+        <para>
+         If <option>-desc</option> appears as an option by itself, all
+         items at or below the directory containing the root of
+         <replaceable>tree-name</replaceable> are added to the build
+         set.  This is equivalent to running <command>abuild
+         --build=desc</command> from the directory containing the root
+         of the tree.
+        </para>
+        <para>
+         If <option>-with-tree-deps</option> appears as an option by
+         itself, all items in all trees that
+         <replaceable>tree-name</replaceable> specifies as tree
+         dependencies are added to the build set in addition to all
+         items in <replaceable>tree-name</replaceable> itself.  This
+         is equivalent to running <command>abuild
+         --build=deptrees</command> somewhere in that tree.
+        </para>
+        <para>
+         If <option>-with-tree-deps</option> and
+         <option>-desc</option> are both specified, the result is to
+         add the items that are in the
+         <emphasis>intersection</emphasis> of the two options
+         specified individually.  In other words, all items that are
+         in any dependent tree <emphasis>and</emphasis> are at or
+         below the directory containing the root of the tree are added
+         to the build set.  This is equivalent to running
+         <command>abuild --build=descdeptrees</command> at the root of
+         the build tree.  Note that if you want the
+         <emphasis>union</emphasis> of <option>-desc</option> and
+         <option>-with-tree-deps</option> instead of the intersection,
+         you simply have to specify both
+         <literal>tree:</literal><replaceable>tree-name</replaceable>
+         <option>-desc</option> and
+         <literal>tree:</literal><replaceable>tree-name</replaceable>
+         <option>-with-tree-deps</option> in the
+         <property>build-also</property> key.
+        </para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </para>
+    <para>
+     In older versions of &abuild;, the only way to force building of
+     one build item to build another item was to declare dependencies
+     or tree dependencies.  This had several disadvantages, including
+     the following:
      <itemizedlist>
       <listitem>
        <para>
@@ -14642,6 +14729,8 @@ flag private INCLUDES = private-include
 
       <programlisting>platform-type <replaceable>new-platform-type</replaceable>
 </programlisting>
+      Platform type names may contain only alphanumeric characters,
+      underscores, and dashes.
      </para>
     </sect2>
     <sect2 id="ref.adding-platforms">
@@ -17063,6 +17152,48 @@ Y = $(X)
 
  end template -->
 
+    <varlistentry>
+     <term>1.1.4: January 4, 2011</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Enhancements
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <property>build-also</property> key has been enhanced
+           to allow specification of trees to build in addition to
+           items.  It also allows options to be added to the
+           <property>build-also</property> items to further refine
+           what is built.  The result is that anything can be built
+           from the command-line using build sets (except for the
+           regular expression pattern build set), and more, can now be
+           specified in a <property>build-also</property> key.  This
+           enables much greater flexibility in creating project-level
+           top-level build items.  For details, see <xref
+           linkend="ref.build-also"/>.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         Miscellaneous Changes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           Minor tweaks were made to &abuild;'s code and test suite to
+           enable it to be built with Visual C++ 2010 and boost 1.43.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
     <varlistentry>
      <term>1.1.3: October 1, 2010</term>
      <listitem>

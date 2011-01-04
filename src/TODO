@@ -5,13 +5,7 @@ Next
    on platform X, treat this as a failure of B on X so that it doesn't
    impact the build more broadly.
 
- * Release notes: mention that abuild has been tested with MSVC 2010;
-   test suite changes were required because of differences in the
-   newer MSVC, and one code change was required to work around an
-   issue with MSVC 2010, but no functionality changes were needed.
-
- * Make sure documentation spells out (in human-readable terms) that
-   platform type names must conform to [a-zA-Z0-9_-]+.
+ * Consider implementing hierarchical platform types
 
  * It would be nice if there were a way to say build only on specific
    platform types (or skip all but some platform type), so you could
@@ -41,29 +35,6 @@ Next
    care that the actual order may not match the prefix and to just
    always use the prefix as k and not care that they come out of
    order.
-
- * Consider implementing hierarchical platform types
-
- * (Implemented and tested but not documented): Expand build-also to
-   make it possible to create arbitrarily complicated build sets
-   combining the following:
-
-    - item-name (or item:item-name) [ -desc ] -- build the named item
-      (analogous to a regular item build and the only option available
-      prior to 1.1.4).  If -desc is given, build all items at or below
-      the named item's path (analogous to -b desc from that item's
-      directory).
-
-    - tree:tree-name [ -with-tree-deps -desc ] -- build all items in
-      the named tree (analogous to -b local from that tree).  With
-      -desc alone, build all items at or below the path of the tree's
-      root (analogous to -b desc from the tree's root).  With
-      -with-dep-trees alone, build all items in the tree dependencies
-      of all specified trees (analogous to -b deptrees from the tree).
-      With -desc and -with-dep-trees, build all items that are at or
-      below the path of the tree's root AND in the tree or one of its
-      tree dependencies (analogous to -b descdeptrees from the tree's
-      root).
 
 Abuild Lint
 ===========
