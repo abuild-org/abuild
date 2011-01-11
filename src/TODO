@@ -1,9 +1,3 @@
-1.1.4
-=====
-
- * Windows test run fails coverage on "Abuild-init windows nl in
-   list_platforms 0".
-
 Next
 ====
 
