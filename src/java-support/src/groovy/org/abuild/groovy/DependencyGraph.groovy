@@ -18,14 +18,14 @@ class DependencyGraph
     // order to get cause proper assertions to be called.
 
     // Data for the normal case.  item -> [item, ...]
-    private final dependencies = [:]
-    private final sortedDependencies = [:]
-    private final reverseDependencies = [:]
+    private dependencies = [:]
+    private sortedDependencies = [:]
+    private reverseDependencies = [:]
 
     // [item, ...]
-    final sortedGraph = []
+    def sortedGraph = []
     // item -> order
-    final itemOrder = [:]
+    def itemOrder = [:]
 
     // Error data -- these are empty if there were no errors.
     // Otherwise, they are initialized after check() has been called.
@@ -33,8 +33,8 @@ class DependencyGraph
     // depend on.  Each element of "cycles" is a list of elements that
     // form a cyclic dependency.  The first item in the cycle is
     // always the one that is lexically earliest.
-    private final unknowns = [:]
-    private final cycles = []
+    private unknowns = [:]
+    private cycles = []
 
     // Initialization: first add an item, then add its dependencies.
     // These functions may not be called after check() has been

@@ -56,7 +56,8 @@ ant.javac('deprecation': 'yes',
           'classpath': antJar,
           'srcdir': srcDir.absolutePath,
           'source': '1.5',
-          'target': '1.5')
+          'target': '1.5',
+          'includeantruntime': 'true')
 {
     compilerarg('value': '-Xlint')
 }
