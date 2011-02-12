@@ -64,14 +64,17 @@ static int run(int argc, char* argv[], char* envp[])
     if ((argc == 2) && (strcmp(argv[1], "-win32") == 0))
     {
 	std::string cwd = Util::getCurrentDirectory();
-	std::string batfile = cwd + "/hello.bat";
+	std::string batfile = cwd + "/hello"; // no explicit suffix
 	std::vector<std::string> args;
 	args.push_back("hello");
 	args.push_back("MOO");
 	std::map<std::string, std::string> env;
 	env["VAR"] = "potato";
 	bool status = pi.runProgram(batfile, args, env, false, ".");
-	std::cout << "status: " << status << std::endl << std::endl;
+	std::cout << "status: " << status << std::endl;
+	env["VAR"] = "salad";
+	bool status = pi.runProgram(batfile + ".bat", args, env, false, ".");
+	std::cout << "status: " << status << std::endl;
     }
     else if ((argc > 2) && (strcmp(argv[1], "-handle-output") == 0))
     {
