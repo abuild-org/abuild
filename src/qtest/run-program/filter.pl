@@ -10,7 +10,6 @@ if ($top =~ m,^(.:/),)
 
 my $will_filter = 0;
 my $filtering_env = 0;
-my $printing_env = 0;
 my $got_more = 0;
 
 while (<>)
@@ -21,36 +20,30 @@ while (<>)
     {
 	$will_filter = 1;
     }
-    if ($will_filter)
-    {
-	if (m/^env:/)
-	{
-	    $printing_env = 5;
-	    $filtering_env = 1;
-	}
-    }
     # Unconditionally filter protected variables
     next if m/LD_LIBRARY_PATH=/;
     next if m/SYSTEMROOT=/;
+    my $suppress = 0;
     if ($filtering_env)
     {
-	if ($printing_env)
+	if (m/^done/)
 	{
-	    --$printing_env;
-	}
-	elsif (m/^done/)
-	{
+	    print "  <other vars>\n" if $got_more;
 	    $filtering_env = 0;
+	    $got_more = 0;
 	}
-    }
-    if ($filtering_env && (! $printing_env))
-    {
-	if (! $got_more)
+	elsif (! m/:qww:/)
 	{
-	    $got_more = 1;
-	    print "  <other vars>\n";
+	    if ((! $got_more) && (m/=/))
+	    {
+		$got_more = 1;
+	    }
+	    $suppress = 1;
 	}
-	next;
     }
-    print;
+    elsif ($will_filter && (m/^env:/))
+    {
+	$filtering_env = 1;
+    }
+    print unless $suppress;
 }

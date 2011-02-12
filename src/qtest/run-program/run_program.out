@@ -6,9 +6,9 @@ args:
   one "two three
   four
 env:
-  MOO=quack
-  OINK=spackle
-  VAR=potato
+  MOO=:qww:quack
+  OINK=:qww:spackle
+  VAR=:qww:potato
 done
 status: 0
 
@@ -20,9 +20,9 @@ args:
   one "two three
   four
 env:
-  MOO=quack
-  OINK=spackle
-  VAR=potato
+  MOO=:qww:quack
+  OINK=:qww:spackle
+  VAR=:qww:potato
   <other vars>
 done
 status: 1

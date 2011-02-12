@@ -141,9 +141,9 @@ static int run(int argc, char* argv[], char* envp[])
 	args.push_back("four");
 
 	std::map<std::string, std::string> env;
-	env["VAR"] = "potato";
-	env["MOO"] = "quack";
-	env["OINK"] = "spackle";
+	env["VAR"] = ":qww:potato";
+	env["MOO"] = ":qww:quack";
+	env["OINK"] = ":qww:spackle";
 
 	for (std::map<std::string, std::string>::iterator iter =
 		 save_environment.begin();
