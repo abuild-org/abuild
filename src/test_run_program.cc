@@ -73,7 +73,7 @@ static int run(int argc, char* argv[], char* envp[])
 	bool status = pi.runProgram(batfile, args, env, false, ".");
 	std::cout << "status: " << status << std::endl;
 	env["VAR"] = "salad";
-	bool status = pi.runProgram(batfile + ".bat", args, env, false, ".");
+	status = pi.runProgram(batfile + ".bat", args, env, false, ".");
 	std::cout << "status: " << status << std::endl;
     }
     else if ((argc > 2) && (strcmp(argv[1], "-handle-output") == 0))
