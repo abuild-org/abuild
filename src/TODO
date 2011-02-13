@@ -431,6 +431,13 @@ Issues, Enhancement Ideas
 
 See also "Known Limitations" in the documentation.
 
+ * ../../misc/boost-process contains an implementation of
+   ProcessHandler that uses the Boost.Process library.  This library
+   was a candidate for inclusion in boost as of February, 2011.
+   Consider switching to the Boost.Process implementation if it is
+   accepted into boost and we are ready to move up the minimum boost
+   version requirement.
+
  * Think about implementing a dependency analyzer that would look at
    first-level includes to figure out what the correct list of direct
    dependencies should be.
