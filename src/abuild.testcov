@@ -173,7 +173,7 @@ Abuild-build A:p -> B:p 1
 Abuild-init ABUILD_PLATFORM_SELECTORS 0
 Abuild-init ERR invalid platform selector 0
 PlatformSelector option 1
-PlatformSelector skip 0
+PlatformSelector skip 1
 PlatformSelector all 0
 PlatformSelector platform 4 0
 PlatformSelector platform 5 0

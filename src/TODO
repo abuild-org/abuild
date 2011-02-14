@@ -7,10 +7,8 @@ Next
 
  * Consider implementing hierarchical platform types
 
- * It would be nice if there were a way to say build only on specific
-   platform types (or skip all but some platform type), so you could
-   do a build of only indep and java, for example, without having to
-   enumerate all the possible platform types to skip.
+ * Test, update release notes: -p skip is now valid and suppresses all
+   object code platform selections.
 
  * Some kind of progress report during a large build might be nice.
    This is especially tempting with the numbered prefixes in a -jn

@@ -94,15 +94,9 @@ PlatformSelector::initialize(std::string const& str)
     std::string selector = match[2].str();
     if (selector == "skip")
     {
-	if (this->platform_type == ANY)
-	{
-	    okay = false;
-	}
-	else
-	{
-	    QTC::TC("abuild", "PlatformSelector skip");
-	    this->skip = true;
-	}
+	QTC::TC("abuild", "PlatformSelector skip",
+		(this->platform_type == ANY) ? 0 : 1);
+	this->skip = true;
     }
     else if (selector == "default")
     {
