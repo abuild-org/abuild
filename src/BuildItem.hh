@@ -56,6 +56,8 @@ class BuildItem
     std::string const& getPlatformType(std::string const& platform) const;
     std::set<std::string> getBuildablePlatforms() const;
     std::set<std::string> const& getBuildPlatforms() const;
+    std::vector<std::string> const& getCompatiblePlatformTypes(
+	std::string const& platform) const;
     std::string getBestPlatformForType(std::string platform_type,
 				       PlatformSelector const*) const;
     TargetType::target_type_e getTargetType() const;
@@ -80,6 +82,9 @@ class BuildItem
 	std::vector<std::string> const& buildable_platforms);
     void setBuildablePlatforms(std::set<std::string> const&);
     void setBuildPlatforms(std::set<std::string> const&);
+    void setCompatiblePlatformTypes(
+	std::string const& platform_type,
+	std::vector<std::string> const& compatible_platform_types);
     void addBuildPlatform(std::string const&);
 
     // Note: if last item of passed-in list of expanded dependencies
@@ -109,6 +114,7 @@ class BuildItem
     std::string forest_root;	      // containing forest
     unsigned int backing_depth;	      // 0 in local build tree and externals
     pt_map platform_types;	      // platform types and associated platforms
+    std::map<std::string, std::vector<std::string> > compatible_platform_types;
     std::map<std::string, std::string> platform_to_type;
     std::set<std::string> build_platforms; // platforms we will build on
     std::list<std::string> expanded_dependencies; // recursively expanded

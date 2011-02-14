@@ -506,10 +506,35 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    }
 	    else if (dep_type == TargetType::tt_platform_independent)
 	    {
-		// XXX Allow any item to depend on a
-		// platform-independent item
-		QTC::TC("abuild", "Abuild-build found compatible platform");
+		// Allow any item, even of type all, to depend on a
+		// platform-independent item.  This is responsible for
+		// the special case of items that depend on
+		// pass-through items always getting any indep
+		// dependencies in addition to any other matches.  I'm
+		// not sure whether that's really correct behavior,
+		// but that's how abuild has been working since the
+		// beginning.
+		QTC::TC("abuild", "Abuild-build item -> indep");
 		dep_platform = PlatformData::PLATFORM_INDEP;
+	    }
+	    else if (item_type != TargetType::tt_all)
+	    {
+		// See if the dependency item can be built on any
+		// compatible platform type.
+		std::vector<std::string> const& compatible_types =
+		    item.getCompatiblePlatformTypes(item_platform);
+		for (std::vector<std::string>::const_iterator citer =
+			 compatible_types.begin();
+		     citer != compatible_types.end();
+		     ++citer)
+		{
+		    dep_platform = dep_item.getBestPlatformForType(*citer, 0);
+		    if (! dep_platform.empty())
+		    {
+			QTC::TC("abuild", "Abuild-build found compatible platform");
+			break;
+		    }
+		}
 	    }
 
 	    if (! dep_platform.empty())

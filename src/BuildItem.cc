@@ -260,6 +260,16 @@ BuildItem::getBuildablePlatforms() const
     return result;
 }
 
+std::vector<std::string> const&
+BuildItem::getCompatiblePlatformTypes(std::string const& platform) const
+{
+    assert(this->target_type != TargetType::tt_all);
+    std::string const& pt = getPlatformType(platform);
+    assert(! pt.empty());
+    assert(this->compatible_platform_types.count(pt));
+    return (*(this->compatible_platform_types.find(pt))).second;
+}
+
 std::string
 BuildItem::getBestPlatformForType(std::string platform_type,
 				  PlatformSelector const* ps) const
@@ -460,6 +470,14 @@ void
 BuildItem::setBuildPlatforms(std::set<std::string> const& platforms)
 {
     this->build_platforms = platforms;
+}
+
+void
+BuildItem::setCompatiblePlatformTypes(
+    std::string const& platform_type,
+    std::vector<std::string> const& compatible_types)
+{
+    this->compatible_platform_types[platform_type] = compatible_types;
 }
 
 void

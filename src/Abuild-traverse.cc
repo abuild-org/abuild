@@ -2813,6 +2813,12 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 		    }
 		}
 		item.setBuildablePlatforms(platform_type, buildable_platforms);
+
+		// Set list of compatible platform types for this
+		// platform type.
+		item.setCompatiblePlatformTypes(
+		    platform_type,
+		    platform_data.getCompatiblePlatformTypes(platform_type));
 	    }
         }
         item.setBuildPlatforms(build_platforms);

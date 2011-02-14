@@ -31,13 +31,12 @@ PlatformData::PlatformData() :
 
 void
 PlatformData::addPlatformType(std::string const& platform_type,
-			      TargetType::target_type_e target_type)
+			      TargetType::target_type_e target_type,
+			      std::string const& parent_platform_type)
 {
     this->checked = false;
 
-    if ((! this->initializing) &&
-	((target_type == TargetType::tt_all) ||
-	 (target_type == TargetType::tt_platform_independent)))
+    if (! (this->initializing || (target_type == TargetType::tt_object_code)))
     {
 	throw QEXC::General("platform types may not be added to target type " +
 			    TargetType::getName(target_type));
@@ -52,6 +51,34 @@ PlatformData::addPlatformType(std::string const& platform_type,
     std::string pt_item = PLATFORM_TYPE_PREFIX + platform_type;
 
     this->platform_graph.addItem(pt_item);
+
+    if (! parent_platform_type.empty())
+    {
+	// target_type can only be other than object code during
+	// initialization, and we don't pass any parent platform types
+	// during initialization.
+	assert(target_type == TargetType::tt_object_code);
+
+	if (this->target_types.count(parent_platform_type) == 0)
+	{
+	    QTC::TC("abuild", "PlatformData ERR unknown parent");
+	    throw QEXC::General("platform type " + platform_type +
+				" has unknown parent type " +
+				parent_platform_type);
+	}
+	if (this->target_types[parent_platform_type] !=
+	    TargetType::tt_object_code)
+	{
+	    QTC::TC("abuild", "PlatformData ERR non-object-code parent");
+	    throw QEXC::General(
+		"platform type " + platform_type +
+		" has parent type " + parent_platform_type +
+		" that is not in target type " +
+		TargetType::getName(TargetType::tt_object_code));
+	}
+	std::string ptp_item = PLATFORM_TYPE_PREFIX + parent_platform_type;
+	this->platform_graph.addDependency(pt_item, ptp_item);
+    }
 }
 
 void
@@ -140,6 +167,7 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors,
     // If everything is okay, initialize platforms_by_type
     this->platforms_by_type.clear();
     boost::regex platform_re(PLATFORM_PREFIX + "(\\S+)");
+    boost::regex platform_type_re(PLATFORM_TYPE_PREFIX + "(\\S+)");
     boost::smatch match;
 
     for (std::map<std::string, TargetType::target_type_e>::const_iterator iter =
@@ -175,9 +203,8 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors,
 	    this->platforms_by_type[platform_type];
 
 	std::list<std::string> deps =
-	    this->platform_graph.getSortedDependencies(
+	    this->platform_graph.getDirectDependencies(
 		PLATFORM_TYPE_PREFIX + platform_type);
-	deps.pop_back();
 	for (std::list<std::string>::iterator dep_iter = deps.begin();
 	     dep_iter != deps.end(); ++dep_iter)
 	{
@@ -185,6 +212,21 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors,
 	    {
 		std::string const& platform = match[1].str();
 		platforms.push_back(std::make_pair(platform, false));
+	    }
+	}
+
+	std::list<std::string> sdeps =
+	    this->platform_graph.getSortedDependencies(
+		PLATFORM_TYPE_PREFIX + platform_type);
+	sdeps.pop_back();
+	compatible_platform_types[platform_type].empty(); // force to exist
+	for (std::list<std::string>::iterator dep_iter = sdeps.begin();
+	     dep_iter != sdeps.end(); ++dep_iter)
+	{
+	    if (boost::regex_match(*dep_iter, match, platform_type_re))
+	    {
+		std::string const& dep_type = match[1].str();
+		compatible_platform_types[platform_type].push_back(dep_type);
 	    }
 	}
 
@@ -290,6 +332,15 @@ PlatformData::getPlatformsByType(std::string const& platform_type) const
 {
     assert(isPlatformTypeValid(platform_type));
     return (*(this->platforms_by_type.find(platform_type))).second;
+}
+
+std::vector<std::string> const&
+PlatformData::getCompatiblePlatformTypes(
+    std::string const& platform_type) const
+{
+    assert(isPlatformTypeValid(platform_type));
+    assert(this->compatible_platform_types.count(platform_type));
+    return (*(this->compatible_platform_types.find(platform_type))).second;
 }
 
 std::set<std::string>

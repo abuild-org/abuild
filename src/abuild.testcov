@@ -167,9 +167,9 @@ Abuild-traverse ERR all with ptype deps 0
 Abuild-traverse ERR dep ptype indep 0
 Abuild-build ERR no override platform 0
 Abuild-build ignoring all's dep without platform 0
-Abuild-build item -> indep 1
+Abuild-build item -> indep 0
 Abuild-build override platform 0
-Abuild-build A:p -> B:p 1
+Abuild-build A:p -> B:p 0
 Abuild-init ABUILD_PLATFORM_SELECTORS 0
 Abuild-init ERR invalid platform selector 0
 PlatformSelector option 1
@@ -346,7 +346,7 @@ Abuild-traverse backing area points below root 0
 Abuild-init no_deps 0
 Abuild-init build current by default 0
 Abuild-init clean from output directory 0
-Abuild-build as-needed platform selection 1
+Abuild-build as-needed platform selection 0
 Abuild-build platform dependency with selector 0
 Abuild-build specific platform selector 0
 Abuild-build default platform selector 0
@@ -451,3 +451,6 @@ Abuild-buildset add build-also by tree name 0
 Abuild-buildset add build-also by descdeptrees 0
 Abuild-buildset add build-also by deptrees 0
 Abuild-buildset add build-also by tree desc 0
+PlatformData ERR non-object-code parent 0
+PlatformData ERR unknown parent 0
+Abuild-build found compatible platform 0
