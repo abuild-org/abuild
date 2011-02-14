@@ -1,0 +1,8 @@
+abuild: build starting
+abuild: indep2 (abuild-indep): no-op
+abuild: java1 (abuild-java): no-op
+abuild: native2 (abuild-<native>): no-op
+abuild: other2 (abuild-zz_os.cpu.toolset.other): no-op
+abuild: java2 (abuild-java): no-op
+abuild: java3 (abuild-java): no-op
+abuild: build complete

@@ -16,3 +16,15 @@ work/case4/d/Abuild.mk
 work/case4/e/Abuild.mk
 work/case4/item/Abuild.mk
 work/case4/java/Abuild.mk
+work/case6/indep1/Abuild.mk
+work/case6/indep2/Abuild.mk
+work/case6/indep3/Abuild.mk
+work/case6/java1/Abuild.mk
+work/case6/java2/Abuild.mk
+work/case6/java3/Abuild.mk
+work/case6/native1/Abuild.mk
+work/case6/native2/Abuild.mk
+work/case6/native3/Abuild.mk
+work/case6/other1/Abuild.mk
+work/case6/other2/Abuild.mk
+work/case6/other3/Abuild.mk

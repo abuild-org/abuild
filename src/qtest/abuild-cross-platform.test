@@ -210,6 +210,30 @@ $td->runtest("list_platforms --native-data",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/case6");
+
+foreach my $d (['none', 'none', ''],
+	       ['native-skip', 'skip native', '-p native:skip'],
+	       ['object-code-skip', 'skip object code', '-p skip'],
+	       ['object-code-java-skip', 'skip java and object code',
+		'-p skip -p java:skip'],
+	       ['object-code-indep-skip', 'skip indep and object code',
+		'-p skip -p indep:skip'],
+	       ['java-indep-skip', 'skip java and indep',
+		'-p java:skip -p indep:skip'],
+	       ['all-skip', 'skip everything',
+		'-p java:skip -p indep:skip -p skip'],
+	       )
+{
+    my ($out, $description, $selectors) = @$d;
+    $td->runtest($description,
+		 {$td->COMMAND => "abuild -b all $selectors no-op",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->FILE => "$top/case6.$out.out",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(31);
+$td->report(38);

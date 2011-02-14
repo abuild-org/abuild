@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+require 5.008;
+BEGIN { $^W = 1; }
+use strict;
+
+# Use zz_os as the os field so that it sorts last no matter what the
+# native platform is.  This is needed for consistent test suite
+# output.
+foreach my $o (".release", ".debug", "")
+{
+    print "platform zz_os.cpu.toolset.other$o -type other\n";
+}

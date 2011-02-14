@@ -1,0 +1,8 @@
+abuild: build starting
+abuild: native1 (abuild-<native>): no-op
+abuild: native2 (abuild-<native>): no-op
+abuild: native3 (abuild-<native>): no-op
+abuild: other1 (abuild-zz_os.cpu.toolset.other): no-op
+abuild: other2 (abuild-zz_os.cpu.toolset.other): no-op
+abuild: other3 (abuild-zz_os.cpu.toolset.other): no-op
+abuild: build complete
