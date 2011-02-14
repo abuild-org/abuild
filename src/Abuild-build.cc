@@ -341,7 +341,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     // empty, they do not explicitly maintain a "buildable" platform
     // list; they could be "built" on any platform.  The "build"
     // platform list for items of type "all" is simply the union of
-    // the build sets of all their reverse dependencies.
+    // the build platform lists of all their reverse dependencies.
 
     // The logic of setting up the build graph is quite subtle, and
     // although the code itself is fairly simple, there are actually
@@ -362,8 +362,9 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     //    with platform type pt, A must not have target type "all",
     //    and B must have pt as one of its platform types.  In this
     //    case, p2 is the highest priority platform in pt that appears
-    //    in B's buildable platform list.  If there are no matching
-    //    platforms, it is an error.
+    //    in B's buildable platform list subject to any qualifications
+    //    in the platform selector in the dependency declaration.  If
+    //    there are no matching platforms, it is an error.
 
     // Ordinarily, for each possible A:p1, if there is no suitable p2
     // in B to create the dependency link, it is an error.  There is
@@ -404,6 +405,13 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    dep_item.getBuildablePlatforms();
 	PlatformSelector const* ps = 0;
 	std::string const& dep_platform_type = item.getDepPlatformType(dep, ps);
+
+	// XXXp Maybe if dep platform type is empty, this is where we
+	// check for parent platform types.  If A depends on B and A
+	// builds on platform type t1 and B does not build on t1 but
+	// does build on an ancestor of t1, treat this as if there
+	// were a platform-specific dependency and resolve in the same
+	// way.
 
 	std::string override_platform;
 	if (! dep_platform_type.empty())
@@ -471,6 +479,9 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    std::string platform_item =
 		createBuildGraphNode(item_name, item_platform);
 
+	    // XXXp handle hierarchical types here?  indep should not
+	    // have to be a special case.  It should end up as the
+	    // override type instead.
 	    if (dep_type == TargetType::tt_platform_independent)
 	    {
 		// Allow any item to depend on a platform-independent

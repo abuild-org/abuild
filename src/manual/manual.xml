@@ -13025,21 +13025,25 @@ flag private INCLUDES = private-include
      </itemizedlist>
     </para>
     <para>
-     The special <type>skip</type> selector removes all platforms from
-     the type and is not valid without a platform-type qualifier.
-     When it is used, no platforms from that platform type are
-     selected by default, so no builds will be done in that platform
-     type except when needed to satisfy a platform-specific
-     dependency.  This could be useful if you only wanted to do
-     embedded builds, for example.  This is the only selector that can
-     be used with the <type>indep</type> or <type>java</type> platform
-     types.
+     The special <type>skip</type> selector prevents automatic
+     selection of any platforms from the type.  When it is used, no
+     platforms from that platform type are selected by default, so no
+     builds will be done in that platform type except when needed to
+     satisfy a platform-specific dependency.  This could be useful if
+     you only wanted to do embedded builds, for example.  This is the
+     only selector that can be used with the <type>indep</type> or
+     <type>java</type> platform types.  Starting with &abuild; 1.1.4,
+     it is valid to specify <type>skip</type> without a platform type
+     qualifier, which will suppress any default platform selection for
+     any object code platform type.  This could be used to build only
+     <type>indep</type> and <type>java</type>.
     </para>
     <para>
      The <type>default</type> selector means to select whichever
      platform would be selected if no platform specifier were given.
-     This is useful to direct &abuild; to use the default for a given
-     platform type when a general specifier was used.
+     It must be used with a platform type qualifier.  This is useful
+     to direct &abuild; to use the default for a given platform type
+     when a general specifier was used.
     </para>
     <para>
      The other selectors are translated into an (<type>os</type>,

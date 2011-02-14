@@ -72,7 +72,7 @@ PlatformData::addPlatform(std::string const& platform,
     // inserted as long as we get monotonically increasing platform
     // priority numbers.  Later additions take precedence over earlier
     // additions, so higher numbers are higher priority.  If the
-    // platform was declared as low priority, make it a more engative
+    // platform was declared as low priority, make it a more negative
     // number than any previous declaration.
     int n = this->platform_declaration.size();
     this->platform_declaration[platform] = (lowpri ? -n : n);
