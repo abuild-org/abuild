@@ -2518,6 +2518,8 @@ Abuild::checkDependencyPlatformTypes(BuildForest& forest)
 	    if (ps)
 	    {
 		dep_platform_type = ps->getPlatformType();
+		// ItemConfig precludes dep_platform_type being ANY
+		assert(dep_platform_type != PlatformSelector::ANY);
 	    }
 	    has_any_dep_platform_types = true;
 	    // Ensure that the dependency has this platform type
