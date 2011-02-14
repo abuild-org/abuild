@@ -406,13 +406,6 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	PlatformSelector const* ps = 0;
 	std::string const& dep_platform_type = item.getDepPlatformType(dep, ps);
 
-	// XXXp Maybe if dep platform type is empty, this is where we
-	// check for parent platform types.  If A depends on B and A
-	// builds on platform type t1 and B does not build on t1 but
-	// does build on an ancestor of t1, treat this as if there
-	// were a platform-specific dependency and resolve in the same
-	// way.
-
 	std::string override_platform;
 	if (! dep_platform_type.empty())
 	{
@@ -479,53 +472,52 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    std::string platform_item =
 		createBuildGraphNode(item_name, item_platform);
 
-	    // XXXp handle hierarchical types here?  indep should not
-	    // have to be a special case.  It should end up as the
-	    // override type instead.
-	    if (dep_type == TargetType::tt_platform_independent)
-	    {
-		// Allow any item to depend on a platform-independent
-		// item
-		QTC::TC("abuild", "Abuild-build item -> indep",
-			((item_platform == PlatformData::PLATFORM_INDEP)
-			 ? 0 : 1));
-		this->build_graph.addDependency(
-		    platform_item, createBuildGraphNode(
-			dep, PlatformData::PLATFORM_INDEP));
-	    }
-	    else if (! override_platform.empty())
+	    std::string dep_platform;
+	    if (! override_platform.empty())
 	    {
 		// If an override platform is available (a specific
 		// platform type was declared on this dependency),
 		// create a dependency on that specific platform.
 		QTC::TC("abuild", "Abuild-build override platform");
-		dep_item.addBuildPlatform(override_platform);
-		this->build_graph.addDependency(
-		    platform_item, createBuildGraphNode(
-			dep, override_platform));
+		dep_platform = override_platform;
 	    }
-	    else if ((dep_type == TargetType::tt_all) ||
-		     (dep_platforms.count(item_platform)))
+	    else if (dep_platforms.count(item_platform))
 	    {
-		// If the dependency is buildable on the current
-		// platform, create a link from the item on this
-		// platform to the dependency on the same platform.
-		// Note that if the dependency is of type "all", it
-		// implicitly is buildable on all platforms.  We
-		// explicitly add the platform to the dependency's
-		// build platform list.  This is how as-needed
-		// platform selection happens.
-		QTC::TC("abuild", "Abuild-build A:p -> B:p",
-			((dep_type == TargetType::tt_all) ? 0 : 1));
+		// If the dependency is already buildable on the
+		// current platform, create a link from the item on
+		// this platform to the dependency on the same
+		// platform.
+		QTC::TC("abuild", "Abuild-build A:p -> B:p");
+		dep_platform = item_platform;
+	    }
+	    else if (dep_type == TargetType::tt_all)
+	    {
+		// If the dependency is of type "all", it implicitly
+		// is buildable on all platforms.  We explicitly add
+		// the platform to the dependency's build platform
+		// list.  This is how as-needed platform selection
+		// happens.
 		if (dep_item.getBuildPlatforms().count(item_platform) == 0)
 		{
-		    QTC::TC("abuild", "Abuild-build as-needed platform selection",
-			    ((dep_type == TargetType::tt_all) ? 0 : 1));
+		    QTC::TC("abuild", "Abuild-build as-needed platform selection");
 		    dep_item.addBuildPlatform(item_platform);
 		}
+		dep_platform = item_platform;
+	    }
+	    else if (dep_type == TargetType::tt_platform_independent)
+	    {
+		// XXX Allow any item to depend on a
+		// platform-independent item
+		QTC::TC("abuild", "Abuild-build found compatible platform");
+		dep_platform = PlatformData::PLATFORM_INDEP;
+	    }
+
+	    if (! dep_platform.empty())
+	    {
+		dep_item.addBuildPlatform(dep_platform);
 		this->build_graph.addDependency(
 		    platform_item, createBuildGraphNode(
-			dep, item_platform));
+			dep, dep_platform));
 	    }
 	    else if (item_type == TargetType::tt_all)
 	    {
@@ -540,7 +532,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		error(item.getLocation(),
 		      "\"" + item_name + "\" is being built on platform \"" +
 		      item_platform + "\", but its dependency \"" +
-		      dep + "\" is not");
+		      dep + "\" is not being built on a compatible platform");
 		error(dep_item.getLocation(),
 		      "here is the location of \"" + dep + "\"");
 	    }
