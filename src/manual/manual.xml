@@ -8,7 +8,7 @@
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
 <!ENTITY swversion "1.1.4">
-<!ENTITY lastreleased "January 4, 2011">
+<!ENTITY lastreleased "February 15, 2011">
 ]>
 <!--
 
@@ -2076,7 +2076,7 @@ C:\cygwin\cygwin.bat
          pass-through build items to hide private build item names.
          For further discussion of using pass-through build items in a
          cross-platform environment, please see <xref
-         linkend="ref.cross-platform-dependencies"/>.
+         linkend="ref.pass-through-dependencies"/>.
         </para>
        </listitem>
       </varlistentry>
@@ -2319,7 +2319,7 @@ C:\cygwin\cygwin.bat
      build item.  When one build item depends on another, the
      platforms on which the two build items are being built come into
      play.  We discuss this in <xref
-     linkend="ref.cross-platform-dependencies"/>.
+     linkend="ref.cross-platform-support"/>.
     </para>
    </sect1>
    <sect1 id="ref.platforms.object-code">
@@ -10318,9 +10318,7 @@ parameters {
      <!--  with <replaceable/>, etc. since it makes the text look  -->
      <!--  more uniform.                                           -->
      <sect3 id="ref.abuild-object.accessing-parameters">
-      <title>
-       Accessing Parameters
-      </title>
+      <title>Accessing Parameters</title>
       <para>
        These methods are used to access the values of definitions,
        parameters, and interface variables.  They can be used either
@@ -10403,9 +10401,7 @@ parameters {
       </variablelist>
      </sect3>
      <sect3 id="ref.abuild-object.modifying-parameters">
-      <title>
-       Modifying Parameters
-      </title>
+      <title>Modifying Parameters</title>
       <para>
        Most of the time, you will set and modify parameters inside a
        parameter block (<xref
@@ -10460,9 +10456,7 @@ parameters {
       </variablelist>
      </sect3>
      <sect3 id="ref.abuild-object.build-environment">
-      <title>
-       Build Environment
-      </title>
+      <title>Build Environment</title>
       <para>
        The following methods supply information about the build
        environment.  These are most often used from within rule code,
@@ -10522,9 +10516,7 @@ parameters {
       </variablelist>
      </sect3>
      <sect3 id="ref.abuild-object.target-configuration">
-      <title>
-       Target Configuration
-      </title>
+      <title>Target Configuration</title>
       <para>
        These methods are used to create or modify targets.  You would
        call these methods from custom rule code.  They would not be
@@ -10630,9 +10622,7 @@ parameters {
       </variablelist>
      </sect3>
      <sect3 id="ref.abuild-object.build-support">
-      <title>
-       Build Support
-      </title>
+      <title>Build Support</title>
       <para>
        The following methods are provided for use in custom rules.
       </para>
@@ -13029,14 +13019,16 @@ flag private INCLUDES = private-include
      selection of any platforms from the type.  When it is used, no
      platforms from that platform type are selected by default, so no
      builds will be done in that platform type except when needed to
-     satisfy a platform-specific dependency.  This could be useful if
-     you only wanted to do embedded builds, for example.  This is the
-     only selector that can be used with the <type>indep</type> or
-     <type>java</type> platform types.  Starting with &abuild; 1.1.4,
-     it is valid to specify <type>skip</type> without a platform type
-     qualifier, which will suppress any default platform selection for
-     any object code platform type.  This could be used to build only
-     <type>indep</type> and <type>java</type>.
+     satisfy a dependency.  This could be useful if you only wanted to
+     do embedded builds, for example.  This is the only selector that
+     can be used with the <type>indep</type> or <type>java</type>
+     platform types.  Starting with &abuild; 1.1.4, it is valid to
+     specify <type>skip</type> without a platform type qualifier,
+     which will suppress any default platform selection for any object
+     code platform type.  This could be used to build only
+     <type>indep</type> and <type>java</type>, or it could be used to
+     suppress all but a specific platform type by also providing a
+     type-specific selector for the type you do want to build.
     </para>
     <para>
      The <type>default</type> selector means to select whichever
@@ -13049,14 +13041,16 @@ flag private INCLUDES = private-include
      The other selectors are translated into an (<type>os</type>,
      <type>cpu</type>, <type>toolset</type>, <type>compiler</type>,
      <type>option</type>) tuple.  Each field may be
-     <literal>*</literal> or a platform field.  The empty string may
-     not be explicitly specified, but omitted fields are mapped to the
-     empty string.  For example, <type>compiler=x</type> is equivalent
-     to (<type>""</type>, <type>""</type>, <type>""</type>,
-     <type>"x"</type>, <type>""</type>).  Any empty string field
-     except for <type>option</type> matches the corresponding field of
-     the highest priority platform (the last one declared) in the list
-     of platforms for the given type.  This is the always the first
+     <literal>*</literal> or a platform field.  The selector
+     <type>all</type> is equivalent to <literal>*.*.*.*.*</literal>.
+     The empty string may not be explicitly specified, but omitted
+     fields are mapped to the empty string.  For example,
+     <type>compiler=x</type> is equivalent to (<type>""</type>,
+     <type>""</type>, <type>""</type>, <type>"x"</type>,
+     <type>""</type>).  Any empty string field except for
+     <type>option</type> matches the corresponding field of the
+     highest priority platform (the last one declared) in the list of
+     platforms for the given type.  This is the always the first
      platform listed for the platform type by <command>abuild
      --list-platforms</command>.  An empty <type>option</type> field
      means that the <type>option</type> field of the platform must be
@@ -13211,12 +13205,24 @@ flag private INCLUDES = private-include
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term><type>skip indep:skip java:skip vxworks:default</type></term>
+       <listitem>
+        <para>
+         Skip all platform types except vxworks, and build with the
+         default platform for vxworks.  Note that specifying
+         <type>skip</type> by itself only skips object-code platform
+         types, so we have to explicitly skip <type>indep</type> and
+         <type>java</type> as well.
+        </para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term><type>vxworks:skip</type></term>
        <listitem>
         <para>
          Skip the vxworks platform type; no vxworks builds will be
-         done except as needed to satisfy platform-specific
-         dependencies.  Native builds are done normally.
+         done except as needed to satisfy dependencies.  Native builds
+         are done normally.
         </para>
        </listitem>
       </varlistentry>
@@ -13246,10 +13252,85 @@ flag private INCLUDES = private-include
      </variablelist>
     </para>
    </sect1>
+   <sect1 id="ref.dependency-platform-compatibility">
+    <title>Dependencies and Platform Compatibility</title>
+    <indexterm>
+     <primary>dependency</primary>
+     <secondary>platform compatibility</secondary>
+    </indexterm>
+    <indexterm>
+     <primary>platforms</primary>
+     <secondary>compatibility for dependency</secondary>
+    </indexterm>
+    <para>
+     As you can see, any given build item may build on one more
+     platforms.  When build item <classname>A</classname> depends on
+     build item <classname>B</classname>, that dependency must be
+     satisfied separately for each platform on which
+     <classname>A</classname> builds.  So if <classname>A</classname>
+     and <classname>B</classname> both build on platforms
+     <type>p1</type> and <type>p2</type>, then the actual situation is
+     that <classname>A</classname> on <type>p1</type> depends on
+     <classname>B</classname> on <type>p1</type>, and
+     <classname>A</classname> on <type>p2</type> depends on
+     <classname>B</classname> on <type>p2</type>.  This case of
+     <classname>A</classname> and <classname>B</classname> building on
+     the same platforms is simple and common, but there are cases in
+     which things don't work out so easily.  For this, &abuild; has
+     two concepts: <firstterm>platform compatibility</firstterm> and
+     <firstterm>explicit cross-platform dependencies</firstterm>.  We
+     discuss platform compatibility here and explicit cross-platform
+     dependencies in the next section.  These sections describe these
+     concepts in basic terms.  For the complete story with all the
+     details, please refer to <xref
+     linkend="ref.construction-of-build-graph"/>.
+    </para>
+    <para>
+     The rules for platform compatibility are fairly straightforward.
+     Specifically, a platform <type>p</type> in a platform type
+     <type>pt</type> is compatible with all other platforms in
+     <type>pt</type> and also with all platforms in <type>pt</type>'s
+     <emphasis>parent</emphasis> platform type, and by extension, all
+     the way up the hierarchy of platform types.  Starting with
+     &abuild; 1.1.4, when a platform type is declared, it can
+     optionally be declared to have a parent platform type.  In all
+     versions of &abuild;, any platform type declared without a parent
+     has the platform type <type>indep</type> as an implicit parent.
+     This means that all platforms are compatible with
+     <type>indep</type>, which is how any build item of any platform
+     type can depend on a build item of type <type>indep</type>.
+    </para>
+    <para>
+     For example, suppose you are creating a plugin to define platform
+     types for the VxWorks embedded operating system, and you are
+     creating separate platform types for different embedded boards
+     that have different vendor-supplied board support packages.
+     Suppose you also have a body of code that will work for all
+     VxWorks boards and don't contain anything that depends on a
+     specific board support package.  To implement this, you could
+     create a common platform type for the specific version of VxWorks
+     and then also create child platform types for each specific
+     board.  For example, you could have a base type called
+     <type>vxworks-6_8-base</type> and child types
+     <type>vxworks-6_8-bsp1</type> and <type>vxworks-6_8-bsp2</type>.
+     Now if you had a build item <classname>Q</classname> of type
+     <type>vxworks-6_8-bsp1</type> and a build item
+     <classname>R</classname> of type <type>vxworks-6_8-bsp2</type>,
+     both build items could depend on item <classname>S</classname> of
+     type <type>vxworks-6_8-base</type> since all platforms in the two
+     board-specific platform types are compatible with the platforms
+     in the base type.  Additionally, if there were a build item
+     <classname>T</classname> of type <type>indep</type>, all three of
+     the other build items could depend on <classname>T</classname>
+     because <type>indep</type> is compatible with all other platform
+     types.  For further discussion of creating platform types, see
+     <xref linkend="ref.adding-platform-types"/>.
+    </para>
+   </sect1>
    <sect1 id="ref.cross-platform-dependencies">
     <!-- The title of this section is included in an error message in
          Interface.cc. -->
-    <title>Cross-Platform Dependencies</title>
+    <title>Explicit Cross-Platform Dependencies</title>
     <indexterm>
      <primary>dependency</primary>
      <secondary>cross-platform</secondary>
@@ -13257,27 +13338,45 @@ flag private INCLUDES = private-include
     <para>
      Ordinarily, when <classname>A</classname> depends on
      <classname>B</classname>, &abuild; requires that
-     <classname>B</classname> be buildable on every platform that
-     <classname>A</classname> is being built on.  In this case, the
-     instance of <classname>A</classname> being built on platform
-     <type>p</type> depends specifically on the instance of
-     <classname>B</classname> being built on platform <type>p</type>.
-     Under these rules, it would be impossible for
-     <classname>A</classname> to depend on <classname>B</classname> if
-     <classname>B</classname> couldn't be built on all of
+     <classname>B</classname> be buildable on platforms that are
+     compatible with all the platforms <classname>A</classname> is
+     being built on.  In this case, the instance of
+     <classname>A</classname> being built on platform <type>p</type>
+     depends specifically on the instance of <classname>B</classname>
+     being built on platform <type>p</type> or some other platform
+     that is compatible with <type>p</type>.  Under these rules, it
+     would be impossible for <classname>A</classname> to depend on
+     <classname>B</classname> if <classname>B</classname> couldn't be
+     built on at least one platform that was compatible with each of
      <classname>A</classname>'s platforms.  This would make it
      impossible for a platform-independent item to depend on any
-     object-code or Java build items or for object-code and Java build
-     items to depend on each other.  (There is a special case that any
-     item can depend on a platform-independent build item.)  To make
-     these other cases possible, &abuild; allows a dependency to
-     declare a specific platform using the <option>-platform</option>
-     flag.  Rather than declaring a platform by name, the argument to
-     the <option>-platform</option> argument is either a platform type
-     or a platform-type-qualified platform selector.  In this case,
-     the instance of <classname>A</classname> on each of its platforms
-     depends on the specifically selected instance of
+     object-code or Java build items, object-code and Java build items
+     to depend on each other, or for non-compatible object-code
+     platform types to depend on each other.  (Recall from the
+     previous section that any item can depend on a
+     platform-independent build item since the platform type
+     <type>indep</type> is compatible with all other platform types.)
+     To make these other cases possible, &abuild; allows a dependency
+     to declare that the dependency should be on a specific platform
+     by using the <option>-platform</option> flag to the dependency
+     declaration.  Rather than declaring a platform by name, the
+     argument to the <option>-platform</option> argument is either a
+     platform type or a platform-type-qualified platform selector.  In
+     this case, the instance of <classname>A</classname> on each of
+     its platforms depends on the specifically selected instance of
      <classname>B</classname>.
+     <footnote>
+      <para>
+       Note that a platform-specific dependency overrides the
+       dependency platform choice for all platforms on which the
+       depending is being built.  It is not presently possible to make
+       the platform-specific dependency behave differently for
+       different platform types of the depending item.  This behavior
+       could be simulated by making use of separate intermediate build
+       items, but if you find yourself doing that, you may need to
+       rethink how you're using the various platform types.
+      </para>
+     </footnote>
     </para>
     <para>
      To choose which of <classname>B</classname>'s platforms will be
@@ -13289,91 +13388,13 @@ flag private INCLUDES = private-include
      platform even if <literal>*</literal> appears as one of the
      fields.  &Abuild; versions prior to 1.1 ignored any platform
      specifiers given on the command line or in the environment when
-     resolving cross-platform dependencies, but the &abuild; does take
-     them into consideration.  If you want to specify a
+     resolving cross-platform dependencies, but the current &abuild;
+     does take them into consideration.  If you want to specify a
      platform-specific dependency on the default platform for a given
      platform type <emphasis>regardless of any platform
      selectors</emphasis>, you can specify
      <type><replaceable>platform-type</replaceable>:default</type> as
      the <option>-platform</option> option to your dependency.
-    </para>
-    <para>
-     The other situation in which a build item may depend on another
-     item with different platforms occurs with pass-through build
-     items.  In this case, if <classname>A1</classname> and
-     <classname>A2</classname> depend on pass-through item
-     <classname>P</classname> which in turn depends on
-     <classname>B1</classname> and <classname>B2</classname>, &abuild;
-     will create effective dependencies between the
-     <classname>A</classname>s and the <classname>B</classname>s based
-     on platform type (see <xref linkend="fig.pass-through"/>).
-     <figure id="fig.pass-through">
-      <title>Multiplatform Pass-through Build Item</title>
-      <mediaobject>
-       <imageobject>
-        <imagedata fileref="pass-through.png"/>
-       </imageobject>
-       <caption>
-        <para>
-         Pass-through item <classname>P</classname> effectively
-         connects <classname>A1</classname> to
-         <classname>B1</classname> and <classname>A2</classname> to
-         <classname>B2</classname> based on their platform types.
-        </para>
-       </caption>
-      </mediaobject>
-     </figure>
-     The documentation doesn't provide a specific example that
-     illustrates that case because this type of usage would be fairly
-     unusual.
-     <footnote>
-      <para>
-       Okay, we don't provide an example because it's tricky to make
-       one that would be more illustrative than confusing without an
-       actual embedded platform to work with.  If we did create an
-       example, we'd have to make up some kind of simulated embedded
-       platform with a plugin, and that would probably create more
-       confusion than it would be worth.
-      </para>
-     </footnote>
-     Instead, we will provide a description of how it would work.
-     Suppose you had a plugin to support VxWorks, an embedded
-     operating system, that added a platform type
-     <type>vxworks</type>, and you wanted to provide a custom
-     threading library that worked for your native platform and for
-     VxWorks.  Suppose also that your native library implementation
-     used boost threads but that you wanted to create a VxWorks
-     implementation that used VxWorks native threads.  You could
-     create a pass-through build item called
-     <classname>threads</classname> that depends on
-     <classname>threads.native</classname> and
-     <classname>threads.vxworks</classname>, and you could set up
-     <classname>threads.native</classname> to have
-     <property>platform-types</property> <type>native</type> and
-     <classname>threads.vxworks</classname> to have
-     <property>platform-types</property> <type>vxworks</type>.  The
-     <classname>threads</classname> build item would not declare any
-     platform types.  It would just depend on
-     <classname>threads.vxworks</classname> and
-     <classname>threads.native</classname>.  If you now had a program
-     that supported both <type>native</type> and <type>vxworks</type>
-     that depended on <classname>threads</classname>, your application
-     would use the <classname>threads.native</classname>
-     implementation when it built on the <type>native</type> platforms
-     and the <classname>threads.vxworks</classname> implementation
-     when it built on <type>vxworks</type> platforms.  This would
-     happen transparently because of the pass-through build item.  To
-     fully understand why this works, please see <xref
-     linkend="ref.construction-of-build-graph"/>.  Note that you could
-     also put conditionals in your
-     <filename>Abuild.interface</filename> and/or
-     <filename>Abuild.mk</filename> to avoid having to split this into
-     multiple build items, so this is not the only solution.  The same
-     trick would work if you wanted to create a facade for a library
-     that was implemented in multiple languages, though it's unlikely
-     that there would be any reason to do that: although you can have
-     one build item that builds for multiple platform types, you can't
-     have a single build item that builds for multiple languages.
     </para>
     <sect2 id="ref.cross-platform-interface-errors">
      <!-- The title of this section is included in an error message in
@@ -13499,6 +13520,131 @@ flag private INCLUDES = private-include
       </itemizedlist>
      </para>
     </sect2>
+   </sect1>
+   <sect1 id="ref.pass-through-dependencies">
+    <title>Dependencies and Pass-through Build Items</title>
+    <indexterm>
+     <primary>pass-through build item</primary>
+     <secondary>dependencies</secondary>
+    </indexterm>
+    <para>
+     When a build item does not declare any platform types and has
+     dependencies on items of multiple platform types, that item
+     because a <firstterm>pass-through</firstterm> build item and is
+     handled slightly differently with respect to dependencies.
+     Specifically, a pass-through build item is implicitly buildable
+     on every platform, so any build item may depend on a pass-through
+     build item.  Also if a specific instance of pass-through build
+     item on a specific platform depends on another item for which
+     there are no compatible platform types, that dependency is
+     ignored.  This makes it possible to use pass-through build items
+     to provide wrappers around families of alternative build items
+     that provide related but separate functionality for consumers of
+     different platform types.
+    </para>
+    <para>
+     For example, suppose build items <classname>A1</classname> and
+     <classname>B1</classname> build on platform <type>X</type> and
+     build items <classname>A2</classname> and
+     <classname>B2</classname> build on platform <type>Y</type>.  If
+     <classname>A1</classname> and <classname>A2</classname> depend on
+     pass-through item <classname>P</classname> which in turn depends
+     on <classname>B1</classname> and <classname>B2</classname>,
+     &abuild; will create effective dependencies between the
+     <classname>A1</classname> and <classname>A2</classname> and also
+     between <classname>B1</classname> and <classname>B2</classname>
+     based on platform type (see <xref linkend="fig.pass-through"/>).
+     <figure id="fig.pass-through">
+      <title>Multiplatform Pass-through Build Item</title>
+      <mediaobject>
+       <imageobject>
+        <imagedata fileref="pass-through.png"/>
+       </imageobject>
+       <caption>
+        <para>
+         Pass-through item <classname>P</classname> effectively
+         connects <classname>A1</classname> to
+         <classname>B1</classname> and <classname>A2</classname> to
+         <classname>B2</classname> based on their platform types.
+        </para>
+       </caption>
+      </mediaobject>
+     </figure>
+     What's really happening here is that the instance of
+     <classname>P</classname> for <type>X</type> depends on
+     <classname>B1</classname> and ignores <classname>B2</classname>
+     while the instance of <classname>P</classname> on <type>Y</type>
+     depends on <classname>B2</classname> and ignores
+     <classname>B1</classname>.  If <classname>P</classname> also had
+     a dependency on some third build item of type <type>indep</type>,
+     both instances of <classname>P</classname>, and therefore
+     effectively both <classname>A1</classname> and
+     <classname>B1</classname> would also depend on the third item of
+     type <type>indep</type>.
+    </para>
+    <para>
+     The documentation doesn't provide a specific example that
+     illustrates that case because this type of usage would be fairly
+     unusual.
+     <footnote>
+      <para>
+       Okay, we don't provide an example because it's tricky to make
+       one that would be more illustrative than confusing without an
+       actual embedded platform to work with.  If we did create an
+       example, we'd have to make up some kind of simulated embedded
+       platform with a plugin, and that would probably create more
+       confusion than it would be worth.
+      </para>
+     </footnote>
+     Instead, we will provide a description of how it would work.
+     Suppose you had a plugin to support VxWorks, an embedded
+     operating system, that added a platform type
+     <type>vxworks</type>, and you wanted to provide a custom
+     threading library that worked for your native platform and for
+     VxWorks.  Suppose also that your native library implementation
+     used boost threads but that you wanted to create a VxWorks
+     implementation that used VxWorks native threads.  You could
+     create a pass-through build item called
+     <classname>threads</classname> that depends on
+     <classname>threads.native</classname> and
+     <classname>threads.vxworks</classname>, and you could set up
+     <classname>threads.native</classname> to have
+     <property>platform-types</property> <type>native</type> and
+     <classname>threads.vxworks</classname> to have
+     <property>platform-types</property> <type>vxworks</type>.  The
+     <classname>threads</classname> build item would not declare any
+     platform types.  It would just depend on
+     <classname>threads.vxworks</classname> and
+     <classname>threads.native</classname>.  If you now had a program
+     that supported both <type>native</type> and <type>vxworks</type>
+     that depended on <classname>threads</classname>, your application
+     would use the <classname>threads.native</classname>
+     implementation when it built on the <type>native</type> platforms
+     and the <classname>threads.vxworks</classname> implementation
+     when it built on <type>vxworks</type> platforms.  This would
+     happen transparently because of the pass-through build item.  If
+     you wanted to allow <emphasis>any</emphasis> build item to depend
+     on <classname>threads</classname> even if there is no support for
+     that item's platform type, you could also create
+     <classname>threads.indep</classname> and make
+     <classname>threads</classname> depend on that as well.  Just keep
+     in mind that all instances of <classname>threads</classname> will
+     depend on the <type>indep</type> version even if they also depend
+     on one of the platform-specific versions.
+    </para>
+    <para>
+     To fully understand why this works, please see <xref
+     linkend="ref.construction-of-build-graph"/>.  Note that you could
+     also put conditionals in your
+     <filename>Abuild.interface</filename> and/or
+     <filename>Abuild.mk</filename> to avoid having to split this into
+     multiple build items, so this is not the only solution.  The same
+     trick would work if you wanted to create a facade for a library
+     that was implemented in multiple languages, though it's unlikely
+     that there would be any reason to do that: although you can have
+     one build item that builds for multiple platform types, you can't
+     have a single build item that builds for target types.
+    </para>
    </sect1>
    <sect1 id="ref.example.cross-platform-dependency">
     <title>Cross-Platform Dependency Example</title>
@@ -14731,10 +14877,49 @@ flag private INCLUDES = private-include
       with the <varname>#</varname> character and blank lines are
       ignored.  Each line may have the following syntax:
 
-      <programlisting>platform-type <replaceable>new-platform-type</replaceable>
+      <programlisting>platform-type <replaceable>new-platform-type</replaceable> [-parent <replaceable>parent-platform-type</replaceable>]
 </programlisting>
       Platform type names may contain only alphanumeric characters,
       underscores, and dashes.
+     </para>
+     <para>
+      You may optionally specify another previously-declared
+      object-code platform type as the new platform type's parent.  If
+      a platform type is declared without a parent platform type, it
+      has <type>indep</type> as its implicit parent.  (Note that
+      <type>indep</type> may not be declared explicitly as a parent;
+      only other <varname>object-code</varname> platform types may be
+      declared are parents.)  Declaring a parent platform type means
+      that any platform in the new platform type may link against any
+      platform in the parent platform type.  It is up to the creator
+      of the platform types to ensure that this is actually the case.
+     </para>
+     <para>
+      One example use of parent platform types would be to implement a
+      base platform type for a particular environment and then to
+      create derived platform types that refine some aspect of the
+      base platform type.  For example, this could be used to overlay
+      additional include directories or libraries on top of support
+      for an embedded operating system to support selective hardware.
+      It would also be possible to create platform types that refine
+      the <type>native</type> platform type for specific
+      circumstances.  Most uses of parent platform types could be
+      achieved in some other way, such as through use of conditionals
+      in <filename>Abuild.interface</filename> or
+      <filename>Abuild.mk</filename> files or through use of
+      pass-through build items with multiple dependencies, but when
+      used properly, parent platform types can reduce the number of
+      times common code has to be recompiled for different platform
+      types.
+     </para>
+     <para>
+      The ability to specify parent platform types was introduced in
+      &abuild; 1.1.4 and is closely related to platform type
+      compatibility as discussed in <xref
+      linkend="ref.dependency-platform-compatibility"/>.  It's
+      possible that a future version of &abuild; may further
+      generalize the ability to create compatibility relationships
+      among platform types.
      </para>
     </sect2>
     <sect2 id="ref.adding-platforms">
@@ -15872,10 +16057,7 @@ native-compiler qcc
     </para>
    </sect1>
    <sect1 id="ref.platform-dependent-in-indep-or-java">
-    <title>
-     Platform-Dependent Files in Non-<type>object-code</type> Build
-     Items
-    </title>
+    <title>Platform-Dependent Files in Non-<type>object-code</type> Build Items</title>
     <para>
      It's easy to fall into the trap of thinking that, just because a
      file is a text file or some other format that can be processed on
@@ -16666,9 +16848,10 @@ native-compiler qcc
       the build item inherits its platform types from the items it
       depends on.  Otherwise, it has no platform types and has the
       special target type <type>all</type>.  Note that this analysis
-      is performed on build items in reverse build order.  That way,
-      every build item's platform types and target type has been
-      determined before any items that depend on it are analyzed.
+      is performed on build items in reverse dependency order (forward
+      build order).  That way, every build item's platform types and
+      target type has been determined before any items that depend on
+      it are analyzed.
      </para>
      <para>
       Once we have determined the list of platform types for each
@@ -16693,33 +16876,21 @@ native-compiler qcc
       files.)
      </para>
      <para>
+      When we compute the buildable platform lists, we also
+      pre-initialize the build platform list (the list of platforms on
+      which the item will actually be built) by including all
+      buildable platforms that are selected by default on the basis of
+      any platform selectors, as described in <xref
+      linkend="ref.platform-selection"/>, that may be in effect.  For
+      build items of target type <type>all</type>, we would not add
+      any items to the list at this step.
+     </para>
+     <para>
       All of the above steps can be completed without knowing which
       build items are actually included in the build set.  These
       computations, in fact, are determined at startup for every build
       item in every known build tree regardless of whether the items
-      are in the build set.  During this validation, we also perform
-      checks to ensure that each build item's dependencies have
-      appropriate platform types.  Specifically, a build item of
-      target type <type>all</type> may depend on any build item, and
-      any build item may depend on an item of target type
-      <type>all</type> or <type>platform-independent</type>.  For
-      other build items, if a build item depends on another build item
-      and declares the dependency with a
-      <option>-platform=<replaceable>selector</replaceable></option>
-      option, the dependency must have the platform type mentioned in
-      the platform selector.  Otherwise, every platform type of the
-      dependent build item must be present in the dependency.  For
-      example, if <classname>A</classname> has platform types
-      <type>X</type> and <type>Y</type> and depends on
-      <classname>B</classname> which has types <type>X</type>,
-      <type>Y</type>, and <type>Z</type>, this is okay because
-      <classname>B</classname> has all of <classname>A</classname>'s
-      platform types.  It would be an error if
-      <classname>B</classname> depended on <classname>A</classname> in
-      this case since the instances of <classname>B</classname>
-      building for platform type <type>Z</type> would not be able to
-      satisfy their dependences on <classname>A</classname> since it
-      doesn't support that platform type.
+      are in the build set.
      </para>
      <para>
       The above validations are all completed before &abuild; starts
@@ -16737,33 +16908,29 @@ native-compiler qcc
       itself.  This is performed only when all previous validations
       have been performed successfully, and this step is also
       performed only for build items that are actually in the build
-      set.  This process is a bit tricky.  We present a prose
-      description of the process here.  For a fully detailed
-      description, please read the comments and code in
+      set.  We present a prose description of the process here.  For a
+      fully detailed description, please read the comments and code in
       <function>addItemToBuildGraph</function> in
-      <filename>Abuild.cc</filename> in the &abuild; sources.  We
-      construct the build graph in reverse build order;
-      <emphasis>i.e.</emphasis>, we start with most depended-on build
-      item and end with the least depended-on build item.  For each
-      build item, we add to the list of <firstterm>build
-      platforms</firstterm> (platforms on which the item will actually
-      be built), based on our platform selection criteria, as
-      described in <xref linkend="ref.platform-selection"/>.  The list
-      may be initially empty, or it may have been modified by items
-      that depend on this item.  For build items of target type
-      <type>all</type>, we would not add any items to the list at this
-      step.  Then, for each direct dependency, we determine which
-      instance of it we will depend on.  If the dependency in question
-      is declared with a platform selector, we pick the best platform
-      from among the dependency's buildable platform list that
-      satisfies the platform selector and make this the
-      <firstterm>dependent platform</firstterm>.  If there are no
-      matches, it is an error.  If there was no platform selector in
-      the dependency and the dependency is platform-independent, the
-      dependent platform is <type>indep</type>.  Otherwise, there is
-      no specific dependent platform.  Then, for each of our build
-      platforms, we add a node to the build graph for the current
-      build item and platform.
+      <filename>Abuild-build.cc</filename> (and in other places it
+      references) in the &abuild; sources.
+     </para>
+     <para>
+      We construct the build graph in reverse build order;
+      <emphasis>i.e.</emphasis>, we start with least depended-on build
+      item and end with the most depended-on build item.  That way,
+      each item is added to the build graph before any item it depends
+      on is added.  This is the opposite of the order in which we
+      compute the platform types.  This makes it possible to modify an
+      item's build platform list while processing items that depend on
+      it.  Therefore, at the time a build item is added to the build
+      graph, its build platform list will have been fully computed.
+      The build platform list may be the initial list as computed
+      during validation, or it may have been modified during the
+      addition of its reverse dependencies to the build graph.  When a
+      build item is added to the build graph, a node is added to the
+      build graph for each platform on which the item is being built.
+      Each node of the build graph therefore corresponds to a
+      <firstterm>build item/platform pair</firstterm>.
       <footnote>
        <para>
         The actual build graph node is a string made up of three
@@ -16777,35 +16944,148 @@ native-compiler qcc
         less dependent trees before items in more dependent trees.
        </para>
       </footnote>
-      If we have a specific dependent platform, we create a dependency
-      from our new node to the node consisting of the dependency item
-      and the dependent platform.  Otherwise, we check the dependency
-      item to make sure that it is buildable on our current platform.
-      If not, it is an error.  If so, we create a dependency from our
-      node to the node consisting of the dependency item and our
-      platform, and we also add the platform to the dependency's build
-      platform list.  This is the mechanism by which &abuild; will
-      build an item on a platform as needed to satisfy a dependency.
-      An example of this is presented in <xref
-      linkend="ref.example.cross-platform-dependency"/>.
+     </para>
+     <para>
+      Then, for each direct dependency, we determine which instance of
+      it (which of its platforms) we will depend on for each of our
+      platforms.  If the dependency in question is declared with a
+      platform selector, we pick the best platform from among the
+      dependency's buildable platform list that satisfies the platform
+      selector and make this the <firstterm>override
+      platform</firstterm>.  If there are no matches, it is an error.
+      If an override platform is selected, it applies to this
+      dependency for all instances of the current item.
+     </para>
+     <para>
+      Next, still processing an individual dependency, we iterate
+      through the item's list of build platforms to decide which of
+      the dependency's platforms each instance will depend on.  We
+      refer to this as the dependency platform.  If we previously
+      computed an override platform for this dependency, we just use
+      that as the dependency platform.  Otherwise, we pick the best
+      match from among the dependency's buildable platform list.  If
+      the dependency is type <type>all</type>, it can be
+      &ldquo;built&rdquo; on any platform, so the dependency platform
+      is the current build platform of the item.  If the dependency is
+      actually buildable on the exact platform that we are
+      considering, then it is the best match and the dependency
+      platform is the current platform.  Otherwise, we have to search
+      for a platform from a compatible platform type.  To do this, we
+      determine the platform type that contains the current platform
+      and then get a list of compatible platform types (as discussed
+      in <xref linkend="ref.dependency-platform-compatibility"/>) in
+      order of preference.  Then we iterate through this list until we
+      find a platform type that is in the dependency's list of
+      platform types.  Once we have identified this type, we find the
+      best matching platform in that type and use that as the
+      dependency platform.  The best matching platform will be first
+      selected platform, or if no platforms are selected, then it will
+      be the first unselected platform.  If no platforms are
+      available, it is an error.
+     </para>
+     <para>
+      If we have successfully determined a dependency platform from
+      among the dependency's buildable platform list, we next add that
+      to the dependency's actual build platform list if it's not
+      already there.  This is the mechanism by which as-needed
+      platform selection occurs.  An example of this is presented in
+      <xref linkend="ref.example.cross-platform-dependency"/>.  So if
+      item <classname>A</classname> on <type>p1</type> wants item
+      <classname>B</classname> on <type>p2</type>, then item
+      <classname>B</classname> will be built on <type>p2</type> even
+      if <type>p2</type> would not have been selected to build for
+      <classname>B</classname> based on platform selectors.  There are
+      many ways in which this can happen including
+      <classname>B</classname> being in a different build tree with
+      different plugins or <classname>A</classname> using a
+      platform-specific dependency to depend on
+      <classname>B</classname>.
      </para>
     </sect2>
     <sect2 id="ref.build-graph.implications">
      <title>Implications</title>
      <para>
       Even if the exact steps of constructing the build graph are
-      involved, there are some implications that are relatively easy
-      to understand.  In particular, the way the build graph works
-      implies that, in general, a build item may only depend on
-      another build item if the dependency builds on all the dependent
-      item's platforms.  There are two ways around this: one is to use
-      a platform selector on a dependency, and the other is to use a
-      build item of target type <type>all</type>.  A build item of
-      target type <type>all</type> is a pass-through build item, as
-      described in <xref linkend="ref.build-item-types"/>.  A build
-      item gets to be this way by not having a build or interface
-      file, not declaring any platform types, and depending on items
-      with different groups of platform types.
+      involved, there are some implications that are worth separate
+      discussion.  Specifically, a build item of target type
+      <type>all</type> may depend on any build item, and any build
+      item may depend on an item of target type <type>all</type>.  For
+      other build items, if a build item depends on another build item
+      and declares the dependency with a
+      <option>-platform=<replaceable>selector</replaceable></option>
+      option, the dependency must have the platform type mentioned in
+      the platform selector.  If a build item depends on another item
+      without a platform-specific dependency, the dependency must be
+      buildable on at least one platform type that is compatible with
+      (or exactly matches) each platform type of the depending build
+      item.  Since all platform types are compatible with
+      <type>indep</type>, this means that any build item may depend on
+      any other build item whose target type is
+      <type>platform-independent</type>.  (This was actually a special
+      case prior to &abuild; 1.1.4, but now it falls out from the fact
+      that <type>indep</type> is made the parent platform type of all
+      platform types that don't declare a parent.)  For example, if
+      <classname>A</classname> has platform types <type>X</type> and
+      <type>Y</type> and depends on <classname>B</classname> which has
+      types <type>X</type>, <type>Y</type>, and <type>Z</type>, this
+      is okay because <classname>B</classname> has all of
+      <classname>A</classname>'s platform types.  Likewise, if
+      platform types <type>X</type> and <type>Y</type> both declared
+      type <type>XY</type> as a parent and <classname>B</classname>
+      has types <type>XY</type> and <type>Z</type>, that would also be
+      fine since each of <classname>A</classname>'s types can be
+      matched with at least one of <classname>B</classname>'s types.
+      It would be an error if <classname>B</classname> depended on
+      <classname>A</classname> in either case since the instances of
+      <classname>B</classname> building for platform type
+      <type>Z</type> would not be able to satisfy their dependences on
+      <classname>A</classname> since it doesn't support that platform
+      type or anything compatible with that platform type.
+     </para>
+     <para>
+      Another important point involves the exact way in which we
+      search for a compatible platform.  Note that we first search for
+      a compatible platform type and, once we have found one, we pick
+      the best platform in that type.  This is subtly different from
+      picking the first matching platform from any compatible platform
+      type.  To illustrate the difference, consider the case of
+      <classname>A</classname>, which has platform type
+      <type>X</type>, depending on <classname>B</classname>, which has
+      platform types <type>Y</type> and <type>Z</type>, where
+      <type>X</type> declares <type>Y</type> as a parent and
+      <type>Y</type> declares <type>Z</type> as a parent.  In this
+      case, <classname>A</classname> on <classname>X</classname> will
+      always depend on <classname>B</classname> on
+      <classname>Y</classname> even if <classname>Y</classname> has no
+      platforms and <classname>Z</classname> does.  The reason for
+      this is that platform types are static but platforms within
+      types are influenced by the environment.  If <type>Y</type> has
+      no platforms, this should result in a build error.  If we fell
+      back to <classname>Z</classname>, instead the lack of platforms
+      for <classname>Y</classname> would actually change the shape of
+      the build graph, which goes against &abuild;'s design.  If it
+      were specifically desired to fall back on one thing if something
+      else weren't available, there are ways to make that happen
+      (using autoconfiguration or other similar mechanisms) that don't
+      require the actual build graph itself to change shape.
+     </para>
+     <para>
+      There are also some implications of the way pass-through items
+      (items of type <type>all</type>) ignore dependencies when no
+      matching platform is available.  This is discussed in <xref
+      linkend="ref.pass-through-dependencies"/>.  Specifically, if a
+      pass-through item depends on multiple items of different types,
+      it's possible for the pass-through to effectively connect one of
+      its reverse dependencies to multiple of its forward
+      dependencies.  So if <classname>A</classname> depends on
+      <classname>P</classname> which depends on one item of type
+      <type>indep</type> and one item of <classname>A</classname>'s
+      platform type, <classname>A</classname> will end up with
+      <emphasis>both</emphasis> of <classname>P</classname>'s
+      dependencies in its dependency list.  This is a consequence of
+      the fact that the dependency platform computation is performed
+      separately for each build platform and for each dependency of a
+      given item.
      </para>
     </sect2>
    </sect1>
@@ -17157,7 +17437,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.4: January 4, 2011</term>
+     <term>1.1.4: February 15, 2011</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -17165,6 +17445,27 @@ Y = $(X)
          Enhancements
         </para>
         <itemizedlist>
+         <listitem>
+          <para>
+           Platform types may now have parents, which makes it
+           possible to make some platform types specializations of
+           other platform types.  This is discussed in <xref
+           linkend="ref.dependency-platform-compatibility"/>.  Three
+           sections of the documentation have been significantly
+           updated based on this change: <xref
+           linkend="ref.cross-platform-support"/>, <xref
+           linkend="ref.adding-platform-types"/>, and <xref
+           linkend="ref.construction-of-build-graph"/>.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The <type>skip</type> platform selector may now be used
+           without a platform type qualifier to prevent default
+           selection of any platform in any object-code platform type.
+           See <xref linkend="ref.platform-selection"/> for details.
+          </para>
+         </listitem>
          <listitem>
           <para>
            The <property>build-also</property> key has been enhanced
@@ -17191,6 +17492,11 @@ Y = $(X)
           <para>
            Minor tweaks were made to &abuild;'s code and test suite to
            enable it to be built with Visual C++ 2010 and boost 1.43.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           The embedded version of Groovy has been updated to 1.7.8.
           </para>
          </listitem>
         </itemizedlist>
@@ -23327,10 +23633,7 @@ Y = $(X)
    <?include-file rules/object-code/ccxx.mk?>
   </appendix>
   <appendix id="ref.rules.java.groovy">
-   <title>
-    The <filename>java.groovy</filename> and
-    <filename>groovy.groovy</filename> Files
-   </title>
+   <title>The <filename>java.groovy</filename> and <filename>groovy.groovy</filename> Files</title>
    <para>
     Here we include a complete copy of
     <filename>rules/groovy/java.groovy</filename> and

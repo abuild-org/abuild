@@ -3,24 +3,9 @@ Next
 
  * If item A on platform X depends on item B and item B doesn't build
    on platform X, treat this as a failure of B on X so that it doesn't
-   impact the build more broadly.
-
- * Consider implementing hierarchical platform types
-
-   Consider whether there should be some generalization of the idea that
-   anyone can depend on indep.  For example, vxworks-6_8-base may be
-   appropriate for non-board-specific vxworks 6.8 items such that we may
-   want it so that vxworks-6_8-av5 could depend on vxworks-6_8-base but
-   not the other way around.  Ideally, it should work that if X is
-   building on vxworks-6_8-av5, vxworks-6_8-1905, vxworks-6_3-base, and
-   vxworks-6_3-mv6100 and Y depends on vxworks-6_3-base and
-   vxworks-6_8-base, abuild should automatically associate the 6.8 types
-   with the 6.8 base and the 6.3 types, including base, with the 6.3
-   base.  Then the hard-coding of indep's special status could be removed
-   by making everything else a "child" of indep.
-
- * Test, update release notes: -p skip is now valid and suppresses all
-   object code platform selections.
+   impact the build more broadly.  Search for "Possible enhancement"
+   in Abuild-build.cc near the error message about a dependency not
+   being able to be built on a compatible platform.
 
  * Some kind of progress report during a large build might be nice.
    This is especially tempting with the numbered prefixes in a -jn
