@@ -2063,7 +2063,7 @@ Abuild::checkPlatformTypes(BuildForest& forest)
 	{
 	    continue;
 	}
-	PlatformData& platform_data = tree.getPlatformData();
+	PlatformData& platform_data = *(tree.getPlatformData());
 
 	// Load any additional platform data from our plugins
 	std::list<std::string> const& plugins = tree.getPlugins();
@@ -2094,7 +2094,7 @@ Abuild::checkPlatformTypes(BuildForest& forest)
 	}
 
 	BuildTree& tree = *(buildtrees[item.getTreeName()]);
-	PlatformData& platform_data = tree.getPlatformData();
+	PlatformData& platform_data = *(tree.getPlatformData());
 	FileLocation const& location = item.getLocation();
 	std::set<std::string> platform_types = item.getPlatformTypes();
 
@@ -2781,7 +2781,8 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 	}
 
 	BuildTree& item_tree = *(buildtrees[item.getTreeName()]);
-	PlatformData& platform_data = item_tree.getPlatformData();
+	boost::shared_ptr<PlatformData> platform_data =
+	    item_tree.getPlatformData();
 	std::set<std::string> const& platform_types =
 	    item.getPlatformTypes();
 	std::set<std::string> build_platforms;
@@ -2790,7 +2791,7 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 	     i2 != platform_types.end(); ++i2)
         {
 	    std::string const& platform_type = *i2;
-	    if (platform_data.isPlatformTypeValid(platform_type))
+	    if (platform_data->isPlatformTypeValid(platform_type))
 	    {
 		// Add all platforms for the platform type to the
 		// buildable platforms list for the platform type.
@@ -2798,7 +2799,7 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 		// the build platforms list.  Additional build
 		// platforms may be added later.
 		PlatformData::selected_platforms_t const& platforms =
-		    platform_data.getPlatformsByType(platform_type);
+		    platform_data->getPlatformsByType(platform_type);
 		std::vector<std::string> buildable_platforms;
 		for (PlatformData::selected_platforms_t::const_iterator i3 =
 			 platforms.begin();
@@ -2813,12 +2814,7 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 		    }
 		}
 		item.setBuildablePlatforms(platform_type, buildable_platforms);
-
-		// Set list of compatible platform types for this
-		// platform type.
-		item.setCompatiblePlatformTypes(
-		    platform_type,
-		    platform_data.getCompatiblePlatformTypes(platform_type));
+		item.setPlatformData(platform_data);
 	    }
         }
         item.setBuildPlatforms(build_platforms);
@@ -2947,6 +2943,7 @@ Abuild::listTraits()
 void
 Abuild::listPlatforms(BuildForest_map& forests)
 {
+    // XXX show parent information
     for (BuildForest_map::iterator forest_iter = forests.begin();
 	 forest_iter != forests.end(); ++forest_iter)
     {
@@ -2960,7 +2957,7 @@ Abuild::listPlatforms(BuildForest_map& forests)
 	    bool tree_name_output = false;
 	    std::string const& tree_name = (*tree_iter).first;
 	    BuildTree& tree = *((*tree_iter).second);
-	    PlatformData& platform_data = tree.getPlatformData();
+	    PlatformData& platform_data = *(tree.getPlatformData());
 	    std::set<std::string> const& platform_types =
 		platform_data.getPlatformTypes(TargetType::tt_object_code);
 	    for (std::set<std::string>::const_iterator pt_iter =

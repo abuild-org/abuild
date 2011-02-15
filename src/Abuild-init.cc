@@ -378,7 +378,9 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	component + "\\." + component + "\\." + component + "\\." +
 	component1or2;
     boost::regex ignore_re("\\s*(?:#.*)?");
-    boost::regex platform_type_re("platform-type (" + component + ")");
+    boost::regex platform_type_re(
+	"platform-type (" + component + ")" +
+	"(?: -parent (" + component + "))?");
     boost::regex platform_re(
 	"platform (-lowpri )?(" + component4or5 +
 	") -type (" + component + ")");
@@ -407,10 +409,16 @@ Abuild::loadPlatformData(PlatformData& platform_data,
 	    else if (boost::regex_match(line, match, platform_type_re))
 	    {
 		std::string platform_type = match[1].str();
+		std::string parent_type;
+		if (match[2].matched)
+		{
+		    parent_type = match[2].str();
+		}
 		try
 		{
 		    platform_data.addPlatformType(
-			platform_type, TargetType::tt_object_code);
+			platform_type, TargetType::tt_object_code,
+			parent_type);
 		}
 		catch (QEXC::General& e)
 		{

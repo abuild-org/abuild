@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <set>
+#include <boost/shared_ptr.hpp>
 #include <PlatformData.hh>
 #include <FileLocation.hh>
 
@@ -19,8 +20,8 @@ class BuildTree
 	      PlatformData const& platform_data);
 
     void addTraits(std::set<std::string> const& traits);
-    // Return writable reference to platform data so it can be modified
-    PlatformData& getPlatformData();
+    // Return modifiable reference to platform data
+    boost::shared_ptr<PlatformData> getPlatformData();
 
     std::string const& getName() const;
     std::string const& getRootPath() const;
@@ -56,7 +57,7 @@ class BuildTree
     std::set<std::string> omitted_tree_deps;
     std::set<std::string> supported_traits;
     std::list<std::string> plugins;
-    PlatformData platform_data;
+    boost::shared_ptr<PlatformData> platform_data;
     int backing_depth;
 };
 

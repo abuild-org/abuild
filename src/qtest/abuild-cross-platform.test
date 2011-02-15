@@ -234,6 +234,24 @@ foreach my $d (['none', 'none', ''],
 		 $td->NORMALIZE_NEWLINES);
 }
 
+cd("work/case7");
+
+$td->runtest("hierarchical types",
+	     {$td->COMMAND => "abuild -b all --dump-build-graph",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case7.buildgraph.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+# Make sure a platform selector works properly through all the
+# hierarchical platform type cases.
+$td->runtest("hierarchical types with -p",
+	     {$td->COMMAND => "abuild -b all -p p1:option=o1 --dump-build-graph",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case7.buildgraph-o1.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(38);
+$td->report(40);

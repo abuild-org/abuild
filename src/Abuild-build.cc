@@ -305,35 +305,32 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     // buildable platform list.
 
     // For purposes of constructing buildable and build platform
-    // lists, there are three cases.
+    // lists, there are two cases: build items of type "all", and
+    // everything else.
 
-    // The first and simplest case is platform-independent items.
-    // These are items that explicitly declare platform type "indep".
-    // Their buildable platform list is always "indep", and their
-    // build platform list is also always "indep".
+    // Regular build items (target type "platform independent",
+    // "java", or "object-code") are all handled the same way by this
+    // code.  Although, in fact, there is only one java platform type
+    // or platform and only one platform independent platform type or
+    // platform, nothing in the code knows or cares about this, and
+    // for purposes of build/buildable platform creation, all of these
+    // items are treated in the same way.  For these items, the list
+    // of buildable platforms is the list of all platforms that belong
+    // to any declared platform type.  The list of build platforms is
+    // initially selected from the buildable platforms based on
+    // selection criteria (documented elsewhere) and may be expanded
+    // to include any platforms that a reverse dependency needs to
+    // build on.  For example, suppose A depends on B, A can be built
+    // only with compiler c1, and B can be built with c1 and c2.  If B
+    // would be built only with c2 based on the selection criteria,
+    // A's requirement of c1 would cause B to also be built with c1.
+    // We refer to this as "as-needed platform selection."  In order
+    // for this to work properly, we must be able to have analysis of
+    // a particular item for build graph insertion be able to modify
+    // that item's dependencies.  This is the reason that we have to
+    // add items to the build graph in reverse dependency order.
 
-    // The second case is for items of target type "java" or
-    // "object-code".  Although, in fact, there is only one java
-    // platform type or platform, nothing in the code knows or cares
-    // about this, and for purposes of build/buildable platform
-    // creation, java and object-code items are treated in the same
-    // way.  For these items, the list of buildable platforms is the
-    // list of all platforms that belong to any declared platform
-    // type.  The list of build platforms is initially selected from
-    // the buildable platforms based on selection criteria (documented
-    // elsewhere) and may be expanded to include any platforms that a
-    // reverse dependency needs to build on.  For example, suppose A
-    // depends on B, A can be built only with compiler c1, and B can
-    // be built with c1 and c2.  If B would be built only with c2
-    // based on the selection criteria, A's requirement of c1 would
-    // cause B to also be built with c1.  We refer to this as
-    // "as-needed platform selection."  In order for this to work
-    // properly, we must be able to have analysis of a particular item
-    // for build graph insertion be able to modify that item's
-    // dependencies.  This is the reason that we have to add items to
-    // the build graph in reverse dependency order.
-
-    // The third case is for items of target type "all".  These items,
+    // The other case is for items of target type "all".  These items,
     // by definition, have no platform types declared.  They also have
     // no Abuild.interface files or build files.  Their sole purpose
     // is connect things that depend on them with things that they
@@ -343,47 +340,44 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     // platform list for items of type "all" is simply the union of
     // the build platform lists of all their reverse dependencies.
 
-    // The logic of setting up the build graph is quite subtle, and
-    // although the code itself is fairly simple, there are actually
-    // quite a number of cases.  For purposes of discussion, suppose
-    // each node in the build graph is a string of the form
-    // item_name:platform.  For every item i and every platform p in
-    // its build platforms, we add the node i:p to the build graph.
-    // We create a dependency from A:p1 to B:p2 in the build graph
-    // whenever A's build on p1 depends on B's build on p2.
+    // For purposes of discussion, suppose each node in the build
+    // graph is a string of the form item_name:platform.  For every
+    // item i and every platform p in its build platforms, we add the
+    // node i:p to the build graph.  We create a dependency from A:p1
+    // to B:p2 in the build graph whenever A's build on p1 depends on
+    // B's build on p2.
 
-    // In the normal case of A:p1 -> B:p2, p1 = p2.  There are two
-    // exceptions to this rule:
+    // When item A on platform p1 depends on B, there are a two broad
+    // cases that we have to consider to decide which platform of B
+    // will be the target of the dependency:
 
-    //  * If B is platform-independent, then p2 is be "indep"
-    //    regardless of what p1 is.
+    //  * If A declared a platform-specific dependency on B, then B is
+    //    built on whichever platform best matches the declared
+    //    platform criteria.
 
-    //  * If the dependency from A to B in A's Abuild.conf is declared
-    //    with platform type pt, A must not have target type "all",
-    //    and B must have pt as one of its platform types.  In this
-    //    case, p2 is the highest priority platform in pt that appears
-    //    in B's buildable platform list subject to any qualifications
-    //    in the platform selector in the dependency declaration.  If
-    //    there are no matching platforms, it is an error.
+    //  * If A declared a regular dependency on B, then B is built on
+    //    whichever of its platforms are most compatible with p1.
 
-    // Ordinarily, for each possible A:p1, if there is no suitable p2
-    // in B to create the dependency link, it is an error.  There is
-    // one exception to this rule:
+    // The logic for both of these decisions is implemented inside of
+    // the BuildItem class in getBestPlatformForType and
+    // getBestPlatformForPlatform.
 
-    //  * If A is of target type "all", then for each p1 in A's build
-    //    platform list, if B cannot be built on p1, the dependency
-    //    between A and B is simply ignored for that platform.
-
-    // It is this that allows an item of target type "all" to be a
-    // platform-type or even language-independent "pass through"
-    // between items that depend on it and items that it depends
-    // on.  For example, suppose object-code item O1 and Java item
-    // J1 both depend on A and A depends on both object-code item
-    // O2 and Java item J2.  Suppose O1 and O2 build on platform p1
-    // and J1 and J2 builds on platform p2.  Then A builds on
-    // platforms p1 and p2.  In this case, we have A:p1 -> O2:p1 and
-    // A:p2 -> J2:p2.  There is no dependency between A:p2 and O2 or
-    // between A:p1 and J2.
+    // If item A is a regular item (not of type "all"), then it is an
+    // error if there is no candidate platform in B for A on p1 to
+    // depend on.  However, if A is of type "all", then we simply
+    // ignore this dependency.  This is what allows an item of target
+    // type "all" to be a platform-type or even language-independent
+    // "pass through" between items that depend on it and items that
+    // it depends on.  For example, suppose object-code item O1 and
+    // Java item J1 both depend on A and A depends on both object-code
+    // item O2 and Java item J2.  Suppose O1 and O2 build on platform
+    // p1 and J1 and J2 builds on platform p2.  Then A builds on
+    // platforms p1 and p2.  In this case, we have O1:p1 -> A:p1 ->
+    // O2:p1 and O2:p2 -> A:p2 -> J2:p2.  There is no dependency
+    // between A:p2 and O2 or between A:p1 and J2.  If A further
+    // depended on X:indep, both A:p1 and A:p2 would have that
+    // dependency as well since the indep platform type is compatible
+    // with all other platform types.
 
     for (std::set<std::string>::const_iterator bp_iter =
 	     build_platforms.begin();
@@ -400,45 +394,12 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
     {
 	std::string const& dep = *dep_iter;
 	BuildItem& dep_item = *(this->buildset[dep]);
-	TargetType::target_type_e dep_type = dep_item.getTargetType();
-	std::set<std::string> const& dep_platforms =
-	    dep_item.getBuildablePlatforms();
 	PlatformSelector const* ps = 0;
 	std::string const& dep_platform_type = item.getDepPlatformType(dep, ps);
 
 	std::string override_platform;
 	if (! dep_platform_type.empty())
 	{
-	    if (ps)
-	    {
-		QTC::TC("abuild", "Abuild-build platform dependency with selector");
-	    }
-	    else
-	    {
-		// If the dependency was declared with a platform type
-		// only and no selector, see if the user specified any
-		// general selectors.
-		if (this->platform_selectors.count(dep_platform_type))
-		{
-		    QTC::TC("abuild", "Abuild-build specific platform selector");
-		    ps = &(this->platform_selectors[dep_platform_type]);
-		}
-		else if (this->platform_selectors.count(PlatformSelector::ANY))
-		{
-		    QTC::TC("abuild", "Abuild-build default platform selector");
-		    ps = &(this->platform_selectors[PlatformSelector::ANY]);
-		}
-		else
-		{
-		    QTC::TC("abuild", "Abuild-build no platform selector");
-		}
-		if (ps && ps->isSkip())
-		{
-		    QTC::TC("abuild", "Abuild-build ignoring skip selector");
-		    ps = 0;
-		}
-	    }
-
 	    // If we have declared a specific platform type with this
 	    // dependency, pick the best platform of that type from
 	    // the dependency's buildable platforms.  We have already
@@ -449,7 +410,8 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    // is an error.
 
 	    override_platform =
-		dep_item.getBestPlatformForType(dep_platform_type, ps);
+		dep_item.getBestPlatformForType(
+		    dep_platform_type, ps, this->platform_selectors);
 	    if (override_platform.empty())
 	    {
 		QTC::TC("abuild", "Abuild-build ERR no override platform");
@@ -481,65 +443,23 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		QTC::TC("abuild", "Abuild-build override platform");
 		dep_platform = override_platform;
 	    }
-	    else if (dep_platforms.count(item_platform))
+	    else
 	    {
-		// If the dependency is already buildable on the
-		// current platform, create a link from the item on
-		// this platform to the dependency on the same
-		// platform.
-		QTC::TC("abuild", "Abuild-build A:p -> B:p");
-		dep_platform = item_platform;
-	    }
-	    else if (dep_type == TargetType::tt_all)
-	    {
-		// If the dependency is of type "all", it implicitly
-		// is buildable on all platforms.  We explicitly add
-		// the platform to the dependency's build platform
-		// list.  This is how as-needed platform selection
-		// happens.
-		if (dep_item.getBuildPlatforms().count(item_platform) == 0)
-		{
-		    QTC::TC("abuild", "Abuild-build as-needed platform selection");
-		    dep_item.addBuildPlatform(item_platform);
-		}
-		dep_platform = item_platform;
-	    }
-	    else if (dep_type == TargetType::tt_platform_independent)
-	    {
-		// Allow any item, even of type all, to depend on a
-		// platform-independent item.  This is responsible for
-		// the special case of items that depend on
-		// pass-through items always getting any indep
-		// dependencies in addition to any other matches.  I'm
-		// not sure whether that's really correct behavior,
-		// but that's how abuild has been working since the
-		// beginning.
-		QTC::TC("abuild", "Abuild-build item -> indep");
-		dep_platform = PlatformData::PLATFORM_INDEP;
-	    }
-	    else if (item_type != TargetType::tt_all)
-	    {
-		// See if the dependency item can be built on any
-		// compatible platform type.
-		std::vector<std::string> const& compatible_types =
-		    item.getCompatiblePlatformTypes(item_platform);
-		for (std::vector<std::string>::const_iterator citer =
-			 compatible_types.begin();
-		     citer != compatible_types.end();
-		     ++citer)
-		{
-		    dep_platform = dep_item.getBestPlatformForType(*citer, 0);
-		    if (! dep_platform.empty())
-		    {
-			QTC::TC("abuild", "Abuild-build found compatible platform");
-			break;
-		    }
-		}
+		// Otherwise, pick the most compatible platform, if
+		// any, from among the item's available platforms.
+		// See comments in BuildItem.cc for details.
+		dep_platform =
+		    dep_item.getBestPlatformForPlatform(
+			item_platform, this->platform_selectors);
 	    }
 
 	    if (! dep_platform.empty())
 	    {
-		dep_item.addBuildPlatform(dep_platform);
+		if (dep_item.getBuildPlatforms().count(item_platform) == 0)
+		{
+		    QTC::TC("abuild", "Abuild-build as-needed platform selection");
+		    dep_item.addBuildPlatform(dep_platform);
+		}
 		this->build_graph.addDependency(
 		    platform_item, createBuildGraphNode(
 			dep, dep_platform));

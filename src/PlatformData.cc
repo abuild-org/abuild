@@ -52,7 +52,16 @@ PlatformData::addPlatformType(std::string const& platform_type,
 
     this->platform_graph.addItem(pt_item);
 
-    if (! parent_platform_type.empty())
+    if (parent_platform_type.empty())
+    {
+	// Everything is compatible with indep.
+	if (target_type != TargetType::tt_platform_independent)
+	{
+	    this->platform_graph.addDependency(
+		pt_item, PLATFORM_TYPE_PREFIX + pt_INDEP);
+	}
+    }
+    else
     {
 	// target_type can only be other than object code during
 	// initialization, and we don't pass any parent platform types

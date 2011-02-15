@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+# Use zz_os as the os field so that it sorts last no matter what the
+# native platform is.  This is needed for consistent test suite
+# output.
+foreach my $pt (qw(base p1 p2 p1a p1b p2a p2b))
+{
+    foreach my $o (".o1", "")
+    {
+	print "platform zz_os.cpu.$pt.other$o -type $pt\n";
+    }
+}

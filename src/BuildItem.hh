@@ -8,6 +8,7 @@
 #include <TargetType.hh>
 #include <Interface.hh>
 #include <ItemConfig.hh>
+#include <PlatformData.hh>
 #include <boost/regex.hpp>
 
 class BuildItem
@@ -56,10 +57,13 @@ class BuildItem
     std::string const& getPlatformType(std::string const& platform) const;
     std::set<std::string> getBuildablePlatforms() const;
     std::set<std::string> const& getBuildPlatforms() const;
-    std::vector<std::string> const& getCompatiblePlatformTypes(
-	std::string const& platform) const;
-    std::string getBestPlatformForType(std::string platform_type,
-				       PlatformSelector const*) const;
+    std::string getBestPlatformForType(
+	std::string platform_type,
+	PlatformSelector const*,
+	std::map<std::string, PlatformSelector> const& platform_selectors) const;
+    std::string getBestPlatformForPlatform(
+	std::string const& platform,
+	std::map<std::string, PlatformSelector> const& platform_selectors) const;
     TargetType::target_type_e getTargetType() const;
     bool isNamed(std::set<std::string>& item_names) const;
     bool matchesPattern(boost::regex& pattern) const;
@@ -81,10 +85,8 @@ class BuildItem
 	std::string const& platform_type,
 	std::vector<std::string> const& buildable_platforms);
     void setBuildablePlatforms(std::set<std::string> const&);
+    void setPlatformData(boost::shared_ptr<PlatformData> platform_data);
     void setBuildPlatforms(std::set<std::string> const&);
-    void setCompatiblePlatformTypes(
-	std::string const& platform_type,
-	std::vector<std::string> const& compatible_platform_types);
     void addBuildPlatform(std::string const&);
 
     // Note: if last item of passed-in list of expanded dependencies
@@ -114,9 +116,9 @@ class BuildItem
     std::string forest_root;	      // containing forest
     unsigned int backing_depth;	      // 0 in local build tree and externals
     pt_map platform_types;	      // platform types and associated platforms
-    std::map<std::string, std::vector<std::string> > compatible_platform_types;
     std::map<std::string, std::string> platform_to_type;
     std::set<std::string> build_platforms; // platforms we will build on
+    boost::shared_ptr<PlatformData> platform_data;
     std::list<std::string> expanded_dependencies; // recursively expanded
     std::set<std::string> shadowed_references;
     std::map<std::string, boost::shared_ptr<Interface> > interfaces;

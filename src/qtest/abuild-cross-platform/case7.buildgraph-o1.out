@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<build-graph version="1">
+ <item name="lib.indep" platform="indep"/>
+ <item name="lib.base" platform="zz_os.cpu.base.other"/>
+ <item name="lib" platform="zz_os.cpu.base.other">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="lib" platform="indep">
+  <dep name="lib.indep" platform="indep"/>
+ </item>
+ <item name="client-indep" platform="indep">
+  <dep name="lib" platform="indep"/>
+ </item>
+ <item name="client-base" platform="zz_os.cpu.base.other">
+  <dep name="lib" platform="zz_os.cpu.base.other"/>
+  <dep name="client-indep" platform="indep"/>
+ </item>
+ <item name="lib.native" platform="<native>"/>
+ <item name="lib" platform="<native>">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.native" platform="<native>"/>
+ </item>
+ <item name="client-native" platform="<native>">
+  <dep name="lib" platform="<native>"/>
+  <dep name="client-indep" platform="indep"/>
+ </item>
+ <item name="lib.p1" platform="zz_os.cpu.p1.other.o1"/>
+ <item name="lib" platform="zz_os.cpu.p1.other.o1">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+  <dep name="lib.p1" platform="zz_os.cpu.p1.other.o1"/>
+ </item>
+ <item name="client-p1" platform="zz_os.cpu.p1.other.o1">
+  <dep name="lib" platform="zz_os.cpu.p1.other.o1"/>
+  <dep name="client-base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="lib.p1a" platform="zz_os.cpu.p1a.other"/>
+ <item name="lib" platform="zz_os.cpu.p1a.other">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+  <dep name="lib.p1" platform="zz_os.cpu.p1.other.o1"/>
+  <dep name="lib.p1a" platform="zz_os.cpu.p1a.other"/>
+ </item>
+ <item name="client-p1a" platform="zz_os.cpu.p1a.other">
+  <dep name="lib" platform="zz_os.cpu.p1a.other"/>
+  <dep name="client-p1" platform="zz_os.cpu.p1.other.o1"/>
+  <dep name="client-base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="lib" platform="zz_os.cpu.p1b.other">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+  <dep name="lib.p1" platform="zz_os.cpu.p1.other.o1"/>
+ </item>
+ <item name="client-p1b" platform="zz_os.cpu.p1b.other">
+  <dep name="lib" platform="zz_os.cpu.p1b.other"/>
+  <dep name="client-p1" platform="zz_os.cpu.p1.other.o1"/>
+  <dep name="client-base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="lib" platform="zz_os.cpu.p2.other">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="client-p2" platform="zz_os.cpu.p2.other">
+  <dep name="lib" platform="zz_os.cpu.p2.other"/>
+  <dep name="client-base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="lib.p2a" platform="zz_os.cpu.p2a.other"/>
+ <item name="lib" platform="zz_os.cpu.p2a.other">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+  <dep name="lib.p2a" platform="zz_os.cpu.p2a.other"/>
+ </item>
+ <item name="client-p2a" platform="zz_os.cpu.p2a.other">
+  <dep name="lib" platform="zz_os.cpu.p2a.other"/>
+  <dep name="client-p2" platform="zz_os.cpu.p2.other"/>
+  <dep name="client-base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="lib" platform="zz_os.cpu.p2b.other">
+  <dep name="lib.indep" platform="indep"/>
+  <dep name="lib.base" platform="zz_os.cpu.base.other"/>
+ </item>
+ <item name="client-p2b" platform="zz_os.cpu.p2b.other">
+  <dep name="lib" platform="zz_os.cpu.p2b.other"/>
+  <dep name="client-p2" platform="zz_os.cpu.p2.other"/>
+  <dep name="client-base" platform="zz_os.cpu.base.other"/>
+ </item>
+</build-graph>

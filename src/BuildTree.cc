@@ -17,7 +17,7 @@ BuildTree::BuildTree(std::string const& name,
     optional_tree_deps(optional_tree_deps),
     supported_traits(declared_traits),
     plugins(plugins),
-    platform_data(platform_data),
+    platform_data(new PlatformData(platform_data)),
     backing_depth(0)
 {
 }
@@ -28,7 +28,7 @@ BuildTree::addTraits(std::set<std::string> const& traits)
     this->supported_traits.insert(traits.begin(), traits.end());
 }
 
-PlatformData&
+boost::shared_ptr<PlatformData>
 BuildTree::getPlatformData()
 {
     return this->platform_data;

@@ -1,0 +1,7 @@
+platform-type base
+platform-type p1 -parent base
+platform-type p2 -parent base
+platform-type p1a -parent p1
+platform-type p1b -parent p1
+platform-type p2a -parent p2
+platform-type p2b -parent p2

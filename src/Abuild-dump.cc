@@ -128,6 +128,7 @@ void
 Abuild::dumpPlatformData(PlatformData const& platform_data,
 			 std::string const& indent)
 {
+    // XXX parent information
     std::ostream& o = std::cout;
 
     o << indent << "<platform-data>" << std::endl;
@@ -201,7 +202,7 @@ Abuild::dumpBuildTree(BuildTree& tree, std::string const& tree_name,
       << "   backing-depth=\"" << tree.getBackingDepth() << "\""
       << std::endl
       << "  >" << std::endl;
-    dumpPlatformData(tree.getPlatformData(), "   ");
+    dumpPlatformData(*(tree.getPlatformData()), "   ");
     if (! traits.empty())
     {
 	o << "   <supported-traits>" << std::endl;

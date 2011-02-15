@@ -260,21 +260,51 @@ BuildItem::getBuildablePlatforms() const
     return result;
 }
 
-std::vector<std::string> const&
-BuildItem::getCompatiblePlatformTypes(std::string const& platform) const
-{
-    assert(this->target_type != TargetType::tt_all);
-    std::string const& pt = getPlatformType(platform);
-    assert(! pt.empty());
-    assert(this->compatible_platform_types.count(pt));
-    return (*(this->compatible_platform_types.find(pt))).second;
-}
-
 std::string
-BuildItem::getBestPlatformForType(std::string platform_type,
-				  PlatformSelector const* ps) const
+BuildItem::getBestPlatformForType(
+    std::string platform_type,
+    PlatformSelector const* ps,
+    std::map<std::string, PlatformSelector> const& platform_selectors) const
 {
+    // Pick the highest priority selected platform of the requested
+    // platform type that matches the given platform selector.  If no
+    // platform selector was provided, fall back to general ones
+    // supplied.  If no matching platform is selected, then pick the
+    // first matching platform.  If no matching platforms are
+    // available, return the empty string, which will be considered an
+    // error.
     std::string result;
+
+    if (ps)
+    {
+	QTC::TC("abuild", "BuildItem platform selection with selector");
+    }
+    else
+    {
+	// If the dependency was declared with a platform type
+	// only and no selector, see if the user specified any
+	// general selectors.
+	if (platform_selectors.count(platform_type))
+	{
+	    QTC::TC("abuild", "BuildItem specific platform selector");
+	    ps = &((*(platform_selectors.find(platform_type))).second);
+	}
+	else if (platform_selectors.count(PlatformSelector::ANY))
+	{
+	    QTC::TC("abuild", "BuildItem default platform selector");
+	    ps = &((*(platform_selectors.find(PlatformSelector::ANY))).second);
+	}
+	else
+	{
+	    QTC::TC("abuild", "BuildItem no platform selector");
+	}
+	if (ps && ps->isSkip())
+	{
+	    QTC::TC("abuild", "BuildItem ignoring skip selector");
+	    ps = 0;
+	}
+    }
+
     if (ps && (ps->getPlatformType() != PlatformSelector::ANY))
     {
 	platform_type = ps->getPlatformType();
@@ -308,6 +338,71 @@ BuildItem::getBestPlatformForType(std::string platform_type,
 			? 1 : 0);
 		result = platforms[0];
 	    }
+	}
+    }
+    return result;
+}
+
+std::string
+BuildItem::getBestPlatformForPlatform(
+    std::string const& platform,
+    std::map<std::string, PlatformSelector> const& platform_selectors) const
+{
+    // Pick the best choice among our buildable platforms for
+    // compatibility with the specified platform.  If we can't find
+    // one, return the empty string, which will be considered an
+    // error.
+    std::string result;
+    if ((this->target_type == TargetType::tt_all) ||
+	(getBuildablePlatforms().count(platform)))
+    {
+	// If we are an "all" build item, we can build on any
+	// platform.  If we actually build on the exact platform
+	// requested, then this is the best match.  (That's actually
+	// the normal case.)  In either case, we are able to build on
+	// the requsted platform.
+	QTC::TC("abuild", "BuildItem best platform for platform is platform",
+		(this->target_type == TargetType::tt_all) ? 0 : 1);
+	result = platform;
+    }
+    else
+    {
+	// If we can't build on the requested platform, see if we can
+	// build on any platform that is compatible with the requested
+	// platform.  Find out from platform_data what platform type
+	// the requested platform belongs to and what other platform
+	// types are compatible with it.  Then see if we build on any
+	// of those platform types and pick the best matching platform
+	// for the best matching platform type.  Note that once we
+	// find a matching platform type, we stop looking.  This is
+	// true even if the first matching platform type has no
+	// matching platforms but subsequent matching types do have
+	// matching platforms.  The reason for this is that the list
+	// of available platform types is static while the list of
+	// available platforms may depend on the environment, and we
+	// don't want the shape of the build graph to be influenced by
+	// the environment (beyond the influence of platform
+	// selectors, which can still only change which platform is
+	// selected within a platform type).
+	assert(this->platform_data.get());
+	std::string const& platform_type =
+	    this->platform_data->getPlatformType(platform);
+	std::vector<std::string> const& compatible_types =
+	    this->platform_data->getCompatiblePlatformTypes(platform_type);
+	for (std::vector<std::string>::const_iterator iter =
+		 compatible_types.begin();
+	     iter != compatible_types.end(); ++iter)
+	{
+	    if (this->platform_types.count(*iter))
+	    {
+		result = getBestPlatformForType(*iter, 0, platform_selectors);
+		break;
+	    }
+	}
+
+	if (! result.empty())
+	{
+	    QTC::TC("abuild", "BuildItem found compatible platform type");
 	}
     }
     return result;
@@ -467,17 +562,15 @@ BuildItem::setBuildablePlatforms(
 }
 
 void
-BuildItem::setBuildPlatforms(std::set<std::string> const& platforms)
+BuildItem::setPlatformData(boost::shared_ptr<PlatformData> platform_data)
 {
-    this->build_platforms = platforms;
+    this->platform_data = platform_data;
 }
 
 void
-BuildItem::setCompatiblePlatformTypes(
-    std::string const& platform_type,
-    std::vector<std::string> const& compatible_types)
+BuildItem::setBuildPlatforms(std::set<std::string> const& platforms)
 {
-    this->compatible_platform_types[platform_type] = compatible_types;
+    this->build_platforms = platforms;
 }
 
 void
