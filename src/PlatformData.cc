@@ -235,8 +235,8 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors,
 		PLATFORM_TYPE_PREFIX + platform_type);
 	sdeps.pop_back();
 	compatible_platform_types[platform_type].empty(); // force to exist
-	for (std::list<std::string>::iterator dep_iter = sdeps.begin();
-	     dep_iter != sdeps.end(); ++dep_iter)
+	for (std::list<std::string>::reverse_iterator dep_iter = sdeps.rbegin();
+	     dep_iter != sdeps.rend(); ++dep_iter)
 	{
 	    if (boost::regex_match(*dep_iter, match, platform_type_re))
 	    {

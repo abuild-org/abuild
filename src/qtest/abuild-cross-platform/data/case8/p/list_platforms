@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+my $skip_parent = $ENV{'SKIP_PARENT'} || 0;
+
+print "platform zz_os.cpu.grandparent.other -type grandparent\n";
+print "platform zz_os.cpu.parent.other -type parent\n" unless $skip_parent;
+print "platform zz_os.cpu.child.other -type child\n";

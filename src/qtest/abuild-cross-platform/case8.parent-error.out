@@ -1,0 +1,3 @@
+--topdir--/case8/a/Abuild.conf:1: ERROR: "a" is being built on platform "zz_os.cpu.child.other", but its dependency "b" is not being built on a suitable platform
+--topdir--/case8/b/Abuild.conf:1: ERROR: here is the location of "b"
+abuild: ERROR: errors detected; exiting

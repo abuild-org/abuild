@@ -278,6 +278,24 @@ $td->runtest("list_platforms with parents",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/case8");
+
+$td->runtest("two levels of hierarchical types",
+	     {$td->COMMAND =>
+		  "abuild -b all --dump-build-graph",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case8.buildgraph.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("no fallback to grandparent",
+	     {$td->COMMAND =>
+		  "SKIP_PARENT=1 abuild -b all --dump-build-graph",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case8.parent-error.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(44);
+$td->report(46);

@@ -1,0 +1,3 @@
+platform-type grandparent
+platform-type parent -parent grandparent
+platform-type child -parent parent

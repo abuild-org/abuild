@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<build-graph version="1">
+ <item name="b" platform="zz_os.cpu.parent.other"/>
+ <item name="c" platform="zz_os.cpu.grandparent.other"/>
+ <item name="a" platform="zz_os.cpu.child.other">
+  <dep name="b" platform="zz_os.cpu.parent.other"/>
+  <dep name="c" platform="zz_os.cpu.grandparent.other"/>
+ </item>
+ <item name="b" platform="zz_os.cpu.grandparent.other"/>
+ <item name="d" platform="zz_os.cpu.parent.other">
+  <dep name="b" platform="zz_os.cpu.parent.other"/>
+  <dep name="c" platform="zz_os.cpu.grandparent.other"/>
+ </item>
+</build-graph>

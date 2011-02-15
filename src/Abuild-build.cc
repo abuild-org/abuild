@@ -483,7 +483,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		error(item.getLocation(),
 		      "\"" + item_name + "\" is being built on platform \"" +
 		      item_platform + "\", but its dependency \"" +
-		      dep + "\" is not being built on a compatible platform");
+		      dep + "\" is not being built on a suitable platform");
 		error(dep_item.getLocation(),
 		      "here is the location of \"" + dep + "\"");
 	    }

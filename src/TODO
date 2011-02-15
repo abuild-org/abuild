@@ -5,7 +5,7 @@ Next
    on platform X, treat this as a failure of B on X so that it doesn't
    impact the build more broadly.  Search for "Possible enhancement"
    in Abuild-build.cc near the error message about a dependency not
-   being able to be built on a compatible platform.
+   being able to be built on a suitable platform.
 
  * Some kind of progress report during a large build might be nice.
    This is especially tempting with the numbered prefixes in a -jn
