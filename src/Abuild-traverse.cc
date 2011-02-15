@@ -2407,9 +2407,10 @@ Abuild::updatePlatformTypes(BuildForest& forest)
     // For every build item with target type "all", if all the item's
     // direct dependencies have the same platform types, inherit
     // platform types and target type from them.  We have to perform
-    // this check in reverse dependency order so that any dependencies
-    // that were originally target type "all" but didn't have to be
-    // have already been updated.
+    // this check in reverse dependency order/forward build order
+    // (from most depended-on to least depended-on) so that any
+    // dependencies that were originally target type "all" but didn't
+    // have to be have already been updated.
 
     BuildItem_map& builditems = forest.getBuildItems();
     std::list<std::string> const& sorted_items =
