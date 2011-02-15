@@ -3,7 +3,7 @@ abuild: b (abuild-<native>): all
 abuild: b (abuild-p1.any.any.abc): all
 abuild: a (abuild-indep):
 --topdir--/double-dep/bad/b/Abuild.interface:2:1: ERROR: variable X already has a value
---topdir--/double-dep/bad/b/Abuild.interface:2:1: ERROR: conflicting assignment was made by this build item's instance on platform <native>; see "Interface Errors" subsection of the "Cross-Platform Dependencies" section of the manual for an explanation and list of remedies
+--topdir--/double-dep/bad/b/Abuild.interface:2:1: ERROR: conflicting assignment was made by this build item's instance on platform <native>; see "Interface Errors" subsection of the "Explicit Cross-Platform Dependencies" section of the manual for an explanation and list of remedies
 abuild: a (abuild-indep): build failed
 abuild: build complete
 abuild: ERROR: at least one build failure occurred; summary follows
