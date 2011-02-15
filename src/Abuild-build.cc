@@ -473,6 +473,12 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    }
 	    else
 	    {
+		// Possible enhancement: create a special type of
+		// build graph node whose build fails with this type
+		// of error message.  That will limit the severity of
+		// this type of error, which could be helpful
+		// particularly in the case where this appears because
+		// of a plugin that is not fully configured.
 		QTC::TC("abuild", "Abuild-build ERR unmatched platform");
 		error(item.getLocation(),
 		      "\"" + item_name + "\" is being built on platform \"" +

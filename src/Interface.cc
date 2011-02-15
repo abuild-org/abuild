@@ -361,9 +361,9 @@ Interface::assignVariable(Error& error_handler,
 				"build item's instance on platform " +
 				previous_normal_assignment->item_platform +
 				"; see \"Interface Errors\" subsection of the "
-				"\"Cross-Platform Dependencies\" section "
-				"of the manual for an explanation and list "
-				"of remedies");
+				"\"Explicit Cross-Platform Dependencies\" "
+				"section of the manual for an explanation and "
+				"list of remedies");
 			}
 			else
 			{
