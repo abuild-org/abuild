@@ -234,6 +234,29 @@ life even before private/bin/get_native_platform_data is called.
    seems like overkill, though generating smarter CPU strings might be
    worth doing.
 
+ * Perhaps the concept of parent platform types could be genearlized
+   to extend the idea of compatible platform types.
+
+ * Cross compiler support is not fully thought out.  It would be nice
+   to be able to support a cross compiler for something that is cross
+   on one platform and native on another.  For example, we should be
+   able to create a Windows cross compiler for Linux or even a Linux
+   cross compiler that builds for once CPU type on host of another CPU
+   type.  For that matter, we could support 32-bit systems that can
+   build 64-bit code and 32-bit code at the same time even though it
+   could only run the 32-bit code, while having a 64-bit system build
+   both and treat both as native.
+
+ * Since Abuild.interface files are always evaluated in the context of
+   the item providing the interface, it makes it hard to set up a
+   build item whose interface does something conditionally upon the
+   platform type (or platform) of the item using the interface.  With
+   parent platform types and cross-platform dependencies, people can
+   often fall into the trap of coding something in an interface file
+   forgetting that the platform variables are from the context of the
+   dependent node in the build graph rather than the context of the
+   intended end user of the build item.
+
 
 Platform Conditionals
 =====================

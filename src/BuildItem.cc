@@ -266,6 +266,12 @@ BuildItem::getBestPlatformForType(
     PlatformSelector const* ps,
     std::map<std::string, PlatformSelector> const& platform_selectors) const
 {
+    // The logic about how to apply platform selectors to deciding
+    // which platform to pick is partially duplicated in
+    // PlatformData::check.  Please be sure to study both sections of
+    // code before making changes to ensure that the changes are
+    // consistent.
+
     // Pick the highest priority selected platform of the requested
     // platform type that matches the given platform selector.  If no
     // platform selector was provided, fall back to general ones

@@ -184,6 +184,11 @@ PlatformData::check(std::map<std::string, PlatformSelector> const& selectors,
 	     this->target_types.begin();
 	 iter != this->target_types.end(); ++iter)
     {
+	// The logic about how to apply platform selectors to deciding
+	// which platform to pick is partially duplicated in
+	// BuildItem::getBestPlatformForType.  Please be sure to study
+	// both sections of code before making changes to ensure that
+	// the changes are consistent.
 	std::string const& platform_type = (*iter).first;
 	TargetType::target_type_e target_type = (*iter).second;
 	PlatformSelector const* ps = 0;
