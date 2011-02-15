@@ -47,6 +47,7 @@ PlatformData::addPlatformType(std::string const& platform_type,
 			    " has been registered multiple times");
     }
     this->target_types[platform_type] = target_type;
+    this->platform_type_parents[platform_type] = parent_platform_type;
 
     std::string pt_item = PLATFORM_TYPE_PREFIX + platform_type;
 
@@ -366,4 +367,11 @@ PlatformData::getPlatformTypes(TargetType::target_type_e target_type) const
 	}
     }
     return result;
+}
+
+std::string const&
+PlatformData::getPlatformTypeParent(std::string const& platform_type) const
+{
+    assert(isPlatformTypeValid(platform_type));
+    return (*(this->platform_type_parents.find(platform_type))).second;
 }

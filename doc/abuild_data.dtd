@@ -55,6 +55,7 @@
 <!ELEMENT platform-type (platform*)>
 <!ATTLIST platform-type
   name           CDATA          #REQUIRED
+  parent         CDATA          #IMPLIED
   target-type    %target-type;  #IMPLIED
 >
 <!--  The selected attribute is present only when platform         -->

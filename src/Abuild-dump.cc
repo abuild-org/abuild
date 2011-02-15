@@ -128,7 +128,6 @@ void
 Abuild::dumpPlatformData(PlatformData const& platform_data,
 			 std::string const& indent)
 {
-    // XXX parent information
     std::ostream& o = std::cout;
 
     o << indent << "<platform-data>" << std::endl;
@@ -148,8 +147,15 @@ Abuild::dumpPlatformData(PlatformData const& platform_data,
 	     i1 != platform_types.end(); ++i1)
 	{
 	    std::string const& platform_type = *i1;
+	    std::string const& parent =
+		platform_data.getPlatformTypeParent(platform_type);
 	    o << indent << " <platform-type name=\""
-	      << platform_type << "\" target-type=\""
+	      << platform_type << "\"";
+	    if (! parent.empty())
+	    {
+		o << " parent=\"" << parent << "\"";
+	    }
+	    o << " target-type=\""
 	      << TargetType::getName(target_types[i]) << "\"";
 	    PlatformData::selected_platforms_t const& platforms =
 		platform_data.getPlatformsByType(platform_type);

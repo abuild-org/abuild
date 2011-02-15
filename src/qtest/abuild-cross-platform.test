@@ -255,12 +255,29 @@ $td->runtest("hierarchical types",
 # Make sure a platform selector works properly through all the
 # hierarchical platform type cases.
 $td->runtest("hierarchical types with -p",
-	     {$td->COMMAND => "abuild -b all -p p1:option=o1 --dump-build-graph",
+	     {$td->COMMAND =>
+		  "abuild -b all -p p1:option=o1 --dump-build-graph",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/case7.buildgraph-o1.out",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("dump data",
+	     {$td->COMMAND => "abuild --dump-data",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case7.dumpdata.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+validate_dump_data($td);
+
+$td->runtest("list_platforms with parents",
+	     {$td->COMMAND => "abuild --list-platforms",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case7.list-platforms.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(41);
+$td->report(44);

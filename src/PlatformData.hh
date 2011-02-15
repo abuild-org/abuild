@@ -63,6 +63,11 @@ class PlatformData
     // Return a list of platform types for a given target type
     std::set<std::string> getPlatformTypes(TargetType::target_type_e) const;
 
+    // Return the parent platform type.  If no explicit parent was
+    // specified, return the empty string.
+    std::string const& getPlatformTypeParent(
+	std::string const& platform_type) const;
+
   private:
     static std::string const PLATFORM_PREFIX;
     static std::string const PLATFORM_TYPE_PREFIX;
@@ -97,6 +102,11 @@ class PlatformData
     // later declarations take priority over earlier ones, higher
     // numbers therefore have higher priority for platform selection.
     std::map<std::string, int> platform_declaration;
+
+    // Platform type parents.  Every platform type has an entry in
+    // this map even if no parent was specified so that
+    // getPlatformTypeParent can return a std::string const&.
+    std::map<std::string, std::string> platform_type_parents;
 
     // We use a dependency graph to handle nested platform types.
     // Every platform and platform type is an item in the graph.

@@ -2943,7 +2943,6 @@ Abuild::listTraits()
 void
 Abuild::listPlatforms(BuildForest_map& forests)
 {
-    // XXX show parent information
     for (BuildForest_map::iterator forest_iter = forests.begin();
 	 forest_iter != forests.end(); ++forest_iter)
     {
@@ -2984,8 +2983,14 @@ Abuild::listPlatforms(BuildForest_map& forests)
 		    }
 		    if (! platform_type_output)
 		    {
-			std::cout << "    platform type " << platform_type
-				  << std::endl;
+			std::cout << "    platform type " << platform_type;
+			std::string const& parent =
+			    platform_data.getPlatformTypeParent(platform_type);
+			if (! parent.empty())
+			{
+			    std::cout << "; parent " << parent;
+			}
+			std::cout << std::endl;
 			platform_type_output = true;
 		    }
 		    std::string const& platform = (*p_iter).first;

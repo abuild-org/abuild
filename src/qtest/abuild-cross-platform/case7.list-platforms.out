@@ -1,0 +1,27 @@
+forest --topdir--/case7
+  tree case7
+    platform type base
+      platform zz_os.cpu.base.other; built by default: yes
+      platform zz_os.cpu.base.other.o1; built by default: no
+    platform type native
+      platform <native>; built by default: yes
+      platform <native>.debug; built by default: no
+      platform <native>.release; built by default: no
+    platform type p1; parent base
+      platform zz_os.cpu.p1.other; built by default: yes
+      platform zz_os.cpu.p1.other.o1; built by default: no
+    platform type p1a; parent p1
+      platform zz_os.cpu.p1a.other; built by default: yes
+      platform zz_os.cpu.p1a.other.o1; built by default: no
+    platform type p1b; parent p1
+      platform zz_os.cpu.p1b.other; built by default: yes
+      platform zz_os.cpu.p1b.other.o1; built by default: no
+    platform type p2; parent base
+      platform zz_os.cpu.p2.other; built by default: yes
+      platform zz_os.cpu.p2.other.o1; built by default: no
+    platform type p2a; parent p2
+      platform zz_os.cpu.p2a.other; built by default: yes
+      platform zz_os.cpu.p2a.other.o1; built by default: no
+    platform type p2b; parent p2
+      platform zz_os.cpu.p2b.other; built by default: yes
+      platform zz_os.cpu.p2b.other.o1; built by default: no

@@ -1,0 +1,483 @@
+<?xml version="1.0"?>
+<abuild-data version="2">
+ <platform-data>
+  <platform-type name="indep" target-type="platform-independent">
+   <platform name="indep" selected="1"/>
+  </platform-type>
+  <platform-type name="native" target-type="object-code">
+   <platform name="<native>" selected="1"/>
+   <platform name="<native>.debug" selected="0"/>
+   <platform name="<native>.release" selected="0"/>
+  </platform-type>
+  <platform-type name="java" target-type="java">
+   <platform name="java" selected="1"/>
+  </platform-type>
+ </platform-data>
+ <forest
+  id="f-1"
+  absolute-path="--topdir--/case7"
+ >
+  <build-tree
+   name="case7"
+   absolute-path="--topdir--/case7"
+   home-forest="f-1"
+   backing-depth="0"
+  >
+   <platform-data>
+    <platform-type name="indep" target-type="platform-independent">
+     <platform name="indep" selected="1"/>
+    </platform-type>
+    <platform-type name="base" target-type="object-code">
+     <platform name="zz_os.cpu.base.other" selected="1"/>
+     <platform name="zz_os.cpu.base.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="native" target-type="object-code">
+     <platform name="<native>" selected="1"/>
+     <platform name="<native>.debug" selected="0"/>
+     <platform name="<native>.release" selected="0"/>
+    </platform-type>
+    <platform-type name="p1" parent="base" target-type="object-code">
+     <platform name="zz_os.cpu.p1.other" selected="1"/>
+     <platform name="zz_os.cpu.p1.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="p1a" parent="p1" target-type="object-code">
+     <platform name="zz_os.cpu.p1a.other" selected="1"/>
+     <platform name="zz_os.cpu.p1a.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="p1b" parent="p1" target-type="object-code">
+     <platform name="zz_os.cpu.p1b.other" selected="1"/>
+     <platform name="zz_os.cpu.p1b.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="p2" parent="base" target-type="object-code">
+     <platform name="zz_os.cpu.p2.other" selected="1"/>
+     <platform name="zz_os.cpu.p2.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="p2a" parent="p2" target-type="object-code">
+     <platform name="zz_os.cpu.p2a.other" selected="1"/>
+     <platform name="zz_os.cpu.p2a.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="p2b" parent="p2" target-type="object-code">
+     <platform name="zz_os.cpu.p2b.other" selected="1"/>
+     <platform name="zz_os.cpu.p2b.other.o1" selected="0"/>
+    </platform-type>
+    <platform-type name="java" target-type="java">
+     <platform name="java" selected="1"/>
+    </platform-type>
+   </platform-data>
+   <plugins>
+    <plugin name="p"/>
+   </plugins>
+   <build-item
+    name="lib.indep"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib/indep"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="lib.native"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib/native"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="lib.base"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib/base"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="base"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.base.other"/>
+     <platform name="zz_os.cpu.base.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="lib.p1"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib/p1"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="p1"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p1.other"/>
+     <platform name="zz_os.cpu.p1.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="lib.p1a"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib/p1a"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="p1a"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p1a.other"/>
+     <platform name="zz_os.cpu.p1a.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="lib.p2a"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib/p2a"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <platform-types>
+     <platform-type name="p2a"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p2a.other"/>
+     <platform name="zz_os.cpu.p2a.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="lib"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/lib"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+    </expanded-dependencies>
+   </build-item>
+   <build-item
+    name="client-indep"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/indep"
+    backing-depth="0"
+    target-type="platform-independent"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="indep"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="indep"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-base"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/base"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="base"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.base.other"/>
+     <platform name="zz_os.cpu.base.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-native"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/native"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="native"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="<native>"/>
+     <platform name="<native>.debug"/>
+     <platform name="<native>.release"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-p1"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/p1"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-base"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+     <dependency name="client-base"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="p1"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p1.other"/>
+     <platform name="zz_os.cpu.p1.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-p1a"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/p1a"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-p1"/>
+     <dependency name="client-base"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+     <dependency name="client-base"/>
+     <dependency name="client-p1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="p1a"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p1a.other"/>
+     <platform name="zz_os.cpu.p1a.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-p1b"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/p1b"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-p1"/>
+     <dependency name="client-base"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+     <dependency name="client-base"/>
+     <dependency name="client-p1"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="p1b"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p1b.other"/>
+     <platform name="zz_os.cpu.p1b.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-p2"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/p2"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-base"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+     <dependency name="client-base"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="p2"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p2.other"/>
+     <platform name="zz_os.cpu.p2.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-p2a"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/p2a"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-p2"/>
+     <dependency name="client-base"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+     <dependency name="client-base"/>
+     <dependency name="client-p2"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="p2a"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p2a.other"/>
+     <platform name="zz_os.cpu.p2a.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="client-p2b"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/clients/p2b"
+    backing-depth="0"
+    target-type="object-code"
+    is-plugin="0"
+   >
+    <declared-dependencies>
+     <dependency name="lib"/>
+     <dependency name="client-p2"/>
+     <dependency name="client-base"/>
+    </declared-dependencies>
+    <expanded-dependencies>
+     <dependency name="lib.indep"/>
+     <dependency name="lib.native"/>
+     <dependency name="lib.base"/>
+     <dependency name="lib.p1"/>
+     <dependency name="lib.p1a"/>
+     <dependency name="lib.p2a"/>
+     <dependency name="lib"/>
+     <dependency name="client-indep"/>
+     <dependency name="client-base"/>
+     <dependency name="client-p2"/>
+    </expanded-dependencies>
+    <platform-types>
+     <platform-type name="p2b"/>
+    </platform-types>
+    <buildable-platforms>
+     <platform name="zz_os.cpu.p2b.other"/>
+     <platform name="zz_os.cpu.p2b.other.o1"/>
+    </buildable-platforms>
+   </build-item>
+   <build-item
+    name="p"
+    home-forest="f-1"
+    absolute-path="--topdir--/case7/p"
+    backing-depth="0"
+    target-type="all"
+    is-plugin="1"
+   />
+  </build-tree>
+ </forest>
+</abuild-data>
