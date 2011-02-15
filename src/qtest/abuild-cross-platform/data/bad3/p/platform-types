@@ -1,0 +1,2 @@
+platform-type quack -parent java
+platform-type moo -parent oink

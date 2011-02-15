@@ -71,19 +71,19 @@ PlatformData::addPlatformType(std::string const& platform_type,
 	if (this->target_types.count(parent_platform_type) == 0)
 	{
 	    QTC::TC("abuild", "PlatformData ERR unknown parent");
-	    throw QEXC::General("platform type " + platform_type +
-				" has unknown parent type " +
-				parent_platform_type);
+	    throw QEXC::General("platform type \"" + platform_type +
+				"\" has unknown parent type \"" +
+				parent_platform_type + "\"");
 	}
 	if (this->target_types[parent_platform_type] !=
 	    TargetType::tt_object_code)
 	{
 	    QTC::TC("abuild", "PlatformData ERR non-object-code parent");
 	    throw QEXC::General(
-		"platform type " + platform_type +
-		" has parent type " + parent_platform_type +
-		" that is not in target type " +
-		TargetType::getName(TargetType::tt_object_code));
+		"platform type \"" + platform_type +
+		"\" has parent type " + parent_platform_type +
+		"\", which is not in target type \"" +
+		TargetType::getName(TargetType::tt_object_code) + "\"");
 	}
 	std::string ptp_item = PLATFORM_TYPE_PREFIX + parent_platform_type;
 	this->platform_graph.addDependency(pt_item, ptp_item);

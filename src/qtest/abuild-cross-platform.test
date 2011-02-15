@@ -41,6 +41,15 @@ $td->runtest("dep platform type runtime errors",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/bad3");
+
+$td->runtest("platform type declaration errors",
+	     {$td->COMMAND => "abuild --build=all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/bad3.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/case1");
 
 $td->runtest("dump data",
@@ -254,4 +263,4 @@ $td->runtest("hierarchical types with -p",
 
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(40);
+$td->report(41);

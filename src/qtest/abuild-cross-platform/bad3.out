@@ -1,0 +1,3 @@
+--topdir--/bad3/p/platform-types:1: ERROR: platform type "quack" has parent type java", which is not in target type "object-code"
+--topdir--/bad3/p/platform-types:2: ERROR: platform type "moo" has unknown parent type "oink"
+abuild: ERROR: errors detected; exiting
