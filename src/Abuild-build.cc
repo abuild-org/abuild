@@ -473,19 +473,31 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 	    }
 	    else
 	    {
-		// Possible enhancement: create a special type of
-		// build graph node whose build fails with this type
-		// of error message.  That will limit the severity of
-		// this type of error, which could be helpful
-		// particularly in the case where this appears because
-		// of a plugin that is not fully configured.
 		QTC::TC("abuild", "Abuild-build ERR unmatched platform");
+		bool count_as_error = true;
+		if (this->keep_going)
+		{
+		    // In keep_going mode, instead of counting these
+		    // as error conditions here and causing the entire
+		    // build to be aborted, just record the fact that
+		    // the build of this item on this platform should
+		    // not be attempted.  That condition will cause an
+		    // error to be issued, so the overall build will
+		    // still fail.  This makes this particular error
+		    // condition localized to the items it affects
+		    // rather than causing it to abort the entire
+		    // build.
+		    count_as_error = false;
+		    this->forced_failures.insert(platform_item);
+		}
 		error(item.getLocation(),
 		      "\"" + item_name + "\" is being built on platform \"" +
 		      item_platform + "\", but its dependency \"" +
-		      dep + "\" is not being built on a suitable platform");
+		      dep + "\" is not being built on a suitable platform",
+		      Logger::NO_JOB, count_as_error);
 		error(dep_item.getLocation(),
-		      "here is the location of \"" + dep + "\"");
+		      "here is the location of \"" + dep + "\"",
+		      Logger::NO_JOB, count_as_error);
 	    }
 	}
     }
@@ -764,7 +776,8 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
     assert(! build_item.hasShadowedReferences());
 
     bool no_op = (this->special_target == s_NO_OP);
-    bool use_interfaces = (! (no_op || is_dep_failure));
+    bool forced_fail = this->forced_failures.count(builder_string);
+    bool use_interfaces = (! (no_op || is_dep_failure || forced_fail));
 
     std::string output_dir = OUTPUT_DIR_PREFIX + item_platform;
     std::string item_label = item_name + " (" + output_dir + ")";
@@ -797,7 +810,15 @@ Abuild::itemBuilder(std::string builder_string, item_filter_t filter,
 	    item_error, parser, logger_job);
     }
 
-    if (build_item.hasBuildFile())
+    if (forced_fail)
+    {
+	QTC::TC("abuild", "Abuild-build ERR forced fail");
+	error(build_item.getLocation(),
+	      "build suppressed because of earlier errors",
+	      logger_job);
+	status = false;
+    }
+    else if (build_item.hasBuildFile())
     {
 	// Ready to build -- clear job header, and let the build's own
 	// output take precedence.

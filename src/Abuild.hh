@@ -358,7 +358,8 @@ class Abuild
     void error(std::string const& msg,
 	       Logger::job_handle_t = Logger::NO_JOB);
     void error(FileLocation const&, std::string const& msg,
-	       Logger::job_handle_t = Logger::NO_JOB);
+	       Logger::job_handle_t = Logger::NO_JOB,
+	       bool count_as_error = true);
     void deprecate(std::string const& version,
 		   std::string const& msg,
 		   Logger::job_handle_t = Logger::NO_JOB);
@@ -491,6 +492,7 @@ class Abuild
     std::string gmake;
     boost::shared_ptr<JavaBuilder> java_builder;
     DependencyGraph build_graph;
+    std::set<std::string> forced_failures;
     boost::shared_ptr<Interface> base_interface;
     std::vector<std::string> buildset_reverse_order;
     std::map<std::string, std::string> buildgraph_tree_prefixes;

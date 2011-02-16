@@ -112,9 +112,9 @@ Abuild::error(std::string const& msg, Logger::job_handle_t job)
 
 void
 Abuild::error(FileLocation const& location, std::string const& msg,
-	      Logger::job_handle_t job)
+	      Logger::job_handle_t job, bool count_as_error)
 {
-    this->error_handler.error(location, msg, job);
+    this->error_handler.error(location, msg, job, count_as_error);
 }
 
 void

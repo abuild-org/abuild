@@ -1,0 +1,8 @@
+abuild: build starting
+abuild: b (abuild-zz_os.cpu.parent.other): all
+abuild: c (abuild-zz_os.cpu.grandparent.other): all
+abuild: a (abuild-zz_os.cpu.child.other): all
+abuild: b (abuild-zz_os.cpu.grandparent.other): all
+abuild: a (abuild-zz_os.cpu.grandparent.other): all
+abuild: d (abuild-zz_os.cpu.parent.other): all
+abuild: build complete

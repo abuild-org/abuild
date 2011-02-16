@@ -288,14 +288,30 @@ $td->runtest("two levels of hierarchical types",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("build all with nested types",
+	     {$td->COMMAND =>
+		  "abuild -b all",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case8.all.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("no fallback to grandparent",
 	     {$td->COMMAND =>
-		  "SKIP_PARENT=1 abuild -b all --dump-build-graph",
+		  "SKIP_PARENT=1 abuild -b all",
 	      $td->FILTER => "perl $filters/filter-abuild.pl"},
 	     {$td->FILE => "$top/case8.parent-error.out",
 	      $td->EXIT_STATUS => 2},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("missing platform with -k",
+	     {$td->COMMAND =>
+		  "SKIP_PARENT=1 abuild -b all -k",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/case8.forced-fail.out",
+	      $td->EXIT_STATUS => 2},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td, "not-accessed.out");
 
-$td->report(46);
+$td->report(48);

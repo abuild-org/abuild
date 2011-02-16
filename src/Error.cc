@@ -66,10 +66,14 @@ Error::logText(FileLocation const& location, std::string const& msg,
 
 void
 Error::error(FileLocation const& location, std::string const& msg,
-	     Logger::job_handle_t job)
+	     Logger::job_handle_t job,
+	     bool count_as_error)
 {
-    any_errors = true;
-    ++this->num_errors;
+    if (count_as_error)
+    {
+	any_errors = true;
+	++this->num_errors;
+    }
     logText(location, "ERROR: " + msg, job);
 }
 

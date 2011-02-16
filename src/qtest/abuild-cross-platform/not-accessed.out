@@ -43,7 +43,3 @@ work/case7/lib/native/Abuild.mk
 work/case7/lib/p1/Abuild.mk
 work/case7/lib/p1a/Abuild.mk
 work/case7/lib/p2a/Abuild.mk
-work/case8/a/Abuild.mk
-work/case8/b/Abuild.mk
-work/case8/c/Abuild.mk
-work/case8/d/Abuild.mk

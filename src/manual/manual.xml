@@ -8,7 +8,7 @@
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
 <!ENTITY swversion "1.1.4">
-<!ENTITY lastreleased "February 15, 2011">
+<!ENTITY lastreleased "February 16, 2011">
 ]>
 <!--
 
@@ -17437,7 +17437,7 @@ Y = $(X)
  end template -->
 
     <varlistentry>
-     <term>1.1.4: February 15, 2011</term>
+     <term>1.1.4: February 16, 2011</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -17445,6 +17445,16 @@ Y = $(X)
          Enhancements
         </para>
         <itemizedlist>
+         <listitem>
+          <para>
+           When &abuild; is run with the <option>-k</option> flag, the
+           condition of a particular item not being able to be built
+           on a particular platform because a dependency can't be
+           built on a compatible platform now causes a failure of only
+           that item on that platform rather than causing a failure of
+           the entire build.
+          </para>
+         </listitem>
          <listitem>
           <para>
            Platform types may now have parents, which makes it

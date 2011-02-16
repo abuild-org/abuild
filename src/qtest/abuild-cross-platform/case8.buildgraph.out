@@ -7,6 +7,10 @@
   <dep name="c" platform="zz_os.cpu.grandparent.other"/>
  </item>
  <item name="b" platform="zz_os.cpu.grandparent.other"/>
+ <item name="a" platform="zz_os.cpu.grandparent.other">
+  <dep name="b" platform="zz_os.cpu.grandparent.other"/>
+  <dep name="c" platform="zz_os.cpu.grandparent.other"/>
+ </item>
  <item name="d" platform="zz_os.cpu.parent.other">
   <dep name="b" platform="zz_os.cpu.parent.other"/>
   <dep name="c" platform="zz_os.cpu.grandparent.other"/>

@@ -15,7 +15,8 @@ class Error
 
     // Writes an error message using the logger
     void error(FileLocation const&, std::string const&,
-	       Logger::job_handle_t job = Logger::NO_JOB);
+	       Logger::job_handle_t job = Logger::NO_JOB,
+	       bool count_as_error = true);
 
     // Writes a deprecation error or warning
     void deprecate(std::string const& version,

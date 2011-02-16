@@ -453,3 +453,4 @@ PlatformData ERR non-object-code parent 0
 PlatformData ERR unknown parent 0
 BuildItem best platform for platform is platform 1
 BuildItem found compatible platform type 0
+Abuild-build ERR forced fail 0
