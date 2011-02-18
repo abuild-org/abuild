@@ -43,3 +43,5 @@ work/case7/lib/native/Abuild.mk
 work/case7/lib/p1/Abuild.mk
 work/case7/lib/p1a/Abuild.mk
 work/case7/lib/p2a/Abuild.mk
+work/case8/backing/other2/indep2/Abuild.mk
+work/case8/backing/other2/java2/Abuild.mk
