@@ -178,6 +178,14 @@ class JavaBuilder
 	{
 	    if (this.buildArgs.testProtocol)
 	    {
+		// There's no guarantee that the rogue error from
+		// before redirection line will be read before the
+		// rogue output after redirection line or even that
+		// the output lines precede the error lines.  The
+		// sleeps should help.  Ideally, the test suite should
+		// tolerate those lines in either order as long as
+		// each rogue line from before redirection precedes
+		// the corresponding line from after redirection.
 		System.out.println("rogue output from before redirection");
 		System.out.flush();
 		Thread.sleep(500);

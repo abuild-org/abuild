@@ -63,6 +63,10 @@ cd("work/protocol");
 chop(my $support_utf8 = `abuild --silent -b name:print-utf8`);
 foreach my $j ('j1', 'j2')
 {
+    # There is a race condition in reading output/error that can
+    # sometimes cause this test case to fail.  See comments in
+    # JavaBuilder.java around testProtocol for details in case it
+    # becomes worth fixing.
     if ($support_utf8)
     {
 	$td->runtest("JavaBuilder protocol (utf8): $j",
