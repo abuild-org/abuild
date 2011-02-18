@@ -351,7 +351,7 @@ BuildItem::getBestPlatformForType(
 
 std::string
 BuildItem::getBestPlatformForPlatform(
-    std::string const& platform,
+    BuildItem const& item, std::string const& platform,
     std::map<std::string, PlatformSelector> const& platform_selectors) const
 {
     // Pick the best choice among our buildable platforms for
@@ -375,14 +375,14 @@ BuildItem::getBestPlatformForPlatform(
     {
 	// If we can't build on the requested platform, see if we can
 	// build on any platform that is compatible with the requested
-	// platform.  Find out from platform_data what platform type
-	// the requested platform belongs to and what other platform
-	// types are compatible with it.  Then see if we build on any
-	// of those platform types and pick the best matching platform
-	// for the best matching platform type.  Note that once we
-	// find a matching platform type, we stop looking.  This is
-	// true even if the first matching platform type has no
-	// matching platforms but subsequent matching types do have
+	// platform.  Find out from the requesting item's
+	// platform_data what platform types are compatible with the
+	// platform on which it is being built.  Then see if we build
+	// on any of those platform types and pick the best matching
+	// platform for the best matching platform type.  Note that
+	// once we find a matching platform type, we stop looking.
+	// This is true even if the first matching platform type has
+	// no matching platforms but subsequent matching types do have
 	// matching platforms.  The reason for this is that the list
 	// of available platform types is static while the list of
 	// available platforms may depend on the environment, and we
@@ -390,11 +390,9 @@ BuildItem::getBestPlatformForPlatform(
 	// the environment (beyond the influence of platform
 	// selectors, which can still only change which platform is
 	// selected within a platform type).
-	assert(this->platform_data.get());
-	std::string const& platform_type =
-	    this->platform_data->getPlatformType(platform);
-	std::vector<std::string> const& compatible_types =
-	    this->platform_data->getCompatiblePlatformTypes(platform_type);
+	assert(item.platform_data.get());
+	std::vector<std::string> compatible_types =
+	    item.platform_data->getCompatiblePlatformTypes(platform);
 	for (std::vector<std::string>::const_iterator iter =
 		 compatible_types.begin();
 	     iter != compatible_types.end(); ++iter)

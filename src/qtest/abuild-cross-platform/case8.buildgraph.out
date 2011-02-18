@@ -1,15 +1,25 @@
 <?xml version="1.0"?>
 <build-graph version="1">
+ <item name="indep" platform="indep"/>
+ <item name="java" platform="java"/>
+ <item name="other" platform="zz_os.cpu.child.other">
+  <dep name="indep" platform="indep"/>
+ </item>
+ <item name="other" platform="zz_os.cpu.grandparent.other">
+  <dep name="indep" platform="indep"/>
+ </item>
  <item name="b" platform="zz_os.cpu.parent.other"/>
  <item name="c" platform="zz_os.cpu.grandparent.other"/>
  <item name="a" platform="zz_os.cpu.child.other">
   <dep name="b" platform="zz_os.cpu.parent.other"/>
   <dep name="c" platform="zz_os.cpu.grandparent.other"/>
+  <dep name="other" platform="zz_os.cpu.child.other"/>
  </item>
  <item name="b" platform="zz_os.cpu.grandparent.other"/>
  <item name="a" platform="zz_os.cpu.grandparent.other">
   <dep name="b" platform="zz_os.cpu.grandparent.other"/>
   <dep name="c" platform="zz_os.cpu.grandparent.other"/>
+  <dep name="other" platform="zz_os.cpu.grandparent.other"/>
  </item>
  <item name="d" platform="zz_os.cpu.parent.other">
   <dep name="b" platform="zz_os.cpu.parent.other"/>

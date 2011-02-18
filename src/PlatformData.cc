@@ -53,16 +53,7 @@ PlatformData::addPlatformType(std::string const& platform_type,
 
     this->platform_graph.addItem(pt_item);
 
-    if (parent_platform_type.empty())
-    {
-	// Everything is compatible with indep.
-	if (target_type != TargetType::tt_platform_independent)
-	{
-	    this->platform_graph.addDependency(
-		pt_item, PLATFORM_TYPE_PREFIX + pt_INDEP);
-	}
-    }
-    else
+    if (! parent_platform_type.empty())
     {
 	// target_type can only be other than object code during
 	// initialization, and we don't pass any parent platform types
@@ -328,13 +319,6 @@ PlatformData::isPlatformTypeValid(std::string const& platform_type) const
     return (this->platforms_by_type.count(platform_type) != 0);
 }
 
-std::string const&
-PlatformData::getPlatformType(std::string const& platform) const
-{
-    assert(this->platform_types.count(platform));
-    return (*(this->platform_types.find(platform))).second;
-}
-
 TargetType::target_type_e
 PlatformData::getTargetType(std::string const& platform_type) const
 {
@@ -349,13 +333,26 @@ PlatformData::getPlatformsByType(std::string const& platform_type) const
     return (*(this->platforms_by_type.find(platform_type))).second;
 }
 
-std::vector<std::string> const&
+std::vector<std::string>
 PlatformData::getCompatiblePlatformTypes(
-    std::string const& platform_type) const
+    std::string const& platform) const
 {
-    assert(isPlatformTypeValid(platform_type));
-    assert(this->compatible_platform_types.count(platform_type));
-    return (*(this->compatible_platform_types.find(platform_type))).second;
+    std::vector<std::string> result;
+    if (this->platform_types.count(platform))
+    {
+	std::string const& platform_type =
+	    (*(this->platform_types.find(platform))).second;
+	assert(isPlatformTypeValid(platform_type));
+	assert(this->compatible_platform_types.count(platform_type));
+	result = (*(this->compatible_platform_types.
+		    find(platform_type))).second;
+    }
+    if (platform != PLATFORM_INDEP)
+    {
+	// All types are compatible with indep
+	result.push_back(pt_INDEP);
+    }
+    return result;
 }
 
 std::set<std::string>

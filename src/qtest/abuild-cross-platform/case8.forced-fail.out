@@ -1,6 +1,8 @@
 --topdir--/case8/a/Abuild.conf:1: ERROR: "a" is being built on platform "zz_os.cpu.child.other", but its dependency "b" is not being built on a suitable platform
 --topdir--/case8/b/Abuild.conf:1: ERROR: here is the location of "b"
 abuild: build starting
+abuild: indep (abuild-indep): all
+abuild: java (abuild-java): all
 abuild: c (abuild-zz_os.cpu.grandparent.other): all
 abuild: a (abuild-zz_os.cpu.child.other):
 --topdir--/case8/a/Abuild.conf:1: ERROR: build suppressed because of earlier errors

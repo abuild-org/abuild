@@ -40,9 +40,6 @@ class PlatformData
     // check() must have been called.
     bool isPlatformTypeValid(std::string const&) const;
 
-    // Get the platform type for a platform
-    std::string const& getPlatformType(std::string const&) const;
-
     // Get the target type for a platform type
     TargetType::target_type_e getTargetType(std::string const&) const;
 
@@ -55,10 +52,10 @@ class PlatformData
     selected_platforms_t const& getPlatformsByType(
 	std::string const& platform_type) const;
 
-    // Return a list of platform types that this platform type may
-    // depend on in order of search preference
-    std::vector<std::string> const& getCompatiblePlatformTypes(
-	std::string const& platform_type) const;
+    // Return a list of platform types that this platform may depend
+    // on in order of search preference
+    std::vector<std::string> getCompatiblePlatformTypes(
+	std::string const& platform) const;
 
     // Return a list of platform types for a given target type
     std::set<std::string> getPlatformTypes(TargetType::target_type_e) const;

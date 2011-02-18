@@ -450,7 +450,7 @@ Abuild::addItemToBuildGraph(std::string const& item_name, BuildItem& item)
 		// See comments in BuildItem.cc for details.
 		dep_platform =
 		    dep_item.getBestPlatformForPlatform(
-			item_platform, this->platform_selectors);
+			item, item_platform, this->platform_selectors);
 	    }
 
 	    if (! dep_platform.empty())

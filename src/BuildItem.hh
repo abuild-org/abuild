@@ -62,7 +62,7 @@ class BuildItem
 	PlatformSelector const*,
 	std::map<std::string, PlatformSelector> const& platform_selectors) const;
     std::string getBestPlatformForPlatform(
-	std::string const& platform,
+	BuildItem const& item, std::string const& platform,
 	std::map<std::string, PlatformSelector> const& platform_selectors) const;
     TargetType::target_type_e getTargetType() const;
     bool isNamed(std::set<std::string>& item_names) const;

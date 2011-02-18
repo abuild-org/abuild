@@ -2784,6 +2784,7 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 	BuildTree& item_tree = *(buildtrees[item.getTreeName()]);
 	boost::shared_ptr<PlatformData> platform_data =
 	    item_tree.getPlatformData();
+	item.setPlatformData(platform_data);
 	std::set<std::string> const& platform_types =
 	    item.getPlatformTypes();
 	std::set<std::string> build_platforms;
@@ -2815,7 +2816,6 @@ Abuild::computeBuildablePlatforms(BuildForest& forest)
 		    }
 		}
 		item.setBuildablePlatforms(platform_type, buildable_platforms);
-		item.setPlatformData(platform_data);
 	    }
         }
         item.setBuildPlatforms(build_platforms);
