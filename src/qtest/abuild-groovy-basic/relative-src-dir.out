@@ -1,0 +1,7 @@
+abuild: build starting
+abuild: java-rules-bug (abuild-java): all
+    [mkdir] Created dir: --topdir--/relative-src-dir/abuild-java/classes
+    [javac] Compiling 1 source file to --topdir--/relative-src-dir/abuild-java/classes
+    [mkdir] Created dir: --topdir--/relative-src-dir/abuild-java/dist
+      [jar] Building jar: --topdir--/relative-src-dir/abuild-java/dist/hello.jar
+abuild: build complete

@@ -181,6 +181,17 @@ $td->runtest("Groovy/Java interdependence",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+# Test relative source directory set in java.dir.src.  This test case
+# is verbatim from a bug report sent in by Brian Reid.
+cd("work/relative-src-dir");
+
+$td->runtest("relative java.src.dir",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/relative-src-dir.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(18 + ($support_utf8 ? 2 : 0));
+$td->report(19 + ($support_utf8 ? 2 : 0));
