@@ -182,6 +182,7 @@ class JavaBuilder
 		System.out.flush();
 		Thread.sleep(500);
 		System.err.println("rogue error from before redirection");
+		Thread.sleep(500);
 	    }
 
 	    OutputHandlerStream newOut =
