@@ -17511,6 +17511,22 @@ Y = $(X)
          </listitem>
         </itemizedlist>
        </listitem>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           A bug to the groovy backend that prevented relative
+           directories from working properly when assigned to
+           java.dir.src and similar variables has been fixed.  Thanks
+           to Brian Reid for the report, test case, and proper
+           diagnosis for the problem.
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
       </itemizedlist>
      </listitem>
     </varlistentry>
