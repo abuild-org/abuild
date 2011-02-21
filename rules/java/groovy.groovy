@@ -17,7 +17,7 @@ class GroovyRules
 
     def getPathVariable(String var, String prefix)
     {
-        def result = abuild.resolveAsString("${prefix}.dir.${var}")
+        String result = abuild.resolveAsString("${prefix}.dir.${var}")
         if (! new File(result).isAbsolute())
         {
             result = new File(abuild.sourceDirectory, result)
