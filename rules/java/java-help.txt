@@ -58,7 +58,7 @@ JAR signing
 JUnit
 -----
 
-  java.junitTestSuite - name of class with JUnit test suite
+  java.junitTestsuite - name of class with JUnit test suite
   java.junitBatchIncludes - pattern matching classes with test suites
   java.junitBatchExcludes - pattern to filter out classes to search
        for test suites
