@@ -259,7 +259,7 @@ my $abuild_out = undef;
 	    }
 	    elsif ($in_tree)
 	    {
-		if (m/platform type (\S+)/)
+		if (m/platform type ([^\s;]+)/)
 		{
 		    $in_platform_type = ($1 eq $platform_type);
 		}
