@@ -1,3 +1,18 @@
+1.1.6
+=====
+
+ * Bug fix: verify-compiler didn't work with platform types that had
+   parents.  Fixed in verify-compiler but not exercised in the test
+   suite.  Need to change the verify-comipler test suite to test a
+   platform type with a parent, back out the change to
+   verify-compiler, have the test case fail, reintroduce the change,
+   and have it pass.  Then update release notes.  Fundamental problem
+   here is that verify-compiler should be looking at xml instead of
+   parsing the output of list-platforms.  Either fix or at least put a
+   loud comment in list-platforms that verify-compiler parses the
+   output.  If XML::Parser is standard, consider updating to use
+   --dump-data.
+
 Next
 ====
 
