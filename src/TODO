@@ -13,6 +13,10 @@
    output.  If XML::Parser is standard, consider updating to use
    --dump-data.
 
+ * "deps: a a -platform=x" doesn't do the right thing.  It apparently
+   just treats this as a dependency on a -platform=x.  It should
+   either give an error or accept both dependencies.
+
 Next
 ====
 
