@@ -17,6 +17,8 @@
    just treats this as a dependency on a -platform=x.  It should
    either give an error or accept both dependencies.
 
+ * a -> deps: b b b b stores b four times....
+
 Next
 ====
 
