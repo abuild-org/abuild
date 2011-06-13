@@ -32,6 +32,16 @@
  * Maybe there should be a way for a build item's backend to know what
    traits it has, but maybe not.
 
+ * When abuild reports a case of a build item depending on an unknown
+   build item or a tree depending on an unknown tree AND the top level
+   Abuild.conf file is below a directory with an Abuild.conf file that
+   does not reference it as a child, abuild could suggest that perhaps
+   the user has failed to reference the top-level file as a child.
+   Sometimes people add a new directory and forget to hook it in.  The
+   error message that it references an unknown item doesn't usually
+   steer them to the actual problem.
+
+
 Next
 ====
 
