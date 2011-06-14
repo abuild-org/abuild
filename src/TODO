@@ -1,6 +1,9 @@
 1.1.6
 =====
 
+ * test-only should not depend on all in qtest-support.mk.  Make sure
+   this causes a test failure, then fix.
+
  * Bug fix: verify-compiler didn't work with platform types that had
    parents.  Fixed in verify-compiler but not exercised in the test
    suite.  Need to change the verify-comipler test suite to test a
