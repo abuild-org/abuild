@@ -1,6 +1,12 @@
 1.1.6
 =====
 
+ * Consider bundling antcontrib with abuild so it doesn't have to be
+   added to ant.  Drop it if there is ever an abuild 1.2 that drops
+   the old ant support.
+
+ * Mention that abuild has been tested with openjdk.
+
  * test-only should not depend on all in qtest-support.mk.  Make sure
    this causes a test failure, then fix.
 
