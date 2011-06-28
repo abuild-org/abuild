@@ -5,3 +5,4 @@ BEGIN { $^W = 1; }
 use strict;
 
 print "platform zz_os.cpu.toolset.xcc -type crosstype\n";
+print "platform zz_os.cpu.toolset2.xcc -type nested\n";

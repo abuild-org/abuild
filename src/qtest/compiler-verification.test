@@ -106,6 +106,20 @@ $td->runtest("cross compiler plugin",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+$td->runtest("nested type compiler plugin",
+	     {$td->COMMAND =>
+		  "$abuild_top/misc/compiler-verification/verify-compiler" .
+		  " </dev/null" .
+		  " --plugin-tree-location $top/plugins" .
+		  " --plugin-tree-name compiler-plugins" .
+		  " --plugin-name cross" .
+		  " --platform-type nested" .
+		  " --compiler xcc",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/nested-type.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 $td->runtest("pseudo-cross compiler plugin",
 	     {$td->COMMAND =>
 		  " $abuild_top/misc/compiler-verification/verify-compiler" .
@@ -136,4 +150,4 @@ $td->runtest("1.0 compatibility",
 
 cleanup();
 
-$td->report(5 + (in_windows() ? 1 : 0));
+$td->report(6 + (in_windows() ? 1 : 0));

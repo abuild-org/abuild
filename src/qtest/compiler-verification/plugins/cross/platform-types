@@ -1,1 +1,2 @@
 platform-type crosstype
+platform-type nested -parent crosstype

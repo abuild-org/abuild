@@ -1,0 +1,173 @@
+
+===> CREATING BUILD TREE <===
+
+
+===> NON-NATIVE COMPILER <===
+
+You will be asked to run programs at various times during this test.
+In each case, the executable target is "main" and is located in
+.verify-tmp/src/abuild-zz_os.cpu.toolset2.xcc.
+
+The program requires three shared libraries: "Z1" and "Z2", which
+can be found in the same directory as "main", and "B", which is
+located in .verify-tmp/b/abuild-zz_os.cpu.toolset2.xcc.
+
+The program itself should contain the symbols A::hello() and
+X::hello().  If Other::Other() is in the expected output, it should
+also contain the symbol Other::Other().  The B shared library should
+contain the symbol B::hello().  The Z1 shared library should contain
+the symbols Y::hello() and Z1::hello().  The Z2 shared library should
+contain the symbol Z2::hello().
+
+When this program asks you to run the program, it will display the expected
+output and prompt you to continue.
+Hit return to continue.
+
+===> RUNNING INITIAL BUILD <===
+
+abuild: build starting
+abuild: a (abuild-zz_os.cpu.toolset2.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset2.xcc'
+Compiling ../A.cc as C++
+Creating A library
+make: Leaving directory `--topdir--/.verify-tmp/a/abuild-zz_os.cpu.toolset2.xcc'
+abuild: auto (abuild-zz_os.cpu.toolset2.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/autoconf/abuild-zz_os.cpu.toolset2.xcc'
+[autoconf output suppressed]
+make: Leaving directory `--topdir--/.verify-tmp/autoconf/abuild-zz_os.cpu.toolset2.xcc'
+abuild: b (abuild-zz_os.cpu.toolset2.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/b/abuild-zz_os.cpu.toolset2.xcc'
+Compiling ../B.cc as C++
+Creating B shared library
+make: Leaving directory `--topdir--/.verify-tmp/b/abuild-zz_os.cpu.toolset2.xcc'
+abuild: x (abuild-zz_os.cpu.toolset2.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/x/abuild-zz_os.cpu.toolset2.xcc'
+Compiling ../X.cc as C++
+Creating X library
+make: Leaving directory `--topdir--/.verify-tmp/x/abuild-zz_os.cpu.toolset2.xcc'
+abuild: src (abuild-zz_os.cpu.toolset2.xcc): all
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset2.xcc'
+Compiling ../Y.cc as C++
+Creating Y library
+Compiling ../Z1.cc as C++
+Creating Z1 shared library
+Compiling ../Z2.cc as C++
+Creating Z2 shared library
+Compiling ../main.cc as C++
+Compiling ../other.cc as C++
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset2.xcc'
+abuild: build complete
+
+===> BUILD OKAY <===
+
+
+===> CHECK PROGRAM OUTPUT <===
+
+Execpted output:
+Other::Other()
+have printf: 1
+have exception: 1
+Hello from A
+Hello from B
+Hello from X
+Hello from Y
+Hello from Z1
+Hello from Z2
+
+Hit return to continue.
+
+===> REBUILD WHEN UP TO DATE <===
+
+abuild: build starting
+abuild: a (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: build complete
+
+===> BUILD OKAY <===
+
+
+===> RUNNING BUILD AFTER REMOVING SOURCE <===
+
+abuild: build starting
+abuild: a (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset2.xcc): all
+Extra object files found: removing libraries and binaries
+make: Entering directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset2.xcc'
+Creating Y library
+Creating Z1 shared library
+Creating Z2 shared library
+Creating main executable
+make: Leaving directory `--topdir--/.verify-tmp/src/abuild-zz_os.cpu.toolset2.xcc'
+abuild: build complete
+
+===> BUILD OKAY <===
+
+
+===> CHECK PROGRAM OUTPUT <===
+
+Execpted output:
+have printf: 1
+have exception: 1
+Hello from A
+Hello from B
+Hello from X
+Hello from Y
+Hello from Z1
+Hello from Z2
+
+Hit return to continue.
+
+===> RUNNING BUILD AFTER MOVING HEADER <===
+
+abuild: build starting
+abuild: a (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: build complete
+
+===> BUILD INCORRECT <===
+
+missing compilation of X.cc
+missing compilation of main.cc
+missing creation of X
+missing creation of Z1
+missing creation of Z2
+missing creation of main
+
+
+===> CHECK PROGRAM OUTPUT <===
+
+Execpted output:
+have printf: 1
+have exception: 1
+Hello from A
+Hello from B
+Hello from X
+Hello from Y
+Hello from Z1
+Hello from Z2
+
+Hit return to continue.
+
+===> REBUILD WHEN UP TO DATE <===
+
+abuild: build starting
+abuild: a (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: auto (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: b (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: x (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: src (abuild-zz_os.cpu.toolset2.xcc): all
+abuild: build complete
+
+===> BUILD OKAY <===
+
+FAILURES: 1
