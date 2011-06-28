@@ -3,6 +3,4 @@ require 5.008;
 use warnings;
 use strict;
 
-my $whoami = basename($0);
-
 print "native-compiler zyx\n";
