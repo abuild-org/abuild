@@ -4,12 +4,6 @@
  * test-only should not depend on all in qtest-support.mk.  Make sure
    this causes a test failure, then fix.
 
- * "deps: a a -platform=x" doesn't do the right thing.  It apparently
-   just treats this as a dependency on a -platform=x.  It should
-   either give an error or accept both dependencies.
-
- * a -> deps: b b b b stores b four times....
-
  * Think about whether to support some way of getting -isystem instead
    of -I for includes under a certain directory.  Ideal
    implementation: have an interface variable (probably global) called

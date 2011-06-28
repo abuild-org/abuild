@@ -8,9 +8,11 @@
 --topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: invalid tree dependency don't
 --topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: invalid tree dependency so.
 --topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: invalid tree dependency you?
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree dependency z appears more than once
 --topdir--/a/aa/aag/aagd/Abuild.conf:1: ERROR: another tree with the name "aagc" has been found in this forest
 --topdir--/a/aa/aag/aagc/Abuild.conf:1: ERROR: here is the other tree
 --topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree I
 --topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree think
 --topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree Do
+--topdir--/a/aa/aag/aagb/Abuild.conf:1: ERROR: tree what kind of a name is this? depends on unknown build tree z
 abuild: ERROR: errors detected; exiting

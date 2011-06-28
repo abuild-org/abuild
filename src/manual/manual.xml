@@ -17457,7 +17457,8 @@ Y = $(X)
          </listitem>
          <listitem>
           <para>
-           LIST ITEM
+           Duplicated dependencies and duplicated tree dependencies
+           are now reported as errors.
           </para>
          </listitem>
         </itemizedlist>

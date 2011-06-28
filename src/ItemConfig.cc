@@ -785,6 +785,7 @@ ItemConfig::checkDeps()
     boost::regex platform_re("-platform=(\\S+)");
     boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
+    std::set<std::string> deps_seen;
 
     this->deps = Util::splitBySpace(this->kv.getVal(k_DEPS));
 
@@ -797,6 +798,17 @@ ItemConfig::checkDeps()
 	if (boost::regex_match(*iter, match, item_name_re))
 	{
 	    last_dep = *iter;
+	    if (deps_seen.count(last_dep) != 0)
+	    {
+		QTC::TC("abuild", "ItemConfig ERR repeated dep");
+		this->error.error(this->location, "dependency " + last_dep +
+				  " appears more than once");
+		this->deps.erase(iter, next);
+	    }
+	    else
+	    {
+		deps_seen.insert(last_dep);
+	    }
 	}
 	else
 	{
@@ -885,6 +897,7 @@ ItemConfig::checkTreeDeps()
 {
     boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
+    std::set<std::string> deps_seen;
 
     this->tree_deps = Util::splitBySpace(this->kv.getVal(k_TREEDEPS));
 
@@ -897,6 +910,17 @@ ItemConfig::checkTreeDeps()
 	if (boost::regex_match(*iter, match, item_name_re))
 	{
 	    last_dep = *iter;
+	    if (deps_seen.count(last_dep) != 0)
+	    {
+		QTC::TC("abuild", "ItemConfig ERR repeated treedep");
+		this->error.error(this->location, "tree dependency "
+				  + last_dep + " appears more than once");
+		this->tree_deps.erase(iter, next);
+	    }
+	    else
+	    {
+		deps_seen.insert(last_dep);
+	    }
 	}
 	else
 	{

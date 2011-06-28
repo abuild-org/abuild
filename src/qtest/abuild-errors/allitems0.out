@@ -15,6 +15,9 @@
 --topdir--/a/ab/Abuild.conf:1: ERROR: a platform has already been declared for dependency b.private
 --topdir--/a/ab/Abuild.conf:1: ERROR: invalid platform selector other:skip
 --topdir--/a/ab/Abuild.conf:1: ERROR: invalid dependency !heh!
+--topdir--/a/ab/Abuild.conf:1: ERROR: dependency a appears more than once
+--topdir--/a/ab/Abuild.conf:1: ERROR: dependency b appears more than once
+--topdir--/a/ab/Abuild.conf:1: ERROR: dependency b appears more than once
 --topdir--/a/ab/Abuild.conf:1: ERROR: visible-to not permitted for public build items
 --topdir--/a/ab/Abuild.conf:1: ERROR: flag names may contain only alphanumeric characters, underscores, periods, and dashes
 --topdir--/a/ab/Abuild.conf:1: ERROR: -global is not preceded by a plugin
@@ -71,6 +74,8 @@
 --topdir--/c/ca/Abuild.conf:1: ERROR: ca depends on unknown build item cc
 --topdir--/c/cc/Abuild.conf:1: ERROR: cc.private depends on unknown build item cc
 --topdir--/a/ab/Abuild.conf:1: ERROR: ab requests building of unknown build item "does-not-exist"
+--topdir--/a/ab/Abuild.conf:1: ERROR: dependency "a" declared with platform type "x" , which dependency does not have
+--topdir--/a/ab/Abuild.conf:1: ERROR: this item has no platform types, so it may not declare platform types on its dependencies
 --topdir--/d/a/Abuild.conf:1: ERROR: d.a may not specify flag oink for dependency d.a.a because d.a.a does not support that flag
 --topdir--/a/ab/Abuild.conf:1: ERROR: trait trait1 refers to item b.private which is private to another scope
 --topdir--/a/ab/Abuild.conf:1: ERROR: trait trait1 refers to item b.private which does not exist
