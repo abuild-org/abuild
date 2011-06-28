@@ -913,7 +913,8 @@ following checks:
       <listitem>
        <para>
         A Java 5 or newer Java SDK is required if you are going to use
-        &abuild; to build Java code.
+        &abuild; to build Java code.  &Abuild; is known to work with
+        OpenJDK 1.6.
        </para>
       </listitem>
       <listitem>
@@ -17435,6 +17436,55 @@ Y = $(X)
     </varlistentry>
 
  end template -->
+
+
+    <varlistentry>
+     <term>1.1.6: XXX</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Bug Fixes
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           The <command>verify-compiler</command> command used for
+           testing your own compiler plugins did not work with nested
+           platform types.  Nested platform types were added to abuild
+           in version 1.1.5.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+       <listitem>
+        <para>
+         HEADING
+        </para>
+        <itemizedlist>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           LIST ITEM
+          </para>
+         </listitem>
+        </itemizedlist>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+
+
+
 
     <varlistentry>
      <term>1.1.5: February 18, 2011</term>

@@ -1,13 +1,8 @@
 1.1.6
 =====
 
- * Doc: Mention that abuild has been tested with openjdk.
-
  * test-only should not depend on all in qtest-support.mk.  Make sure
    this causes a test failure, then fix.
-
- * Release notes: Bug fix: verify-compiler didn't work with platform
-   types that had parents.
 
  * "deps: a a -platform=x" doesn't do the right thing.  It apparently
    just treats this as a dependency on a -platform=x.  It should
