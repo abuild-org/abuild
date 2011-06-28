@@ -1,9 +1,9 @@
 require 5.008;
-BEGIN { $^W = 1; }
+use warnings;
 use strict;
+use File::Basename;
 
-my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
-#my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+my $whoami = basename($0);
 
 my $calculate = $ENV{'CALCULATE'} or die "$whoami: CALCULATE is not defined\n";
 

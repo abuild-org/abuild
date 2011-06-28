@@ -3,7 +3,7 @@
 # See README.txt for details about this verification.
 
 require 5.008;
-BEGIN { $^W = 1; }
+use warnings;
 use strict;
 use Cwd;
 use Cwd 'abs_path';
@@ -11,8 +11,8 @@ use File::Find;
 use File::Basename;
 use File::Copy;
 
-my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
-my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+my $whoami = basename($0);
+my $dirname = dirname($0);
 
 my $tmpdir = undef;
 my $cwd = getcwd();

@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 
 require 5.008;
-BEGIN { $^W = 1; }
+use warnings;
 use strict;
 use File::Basename;
 use IO::File;
 
-my $whoami = ($0 =~ m,([^/\\]*)$,) ? $1 : $0;
-my $dirname = ($0 =~ m,(.*)[/\\][^/\\]+$,) ? $1 : ".";
+my $whoami = basename($0);
+my $dirname = dirname($0);
 
 my $tabwidth = 8;
 
