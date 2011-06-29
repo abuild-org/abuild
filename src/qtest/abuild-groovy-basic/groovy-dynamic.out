@@ -4,6 +4,7 @@ abuild.itemPaths['qwer'] = '--topdir--/dynamic'
 abuild.abuildTop = '--abuild-dir--'
 abuild.pluginPaths = []
 abuild.rulePaths = ['--abuild-dir--/rules/platform-independent', '--abuild-dir--/rules/all']
+abuild.traits = []
 abuild.interfaceVars['ABUILD_ITEM_NAME'] = 'qwer'
 abuild.interfaceVars['ABUILD_OUTPUT_DIR'] = '--topdir--/dynamic/abuild-indep'
 abuild.interfaceVars['ABUILD_PLATFORM'] = 'indep'

@@ -162,12 +162,26 @@ $td->runtest("clean all",
 	     $td->NORMALIZE_NEWLINES);
 
 cd("work/show-traits");
-$td->runtest("show traits",
-	     {$td->COMMAND => "abuild --silent --build=all"},
-	     {$td->FILE => "$top/show-traits.out",
+
+$td->runtest("show traits (make)",
+	     {$td->COMMAND => "abuild --silent --build=name:make"},
+	     {$td->STRING => "make traits: moo quack\n",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+if ($test_java)
+{
+    $td->runtest("show traits (groovy)",
+		 {$td->COMMAND => "abuild --silent --build=name:groovy"},
+		 {$td->STRING => "groovy traits: moo quack\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    system("(tar cf - groovy | cat > /dev/null)");
+}
+
 check_work_accessed($td);
 
-$td->report(14 + ($test_java ? 1 : 0));
+$td->report(15 + ($test_java ? 1 : 0));

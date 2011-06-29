@@ -4110,6 +4110,23 @@ C:\cygwin\cygwin.bat
      with build items, the period does not have any semantic meaning
      when used in a trait name.
     </para>
+    <para>
+     Starting with &abuild; 1.1.6, a build item that uses either the
+     GNU Make backend or the Groovy backend (but not the deprecated
+     xml-based ant backend) may also get access to the list of traits
+     that are declared in its <filename>Abuild.conf</filename> file.
+     For the GNU Make backend, the variable
+     <varname>ABUILD_TRAITS</varname> contains a list of traits
+     separated by spaces.  For the Groovy backend, the variable
+     <varname>abuild.traits</varname> contains a groovy list of traits
+     represented as strings.  In both cases, any information about
+     referent build items is excluded; only the list of declared
+     traits is provided.  Possible uses for this information would
+     include having a custom rule check to make sure a given trait is
+     specified before providing a particular target, having it give an
+     error if a particular trait is not defined, or even having it
+     change behavior on the basis of a trait.
+    </para>
     <sect2 id="ref.declaring-traits">
      <title>Declaring Traits</title>
      <para>
