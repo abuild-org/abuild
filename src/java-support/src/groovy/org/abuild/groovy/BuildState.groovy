@@ -14,7 +14,7 @@ class BuildState implements Parameterized
     // "public" or "private" are public in groovy, but they are
     // intended to be accessed only from the Backend class in this
     // file.  (As of 1.6, groovy still doesn't honor public, private,
-    // and protected anywa.)
+    // and protected anyway.)
 
     // fields supplied by .ab-dynamic.groovy
     public interfaceVars = [:]
@@ -22,6 +22,7 @@ class BuildState implements Parameterized
     def abuildTop
     def pluginPaths
     def rulePaths
+    def traits
 
     // supplied by abuild
     public defines

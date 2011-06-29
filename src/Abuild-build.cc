@@ -1558,6 +1558,19 @@ Abuild::invoke_gmake(boost::mutex::scoped_lock& build_lock,
     }
     mk << "\n";
 
+    // Generate a list of traits just for the user's general
+    // information.  Since it's hard to parse complex strings in make,
+    // we'll ignore references and just provide a list of traits.
+    TraitData::trait_data_t const& td =
+	build_item.getTraitData().getTraitData();
+    mk << "ABUILD_TRAITS :=";
+    for (TraitData::trait_data_t::const_iterator iter = td.begin();
+	 iter != td.end(); ++iter)
+    {
+	mk << " " << (*iter).first;
+    }
+    mk << "\n";
+
     // Output variables based on the item's interface object.
     Interface const& _interface = build_item.getInterface(item_platform);
     std::map<std::string, Interface::VariableInfo> variables =
@@ -1820,6 +1833,23 @@ Abuild::invoke_groovy(boost::mutex::scoped_lock& build_lock,
     std::list<std::string> rule_paths =
 	getRulePaths(item_name, build_item, dir, false);
     dyn << "abuild.rulePaths = ['" << Util::join("', '", rule_paths) << "']\n";
+
+    // Generate a list of traits just for the user's general
+    // information.  For consistency with the make backend, just
+    // provide a list of traits without regard to any referent items.
+    TraitData::trait_data_t const& td =
+	build_item.getTraitData().getTraitData();
+    dyn << "abuild.traits = [";
+    for (TraitData::trait_data_t::const_iterator iter = td.begin();
+	 iter != td.end(); ++iter)
+    {
+	if (iter != td.begin())
+	{
+	    dyn << ", ";
+	}
+	dyn << "'" << (*iter).first << "'";
+    }
+    dyn << "]\n";
 
     // Provide data from the item's interface object.  We use
     // "interfaceVars" because "interface" is a reserved word in

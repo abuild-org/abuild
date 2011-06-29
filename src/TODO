@@ -11,21 +11,13 @@
    -isystem instead of -I.  This can be done without changing the
    order of include path searching.
 
- * Maybe there should be a way for a build item's backend to know what
-   traits it has, but maybe not.
-
- * When abuild reports a case of a build item depending on an unknown
-   build item or a tree depending on an unknown tree AND the top level
-   Abuild.conf file is below a directory with an Abuild.conf file that
-   does not reference it as a child, abuild could suggest that perhaps
-   the user has failed to reference the top-level file as a child.
-   Sometimes people add a new directory and forget to hook it in.  The
-   error message that it references an unknown item doesn't usually
-   steer them to the actual problem.
-
 
 Next
 ====
+
+ * In >= 1.2, make duplicated dependencies and tree dependencies
+   errors instead of warnings.  This can't be done in 1.1.x because it
+   breaks compatibility.
 
  * If you have a.c and a.o in the source directory, abuild will find
    ../a.o to satisfy the bin dependency because of vpath but will use
@@ -40,6 +32,15 @@ Next
    bad...
 
    Report from Ben Muzal
+
+ * When abuild reports a case of a build item depending on an unknown
+   build item or a tree depending on an unknown tree AND the top level
+   Abuild.conf file is below a directory with an Abuild.conf file that
+   does not reference it as a child, abuild could suggest that perhaps
+   the user has failed to reference the top-level file as a child.
+   Sometimes people add a new directory and forget to hook it in.  The
+   error message that it references an unknown item doesn't usually
+   steer them to the actual problem.
 
  * Some kind of progress report during a large build might be nice.
    This is especially tempting with the numbered prefixes in a -jn

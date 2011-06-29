@@ -13,6 +13,7 @@ test_setup();
 
 my $top = get_top();
 my $filters = get_filters();
+my ($test_java, $test_junit, $jar, $java) = @{get_java_information()};
 
 # We have three traits: eater, painter, and edible.  A depends upon
 # A-dep, is eaten by AB-eater, and is painted by A-painter.
@@ -160,6 +161,13 @@ $td->runtest("clean all",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/show-traits");
+$td->runtest("show traits",
+	     {$td->COMMAND => "abuild --silent --build=all"},
+	     {$td->FILE => "$top/show-traits.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 check_work_accessed($td);
 
-$td->report(14);
+$td->report(14 + ($test_java ? 1 : 0));

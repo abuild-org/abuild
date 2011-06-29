@@ -17492,6 +17492,14 @@ Y = $(X)
            are now reported as warnings.
           </para>
          </listitem>
+         <listitem>
+          <para>
+           New variables <varname>ABUILD_TRAITS</varname> and
+           <varname>abuild.traits</varname> are available to make and
+           groovy (respectively) backends that indicate which traits
+           are declared for the current build item.
+          </para>
+         </listitem>
         </itemizedlist>
        </listitem>
       </itemizedlist>
