@@ -56,6 +56,19 @@ _comma := ,
 
 GEN_DEPS := $(abBIN)/gen_deps
 
+# Usage: $(call starts_with s1,s2) -- returns 1 if s2 starts with s1
+# and the empty string otherwise
+define starts_with
+$(if $(filter $(1)%,$(2)),1)
+endef
+
+# Usage: $(call starts_with_any s1,s2) -- returns a non-empty string
+# if s2 starts with any of the strings in s1 and the empty string
+# otherwise
+define starts_with_any
+$(subst $(_space),,$(foreach S,$(1),$(call starts_with,$(S),$(2))))
+endef
+
 # usage: $(call strip_srcdir,val) -- strip $(SRCDIR) from the
 # beginning of val
 define strip_srcdir

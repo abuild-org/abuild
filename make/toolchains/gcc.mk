@@ -32,6 +32,7 @@ SHARED_FLAGS = -shared
 define soname_args
 -Wl,-soname -Wl,$(1)
 endef
+SYSTEM_INCLUDE_FLAG := -isystem$(_space)
 
 CCXX_GEN_DEPS = @:
 

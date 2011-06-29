@@ -49,6 +49,7 @@ declare XCPPFLAGS list string append
 declare XCFLAGS list string append
 declare XCXXFLAGS list string append
 declare XLINKFLAGS list string prepend
+declare SYSTEM_INCLUDES list filename append
 
 target-type java
 

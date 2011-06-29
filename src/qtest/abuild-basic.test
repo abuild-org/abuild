@@ -768,6 +768,7 @@ my $gcc32 = 0;
 my $gcc64 = 0;
 if ($gcc)
 {
+    # Test forced 32/64-bit operation
     foreach my $w (32, 64)
     {
 	my $var = ($w == 32) ? \$gcc32 : \$gcc64;
@@ -811,6 +812,39 @@ else
     system("(tar cf - . | cat > /dev/null)");
 }
 
+cd("work/system-includes");
+if ($gcc)
+{
+    # Test SYSTEM_INCLUDES
+    $td->runtest("build without system includes",
+		 {$td->COMMAND => "abuild",
+		  $td->FILTER => "perl $top/filter-gcc-warnings.pl"},
+		 {$td->STRING => "warnings: ../d1/a.h ../d1/s1/b.h ../d2/c.h\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("clean",
+		 {$td->COMMAND => "abuild clean",
+		  $td->FILTER => "perl $filters/filter-abuild.pl"},
+		 {$td->STRING => "abuild: cleaning in .\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+
+    $td->runtest("build with system includes",
+		 {$td->COMMAND => "abuild SI=1",
+		  $td->FILTER => "perl $top/filter-gcc-warnings.pl"},
+		 {$td->STRING => "warnings: ../d2/c.h\n",
+		  $td->EXIT_STATUS => 0},
+		 $td->NORMALIZE_NEWLINES);
+}
+else
+{
+    # force files to be accessed
+    system("(tar cf - . | cat > /dev/null)");
+}
+
+
 check_work_accessed($td);
 
-$td->report(110 + ($msvc ? 24 : 0) + ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));
+$td->report(110 + ($msvc ? 24 : 0) + ($gcc ? 3 : 0) +
+	    ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));

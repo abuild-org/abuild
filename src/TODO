@@ -1,17 +1,3 @@
-1.1.6
-=====
-
- * Think about whether to support some way of getting -isystem instead
-   of -I for includes under a certain directory.  Ideal
-   implementation: have an interface variable (probably global) called
-   SYSTEM_INCLUDES that you can add directories to when they should be
-   treated as system includes.  Any include path at or below one of
-   those directories will be treated as a system include directory by
-   abuild if the compiler supports it.  For gcc, this would mean using
-   -isystem instead of -I.  This can be done without changing the
-   order of include path searching.
-
-
 Next
 ====
 

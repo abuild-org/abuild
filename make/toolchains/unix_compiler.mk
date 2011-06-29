@@ -19,6 +19,16 @@
 #   soname_args -- $(call soname_args,soname) returns arguments to set the
 #       soname to be stored in the shared library
 
+# Users of this file may define the following:
+
+#   INCLUDE_FLAG -- flag to pass the compiler to specify an include
+#       directory.  Default is -I.  Flag is prepended to a directory
+#       without a space between the flag and the directory.
+#   SYSTEM_INCLUDE_FLAG -- flag to pass the compiler to specify a
+#       system include directory.  Default is $(INCLUDE_FLAGS).  Flag
+#       is prepended to a directory without a space between the flag
+#       and the directory.
+
 # It is assumed that the "debug" and "release" platform options are
 # supported.  We clear OFLAGS and DFLAGS respectively in those cases.
 
@@ -55,9 +65,12 @@ COMPILE_cxx = $(CXX)
 LINK_c = $(CC)
 LINK_cxx = $(CXX)
 
+INCLUDE_FLAG ?= -I
+SYSTEM_INCLUDE_FLAG ?= $(INCLUDE_FLAG)
+
 # Usage: $(call include_flags,include-dirs)
 define include_flags
-	$(foreach I,$(1),-I$(I))
+	$(foreach I,$(1),$(if $(call starts_with_any,$(SYSTEM_INCLUDES),$(I)),$(SYSTEM_INCLUDE_FLAG),$(INCLUDE_FLAG))$(I))
 endef
 
 # Usage: $(call make_obj,compiler,pic,flags,src,obj)

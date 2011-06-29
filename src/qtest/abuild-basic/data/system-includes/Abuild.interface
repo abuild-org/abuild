@@ -1,0 +1,4 @@
+INCLUDES = d1 d1/s1 d2
+if (equals($(PARAM:SI:0), 1))
+  SYSTEM_INCLUDES = d1
+endif

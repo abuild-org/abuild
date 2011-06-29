@@ -17,6 +17,7 @@ RANLIB = ranlib
 PIC_FLAGS =
 SHARED_FLAGS = -shared
 soname_args =
+SYSTEM_INCLUDE_FLAG := -isystem$(_space)
 
 CCXX_GEN_DEPS = @:
 
