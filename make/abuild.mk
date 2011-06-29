@@ -83,7 +83,8 @@ endif
 doc:: all ;
 
 # Make sure check, test, and test-only are defined and that check and
-# test depend on all.
+# test depend on all.  Individual test implementations still have to
+# do this same thing -- see qtest-support.mk.
 check test:: all ;
 test-only:: ;
 

@@ -4842,13 +4842,16 @@ traits: deployable tester -item=potato.lib -item=potato.bin unclassified
      the appropriate code to the appropriate targets.  For make-based
      items, you must make sure that your tests are run by the
      <command>check</command>, <command>test</command>, and
-     <command>test-only</command> targets.  For Groovy-based items,
-     you must make sure that your tests are run by the
-     <command>test-only</command> target, and &abuild; will take care
-     of making sure it is run by the <command>test</command> and
-     <command>check</command> targets.  For details on plugins, see
-     <xref linkend="ref.plugins"/>.  For details on writing make
-     rules, see <xref
+     <command>test-only</command> targets.  You also must ensure that
+     your <command>check</command> and <command>test</command> targets
+     depend on <command>all</command> and that your
+     <command>test-only</command> target does not depend on
+     <command>all</command>.  For Groovy-based items, you must make
+     sure that your tests are run by the <command>test-only</command>
+     target, and &abuild; will take care of making sure it is run by
+     the <command>test</command> and <command>check</command> targets.
+     For details on plugins, see <xref linkend="ref.plugins"/>.  For
+     details on writing make rules, see <xref
      linkend="ref.guidelines-for-make-rule-authors"/>.  For details on
      writing rules for the Groovy backend, see <xref
      linkend="ref.guidelines-for-groovy-target-authors"/>.
@@ -15922,10 +15925,16 @@ native-compiler qcc
         If you are adding support for a new test driver, you should
         make sure that your test driver is invoked from the
         <command>check</command>, <command>test</command>, and
-        <command>test-only</command> targets.  &Abuild; internally
-        takes care of the dependency of <command>check</command> and
-        <command>test</command> on <command>all</command> so you don't
-        have to.  For an example, see
+        <command>test-only</command> targets.  You must also ensure
+        that both the <command>check</command> and
+        <command>test</command> targets depend on the
+        <command>all</command> target but that the
+        <command>test-only</command> target does not depend on the
+        <command>all</command> target.  &Abuild; internally provides
+        this construct for these targets that don't do anything, so if
+        your test support only operates conditionally upon the
+        presence of test files, you don't have to worry about
+        conditionally defining empty targets.  For an example, see
         <filename>make/qtest-support.mk</filename> in the &abuild;
         distribution.
        </para>
@@ -17459,6 +17468,12 @@ Y = $(X)
           <para>
            Duplicated dependencies and duplicated tree dependencies
            are now reported as errors.
+          </para>
+         </listitem>
+         <listitem>
+          <para>
+           When using qtest, the <command>test-only</command> target
+           no longer depends on the <command>all</command> target.
           </para>
          </listitem>
         </itemizedlist>

@@ -1,9 +1,6 @@
 1.1.6
 =====
 
- * test-only should not depend on all in qtest-support.mk.  Make sure
-   this causes a test failure, then fix.
-
  * Think about whether to support some way of getting -isystem instead
    of -I for includes under a certain directory.  Ideal
    implementation: have an interface variable (probably global) called

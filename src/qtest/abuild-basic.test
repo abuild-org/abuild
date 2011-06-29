@@ -644,6 +644,51 @@ $td->runtest("qtest coverage",
 	      $td->EXIT_STATUS => 0},
 	     $td->NORMALIZE_NEWLINES);
 
+cd("work/qtest-support");
+
+$td->runtest("build",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/all-target.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("rebuild",
+	     {$td->COMMAND => "abuild",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/all-target-up-to-date.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+sleep 1;
+my $now = time;
+utime $now, $now, "prog.c" or die;
+
+$td->runtest("check target",
+	     {$td->COMMAND => "abuild check",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/check-target.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+sleep 1;
+$now = time;
+utime $now, $now, "prog.c" or die;
+
+$td->runtest("test-only target",
+	     {$td->COMMAND => "abuild test-only",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/test-only-target.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
+$td->runtest("test target",
+	     {$td->COMMAND => "abuild test",
+	      $td->FILTER => "perl $filters/filter-abuild.pl"},
+	     {$td->FILE => "$top/test-target.out",
+	      $td->EXIT_STATUS => 0},
+	     $td->NORMALIZE_NEWLINES);
+
 cd("work/msvc");
 
 my $msvc = ($platform_native =~ m/\.msvc$/);
@@ -768,4 +813,4 @@ else
 
 check_work_accessed($td);
 
-$td->report(105 + ($msvc ? 24 : 0) + ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));
+$td->report(110 + ($msvc ? 24 : 0) + ($gcc32 ? 3 : 0) + ($gcc64 ? 3 : 0));

@@ -1,0 +1,7 @@
+abuild: build starting
+abuild: qtest-support (abuild-<native>): all
+make: Entering directory `--topdir--/qtest-support/abuild-<native>'
+Compiling ../prog.c as C
+Creating prog executable
+make: Leaving directory `--topdir--/qtest-support/abuild-<native>'
+abuild: build complete
