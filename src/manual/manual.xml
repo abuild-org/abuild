@@ -17468,6 +17468,17 @@ Y = $(X)
            no longer depends on the <command>all</command> target.
           </para>
          </listitem>
+         <listitem>
+          <para>
+           When dependencies are duplicated and platform
+           specifications are associated with at least one of the
+           dependencies, it is reported as an error.  In the past, the
+           last platform specifier given would silently be used over
+           others, which could lead people to a false sense of
+           security if they were trying to declare a dependency on two
+           different platform types.
+          </para>
+         </listitem>
         </itemizedlist>
        </listitem>
        <listitem>
@@ -17478,7 +17489,7 @@ Y = $(X)
          <listitem>
           <para>
            Duplicated dependencies and duplicated tree dependencies
-           are now reported as errors.
+           are now reported as warnings.
           </para>
          </listitem>
         </itemizedlist>
