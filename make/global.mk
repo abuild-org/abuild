@@ -57,7 +57,12 @@ _comma := ,
 GEN_DEPS := $(abBIN)/gen_deps
 
 # Usage: $(call starts_with s1,s2) -- returns 1 if s2 starts with s1
-# and the empty string otherwise
+# and the empty string otherwise.  Caveat: this does not take path
+# separators into consideration, so $(call starts_with
+# /usr/lib,/usr/libexec) would return 1 even though that's probably
+# not what we want.  I am making the conscious decision to disregard
+# this case as it is not likely to happen or to be harmful if it did,
+# and handling it would needlessly complicate the code.
 define starts_with
 $(if $(filter $(1)%,$(2)),1)
 endef
