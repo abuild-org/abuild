@@ -12,12 +12,18 @@
 --topdir--/a/ab/Abuild.conf:1: ERROR: -optional is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf:1: ERROR: flag -flag=moo is not preceded by a build item name
 --topdir--/a/ab/Abuild.conf:1: ERROR: platform declaration -platform=oink is not preceded by a build item name
---topdir--/a/ab/Abuild.conf:1: ERROR: a platform has already been declared for dependency b.private
+--topdir--/a/ab/Abuild.conf:1: ERROR: a platform has already been declared for dependency "b.private"
 --topdir--/a/ab/Abuild.conf:1: ERROR: invalid platform selector other:skip
 --topdir--/a/ab/Abuild.conf:1: ERROR: invalid dependency !heh!
---topdir--/a/ab/Abuild.conf:1: ERROR: dependency a appears more than once
---topdir--/a/ab/Abuild.conf:1: ERROR: dependency b appears more than once
---topdir--/a/ab/Abuild.conf:1: ERROR: dependency b appears more than once
+--topdir--/a/ab/Abuild.conf:1: WARNING: dependency "a" appears more than once
+--topdir--/a/ab/Abuild.conf:1: ERROR: platform specification applies to a dependency ("a") that had been previously declared
+--topdir--/a/ab/Abuild.conf:1: WARNING: dependency "b" appears more than once
+--topdir--/a/ab/Abuild.conf:1: WARNING: dependency "b" appears more than once
+--topdir--/a/ab/Abuild.conf:1: WARNING: dependency "c" appears more than once
+--topdir--/a/ab/Abuild.conf:1: ERROR: a previous declaration of this dependency ("c") included a platform specification
+--topdir--/a/ab/Abuild.conf:1: WARNING: dependency "c" appears more than once
+--topdir--/a/ab/Abuild.conf:1: ERROR: a previous declaration of this dependency ("c") included a platform specification
+--topdir--/a/ab/Abuild.conf:1: ERROR: a platform has already been declared for dependency "c"
 --topdir--/a/ab/Abuild.conf:1: ERROR: visible-to not permitted for public build items
 --topdir--/a/ab/Abuild.conf:1: ERROR: flag names may contain only alphanumeric characters, underscores, periods, and dashes
 --topdir--/a/ab/Abuild.conf:1: ERROR: -global is not preceded by a plugin
@@ -71,6 +77,7 @@
 --topdir--/a/ab/Abuild.conf:1: ERROR: ab may not depend on b.private because it is private to another scope
 --topdir--/d/a/Abuild.conf:1: ERROR: d.a may not depend on d.b.a because it is private to another scope
 --topdir--/a/ab/Abuild.conf:1: ERROR: ab depends on unknown build item b.private
+--topdir--/a/ab/Abuild.conf:1: ERROR: ab depends on unknown build item c
 --topdir--/c/ca/Abuild.conf:1: ERROR: ca depends on unknown build item cc
 --topdir--/c/cc/Abuild.conf:1: ERROR: cc.private depends on unknown build item cc
 --topdir--/a/ab/Abuild.conf:1: ERROR: ab requests building of unknown build item "does-not-exist"

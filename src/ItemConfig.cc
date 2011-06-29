@@ -786,6 +786,7 @@ ItemConfig::checkDeps()
     boost::regex item_name_re(ITEM_NAME_RE);
     boost::smatch match;
     std::set<std::string> deps_seen;
+    std::set<std::string> duplicated_deps;
 
     this->deps = Util::splitBySpace(this->kv.getVal(k_DEPS));
 
@@ -801,9 +802,20 @@ ItemConfig::checkDeps()
 	    if (deps_seen.count(last_dep) != 0)
 	    {
 		QTC::TC("abuild", "ItemConfig ERR repeated dep");
-		this->error.error(this->location, "dependency " + last_dep +
-				  " appears more than once");
+		duplicated_deps.insert(last_dep);
+		this->error.warning(
+		    this->location,
+		    "dependency \"" + last_dep +
+		    "\" appears more than once");
 		this->deps.erase(iter, next);
+		if (this->dep_platform_types.count(last_dep) != 0)
+		{
+		    QTC::TC("abuild", "ItemConfig ERR repeated dep with pt");
+		    this->error.error(
+			this->location,
+			"a previous declaration of this dependency (\"" +
+			last_dep + "\") included a platform specification");
+		}
 	    }
 	    else
 	    {
@@ -841,9 +853,19 @@ ItemConfig::checkDeps()
 			QTC::TC("abuild", "ItemConfig ERR duplicate dep ptype");
 			this->error.error(this->location,
 					  "a platform has already"
-					  " been declared for dependency " +
-					  last_dep);
+					  " been declared for dependency \"" +
+					  last_dep + "\"");
 		    }
+		    else if (duplicated_deps.count(last_dep) != 0)
+		    {
+			QTC::TC("abuild", "ItemConfig ERR pt on repeated dep");
+			this->error.error(
+			    this->location,
+			    "platform specification applies to a"
+			    " dependency (\"" +
+			    last_dep + "\") that had been previously declared");
+		    }
+
 		    std::string dep_platform_type = match.str(1);
 		    PlatformSelector p;
 		    if (dep_platform_type.find(':') != std::string::npos)
@@ -913,8 +935,9 @@ ItemConfig::checkTreeDeps()
 	    if (deps_seen.count(last_dep) != 0)
 	    {
 		QTC::TC("abuild", "ItemConfig ERR repeated treedep");
-		this->error.error(this->location, "tree dependency "
-				  + last_dep + " appears more than once");
+		this->error.warning(
+		    this->location, "tree dependency \""
+		    + last_dep + "\" appears more than once");
 		this->tree_deps.erase(iter, next);
 	    }
 	    else

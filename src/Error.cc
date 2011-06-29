@@ -78,6 +78,12 @@ Error::error(FileLocation const& location, std::string const& msg,
 }
 
 void
+Error::warning(FileLocation const& location, std::string const& msg)
+{
+    logText(location, "WARNING: " + msg, Logger::NO_JOB);
+}
+
+void
 Error::deprecate(std::string const& version,
 		 FileLocation const& location, std::string const& orig_message,
 		 Logger::job_handle_t job)

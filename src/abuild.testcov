@@ -456,3 +456,5 @@ BuildItem found compatible platform type 0
 Abuild-build ERR forced fail 0
 ItemConfig ERR repeated dep 0
 ItemConfig ERR repeated treedep 0
+ItemConfig ERR repeated dep with pt 0
+ItemConfig ERR pt on repeated dep 0

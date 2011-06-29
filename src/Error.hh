@@ -18,6 +18,10 @@ class Error
 	       Logger::job_handle_t job = Logger::NO_JOB,
 	       bool count_as_error = true);
 
+    // Writes a warning message using the logger; does not increment
+    // error count
+    void warning(FileLocation const&, std::string const&);
+
     // Writes a deprecation error or warning
     void deprecate(std::string const& version,
 		   FileLocation const&, std::string const&,

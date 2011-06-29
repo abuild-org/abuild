@@ -130,6 +130,7 @@
      </dependency>
      <dependency name="a" platform-type="x"/>
      <dependency name="b"/>
+     <dependency name="c" platform-type="z"/>
     </declared-dependencies>
     <expanded-dependencies>
      <dependency name="a"/>
