@@ -7,8 +7,8 @@
 <!ENTITY mdash "&#x2014;">
 <!ENTITY nbsp "&#xA0;">
 <!ENTITY indent "&#x2014;/">
-<!ENTITY swversion "1.1.5">
-<!ENTITY lastreleased "February 18, 2011">
+<!ENTITY swversion "1.1.6">
+<!ENTITY lastreleased "June 30, 2011">
 ]>
 <!--
 
@@ -17494,7 +17494,7 @@ Y = $(X)
 
  end template -->
     <varlistentry>
-     <term>1.1.6: XXX</term>
+     <term>1.1.6: June 30, 2011</term>
      <listitem>
       <itemizedlist>
        <listitem>
@@ -17507,7 +17507,9 @@ Y = $(X)
            The <command>verify-compiler</command> command used for
            testing your own compiler plugins did not work with nested
            platform types.  Nested platform types were added to abuild
-           in version 1.1.5.
+           in version 1.1.5, and compiler plugins worked with them; it
+           was only the <command>verify-compiler</command> command
+           itself that was broken.
           </para>
          </listitem>
          <listitem>
