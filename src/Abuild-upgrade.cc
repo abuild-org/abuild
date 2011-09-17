@@ -194,10 +194,8 @@ Abuild::constructTreeGraph(UpgradeData& ud, DependencyGraph& g)
 	}
 
 	FileLocation location(dir + "/" + ItemConfig::FILE_CONF, 0, 0);
-	bool has_backing = false;
 	if (Util::isFile(dir + "/" + BackingConfig::FILE_BACKING))
 	{
-	    has_backing = true;
 	    std::list<std::string> const& backing_areas =
 		readBacking(dir)->getBackingAreas();
 	    for (std::list<std::string>::const_iterator iter =
