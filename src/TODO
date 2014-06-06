@@ -1,3 +1,23 @@
+Post-Death Notes
+================
+
+This is a log of changes made since the end of abuild's life. These
+changes are not incorporated in the docs or README files.
+
+ * Groovy: put a groovy 2.x version in the lib directory
+
+ * Copied ant-contrib into the lib directory so abuild can be built
+   without having ant-contrib in ant's lib directory. This wouldn't be
+   good for real because it means ant-contrib is always present, which
+   is undesirable since it precludes having a build that doesn't
+   include ant-contrib.
+
+Would be nice:
+
+ * Create a version of abuild after surgically removing java, backing
+   areas, and all deprecation. But it will never happen.
+
+
 Next
 ====
 
