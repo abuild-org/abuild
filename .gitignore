@@ -1,0 +1,4 @@
+src/abuild-*.*.*.*
+src/autoconf/abuild-*.*.*.*
+src/java-support/abuild-java
+src/manual/abuild-indep
